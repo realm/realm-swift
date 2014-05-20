@@ -19,13 +19,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectSchema.h"
-#import "RLMPrivate.hpp"
+#import "RLMProperty_Private.h"
+#import <tightdb/table.hpp>
 
+
+// private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
 @end
+
 
 @implementation RLMObjectSchema
 
@@ -76,10 +80,10 @@
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned long col = 0; col < count; col++) {
         // create new property
-        RLMProperty *prop = [RLMProperty new];
-        prop.name = [NSString stringWithUTF8String:table->get_column_name(col).data()];
-        prop.type = RLMPropertyType(table->get_column_type(col));
-        prop.column = col;
+        NSString *name = [NSString stringWithUTF8String:table->get_column_name(col).data()];
+        RLMProperty *prop = [[RLMProperty alloc] initWithName:name
+                                                         type:RLMPropertyType(table->get_column_type(col))
+                                                       column:col];
         
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             @throw [NSException exceptionWithName:@"RLMNotImplementedException" reason:@"Not implemented." userInfo:nil];

@@ -17,30 +17,24 @@
 // from TightDB Incorporated.
 //
 ////////////////////////////////////////////////////////////////////////////
-#import "RLMObjectStore.h"
-#import "RLMSchema.h"
-#import "RLMObjectSchema.h"
-#import "RLMPrivate.hpp"
+
+#import "RLMRealm_Private.hpp"
+#import "RLMArray_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
+#import "RLMAccessor.h"
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
 
 #import <objc/runtime.h>
 
-RLMSchema *s_currentSchema;
-
+// initializer
 void RLMInitializeObjectStore() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // register accessor cache
         RLMAccessorCacheInitialize();
-
-        // get the schema for current object interfaces
-        s_currentSchema = [RLMSchema schemaForRuntimeObjects];
     });
-}
-
-RLMSchema *RLMSharedSchema() {
-    return s_currentSchema;
 }
 
 // get the table used to store object of objectClass
@@ -140,20 +134,21 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order) {
     // get table for this calss
-    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:objectClassName];
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    array.backingTable = table.get();
-    array.backingTableIndex = array.backingTable->get_index_in_parent();
     
     // create view from table and predicate
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    array.backingQuery = new tightdb::Query(table->where());
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
+    tightdb::Query *query = new tightdb::Query(table->where());
+    RLMUpdateQueryWithPredicate(query, predicate, schema);
     
     // create view and sort
-    tightdb::TableView view = array.backingQuery->find_all();
+    tightdb::TableView view = query->find_all();
     RLMUpdateViewWithOrder(view, order, schema);
-    array.backingView = view;
+    
+    // create and populate array
+    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:objectClassName query:query view:view];
+    array.backingTable = table.get();
+    array.backingTableIndex = array.backingTable->get_index_in_parent();
     array.realm = realm;
     [realm registerAccessor:array];
     return array;

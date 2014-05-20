@@ -18,29 +18,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMArray.h"
+#import "RLMAccessor.h"
+#import <tightdb/query.hpp>
 
-#import <Foundation/Foundation.h>
-#import <objc/runtime.h>
-#import "RLMConstants.h"
-
-// object property definition
-@interface RLMProperty : NSObject
-
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
-
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
-
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly) NSString *objectClassName;
-
+// RLMArray private members and accessor
+@interface RLMArray () <RLMAccessor>
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                  query:(tightdb::Query *)query
+                                   view:(tightdb::TableView &)view;
 @end
 
 

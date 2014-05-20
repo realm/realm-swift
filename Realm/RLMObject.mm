@@ -18,9 +18,7 @@
  *
  **************************************************************************/
 
-#import "RLMPrivate.hpp"
-#import "RLMObject.h"
-#import "RLMObjectSchema.h"
+#import "RLMObject_Private.h"
 #import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
@@ -85,6 +83,10 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 #pragma GCC diagnostic pop
 
 - (void)setWritable:(BOOL)writable {
+    if (!_realm) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
+    }
+    
     // set accessor class based on write permission
     // FIXME - this lookup should be optimized
     // FIXME - we are assuming this is always an accessor subclass

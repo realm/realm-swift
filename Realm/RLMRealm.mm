@@ -18,11 +18,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
-#import "RLMConstants.h"
-#import "RLMPrivate.hpp"
-#import "RLMObjectSchema.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
+#import "RLMConstants.h"
 #import "RLMQueryUtil.h"
 
 #include <exception>
@@ -270,11 +269,11 @@ static NSArray *s_objectDescriptors = nil;
         [realm beginReadTransaction];
         
         // for dynamic realms, get schema from stored tables
-        realm.schema = [RLMSchema schemaFromTablesInRealm:realm];
+        realm.schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
         // set the schema for this realm
-        realm.schema = RLMSharedSchema();
+        realm.schema = [RLMSchema sharedSchema];
         
         // initialize object store for this realm
         RLMEnsureRealmTablesExist(realm);

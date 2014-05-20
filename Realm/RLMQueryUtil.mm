@@ -20,6 +20,7 @@
 
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
+#import "RLMProperty_Private.h"
 #import "NSData+RLMGetBinaryData.h"
 
 // small helper to create the many exceptions thrown when parsing predicates

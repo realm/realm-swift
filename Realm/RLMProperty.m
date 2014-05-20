@@ -19,66 +19,72 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMProperty.h"
-#import "RLMObjectSchema.h"
-#import "RLMPrivate.hpp"
-#import "RLMUtil.h"
-#import "RLMObjectStore.h"
+#import "RLMProperty_Private.h"
+#import "RLMObject.h"
 
 // private properties
 @interface RLMProperty ()
 @property (nonatomic, assign) BOOL dynamic;
 @property (nonatomic, assign) BOOL nonatomic;
+
 @end
 
 @implementation RLMProperty
 
-@synthesize getterName = _getterName;
-@synthesize setterName = _setterName;
-
+-(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column {
+    self = [super init];
+    if (self) {
+        _name = name;
+        _type = type;
+        _column = column;
+    }
+    
+    return self;
+}
 
 // determine RLMPropertyType from objc code
 -(void)parsePropertyTypeString:(const char *)code {
-    self.objcType = *(code);    // first char of type attr
+    _objcType = *(code);    // first char of type attr
     if (self.objcType == 'q') {
-        self.objcType = 'l';    // collapse these as they are the same
+        _objcType = 'l';    // collapse these as they are the same
     }
     
     // map to RLMPropertyType
     switch (self.objcType) {
         case 'i':   // int
         case 'l':   // long
-            self.type = RLMPropertyTypeInt;
+            _type = RLMPropertyTypeInt;
             break;
         case 'f':
-            self.type = RLMPropertyTypeFloat;
+            _type = RLMPropertyTypeFloat;
             break;
         case 'd':
-            self.type = RLMPropertyTypeDouble;
+            _type = RLMPropertyTypeDouble;
             break;
         case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
         case 'B':
-            self.type = RLMPropertyTypeBool;
+            _type = RLMPropertyTypeBool;
             break;
         case '@':
         {
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
-                self.type = RLMPropertyTypeAny;
+                _type = RLMPropertyTypeAny;
             }
             else if ([type isEqualToString:@"@\"NSString\""]) {
-                self.type = RLMPropertyTypeString;
+                _type = RLMPropertyTypeString;
             }
             else if ([type isEqualToString:@"@\"NSDate\""]) {
-                self.type = RLMPropertyTypeDate;
+                _type = RLMPropertyTypeDate;
             }
             else if ([type isEqualToString:@"@\"NSData\""]) {
-                self.type = RLMPropertyTypeData;
+                _type = RLMPropertyTypeData;
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // get object class and set type
-                self.objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
-                self.type = RLMPropertyTypeArray;
+                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
+                _type = RLMPropertyTypeArray;
                 
                 // verify type
                 Class cls = NSClassFromString(self.objectClassName);
@@ -88,8 +94,8 @@
             }
             else {
                 // get object class and set type
-                self.objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
-                self.type = RLMPropertyTypeObject;
+                _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
+                _type = RLMPropertyTypeObject;
                 
                 // verify type
                 Class cls = NSClassFromString(self.objectClassName);
@@ -100,7 +106,7 @@
             break;
         }
         default:
-            self.type = RLMPropertyTypeNone;
+            _type = RLMPropertyTypeNone;
             break;
     }
 }
@@ -108,10 +114,10 @@
 +(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp column:(NSUInteger)column
 {
     // create new property
-    RLMProperty *prop = [RLMProperty new];
-    prop.name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
-    prop.column = column;
-    
+    NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
+    RLMProperty *prop = [[RLMProperty alloc] initWithName:name
+                                                     type:RLMPropertyTypeNone
+                                                   column:column];
     // parse attributes
     unsigned int attCount;
     objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);

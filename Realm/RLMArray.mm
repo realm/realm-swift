@@ -18,14 +18,27 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMArray.h"
-#import "RLMPrivate.hpp"
+#import "RLMArray_Private.hpp"
+#import "RLMArrayAccessor.h"
+
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMConstants.h"
-#import "RLMArrayAccessor.h"
 
 #import <objc/runtime.h>
+
+#import <tightdb/util/unique_ptr.hpp>
+
+//
+// Private properties
+//
+@interface RLMArray ()
+@property (nonatomic, assign) tightdb::Query *backingQuery;
+@property (nonatomic, assign) tightdb::TableView backingView;
+@property (nonatomic, assign) NSString *objectClassName;
+@end
 
 //
 // RLMArray implementation
@@ -40,6 +53,18 @@
 @synthesize backingTableIndex = _backingTableIndex;
 @synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                  query:(tightdb::Query *)query
+                                   view:(tightdb::TableView &)view {
+    self = [super init];
+    if (self) {
+        self.objectClassName = objectClassName;
+        self.backingQuery = query;
+        self.backingView = view;
+    }
+    return self;
+}
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     self = [super init];
@@ -165,8 +190,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     array.realm = _realm;
     array.backingTable = _backingTable;
     array.backingTableIndex = _backingTableIndex;
-    array.backingView = _backingView;
     array.backingQuery = new tightdb::Query(*_backingQuery);
+    array.backingView = array.backingQuery->find_all();
+    
+    // FIXME - we are not sorting properly as the following line doesn't link
+    // array.backingView.apply_same_order(_backingView);
+    
     [_realm registerAccessor:array];
     return array;
 }
