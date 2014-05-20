@@ -47,5 +47,7 @@ realm-ios-*.zip
 .idea/
 *.iml
 
-
+# backup and crash files
+*.swp
+*~
 

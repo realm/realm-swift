@@ -283,7 +283,7 @@ Class RLMCreateAccessorClass(Class objectClass,
                              NSString *accessorClassPrefix,
                              IMP (*getterGetter)(NSUInteger, char, Class),
                              IMP (*setterGetter)(NSUInteger, char)) {
-    // if objectClass is RLMRow use it, otherwise use proxy class
+    // if objectClass is RLMObject use it, otherwise use proxy class
     if (!RLMIsSubclass(objectClass, RLMObject.class)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
