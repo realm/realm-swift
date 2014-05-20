@@ -7,8 +7,8 @@ library has already been installed.**
 
 You can use CocoaPods to install the Realm Core library. In the
 root folder of this repository you find the file `Podfile`. It points
-to the latest version of the Realm Core library. To create a 
-Xcode workspace and downloading the Realm Core library you must
+to the latest version of the Realm Core library. To create an 
+Xcode workspace and download the Realm Core library you must
 run the following command:
 
     pod install
