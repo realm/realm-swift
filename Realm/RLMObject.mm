@@ -88,14 +88,12 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     }
     
     // set accessor class based on write permission
-    // FIXME - this lookup should be optimized
     // FIXME - we are assuming this is always an accessor subclass
-    RLMObjectSchema *schema = _realm.schema[NSStringFromClass(self.superclass.class)];
     if (writable) {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, schema));
+        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _schema));
     }
     else {
-        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, schema));
+        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, _schema));
     }
     _writable = writable;
 }

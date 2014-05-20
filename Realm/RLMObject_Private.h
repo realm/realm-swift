@@ -20,11 +20,13 @@
 
 #import "RLMObject.h"
 #import "RLMAccessor.h"
+#import "RLMObjectSchema.h"
 
 // RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
 
 @property (nonatomic, readwrite) RLMRealm *realm;
+@property (nonatomic) RLMObjectSchema *schema;
 
 @end
 

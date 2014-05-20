@@ -293,6 +293,11 @@ Class RLMCreateAccessorClass(Class objectClass,
         return cls;
     }
     
+    // throw if no schema, prefix, or object class
+    if (!objectClass || !schema || !accessorClassPrefix) {
+        @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
+    }
+    
     // if objectClass is a dicrect RLMSubclass use it, otherwise use proxy class
     if (class_getSuperclass(objectClass) != RLMObject.class) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
@@ -318,7 +323,6 @@ Class RLMCreateAccessorClass(Class objectClass,
             IMP setterImp = setterGetter(prop.column, accessorCode);
             class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
         }
-
     }
     
     // cache and return

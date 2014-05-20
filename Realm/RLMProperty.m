@@ -37,9 +37,51 @@
         _name = name;
         _type = type;
         _column = column;
+        [self updateAccessorNames];
+        [self setObjcCodeFromType];
     }
     
     return self;
+}
+
+-(void)updateAccessorNames {
+    // populate getter/setter names if generic
+    if (!_getterName) {
+        _getterName = _name;
+    }
+    if (!_setterName) {
+        _setterName = [NSString stringWithFormat:@"set%c%@:", toupper(_name.UTF8String[0]), [_name substringFromIndex:1]];
+    }
+}
+
+-(void)setObjcCodeFromType {
+    switch (_type) {
+        case RLMPropertyTypeInt:
+            _objcType = 'i';
+            break;
+        case RLMPropertyTypeBool:
+            _objcType = 'c';
+            break;
+        case RLMPropertyTypeDouble:
+            _objcType = 'd';
+            break;
+        case RLMPropertyTypeFloat:
+            _objcType = 'f';
+            break;
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
+            _objcType = '@';
+            break;
+        default:
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid property type"
+                                         userInfo:nil];
+            break;
+    }
 }
 
 // determine RLMPropertyType from objc code
@@ -115,9 +157,10 @@
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
-    RLMProperty *prop = [[RLMProperty alloc] initWithName:name
-                                                     type:RLMPropertyTypeNone
-                                                   column:column];
+    RLMProperty *prop = [RLMProperty new];
+    prop->_name = name;
+    prop->_column = column;
+    
     // parse attributes
     unsigned int attCount;
     objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);
@@ -151,13 +194,8 @@
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     
-    // populate getter/setter names if generic
-    if (!prop.getterName) {
-        prop.getterName = prop.name;
-    }
-    if (!prop.setterName) {
-        prop.setterName = [NSString stringWithFormat:@"set%c%@:", toupper(prop.name.UTF8String[0]), [prop.name substringFromIndex:1]];
-    }
+    // update getter/setter names
+    [prop updateAccessorNames];
     
     return prop;
 }
