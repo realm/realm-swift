@@ -19,9 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
-@class RLMObjectSchema;
-@class RLMProperty;
+#import "RLMObjectSchema.h"
 
 @interface RLMSchema : NSObject
 
@@ -54,4 +52,5 @@
 - (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;
 
 @end
+
 

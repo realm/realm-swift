@@ -49,14 +49,6 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 
 //
-// Schema
-//
-
-// Shared schema for current runtime objects
-RLMSchema *RLMSharedSchema();
-
-
-//
 // Accessor Creation
 //
 

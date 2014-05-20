@@ -18,10 +18,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAccesor.h"
-#import "RLMPrivate.hpp"
+#import "RLMAccessor.h"
 #import "RLMUtil.h"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
+#import "RLMObject.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
