@@ -52,5 +52,9 @@ Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
+//
+// Dynamic accessor creation
+//
+Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version);
 
 

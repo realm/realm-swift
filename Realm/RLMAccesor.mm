@@ -287,13 +287,14 @@ Class RLMCreateAccessorClass(Class objectClass,
                              NSString *accessorClassPrefix,
                              IMP (*getterGetter)(NSUInteger, char, Class),
                              IMP (*setterGetter)(NSUInteger, char)) {
-    // if objectClass is RLMRow use it, otherwise use proxy class
-    if (!RLMIsSubclass(objectClass, RLMObject.class)) {
+    // if objectClass is a dicrect RLMSubclass use it, otherwise use proxy class
+    if (class_getSuperclass(objectClass) != RLMObject.class) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
     
     // create and register proxy class which derives from object class
-    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:NSStringFromClass(objectClass)];
+    NSString *objectClassName = NSStringFromClass(objectClass);
+    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:objectClassName];
     Class proxyClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
     objc_registerClassPair(proxyClass);
     
@@ -366,5 +367,23 @@ Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
                                                  NULL, RLMAccessorSetter);
     [s_insertionAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
+}
+
+// Dynamic accessor name for a classname
+inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
+    return [NSString stringWithFormat:@"RLMDynamic_%@_Version%lu", className, (unsigned long)version];
+}
+
+// Get or generate a dynamic class from a table and classname
+Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version) {
+    // generate our new classname, and check if it exists
+    NSString *dynamicName = RLMDynamicClassName(schema.className, version);
+    Class dynamicClass = NSClassFromString(dynamicName);
+    if (!dynamicClass) {
+        // if we don't have this class, create a subclass or RLMObject
+        dynamicClass = objc_allocateClassPair(RLMObject.class, dynamicName.UTF8String, 0);
+        objc_registerClassPair(dynamicClass);
+    }
+    return dynamicClass;
 }
 

@@ -158,7 +158,6 @@ static NSArray *s_objectDescriptors = nil;
                                                       selector:@selector(checkForUpdate)
                                                       userInfo:nil
                                                        repeats:YES];
-        _schema = RLMSharedSchema();
     }
     return self;
 }
@@ -207,6 +206,14 @@ static NSArray *s_objectDescriptors = nil;
 
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                        error:(NSError **)outError
+{
+    return [self realmWithPath:path readOnly:readonly dynamic:NO error:outError];
+}
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
                         error:(NSError **)outError
 {
     NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
@@ -258,14 +265,26 @@ static NSArray *s_objectDescriptors = nil;
         return nil;
     }
     
-    // initialize object store for this realm
-    RLMEnsureRealmTablesExist(realm);
-    
-    // cache main thread realm at this path
-    cacheRealm(realm, path);
-
-    // begin read transaction
-    [realm beginReadTransaction];
+    if (dynamic) {
+        // begin read transaction
+        [realm beginReadTransaction];
+        
+        // for dynamic realms, get schema from stored tables
+        realm.schema = [RLMSchema schemaFromTablesInRealm:realm];
+    }
+    else {
+        // set the schema for this realm
+        realm.schema = RLMSharedSchema();
+        
+        // initialize object store for this realm
+        RLMEnsureRealmTablesExist(realm);
+        
+        // cache main thread realm at this path
+        cacheRealm(realm, path);
+        
+        // begin read transaction
+        [realm beginReadTransaction];
+    }
     
     return realm;
 }
@@ -477,6 +496,11 @@ static NSArray *s_objectDescriptors = nil;
         RLM_PREDICATE(predicate, outPredicate);
     }
     return RLMGetObjects(self, objectClassName, outPredicate, order);
+}
+
+-(NSUInteger)schemaVersion {
+    // FIXME - store version in metadata table
+    return 0;
 }
 
 #pragma GCC diagnostic push

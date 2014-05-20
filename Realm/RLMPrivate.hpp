@@ -63,6 +63,8 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 +(instancetype)schemaForRuntimeObjects;
 // schema based on tables in a realm
 +(instancetype)schemaFromTablesInRealm:(RLMRealm *)realm;
+// get object class to use for a given class name
+-(Class)objectClassForClassName:(NSString *)className;
 @end
 
 

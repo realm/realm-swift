@@ -161,8 +161,10 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessor and register with realm
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
-    // FIXME - support cutom class types
-    Class objectClass = NSClassFromString(objectClassName);
+    // get object classname to use from the schema
+    Class objectClass = [realm.schema objectClassForClassName:objectClassName];
+    
+    // get acessor fot the object class
     Class accessorClass = RLMAccessorClassForObjectClass(objectClass, realm.schema[objectClassName]);
     RLMObject *accessor = [[accessorClass alloc] init];
     accessor.realm = realm;

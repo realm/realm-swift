@@ -77,6 +77,8 @@
 		02D16106192AD333007ACF50 /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = 02D16103192AD333007ACF50 /* RLMSchema.h */; };
 		02D1610A192AD377007ACF50 /* RLMSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02D16109192AD377007ACF50 /* RLMSchema.mm */; };
 		02D1610B192AD377007ACF50 /* RLMSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02D16109192AD377007ACF50 /* RLMSchema.mm */; };
+		02D1610D192AEABA007ACF50 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D1610C192AEABA007ACF50 /* DynamicTests.m */; };
+		02D1610E192AEABA007ACF50 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D1610C192AEABA007ACF50 /* DynamicTests.m */; };
 		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
@@ -163,6 +165,7 @@
 		02D160E2192A716B007ACF50 /* RLMArrayAccessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMArrayAccessor.m; sourceTree = "<group>"; };
 		02D16103192AD333007ACF50 /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema.h; sourceTree = "<group>"; };
 		02D16109192AD377007ACF50 /* RLMSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSchema.mm; sourceTree = "<group>"; };
+		02D1610C192AEABA007ACF50 /* DynamicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTests.m; sourceTree = "<group>"; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = release_notes.md; sourceTree = "<group>"; };
@@ -265,6 +268,7 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
+				02D1610C192AEABA007ACF50 /* DynamicTests.m */,
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
@@ -572,6 +576,7 @@
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
+				02D1610D192AEABA007ACF50 /* DynamicTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,6 +609,7 @@
 				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
 				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
+				02D1610E192AEABA007ACF50 /* DynamicTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
