@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMSchema.h"
 #import "XCTestCase+AsyncTesting.h"
 
 @interface RLMDynamicObject : RLMObject
@@ -58,7 +59,14 @@
     XCTAssertNotNil(dyrealm, @"realm should not be nil");
     XCTAssertEqual([dyrealm class], [RLMRealm class], @"realm should be of class RLMDynamicRealm");
     
-    // get objects
+    // verify schema
+    RLMObjectSchema *dynSchema = dyrealm.schema[@"RLMDynamicObject"];
+    XCTAssertNotNil(dynSchema, @"Should be able to get object schema dynamically");
+    XCTAssertEqual(dynSchema.properties.count, 2, @"RLMDynamicObject should have 2 properties");
+    XCTAssertEqualObjects([dynSchema.properties[0] name], @"column", @"Invalid property name");
+    XCTAssertEqual([(RLMProperty *)dynSchema.properties[1] type], RLMPropertyTypeInt, @"Invalid type");
+    
+    // verify object type
     RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
     XCTAssertEqual(array.count, 2, @"Array should have 2 elements");
     XCTAssertNotEqual(array.objectClass, RLMDynamicObject.class,

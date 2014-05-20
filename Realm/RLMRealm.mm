@@ -498,7 +498,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 -(NSUInteger)schemaVersion {
-    // FIXME - store version in metadata table
+    // FIXME - store version in metadata table - will come with migration support
     return 0;
 }
 
