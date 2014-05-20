@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 
 #import <Realm/Realm.h>
 
@@ -44,24 +45,6 @@
 @end
 
 @implementation InvalidSubclassObject
-@end
-
-
-@interface AllTypesObject : RLMObject
-@property BOOL           boolCol;
-@property int            intCol;
-@property float          floatCol;
-@property double         doubleCol;
-@property NSString      *stringCol;
-@property NSData        *binaryCol;
-@property NSDate        *dateCol;
-@property bool           cBoolCol;
-@property long           longCol;
-//@property id             mixedCol;
-//@property AgeTable      *tableCol;
-@end
-
-@implementation AllTypesObject
 @end
 
 //@interface InvalidType : RLMObject
