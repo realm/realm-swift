@@ -22,6 +22,7 @@
 #import "RLMRealm.h"
 #import "RLMArray.h"
 #import "RLMAccesor.h"
+#import "RLMSchema.h"
 
 #import <tightdb/table.hpp>
 #import <tightdb/group.hpp>
@@ -52,8 +53,19 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @interface RLMArray () <RLMAccessor>
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 @property (nonatomic, assign) tightdb::TableView backingView;
-@property (nonatomic, assign) Class objectClass;
+@property (nonatomic, assign) NSString *objectClassName;
 @end
+
+// RLMSchema internal properties
+@interface RLMSchema ()
+@property (nonatomic) NSMutableDictionary *tableNamesForClass;
+// schema based on runime objects
++(instancetype)schemaForRuntimeObjects;
+// schema based on tables in a realm
++(instancetype)schemaFromTablesInRealm:(RLMRealm *)realm;
+@end
+
+
 
 
 

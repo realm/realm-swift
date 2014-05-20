@@ -47,20 +47,21 @@
     [RLMTestObject createInRealm:realm withObject:@[@"a"]];
     [RLMTestObject createInRealm:realm withObject:@[@"b"]];
     [RLMTestObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:RLMTestObject.class where:nil].count, 3, @"Expecting 3 objects");
+    XCTAssertEqual([realm objects:RLMTestObject.className where:nil].count, 3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
-    RLMArray *objects = [realm objects:RLMTestObject.class where:nil];
+    RLMArray *objects = [realm allObjects:RLMTestObject.className];
     XCTAssertEqual(objects.count, 3, @"Expecting 3 objects");
-    
+    XCTAssertEqualObjects([objects.firstObject column], @"a", @"Expecting column to be 'a'");
+
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:RLMTestObject.class where:nil].count, 1, @"Expecting 1 object");
+    XCTAssertEqual([realm objects:RLMTestObject.className where:nil].count, 1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
-    objects = [realm objects:RLMTestObject.class where:nil];
+    objects = [realm allObjects:RLMTestObject.className];
     XCTAssertEqual(objects.count, 1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
 }
@@ -127,7 +128,7 @@
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
     // get object
-    RLMArray *objects = [realm objects:RLMTestObject.class where:nil];
+    RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
     XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
 }

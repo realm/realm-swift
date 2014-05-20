@@ -21,21 +21,30 @@
 #import <Foundation/Foundation.h>
 #import "RLMProperty.h"
 
-// ordered properties extracted from an object
-@interface RLMObjectDescriptor : NSObject
+/**---------------------------------------------------------------------------------------
+ *  @name Object Schema
+ * ---------------------------------------------------------------------------------------
+ */
+@interface RLMObjectSchema : NSObject
 
-// array of properties which define an object schema
-@property (nonatomic, readonly, copy) NSArray * properties;
+/**
+ Array of persisted properties for an object.
+ */
+@property (nonatomic, readonly, copy) NSArray *properties;
 
-// object this describes - may be NULL
-@property (nonatomic, readonly) Class objectClass;
+/**
+ The name of the class this schema describes.
+ */
+@property (nonatomic, readonly) NSString *className;
 
-
-// property lookup by name
--(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
-
-// returns a cached or new schema for a given object class
-+(instancetype)descriptorForObjectClass:(Class)objectClass;
+/**
+ Lookup a property object by name.
+ 
+ @param key The properties name.
+ 
+ @return    RLMProperty object or nil if there is no property with the given name.
+ */
+- (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
 @end
 

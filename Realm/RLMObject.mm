@@ -20,7 +20,8 @@
 
 #import "RLMPrivate.hpp"
 #import "RLMObject.h"
-#import "RLMObjectDescriptor.h"
+#import "RLMObjectSchema.h"
+#import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 
@@ -56,7 +57,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     else if ([values isKindOfClass:NSArray.class]) {
         // for arrays use property names as keys
         NSArray *array = values;
-        RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:self];
+        RLMObjectSchema *desc = realm.schema[self.className];
         NSArray *properties = desc.properties;
         if (array.count != desc.properties.count) {
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
@@ -85,11 +86,14 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 
 - (void)setWritable:(BOOL)writable {
     // set accessor class based on write permission
+    // FIXME - this lookup should be optimized
+    // FIXME - we are assuming this is always an accessor subclass
+    RLMObjectSchema *schema = _realm.schema[NSStringFromClass(self.superclass.class)];
     if (writable) {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass));
+        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, schema));
     }
     else {
-        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass));
+        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, schema));
     }
     _writable = writable;
 }
@@ -103,7 +107,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 }
 
 + (RLMArray *)allObjects {
-    return RLMGetObjects(RLMRealm.defaultRealm, self.class, nil, nil);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
 + (RLMArray *)objectsWhere:(id)predicate, ... {
@@ -111,7 +115,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.class, outPredicate, nil);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, nil);
 }
 
 + (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
@@ -119,12 +123,16 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.class, outPredicate, order);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, order);
 }
 
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
+}
+
++ (NSString *)className {
+    return NSStringFromClass(self);
 }
 
 @end

@@ -73,15 +73,6 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Sets the path used for the default Realm.
- 
- @warning This must be called before any Realm instances are obtained (otherwise throws).
- 
- @param path    Path to the file you want the data saved in.
- */
-+ (void)setDefaultRealmPath:(NSString *)path;
-
-/**
  Make the default Realm in-memory only
  
  By default, the default Realm is persisted to disk unless this method is called.
@@ -227,6 +218,17 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  *  ---------------------------------------------------------------------------------------
  */
 /**
+ Get all objects of a given type in this Realm.
+ 
+ @param className   The name of the RLMObject subclass to retrieve on eg. <code>MyClass.className</code>.
+ 
+ @return    An RLMArray of all objects in this realm of the given type.
+ 
+ @see       RLMObject allObjects
+ */
+- (RLMArray *)allObjects:(NSString *)className;
+
+/**
  Get objects matching the given predicate from the this Realm.
  
  In the future this method will be used to get an RLMArray with objects of mixed types. For now, you must
@@ -240,7 +242,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(Class)objectClass where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className where:(id)predicate, ...;
 
 /**
  Get an ordered array of objects matching the given predicate from the this Realm.
@@ -258,7 +260,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  
  @see       RLMObject objectsOrderedBy:where:
  */
-- (RLMArray *)objects:(Class)objectClass orderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
 
 @end
 
@@ -294,22 +296,62 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 @end
 
-@interface RLMRealm (Migrations)
+
+@class RLMSchema;
+
+@interface RLMRealm (Schema)
 /**---------------------------------------------------------------------------------------
- *  @name Migrations
+ *  @name Realm and Object Schema
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Sets the object used for migration used to migrate all realms.
+ Returns the schema used by this realm. This can be used to enumerate and introspect object
+ types during migrations for dynamic introspection.
  
- Must be called before any Realm instances are retreived (otherwise throws)
- 
- @return    object used for migration.
- 
- @see       RLMMigration protocol
+ @see       RLMObjectSchema
  */
-+ (void)setMigration:(id<RLMMigration>)block realmVersion:(NSUInteger)version;
+@property (nonatomic, readonly) RLMSchema *schema;
+
+/**
+ The schema version for this Realm.
+ */
+@property (nonatomic, readonly) NSUInteger schemaVersion;
 
 @end
 
 
+@interface RLMRealm (Migrations)
+/**---------------------------------------------------------------------------------------
+ *  @name Realm Migrations
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Performs a migration on the default Realm.
+ 
+ Must be called before the default Realm is accessed (otherwise throws). If the
+ default Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param version     The current schema version.
+ @param migration   The migration object (which implmements the RLMMigration protocol).
+ 
+ @see               RLMMigration protocol
+ */
++ (void)ensureSchemaVersion:(NSUInteger)version usingMigration:(id<RLMMigration>)migration;
+
+/**
+ Performs a migration on a Realm at a path.
+ 
+ Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
+ If the Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param version     The current schema version.
+ @param realmPath   The path of the relm to migrate.
+ @param migration   The migration object (which implmements the RLMMigration protocol).
+ 
+ @see               RLMMigration protocol
+ */
++ (void)ensureSchemaVersion:(NSUInteger)version
+                     atPath:(NSString *)realmPath
+             usingMigration:(id<RLMMigration>)migration;
+
+@end
