@@ -19,8 +19,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <tightdb/table.hpp>
 #import "RLMRealm.h"
-#include <tightdb/table.hpp>
 
 //
 // Accessor Protocol
@@ -41,15 +41,16 @@
 //
 // Accessors Class Creation/Caching
 //
+@class RLMObjectSchema;
 
 // initialize accessor cache
 void RLMAccessorCacheInitialize();
 
 // get accessor classes for an object class - generates classes if not cached
-Class RLMAccessorClassForObjectClass(Class objectClass);
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
-Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
-Class RLMInsertionAccessorClassForObjectClass(Class objectClass);
+Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 
 

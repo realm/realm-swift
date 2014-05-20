@@ -22,7 +22,7 @@
 #import "RLMPrivate.hpp"
 #import "RLMUtil.h"
 #import "RLMProperty.h"
-#import "RLMObjectDescriptor.h"
+#import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
 #import <objc/runtime.h>
@@ -274,7 +274,7 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
             return 'l';
         case '@':           // custom accessors for strings and subtables
             if (rlmType == RLMPropertyTypeString) return 's';
-            if (rlmType == RLMPropertyTypeTable) return 't';
+            if (rlmType == RLMPropertyTypeArray) return 't';
             if (rlmType == RLMPropertyTypeDate) return 'a';
             if (rlmType == RLMPropertyTypeObject) return 'k';
         default:
@@ -283,6 +283,7 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
 }
 
 Class RLMCreateAccessorClass(Class objectClass,
+                             RLMObjectSchema *schema,
                              NSString *accessorClassPrefix,
                              IMP (*getterGetter)(NSUInteger, char, Class),
                              IMP (*setterGetter)(NSUInteger, char)) {
@@ -297,9 +298,8 @@ Class RLMCreateAccessorClass(Class objectClass,
     objc_registerClassPair(proxyClass);
     
     // override getters/setters for each propery
-    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
-        RLMProperty *prop = descriptor.properties[propNum];
+    for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
+        RLMProperty *prop = schema.properties[propNum];
         char accessorCode = accessorCodeForType(prop.objcType, prop.type);
         if (getterGetter) {
             SEL getterSel = NSSelectorFromString(prop.getterName);
@@ -316,53 +316,53 @@ Class RLMCreateAccessorClass(Class objectClass,
     return proxyClass;
 }
 
-Class RLMAccessorClassForObjectClass(Class objectClass) {
+Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     // see if we have a cached version
     if (Class cls = [s_accessorCache objectForKey:objectClass]) {
         return cls;
     }
 
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMAccessor_",
+    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
                                                  RLMAccessorGetter, RLMAccessorSetter);
     [s_accessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
 
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass) {
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     // see if we have a cached version
     if (Class cls = [s_readOnlyAccessorCache objectForKey:objectClass]) {
         return cls;
     }
     
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMReadOnly_",
+    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMReadOnly_",
                                                  RLMAccessorGetter, RLMAccessorReadOnlySetter);
     [s_readOnlyAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
 
-Class RLMInvalidAccessorClassForObjectClass(Class objectClass) {
+Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     // see if we have a cached version
     if (Class cls = [s_invalidAccessorCache objectForKey:objectClass]) {
         return cls;
     }
     
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMInvalid_",
+    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMInvalid_",
                                                  RLMAccessorInvalidGetter, RLMAccessorInvalidSetter);
     [s_invalidAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
 
-Class RLMInsertionAccessorClassForObjectClass(Class objectClass) {
+Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     // see if we have a cached version
     if (Class cls = [s_insertionAccessorCache objectForKey:objectClass]) {
         return cls;
     }
     
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMInserter_",
+    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
                                                  NULL, RLMAccessorSetter);
     [s_insertionAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;

@@ -21,7 +21,7 @@
 #import "RLMRealm.h"
 #import "RLMConstants.h"
 #import "RLMPrivate.hpp"
-#import "RLMObjectDescriptor.h"
+#import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 
@@ -112,6 +112,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex)
 @property (nonatomic) NSString *path;
 @property (nonatomic) BOOL isReadOnly;
 @property (nonatomic) id<RLMMigration> migration;
+@property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
 
@@ -157,6 +158,7 @@ static NSArray *s_objectDescriptors = nil;
                                                       selector:@selector(checkForUpdate)
                                                       userInfo:nil
                                                        repeats:YES];
+        _schema = RLMSharedSchema();
     }
     return self;
 }
@@ -457,20 +459,24 @@ static NSArray *s_objectDescriptors = nil;
     RLMDeleteObjectFromRealm(object);
 }
 
-- (RLMArray *)objects:(Class)objectClass where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClass, outPredicate, nil);
+- (RLMArray *)allObjects:(NSString *)objectClassName {
+    return RLMGetObjects(self, objectClassName, nil, nil);
 }
 
-- (RLMArray *)objects:(Class)objectClass orderedBy:(id)order where:(id)predicate, ... {
+- (RLMArray *)objects:(NSString *)objectClassName where:(id)predicate, ... {
     NSPredicate *outPredicate = nil;
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMGetObjects(self, objectClass, outPredicate, order);
+    return RLMGetObjects(self, objectClassName, outPredicate, nil);
+}
+
+- (RLMArray *)objects:(NSString *)objectClassName orderedBy:(id)order where:(id)predicate, ... {
+    NSPredicate *outPredicate = nil;
+    if (predicate) {
+        RLM_PREDICATE(predicate, outPredicate);
+    }
+    return RLMGetObjects(self, objectClassName, outPredicate, order);
 }
 
 #pragma GCC diagnostic push

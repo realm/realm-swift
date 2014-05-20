@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMProperty.h"
-#import "RLMObjectDescriptor.h"
+#import "RLMObjectSchema.h"
 #import "RLMPrivate.hpp"
 #import "RLMUtil.h"
 #import "RLMObjectStore.h"
@@ -84,7 +84,7 @@
                 else {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
                 }
-                self.type = RLMPropertyTypeTable;
+                self.type = RLMPropertyTypeArray;
             }
             else {
                 // check if this is an RLMObject

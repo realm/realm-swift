@@ -233,3 +233,20 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
+/**---------------------------------------------------------------------------------------
+ *  @name RLMObject Class Name
+ *  ---------------------------------------------------------------------------------------
+ */
+@interface RLMObject (ClassName)
+/**
+ Helper to return the class name for an RLMObject subclass.
+ 
+ @return    The class name for a given class.
+ */
++ (NSString *)className;
+
+@end
+
+
+
+
