@@ -76,24 +76,24 @@
                 self.type = RLMPropertyTypeData;
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
-                // check for array class
-                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(11, type.length-5)]);
-                if (RLMIsSubclass(cls, RLMObject.class)) {
-                    self.linkClass = cls;
-                }
-                else {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
-                }
+                // get object class and set type
+                self.objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
                 self.type = RLMPropertyTypeArray;
+                
+                // verify type
+                Class cls = NSClassFromString(self.objectClassName);
+                if (class_getSuperclass(cls) != RLMObject.class) {
+                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
+                }
             }
             else {
-                // check if this is an RLMObject
-                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
-                if (RLMIsSubclass(cls, RLMObject.class)) {
-                    self.linkClass = cls;
-                    self.type = RLMPropertyTypeObject;
-                }
-                else {
+                // get object class and set type
+                self.objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
+                self.type = RLMPropertyTypeObject;
+                
+                // verify type
+                Class cls = NSClassFromString(self.objectClassName);
+                if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
                 }
             }
