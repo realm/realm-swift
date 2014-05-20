@@ -34,6 +34,7 @@ inline bool nsnumber_is_like_bool(NSObject *obj)
 inline bool nsnumber_is_like_integer(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
+    // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
@@ -45,6 +46,7 @@ inline bool nsnumber_is_like_integer(NSObject *obj)
 inline bool nsnumber_is_like_float(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
+    // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(float)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
@@ -57,6 +59,7 @@ inline bool nsnumber_is_like_float(NSObject *obj)
 inline bool nsnumber_is_like_double(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
+    // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(double)) == 0 ||
             strcmp(data_type, @encode(float)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
@@ -70,51 +73,44 @@ inline bool nsnumber_is_like_double(NSObject *obj)
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
     switch (type) {
         case RLMPropertyTypeString:
-            if (![obj isKindOfClass:[NSString class]])
-                return NO;
-            break;
+            return [obj isKindOfClass:[NSString class]];
         case RLMPropertyTypeBool:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                if (nsnumber_is_like_bool(obj))
-                    break;
-                return NO;
-            }
-            break;
-        case RLMPropertyTypeDate:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                if (nsnumber_is_like_integer(obj))
-                    break;
-            }
-            if ([obj isKindOfClass:[NSDate class]]) {
-                break;
+                return nsnumber_is_like_bool(obj);
             }
             return NO;
+        case RLMPropertyTypeDate:
+            if ([obj isKindOfClass:[NSNumber class]]) {
+                return nsnumber_is_like_integer(obj);
+            }
+            return [obj isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                if (nsnumber_is_like_integer(obj))
-                    break;
+                return nsnumber_is_like_integer(obj);
             }
             return NO;
         case RLMPropertyTypeFloat:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                if (nsnumber_is_like_float(obj))
-                    break;
+                return nsnumber_is_like_float(obj);
             }
             return NO;
         case RLMPropertyTypeDouble:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                if (nsnumber_is_like_double(obj))
-                    break;
+                return nsnumber_is_like_double(obj);
             }
             return NO;
         case RLMPropertyTypeData:
-            if ([obj isKindOfClass:[NSData class]])
-                break;
-            return NO;
-        default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
+            return [obj isKindOfClass:[NSData class]];
+        case RLMPropertyTypeNone:
+            break;
+
+        // FIXME: missing entries
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeTable:
+        case RLMPropertyTypeAny:
+            break;
     }
-    return YES;
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
 }
 
 
@@ -180,6 +176,11 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
             return d;
         }
+        // case RLMPropertyTypeObject:
+        // FIXME - implement when we switch over to the links branch
+        case RLMPropertyTypeTable:
+            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                           reason:@"RLMArray not yet supported" userInfo:nil];
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
         }
