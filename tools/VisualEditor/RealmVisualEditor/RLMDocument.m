@@ -71,7 +71,7 @@
         return [self tables].count;
     }
     else if (tableView == self.tableColumns) {
-        NSArray *columns = [self columnsForTableAtIndex:self.realmTables.selectedRow];
+        NSArray *columns = [self columnNamesForTableAtIndex:self.realmTables.selectedRow];
         return columns.count;
     }
     return 0;
@@ -113,16 +113,33 @@
     if (notification.object == self.realmTables) {
         // How many columns does the table contains?
         NSUInteger selectedTabelIndex = self.realmTables.selectedRow;
-        NSArray *columns = [self columnsForTableAtIndex:selectedTabelIndex];
-        NSUInteger columnCount = columns.count;
+        NSArray *columns = [self columnNamesForTableAtIndex:selectedTabelIndex];
+        NSUInteger requiredColumnCount = columns.count;
         
-        // If we have more columns than needed we hide those in excess
-        NSUInteger displayColumnsCount = self.tableColumns.numberOfColumns;
-        if (columnCount <= displayColumnsCount) {
-        
+        // If we have more columns than needed we remove the ones in excess
+        NSUInteger existingColumnsCount = self.tableColumns.numberOfColumns;
+        if (requiredColumnCount <= existingColumnsCount) {
+            NSUInteger excessColumnCount = existingColumnsCount - requiredColumnCount;
+            for (NSUInteger index = 0; index < excessColumnCount; index++) {
+                NSTableColumn *column = [self.tableColumns.tableColumns lastObject];
+                [self.tableColumns removeTableColumn:column];
+            }
         }
+        // Otherwise we need to add new columns to display all columns
         else {
+            for (NSUInteger index = 0; index < requiredColumnCount - existingColumnsCount; index++) {
+                NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
+                [self.tableColumns addTableColumn:tableColumn];
+            }
+        }
         
+        // Set the column names
+        NSArray *columnNames = [self columnNamesForTableAtIndex:selectedTabelIndex];
+        
+        for (NSUInteger index = 0; index < columnNames.count; index++) {
+            NSTableColumn *tableColumn = self.tableColumns.tableColumns[index];
+            NSTableHeaderCell *headerCell = tableColumn.headerCell;
+            headerCell.stringValue = columnNames[index];
         }
         
         [self.tableColumns reloadData];
@@ -141,7 +158,7 @@
     return @[@"Table 0", @"Table 1", @"Table 2"];
 }
 
-- (NSArray *)columnsForTableAtIndex:(NSUInteger)index
+- (NSArray *)columnNamesForTableAtIndex:(NSUInteger)index
 {
     switch (index) {
         case 0:
@@ -170,7 +187,7 @@
             break;
             
         case 1:
-            return @[@[@"Item 1,0,0", @"Item 1,1,0"], @[@"Item 1,0,1", @"Item 1,1,1"],  @[@"Item 1,0,2", @"Item 1,1,2"]];
+            return @[@[@"Item 1,0,0", @"Item 1,1,0", @"Item 1,2,0"], @[@"Item 1,0,1", @"Item 1,1,1", @"Item 1,2,1"],  @[@"Item 1,0,2", @"Item 1,1,2", @"Item 1,2,2"]];
             break;
             
         case 2:
