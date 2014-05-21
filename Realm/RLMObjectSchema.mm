@@ -20,6 +20,7 @@
 
 #import "RLMObjectSchema.h"
 #import "RLMProperty_Private.h"
+#import "NSString+RLMStringData.h"
 #import <tightdb/table.hpp>
 
 
@@ -80,7 +81,7 @@
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (size_t col = 0; col < count; col++) {
         // create new property
-        NSString *name = [NSString stringWithUTF8String:table->get_column_name(col).data()];
+        NSString *name = [NSString stringWithRLMStringData:table->get_column_name(col).data()];
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                                        column:col];

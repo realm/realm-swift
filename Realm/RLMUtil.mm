@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
 #import "NSData+RLMGetBinaryData.h"
+#import "NSString+RLMStringData.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -118,8 +119,7 @@ void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col
 //        return;
 //    }
     if ([obj isKindOfClass:[NSString class]]) {
-        tightdb::StringData sd([(NSString *)obj UTF8String]);
-        table.set_mixed(col_ndx, row_ndx, sd);
+        table.set_mixed(col_ndx, row_ndx, [(NSString *)obj RLMStringData]);
         return;
     }
     if ([obj isKindOfClass:[NSDate class]]) {
@@ -158,7 +158,7 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
     tightdb::Mixed mixed = table.get_mixed(col_ndx, row_ndx);
     switch (mixed.get_type()) {
         case RLMPropertyTypeString:
-            return [NSString stringWithUTF8String:mixed.get_string().data()];
+            return [NSString stringWithRLMStringData:mixed.get_string()];
         case RLMPropertyTypeInt: {
             return @(mixed.get_int());
         case RLMPropertyTypeFloat:

@@ -46,7 +46,7 @@
 
 #pragma mark - Tests
 
-- (void)testDynaimcRealmExists {
+- (void)testDynamicRealmExists {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];

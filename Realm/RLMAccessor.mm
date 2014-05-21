@@ -25,6 +25,7 @@
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 #import "NSData+RLMGetBinaryData.h"
+#import "NSString+RLMStringData.h"
 
 #import <objc/runtime.h>
 
@@ -78,9 +79,7 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
         case 's':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 tightdb::StringData strData = obj.backingTable->get_string(col, obj.objectIndex);
-                return [[NSString alloc] initWithBytes:strData.data()
-                                                length:strData.size()
-                                              encoding:NSUTF8StringEncoding];
+                return [NSString stringWithRLMStringData:strData];
             });
         case 'a':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -142,8 +141,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
             });
         case 's':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
-                tightdb::StringData strData = tightdb::StringData(val.UTF8String, val.length);
-                obj.backingTable->set_string(col, obj.objectIndex, strData);
+                obj.backingTable->set_string(col, obj.objectIndex, val.RLMStringData);
             });
         case 'a':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
