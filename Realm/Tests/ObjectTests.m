@@ -47,27 +47,7 @@
 @implementation InvalidSubclassObject
 @end
 
-//@interface InvalidType : RLMObject
-//@property NSDictionary *dict;
-//@end
-//
-//@implementation InvalidType
-//@end
-//
-//RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
-//
-//@interface InvalidProperty : RLMObject
-//@property NSUInteger noUnsigned;
-//@end
-//
-//@implementation InvalidProperty
-//@end
-//
-//@interface RLMTypedTableTests: RLMTestCase
-//  // Intentionally left blank.
-//  // No new public instance methods need be defined.
-//@end
-//
+
 @interface KeyedObject : RLMObject
 @property NSString * name;
 @property int objID;
@@ -378,27 +358,27 @@
     AllTypesObject* row1 = [AllTypesObject allObjects][0];
     AllTypesObject* row2 = [AllTypesObject allObjects][1];
 
-    XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
-    XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
-    XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
-    XCTAssertEqual(row2.intCol, 506,            @"row2.IntCol");
-    XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
-    XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
-    XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
-    XCTAssertEqual(row2.doubleCol, 8.8,              @"row2.DoubleCol");
-    XCTAssertTrue([row1.stringCol isEqual:@"foo"],    @"row1.StringCol");
-    XCTAssertTrue([row2.stringCol isEqual:@"banach"], @"row2.StringCol");
-    XCTAssertTrue([row1.binaryCol isEqual:bin1],      @"row1.BinaryCol");
-    XCTAssertTrue([row2.binaryCol isEqual:bin2],      @"row2.BinaryCol");
-    XCTAssertTrue(([row1.dateCol isEqual:timeZero]),  @"row1.DateCol");
-    XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
-    XCTAssertEqual(row1.cBoolCol, (bool)false,        @"row1.cBoolCol");
-    XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
-    XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
-    XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
+    XCTAssertEqual(row1.boolCol, NO,                    @"row1.BoolCol");
+    XCTAssertEqual(row2.boolCol, YES,                   @"row2.BoolCol");
+    XCTAssertEqual(row1.intCol, 54,                     @"row1.IntCol");
+    XCTAssertEqual(row2.intCol, 506,                    @"row2.IntCol");
+    XCTAssertEqual(row1.floatCol, 0.7f,                 @"row1.FloatCol");
+    XCTAssertEqual(row2.floatCol, 7.7f,                 @"row2.FloatCol");
+    XCTAssertEqual(row1.doubleCol, 0.8,                 @"row1.DoubleCol");
+    XCTAssertEqual(row2.doubleCol, 8.8,                 @"row2.DoubleCol");
+    XCTAssertTrue([row1.stringCol isEqual:@"foo"],      @"row1.StringCol");
+    XCTAssertTrue([row2.stringCol isEqual:@"banach"],   @"row2.StringCol");
+    XCTAssertTrue([row1.binaryCol isEqual:bin1],        @"row1.BinaryCol");
+    XCTAssertTrue([row2.binaryCol isEqual:bin2],        @"row2.BinaryCol");
+    XCTAssertTrue(([row1.dateCol isEqual:timeZero]),    @"row1.DateCol");
+    XCTAssertTrue(([row2.dateCol isEqual:timeNow]),     @"row2.DateCol");
+    XCTAssertEqual(row1.cBoolCol, (bool)false,          @"row1.cBoolCol");
+    XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
+    XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
+    XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
 
-    XCTAssertTrue([row1.mixedCol isEqualToString:@"string"], @"row1.mixedCol");
-    XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
+    XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
+    XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 
 }
 
