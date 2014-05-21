@@ -23,10 +23,6 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 
-NSString *const RLMPropertyAttributeUnique = @"RLMPropertyAttributeUnique";
-NSString *const RLMPropertyAttributeIndexed = @"RLMPropertyAttributeIndexed";
-NSString *const RLMPropertyAttributeInlined = @"RLMPropertyAttributeInlined";
-NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 
 @implementation RLMObject
 
