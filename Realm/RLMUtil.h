@@ -21,6 +21,8 @@
 #import "RLMConstants.h"
 #import <objc/runtime.h>
 
+#import <tightdb/table.hpp>
+
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
 
@@ -66,3 +68,7 @@ inline NSString *rlmtype_to_string(RLMPropertyType type) {
     }
     return @"Unknown";
 }
+
+// Getter and Setter for RLMPropertyTypeAny properties
+id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx);
+void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj);
