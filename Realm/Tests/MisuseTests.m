@@ -58,7 +58,7 @@
     
     XCTAssertThrows([realm rollbackWriteTransaction], @"No write transaction to rool-back");
 
-    XCTAssertThrows([realm deleteObject:obj cascade:YES], @"Outside writetransaction");
+    XCTAssertThrows([realm deleteObject:obj], @"Outside writetransaction");
 }
 
 

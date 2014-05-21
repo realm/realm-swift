@@ -44,7 +44,7 @@ void RLMInitializeObjectStore() {
         NSMutableArray *classArray = [NSMutableArray array];
         
         // cache descriptors for all subclasses of RLMObject
-        for (int i = 0; i < numClasses; i++) {
+        for (unsigned int i = 0; i < numClasses; i++) {
             if (RLMIsSubclass(classes[i], RLMObject.class)) {
                 // add to class list
                 RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:classes[i]];
@@ -141,18 +141,18 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     [realm registerAccessor:object];
 }
 
-void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade) {
+void RLMDeleteObjectFromRealm(RLMObject *object) {
     // if realm is not writable throw
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (object.realm.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
-    
     // if last in table delete, otherwise replace with last
     if (object.objectIndex == object.backingTable->size() - 1) {
         object.backingTable->remove(object.objectIndex);
     }
     else {
         object.backingTable->move_last_over(object.objectIndex);
+        // FIXME - fix all accessors
     }
 }
 
