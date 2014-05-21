@@ -19,7 +19,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObject.h"
+
+@class RLMObject;
 
 /**---------------------------------------------------------------------------------------
  *  @name Accessors and Getting Objects

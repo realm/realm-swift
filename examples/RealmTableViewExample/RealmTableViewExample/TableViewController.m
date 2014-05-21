@@ -101,7 +101,7 @@ static NSString * const kTableName = @"table";
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        [realm deleteObject:self.array[indexPath.row] cascade:NO];
+        [realm deleteObject:self.array[indexPath.row]];
         [realm commitWriteTransaction];
     }
 }
@@ -135,7 +135,7 @@ static NSString * const kTableName = @"table";
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
     for (DemoObject *obj in self.array) {
-        [realm deleteObject:obj cascade:NO];
+        [realm deleteObject:obj];
     }
     [realm commitWriteTransaction];
 }

@@ -24,4 +24,3 @@
 #import <Realm/RLMObject.h>
 #import <Realm/RLMArray.h>
 #import <Realm/RLMSchema.h>
-#import <Realm/RLMMigration.h>

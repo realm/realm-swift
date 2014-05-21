@@ -23,6 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 
+#import <objc/runtime.h>
 
 @implementation RLMObject
 
