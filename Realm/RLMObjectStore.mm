@@ -85,7 +85,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
 //                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
 //                    table->add_column_link(name, linkTable->get_index_in_parent());
                     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                                   reason:@"Links not yest supported" userInfo:nil];
+                                                   reason:@"Links not yet supported" userInfo:nil];
                 }
                 else {
                     table->add_column((tightdb::DataType)prop.type, name);
