@@ -281,17 +281,16 @@ const char * setterTypeStringForObjcCode(char code) {
 // get accessor lookup code based on objc type and rlm type
 char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     switch (objcTypeCode) {
-        case 'q':           // long long same as long
-            return 'l';
-        case '@':           // custom accessors for strings and subtables
-            switch (rlmType) {
+        case 'q': return 'l';   // long long same as long
+        case '@':               // custom accessors for strings and subtables
+            switch (rlmType) {  // custom accessor codes for types that map to objc objects
                 case RLMPropertyTypeObject: return 'k';
                 case RLMPropertyTypeString: return 's';
                 case RLMPropertyTypeArray: return 't';
                 case RLMPropertyTypeDate: return 'a';
                 case RLMPropertyTypeData: return 'e';
                 case RLMPropertyTypeAny: return '@';
-                default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type code" userInfo:nil];
+                default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type for objc typecode" userInfo:nil];
             }
         default:
             return objcTypeCode;

@@ -76,16 +76,11 @@
         case RLMPropertyTypeString:
             _objcType = '@';
             break;
-        default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid property type"
-                                         userInfo:nil];
-            break;
     }
 }
 
-// determine RLMPropertyType from objc code
--(void)parsePropertyTypeString:(const char *)code {
+// determine RLMPropertyType from objc code - returna true if valid type was found/set
+-(BOOL)parsePropertyTypeString:(const char *)code {
     _objcType = *(code);    // first char of type attr
     if (self.objcType == 'q') {
         _objcType = 'l';    // collapse these as they are the same
@@ -96,17 +91,17 @@
         case 'i':   // int
         case 'l':   // long
             _type = RLMPropertyTypeInt;
-            break;
+            return YES;
         case 'f':
             _type = RLMPropertyTypeFloat;
-            break;
+            return YES;
         case 'd':
             _type = RLMPropertyTypeDouble;
-            break;
+            return YES;
         case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
         case 'B':
             _type = RLMPropertyTypeBool;
-            break;
+            return YES;
         case '@':
         {
             NSString *type = [NSString stringWithUTF8String:code];
@@ -145,11 +140,10 @@
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
                 }
             }
-            break;
+            return YES;
         }
         default:
-            _type = RLMPropertyTypeNone;
-            break;
+            return NO;
     }
 }
 
@@ -164,10 +158,11 @@
     // parse attributes
     unsigned int attCount;
     objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);
+    BOOL validType = NO;
     for (unsigned int a = 0; a < attCount; a++) {
         switch (*(atts[a].name)) {
             case 'T':
-                [prop parsePropertyTypeString:atts[a].value];
+                validType = [prop parsePropertyTypeString:atts[a].value];
                 break;
             case 'N':
                 prop.nonatomic = YES;
@@ -187,8 +182,8 @@
     }
     free(atts);
     
-    // make sure we have a valid type
-    if (prop.type == RLMPropertyTypeNone) {
+    // throw if there was no type
+    if (!validType) {
         NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];

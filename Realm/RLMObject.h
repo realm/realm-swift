@@ -127,14 +127,14 @@ extern NSString *const RLMPropertyAttributeDeleteNever;
  Delete a child object (or object in an RLMArray) when the parent is deleted or the object is 
  nullified only if no other objects in the realm reference the object.
  */
-extern NSString *const RLMPropertyAttributDeleteIfOnlyOwner;
+extern NSString *const RLMPropertyAttributeDeleteIfOnlyOwner;
 
 /**
  Always delete a child object or object in a child array when the parent is deleted or the 
  reference in nullified. If other objects reference the same child object those references are
  nullified.
  */
-extern NSString *const RLMPropertyAttributDeleteAlways;
+extern NSString *const RLMPropertyAttributeDeleteAlways;
 
 
 /**---------------------------------------------------------------------------------------
