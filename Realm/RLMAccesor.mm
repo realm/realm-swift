@@ -48,7 +48,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class linkClass) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -95,7 +95,7 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class linkClass) {
                                            reason:@"Links not yet supported" userInfo:nil];
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj[col];
+                return RLMGetAnyProperty(*obj.backingTable, obj.objectIndex, col);
             });
         case 't':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -162,6 +162,9 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"Links not yet supported" userInfo:nil];
         case '@':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
+                RLMSetAnyProperty(*obj.backingTable, obj.objectIndex, col, val);
+            });
         case 't':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
                 obj[col] = val;
@@ -175,32 +178,32 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
 
 
 // setter which throws exception
-IMP RLMAccessorExceptionSetter(NSUInteger col, char accessorCode, NSString *message) {
+IMP RLMAccessorExceptionSetter(NSUInteger, char accessorCode, NSString *message) {
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, int) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, long val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, long) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, float val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, float) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, double val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, double) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, bool val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, bool) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, BOOL val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, BOOL) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         case 's':
         case 'a':
         case 'k':
         case '@':
         case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
+            return imp_implementationWithBlock(^(id<RLMAccessor>, id) {
                 @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
         default:
             @throw [NSException exceptionWithName:@"RLMException"
@@ -211,8 +214,8 @@ IMP RLMAccessorExceptionSetter(NSUInteger col, char accessorCode, NSString *mess
 
 // getter for invalid objects
 NSString *const c_invalidObjectMessage = @"Object is no longer valid.";
-IMP RLMAccessorInvalidGetter(NSUInteger col, char accessorCode, Class linkClass) {
-    return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+IMP RLMAccessorInvalidGetter(NSUInteger, char, Class) {
+    return imp_implementationWithBlock(^(id<RLMAccessor>) {
         @throw [NSException exceptionWithName:@"RLMException" reason:c_invalidObjectMessage userInfo:nil];
     });
 }
