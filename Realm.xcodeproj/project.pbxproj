@@ -22,7 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		420EB1B5192B81BB00A2F425 /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 420EB1B4192B81BB00A2F425 /* RealmCore.framework */; };
+		420EB1B5192B81BB00A2F425 /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 420EB1B4192B81BB00A2F425 /* RealmCore.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		423FAD22192B608E00CDC320 /* NSData+RLMGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD21192B608E00CDC320 /* NSData+RLMGetBinaryData.mm */; };
 		423FAD38192B609E00CDC320 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD25192B609E00CDC320 /* RLMAccesor.mm */; };
 		423FAD39192B609E00CDC320 /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD27192B609E00CDC320 /* RLMArray.mm */; };
