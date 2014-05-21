@@ -18,6 +18,11 @@
 xcuserdata/
 project.xcworkspace
 DerivedData
+build/
+
+# CocoaPods
+Pods/
+Podfile.lock
 
 # sh build.sh build-iphone
 /iphone-lib/include
