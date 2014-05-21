@@ -22,7 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		420EB1B5192B81BB00A2F425 /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 420EB1B4192B81BB00A2F425 /* RealmCore.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		420EB1B5192B81BB00A2F425 /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 420EB1B4192B81BB00A2F425 /* RealmCore.framework */; };
 		423FAD22192B608E00CDC320 /* NSData+RLMGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD21192B608E00CDC320 /* NSData+RLMGetBinaryData.mm */; };
 		423FAD38192B609E00CDC320 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD25192B609E00CDC320 /* RLMAccesor.mm */; };
 		423FAD39192B609E00CDC320 /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 423FAD27192B609E00CDC320 /* RLMArray.mm */; };
@@ -46,6 +46,9 @@
 		423FAD5A192B752E00CDC320 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 423FAD34192B609E00CDC320 /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		423FAD5B192B752E00CDC320 /* RLMUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 423FAD36192B609E00CDC320 /* RLMUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		423FAD5C192B752E00CDC320 /* NSData+RLMGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 423FAD20192B608D00CDC320 /* NSData+RLMGetBinaryData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		426DCC8A192D17EE005F0A60 /* RLMArrayAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 426DCC88192D17EE005F0A60 /* RLMArrayAccessor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		426DCC8B192D17EE005F0A60 /* RLMArrayAccessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 426DCC89192D17EE005F0A60 /* RLMArrayAccessor.m */; };
+		426DCC8C192D1902005F0A60 /* RLMMixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 426DCC86192D17D6005F0A60 /* RLMMixedTests.m */; };
 		42B68BCC192B96AA00E325F9 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 42B68BCB192B96AA00E325F9 /* LinkTests.m */; };
 		42B68BD4192B96C800E325F9 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 42B68BCD192B96C800E325F9 /* ObjectTests.m */; };
 		42B68BD5192B96C800E325F9 /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 42B68BCE192B96C800E325F9 /* QueryTests.m */; };
@@ -118,6 +121,9 @@
 		423FAD35192B609E00CDC320 /* RLMRealm.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealm.mm; sourceTree = "<group>"; };
 		423FAD36192B609E00CDC320 /* RLMUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUtil.h; sourceTree = "<group>"; };
 		423FAD37192B609E00CDC320 /* RLMUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUtil.mm; sourceTree = "<group>"; };
+		426DCC86192D17D6005F0A60 /* RLMMixedTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMMixedTests.m; path = Realm/Tests/RLMMixedTests.m; sourceTree = "<group>"; };
+		426DCC88192D17EE005F0A60 /* RLMArrayAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArrayAccessor.h; sourceTree = "<group>"; };
+		426DCC89192D17EE005F0A60 /* RLMArrayAccessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMArrayAccessor.m; sourceTree = "<group>"; };
 		42B68BCB192B96AA00E325F9 /* LinkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LinkTests.m; path = Realm/Tests/LinkTests.m; sourceTree = "<group>"; };
 		42B68BCD192B96C800E325F9 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjectTests.m; path = Realm/Tests/ObjectTests.m; sourceTree = "<group>"; };
 		42B68BCE192B96C800E325F9 /* QueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QueryTests.m; path = Realm/Tests/QueryTests.m; sourceTree = "<group>"; };
@@ -168,6 +174,7 @@
 		42B68BCA192B968500E325F9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
+				426DCC86192D17D6005F0A60 /* RLMMixedTests.m */,
 				42B68BCD192B96C800E325F9 /* ObjectTests.m */,
 				42B68BCE192B96C800E325F9 /* QueryTests.m */,
 				42B68BCF192B96C800E325F9 /* RealmTests.m */,
@@ -217,6 +224,8 @@
 		42D48821192B5F0300F50523 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
+				426DCC88192D17EE005F0A60 /* RLMArrayAccessor.h */,
+				426DCC89192D17EE005F0A60 /* RLMArrayAccessor.m */,
 				42B68BD9192B96E000E325F9 /* RLMConstants.m */,
 				42B68BDA192B96E000E325F9 /* RLMObjectDescriptor.m */,
 				423FAD23192B609E00CDC320 /* Realm.h */,
@@ -273,6 +282,7 @@
 				423FAD5A192B752E00CDC320 /* RLMRealm.h in Headers */,
 				423FAD5B192B752E00CDC320 /* RLMUtil.h in Headers */,
 				423FAD58192B752E00CDC320 /* RLMProperty.h in Headers */,
+				426DCC8A192D17EE005F0A60 /* RLMArrayAccessor.h in Headers */,
 				423FAD5C192B752E00CDC320 /* NSData+RLMGetBinaryData.h in Headers */,
 				423FAD51192B752E00CDC320 /* RLMArray.h in Headers */,
 				423FAD57192B752E00CDC320 /* RLMPrivate.hpp in Headers */,
@@ -399,7 +409,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nset +u\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\n  exit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_TARGET_NAME=${PROJECT_NAME}\nSF_EXECUTABLE_PATH=\"lib${SF_TARGET_NAME}.a\"\nSF_WRAPPER_NAME=\"${SF_TARGET_NAME}.framework\"\n\n# The following conditionals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\n  SF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\n  echo \"Could not find platform name from SDK_NAME: $SDK_NAME\"\n  exit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\n  SF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\n  echo \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\n  exit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\n  SF_OTHER_PLATFORM=iphonesimulator\nelse\n  SF_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\n  SF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\n  echo \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\n  exit 1\nfi\n\n# Build the other platform.\nxcrun xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" OBJROOT=\"${OBJROOT}\" BUILD_ROOT=\"${BUILD_ROOT}\" SYMROOT=\"${SYMROOT}\" $ACTION\n\n# Smash the two static libraries into one fat binary and store it in the .framework\nxcrun lipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n\n# Copy the binary to the other architecture folder to have a complete framework in both.\ncp -a \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n";
+			shellScript = "set -e\nset +u\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\n  exit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_TARGET_NAME=${PROJECT_NAME}\nSF_EXECUTABLE_PATH=\"lib${SF_TARGET_NAME}.a\"\nSF_WRAPPER_NAME=\"${SF_TARGET_NAME}.framework\"\n\n# The following conditionals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\n  SF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\n  echo \"Could not find platform name from SDK_NAME: $SDK_NAME\"\n  exit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\n  SF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\n  echo \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\n  exit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\n  SF_OTHER_PLATFORM=iphonesimulator\nelse\n  SF_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\n  SF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\n  echo \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\n  exit 1\nfi\n\n# Build the other platform.\nxcrun xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" OBJROOT=\"${OBJROOT}\" BUILD_ROOT=\"${BUILD_ROOT}\" SYMROOT=\"${SYMROOT}\" $ACTION\n\n# Smash the two static libraries into one fat binary and store it in the .framework\nxcrun lipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n\n# Copy the binary to the other architecture folder to have a complete framework in both.\ncp -a \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n\n# Finally create a zip file\n(cd \"${SF_OTHER_BUILT_PRODUCTS_DIR}\" && zip -r \"${SF_WRAPPER_NAME}.zip\" \"${SF_WRAPPER_NAME}\" && cp \"${SF_WRAPPER_NAME}.zip\" $HOME)";
 		};
 		C724B071A9C3409E9516597E /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -423,6 +433,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				426DCC8B192D17EE005F0A60 /* RLMArrayAccessor.m in Sources */,
 				423FAD38192B609E00CDC320 /* RLMAccesor.mm in Sources */,
 				423FAD39192B609E00CDC320 /* RLMArray.mm in Sources */,
 				423FAD3F192B609E00CDC320 /* RLMUtil.mm in Sources */,
@@ -441,6 +452,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				426DCC8C192D1902005F0A60 /* RLMMixedTests.m in Sources */,
 				42B68BD5192B96C800E325F9 /* QueryTests.m in Sources */,
 				42B68BD4192B96C800E325F9 /* ObjectTests.m in Sources */,
 				42B68BCC192B96AA00E325F9 /* LinkTests.m in Sources */,
@@ -603,7 +615,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"\"$(PROJECT_DIR)/Pods/realm core\"",
+					"\"$(PROJECT_DIR)/Pods/realm_core\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
@@ -624,7 +636,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"\"$(PROJECT_DIR)/Pods/realm core\"",
+					"\"$(PROJECT_DIR)/Pods/realm_core\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
