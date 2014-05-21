@@ -218,10 +218,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Delete an object from this Realm.
  
  @param object  Object to be deleted from this Realm.
- @param cascade BOOL which indicates if child objects linked from object should also be deleted.
-                When child objects are deleted, all other links to these objects are nullified.
  */
-- (void)deleteObject:(RLMObject *)object cascade:(BOOL)deleteChildren;
+- (void)deleteObject:(RLMObject *)object;
 
 
 /**---------------------------------------------------------------------------------------
