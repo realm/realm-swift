@@ -290,7 +290,13 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
                 case RLMPropertyTypeDate: return 'a';
                 case RLMPropertyTypeData: return 'e';
                 case RLMPropertyTypeAny: return '@';
-                default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type for objc typecode" userInfo:nil];
+                    
+                // throw for all primitive types
+                case RLMPropertyTypeBool:
+                case RLMPropertyTypeDouble:
+                case RLMPropertyTypeFloat:
+                case RLMPropertyTypeInt:
+                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type for objc typecode" userInfo:nil];
             }
         default:
             return objcTypeCode;
