@@ -242,8 +242,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Sum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"minOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
     }
 }
@@ -265,8 +265,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Maximum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"maxOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
     }
 }
@@ -284,8 +284,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
         case RLMPropertyTypeFloat:
             return @(self.backingView.sum_float(colIndex));
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Maximum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"sumOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
     }
 }
@@ -303,8 +303,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
         case RLMPropertyTypeFloat:
             return @(self.backingView.average_float(colIndex));
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Sum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"averageOfProperty only supported fornam int, float and double properties."
                                          userInfo:nil];
     }
 }
