@@ -58,7 +58,7 @@ inline NSString *rlmtype_to_string(RLMPropertyType type) {
         case RLMPropertyTypeFloat:
             return @"float";
         case RLMPropertyTypeAny:
-            return @"mixed";
+            return @"any";
         case RLMPropertyTypeTable:
             return @"table";
         case RLMPropertyTypeObject:
