@@ -55,12 +55,12 @@
 		42B68BDB192B96E000E325F9 /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 42B68BD9192B96E000E325F9 /* RLMConstants.m */; };
 		42B68BDC192B96E000E325F9 /* RLMObjectDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 42B68BDA192B96E000E325F9 /* RLMObjectDescriptor.m */; };
 		42B68BDD192B982300E325F9 /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 420EB1B4192B81BB00A2F425 /* RealmCore.framework */; };
+		42D1F306192CBA13007D5B97 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D1F305192CBA13007D5B97 /* libstdc++.6.dylib */; };
 		42D48820192B5F0300F50523 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D4881F192B5F0300F50523 /* Foundation.framework */; };
 		42D4882E192B5F0300F50523 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D4882D192B5F0300F50523 /* XCTest.framework */; };
 		42D4882F192B5F0300F50523 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D4881F192B5F0300F50523 /* Foundation.framework */; };
 		42D48831192B5F0300F50523 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D48830192B5F0300F50523 /* UIKit.framework */; };
 		42D48834192B5F0300F50523 /* libRealm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42D4881C192B5F0300F50523 /* libRealm.a */; };
-		AF6792BA8CAC4552B1474654 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB0E01DDA6644848803E5587 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +128,7 @@
 		42B68BD3192B96C800E325F9 /* XCTestCase+AsyncTesting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "XCTestCase+AsyncTesting.m"; path = "Realm/Tests/XCTestCase+AsyncTesting.m"; sourceTree = "<group>"; };
 		42B68BD9192B96E000E325F9 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMConstants.m; sourceTree = "<group>"; };
 		42B68BDA192B96E000E325F9 /* RLMObjectDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMObjectDescriptor.m; sourceTree = "<group>"; };
+		42D1F305192CBA13007D5B97 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		42D4881C192B5F0300F50523 /* libRealm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRealm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		42D4881F192B5F0300F50523 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		42D48823192B5F0300F50523 /* Realm-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Realm-Prefix.pch"; sourceTree = "<group>"; };
@@ -144,7 +145,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				42D48820192B5F0300F50523 /* Foundation.framework in Frameworks */,
-				AF6792BA8CAC4552B1474654 /* libPods.a in Frameworks */,
 				420EB1B5192B81BB00A2F425 /* RealmCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -153,6 +153,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42D1F306192CBA13007D5B97 /* libstdc++.6.dylib in Frameworks */,
 				42D4882E192B5F0300F50523 /* XCTest.framework in Frameworks */,
 				42D48834192B5F0300F50523 /* libRealm.a in Frameworks */,
 				42D48831192B5F0300F50523 /* UIKit.framework in Frameworks */,
@@ -202,6 +203,7 @@
 		42D4881E192B5F0300F50523 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				42D1F305192CBA13007D5B97 /* libstdc++.6.dylib */,
 				420EB1B4192B81BB00A2F425 /* RealmCore.framework */,
 				420EB1B2192B819200A2F425 /* libPods-realm core.a */,
 				42D4881F192B5F0300F50523 /* Foundation.framework */,
@@ -552,17 +554,13 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/Realm.dst;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Pods/realm",
-					core,
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"\"${PODS_ROOT}/Headers\"",
-					"\"${PODS_ROOT}/Headers/realm core\"",
-					"\"${PODS_ROOT}/realm core/RealmCore.framework/Headers\"",
+					"\"${PODS_ROOT}/Headers/realm_core\"",
+					"\"${PODS_ROOT}/realm_core/RealmCore.framework/Headers\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -580,17 +578,13 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/Realm.dst;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Pods/realm",
-					core,
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"\"${PODS_ROOT}/Headers\"",
-					"\"${PODS_ROOT}/Headers/realm core\"",
-					"\"${PODS_ROOT}/realm core/RealmCore.framework/Headers\"",
+					"\"${PODS_ROOT}/Headers/realm_core\"",
+					"\"${PODS_ROOT}/realm_core/RealmCore.framework/Headers\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -609,8 +603,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(PROJECT_DIR)/Pods/realm",
-					core,
+					"\"$(PROJECT_DIR)/Pods/realm core\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
@@ -618,7 +611,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "RealmTests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -631,12 +624,11 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(PROJECT_DIR)/Pods/realm",
-					core,
+					"\"$(PROJECT_DIR)/Pods/realm core\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
-				INFOPLIST_FILE = "RealmTests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xctest;
 			};
