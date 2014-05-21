@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840F97C0192B7DCE006B591E /* RLMDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97BF192B7DCE006B591E /* RLMDocument.m */; };
+		840F97C4192B7EB7006B591E /* RLMRealmTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C3192B7EB7006B591E /* RLMRealmTable.m */; };
+		840F97CA192B7EF4006B591E /* RLMRealmColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C9192B7EF4006B591E /* RLMRealmColumn.m */; };
+		840F97CF192B8B6F006B591E /* RLMRealm.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97CE192B8B6F006B591E /* RLMRealm.m */; };
 		84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E0F94F1921F3B900D6CA14 /* Cocoa.framework */; };
 		84E0F95A1921F3B900D6CA14 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9581921F3B900D6CA14 /* InfoPlist.strings */; };
 		84E0F95C1921F3B900D6CA14 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F95B1921F3B900D6CA14 /* main.m */; };
 		84E0F9601921F3B900D6CA14 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F95E1921F3B900D6CA14 /* Credits.rtf */; };
-		84E0F9631921F3B900D6CA14 /* RLMDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F9621921F3B900D6CA14 /* RLMDocument.m */; };
 		84E0F9661921F3B900D6CA14 /* RLMDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9641921F3B900D6CA14 /* RLMDocument.xib */; };
 		84E0F9691921F3B900D6CA14 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9671921F3B900D6CA14 /* MainMenu.xib */; };
 		84E0F96B1921F3B900D6CA14 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F96A1921F3B900D6CA14 /* Images.xcassets */; };
@@ -32,6 +35,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		840F97BE192B7DCE006B591E /* RLMDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDocument.h; path = Classes/RLMDocument.h; sourceTree = "<group>"; };
+		840F97BF192B7DCE006B591E /* RLMDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDocument.m; path = Classes/RLMDocument.m; sourceTree = "<group>"; };
+		840F97C2192B7EB7006B591E /* RLMRealmTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmTable.h; path = Classes/RLMRealmTable.h; sourceTree = "<group>"; };
+		840F97C3192B7EB7006B591E /* RLMRealmTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmTable.m; path = Classes/RLMRealmTable.m; sourceTree = "<group>"; };
+		840F97C8192B7EF4006B591E /* RLMRealmColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmColumn.h; path = Classes/RLMRealmColumn.h; sourceTree = "<group>"; };
+		840F97C9192B7EF4006B591E /* RLMRealmColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmColumn.m; path = Classes/RLMRealmColumn.m; sourceTree = "<group>"; };
+		840F97CD192B8B6F006B591E /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm.h; path = Classes/RLMRealm.h; sourceTree = "<group>"; };
+		840F97CE192B8B6F006B591E /* RLMRealm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealm.m; path = Classes/RLMRealm.m; sourceTree = "<group>"; };
+		840F97D0192C7B17006B591E /* RLMRealmOutlineNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRealmOutlineNode.h; path = Classes/RLMRealmOutlineNode.h; sourceTree = "<group>"; };
 		84E0F94C1921F3B900D6CA14 /* RealmVisualEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmVisualEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84E0F94F1921F3B900D6CA14 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		84E0F9521921F3B900D6CA14 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -42,8 +54,6 @@
 		84E0F95B1921F3B900D6CA14 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		84E0F95D1921F3B900D6CA14 /* RealmVisualEditor-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmVisualEditor-Prefix.pch"; sourceTree = "<group>"; };
 		84E0F95F1921F3B900D6CA14 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		84E0F9611921F3B900D6CA14 /* RLMDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMDocument.h; sourceTree = "<group>"; };
-		84E0F9621921F3B900D6CA14 /* RLMDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMDocument.m; sourceTree = "<group>"; };
 		84E0F9651921F3B900D6CA14 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/RLMDocument.xib; sourceTree = "<group>"; };
 		84E0F9681921F3B900D6CA14 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		84E0F96A1921F3B900D6CA14 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -75,6 +85,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		840F97C1192B7DD4006B591E /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				840F97CC192B81DB006B591E /* Model */,
+				840F97BE192B7DCE006B591E /* RLMDocument.h */,
+				840F97BF192B7DCE006B591E /* RLMDocument.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		840F97CC192B81DB006B591E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				840F97C8192B7EF4006B591E /* RLMRealmColumn.h */,
+				840F97C9192B7EF4006B591E /* RLMRealmColumn.m */,
+				840F97CD192B8B6F006B591E /* RLMRealm.h */,
+				840F97CE192B8B6F006B591E /* RLMRealm.m */,
+				840F97C2192B7EB7006B591E /* RLMRealmTable.h */,
+				840F97C3192B7EB7006B591E /* RLMRealmTable.m */,
+				840F97D0192C7B17006B591E /* RLMRealmOutlineNode.h */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		84E0F9431921F3B900D6CA14 = {
 			isa = PBXGroup;
 			children = (
@@ -117,8 +151,7 @@
 		84E0F9551921F3B900D6CA14 /* RealmVisualEditor */ = {
 			isa = PBXGroup;
 			children = (
-				84E0F9611921F3B900D6CA14 /* RLMDocument.h */,
-				84E0F9621921F3B900D6CA14 /* RLMDocument.m */,
+				840F97C1192B7DD4006B591E /* Classes */,
 				84E0F9641921F3B900D6CA14 /* RLMDocument.xib */,
 				84E0F9671921F3B900D6CA14 /* MainMenu.xib */,
 				84E0F96A1921F3B900D6CA14 /* Images.xcassets */,
@@ -257,8 +290,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84E0F9631921F3B900D6CA14 /* RLMDocument.m in Sources */,
+				840F97CA192B7EF4006B591E /* RLMRealmColumn.m in Sources */,
+				840F97C0192B7DCE006B591E /* RLMDocument.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
+				840F97C4192B7EB7006B591E /* RLMRealmTable.m in Sources */,
+				840F97CF192B8B6F006B591E /* RLMRealm.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

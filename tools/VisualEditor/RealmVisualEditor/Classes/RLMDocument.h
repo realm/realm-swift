@@ -8,6 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface RLMDocument : NSDocument <NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMDocument : NSDocument <NSOutlineViewDataSource, NSOutlineViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @end
