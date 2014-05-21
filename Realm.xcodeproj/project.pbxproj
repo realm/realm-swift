@@ -76,6 +76,7 @@
 		02D16115192B0872007ACF50 /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C414A1191DF3EF00F858D9 /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02D1611C192BFC62007ACF50 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D1611B192BFC62007ACF50 /* RLMTestObjects.m */; };
 		02D1611D192BFC62007ACF50 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D1611B192BFC62007ACF50 /* RLMTestObjects.m */; };
+		02D4343B192D503E003A61BE /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41494191DE72100F858D9 /* RLMConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
@@ -380,6 +381,7 @@
 				02D16106192AD333007ACF50 /* RLMSchema.h in Headers */,
 				02D16114192B0872007ACF50 /* RLMObjectSchema.h in Headers */,
 				02D16115192B0872007ACF50 /* RLMProperty.h in Headers */,
+				02D4343B192D503E003A61BE /* RLMConstants.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -804,10 +806,7 @@
 					"$(SRCROOT)/../tightdb/iphone-lib",
 					"/Users/ari/src/tightdb/tightdb/iphone-lib",
 				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
 				SDKROOT = iphoneos;
@@ -844,10 +843,7 @@
 					"$(SRCROOT)/../tightdb/iphone-lib",
 					"/Users/ari/src/tightdb/tightdb/iphone-lib",
 				);
-				OTHER_LDFLAGS = (
-					"-ObjC",
-					"-all_load",
-				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
 				SDKROOT = iphoneos;

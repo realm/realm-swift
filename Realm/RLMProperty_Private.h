@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMProperty.h"
+#import <objc/runtime.h>
 
 // private property interface
 @interface RLMProperty ()

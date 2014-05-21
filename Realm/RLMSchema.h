@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectSchema.h"
+#import <Realm/RLMObjectSchema.h>
 
 @interface RLMSchema : NSObject
 

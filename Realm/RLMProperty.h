@@ -20,8 +20,7 @@
 
 
 #import <Foundation/Foundation.h>
-#import <objc/runtime.h>
-#import "RLMConstants.h"
+#import <Realm/RLMConstants.h>
 
 // object property definition
 @interface RLMProperty : NSObject

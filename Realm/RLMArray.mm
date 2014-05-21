@@ -37,7 +37,7 @@
 @interface RLMArray ()
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 @property (nonatomic, assign) tightdb::TableView backingView;
-@property (nonatomic, assign) NSString *objectClassName;
+@property (nonatomic, copy) NSString *objectClassName;
 @end
 
 //
