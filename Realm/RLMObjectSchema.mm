@@ -76,9 +76,9 @@
 // class and the name to be used in the schema - used for migrations and dynamic interface
 +(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className {
     // create array of RLMProperties
-    unsigned long count = table->get_column_count();
+    size_t count = table->get_column_count();
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
-    for (unsigned long col = 0; col < count; col++) {
+    for (size_t col = 0; col < count; col++) {
         // create new property
         NSString *name = [NSString stringWithUTF8String:table->get_column_name(col).data()];
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name

@@ -20,7 +20,6 @@
 
 
 #import <Foundation/Foundation.h>
-#import "RLMMigration.h"
 
 @class RLMObject;
 @class RLMArray;
@@ -320,6 +319,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 @end
 
 
+@class RLMMigrationRealm;
+typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
+
 @interface RLMRealm (Migrations)
 /**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
@@ -332,11 +334,11 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  default Realm is at a version other than <code>version</code>, the migration is applied.
  
  @param version     The current schema version.
- @param migration   The migration object (which implmements the RLMMigration protocol).
+ @param block       The block which migrates the Realm to the current version.
  
- @see               RLMMigration protocol
+ @see               RLMMigrationRealm
  */
-+ (void)ensureSchemaVersion:(NSUInteger)version usingMigration:(id<RLMMigration>)migration;
++ (void)ensureSchemaVersion:(NSUInteger)version usingBlock:(RLMMigrationBlock)block;
 
 /**
  Performs a migration on a Realm at a path.
@@ -346,12 +348,12 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  
  @param version     The current schema version.
  @param realmPath   The path of the relm to migrate.
- @param migration   The migration object (which implmements the RLMMigration protocol).
+ @param block       The block which migrates the Realm to the current version.
  
- @see               RLMMigration protocol
+ @see               RLMMigrationRealm
  */
 + (void)ensureSchemaVersion:(NSUInteger)version
                      atPath:(NSString *)realmPath
-             usingMigration:(id<RLMMigration>)migration;
+                 usingBlock:(RLMMigrationBlock)block;
 
 @end

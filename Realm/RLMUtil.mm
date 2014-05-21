@@ -101,8 +101,6 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return NO;
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
-        case RLMPropertyTypeNone:
-            break;
 
         // FIXME: missing entries
         case RLMPropertyTypeObject:

@@ -110,7 +110,6 @@ inline NSError* make_realm_error(RLMError code, exception &ex)
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
 @property (nonatomic) BOOL isReadOnly;
-@property (nonatomic) id<RLMMigration> migration;
 @property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
@@ -510,11 +509,6 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 -(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-+ (void)setMigration:(id<RLMMigration>)block realmVersion:(NSUInteger)version {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
