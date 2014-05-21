@@ -283,7 +283,8 @@
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns a JSON string of an RLMArray and all of its objects.
+ Returns a JSON string of an RLMArray and all of its objects. If a mapping between 
+ JSON keys and property names is declared, properties names will be transformed.
  
  @return    JSON string representation of this RLMArray.
  */
@@ -298,4 +299,3 @@
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
 
 @end
-

@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -202,7 +202,7 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
-/**---------------------------------------------------------------------------------------
+/**----------------------------------------------------------------------------------------
  *  @name Dynamic Accessors
  *  ---------------------------------------------------------------------------------------
  *
@@ -218,10 +218,32 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
-/**---------------------------------------------------------------------------------------
+/**.---------------------------------------------------------------------------------------
  *  @name JSON Serialization
  *  ---------------------------------------------------------------------------------------
  */
+@protocol RLMJSONSerialization
+@optional
+/**
+ Setup a mapping between JSON keys and property names. For cases where
+ JSON key and property name are identical a mapping is not required.
+ 
+ @return A NSDirectory with property names as key and JSON keys as value.
+ */
++(NSDictionary *)propertyKeyMapping;
+
+/**
+ Implement this optional method if a JSON value cannot be transformed
+ by standard methods to a Objective C value.
+ 
+ @param key     The JSON key.
+ @return    The transformer, nil if standard transformation can be used.
+ */
++(NSValueTransformer *)getTransformerForKey:(NSString *)key;
+
+@end
+
+
 @interface RLMObject (JSONSerialization)
 /**
  Returns this object represented as a JSON string.
@@ -231,5 +253,3 @@ extern NSString *const RLMPropertyAttributeRequired;
 - (NSString *)JSONString;
 
 @end
-
-
