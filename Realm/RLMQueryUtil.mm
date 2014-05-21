@@ -21,7 +21,6 @@
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
-#import "NSData+RLMGetBinaryData.h"
 
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
@@ -240,7 +239,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
                                     NSData *value) {
-    tightdb::BinaryData binData = [value rlmBinaryData];
+    tightdb::BinaryData binData = RLMBinaryDataForNSData(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             query.begins_with(index, binData);
