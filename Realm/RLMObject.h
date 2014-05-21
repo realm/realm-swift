@@ -84,61 +84,64 @@
  * Attributes which can be returned when implementing attributesForProperty:
  */
 
-/**
- Create an index for this property for improved search performance.
- */
-extern NSString *const RLMPropertyAttributeIndexed;
+typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
+    /**
+     Create an index for this property for improved search performance.
+     */
+    RLMPropertyAttributeIndexed = 1 << 2,
+    
+    /**
+     Store this property inline (de-normalization) which in some cases can improve performance. Setting this
+     attribute will result in objects being copied (rather than linked) when getting and setting this property.
+     */
+    RLMPropertyAttributeInlined = 1 << 3,
 
-/**
- Store this property inline (de-normalization) which in some cases can improve performance. Setting this
- attribute will result in objects being copied (rather than linked) when getting and setting this property.
- */
-extern NSString *const RLMPropertyAttributeInlined;
+    /**
+     The value for a property with this attribute must be unique across all objects of this type. An exception
+     will be thrown when setting a property with this attribute to a non-unique value.
+     */
+    RLMPropertyAttributeUnique = 1 << 4,
 
-/**
- The value for a property with this attribute must be unique across all objects of this type. An exception
- will be thrown when setting a property with this attribute to a non-unique value.
- */
-extern NSString *const RLMPropertyAttributeUnique;
+    /**
+     This property value must be set before the object can be added to a Realm. If not set an
+     exception will be thrown if no default value for this property is specified. If a default
+     value is specified it is set upon insertion into a Realm
+     
+     @see defaultPropertyValues
+     */
+    RLMPropertyAttributeRequired = 1 << 5,
+    
+    
+    /**---------------------------------------------------------------------------------------
+     *  @name Delete Rule Attributes
+     * ---------------------------------------------------------------------------------------
+     * Set the following attributes on RLMPropertyTypeObject or RLMPropertyTypeArray properties
+     * to customize a properties delete rules. These rules are mutually exclusive.
+     */
 
-/**
- This property value must be set before the object can be added to a Realm. If not set an
- exception will be thrown if no default value for this property is specified. If a default
- value is specified it is set upon insertion into a Realm
- 
- @see defaultPropertyValues
- */
-extern NSString *const RLMPropertyAttributeRequired;
+    /**
+     When a parent object is deleted or a child property is nullified nothing is done.
+     This is the default delete rule.
+     */
+    RLMPropertyAttributeDeleteNever = 0,
+    
+    /**
+     Delete a child object (or object in an RLMArray) when the parent is deleted or the object is
+     nullified only if no other objects in the realm reference the object.
+     */
+    RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
+    
+    /**
+     Always delete a child object or object in a child array when the parent is deleted or the
+     reference in nullified. If other objects reference the same child object those references are
+     nullified.
+     */
+    RLMPropertyAttributeDeleteAlways = 1 << 1
+};
+
 
 /**---------------------------------------------------------------------------------------
- *  @name Delete Rule Attributes
- * ---------------------------------------------------------------------------------------
- * Set the following attributes on RLMPropertyTypeObject or RLMPropertyTypeArray properties
- * to customize a properties delete rules
- */
-
-/**
- When a parent object is deleted or a child property is nullified nothing is done. 
- This is the default delete rule.
- */
-extern NSString *const RLMPropertyAttributeDeleteNever;
-
-/**
- Delete a child object (or object in an RLMArray) when the parent is deleted or the object is 
- nullified only if no other objects in the realm reference the object.
- */
-extern NSString *const RLMPropertyAttributeDeleteIfOnlyOwner;
-
-/**
- Always delete a child object or object in a child array when the parent is deleted or the 
- reference in nullified. If other objects reference the same child object those references are
- nullified.
- */
-extern NSString *const RLMPropertyAttributeDeleteAlways;
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Sublcass Customization
+ *  @name Subclass Customization
  *  ---------------------------------------------------------------------------------------
  *
  * These methods can be overridden to customize the behavior of RLMObject subclasses.
@@ -149,9 +152,9 @@ extern NSString *const RLMPropertyAttributeDeleteAlways;
  Implement to set custom attributes for each property.
  
  @param propertyName    Name of property for which attributes have been requested.
- @return                Array of property attributes for the given property.
+ @return                Bitmask of property attributes for the given property.
  */
-+ (NSArray *)attributesForProperty:(NSString *)propertyName;
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
 
 /**
  Implement to indicate the default values to be used for each property.

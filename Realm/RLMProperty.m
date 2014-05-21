@@ -79,7 +79,7 @@
     }
 }
 
-// determine RLMPropertyType from objc code - returna true if valid type was found/set
+// determine RLMPropertyType from objc code - returns true if valid type was found/set
 -(BOOL)parsePropertyTypeString:(const char *)code {
     _objcType = *(code);    // first char of type attr
     if (self.objcType == 'q') {
