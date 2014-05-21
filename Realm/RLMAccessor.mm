@@ -24,8 +24,6 @@
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
-#import "NSData+RLMGetBinaryData.h"
-#import "NSString+RLMStringData.h"
 
 #import <objc/runtime.h>
 
@@ -78,8 +76,7 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
             });
         case 's':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                tightdb::StringData strData = obj.backingTable->get_string(col, obj.objectIndex);
-                return [NSString stringWithRLMStringData:strData];
+                return RLMStringDataToNSString(obj.backingTable->get_string(col, obj.objectIndex));
             });
         case 'a':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -141,7 +138,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
             });
         case 's':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
-                obj.backingTable->set_string(col, obj.objectIndex, val.RLMStringData);
+                obj.backingTable->set_string(col, obj.objectIndex, RLMStringDataWithNSString(val));
             });
         case 'a':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
@@ -150,7 +147,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
             });
         case 'e':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSData *data) {
-                obj.backingTable->set_binary(col, obj.objectIndex, data.rlmBinaryData);
+                obj.backingTable->set_binary(col, obj.objectIndex, RLMBinaryDataForNSData(data));
             });
         case 'k':
 //            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
