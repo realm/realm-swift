@@ -16,10 +16,10 @@
 // mapping of className to tableName
 @property (nonatomic, readonly) NSMutableDictionary *tableNamesForClass;
 
-// schema based on runime objects
+// schema based on runtime objects
 +(instancetype)sharedSchema;
 
-// schema based on tables in a realm
+// schema based on tables in a Realm
 +(instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
 
 // get object class to use for a given class name
