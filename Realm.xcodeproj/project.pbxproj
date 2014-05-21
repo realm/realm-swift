@@ -69,6 +69,10 @@
 		02C4155B1923DDFC00F858D9 /* RLMAccesor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C415581923DDFC00F858D9 /* RLMAccesor.h */; };
 		02C4155C1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
 		02C4155D1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
+		02D160E3192A716B007ACF50 /* RLMArrayAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02D160E1192A716B007ACF50 /* RLMArrayAccessor.h */; };
+		02D160E4192A716B007ACF50 /* RLMArrayAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02D160E1192A716B007ACF50 /* RLMArrayAccessor.h */; };
+		02D160E5192A716B007ACF50 /* RLMArrayAccessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D160E2192A716B007ACF50 /* RLMArrayAccessor.m */; settings = {COMPILER_FLAGS = "-Wno-unused-parameter"; }; };
+		02D160E6192A716B007ACF50 /* RLMArrayAccessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 02D160E2192A716B007ACF50 /* RLMArrayAccessor.m */; settings = {COMPILER_FLAGS = "-Wno-unused-parameter"; }; };
 		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
@@ -151,6 +155,8 @@
 		02C415521921BF3C00F858D9 /* Realm-iOS-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Realm-iOS-Prefix.pch"; sourceTree = "<group>"; };
 		02C415581923DDFC00F858D9 /* RLMAccesor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccesor.h; sourceTree = "<group>"; };
 		02C415591923DDFC00F858D9 /* RLMAccesor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMAccesor.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		02D160E1192A716B007ACF50 /* RLMArrayAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArrayAccessor.h; sourceTree = "<group>"; };
+		02D160E2192A716B007ACF50 /* RLMArrayAccessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMArrayAccessor.m; sourceTree = "<group>"; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = release_notes.md; sourceTree = "<group>"; };
@@ -212,6 +218,8 @@
 				02C415591923DDFC00F858D9 /* RLMAccesor.mm */,
 				02C41482191DE57600F858D9 /* RLMArray.h */,
 				02C41488191DE58D00F858D9 /* RLMArray.mm */,
+				02D160E1192A716B007ACF50 /* RLMArrayAccessor.h */,
+				02D160E2192A716B007ACF50 /* RLMArrayAccessor.m */,
 				02C41494191DE72100F858D9 /* RLMConstants.h */,
 				02C41495191DE95800F858D9 /* RLMConstants.m */,
 				02C41483191DE57600F858D9 /* RLMObject.h */,
@@ -337,6 +345,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02C414C4191F41AE00F858D9 /* Realm.h in Headers */,
+				02D160E3192A716B007ACF50 /* RLMArrayAccessor.h in Headers */,
 				02C41487191DE57600F858D9 /* RLMRealm.h in Headers */,
 				02C41486191DE57600F858D9 /* RLMObject.h in Headers */,
 				02C4155A1923DDFC00F858D9 /* RLMAccesor.h in Headers */,
@@ -357,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02C4154B1921BE4700F858D9 /* Realm.h in Headers */,
+				02D160E4192A716B007ACF50 /* RLMArrayAccessor.h in Headers */,
 				02C4154D1921BE4E00F858D9 /* RLMRealm.h in Headers */,
 				02C4154C1921BE4900F858D9 /* RLMArray.h in Headers */,
 				02C4154F1921BE5500F858D9 /* RLMObject.h in Headers */,
@@ -537,6 +547,7 @@
 				02C4155C1923DDFC00F858D9 /* RLMAccesor.mm in Sources */,
 				02C41489191DE58D00F858D9 /* RLMArray.mm in Sources */,
 				02C414A9191DF3EF00F858D9 /* RLMObjectStore.mm in Sources */,
+				02D160E5192A716B007ACF50 /* RLMArrayAccessor.m in Sources */,
 				02C4148D191DE5B100F858D9 /* RLMRealm.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -567,6 +578,7 @@
 				02C4155D1923DDFC00F858D9 /* RLMAccesor.mm in Sources */,
 				02C415361921B10A00F858D9 /* RLMQueryUtil.mm in Sources */,
 				02C415391921B10A00F858D9 /* RLMRealm.mm in Sources */,
+				02D160E6192A716B007ACF50 /* RLMArrayAccessor.m in Sources */,
 				02C4153C1921B10A00F858D9 /* RLMUtil.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -708,6 +720,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-Wall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -740,6 +753,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-Wall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -853,6 +867,7 @@
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../tightdb/iphone-lib";
+				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -887,6 +902,7 @@
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../tightdb/iphone-lib";
+				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = "-ltightdb-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -933,6 +949,11 @@
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-ltightdb-dbg";
 				SDKROOT = macosx;
 			};
@@ -968,6 +989,11 @@
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-ltightdb";
 				SDKROOT = macosx;
 			};
