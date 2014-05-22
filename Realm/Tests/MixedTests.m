@@ -43,7 +43,7 @@
     [MixedObject createInRealm:_realm withObject:@[@YES, [NSData dataWithBytes:(void *)data length:strlen(data)], @56]];
     [_realm commitWriteTransaction];
 
-    RLMArray *objects = [_realm objects:MixedObject.class where:nil];
+    RLMArray *objects = [_realm objects:MixedObject.className where:nil];
     XCTAssertEqual(objects.count, (NSUInteger)6, @"6 rows excepted");
     XCTAssertTrue([[objects objectAtIndex:0] isKindOfClass:[MixedObject class]], @"MixedObject expected");
     XCTAssertTrue([[objects objectAtIndex:0][@"other"] isKindOfClass:[NSString class]], @"NSString expected");
