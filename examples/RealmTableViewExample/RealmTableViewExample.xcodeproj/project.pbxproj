@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		02C415561921C26600F858D9 /* libRealm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C415551921C26600F858D9 /* libRealm.a */; };
+		42C10B3E192DFB51000F9787 /* libRealm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 42C10B3D192DFB51000F9787 /* libRealm.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D318FEFFD70071CFAB /* Foundation.framework */; };
 		E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D518FEFFD70071CFAB /* CoreGraphics.framework */; };
 		E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D718FEFFD70071CFAB /* UIKit.framework */; };
@@ -21,6 +21,7 @@
 
 /* Begin PBXFileReference section */
 		02C415551921C26600F858D9 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
+		42C10B3D192DFB51000F9787 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Release-iphoneos/libRealm.a"; sourceTree = "<group>"; };
 		E80762D018FEFFD70071CFAB /* RealmTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -43,7 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02C415561921C26600F858D9 /* libRealm.a in Frameworks */,
+				42C10B3E192DFB51000F9787 /* libRealm.a in Frameworks */,
 				E807630818FF00F00071CFAB /* libstdc++.6.dylib in Frameworks */,
 				E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */,
 				E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */,
