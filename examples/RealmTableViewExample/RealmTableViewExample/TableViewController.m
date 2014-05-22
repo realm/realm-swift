@@ -18,6 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+
 #import "TableViewController.h"
 #import <Realm/Realm.h>
 
@@ -47,7 +48,10 @@ static NSString * const kTableName = @"table";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupUI];
-    
+
+    // FIXME: Reset realm
+    //[[DemoObject allObjects] removeAllObjects];
+
     // Set realm notification block
     NSString *order = nil; // FIXME - crashes @"date"
     [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
