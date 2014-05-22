@@ -21,7 +21,7 @@
 @end
 
 @implementation RLMDocument {
-    NSArray *testRealms;
+    RLMRealmNode *presentedRealm;
     RLMTableNode *selectedTable;
     NSUInteger selectedRowIndex;
 }
@@ -41,8 +41,7 @@
                     
                     RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
                                                                          url:absoluteURL.path];
-                    testRealms = @[realm];
-                    
+                    presentedRealm = realm;
                 }
             }
             else {
@@ -100,12 +99,21 @@
     return YES;
 }
 
+#pragma mnark - Public methods - NSDocument overrides
+
+- (NSString *)displayName {
+    if (presentedRealm.name != nil)
+        return presentedRealm.name;
+    
+    return [super displayName];
+}
+
 #pragma mark - NSOutlineViewDataSource implementation
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     if (item == nil) {
-        return testRealms[index];
+        return presentedRealm;
     }
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
@@ -118,7 +126,7 @@
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
     if (item == nil) {
-        return testRealms.count != 0;
+        return presentedRealm == nil;
     }
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
@@ -131,7 +139,7 @@
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     if (item == nil) {
-        return testRealms.count;
+        return 1;
     }
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
@@ -208,8 +216,7 @@
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
         RLMTableColumn *columnNode = selectedTable.tableColumns[columnIndex];
 
-        RLMRealmNode *realmNode = testRealms[0];
-        RLMRealm *realm = realmNode.realm;
+        RLMRealm *realm = presentedRealm.realm;
         
         switch (columnNode.columnType) {
             case RLMTypeBool: {
