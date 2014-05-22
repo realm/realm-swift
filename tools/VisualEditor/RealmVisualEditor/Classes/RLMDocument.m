@@ -26,7 +26,15 @@
     NSUInteger selectedRowIndex;
 }
 
-- (id)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+    }
+    return self;
+}
+
+- (instancetype)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     if (self = [super init]) {
         if ([[typeName lowercaseString] isEqualToString:@"documenttype"]) {
@@ -353,7 +361,7 @@
             column.columnType == RLMTypeFloat ||
             column.columnType == RLMTypeDouble ||
             column.columnType == RLMTypeString) {
-            tableColumn.editable = YES;            
+            tableColumn.editable = YES;
         }
         else {
             tableColumn.editable = NO;
