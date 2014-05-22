@@ -90,6 +90,10 @@
 		02E4D6E5192E3DC40082808D /* RLMUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A8192E3DC40082808D /* RLMUtil.h */; };
 		02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A9192E3DC40082808D /* RLMUtil.mm */; };
 		02E4D6E7192E3DC40082808D /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A9192E3DC40082808D /* RLMUtil.mm */; };
+		02E4D6E9192E58250082808D /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6E8192E58250082808D /* MixedTests.m */; };
+		02E4D6EA192E58250082808D /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6E8192E58250082808D /* MixedTests.m */; };
+		02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
+		02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
 		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
@@ -179,6 +183,9 @@
 		02E4D6A7192E3DC40082808D /* RLMSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSchema.mm; sourceTree = "<group>"; };
 		02E4D6A8192E3DC40082808D /* RLMUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUtil.h; sourceTree = "<group>"; };
 		02E4D6A9192E3DC40082808D /* RLMUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUtil.mm; sourceTree = "<group>"; };
+		02E4D6E8192E58250082808D /* MixedTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MixedTests.m; sourceTree = "<group>"; };
+		02E4D6EB192E58320082808D /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
+		02E4D6EE192E583A0082808D /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = release_notes.md; sourceTree = "<group>"; };
@@ -287,8 +294,11 @@
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
+				02E4D6E8192E58250082808D /* MixedTests.m */,
 				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
 				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
+				02E4D6EE192E583A0082808D /* RLMTestObjects.h */,
+				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
 				02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */,
 				02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
@@ -592,7 +602,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
+				02E4D6E9192E58250082808D /* MixedTests.m in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
+				02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */,
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
@@ -623,7 +635,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
+				02E4D6EA192E58250082808D /* MixedTests.m in Sources */,
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
+				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
 				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
 				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
