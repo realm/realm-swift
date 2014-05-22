@@ -200,8 +200,11 @@
         
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
         id object = row[columnIndex];
-        if ([object isKindOfClass:[RLMTableNode class]] || [object isKindOfClass:[RLMTable class]]) {
+        if ([object isKindOfClass:[RLMTable class]]) {
             return @"<Sub table>";
+        }
+        else if ([object isKindOfClass:[NSNumber class]]) {
+        
         }
         
         return object;
@@ -241,7 +244,8 @@
                 if ([object isKindOfClass:[NSNumber class]]) {
                     [realm writeUsingBlock:^(RLMRealm *realm) {
                         RLMTable *table = [realm tableWithName:selectedTable.tableName];
-                        table[rowIndex][columnIndex] = @(((NSNumber *)object).floatValue);
+                        NSNumber *storeValue = @(((NSNumber *)object).floatValue);
+                        table[rowIndex][columnIndex] = storeValue;
                     }];
                 }
                 break;
@@ -250,7 +254,8 @@
                 if ([object isKindOfClass:[NSNumber class]]) {
                     [realm writeUsingBlock:^(RLMRealm *realm) {
                         RLMTable *table = [realm tableWithName:selectedTable.tableName];
-                        table[rowIndex][columnIndex] = @(((NSNumber *)object).doubleValue);
+                        NSNumber *storeValue = @(((NSNumber *)object).doubleValue);
+                        table[rowIndex][columnIndex] = storeValue;
                     }];
                 }
                 break;
@@ -301,6 +306,8 @@
             case RLMTypeFloat:
             case RLMTypeDouble: {
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+                formatter.allowsFloats = YES;
+                formatter.numberStyle = NSNumberFormatterDecimalStyle;
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
@@ -326,43 +333,48 @@
 
     // How many columns does the table contains?
     NSArray *columns = selectedTable.tableColumns;
-    NSUInteger requiredColumnCount = columns.count;
-    
-    // If we have more columns than needed we remove the ones in excess
+    NSUInteger columnCount = columns.count;
+
+    // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.realmTableColumnsView.numberOfColumns;
-    if (requiredColumnCount <= existingColumnsCount) {
-        NSUInteger excessColumnCount = existingColumnsCount - requiredColumnCount;
-        for (NSUInteger index = 0; index < excessColumnCount; index++) {
-            NSTableColumn *column = [self.realmTableColumnsView.tableColumns lastObject];
-            [self.realmTableColumnsView removeTableColumn:column];
-        }
+    for (NSUInteger index = 0; index < existingColumnsCount; index++) {
+        NSTableColumn *column = [self.realmTableColumnsView.tableColumns lastObject];
+        [self.realmTableColumnsView removeTableColumn:column];
     }
-    // Otherwise we need to add new columns to display all columns
-    else {
-        for (NSUInteger index = 0; index < requiredColumnCount - existingColumnsCount; index++) {
-            NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
-            
-            RLMTableColumn *column = columns[index];
-            
-            if (column.columnType == RLMTypeBool ||
-                column.columnType == RLMTypeInt ||
-                column.columnType == RLMTypeFloat ||
-                column.columnType == RLMTypeDouble ||
-                column.columnType == RLMTypeString) {
-                tableColumn.editable = YES;
-            
-            }
-            else {
-                tableColumn.editable = NO;
-            }
-            
-            [self.realmTableColumnsView addTableColumn:tableColumn];
+
+    // ... and add new columns matching the structure of the new realm table.
+    for (NSUInteger index = 0; index < columnCount; index++) {
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
+        
+        RLMTableColumn *column = columns[index];
+        
+        if (column.columnType == RLMTypeBool ||
+            column.columnType == RLMTypeInt ||
+            column.columnType == RLMTypeFloat ||
+            column.columnType == RLMTypeDouble ||
+            column.columnType == RLMTypeString) {
+            tableColumn.editable = YES;            
         }
+        else {
+            tableColumn.editable = NO;
+        }
+        
+        [self.realmTableColumnsView addTableColumn:tableColumn];
     }
     
     // Set the column names
     for (NSUInteger index = 0; index < columns.count; index++) {
         NSTableColumn *tableColumn = self.realmTableColumnsView.tableColumns[index];
+        RLMTableColumn *rlmTableColumn = columns[index];
+        
+        if(rlmTableColumn.columnType == RLMTypeBool) {
+            NSButtonCell *cell = [[NSButtonCell alloc] init];
+            [cell setTitle:nil];
+            [cell setAllowsMixedState:YES];
+            [cell setButtonType:NSSwitchButton];
+            tableColumn.dataCell = cell;
+        }
+        
         NSTableHeaderCell *headerCell = tableColumn.headerCell;
         RLMTableColumn *column = columns[index];
         headerCell.stringValue = column.columnName;
