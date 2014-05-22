@@ -10,6 +10,12 @@
 
 @implementation RLMApplicationDelegate
 
+-(void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+    NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
+    [self.fileMenu performActionForItemAtIndex:openFileIndex];    
+}
+
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
     return NO;

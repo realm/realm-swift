@@ -10,4 +10,7 @@
 
 @interface RLMApplicationDelegate : NSObject <NSApplicationDelegate>
 
+@property (nonatomic, weak) IBOutlet NSMenu *fileMenu;
+@property (nonatomic, weak) IBOutlet NSMenuItem *openMenuItem;
+
 @end
