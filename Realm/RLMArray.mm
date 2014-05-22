@@ -18,13 +18,27 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMArray.h"
-#import "RLMPrivate.hpp"
+#import "RLMArray_Private.hpp"
+#import "RLMArrayAccessor.h"
+
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMConstants.h"
-#import "RLMArrayAccessor.h"
 
+#import <objc/runtime.h>
+
+#import <tightdb/util/unique_ptr.hpp>
+
+//
+// Private properties
+//
+@interface RLMArray ()
+@property (nonatomic, assign) tightdb::Query *backingQuery;
+@property (nonatomic, assign) tightdb::TableView backingView;
+@property (nonatomic, copy) NSString *objectClassName;
+@end
 
 //
 // RLMArray implementation
@@ -40,10 +54,22 @@
 @synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
-- (instancetype)initWithObjectClass:(Class)objectClass {
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                  query:(tightdb::Query *)query
+                                   view:(tightdb::TableView &)view {
     self = [super init];
     if (self) {
-        self.objectClass = objectClass;
+        self.objectClassName = objectClassName;
+        self.backingQuery = query;
+        self.backingView = view;
+    }
+    return self;
+}
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
+    self = [super init];
+    if (self) {
+        self.objectClassName = objectClassName;
     }
     return self;
 }
@@ -64,7 +90,7 @@
 
 inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return RLMCreateObjectAccessor(array->_realm,
-                                   array->_objectClass,
+                                   array->_objectClassName,
                                    array->_backingView.get_source_ndx(index));
 }
 
@@ -160,12 +186,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 }
 
 - (RLMArray *)copy {
-    RLMArray *array = [[RLMArray alloc] initWithObjectClass:_objectClass];
+    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:_objectClassName];
     array.realm = _realm;
     array.backingTable = _backingTable;
     array.backingTableIndex = _backingTableIndex;
-    array.backingView = _backingView;
     array.backingQuery = new tightdb::Query(*_backingQuery);
+    array.backingView = array.backingTable->where(&_backingView).find_all();
     [_realm registerAccessor:array];
     return array;
 }
@@ -176,9 +202,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLM_PREDICATE(predicate, outPred);
     
     // copy array and apply new predicate creating a new query and view
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);;
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[_objectClassName]);
     array.backingView = array.backingQuery->find_all();
     return array;
 }
@@ -189,19 +214,19 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLM_PREDICATE(predicate, outPred);
     
     // copy array and apply new predicate
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
+    RLMObjectSchema *schema = array.realm.schema[_objectClassName];
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
     tightdb::TableView view = array.backingQuery->find_all();
     
     // apply order
-    RLMUpdateViewWithOrder(view, order, desc);
+    RLMUpdateViewWithOrder(view, order, schema);
     array.backingView = view;
     return array;
 }
 
 -(id)minOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -224,7 +249,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -247,7 +272,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -266,7 +291,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     

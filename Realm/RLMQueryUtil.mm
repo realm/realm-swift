@@ -20,7 +20,7 @@
 
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
-#import "NSData+RLMGetBinaryData.h"
+#import "RLMProperty_Private.h"
 
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
@@ -28,7 +28,7 @@ NSException *RLMPredicateException(NSString *name, NSString *reason) {
 }
 
 // return the column index for a validated column name
-NSUInteger RLMValidatedColumnIndex(RLMObjectDescriptor *desc, NSString *columnName) {
+NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) {
     RLMProperty *prop = desc[columnName];
     if (!prop) {
         @throw RLMPredicateException(@"Invalid column name",
@@ -239,7 +239,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
                                     NSData *value) {
-    tightdb::BinaryData binData = [value rlmBinaryData];
+    tightdb::BinaryData binData = RLMBinaryDataForNSData(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             query.begins_with(index, binData);
@@ -286,7 +286,7 @@ void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperat
     }
 }
 
-void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Query & query,
+void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query & query,
                                         NSString * columnName, id value, NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions) {
     
@@ -336,7 +336,7 @@ void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Que
     }
 }
 
-void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *desc, tightdb::Query & query)
+void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *desc, tightdb::Query & query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -415,7 +415,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *d
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectDescriptor *desc)
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectSchema *desc)
 {
     // parse and apply predicate tree
     if (predicate) {
@@ -441,7 +441,7 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectD
     }
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc) {
+void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema *desc) {
     if (order) {
         NSString *propName;
         BOOL ascending = YES;

@@ -18,24 +18,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectDescriptor.h"
+#import "RLMObjectSchema.h"
+#import "RLMUtil.h"
+#import "RLMProperty_Private.h"
+#import <tightdb/table.hpp>
 
-@interface RLMObjectDescriptor ()
+
+// private properties
+@interface RLMObjectSchema ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
-
+@property (nonatomic, readwrite, assign) NSString *className;
 @end
 
-// static caches for schema and proxy classes
-static NSMutableDictionary * s_descriptorCache;
 
-@implementation RLMObjectDescriptor
-
-+ (void)initialize {
-    if (self == [RLMObjectDescriptor class]) {
-        s_descriptorCache = [NSMutableDictionary dictionary];
-    }
-}
+@implementation RLMObjectSchema
 
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
@@ -52,12 +49,7 @@ static NSMutableDictionary * s_descriptorCache;
     _properties = properties;
 }
 
-+(instancetype)descriptorForObjectClass:(Class)objectClass {
-    NSString * className = NSStringFromClass(objectClass);
-    if (s_descriptorCache[className]) {
-        return s_descriptorCache[className];
-    }
-    
++(instancetype)schemaForObjectClass:(Class)objectClass {
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -74,12 +66,39 @@ static NSMutableDictionary * s_descriptorCache;
     free(props);
     
     // create schema object and set properties
-    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor new];
-    descriptor.properties = propArray;
-    descriptor->_objectClass = objectClass;
+    RLMObjectSchema * schema = [RLMObjectSchema new];
+    schema.properties = propArray;
+    schema.className = NSStringFromClass(objectClass);
+    return schema;
+}
+
+
+// generate a schema from a table - specify the custom class name for the dynamic
+// class and the name to be used in the schema - used for migrations and dynamic interface
++(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className {
+    // create array of RLMProperties
+    size_t count = table->get_column_count();
+    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
+    for (size_t col = 0; col < count; col++) {
+        // create new property
+        NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
+        RLMProperty *prop = [[RLMProperty alloc] initWithName:name
+                                                         type:RLMPropertyType(table->get_column_type(col))
+                                                       column:col];
+        
+        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+            @throw [NSException exceptionWithName:@"RLMNotImplementedException" reason:@"Not implemented." userInfo:nil];
+        }
+        
+        [propArray addObject:prop];
+    }
     
-    s_descriptorCache[className] = descriptor;
-    return descriptor;
+    // create schema object and set properties
+    RLMObjectSchema * schema = [RLMObjectSchema new];
+    schema.properties = propArray;
+    schema.className = className;
+    
+    return schema;
 }
 
 @end
