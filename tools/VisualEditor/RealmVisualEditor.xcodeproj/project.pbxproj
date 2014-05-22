@@ -8,9 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		840F97C0192B7DCE006B591E /* RLMDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97BF192B7DCE006B591E /* RLMDocument.m */; };
-		840F97C4192B7EB7006B591E /* RLMRealmTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C3192B7EB7006B591E /* RLMRealmTable.m */; };
-		840F97CA192B7EF4006B591E /* RLMRealmColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C9192B7EF4006B591E /* RLMRealmColumn.m */; };
-		840F97CF192B8B6F006B591E /* RLMRealm.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97CE192B8B6F006B591E /* RLMRealm.m */; };
+		840F97C4192B7EB7006B591E /* RLMTableNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C3192B7EB7006B591E /* RLMTableNode.m */; };
+		840F97CA192B7EF4006B591E /* RLMTableColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97C9192B7EF4006B591E /* RLMTableColumn.m */; };
+		840F97CF192B8B6F006B591E /* RLMRealmNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97CE192B8B6F006B591E /* RLMRealmNode.m */; };
+		840F97D9192CB0E9006B591E /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97D8192CB0E9006B591E /* RealmCore.framework */; };
+		840F97DD192CB282006B591E /* librealm-objc.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97DB192CB281006B591E /* librealm-objc.4.dylib */; };
+		840F97DE192CB2CA006B591E /* librealm-objc-dbg.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97DA192CB281006B591E /* librealm-objc-dbg.4.dylib */; };
+		840F97DF192CB2E6006B591E /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97D8192CB0E9006B591E /* RealmCore.framework */; };
 		84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E0F94F1921F3B900D6CA14 /* Cocoa.framework */; };
 		84E0F95A1921F3B900D6CA14 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9581921F3B900D6CA14 /* InfoPlist.strings */; };
 		84E0F95C1921F3B900D6CA14 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F95B1921F3B900D6CA14 /* main.m */; };
@@ -37,13 +41,31 @@
 /* Begin PBXFileReference section */
 		840F97BE192B7DCE006B591E /* RLMDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDocument.h; path = Classes/RLMDocument.h; sourceTree = "<group>"; };
 		840F97BF192B7DCE006B591E /* RLMDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDocument.m; path = Classes/RLMDocument.m; sourceTree = "<group>"; };
-		840F97C2192B7EB7006B591E /* RLMRealmTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmTable.h; path = Classes/RLMRealmTable.h; sourceTree = "<group>"; };
-		840F97C3192B7EB7006B591E /* RLMRealmTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmTable.m; path = Classes/RLMRealmTable.m; sourceTree = "<group>"; };
-		840F97C8192B7EF4006B591E /* RLMRealmColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmColumn.h; path = Classes/RLMRealmColumn.h; sourceTree = "<group>"; };
-		840F97C9192B7EF4006B591E /* RLMRealmColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmColumn.m; path = Classes/RLMRealmColumn.m; sourceTree = "<group>"; };
-		840F97CD192B8B6F006B591E /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm.h; path = Classes/RLMRealm.h; sourceTree = "<group>"; };
-		840F97CE192B8B6F006B591E /* RLMRealm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealm.m; path = Classes/RLMRealm.m; sourceTree = "<group>"; };
+		840F97C2192B7EB7006B591E /* RLMTableNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTableNode.h; path = Classes/RLMTableNode.h; sourceTree = "<group>"; };
+		840F97C3192B7EB7006B591E /* RLMTableNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTableNode.m; path = Classes/RLMTableNode.m; sourceTree = "<group>"; };
+		840F97C8192B7EF4006B591E /* RLMTableColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTableColumn.h; path = Classes/RLMTableColumn.h; sourceTree = "<group>"; };
+		840F97C9192B7EF4006B591E /* RLMTableColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTableColumn.m; path = Classes/RLMTableColumn.m; sourceTree = "<group>"; };
+		840F97CD192B8B6F006B591E /* RLMRealmNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmNode.h; path = Classes/RLMRealmNode.h; sourceTree = "<group>"; };
+		840F97CE192B8B6F006B591E /* RLMRealmNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmNode.m; path = Classes/RLMRealmNode.m; sourceTree = "<group>"; };
 		840F97D0192C7B17006B591E /* RLMRealmOutlineNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRealmOutlineNode.h; path = Classes/RLMRealmOutlineNode.h; sourceTree = "<group>"; };
+		840F97D8192CB0E9006B591E /* RealmCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmCore.framework; path = RealmVisualEditor/Externals/Frameworks/RealmCore.framework; sourceTree = "<group>"; };
+		840F97DA192CB281006B591E /* librealm-objc-dbg.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "librealm-objc-dbg.4.dylib"; path = "RealmVisualEditor/Externals/Libraries/Realm/librealm-objc-dbg.4.dylib"; sourceTree = "<group>"; };
+		840F97DB192CB281006B591E /* librealm-objc.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "librealm-objc.4.dylib"; path = "RealmVisualEditor/Externals/Libraries/Realm/librealm-objc.4.dylib"; sourceTree = "<group>"; };
+		840F97E2192CB38F006B591E /* Realm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Realm.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/Realm.h; sourceTree = "<group>"; };
+		840F97E3192CB38F006B591E /* RLMColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMColumnProxy.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMColumnProxy.h; sourceTree = "<group>"; };
+		840F97E4192CB38F006B591E /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMConstants.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMConstants.h; sourceTree = "<group>"; };
+		840F97E5192CB38F006B591E /* RLMDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptor.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMDescriptor.h; sourceTree = "<group>"; };
+		840F97E6192CB38F006B591E /* RLMFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMFast.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMFast.h; sourceTree = "<group>"; };
+		840F97E7192CB38F006B591E /* RLMPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMPrivate.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMPrivate.h; sourceTree = "<group>"; };
+		840F97E8192CB38F006B591E /* RLMQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMQuery.h; sourceTree = "<group>"; };
+		840F97E9192CB38F006B591E /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMRealm.h; sourceTree = "<group>"; };
+		840F97EA192CB38F006B591E /* RLMRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRow.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMRow.h; sourceTree = "<group>"; };
+		840F97EB192CB38F006B591E /* RLMRowFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMRowFast.h; sourceTree = "<group>"; };
+		840F97EC192CB38F006B591E /* RLMTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTable.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMTable.h; sourceTree = "<group>"; };
+		840F97ED192CB38F006B591E /* RLMType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMType.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMType.h; sourceTree = "<group>"; };
+		840F97EE192CB38F006B591E /* RLMVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMVersion.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMVersion.h; sourceTree = "<group>"; };
+		840F97EF192CB38F006B591E /* RLMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMView.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMView.h; sourceTree = "<group>"; };
+		840F97F0192CB38F006B591E /* RLMViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewProtocol.h; path = RealmVisualEditor/Externals/Libraries/Realm/objc/RLMViewProtocol.h; sourceTree = "<group>"; };
 		84E0F94C1921F3B900D6CA14 /* RealmVisualEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmVisualEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84E0F94F1921F3B900D6CA14 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		84E0F9521921F3B900D6CA14 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -69,6 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				840F97DD192CB282006B591E /* librealm-objc.4.dylib in Frameworks */,
+				840F97D9192CB0E9006B591E /* RealmCore.framework in Frameworks */,
 				84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,6 +101,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				840F97DE192CB2CA006B591E /* librealm-objc-dbg.4.dylib in Frameworks */,
+				840F97DF192CB2E6006B591E /* RealmCore.framework in Frameworks */,
 				84E0F9731921F3B900D6CA14 /* Cocoa.framework in Frameworks */,
 				84E0F9721921F3B900D6CA14 /* XCTest.framework in Frameworks */,
 			);
@@ -98,15 +124,47 @@
 		840F97CC192B81DB006B591E /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				840F97C8192B7EF4006B591E /* RLMRealmColumn.h */,
-				840F97C9192B7EF4006B591E /* RLMRealmColumn.m */,
-				840F97CD192B8B6F006B591E /* RLMRealm.h */,
-				840F97CE192B8B6F006B591E /* RLMRealm.m */,
-				840F97C2192B7EB7006B591E /* RLMRealmTable.h */,
-				840F97C3192B7EB7006B591E /* RLMRealmTable.m */,
+				840F97CD192B8B6F006B591E /* RLMRealmNode.h */,
+				840F97CE192B8B6F006B591E /* RLMRealmNode.m */,
+				840F97C8192B7EF4006B591E /* RLMTableColumn.h */,
+				840F97C9192B7EF4006B591E /* RLMTableColumn.m */,
+				840F97C2192B7EB7006B591E /* RLMTableNode.h */,
+				840F97C3192B7EB7006B591E /* RLMTableNode.m */,
 				840F97D0192C7B17006B591E /* RLMRealmOutlineNode.h */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		840F97E0192CB35E006B591E /* RealmObjC */ = {
+			isa = PBXGroup;
+			children = (
+				840F97E1192CB376006B591E /* Headers */,
+				840F97DA192CB281006B591E /* librealm-objc-dbg.4.dylib */,
+				840F97DB192CB281006B591E /* librealm-objc.4.dylib */,
+			);
+			name = RealmObjC;
+			sourceTree = "<group>";
+		};
+		840F97E1192CB376006B591E /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				840F97E2192CB38F006B591E /* Realm.h */,
+				840F97E3192CB38F006B591E /* RLMColumnProxy.h */,
+				840F97E4192CB38F006B591E /* RLMConstants.h */,
+				840F97E5192CB38F006B591E /* RLMDescriptor.h */,
+				840F97E6192CB38F006B591E /* RLMFast.h */,
+				840F97E7192CB38F006B591E /* RLMPrivate.h */,
+				840F97E8192CB38F006B591E /* RLMQuery.h */,
+				840F97E9192CB38F006B591E /* RLMRealm.h */,
+				840F97EA192CB38F006B591E /* RLMRow.h */,
+				840F97EB192CB38F006B591E /* RLMRowFast.h */,
+				840F97EC192CB38F006B591E /* RLMTable.h */,
+				840F97ED192CB38F006B591E /* RLMType.h */,
+				840F97EE192CB38F006B591E /* RLMVersion.h */,
+				840F97EF192CB38F006B591E /* RLMView.h */,
+				840F97F0192CB38F006B591E /* RLMViewProtocol.h */,
+			);
+			name = Headers;
 			sourceTree = "<group>";
 		};
 		84E0F9431921F3B900D6CA14 = {
@@ -131,6 +189,8 @@
 		84E0F94E1921F3B900D6CA14 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				840F97E0192CB35E006B591E /* RealmObjC */,
+				840F97D8192CB0E9006B591E /* RealmCore.framework */,
 				84E0F94F1921F3B900D6CA14 /* Cocoa.framework */,
 				84E0F9711921F3B900D6CA14 /* XCTest.framework */,
 				84E0F9511921F3B900D6CA14 /* Other Frameworks */,
@@ -290,11 +350,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				840F97CA192B7EF4006B591E /* RLMRealmColumn.m in Sources */,
+				840F97CA192B7EF4006B591E /* RLMTableColumn.m in Sources */,
 				840F97C0192B7DCE006B591E /* RLMDocument.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
-				840F97C4192B7EB7006B591E /* RLMRealmTable.m in Sources */,
-				840F97CF192B8B6F006B591E /* RLMRealm.m in Sources */,
+				840F97C4192B7EB7006B591E /* RLMTableNode.m in Sources */,
+				840F97CF192B8B6F006B591E /* RLMRealmNode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,10 +499,15 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-dvvsucmbnnklzccfpwbizabwvair/Build/Products/Debug",
 					/Users/zuschlag/Documents/Realm/Library/Frameworks,
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
 				INFOPLIST_FILE = "RealmVisualEditor/RealmVisualEditor-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -457,10 +522,15 @@
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-dvvsucmbnnklzccfpwbizabwvair/Build/Products/Debug",
 					/Users/zuschlag/Documents/Realm/Library/Frameworks,
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
 				INFOPLIST_FILE = "RealmVisualEditor/RealmVisualEditor-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -474,6 +544,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
@@ -482,6 +553,10 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "RealmVisualEditorTests/RealmVisualEditorTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -496,10 +571,15 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
 				INFOPLIST_FILE = "RealmVisualEditorTests/RealmVisualEditorTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

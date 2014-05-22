@@ -8,9 +8,9 @@
 
 #import "RLMDocument.h"
 
-#import "RLMRealm.h"
-#import "RLMRealmTable.h"
-#import "RLMRealmColumn.h"
+#import "RLMRealmNode.h"
+#import "RLMTableNode.h"
+#import "RLMTableColumn.h"
 #import "RLMRealmOutlineNode.h"
 
 @interface RLMDocument ()
@@ -22,10 +22,10 @@
 
 @implementation RLMDocument {
     NSArray *testRealms;
-    RLMRealmTable *selectedTable;
+    RLMTableNode *selectedTable;
     NSUInteger selectedRowIndex;
 }
-
+/*
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -35,6 +35,39 @@
     }
     return self;
 }
+*/
+- (id)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+{
+    if (self = [super init]) {
+        NSLog(@"Url: %@", absoluteURL);
+        NSLog(@"Path: %@", absoluteURL.path);
+        NSLog(@"Type name: %@", typeName);
+        
+        if ([[typeName lowercaseString] isEqualToString:@"documenttype"]) {
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            if ([fileManager fileExistsAtPath:absoluteURL.path]) {
+                RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:@"Realm #1"
+                                                                     url:absoluteURL.path];
+                testRealms = @[realm];
+                
+            }
+            else {
+                
+            }
+        }
+        else {
+            
+        }
+    }
+    
+    return self;
+}
+
+- (id)initForURL:(NSURL *)urlOrNil withContentsOfURL:(NSURL *)contentsURL ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
+{
+    return nil;
+}
+
 
 - (NSString *)windowNibName
 {
@@ -134,11 +167,12 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
+
     NSOutlineView *outlineView = notification.object;
     if(outlineView == self.realmTableOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
-        if([selectedItem isKindOfClass:[RLMRealmTable class]]) {
-            [self updateSelectedTable:selectedItem];
+        if([selectedItem isKindOfClass:[RLMTableNode class]]) {
+        [self updateSelectedTable:selectedItem];
             return;
         }
     }
@@ -164,9 +198,10 @@
         
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
         id object = row[columnIndex];
-        if([object isKindOfClass:[RLMRealmTable class]]) {
+        if([object isKindOfClass:[RLMTableNode class]] || [object isKindOfClass:[RLMTable class]]) {
             return @"<Sub table>";
         }
+        
         return object;
     }
     
@@ -175,7 +210,71 @@
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    if (tableView == self.realmTableColumnsView) {
+        NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
+        RLMTableColumn *columnNode = selectedTable.tableColumns[columnIndex];
 
+        RLMRealmNode *realmNode = testRealms[0];
+        RLMRealm *realm = realmNode.realm;
+        
+        switch (columnNode.columnType) {
+            case RLMTypeBool: {
+                if([object isKindOfClass:[NSNumber class]]) {
+                    [realm writeUsingBlock:^(RLMRealm *realm) {
+                        RLMTable *table = [realm tableWithName:selectedTable.tableName];
+                        table[rowIndex][columnIndex] = @(((NSNumber *)object).boolValue);
+                    }];
+                }
+                break;
+            }
+            case RLMTypeInt: {
+                if([object isKindOfClass:[NSNumber class]]) {
+                    [realm writeUsingBlock:^(RLMRealm *realm) {
+                        RLMTable *table = [realm tableWithName:selectedTable.tableName];
+                        table[rowIndex][columnIndex] = @(((NSNumber *)object).intValue);
+                    }];
+                }
+                break;
+            }
+            case RLMTypeFloat: {
+                if([object isKindOfClass:[NSNumber class]]) {
+                    [realm writeUsingBlock:^(RLMRealm *realm) {
+                        RLMTable *table = [realm tableWithName:selectedTable.tableName];
+                        table[rowIndex][columnIndex] = @(((NSNumber *)object).floatValue);
+                    }];
+                }
+                break;
+            }
+            case RLMTypeDouble: {
+                if([object isKindOfClass:[NSNumber class]]) {
+                    [realm writeUsingBlock:^(RLMRealm *realm) {
+                        RLMTable *table = [realm tableWithName:selectedTable.tableName];
+                        table[rowIndex][columnIndex] = @(((NSNumber *)object).doubleValue);
+                    }];
+                }
+                break;
+            }
+            case RLMTypeString: {
+                if([object isKindOfClass:[NSString class]]) {
+                    [realm writeUsingBlock:^(RLMRealm *realm) {
+                        RLMTable *table = [realm tableWithName:selectedTable.tableName];
+                        table[rowIndex][columnIndex] = object;
+                    }];
+                }
+                break;
+            }
+            case RLMTypeNone:
+            case RLMTypeBinary:
+            case RLMTypeDate:
+            case RLMTypeTable:
+            case RLMTypeMixed:
+                break;
+                
+            default:
+                break;
+        }
+    }
+//    NSArray *row = [selectedTable rowAtIndex:rowIndex];
 }
 
 #pragma mark - NSTableViewDelegate implementation
@@ -184,12 +283,46 @@
 {
 }
 
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+{
+    if (tableView == self.realmTableColumnsView) {
+        NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
+        RLMTableColumn *columnNode = selectedTable.tableColumns[columnIndex];
+        
+        switch (columnNode.columnType) {
+            case RLMTypeBool:
+            case RLMTypeInt: {
+                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+                formatter.allowsFloats = NO;
+                ((NSCell *)cell).formatter = formatter;
+                break;
+            }
+            case RLMTypeFloat:
+            case RLMTypeDouble: {
+                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+                ((NSCell *)cell).formatter = formatter;
+                break;
+            }
+            case RLMTypeNone:
+            case RLMTypeString:
+            case RLMTypeBinary:
+            case RLMTypeDate:
+            case RLMTypeTable:
+            case RLMTypeMixed:
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
 #pragma mark - Private methods
 
-- (void)updateSelectedTable:(RLMRealmTable *)table
+- (void)updateSelectedTable:(RLMTableNode *)table
 {
     selectedTable = table;
-    
+
     // How many columns does the table contains?
     NSArray *columns = selectedTable.tableColumns;
     NSUInteger requiredColumnCount = columns.count;
@@ -207,6 +340,21 @@
     else {
         for (NSUInteger index = 0; index < requiredColumnCount - existingColumnsCount; index++) {
             NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
+            
+            RLMTableColumn *column = columns[index];
+            
+            if(column.columnType == RLMTypeBool ||
+               column.columnType == RLMTypeInt ||
+               column.columnType == RLMTypeFloat ||
+               column.columnType == RLMTypeDouble ||
+               column.columnType == RLMTypeString) {
+                tableColumn.editable = YES;
+            
+            }
+            else {
+                tableColumn.editable = NO;
+            }
+            
             [self.realmTableColumnsView addTableColumn:tableColumn];
         }
     }
@@ -215,7 +363,7 @@
     for (NSUInteger index = 0; index < columns.count; index++) {
         NSTableColumn *tableColumn = self.realmTableColumnsView.tableColumns[index];
         NSTableHeaderCell *headerCell = tableColumn.headerCell;
-        RLMRealmColumn *column = columns[index];
+        RLMTableColumn *column = columns[index];
         headerCell.stringValue = column.columnName;
     }
     
@@ -224,61 +372,8 @@
 
 - (void)initializeTestRealm
 {
-    RLMRealm *testRealm1 = [[RLMRealm alloc] initWithName:@"Realm 1" url:@"~/zuschlag/Documents/default.realm"];
-    RLMRealm *testRealm2 = [[RLMRealm alloc] initWithName:@"Realm 2" url:@"~/zuschlag/temp/old/customers.realm"];
-    
-    RLMRealmTable *table1 = [[RLMRealmTable alloc] initWithName:@"Table 1"
-                                                    columnNames:@[@"Int column 1", @"String col 1", @"Subtable col 1"]
-                                                    columnTypes:@[@(RLMTableColumnTypeInteger), @(RLMTableColumnTypeString), @(RLMTableColumnTypeSubTable)]];
-
-    RLMRealmTable *table2 = [[RLMRealmTable alloc] initWithName:@"Table 2"
-                                                    columnNames:@[@"Int col 2", @"String col 2"]
-                                                    columnTypes:@[@(RLMTableColumnTypeInteger), @(RLMTableColumnTypeString)]];
-
-    RLMRealmTable *table3 = [[RLMRealmTable alloc] initWithName:@"Table 3"
-                                                    columnNames:@[@"Int col 4", @"String col 3"]
-                                                    columnTypes:@[@(RLMTableColumnTypeInteger), @(RLMTableColumnTypeString)]];
-    
-    
-    RLMRealmTable *subtable1 = [[RLMRealmTable alloc] initWithName:@"Sub table 1"
-                                                       columnNames:@[@"Int subcol 1",]
-                                                       columnTypes:@[@(RLMTableColumnTypeInteger)]];
-    
-    RLMRealmTable *subtable2 = [[RLMRealmTable alloc] initWithName:@"Subtable 2"
-                                                       columnNames:@[@"String subcol 2",]
-                                                       columnTypes:@[@(RLMTableColumnTypeString)]];
-    
-    [table1 addRowWithValues:@[@(1234), @"Denmark", subtable1]];
-    [table1 addRowWithValues:@[@(4321), @"USA", subtable2]];
-    
-    [table2 addRowWithValues:@[@(8642), @"Green"]];
-    [table2 addRowWithValues:@[@(12),   @"Blue"]];
-    [table2 addRowWithValues:@[@(-789), @"Yellow"]];
-    [table2 addRowWithValues:@[@(1000), @"Black"]];
-    [table2 addRowWithValues:@[@(8),    @"Red"]];
-    
-    [table3 addRowWithValues:@[@(1200), @"New York"]];
-    [table3 addRowWithValues:@[@(800),  @"Paris"]];
-    [table3 addRowWithValues:@[@(1500), @"Rome"]];
-    
-    [subtable1 addRowWithValues:@[@(2342)]];
-    [subtable1 addRowWithValues:@[@(4522)]];
-    [subtable1 addRowWithValues:@[@(999)]];
-    [subtable1 addRowWithValues:@[@(111)]];
-    [subtable1 addRowWithValues:@[@(222)]];
-
-    [subtable2 addRowWithValues:@[@"Luke Skywalker"]];
-    [subtable2 addRowWithValues:@[@"Yoda"]];
-    [subtable2 addRowWithValues:@[@"Anakin Skywalker"]];
-    [subtable2 addRowWithValues:@[@"R2D2"]];
-    [subtable2 addRowWithValues:@[@"Han Solo"]];
-    
-    [testRealm1 addTable:table1];
-    [testRealm1 addTable:table2];
-    
-    [testRealm2 addTable:table3];
-    
-    testRealms = @[testRealm1, testRealm2];
+    RLMRealmNode *testRealm = [[RLMRealmNode alloc] initWithName:@"Realm #1" url:@"/Users/zuschlag/Projects/TightDB/tightdb_objc/tools/VisualEditor/Test/test.realm"];
+    testRealms = @[testRealm];
 }
 
 @end
