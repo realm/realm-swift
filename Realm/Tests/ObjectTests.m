@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 
 #import <Realm/Realm.h>
 
@@ -39,45 +40,14 @@
 @implementation AgeObject
 @end
 
-
-@interface AllTypesObject : RLMObject
-@property BOOL           boolCol;
-@property int            intCol;
-@property float          floatCol;
-@property double         doubleCol;
-@property NSString      *stringCol;
-@property NSData        *binaryCol;
-@property NSDate        *dateCol;
-@property bool           cBoolCol;
-@property long           longCol;
-//@property id             mixedCol;
-//@property AgeTable      *tableCol;
+@interface InvalidSubclassObject : AgeObject
+@property NSString *invalid;
 @end
 
-@implementation AllTypesObject
+@implementation InvalidSubclassObject
 @end
 
-//@interface InvalidType : RLMObject
-//@property NSDictionary *dict;
-//@end
-//
-//@implementation InvalidType
-//@end
-//
-//RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
-//
-//@interface InvalidProperty : RLMObject
-//@property NSUInteger noUnsigned;
-//@end
-//
-//@implementation InvalidProperty
-//@end
-//
-//@interface RLMTypedTableTests: RLMTestCase
-//  // Intentionally left blank.
-//  // No new public instance methods need be defined.
-//@end
-//
+
 @interface KeyedObject : RLMObject
 @property NSString * name;
 @property int objID;
@@ -85,6 +55,7 @@
 
 @implementation KeyedObject
 @end
+
 
 @interface CustomAccessors : RLMObject
 @property (getter = getThatName) NSString * name;
@@ -107,12 +78,10 @@
 @end
 
 
-
-@interface RLMTypedTableTests : RLMTestCase
-
+@interface RLMObjectTests : RLMTestCase
 @end
 
-@implementation RLMTypedTableTests
+@implementation RLMObjectTests
 
 -(void)testObjectInit
 {
@@ -345,70 +314,71 @@
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
 }
 
+- (void)testObjectSubclass
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    NSArray *obj = @[@1, @"throw"];
+    XCTAssertThrows([InvalidSubclassObject createInRealm:realm withObject:obj],
+                    @"Adding invalid object should throw");
+    [realm commitWriteTransaction];
+}
 
 - (void)testDataTypes
 {
-//    RLMRealm *realm = [RLMRealm defaultRealm];
-//    [realm beginWriteTransaction];
-//    
-//    const char bin[4] = { 0, 1, 2, 3 };
-//    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-//   // NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-//  //  NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-//    NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
-//
-//    AllTypesObject *c = [[AllTypesObject alloc] init];
-//
-//    c.BoolCol   = NO;
-//    c.IntCol  = 54;
-//    c.FloatCol = 0.7f;
-//    c.DoubleCol = 0.8;
-//    c.StringCol = @"foo";
-//    c.BinaryCol = bin1;
-//    c.DateCol = timeZero;
-//    c.cBoolCol = false;
-//    c.longCol = 99;
-//   // c.mixedCol = @"string";
-//    
-//    [realm addObject:c];
-//    
-//    [realm commitWriteTransaction];
-//
-//        [table addRow:nil];
-//        c = table.lastRow;
-//
-//        c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
-//        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.cBoolCol = true;    c.longCol = -20;
-//        c.mixedCol = @2;
-//
-//        //AllTypes* row1 = [table rowAtIndex:0];
-//        //AllTypes* row2 = [table rowAtIndex:1];
-//        AllTypes* row1 = table[0];
-//        AllTypes* row2 = table[1];
-//
-//        XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
-//        XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
-//        XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
-//        XCTAssertEqual(row2.intCol, 506,            @"row2.IntCol");
-//        XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
-//        XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
-//        XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
-//        XCTAssertEqual(row2.doubleCol, 8.8,              @"row2.DoubleCol");
-//        XCTAssertTrue([row1.stringCol isEqual:@"foo"],    @"row1.StringCol");
-//        XCTAssertTrue([row2.stringCol isEqual:@"banach"], @"row2.StringCol");
-//        XCTAssertTrue([row1.binaryCol isEqual:bin1],      @"row1.BinaryCol");
-//        XCTAssertTrue([row2.binaryCol isEqual:bin2],      @"row2.BinaryCol");
-//        XCTAssertTrue(([row1.dateCol isEqual:timeZero]),  @"row1.DateCol");
-//        XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
-//        XCTAssertTrue([row1.tableCol isEqual:subtab1],    @"row1.TableCol");
-//        XCTAssertTrue([row2.tableCol isEqual:subtab2],    @"row2.TableCol");
-//        XCTAssertEqual(row1.cBoolCol, (bool)false,        @"row1.cBoolCol");
-//        XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
-//        XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
-//        XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
-//
-//        XCTAssertTrue([row1.mixedCol isEqualToString:string], @"row1.mixedCol");
-//        XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
+
+    AllTypesObject *c = [[AllTypesObject alloc] init];
+
+    c.BoolCol   = NO;
+    c.IntCol  = 54;
+    c.FloatCol = 0.7f;
+    c.DoubleCol = 0.8;
+    c.StringCol = @"foo";
+    c.BinaryCol = bin1;
+    c.DateCol = timeZero;
+    c.cBoolCol = false;
+    c.longCol = 99;
+    c.mixedCol = @"string";
+    
+    [realm addObject:c];
+
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
+                                                     timeNow, @YES, @(-20), @2]];
+    [realm commitWriteTransaction];
+    
+    AllTypesObject* row1 = [AllTypesObject allObjects][0];
+    AllTypesObject* row2 = [AllTypesObject allObjects][1];
+
+    XCTAssertEqual(row1.boolCol, NO,                    @"row1.BoolCol");
+    XCTAssertEqual(row2.boolCol, YES,                   @"row2.BoolCol");
+    XCTAssertEqual(row1.intCol, 54,                     @"row1.IntCol");
+    XCTAssertEqual(row2.intCol, 506,                    @"row2.IntCol");
+    XCTAssertEqual(row1.floatCol, 0.7f,                 @"row1.FloatCol");
+    XCTAssertEqual(row2.floatCol, 7.7f,                 @"row2.FloatCol");
+    XCTAssertEqual(row1.doubleCol, 0.8,                 @"row1.DoubleCol");
+    XCTAssertEqual(row2.doubleCol, 8.8,                 @"row2.DoubleCol");
+    XCTAssertTrue([row1.stringCol isEqual:@"foo"],      @"row1.StringCol");
+    XCTAssertTrue([row2.stringCol isEqual:@"banach"],   @"row2.StringCol");
+    XCTAssertTrue([row1.binaryCol isEqual:bin1],        @"row1.BinaryCol");
+    XCTAssertTrue([row2.binaryCol isEqual:bin2],        @"row2.BinaryCol");
+    XCTAssertTrue(([row1.dateCol isEqual:timeZero]),    @"row1.DateCol");
+    XCTAssertTrue(([row2.dateCol isEqual:timeNow]),     @"row2.DateCol");
+    XCTAssertEqual(row1.cBoolCol, (bool)false,          @"row1.cBoolCol");
+    XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
+    XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
+    XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
+
+    XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
+    XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 
 }
 

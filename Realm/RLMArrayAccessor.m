@@ -39,6 +39,8 @@ static NSException *s_arrayReadOnlyException;
     });
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
     @throw s_arrayReadOnlyException;
 }
@@ -99,3 +101,4 @@ static NSException *s_arrayReadOnlyException;
 }
 @end
 
+#pragma GCC diagnostic pop
