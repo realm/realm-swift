@@ -50,28 +50,27 @@ You can write data in Realm using write transactions. You begin and end a write 
     // Commit the transaction
     [realm commitWriteTransaction];
 
-See RLMRealm and RLMTable for more details.
+See `RLMRealm` and `RLMObject` for more details.
 
 ## Querying
 
 You can simply apply `NSPredicates` to an `RLMRealm` to return an `RLMArray` containing a filtered view of your objects.
 
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@",
-															  [NSDate date], @"00"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@", [NSDate date], @"00"];
     RLMArray objects = [realm objects:DemoObject.class where:predicate];
 
     for (RLMDemoObject *object in objects) {
-	    NSLog(@"title: %@\ndate: %@", object.title, object.date);
-	}
+        NSLog(@"title: %@\ndate: %@", object.title, object.date);
+    }
 
-See `RLMRealm` for more details on possible queries.
+See `RLMRealm` and `RLMObject` for more details on possible queries.
 
 
 ## Notifications
 
 The auto-updating Realm will send out notifications every time the underlying Realm is updated. These notifications can be observed by registering a block:
 
-	// Observe Realm Notifications
+    // Observe Realm Notifications
     [realm addNotification:^(NSString *note, RLMRealm * realm) {
         [myViewController updateUI];
     }];
@@ -80,10 +79,10 @@ The auto-updating Realm will send out notifications every time the underlying Re
 
 Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread. RLMRealm objects are not thread safe and cannot be shared across threads, so you must get an RLMRealm instance in each thread/dispatch_queue in which you want to read or write. Here's an example of inserting a million objects in a background queue:
 
-	dispatch_async(queue, ^{
+    dispatch_async(queue, ^{
         // Get realm and table instances for this thread
         RLMRealm *realm = [RLMRealm defaultRealm];
-	    for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
+        for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
             // Break up the writing blocks into smaller portions by starting a new transaction
             [realm beginWriteTransaction];
             for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
@@ -93,8 +92,8 @@ Realm can be very efficient when writing large amounts of data by batching toget
 
             // Commit the write transaction to make this data available to other threads
             [realm commitWriteTransaction];
-	    }
-	});
+	}
+    });
 
 
 See `RLMRealm` for more details.
