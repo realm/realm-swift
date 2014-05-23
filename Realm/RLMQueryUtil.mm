@@ -25,8 +25,8 @@
 NSString *const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException = @"RLMUnsupportedTypesFoundInPropertyComparisonException";
 
-NSString *const RLMPropertiesComparisonTypeMismatchReason = @"Property type mismatch between %i and %i";
-NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Comparison between %i and %i";
+NSString *const RLMPropertiesComparisonTypeMismatchReason = @"Property type mismatch between %@ and %@";
+NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Comparison between %@ and %@";
 
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
@@ -432,12 +432,16 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
                 
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
-                                             [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason, leftType, rightType]);
+                                             [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason,
+                                              rlmtype_to_string(leftType),
+                                              rlmtype_to_string(rightType)]);
         }
     }
     else {
         @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
-                                     [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
+                                     [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason,
+                                      rlmtype_to_string(leftType),
+                                      rlmtype_to_string(rightType)]);
     }
 }
     
