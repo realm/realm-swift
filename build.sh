@@ -124,7 +124,7 @@ find_iphone_sdk()
 }
 
 
-CONFIG_MK="src/config.mk"
+CONFIG_MK="Realm/config.mk"
 
 require_config()
 {
