@@ -17,10 +17,6 @@ run the following command:
 Prerequisites
 -------------
 
-You need the standard set of build tools. This includes an
-Objective-C/C++ compiler. The Objective-C language binding is 
-thoroughly tested with Clang. It is known to work with Clang 3.0 and newer.
-
 Currently, the Objective-C binding is available only for iOS and OS X. 
 The following is a suggestion of how to install the
 prerequisites on Mac OS X 10.7, 10.8, and 10.9:
@@ -43,11 +39,19 @@ the "Command Line tools" is an optional Xcode add-on that you must install.
 You can find it under the "Downloads" pane of the "Preferences" dialog 
 in the Xcode 4 menu.
 
+In addition, if you want to generate the documentation you must install [Appledoc](https://github.com/tomaz/appledoc/releases/tag/v2.2-963).
+
+In order to build the `ci-test` target of `build.sh` it is also required to 
+install [xctool](https://github.com/facebook/xctool). If you use
+[Homebrew](http://brew.sh/) you do that with
+
+    brew install xctool
+
+
 Configure, build, install
 -------------------------
 
-Run the following commands to configure, build, and install the
-language binding:
+Run the following commands to configure, build, and install the language binding for OSX:
 
     sh build.sh config
     sh build.sh build
@@ -74,12 +78,6 @@ Here is a more complete set of build-related commands:
     sudo sh build.sh install
     sh build.sh test-intalled
     sudo sh build.sh uninstall
-
-In order to build the `ci-test` target of `build.sh` it is also required to 
-install [xctool](https://github.com/facebook/xctool). If you use
-[Homebrew](http://brew.sh/) you do that with
-
-    brew install xctool
 
 
 Building for iOS
@@ -152,3 +150,12 @@ set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
 
     CC=clang sh build.sh build
+
+Documentation
+-------------
+
+The documentation is generated with the following command:
+
+    sh build.sh docs
+
+Please note that this will also install the documentation to your machine.
