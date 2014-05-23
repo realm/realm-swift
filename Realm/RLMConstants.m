@@ -19,5 +19,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
+#import <Foundation/Foundation.h>
 
 NSString *const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";

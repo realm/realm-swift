@@ -2,41 +2,33 @@
 .DS_Store
 
 # sh build.sh config
-/src/config.mk
+/Realm/config.mk
+
+# sh build.sh build
+/Realm/*.o
+/Realm/*.d
 
 # sh build.sh test
-*.tightdb
-*.tightdb.lock
 *.realm
 *.realm.lock
-
-/doc/appledocs/html/*
-/doc/ref/html/*.html
-/doc/ref/html/*.css
+/Realm/Tests/*.o
+/Realm/Tests/*.d
 
 # XCode
 xcuserdata/
 project.xcworkspace
 DerivedData
-
 # sh build.sh build-iphone
 /iphone-lib/include
 /iphone-lib/librealm-objc-ios.a
 /iphone-lib/librealm-objc-ios-dbg.a
 
-# for running the example tutorial
-examples/tutorial.d
-examples/tutorial.o
-examples/tutorial
-
 # sh build.sh ios-framework
-/Tightdb.framework
-tightdb-ios-*.zip
 /Realm.framework
 realm-ios-*.zip
 
 # sh build.sh docs
-/doc/appledocs
+/docs/output
 
 # sh build.sh package-examples
 /examples/*.zip
@@ -46,7 +38,6 @@ realm-ios-*.zip
 # AppCode specific files
 .idea/
 *.iml
-
 # backup and crash files
 *.swp
 *~
