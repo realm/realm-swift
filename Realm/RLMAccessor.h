@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <tightdb/table.hpp>
+#include <tightdb/table.hpp>
 #import "RLMRealm.h"
 
 //
