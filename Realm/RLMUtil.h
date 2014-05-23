@@ -22,6 +22,8 @@
 #import <objc/runtime.h>
 
 #import <tightdb/table.hpp>
+#import <tightdb/string_data.hpp>
+#import <tightdb/util/safe_int_ops.hpp>
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
@@ -41,10 +43,9 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfclass(class1, class2);
 }
 
+// Translate an rlmtype to a string representation
 inline NSString *rlmtype_to_string(RLMPropertyType type) {
     switch (type) {
-        case RLMPropertyTypeNone:
-            return @"None";
         case RLMPropertyTypeString:
             return @"string";
         case RLMPropertyTypeInt:
@@ -61,10 +62,10 @@ inline NSString *rlmtype_to_string(RLMPropertyType type) {
             return @"float";
         case RLMPropertyTypeAny:
             return @"any";
-        case RLMPropertyTypeTable:
-            return @"table";
         case RLMPropertyTypeObject:
             return @"object";
+        case RLMPropertyTypeArray:
+            return @"array";
     }
     return @"Unknown";
 }
@@ -72,3 +73,30 @@ inline NSString *rlmtype_to_string(RLMPropertyType type) {
 // Getter and Setter for RLMPropertyTypeAny properties
 id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx);
 void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj);
+
+
+// String conversion utilities
+inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
+    if (tightdb::util::int_cast_has_overflow<NSUInteger>(stringData.size())) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"String size overflow" userInfo:nil];
+        
+    }
+    return [[NSString alloc] initWithBytes:stringData.data()
+                                    length:stringData.size()
+                                  encoding:NSUTF8StringEncoding];
+}
+
+inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
+    if (tightdb::util::int_cast_has_overflow<size_t>(string.length)) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"String size overflow" userInfo:nil];
+        
+    }
+    return tightdb::StringData(string.UTF8String, string.length);
+}
+
+// Binary convertion utilities
+inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
+    return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
+}
+
+
