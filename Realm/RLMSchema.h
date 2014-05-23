@@ -18,27 +18,38 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
 #import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+#import <Realm/RLMObjectSchema.h>
 
-// object property definition
-@interface RLMProperty : NSObject
-
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
+@interface RLMSchema : NSObject
 
 /**
- Property type.
+ An NSArray containing RLMObjectSchema for all object types in this Realm. Meant
+ to be used during migrations for dynamic introspection.
+ 
+ @see       RLMObjectSchema
  */
-@property (nonatomic, readonly) RLMPropertyType type;
+@property (nonatomic, readonly) NSArray *objectSchema;
 
 /**
- Object class name - specify object types for RLMObject and RLMArray properties.
+ Returns an RLMObjectSchema for the given class in this Realm.
+ 
+ @param className   The object class name.
+ @return            RLMObjectSchema for the given class in this Realm.
+ 
+ @see               RLMObjectSchema
  */
-@property (nonatomic, readonly) NSString *objectClassName;
+- (RLMObjectSchema *)schemaForObject:(NSString *)className;
+
+/**
+ Lookup an RLMObjectSchema for the given class in this Realm.
+ 
+ @param className   The object class name.
+ @return            RLMObjectSchema for the given class in this Realm.
+ 
+ @see               RLMObjectSchema
+ */
+- (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;
 
 @end
 

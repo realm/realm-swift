@@ -18,11 +18,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
-#import "RLMConstants.h"
-#import "RLMPrivate.hpp"
-#import "RLMObjectDescriptor.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
+#import "RLMConstants.h"
 #import "RLMQueryUtil.h"
 
 #include <exception>
@@ -111,7 +110,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex)
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
 @property (nonatomic) BOOL isReadOnly;
-@property (nonatomic) id<RLMMigration> migration;
+@property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
 
@@ -207,6 +206,14 @@ static NSArray *s_objectDescriptors = nil;
                      readOnly:(BOOL)readonly
                         error:(NSError **)outError
 {
+    return [self realmWithPath:path readOnly:readonly dynamic:NO error:outError];
+}
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError
+{
     NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
@@ -256,14 +263,26 @@ static NSArray *s_objectDescriptors = nil;
         return nil;
     }
     
-    // initialize object store for this realm
-    RLMEnsureRealmTablesExist(realm);
-    
-    // cache main thread realm at this path
-    cacheRealm(realm, path);
-
-    // begin read transaction
-    [realm beginReadTransaction];
+    if (dynamic) {
+        // begin read transaction
+        [realm beginReadTransaction];
+        
+        // for dynamic realms, get schema from stored tables
+        realm.schema = [RLMSchema dynamicSchemaFromRealm:realm];
+    }
+    else {
+        // set the schema for this realm
+        realm.schema = [RLMSchema sharedSchema];
+        
+        // initialize object store for this realm
+        RLMEnsureRealmTablesExist(realm);
+        
+        // cache main thread realm at this path
+        cacheRealm(realm, path);
+        
+        // begin read transaction
+        [realm beginReadTransaction];
+    }
     
     return realm;
 }
@@ -457,20 +476,29 @@ static NSArray *s_objectDescriptors = nil;
     RLMDeleteObjectFromRealm(object);
 }
 
-- (RLMArray *)objects:(Class)objectClass where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClass, outPredicate, nil);
+- (RLMArray *)allObjects:(NSString *)objectClassName {
+    return RLMGetObjects(self, objectClassName, nil, nil);
 }
 
-- (RLMArray *)objects:(Class)objectClass orderedBy:(id)order where:(id)predicate, ... {
+- (RLMArray *)objects:(NSString *)objectClassName where:(id)predicate, ... {
     NSPredicate *outPredicate = nil;
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMGetObjects(self, objectClass, outPredicate, order);
+    return RLMGetObjects(self, objectClassName, outPredicate, nil);
+}
+
+- (RLMArray *)objects:(NSString *)objectClassName orderedBy:(id)order where:(id)predicate, ... {
+    NSPredicate *outPredicate = nil;
+    if (predicate) {
+        RLM_PREDICATE(predicate, outPredicate);
+    }
+    return RLMGetObjects(self, objectClassName, outPredicate, order);
+}
+
+-(NSUInteger)schemaVersion {
+    // FIXME - store version in metadata table - will come with migration support
+    return 0;
 }
 
 #pragma GCC diagnostic push
@@ -481,11 +509,6 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 -(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-+ (void)setMigration:(id<RLMMigration>)block realmVersion:(NSUInteger)version {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }

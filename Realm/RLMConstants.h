@@ -20,9 +20,7 @@
 
 
 // Make sure numbers match those in <tightdb/data_type.hpp>
-typedef NS_ENUM(int32_t, RLMPropertyType) {
-    RLMPropertyTypeNone     = -1,
-    
+typedef NS_ENUM(int32_t, RLMPropertyType) {    
     // Primitive types
     RLMPropertyTypeInt      = 0,
     RLMPropertyTypeBool     = 1,
@@ -36,7 +34,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeDate     = 7,
     
     // Array/Linked object types
-    RLMPropertyTypeTable    = 5,
+    RLMPropertyTypeArray    = 5,
     RLMPropertyTypeObject   = 12,
 };
 
