@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = Realm
 PASSIVE_SUBDIRS = 
 
 PASSIVE_SUBDIRS += doc/ref/examples

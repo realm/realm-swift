@@ -3,12 +3,19 @@
 
 # sh build.sh config
 /src/config.mk
+/Realm/config.mk
+
+# sh build.sh build
+/Realm/*.o
+/Realm/*.d
 
 # sh build.sh test
 *.tightdb
 *.tightdb.lock
 *.realm
 *.realm.lock
+/Realm/Tests/*.o
+/Realm/Tests/*.d
 
 /doc/appledocs/html/*
 /doc/ref/html/*.html
