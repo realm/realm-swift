@@ -20,7 +20,6 @@
 
 #import "RLMObjectSchema.h"
 #import "RLMUtil.h"
-#import "RLMObject.h"
 #import "RLMProperty_Private.h"
 #import <tightdb/table.hpp>
 
@@ -55,17 +54,11 @@
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     
-    // create array of RLMProperties
-    NSDictionary *defaults = nil;
-    if ([objectClass respondsToSelector:@selector(defaultPropertyValues)]) {
-        defaults = [objectClass defaultPropertyValues];
-    }
-    
+    // create array of RLMProperties    
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
         if (prop) {
-            prop.defaultValue = defaults[prop.name];
             [propArray addObject:prop];
         }
     }
