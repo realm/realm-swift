@@ -78,6 +78,30 @@
 @end
 
 
+@interface DefaultObject : RLMObject
+@property int intCol;
+@property float floatCol;
+@property double doubleCol;
+@property BOOL boolCol;
+@property NSDate *dateCol;
+@property NSString *stringCol;
+@end
+
+@implementation DefaultObject
+
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"intCol" : @12,
+             @"floatCol" : @88.9f,
+             @"doubleCol" : @1002.892,
+             @"boolCol" : @YES,
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:999999],
+             @"stringCol" : @"potato"};
+}
+
+@end
+
+
 @interface RLMObjectTests : RLMTestCase
 @end
 
@@ -379,7 +403,132 @@
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
+}
 
+- (void)testDefaultValues
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    const int inputInt = 98;
+    const float inputFloat = 231.0f;
+    const double inputDouble = 123732.9231;
+    const BOOL inputBool = NO;
+    NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
+    NSString * const inputString = @"Westeros";
+    
+    // Test defaulting intCol
+    DefaultObject *defaultIntCol = [[DefaultObject alloc] init];
+    defaultIntCol.floatCol = inputFloat;
+    defaultIntCol.doubleCol = inputDouble;
+    defaultIntCol.boolCol = inputBool;
+    defaultIntCol.dateCol = inputDate;
+    defaultIntCol.stringCol = inputString;
+    
+    // Test defaulting floatCol
+    DefaultObject *defaultFloatCol = [[DefaultObject alloc] init];
+    defaultFloatCol.intCol = inputInt;
+    defaultFloatCol.doubleCol = inputDouble;
+    defaultFloatCol.boolCol = inputBool;
+    defaultFloatCol.dateCol = inputDate;
+    defaultFloatCol.stringCol = inputString;
+    
+    // Test defaulting doubleCol
+    DefaultObject *defaultDoubleCol = [[DefaultObject alloc] init];
+    defaultDoubleCol.intCol = inputInt;
+    defaultDoubleCol.floatCol = inputFloat;
+    defaultDoubleCol.boolCol = inputBool;
+    defaultDoubleCol.dateCol = inputDate;
+    defaultDoubleCol.stringCol = inputString;
+    
+    // Test defaulting boolCol
+    DefaultObject *defaultBoolCol = [[DefaultObject alloc] init];
+    defaultBoolCol.intCol = inputInt;
+    defaultBoolCol.floatCol = inputFloat;
+    defaultBoolCol.doubleCol = inputDouble;
+    defaultBoolCol.dateCol = inputDate;
+    defaultBoolCol.stringCol = inputString;
+    
+    // Test defaulting dateCol
+    DefaultObject *defaultDateCol = [[DefaultObject alloc] init];
+    defaultDateCol.intCol = inputInt;
+    defaultDateCol.floatCol = inputFloat;
+    defaultDateCol.doubleCol = inputDouble;
+    defaultDateCol.boolCol = inputBool;
+    defaultDateCol.stringCol = inputString;
+    
+    // Test defaulting stringCol
+    DefaultObject *defaultStringCol = [[DefaultObject alloc] init];
+    defaultStringCol.intCol = inputInt;
+    defaultStringCol.floatCol = inputFloat;
+    defaultStringCol.doubleCol = inputDouble;
+    defaultStringCol.boolCol = inputBool;
+    defaultStringCol.dateCol = inputDate;
+    
+    // Test no default specified for nil value
+    DefaultObject *noDefault = [[DefaultObject alloc] init];
+    
+    
+    // Add objects
+    [realm addObject:defaultIntCol];
+    [realm addObject:defaultFloatCol];
+    [realm addObject:defaultDoubleCol];
+    [realm addObject:defaultBoolCol];
+    [realm addObject:defaultDateCol];
+    [realm addObject:defaultStringCol];
+    
+    XCTAssertThrows(([realm addObject:noDefault]), @"Adding object with no default value specified for nil properties should throw exception");
+    
+    [realm commitWriteTransaction];
+    
+    DefaultObject *fetchedIntDefaultObject = [DefaultObject allObjects][0];
+    XCTAssertEqual(fetchedIntDefaultObject.intCol, 12, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedIntDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedIntDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedIntDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedIntDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedIntDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedFloatDefaultObject = [DefaultObject allObjects][1];
+    XCTAssertEqual(fetchedFloatDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedFloatDefaultObject.floatCol, 88.9f, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedFloatDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedFloatDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedFloatDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedFloatDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedDoubleDefaultObject = [DefaultObject allObjects][2];
+    XCTAssertEqual(fetchedDoubleDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedDoubleDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedDoubleDefaultObject.doubleCol, 1002.892, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedDoubleDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedDoubleDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDoubleDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedBoolDefaultObject = [DefaultObject allObjects][3];
+    XCTAssertEqual(fetchedBoolDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedBoolDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBoolDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBoolDefaultObject.boolCol, YES, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBoolDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBoolDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedDateDefaultObject = [DefaultObject allObjects][4];
+    XCTAssertEqual(fetchedDateDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedDateDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedDateDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedDateDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDateDefaultObject.dateCol, [NSDate dateWithTimeIntervalSince1970:999999], @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDateDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedStringDefaultObject = [DefaultObject allObjects][5];
+    XCTAssertEqual(fetchedStringDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedStringDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedStringDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedStringDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedStringDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedStringDefaultObject.stringCol, @"potato", @"Value should match value that object was initialized with");
 }
 
 @end
