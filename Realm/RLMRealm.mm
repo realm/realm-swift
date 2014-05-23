@@ -364,6 +364,8 @@ static NSArray *s_objectDescriptors = nil;
             // the excepted error related to file access.
             throw_objc_exception(ex);
         }
+    } else {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"The Realm is already in a writetransaction" userInfo:nil];
     }
 }
 
@@ -388,6 +390,8 @@ static NSArray *s_objectDescriptors = nil;
         catch (std::exception& ex) {
             throw_objc_exception(ex);
         }
+    } else {
+       @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing writetransaction" userInfo:nil];
     }
 }
 
@@ -402,6 +406,8 @@ static NSArray *s_objectDescriptors = nil;
         catch (std::exception& ex) {
             throw_objc_exception(ex);
         }
+    } else {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't roll-back a non-existing writetransaction" userInfo:nil];
     }
 }
 
@@ -410,7 +416,9 @@ static NSArray *s_objectDescriptors = nil;
     [_updateTimer invalidate];
     _updateTimer = nil;
     
-    [self commitWriteTransaction];
+    if (self.transactionMode == RLMTransactionModeWrite) {
+        [self commitWriteTransaction];
+    }
     [self endReadTransaction];
 }
 

@@ -123,6 +123,10 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 }
 
 void RLMDeleteObjectFromRealm(RLMObject *object) {
+    // if realm is not writable throw
+    if (object.realm.transactionMode != RLMTransactionModeWrite) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
+    }
     // if last in table delete, otherwise replace with last
     if (object.objectIndex == object.backingTable->size() - 1) {
         object.backingTable->remove(object.objectIndex);
