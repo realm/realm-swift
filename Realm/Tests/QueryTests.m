@@ -306,22 +306,33 @@
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 >= double2" expectedCount:1];
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 <= double2" expectedCount:6];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"int1 == float1"
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"int1 == float1"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between int and float"];
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"float2 >= double1"
+    
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"float2 >= double1"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between float and double"];
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"double2 <= int2"
+    
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"double2 <= int2"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between double and int"];
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"int2 != recordTag"
+    
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"int2 != recordTag"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between int and string"];
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"float1 > recordTag"
+    
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"float1 > recordTag"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between float and string"];
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"double1 < recordTag"
+    
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
+                                                   predicate:@"double1 < recordTag"
                                                expectedCount:0
                                               expectedReason:@"Property type mismatch between double and string"];
 }
