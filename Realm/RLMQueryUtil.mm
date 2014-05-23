@@ -20,7 +20,7 @@
 
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
-#import "NSData+RLMGetBinaryData.h"
+#import "RLMProperty_Private.h"
 
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
@@ -28,7 +28,7 @@ NSException *RLMPredicateException(NSString *name, NSString *reason) {
 }
 
 // return the column index for a validated column name
-NSUInteger RLMValidatedColumnIndex(RLMObjectDescriptor *desc, NSString *columnName) {
+NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) {
     RLMProperty *prop = desc[columnName];
     if (!prop) {
         @throw RLMPredicateException(@"Invalid column name",
@@ -106,7 +106,7 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %d", (unsigned long)operatorType, datatype]);
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, rlmtype_to_string(datatype)]);
             break;
     }
 }
@@ -231,7 +231,7 @@ void add_between_constraint_to_query(tightdb::Query & query,
         }
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %inot supported for BETWEEN operations", dataType]);
+                                           [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations", rlmtype_to_string(dataType)]);
     }
 }
 
@@ -239,7 +239,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
                                     NSData *value) {
-    tightdb::BinaryData binData = [value rlmBinaryData];
+    tightdb::BinaryData binData = RLMBinaryDataForNSData(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             query.begins_with(index, binData);
@@ -271,7 +271,7 @@ void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperat
                 if (!RLMIsObjectOfType(array.firstObject, type) ||
                     !RLMIsObjectOfType(array.lastObject, type)) {
                     @throw RLMPredicateException(@"Invalid value",
-                                                [NSString stringWithFormat:@"NSArray objects must be of type %i for BETWEEN operations", type]);
+                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", rlmtype_to_string(type)]);
                 }
             } else {
                 @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
@@ -281,12 +281,12 @@ void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperat
         }
     } else {
         if (!RLMIsObjectOfType(value, type)) {
-            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %i", type]);
+            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", rlmtype_to_string(type)]);
         }
     }
 }
 
-void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Query & query,
+void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query & query,
                                         NSString * columnName, id value, NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions) {
     
@@ -332,11 +332,11 @@ void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Que
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %i not supported", type]);
+                                           [NSString stringWithFormat:@"Object type %@ not supported", rlmtype_to_string(type)]);
     }
 }
 
-void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *desc, tightdb::Query & query)
+void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *desc, tightdb::Query & query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -415,7 +415,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *d
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectDescriptor *desc)
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectSchema *desc)
 {
     // parse and apply predicate tree
     if (predicate) {
@@ -441,7 +441,7 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectD
     }
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc) {
+void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema *desc) {
     if (order) {
         NSString *propName;
         BOOL ascending = YES;
