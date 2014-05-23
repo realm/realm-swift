@@ -50,11 +50,18 @@ NSString *RLMTestRealmPathLock() {
 - (void)setUp {
     // This method is run before every test method
     [super setUp];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
     [[NSFileManager defaultManager] removeItemAtPath:[RLMDefaultRealmPath() stringByAppendingString:@".lock"] error:nil];
-
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
+    
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock() error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMTestRealmPath()]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMDefaultRealmPath()]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
+    }
 }
 
 + (void)tearDown {

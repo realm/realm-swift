@@ -18,17 +18,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSData+RLMGetBinaryData.h"
+#import <Foundation/Foundation.h>
+#import "RLMObject.h"
 
-#include <tightdb/binary_data.hpp>
-
-
-@implementation NSData (RLMGetBinaryData)
-
--(tightdb::BinaryData)rlmBinaryData
-{
-    const void *data = self.bytes;
-    return tightdb::BinaryData(static_cast<const char *>(data), self.length);
-}
-
+@interface AllTypesObject : RLMObject
+@property BOOL           boolCol;
+@property int            intCol;
+@property float          floatCol;
+@property double         doubleCol;
+@property NSString      *stringCol;
+@property NSData        *binaryCol;
+@property NSDate        *dateCol;
+@property bool           cBoolCol;
+@property long           longCol;
+@property id             mixedCol;
+//@property AgeTable      *tableCol;
 @end
+

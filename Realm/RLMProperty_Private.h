@@ -18,13 +18,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMProperty.h"
+#import <objc/runtime.h>
 
-#include <tightdb/binary_data.hpp>
+// private property interface
+@interface RLMProperty ()
 
+// initializer
+-(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;
 
-@interface NSData (RLMGetBinaryData)
+// creates an RLMProperty object from a runtime property
++(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
 
-@property (nonatomic, readonly) tightdb::BinaryData rlmBinaryData;
+// private properties
+@property (nonatomic, readonly) NSUInteger column;
+@property (nonatomic, readonly) char objcType;
+@property (nonatomic, readonly) id defaultValue;
+
+// getter and setter names
+@property (nonatomic, copy) NSString * getterName;
+@property (nonatomic, copy) NSString * setterName;
 
 @end
+
