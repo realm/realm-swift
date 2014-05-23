@@ -100,6 +100,7 @@
 		4D8D90B2192B825E004C89AA /* MisuseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* MisuseTests.m */; };
 		4DFB045D192F877300F36C59 /* ClassExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ClassExtensionTest.m */; };
 		4DFB045E192F877300F36C59 /* ClassExtensionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ClassExtensionTest.m */; };
+		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -193,7 +194,7 @@
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		4D8D90AF192B7FC4004C89AA /* MisuseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MisuseTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ClassExtensionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassExtensionTest.m; sourceTree = "<group>"; };
-		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; lineEnding = 0; path = release_notes.md; sourceTree = "<group>"; };
+		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -327,7 +328,7 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
-				803BC78F1907C0D3006AB33A /* release_notes.md */,
+				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
 				E918909B177B677900653D7A /* Frameworks */,
@@ -548,6 +549,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */,
+				4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
