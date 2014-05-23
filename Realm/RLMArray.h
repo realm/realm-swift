@@ -19,7 +19,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObject.h"
+
+@class RLMObject;
 
 /**---------------------------------------------------------------------------------------
  *  @name Accessors and Getting Objects
@@ -30,11 +31,11 @@
 /** 
  Initialize an RLMArray.
  
- @param objectClass The class of object this RLMArray will hold.
+ @param objectClassName     The class name of object this RLMArray will hold.
 
- @return            An initialized RLMArray instance.
+ @return                    An initialized RLMArray instance.
 */
-- (instancetype)initWithObjectClass:(Class)objectClass;
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 /**
  Number of objects in the RLMArray.

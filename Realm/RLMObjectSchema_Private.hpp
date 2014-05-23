@@ -18,28 +18,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObjectSchema.h"
 
-#import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+#import <tightdb/table.hpp>
 
-// object property definition
-@interface RLMProperty : NSObject
+// RLMObjectSchema private
+@interface RLMObjectSchema ()
 
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
+// returns a cached or new schema for a given object class
++(instancetype)schemaForObjectClass:(Class)objectClass;
 
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
-
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly) NSString *objectClassName;
+// generate a schema from a table
++(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className;
 
 @end
-
-

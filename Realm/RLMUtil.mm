@@ -20,7 +20,6 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
-#import "NSData+RLMGetBinaryData.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -101,12 +100,10 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return NO;
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
-        case RLMPropertyTypeNone:
-            break;
 
         // FIXME: missing entries
         case RLMPropertyTypeObject:
-        case RLMPropertyTypeTable:
+        case RLMPropertyTypeArray:
         case RLMPropertyTypeAny:
             break;
     }
@@ -120,8 +117,7 @@ void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col
 //        return;
 //    }
     if ([obj isKindOfClass:[NSString class]]) {
-        tightdb::StringData sd([(NSString *)obj UTF8String]);
-        table.set_mixed(col_ndx, row_ndx, sd);
+        table.set_mixed(col_ndx, row_ndx, RLMStringDataWithNSString(obj));
         return;
     }
     if ([obj isKindOfClass:[NSDate class]]) {
@@ -129,7 +125,7 @@ void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col
         return;
     }
     if ([obj isKindOfClass:[NSData class]]) {
-        table.set_mixed(col_ndx, row_ndx, ((NSData *)obj).rlmBinaryData);
+        table.set_mixed(col_ndx, row_ndx, RLMBinaryDataForNSData(obj));
         return;
     }
     if ([obj isKindOfClass:[NSNumber class]]) {
@@ -160,7 +156,7 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
     tightdb::Mixed mixed = table.get_mixed(col_ndx, row_ndx);
     switch (mixed.get_type()) {
         case RLMPropertyTypeString:
-            return [NSString stringWithUTF8String:mixed.get_string().data()];
+            return RLMStringDataToNSString(mixed.get_string());
         case RLMPropertyTypeInt: {
             return @(mixed.get_int());
         case RLMPropertyTypeFloat:
@@ -178,7 +174,7 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
         }
         // case RLMPropertyTypeObject:
         // FIXME - implement when we switch over to the links branch
-        case RLMPropertyTypeTable:
+        case RLMPropertyTypeArray:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"RLMArray not yet supported" userInfo:nil];
         default:
