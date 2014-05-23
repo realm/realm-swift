@@ -43,9 +43,37 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfclass(class1, class2);
 }
 
+// Translate an rlmtype to a string representation
+inline NSString *rlmtype_to_string(RLMPropertyType type) {
+    switch (type) {
+        case RLMPropertyTypeString:
+            return @"string";
+        case RLMPropertyTypeInt:
+            return @"int";
+        case RLMPropertyTypeBool:
+            return @"bool";
+        case RLMPropertyTypeDate:
+            return @"date";
+        case RLMPropertyTypeData:
+            return @"data";
+        case RLMPropertyTypeDouble:
+            return @"double";
+        case RLMPropertyTypeFloat:
+            return @"float";
+        case RLMPropertyTypeAny:
+            return @"any";
+        case RLMPropertyTypeObject:
+            return @"object";
+        case RLMPropertyTypeArray:
+            return @"array";
+    }
+    return @"Unknown";
+}
+
 // Getter and Setter for RLMPropertyTypeAny properties
 id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx);
 void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj);
+
 
 // String conversion utilities
 inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
