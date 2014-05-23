@@ -18,17 +18,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSData+RLMGetBinaryData.h"
+#import "RLMArray.h"
 
-#include <tightdb/binary_data.hpp>
+//
+// RLMArray accessor classes
+//
 
+// NOTE: do not add any ivars or properties to these classes
+//  we switch versions of RLMArray with this subclass dynamically
 
-@implementation NSData (RLMGetBinaryData)
-
--(tightdb::BinaryData)rlmBinaryData
-{
-    const void *data = self.bytes;
-    return tightdb::BinaryData(static_cast<const char *>(data), self.length);
-}
-
+// RLMArray variant used when read only
+@interface RLMArrayReadOnly : RLMArray
 @end
+
+// RLMArray variant used when invalidated
+@interface RLMArrayInvalid : RLMArray
+@end
+
