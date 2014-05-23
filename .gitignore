@@ -2,7 +2,6 @@
 .DS_Store
 
 # sh build.sh config
-/src/config.mk
 /Realm/config.mk
 
 # sh build.sh build
@@ -10,8 +9,6 @@
 /Realm/*.d
 
 # sh build.sh test
-*.tightdb
-*.tightdb.lock
 *.realm
 *.realm.lock
 /Realm/Tests/*.o
