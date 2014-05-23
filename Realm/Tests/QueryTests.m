@@ -239,7 +239,7 @@
     o = results[0];
     XCTAssertEqualObjects(o.stringCol, @"cc", @"Should be cc");
 }
-/* TEMP disabled
+
 - (void)testTwoColumnComparisonQuery
 {
     [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath()
@@ -313,12 +313,12 @@
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"float1 > recordTag" expectedCount:0];
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class] predicate:@"double1 < recordTag" expectedCount:0];
 }
-*/
+
 - (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
-    RLMArray *queryResult = [realm objects:class
+    RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                                      where:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, expectedCount, actualCount);
@@ -336,7 +336,7 @@
     @try {
         RLMRealm *realm = [RLMRealm defaultRealm];
         
-        RLMArray *queryResult = [realm objects:class
+        RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                                          where:predicate];
         NSUInteger actualCount = queryResult.count;
 #pragma unused(actualCount)
