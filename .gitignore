@@ -2,11 +2,17 @@
 .DS_Store
 
 # sh build.sh config
-/src/config.mk
+/Realm/config.mk
+
+# sh build.sh build
+/Realm/*.o
+/Realm/*.d
 
 # sh build.sh test
 *.realm
 *.realm.lock
+/Realm/Tests/*.o
+/Realm/Tests/*.d
 
 # XCode
 xcuserdata/

@@ -1,8 +1,8 @@
-SUBDIRS = src
+SUBDIRS = Realm
 PASSIVE_SUBDIRS = 
 
 PASSIVE_SUBDIRS += doc/ref/examples
-doc_ref_examples_DEPS = src
+doc_ref_examples_DEPS = Realm
 
 # Build and run documentation examples
 .PHONY: check-doc-examples
@@ -23,4 +23,4 @@ get-libexecdir:
 	@echo $(libexecdir)
 
 
-include src/generic.mk
+include Realm/generic.mk
