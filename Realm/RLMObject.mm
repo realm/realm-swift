@@ -35,6 +35,15 @@
 
 -(instancetype)init {
     self = [super init];
+    
+    if (self) {
+        // set default values
+        NSDictionary *dict = [self.class defaultPropertyValues];
+        for (NSString *key in dict) {
+            [self setValue:dict[key] forKey:key];
+        }
+    }
+    
     return self;
 }
 
