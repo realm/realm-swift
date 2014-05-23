@@ -155,27 +155,23 @@ th {
 /* @group Header */
 
 #top_header #library {
-	background: url("../img/library_background.png") repeat-x 0 0 #485E78;
-	background-color: #ccc;
+	/*background: url("../img/library_background.png") repeat-x 0 0 #485E78;*/
+	background-color: #F0727D;
 	height: 35px;
 	font-size: 115%;
+	text-align: center;
 }
 
 #top_header #library #libraryTitle {
-	color: #FFFFFF;
-	margin-left: 15px;
-	text-shadow: 0 -1px 0 #485E78;
+	color: rgba(255,255,255,0.8);
+	font-size: 80%;
+	left: 5px;
 	top: 8px;
 	position: absolute;
 }
 
-#libraryTitle {
-        left: 0;
-}
-
 #top_header #library #developerHome {
-	color: #92979E;
-	right: 15px;
+	color: rgb(34, 34, 34);
 	top: 8px;
 	position: absolute;
 }
@@ -200,6 +196,27 @@ th {
 	/*text-shadow: 0 1px 0 #D5D5D5;*/
 	white-space: nowrap;
 }
+
+#top_header #library img {
+	display: block;
+	float: right;
+	margin-top: -5px;
+}
+
+#dropdown { display:none; }
+#dash { display:none; }
+#xcode { display:none; }
+
+
+#top_header #library #dash_img:hover ~ #dropdown { display: block; }
+#top_header #library #xcode_img:hover ~ #dropdown { display: block; }
+#top_header #library #dash_img:hover ~ #dropdown #dash { display: block; }
+#top_header #library #xcode_img:hover ~ #dropdown #xcode { display: block; }
+
+#top_header #library #dropdown:hover { display: block; }
+#top_header #library #dash:hover { display: block; }
+#top_header #library #xcode:hover { display: block; }
+
 
 #headerButtons {
 	background-color: #D8D8D8;
@@ -614,6 +631,41 @@ span.tooltip:hover span.tooltip {
 	border: 0px solid black;
 	top: 0px;
 	left: 0px;
+}
+
+/*#docs-links {
+	position: absolute;
+	right: 100px;
+	top: 0px;
+	text-align: right;
+}*/
+
+#dropdown {
+	position: absolute;
+	top: 35px;
+	right: 0px;
+	z-index: 100;
+}
+
+.popup-link {
+	background-color: #f0717d;
+	padding: 15px;
+	-moz-border-bottom-left-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+
+.popup-link p {
+	margin-top: 0px;
+}
+
+.popup-link p.subtext {
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+.popup-link input {
+	width: 100%;
 }
 
 /* @end */
