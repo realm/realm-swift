@@ -50,6 +50,19 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestSubtable, RLMTestObj);
             RLMTestObj *obj = subtable.firstRow;
             XCTAssertEqual([obj[@"age"] integerValue], (NSInteger)42, @"Sub table row should be 42");
         }
+
+        {
+            [table addRow:@{@"Outer": @YES, @"Number": @37, @"RLMTestSubtable": @[]}];
+            RLMTable *subtable = table.lastRow[@"RLMTestSubtable"];
+            [subtable addRow:@[@NO, @91]];
+        }
+
+        {
+            RLMTable *subtable = table.lastRow[@"RLMTestSubtable"];
+            RLMTestObj *obj = subtable.firstRow;
+            XCTAssertEqual([obj[@"age"] integerValue], (NSInteger)91, @"Sub table row should be 91");
+
+        }
     }];
 }
 
