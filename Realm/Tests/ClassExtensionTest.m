@@ -39,7 +39,7 @@
 @end
 @implementation ClassExtensionTest
 
-- (void)testCategory
+- (void)testClassExtension
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
