@@ -1,6 +1,5 @@
 #import "RLMTestCase.h"
 
-
 @interface BaseCategoryTestObject : RLMObject
 @property NSInteger intCol;
 @end
@@ -13,12 +12,11 @@
 @implementation BaseCategoryTestObject
 @end
 
-
 @interface CategoryTest : RLMTestCase
-
 @end
-@implementation CategoryTest
 
+
+@implementation CategoryTest
 
 
 - (void)testCategory
@@ -31,7 +29,6 @@
     bObject.stringCol = @"stringVal";
     [realm addObject:bObject];
     [realm commitWriteTransaction];
-    
     
     BaseCategoryTestObject *objectFromRealm = [BaseCategoryTestObject allObjects][0];
     XCTAssertEqual(1, objectFromRealm.intCol, @"Should be 1");
