@@ -18,28 +18,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMProperty.h"
+#import <objc/runtime.h>
 
-#import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+// private property interface
+@interface RLMProperty ()
 
-// object property definition
-@interface RLMProperty : NSObject
+// initializer
+-(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;
 
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
+// creates an RLMProperty object from a runtime property
++(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
 
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
+// private properties
+@property (nonatomic, readonly) NSUInteger column;
+@property (nonatomic, readonly) char objcType;
+@property (nonatomic, readonly) id defaultValue;
 
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly) NSString *objectClassName;
+// getter and setter names
+@property (nonatomic, copy) NSString * getterName;
+@property (nonatomic, copy) NSString * setterName;
 
 @end
-
 
