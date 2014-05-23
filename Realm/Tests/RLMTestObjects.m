@@ -18,13 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMTestObjects.h"
 
-#include <tightdb/binary_data.hpp>
-
-
-@interface NSData (RLMGetBinaryData)
-
-@property (nonatomic, readonly) tightdb::BinaryData rlmBinaryData;
-
+@implementation AllTypesObject
 @end

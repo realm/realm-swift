@@ -18,31 +18,27 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMArray.h"
-#import "RLMPrivate.hpp"
+#import "RLMArray_Private.hpp"
+#import "RLMArrayAccessor.h"
+
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMConstants.h"
 
+#import <objc/runtime.h>
 
-static NSException *s_arrayInvalidException;
-static NSException *s_arrayReadOnlyException;
+#import <tightdb/util/unique_ptr.hpp>
 
 //
-// RLMArray accessor classes
+// Private properties
 //
-
-// NOTE: do not add any ivars or properties to these classes
-//  we switch versions of RLMArray with this subclass dynamically
-
-// RLMArray variant used when read only
-@interface RLMArrayReadOnly : RLMArray
+@interface RLMArray ()
+@property (nonatomic, assign) tightdb::Query *backingQuery;
+@property (nonatomic, assign) tightdb::TableView backingView;
+@property (nonatomic, copy) NSString *objectClassName;
 @end
-
-// RLMArray variant used when invalidated
-@interface RLMArrayInvalid : RLMArray
-@end
-
 
 //
 // RLMArray implementation
@@ -58,22 +54,22 @@ static NSException *s_arrayReadOnlyException;
 @synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
-+ (void)initialize {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_arrayInvalidException = [NSException exceptionWithName:@"RLMException"
-                                                          reason:@"RLMArray is no longer valid."
-                                                        userInfo:nil];
-        s_arrayReadOnlyException = [NSException exceptionWithName:@"RLMException"
-                                                          reason:@"Attempting to modify a read-only RLMArray."
-                                                        userInfo:nil];
-    });
-}
-
-- (instancetype)initWithObjectClass:(Class)objectClass {
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                  query:(tightdb::Query *)query
+                                   view:(tightdb::TableView &)view {
     self = [super init];
     if (self) {
-        self.objectClass = objectClass;
+        self.objectClassName = objectClassName;
+        self.backingQuery = query;
+        self.backingView = view;
+    }
+    return self;
+}
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
+    self = [super init];
+    if (self) {
+        self.objectClassName = objectClassName;
     }
     return self;
 }
@@ -94,7 +90,7 @@ static NSException *s_arrayReadOnlyException;
 
 inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return RLMCreateObjectAccessor(array->_realm,
-                                   array->_objectClass,
+                                   array->_objectClassName,
                                    array->_backingView.get_source_ndx(index));
 }
 
@@ -133,6 +129,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return nil;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
@@ -177,6 +175,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (void)setBackingQuery:(tightdb::Query *)backingQuery {
     _backingQuery.reset(backingQuery);
@@ -187,12 +186,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 }
 
 - (RLMArray *)copy {
-    RLMArray *array = [[RLMArray alloc] initWithObjectClass:_objectClass];
+    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:_objectClassName];
     array.realm = _realm;
     array.backingTable = _backingTable;
     array.backingTableIndex = _backingTableIndex;
-    array.backingView = _backingView;
     array.backingQuery = new tightdb::Query(*_backingQuery);
+    array.backingView = array.backingTable->where(&_backingView).find_all();
     [_realm registerAccessor:array];
     return array;
 }
@@ -203,9 +202,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLM_PREDICATE(predicate, outPred);
     
     // copy array and apply new predicate creating a new query and view
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);;
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[_objectClassName]);
     array.backingView = array.backingQuery->find_all();
     return array;
 }
@@ -216,19 +214,19 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLM_PREDICATE(predicate, outPred);
     
     // copy array and apply new predicate
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
+    RLMObjectSchema *schema = array.realm.schema[_objectClassName];
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
     tightdb::TableView view = array.backingQuery->find_all();
     
     // apply order
-    RLMUpdateViewWithOrder(view, order, desc);
+    RLMUpdateViewWithOrder(view, order, schema);
     array.backingView = view;
     return array;
 }
 
 -(id)minOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -244,14 +242,14 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Sum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"minOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
     }
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -267,14 +265,14 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Maximum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"maxOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
     }
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -286,14 +284,14 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
         case RLMPropertyTypeFloat:
             return @(self.backingView.sum_float(colIndex));
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Maximum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"sumOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
     }
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
@@ -305,8 +303,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
         case RLMPropertyTypeFloat:
             return @(self.backingView.average_float(colIndex));
         default:
-            @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
-                                           reason:@"Sum only supported on int, float and double columns."
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"averageOfProperty only supported fornam int, float and double properties."
                                          userInfo:nil];
     }
 }
@@ -327,66 +325,4 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 @end
 
 
-
-// NOTE: do not add any ivars or properties to these classes
-//  we switch versions of RLMArray with this subclass dynamically
-@implementation RLMArrayReadOnly
-- (void)addObject:(RLMObject *)object {
-    @throw s_arrayReadOnlyException;
-}
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw s_arrayReadOnlyException;
-}
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw s_arrayReadOnlyException;
-}
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw s_arrayReadOnlyException;
-}
-@end
-
-@implementation RLMArrayInvalid
-- (NSUInteger)count {
-    @throw s_arrayInvalidException;
-}
-- (void)addObject:(RLMObject *)object {
-    @throw s_arrayInvalidException;
-}
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw s_arrayInvalidException;
-}
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw s_arrayInvalidException;
-}
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw s_arrayInvalidException;
-}
-- (NSUInteger)indexOfObject:(RLMObject *)object {
-    @throw s_arrayInvalidException;
-}
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (RLMArray *)objectsWhere:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (id)minOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (id)maxOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSNumber *)sumOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSNumber *)averageOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSString *)JSONString {
-    @throw s_arrayInvalidException;
-}
-@end
 

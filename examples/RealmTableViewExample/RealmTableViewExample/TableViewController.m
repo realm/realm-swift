@@ -18,6 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+
 #import "TableViewController.h"
 #import <Realm/Realm.h>
 
@@ -47,7 +48,10 @@ static NSString * const kTableName = @"table";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupUI];
-    
+
+    // FIXME: Reset realm
+    //[[DemoObject allObjects] removeAllObjects];
+
     // Set realm notification block
     NSString *order = nil; // FIXME - crashes @"date"
     [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
@@ -101,7 +105,7 @@ static NSString * const kTableName = @"table";
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        [realm deleteObject:self.array[indexPath.row] cascade:NO];
+        [realm deleteObject:self.array[indexPath.row]];
         [realm commitWriteTransaction];
     }
 }
@@ -135,7 +139,7 @@ static NSString * const kTableName = @"table";
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
     for (DemoObject *obj in self.array) {
-        [realm deleteObject:obj cascade:NO];
+        [realm deleteObject:obj];
     }
     [realm commitWriteTransaction];
 }
