@@ -18,28 +18,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObject.h"
+#import "RLMAccessor.h"
+#import "RLMObjectSchema.h"
 
-#import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+// RLMObject accessor and read/write realm
+@interface RLMObject () <RLMAccessor>
 
-// object property definition
-@interface RLMProperty : NSObject
-
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
-
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
-
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly) NSString *objectClassName;
+@property (nonatomic, readwrite) RLMRealm *realm;
+@property (nonatomic) RLMObjectSchema *schema;
 
 @end
-
 

@@ -19,37 +19,19 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMRealm.h"
-#include <tightdb/table.hpp>
+#import "RLMObject.h"
 
-//
-// Accessor Protocol
-//
-
-// implemented by all persisted objects
-@protocol RLMAccessor <NSObject>
-
-@property (nonatomic) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
-@property (nonatomic, assign) BOOL writable;
-
+@interface AllTypesObject : RLMObject
+@property BOOL           boolCol;
+@property int            intCol;
+@property float          floatCol;
+@property double         doubleCol;
+@property NSString      *stringCol;
+@property NSData        *binaryCol;
+@property NSDate        *dateCol;
+@property bool           cBoolCol;
+@property long           longCol;
+@property id             mixedCol;
+//@property AgeTable      *tableCol;
 @end
-
-
-//
-// Accessors Class Creation/Caching
-//
-
-// initialize accessor cache
-void RLMAccessorCacheInitialize();
-
-// get accessor classes for an object class - generates classes if not cached
-Class RLMAccessorClassForObjectClass(Class objectClass);
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
-Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
-Class RLMInsertionAccessorClassForObjectClass(Class objectClass);
-
-
 
