@@ -101,6 +101,15 @@
 
 @end
 
+@interface NoDefaultObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
+
+@end
+
+@implementation NoDefaultObject
+@end
+
 
 @interface RLMObjectTests : RLMTestCase
 @end
@@ -405,6 +414,33 @@
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 }
 
+- (void)testNoDefaultPropertyValues
+{
+    // Test alloc init does not crash for no defaultPropertyValues implementation
+    XCTAssertNoThrow(([[SimpleObject alloc] init]), @"Not implementing defaultPropertyValues should not crash");
+}
+
+- (void)testNoDefaultAdd
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Test #1
+    SimpleObject *simpleObject = [[SimpleObject alloc] init];
+    XCTAssertThrows(([realm addObject:simpleObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    
+    // Test #2
+    NoDefaultObject *noDefaultObject = [[NoDefaultObject alloc] init];
+    XCTAssertThrows(([realm addObject:noDefaultObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    
+    // Test #3
+    noDefaultObject.stringCol = @"foo";
+    XCTAssertNoThrow(([realm addObject:noDefaultObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
+    
+    [realm commitWriteTransaction];
+}
+
 - (void)testDefaultValues
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -466,10 +502,6 @@
     defaultStringCol.boolCol = inputBool;
     defaultStringCol.dateCol = inputDate;
     
-    // Test no default specified for nil value
-    DefaultObject *noDefault = [[DefaultObject alloc] init];
-    
-    
     // Add objects
     [realm addObject:defaultIntCol];
     [realm addObject:defaultFloatCol];
@@ -477,8 +509,6 @@
     [realm addObject:defaultBoolCol];
     [realm addObject:defaultDateCol];
     [realm addObject:defaultStringCol];
-    
-    XCTAssertThrows(([realm addObject:noDefault]), @"Adding object with no default value specified for nil properties should throw exception");
     
     [realm commitWriteTransaction];
     
