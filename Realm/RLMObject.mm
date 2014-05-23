@@ -43,6 +43,7 @@
     if (self) {
         if (useDefaults) {
             // set default values
+            // FIXME: Cache defaultPropertyValues in this instance
             NSDictionary *dict = [self.class defaultPropertyValues];
             for (NSString *key in dict) {
                 [self setValue:dict[key] forKey:key];

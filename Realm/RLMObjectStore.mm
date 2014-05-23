@@ -112,6 +112,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         // InsertionAccessr getter gets object from ivar
         id value = [object valueForKey:prop.name];
         
+        // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
         if (value) {
             // InsertionAccssor setter inserts into table
             [object setValue:value forKey:prop.name];
