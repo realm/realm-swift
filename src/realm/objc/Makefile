@@ -13,7 +13,7 @@ lib_LIBRARIES = librealm-objc.a
 librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMQuery.mm \
 RLMRealm.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
 RLMColumnProxy.mm NSData+RLMGetBinaryData.mm RLMProperty.mm RLMProxy.mm \
-RLMObjectDescriptor.m query_util.mm
+RLMObjectDescriptor.m query_util.mm RLMCommitLog.cpp
 
 librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -Wno-comment
 librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
