@@ -779,10 +779,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					src,
-				);
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = "-Wall";
@@ -815,10 +812,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					src,
-				);
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = "-Wall";
