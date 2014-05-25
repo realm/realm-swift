@@ -16,7 +16,6 @@
 		E80762E618FEFFD70071CFAB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E80762E518FEFFD70071CFAB /* Images.xcassets */; };
 		E807630418FEFFF80071CFAB /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E807630318FEFFF80071CFAB /* TableViewController.m */; };
 		E807630818FF00F00071CFAB /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E807630718FF00F00071CFAB /* libstdc++.6.dylib */; };
-		E8F3ABC11901BE8400636584 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F3ABC01901BE8400636584 /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +34,6 @@
 		E807630218FEFFF80071CFAB /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewController.h; sourceTree = "<group>"; };
 		E807630318FEFFF80071CFAB /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewController.m; sourceTree = "<group>"; };
 		E807630718FF00F00071CFAB /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
-		E8F3ABC01901BE8400636584 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +45,6 @@
 				E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */,
 				E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */,
 				E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */,
-				E8F3ABC11901BE8400636584 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,7 +72,6 @@
 			isa = PBXGroup;
 			children = (
 				E807630718FF00F00071CFAB /* libstdc++.6.dylib */,
-				E8F3ABC01901BE8400636584 /* Realm.framework */,
 				E80762D318FEFFD70071CFAB /* Foundation.framework */,
 				E80762D518FEFFD70071CFAB /* CoreGraphics.framework */,
 				E80762D718FEFFD70071CFAB /* UIKit.framework */,
@@ -115,9 +111,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E80762FC18FEFFD70071CFAB /* Build configuration list for PBXNativeTarget "RealmTableViewExample" */;
 			buildPhases = (
+				ABA2BF2CB7ED419E96C8AE86 /* Check Pods Manifest.lock */,
 				E80762CC18FEFFD70071CFAB /* Sources */,
 				E80762CD18FEFFD70071CFAB /* Frameworks */,
 				E80762CE18FEFFD70071CFAB /* Resources */,
+				DE3777D66F7C4A1985230A24 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -166,6 +164,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		ABA2BF2CB7ED419E96C8AE86 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		DE3777D66F7C4A1985230A24 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E80762CC18FEFFD70071CFAB /* Sources */ = {
