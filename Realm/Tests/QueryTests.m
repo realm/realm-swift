@@ -344,14 +344,14 @@
     RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                                      where:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, expectedCount, actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, (unsigned long)expectedCount, (unsigned long)actualCount);
 }
 
 - (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
 {
     RLMArray *queryResult = [TestQueryObject objectsWhere:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, expectedCount, actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, (unsigned long)expectedCount, (unsigned long)actualCount);
 }
 
 - (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount expectedReason:(NSString *)expectedReason
