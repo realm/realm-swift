@@ -369,8 +369,8 @@ EOF
 
     "clean")
         auto_configure || exit 1
-        $MAKE clean || exit 1
         if [ "$OS" = "Darwin" ]; then
+            xcodebuild clean || exit 1
             for x in $IPHONE_PLATFORMS; do
                 $MAKE BASE_DENOM="$x" clean || exit 1
             done
@@ -428,7 +428,7 @@ EOF
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
-        $MAKE || exit 1
+        xcodebuild -target Realm -configuration Release || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -522,15 +522,7 @@ EOF
 
     "test")
         auto_configure || exit 1
-        $MAKE check-norun || exit 1
-        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
-        cp "src/realm/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
-        XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
-        export DYLD_LIBRARY_PATH
-        OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests.xctest" || exit 1
+        xcodebuild -target Realm -scheme Realm test || exit 1
         echo "Test passed"
         exit 0
         ;;
