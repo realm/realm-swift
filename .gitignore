@@ -22,6 +22,9 @@ DerivedData
 /iphone-lib/include
 /iphone-lib/librealm-objc-ios.a
 /iphone-lib/librealm-objc-ios-dbg.a
+Realm/*.dylib
+Realm/*.a
+Realm/*.libdeps
 
 # sh build.sh ios-framework
 /Realm.framework
@@ -41,4 +44,11 @@ realm-ios-*.zip
 # backup and crash files
 *.swp
 *~
+
+
+
+
+
+
+
 

@@ -461,10 +461,10 @@ EOF
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            $MAKE -C "src/realm/objc" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
+            $MAKE -C "Realm" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
-            cp "src/realm/objc/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
-            cp "src/realm/objc/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
+            cp "Realm/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
+            cp "Realm/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
         realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios.a'"
@@ -475,8 +475,8 @@ EOF
         libtool -static -o "$IPHONE_DIR/librealm-objc-ios-dbg.a" "$temp_dir/librealm-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
         realm_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
-        inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
-        (cd "src/realm/objc" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
+        inst_headers="$(cd Realm && $MAKE --no-print-directory get-inst-headers)" || exit 1
+        (cd "Realm" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -486,7 +486,7 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-	realm_version="$(sh build.sh get-version)"
+	realm_version=20
 	FRAMEWORK=Realm.framework
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
