@@ -36,7 +36,6 @@
 //
 @interface RLMArray ()
 @property (nonatomic, assign) tightdb::Query *backingQuery;
-@property (nonatomic, assign) tightdb::TableView backingView;
 @property (nonatomic, copy) NSString *objectClassName;
 @end
 
@@ -45,6 +44,7 @@
 //
 @implementation RLMArray {
     tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
+    tightdb::TableView _backingView;
 }
 
 @dynamic backingQuery;
@@ -61,7 +61,7 @@
     if (self) {
         self.objectClassName = objectClassName;
         self.backingQuery = query;
-        self.backingView = view;
+        _backingView = view;
     }
     return self;
 }
@@ -82,6 +82,11 @@
         object_setClass(self, RLMArrayReadOnly.class);
     }
     _writable = writable;
+}
+
+- (void)setBackingView:(tightdb::TableView)backingView
+{
+    _backingView = backingView;
 }
 
 - (NSUInteger)count {
@@ -228,17 +233,17 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(id)minOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
-    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
         case RLMPropertyTypeInt:
-            return @(self.backingView.minimum_int(colIndex));
+            return @(_backingView.minimum_int(colIndex));
         case RLMPropertyTypeDouble:
-            return @(self.backingView.minimum_double(colIndex));
+            return @(_backingView.minimum_double(colIndex));
         case RLMPropertyTypeFloat:
-            return @(self.backingView.minimum_float(colIndex));
+            return @(_backingView.minimum_float(colIndex));
         case RLMPropertyTypeDate: {
-            tightdb::DateTime dt = self.backingView.minimum_datetime(colIndex);
+            tightdb::DateTime dt = _backingView.minimum_datetime(colIndex);
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
@@ -251,17 +256,17 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(id)maxOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
-    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
         case RLMPropertyTypeInt:
-            return @(self.backingView.maximum_int(colIndex));
+            return @(_backingView.maximum_int(colIndex));
         case RLMPropertyTypeDouble:
-            return @(self.backingView.maximum_double(colIndex));
+            return @(_backingView.maximum_double(colIndex));
         case RLMPropertyTypeFloat:
-            return @(self.backingView.maximum_float(colIndex));
+            return @(_backingView.maximum_float(colIndex));
         case RLMPropertyTypeDate: {
-            tightdb::DateTime dt = self.backingView.maximum_datetime(colIndex);
+            tightdb::DateTime dt = _backingView.maximum_datetime(colIndex);
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
         default:
@@ -274,15 +279,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(NSNumber *)sumOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
-    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
         case RLMPropertyTypeInt:
-            return @(self.backingView.sum_int(colIndex));
+            return @(_backingView.sum_int(colIndex));
         case RLMPropertyTypeDouble:
-            return @(self.backingView.sum_double(colIndex));
+            return @(_backingView.sum_double(colIndex));
         case RLMPropertyTypeFloat:
-            return @(self.backingView.sum_float(colIndex));
+            return @(_backingView.sum_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"sumOfProperty only supported for int, float and double properties."
@@ -293,15 +298,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(NSNumber *)averageOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[_objectClassName], property);
     
-    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
         case RLMPropertyTypeInt:
-            return @(self.backingView.average_int(colIndex));
+            return @(_backingView.average_int(colIndex));
         case RLMPropertyTypeDouble:
-            return @(self.backingView.average_double(colIndex));
+            return @(_backingView.average_double(colIndex));
         case RLMPropertyTypeFloat:
-            return @(self.backingView.average_float(colIndex));
+            return @(_backingView.average_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"averageOfProperty only supported fornam int, float and double properties."
