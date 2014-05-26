@@ -37,7 +37,6 @@
 @property (nonatomic, assign) float floatCol;
 @property (nonatomic, assign) NSInteger intCol;
 @property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, copy) id mixedCol;
 @end
 
 @implementation AllPropertyTypesObject
@@ -138,10 +137,10 @@
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
     
     [realm beginWriteTransaction];
-    [AllPropertyTypesObject createInRealm:realm withObject:@[@YES, date1, @1.0, @1.0f, @1, @"a", @"mixed"]];
-    [AllPropertyTypesObject createInRealm:realm withObject:@[@YES, date2, @2.0, @2.0f, @2, @"b", @"mixed"]];
-    [AllPropertyTypesObject createInRealm:realm withObject:@[@NO, date3, @3.0, @3.0f, @3, @"c", @"mixed"]];
-    [AllPropertyTypesObject createInRealm:realm withObject:@[@NO, date33, @3.3, @3.3f, @33, @"cc", @"mixed"]];
+    [AllPropertyTypesObject createInRealm:realm withObject:@[@YES, date1, @1.0, @1.0f, @1, @"a"]];
+    [AllPropertyTypesObject createInRealm:realm withObject:@[@YES, date2, @2.0, @2.0f, @2, @"b"]];
+    [AllPropertyTypesObject createInRealm:realm withObject:@[@NO, date3, @3.0, @3.0f, @3, @"c"]];
+    [AllPropertyTypesObject createInRealm:realm withObject:@[@NO, date33, @3.3, @3.3f, @33, @"cc"]];
     [realm commitWriteTransaction];
     
     
@@ -239,17 +238,6 @@
     results = [AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil];
     o = results[0];
     XCTAssertEqualObjects(o.stringCol, @"cc", @"Should be cc");
-    
-    
-    
-    // sort by mixed column
-    XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:@"mixedCol" where:nil], @"Sort on mixed col not supported");
-    sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:YES];
-    XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
-    sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:NO];
-    XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
-
-
 }
 
 - (void)testTwoColumnComparisonQuery
