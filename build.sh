@@ -342,11 +342,14 @@ EOF
         ;;
 
     "get-version")
-        version_file="src/realm/objc/RLMVersion.h"
-        realm_version_major="$(grep REALM_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        realm_version_minor="$(grep REALM_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        realm_version_patch="$(grep REALM_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
+        if [ "$OS" != "Darwin" ]; then
+            echo "You can only set version when running Mac OS X"
+            exit 1
+        fi
+
+        version_file="Realm/Realm-Info.plist"
+
+        echo "$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
         exit 0
         ;;
 
@@ -355,15 +358,12 @@ EOF
             echo "You can only set version when running Mac OS X"
             exit 1
         fi
-            realm_version="$1"
-            version_file="src/realm/objc/RLMVersion.h"
-            realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
-            realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
-            realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-        sed -i '' -e "s/REALM_VERSION_MAJOR .*$/REALM_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
-        sed -i '' -e "s/REALM_VERSION_MINOR .*$/REALM_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
-        sed -i '' -e "s/REALM_VERSION_PATCH .*$/REALM_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
+        realm_version="$1"
+        version_file="Realm/Realm-Info.plist"
+
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         exit 0
         ;;
 
