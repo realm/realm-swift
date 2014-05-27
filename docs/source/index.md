@@ -44,6 +44,7 @@ You can also install the plugin manually by opening tools/RealmTools.xcodeproj c
 
 ### Getting Help
 
+- Sign up for our [weekly newsletter](http://eepurl.com/VEKCn) to get tips, learn about other use-cases and get alerted of blogposts & tutorials about Realm.
 - **StackOverflow**: look for [previous questions under the tag realm](https://stackoverflow.com/questions/tagged/realm) — or [open a new one](http://stackoverflow.com/questions/ask?tags=realm).
 - **Twitter**: contact [@realm](http://twitter.com/realm) or use [#realm](https://twitter.com/search?q=%23realm&src=typd&f=realtime)
 - **Email**: [support@realm.io](mailto:support@realm.io)
