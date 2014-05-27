@@ -36,6 +36,7 @@
 //
 @interface RLMArray ()
 @property (nonatomic, assign) tightdb::Query *backingQuery;
+// When getting the backingView using dot notation, the tableview is copied in core. Use _backingView instead when accessing.
 @property (nonatomic, assign) tightdb::TableView backingView;
 @property (nonatomic, copy) NSString *objectClassName;
 @end
