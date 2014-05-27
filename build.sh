@@ -742,6 +742,7 @@ EOF
 EOF
         mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/
         rm -rf docs/output/$(sh build.sh get-version)/publish/
+        rm -rf docs/output/$(sh build.sh get-version)/realm.docset
         echo "Done generating Apple docset under docs/output/"
 
         exit 0
