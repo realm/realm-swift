@@ -36,6 +36,7 @@
 //
 @interface RLMArray ()
 @property (nonatomic, assign) tightdb::Query *backingQuery;
+@property (nonatomic, assign) tightdb::TableView backingView;
 @property (nonatomic, copy) NSString *objectClassName;
 @end
 
@@ -44,7 +45,6 @@
 //
 @implementation RLMArray {
     tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
-    tightdb::TableView _backingView;
 }
 
 @dynamic backingQuery;
@@ -82,11 +82,6 @@
         object_setClass(self, RLMArrayReadOnly.class);
     }
     _writable = writable;
-}
-
-- (void)setBackingView:(tightdb::TableView)backingView
-{
-    _backingView = backingView;
 }
 
 - (NSUInteger)count {
