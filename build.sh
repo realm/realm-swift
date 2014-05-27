@@ -689,17 +689,13 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore src/realm/objc/RLMColumnProxy.h \
-                    --ignore src/realm/objc/RLMProxy.h \
-                    --ignore src/realm/objc/RLMQuery.h \
-                    --ignore src/realm/objc/RLMType.h \
-                    --ignore src/realm/objc/RLMVersion.h \
-                    --ignore src/realm/objc/RLMDescriptor.h \
-                    --ignore "src/realm/objc/test/*" \
+                    --ignore "Realm/RLMQueryUtil.h" \
+                    --ignore "Realm/RLMUtil.h" \
+                    --ignore "Realm/Tests/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
-                    src/realm/objc/ || exit 1
+                    Realm || exit 1
         mkdir -p docs/output
         mv docs/html docs/output/$(sh build.sh get-version)
         echo "Done generating HTML docs under docs/output/"
@@ -724,17 +720,13 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore src/realm/objc/RLMColumnProxy.h \
-                    --ignore src/realm/objc/RLMProxy.h \
-                    --ignore src/realm/objc/RLMQuery.h \
-                    --ignore src/realm/objc/RLMType.h \
-                    --ignore src/realm/objc/RLMVersion.h \
-                    --ignore src/realm/objc/RLMDescriptor.h \
-                    --ignore "src/realm/objc/test/*" \
+                    --ignore "Realm/RLMQueryUtil.h" \
+                    --ignore "Realm/RLMUtil.h" \
+                    --ignore "Realm/Tests" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
-                    src/realm/objc/ || exit 1
+                    Realm || exit 1
         echo "Generating Dash docs..."
         (
             cd docs/output/$(sh build.sh get-version)/
@@ -744,7 +736,7 @@ EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
     <url>
-        http://realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
+        http://static.realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
     </url>
 </entry>
 EOF
