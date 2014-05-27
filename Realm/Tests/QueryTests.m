@@ -63,7 +63,8 @@
 
 #pragma mark - Tests
 
-- (void)testBasicQuery {
+- (void)testBasicQuery
+{
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -80,10 +81,8 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
-- (void)testDefaultRealmQuery {
-    // delete default realm file
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-    
+- (void)testDefaultRealmQuery
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -102,13 +101,8 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
-- (void)testArrayQuery {
-    // delete default realm file
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *defaultRealmPath = [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:defaultRealmPath error:nil];
-    
+- (void)testArrayQuery
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -251,8 +245,6 @@
 
 - (void)testTwoColumnComparisonQuery
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath()
-                                               error:nil];
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -346,24 +338,32 @@
                                               expectedReason:@"Property type mismatch between double and string"];
 }
 
-- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
+- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
+                                                   predicate:(NSString *)predicate
+                                               expectedCount:(NSUInteger)expectedCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                                      where:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, expectedCount, actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
+                   predicate, expectedCount, actualCount);
 }
 
-- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
+- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
+                                              expectedCount:(NSUInteger)expectedCount
 {
     RLMArray *queryResult = [TestQueryObject objectsWhere:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, expectedCount, actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
+                   predicate, expectedCount, actualCount);
 }
 
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount expectedReason:(NSString *)expectedReason
+- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
+                                                 predicate:(NSString *)predicate
+                                             expectedCount:(NSUInteger)expectedCount
+                                            expectedReason:(NSString *)expectedReason
 {
     @try {
         RLMRealm *realm = [RLMRealm defaultRealm];
