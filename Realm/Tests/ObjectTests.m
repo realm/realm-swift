@@ -461,6 +461,7 @@
     NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
     NSString * const inputString = @"Westeros";
     NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
+    id inputMixed = @"Tyrion";
     
     // Test defaulting intCol
     DefaultObject *defaultIntCol = [[DefaultObject alloc] init];
@@ -470,6 +471,7 @@
     defaultIntCol.dateCol = inputDate;
     defaultIntCol.stringCol = inputString;
     defaultIntCol.binaryCol = inputData;
+    defaultIntCol.mixedCol = inputMixed;
     
     // Test defaulting floatCol
     DefaultObject *defaultFloatCol = [[DefaultObject alloc] init];
@@ -479,6 +481,7 @@
     defaultFloatCol.dateCol = inputDate;
     defaultFloatCol.stringCol = inputString;
     defaultFloatCol.binaryCol = inputData;
+    defaultFloatCol.mixedCol = inputMixed;
     
     // Test defaulting doubleCol
     DefaultObject *defaultDoubleCol = [[DefaultObject alloc] init];
@@ -488,6 +491,7 @@
     defaultDoubleCol.dateCol = inputDate;
     defaultDoubleCol.stringCol = inputString;
     defaultDoubleCol.binaryCol = inputData;
+    defaultDoubleCol.mixedCol = inputMixed;
     
     // Test defaulting boolCol
     DefaultObject *defaultBoolCol = [[DefaultObject alloc] init];
@@ -497,6 +501,7 @@
     defaultBoolCol.dateCol = inputDate;
     defaultBoolCol.stringCol = inputString;
     defaultBoolCol.binaryCol = inputData;
+    defaultBoolCol.mixedCol = inputMixed;
     
     // Test defaulting dateCol
     DefaultObject *defaultDateCol = [[DefaultObject alloc] init];
@@ -506,6 +511,7 @@
     defaultDateCol.boolCol = inputBool;
     defaultDateCol.stringCol = inputString;
     defaultDateCol.binaryCol = inputData;
+    defaultDateCol.mixedCol = inputMixed;
     
     // Test defaulting stringCol
     DefaultObject *defaultStringCol = [[DefaultObject alloc] init];
@@ -515,6 +521,7 @@
     defaultStringCol.boolCol = inputBool;
     defaultStringCol.dateCol = inputDate;
     defaultStringCol.binaryCol = inputData;
+    defaultStringCol.mixedCol = inputMixed;
     
     // Test defaulting binaryCol
     DefaultObject *defaultBinaryCol = [[DefaultObject alloc] init];
@@ -524,8 +531,17 @@
     defaultBinaryCol.boolCol = inputBool;
     defaultBinaryCol.dateCol = inputDate;
     defaultBinaryCol.stringCol = inputString;
+    defaultBinaryCol.mixedCol = inputMixed;
     
     // Test defaulting mixedCol
+    DefaultObject *defaultMixedCol = [[DefaultObject alloc] init];
+    defaultMixedCol.intCol = inputInt;
+    defaultMixedCol.floatCol = inputFloat;
+    defaultMixedCol.doubleCol = inputDouble;
+    defaultMixedCol.boolCol = inputBool;
+    defaultMixedCol.dateCol = inputDate;
+    defaultMixedCol.stringCol = inputString;
+    defaultMixedCol.binaryCol = inputData;
     
     // Add objects
     [realm addObject:defaultIntCol];
@@ -535,6 +551,7 @@
     [realm addObject:defaultDateCol];
     [realm addObject:defaultStringCol];
     [realm addObject:defaultBinaryCol];
+    [realm addObject:defaultMixedCol];
     
     [realm commitWriteTransaction];
     
@@ -545,6 +562,9 @@
     XCTAssertEqual(fetchedIntDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedIntDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedIntDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedIntDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedIntDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+
     
     DefaultObject *fetchedFloatDefaultObject = [DefaultObject allObjects][1];
     XCTAssertEqual(fetchedFloatDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -553,6 +573,9 @@
     XCTAssertEqual(fetchedFloatDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedFloatDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedFloatDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedFloatDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedFloatDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+
     
     DefaultObject *fetchedDoubleDefaultObject = [DefaultObject allObjects][2];
     XCTAssertEqual(fetchedDoubleDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -561,6 +584,9 @@
     XCTAssertEqual(fetchedDoubleDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedDoubleDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedDoubleDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDoubleDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDoubleDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+
     
     DefaultObject *fetchedBoolDefaultObject = [DefaultObject allObjects][3];
     XCTAssertEqual(fetchedBoolDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -569,6 +595,9 @@
     XCTAssertEqual(fetchedBoolDefaultObject.boolCol, YES, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedBoolDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedBoolDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBoolDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBoolDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+
     
     DefaultObject *fetchedDateDefaultObject = [DefaultObject allObjects][4];
     XCTAssertEqual(fetchedDateDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -577,6 +606,9 @@
     XCTAssertEqual(fetchedDateDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedDateDefaultObject.dateCol, [NSDate dateWithTimeIntervalSince1970:999999], @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedDateDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDateDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedDateDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+
     
     DefaultObject *fetchedStringDefaultObject = [DefaultObject allObjects][5];
     XCTAssertEqual(fetchedStringDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -585,6 +617,8 @@
     XCTAssertEqual(fetchedStringDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedStringDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedStringDefaultObject.stringCol, @"potato", @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedStringDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedStringDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
     
     DefaultObject *fetchedBinaryDefaultObject = [DefaultObject allObjects][6];
     XCTAssertEqual(fetchedBinaryDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
@@ -594,6 +628,17 @@
     XCTAssertEqual(fetchedBinaryDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedBinaryDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedBinaryDefaultObject.binaryCol, [@"binary" dataUsingEncoding:NSUTF8StringEncoding], @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBinaryDefaultObject.mixedCol, inputMixed, @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedMixedDefaultObject = [DefaultObject allObjects][7];
+    XCTAssertEqual(fetchedMixedDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedMixedDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedMixedDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedMixedDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedMixedDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedMixedDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedMixedDefaultObject.binaryCol, inputData, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedMixedDefaultObject.mixedCol, @"foo", @"Value should match value that object was initialized with");
 }
 
 @end
