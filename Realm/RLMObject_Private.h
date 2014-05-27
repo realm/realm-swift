@@ -18,6 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMRealm_Private.hpp"
 #import "RLMObject.h"
 #import "RLMAccessor.h"
 #import "RLMObjectSchema.h"

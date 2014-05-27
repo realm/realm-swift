@@ -21,6 +21,10 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMObjectSchema.h>
 
+/**---------------------------------------------------------------------------------------
+ *  @name Global Schema
+ * ---------------------------------------------------------------------------------------
+ */
 @interface RLMSchema : NSObject
 
 /**
@@ -53,4 +57,31 @@
 
 @end
 
+
+/**---------------------------------------------------------------------------------------
+ *  @name Schema Migration Methods
+ * ---------------------------------------------------------------------------------------
+ */
+@interface RLMSchema (Migrations)
+
+/**
+ Delete an object class during a migration.
+ 
+ @warning   It is only valid to call this method during a migration.
+ 
+ @param objectClassName The name of the object class to delete from the global schema.
+ */
+- (void)deleteObjectClass:(NSString *)objectClassName;
+
+/**
+ Rename an object class during a migration.
+ 
+ @warning   It is only valid to call this method during a migration.
+ 
+ @param objectClassName     The name of the object class to rename.
+ @param newObjectClassName  The new object class name.
+ */
+- (void)renameObjectClass:(NSString *)objectClassName to:(NSString *)newObjectClassName;
+
+@end
 
