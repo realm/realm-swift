@@ -35,7 +35,7 @@
  Initialize an unpersisted instance of this object.
  Call addObject: on an RLMRealm to add standalone object to a realm.
  
- @see [RLMArray addObject:]:
+ @see [RLMRealm addObject:]:
  */
 -(instancetype)init;
 
