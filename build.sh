@@ -685,6 +685,7 @@ EOF
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/*" \
                     --index-desc docs/source/index.md \
+                    --include "docs/source/Guides/" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
@@ -716,6 +717,7 @@ EOF
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests" \
                     --index-desc docs/source/index.md \
+                    --include "docs/source/Guides/" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
