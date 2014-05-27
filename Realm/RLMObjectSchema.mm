@@ -54,7 +54,7 @@
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     
-    // create array of RLMProperties    
+    // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
