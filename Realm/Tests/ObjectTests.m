@@ -85,18 +85,25 @@
 @property BOOL boolCol;
 @property NSDate *dateCol;
 @property NSString *stringCol;
+@property NSData *binaryCol;
+@property id mixedCol;
 @end
 
 @implementation DefaultObject
 
 + (NSDictionary *)defaultPropertyValues
 {
+    NSString *binaryString = @"binary";
+    NSData *binaryData = [binaryString dataUsingEncoding:NSUTF8StringEncoding];
+    
     return @{@"intCol" : @12,
              @"floatCol" : @88.9f,
              @"doubleCol" : @1002.892,
              @"boolCol" : @YES,
              @"dateCol" : [NSDate dateWithTimeIntervalSince1970:999999],
-             @"stringCol" : @"potato"};
+             @"stringCol" : @"potato",
+             @"binaryCol" : binaryData,
+             @"mixedCol" : @"foo"};
 }
 
 @end
@@ -453,6 +460,7 @@
     const BOOL inputBool = NO;
     NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
     NSString * const inputString = @"Westeros";
+    NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
     
     // Test defaulting intCol
     DefaultObject *defaultIntCol = [[DefaultObject alloc] init];
@@ -461,6 +469,7 @@
     defaultIntCol.boolCol = inputBool;
     defaultIntCol.dateCol = inputDate;
     defaultIntCol.stringCol = inputString;
+    defaultIntCol.binaryCol = inputData;
     
     // Test defaulting floatCol
     DefaultObject *defaultFloatCol = [[DefaultObject alloc] init];
@@ -469,6 +478,7 @@
     defaultFloatCol.boolCol = inputBool;
     defaultFloatCol.dateCol = inputDate;
     defaultFloatCol.stringCol = inputString;
+    defaultFloatCol.binaryCol = inputData;
     
     // Test defaulting doubleCol
     DefaultObject *defaultDoubleCol = [[DefaultObject alloc] init];
@@ -477,6 +487,7 @@
     defaultDoubleCol.boolCol = inputBool;
     defaultDoubleCol.dateCol = inputDate;
     defaultDoubleCol.stringCol = inputString;
+    defaultDoubleCol.binaryCol = inputData;
     
     // Test defaulting boolCol
     DefaultObject *defaultBoolCol = [[DefaultObject alloc] init];
@@ -485,6 +496,7 @@
     defaultBoolCol.doubleCol = inputDouble;
     defaultBoolCol.dateCol = inputDate;
     defaultBoolCol.stringCol = inputString;
+    defaultBoolCol.binaryCol = inputData;
     
     // Test defaulting dateCol
     DefaultObject *defaultDateCol = [[DefaultObject alloc] init];
@@ -493,6 +505,7 @@
     defaultDateCol.doubleCol = inputDouble;
     defaultDateCol.boolCol = inputBool;
     defaultDateCol.stringCol = inputString;
+    defaultDateCol.binaryCol = inputData;
     
     // Test defaulting stringCol
     DefaultObject *defaultStringCol = [[DefaultObject alloc] init];
@@ -501,6 +514,18 @@
     defaultStringCol.doubleCol = inputDouble;
     defaultStringCol.boolCol = inputBool;
     defaultStringCol.dateCol = inputDate;
+    defaultStringCol.binaryCol = inputData;
+    
+    // Test defaulting binaryCol
+    DefaultObject *defaultBinaryCol = [[DefaultObject alloc] init];
+    defaultBinaryCol.intCol = inputInt;
+    defaultBinaryCol.floatCol = inputFloat;
+    defaultBinaryCol.doubleCol = inputDouble;
+    defaultBinaryCol.boolCol = inputBool;
+    defaultBinaryCol.dateCol = inputDate;
+    defaultBinaryCol.stringCol = inputString;
+    
+    // Test defaulting mixedCol
     
     // Add objects
     [realm addObject:defaultIntCol];
@@ -509,6 +534,7 @@
     [realm addObject:defaultBoolCol];
     [realm addObject:defaultDateCol];
     [realm addObject:defaultStringCol];
+    [realm addObject:defaultBinaryCol];
     
     [realm commitWriteTransaction];
     
@@ -559,6 +585,15 @@
     XCTAssertEqual(fetchedStringDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
     XCTAssertEqual(fetchedStringDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
     XCTAssertEqualObjects(fetchedStringDefaultObject.stringCol, @"potato", @"Value should match value that object was initialized with");
+    
+    DefaultObject *fetchedBinaryDefaultObject = [DefaultObject allObjects][6];
+    XCTAssertEqual(fetchedBinaryDefaultObject.intCol, inputInt, @"Value should match value in defaultPropertyValues method");
+    XCTAssertEqual(fetchedBinaryDefaultObject.floatCol, inputFloat, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBinaryDefaultObject.doubleCol, inputDouble, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBinaryDefaultObject.boolCol, inputBool, @"Value should match value that object was initialized with");
+    XCTAssertEqual(fetchedBinaryDefaultObject.dateCol, inputDate, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBinaryDefaultObject.stringCol, inputString, @"Value should match value that object was initialized with");
+    XCTAssertEqualObjects(fetchedBinaryDefaultObject.binaryCol, [@"binary" dataUsingEncoding:NSUTF8StringEncoding], @"Value should match value that object was initialized with");
 }
 
 @end
