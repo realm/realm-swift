@@ -7,12 +7,14 @@
 # sh build.sh build
 /Realm/*.o
 /Realm/*.d
+/Realm/*.dylib
 
 # sh build.sh test
 *.realm
 *.realm.lock
 /Realm/Tests/*.o
 /Realm/Tests/*.d
+build/
 
 # XCode
 xcuserdata/
