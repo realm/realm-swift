@@ -8,9 +8,8 @@
 
 #import <Realm/Realm.h>
 
-@protocol ___FILEBASENAMEASIDENTIFIER___ <NSObject>
-@end
-
 @interface ___FILEBASENAMEASIDENTIFIER___ : RLMObject
-
+// Add properties here to define the model
 @end
+
+RLM_OBJECT_PROTOCOL(___FILEBASENAMEASIDENTIFIER___)
