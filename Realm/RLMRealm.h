@@ -336,9 +336,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
  
- FIXME: RLMMigrationRealm is not defined yet
- //see               RLMMigrationRealm
  */
+ // FIXME: RLMMigrationRealm is not defined yet
+ // @see               RLMMigrationRealm
 + (void)ensureSchemaVersion:(NSUInteger)version usingBlock:(RLMMigrationBlock)block;
 
 /**
@@ -351,9 +351,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @param realmPath   The path of the relm to migrate.
  @param block       The block which migrates the Realm to the current version.
  
- FIXME: RLMMigrationRealm is not defined yet
- //see               RLMMigrationRealm
  */
+ // FIXME: RLMMigrationRealm is not defined yet
+ // @see               RLMMigrationRealm
 + (void)ensureSchemaVersion:(NSUInteger)version
                      atPath:(NSString *)realmPath
                  usingBlock:(RLMMigrationBlock)block;
