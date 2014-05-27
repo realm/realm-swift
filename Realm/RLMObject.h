@@ -35,7 +35,7 @@
  Initialize an unpersisted instance of this object.
  Call addObject: on an RLMRealm to add standalone object to a realm.
  
- @see   addObject:
+ @see [RLMArray addObject:]:
  */
 -(instancetype)init;
 
@@ -107,7 +107,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
      exception will be thrown if no default value for this property is specified. If a default
      value is specified it is set upon insertion into a Realm
      
-     @see defaultPropertyValues
+    @see [RLMObject defaultPropertyValues]
      */
     RLMPropertyAttributeRequired = 1 << 5,
     

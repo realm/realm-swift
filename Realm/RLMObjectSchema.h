@@ -40,7 +40,7 @@
 /**
  Lookup a property object by name.
  
- @param key The properties name.
+ @param propertyName The properties name.
  
  @return    RLMProperty object or nil if there is no property with the given name.
  */
