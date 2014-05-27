@@ -38,12 +38,17 @@
 @interface RLMMigration : NSObject
 
 /**
+ The schema version of the Realm at the beginning of the migration.
+ */
+@property (nonatomic, readonly) NSUInteger schemaVersion;
+
+/**
  Get the current RLMSchema for the migration. This object provides the ability to remove/rename object 
  clases. Each RLMObjectSchema object exposed by this object providee the ability to remove/rename/add 
  individual properties to existing object types.
 
  @see       RLMObjectSchema
-*/
+ */
 @property (nonatomic, readonly) RLMSchema *schema;
 
 
