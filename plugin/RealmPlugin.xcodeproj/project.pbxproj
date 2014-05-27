@@ -94,7 +94,7 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 			};
-			buildConfigurationList = E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmTools" */;
+			buildConfigurationList = E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmPlugin" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -157,7 +157,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmTools" */ = {
+		E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmPlugin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E8CD45FA193547AF0074FDE7 /* Debug */,
