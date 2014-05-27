@@ -26,3 +26,9 @@ Our Xcode plugin makes it easy to generate new Realm models and inspect your dat
 If you use [Alcatraz](http://alcatraz.io/) you will find our plugin under “Realm”.
 
 You can also install the plugin manually by opening tools/RealmTools.xcodeproj contained in the release zip and clicking run. You will need to quit and relaunch Xcode to see our plugin.
+
+## Getting Help
+
+- **StackOverflow**: look for [previous questions under the tag realm](https://stackoverflow.com/questions/tagged/realm) — or [open a new one](http://stackoverflow.com/questions/ask?tags=realm).
+- **Twitter**: contact [@realm](http://twitter.com/realm) or use [#realm](https://twitter.com/search?q=%23realm&src=typd&f=realtime)
+- **Email**: [support@realm.io](mailto:support@realm.io)
