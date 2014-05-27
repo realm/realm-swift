@@ -241,15 +241,12 @@
     XCTAssertEqualObjects(o.stringCol, @"cc", @"Should be cc");
     
     
-    
     // sort by mixed column
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:@"mixedCol" where:nil], @"Sort on mixed col not supported");
     sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:YES];
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
     sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:NO];
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
-
-
 }
 
 - (void)testTwoColumnComparisonQuery
