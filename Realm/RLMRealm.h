@@ -288,11 +288,13 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
                     you to alter its Schema and to access objects in the Realm to populate added
                     object classes and properties.
  
- @return            Version number for the Realm after completing the migration. This version 
-                    number is accessible in future migrations through the <code>schemaVersion</code>
-                    property on the RLMMigration object.
+ @param oldSchemaVersion    The schema version of the Realm which requires migration.
+ 
+ @return    Version number for the Realm after completing the migration. This version
+            number is accessible in future migrations through the <code>schemaVersion</code>
+            property on the RLMMigration object.
  */
-typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration);
+typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
 @interface RLMRealm (Migrations)
 

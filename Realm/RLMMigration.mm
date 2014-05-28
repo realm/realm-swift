@@ -33,10 +33,6 @@
     return migration;
 }
 
-- (NSUInteger)schemaVersion {
-    return self.realm.schemaVersion;
-}
-
 - (RLMSchema *)schema {
     return self.realm.schema;
 }
