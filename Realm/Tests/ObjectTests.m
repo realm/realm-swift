@@ -20,7 +20,6 @@
 
 #import "RLMTestCase.h"
 #import "RLMTestObjects.h"
-#import <objc/runtime.h>
 
 #import <Realm/Realm.h>
 
