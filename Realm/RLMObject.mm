@@ -34,7 +34,23 @@
 @synthesize writable = _writable;
 
 -(instancetype)init {
+    return [self initWithDefaultValues:YES];
+}
+
+-(instancetype)initWithDefaultValues:(BOOL)useDefaults {
     self = [super init];
+    
+    if (self) {
+        if (useDefaults) {
+            // set default values
+            // FIXME: Cache defaultPropertyValues in this instance
+            NSDictionary *dict = [self.class defaultPropertyValues];
+            for (NSString *key in dict) {
+                [self setValue:dict[key] forKey:key];
+            }
+        }
+    }
+    
     return self;
 }
 
@@ -68,6 +84,11 @@
     RLMAddObjectToRealm(obj, realm);
 
     return obj;
+}
+
+// default default values implementation
++ (NSDictionary *)defaultPropertyValues {
+    return nil;
 }
 
 #pragma GCC diagnostic push
