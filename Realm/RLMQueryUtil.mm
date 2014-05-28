@@ -22,6 +22,9 @@
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 
+using namespace tightdb;
+#include <tightdb/query_expression.hpp>
+
 NSString *const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException = @"RLMUnsupportedTypesFoundInPropertyComparisonException";
 
@@ -342,13 +345,36 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
     }
 }
 
+template<typename T>
+Expression *column_expression(NSComparisonPredicateOptions operatorType,
+                                            NSUInteger leftColumn,
+                                            NSUInteger rightColumn) {
+    tightdb::Column<T> *col1 = new tightdb::Columns<T>(leftColumn);
+    tightdb::Column<T> *col2 = new tightdb::Columns<T>(rightColumn);
+
+    switch (operatorType) {
+        case NSEqualToPredicateOperatorType:
+            return new Compare<tightdb::Equal, T>(col1, col2, true);
+        case NSNotEqualToPredicateOperatorType:
+            return new Compare<tightdb::NotEqual, T>(col1, col2, true);
+        case NSLessThanPredicateOperatorType:
+            return new Compare<tightdb::Less, T>(col1, col2, true);
+        case NSGreaterThanPredicateOperatorType:
+            return new Compare<tightdb::Greater, T>(col1, col2, true);
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return new Compare<tightdb::LessEqual, T>(col1, col2, true);
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return new Compare<tightdb::GreaterEqual, T>(col1, col2, true);
+    }
+}
+    
 void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
-    NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
+    NSUInteger left = RLMValidatedColumnIndex(scheme, leftColumnName);
     RLMPropertyType leftType = [scheme[leftColumnName] type];
     
-    NSUInteger rightIndex = RLMValidatedColumnIndex(scheme, rightColumnName);
+    NSUInteger right = RLMValidatedColumnIndex(scheme, rightColumnName);
     RLMPropertyType rightType = [scheme[rightColumnName] type];
     
     // TODO: Should we handle special case where left row is the same as right row (tautology)
@@ -356,80 +382,14 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
     if (leftType == rightType) {
         switch (leftType) {
             case tightdb::type_Int:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_int(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_int(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_int(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+                query.and_query(*column_expression<int>(predicateOptions, left, right));
                 break;
-                
             case tightdb::type_Float:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_float(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_float(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_float(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+                query.and_query(*column_expression<float>(predicateOptions, left, right));
                 break;
-                
             case tightdb::type_Double:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_double(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_double(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_double(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+                query.and_query(*column_expression<double>(predicateOptions, left, right));
                 break;
-                
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
                                              [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason,
