@@ -8,14 +8,15 @@
 
 #import "RLMRealmNode.h"
 
-#import "Realm.h"
+#import <Realm/Realm.h>
+
 
 @implementation RLMRealmNode
 
 @synthesize realm = _realm;
 @synthesize name = _name;
 @synthesize url = _url;
-@synthesize topLevelTables = _topLevelTables;
+@synthesize topLevelClazzes = _topLevelClazzes;
 
 - (instancetype)init
 {
@@ -30,12 +31,12 @@
         
         _name = name;
         _url = url;        
-        _topLevelTables = [self constructTopLevelTables];
+        _topLevelClazzes = [self constructTopLevelClazzes];
     }
     return self;
 }
 
-- (void)addTable:(RLMTableNode *)table
+- (void)addTable:(RLMClazzNode *)table
 {
 
 }
@@ -49,17 +50,17 @@
 
 - (BOOL)isExpandable
 {
-    return [self topLevelTables].count != 0;
+    return [self topLevelClazzes].count != 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    return [self topLevelTables].count;
+    return [self topLevelClazzes].count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    return [self topLevelTables][index];
+    return [self topLevelClazzes][index];
 }
 
 - (id)nodeElementForColumnWithIndex:(NSInteger)index
@@ -78,17 +79,18 @@
 
 #pragma mark - Private methods
 
-- (NSArray *)constructTopLevelTables
+- (NSArray *)constructTopLevelClazzes
 {
-    NSUInteger tableCount = [_realm tableCount];
-    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:tableCount];
+    RLMSchema *realmSchema = _realm.schema;
+    NSArray *allObjectSchemas = realmSchema.objectSchema;
     
-    for(NSUInteger index = 0; index < tableCount; index++) {
-        NSString *tableName = [_realm nameOfTableWithIndex:index];
-        RLMTable *realmTable = [_realm tableWithName:tableName];
-        
-        RLMTableNode *tableNode = [[RLMTableNode alloc] initWithName:tableName
-                                                          realmTable:realmTable];
+    NSUInteger clazzCount = allObjectSchemas.count;
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:clazzCount];
+    
+    for(NSUInteger index = 0; index < clazzCount; index++) {
+        RLMObjectSchema *objectSchema = allObjectSchemas[index];        
+        RLMClazzNode *tableNode = [[RLMClazzNode alloc] initWithSchema:objectSchema
+                                                               inRealm:_realm];
         
         [result addObject:tableNode];
     }

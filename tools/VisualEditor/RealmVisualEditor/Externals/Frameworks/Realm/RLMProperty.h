@@ -18,28 +18,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "RLMType.h"
 
-@class RLMRow;
-@class RLMQuery;
+#import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
+// object property definition
+@interface RLMProperty : NSObject
 
-@protocol RLMView
+/**
+ Property name.
+ */
+@property (nonatomic, readonly) NSString * name;
 
-@property (nonatomic, readonly) NSUInteger rowCount;
-@property (nonatomic, readonly) NSUInteger columnCount;
+/**
+ Property type.
+ */
+@property (nonatomic, readonly) RLMPropertyType type;
 
-// Getting and setting individual rows
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
--(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
--(RLMRow *)lastRow;
--(RLMRow *)firstRow;
-
-// Working with columns
--(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
-
-// Removing rows
--(void)removeRowAtIndex:(NSUInteger)rowIndex;
--(void)removeAllRows;
+/**
+ Object class name - specify object types for RLMObject and RLMArray properties.
+ */
+@property (nonatomic, readonly) NSString *objectClassName;
 
 @end
+
+

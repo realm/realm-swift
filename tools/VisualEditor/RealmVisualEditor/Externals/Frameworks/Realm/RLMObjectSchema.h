@@ -19,8 +19,32 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMProperty.h>
 
-// Posted by RLMRealm when it changes, that is when a table is
-// added, removed, or changed in any way.
+/**---------------------------------------------------------------------------------------
+ *  @name Object Schema
+ * ---------------------------------------------------------------------------------------
+ */
+@interface RLMObjectSchema : NSObject
 
-extern NSString *const RLMRealmDidChangeNotification;
+/**
+ Array of persisted properties for an object.
+ */
+@property (nonatomic, readonly, copy) NSArray *properties;
+
+/**
+ The name of the class this schema describes.
+ */
+@property (nonatomic, readonly) NSString *className;
+
+/**
+ Lookup a property object by name.
+ 
+ @param propertyName The properties name.
+ 
+ @return    RLMProperty object or nil if there is no property with the given name.
+ */
+- (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
+
+@end
+

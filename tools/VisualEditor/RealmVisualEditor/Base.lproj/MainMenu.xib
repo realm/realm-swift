@@ -609,6 +609,19 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Tools" id="QHR-Bb-K4I">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Tools" id="y0u-fA-7CK">
+                        <items>
+                            <menuItem title="Generate test db" id="sHB-lE-A0K">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="generatedTestDb:" target="-1" id="CiV-xY-OMi"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="View" id="H8h-7b-M4v">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="View" id="HyV-fh-RgO">

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMTableNode.h"
+#import "RLMClazzNode.h"
 
 #import "RLMRealmOutlineNode.h"
 
@@ -17,10 +17,10 @@
 @property (nonatomic, readonly) RLMRealm *realm;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *url;
-@property (nonatomic, readonly) NSArray *topLevelTables;
+@property (nonatomic, readonly) NSArray *topLevelClazzes;
 
 - (instancetype)initWithName:(NSString *)name url:(NSString *)url;
 
-- (void)addTable:(RLMTableNode *)table;
+- (void)addTable:(RLMClazzNode *)table;
 
 @end

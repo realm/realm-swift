@@ -18,20 +18,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMArray.h"
 
-#define REALM_VERSION_MAJOR 0
-#define REALM_VERSION_MINOR 10
-#define REALM_VERSION_PATCH 0
+//
+// RLMArray accessor classes
+//
 
-@interface RLMVersion : NSObject
+// NOTE: do not add any ivars or properties to these classes
+//  we switch versions of RLMArray with this subclass dynamically
 
-+(NSString*)version;
-
-+(NSInteger)major;
-+(NSInteger)minor;
-+(NSInteger)patch;
-
-+(BOOL)isAtLeast:(NSInteger)major minor:(NSInteger)minor patch:(NSInteger)patch;
-
+// RLMArray variant used when read only
+@interface RLMArrayReadOnly : RLMArray
 @end
+
+// RLMArray variant used when invalidated
+@interface RLMArrayInvalid : RLMArray
+@end
+

@@ -18,27 +18,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef REALM_OBJC_TYPE_H
-#define REALM_OBJC_TYPE_H
+#import "RLMArray.h"
 
-// Make sure numbers match those in <tightdb/data_type.hpp>
-typedef NS_ENUM(NSInteger, RLMType) {
-    RLMTypeNone =  -1,
-    RLMTypeBool =  1,
-    RLMTypeInt =  0,
-    RLMTypeFloat =  9,
-    RLMTypeDouble = 10,
-    RLMTypeString =  2,
-    RLMTypeBinary =  4,
-    RLMTypeDate =  7,
-    RLMTypeTable =  5,
-    RLMTypeMixed =  6,
-};
+//
+// RLMArray accessor classes
+//
 
+// NOTE: do not add any ivars or properties to these classes
+//  we switch versions of RLMArray with this subclass dynamically
 
-typedef NS_ENUM(NSInteger, RLMSortOrder) {
-    RLMSortOrderAscending =  0,
-    RLMSortOrderDescending =  1,
-};
+// RLMArray variant used when read only
+@interface RLMArrayReadOnly : RLMArray
+@end
 
-#endif // REALM_OBJC_TYPE_H
+// RLMArray variant used when invalidated
+@interface RLMArrayInvalid : RLMArray
+@end
+

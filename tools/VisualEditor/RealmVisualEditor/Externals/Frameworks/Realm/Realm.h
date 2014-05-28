@@ -18,6 +18,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <realm/objc/Realm.h>
-#import "RLMRowFast.h"
+#import <Foundation/Foundation.h>
 
+#import <Realm/RLMRealm.h>
+#import <Realm/RLMObject.h>
+#import <Realm/RLMArray.h>
+#import <Realm/RLMSchema.h>
