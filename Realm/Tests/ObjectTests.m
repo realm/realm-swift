@@ -207,6 +207,8 @@
     [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    
+    [realm commitWriteTransaction];
         
     RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
     RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
