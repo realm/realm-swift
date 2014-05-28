@@ -224,7 +224,7 @@ static NSArray *s_objectDescriptors = nil;
     }
 
     // try to reuse existing realm first
-    RLMRealm *realm = cachedRealm(path);
+    RLMRealm *realm = nil;//cachedRealm(path);
     if (realm) {
         // if already open with different read permissions then throw
         if (realm.isReadOnly != readonly) {
