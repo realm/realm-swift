@@ -22,6 +22,7 @@
 #import "RLMSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #import <objc/runtime.h>
 
@@ -59,21 +60,16 @@
     
     // FIXME - this can be optimized by inserting directly into the table
     //  after validation, rather than populating the object first
-    if ([values isKindOfClass:NSDictionary.class]) {
+    if ([values isKindOfClass:NSDictionary.class] && RLMValidateValuesForDictionary(values, [self className], realm)) {
         // if a dictionary, use key value coding to populate our object
         for (NSString *key in values) {
             [obj setValue:values[key] forKeyPath:key];
         }
     }
-    else if ([values isKindOfClass:NSArray.class]) {
+    else if ([values isKindOfClass:NSArray.class] && RLMValidateValuesForArray(values, [self className], realm)) {
         // for arrays use property names as keys
         NSArray *array = values;
-        RLMObjectSchema *desc = realm.schema[self.className];
-        NSArray *properties = desc.properties;
-        if (array.count != desc.properties.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-        }
-        // FIXME - more validation for each property type
+        NSArray *properties = RLMPropertiesForClassName([self className], realm);
         
         for (NSUInteger i = 0; i < array.count; i++) {
             [obj setValue:array[i] forKeyPath:[properties[i] name]];
