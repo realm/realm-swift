@@ -342,11 +342,14 @@ EOF
         ;;
 
     "get-version")
-        version_file="src/realm/objc/RLMVersion.h"
-        realm_version_major="$(grep REALM_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        realm_version_minor="$(grep REALM_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        realm_version_patch="$(grep REALM_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-        echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
+        if [ "$OS" != "Darwin" ]; then
+            echo "You can only set version when running Mac OS X"
+            exit 1
+        fi
+
+        version_file="Realm/Realm-Info.plist"
+
+        echo "$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
         exit 0
         ;;
 
@@ -355,22 +358,19 @@ EOF
             echo "You can only set version when running Mac OS X"
             exit 1
         fi
-            realm_version="$1"
-            version_file="src/realm/objc/RLMVersion.h"
-            realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
-            realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
-            realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-        sed -i '' -e "s/REALM_VERSION_MAJOR .*$/REALM_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
-        sed -i '' -e "s/REALM_VERSION_MINOR .*$/REALM_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
-        sed -i '' -e "s/REALM_VERSION_PATCH .*$/REALM_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
+        realm_version="$1"
+        version_file="Realm/Realm-Info.plist"
+
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         exit 0
         ;;
 
     "clean")
         auto_configure || exit 1
-        $MAKE clean || exit 1
         if [ "$OS" = "Darwin" ]; then
+            xcodebuild clean || exit 1
             for x in $IPHONE_PLATFORMS; do
                 $MAKE BASE_DENOM="$x" clean || exit 1
             done
@@ -428,7 +428,7 @@ EOF
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
-        $MAKE || exit 1
+        xcodebuild -target Realm -configuration Release || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -461,10 +461,10 @@ EOF
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            $MAKE -C "src/realm/objc" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
+            $MAKE -C "Realm" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
-            cp "src/realm/objc/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
-            cp "src/realm/objc/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
+            cp "Realm/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
+            cp "Realm/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
         realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios.a'"
@@ -475,8 +475,8 @@ EOF
         libtool -static -o "$IPHONE_DIR/librealm-objc-ios-dbg.a" "$temp_dir/librealm-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
         realm_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
-        inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
-        (cd "src/realm/objc" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
+        inst_headers="$(cd Realm && $MAKE --no-print-directory get-inst-headers)" || exit 1
+        (cd "Realm" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -486,7 +486,8 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-	realm_version="$(sh build.sh get-version)"
+#FIXME https://app.asana.com/0/861870036984/12604665254221
+	realm_version="manual-version"
 	FRAMEWORK=Realm.framework
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
@@ -522,15 +523,7 @@ EOF
 
     "test")
         auto_configure || exit 1
-        $MAKE check-norun || exit 1
-        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
-        cp "src/realm/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
-        XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
-        export DYLD_LIBRARY_PATH
-        OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests.xctest" || exit 1
+        xcodebuild -target Realm -scheme Realm test || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -688,17 +681,13 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore src/realm/objc/RLMColumnProxy.h \
-                    --ignore src/realm/objc/RLMProxy.h \
-                    --ignore src/realm/objc/RLMQuery.h \
-                    --ignore src/realm/objc/RLMType.h \
-                    --ignore src/realm/objc/RLMVersion.h \
-                    --ignore src/realm/objc/RLMDescriptor.h \
-                    --ignore "src/realm/objc/test/*" \
+                    --ignore "Realm/RLMQueryUtil.h" \
+                    --ignore "Realm/RLMUtil.h" \
+                    --ignore "Realm/Tests/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
-                    src/realm/objc/ || exit 1
+                    Realm || exit 1
         mkdir -p docs/output
         mv docs/html docs/output/$(sh build.sh get-version)
         echo "Done generating HTML docs under docs/output/"
@@ -723,17 +712,13 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore src/realm/objc/RLMColumnProxy.h \
-                    --ignore src/realm/objc/RLMProxy.h \
-                    --ignore src/realm/objc/RLMQuery.h \
-                    --ignore src/realm/objc/RLMType.h \
-                    --ignore src/realm/objc/RLMVersion.h \
-                    --ignore src/realm/objc/RLMDescriptor.h \
-                    --ignore "src/realm/objc/test/*" \
+                    --ignore "Realm/RLMQueryUtil.h" \
+                    --ignore "Realm/RLMUtil.h" \
+                    --ignore "Realm/Tests" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
-                    src/realm/objc/ || exit 1
+                    Realm || exit 1
         echo "Generating Dash docs..."
         (
             cd docs/output/$(sh build.sh get-version)/
@@ -743,12 +728,13 @@ EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
     <url>
-        http://realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
+        http://static.realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
     </url>
 </entry>
 EOF
         mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/
         rm -rf docs/output/$(sh build.sh get-version)/publish/
+        rm -rf docs/output/$(sh build.sh get-version)/realm.docset
         echo "Done generating Apple docset under docs/output/"
 
         exit 0
