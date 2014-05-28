@@ -23,22 +23,78 @@
     
     [self.window setRootViewController:vc];
 
+    // Change the parameters to tweak the test
+    [self memoryMapTestWithSizeInMb:800 numberOfFiles:1 permission:PROT_READ];
     
-    [self memoryMapTestWithSizeInMb:25 permission:PROT_WRITE numberOfFiles:100];
+    
+    // Mapping 1 file Max succes size:
+    
+    // iPad Air 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:800 numberOfFiles:1 permission:PROT_READ]; 800 mb total
+    // [self memoryMapTestWithSizeInMb:800 numberOfFiles:1 permission:PROT_WRITE]; 800 mb total
+
+    // iPhone 5s 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:720 numberOfFiles:1 permission:PROT_READ]; 720 mb total
+    
+    // iPhone 4s 2011. 512 mb memory
+    // [self memoryMapTestWithSizeInMb:300 numberOfFiles:1 permission:PROT_READ]; 300 mb total
+    // [self memoryMapTestWithSizeInMb:300 numberOfFiles:1 permission:PROT_WRITE]; 300 mb total
+    
+    // Simulator
+    // [self memoryMapTestWithSizeInMb:500000000 numberOfFiles:1 permission:PROT_READ]; NO LIMIT
+    
+    
+    
+    // Mapping 10 files Max succes size:
+    
+    // iPad Air 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:150 numberOfFiles:10 permission:PROT_READ]; 1500 mb total
+    // [self memoryMapTestWithSizeInMb:150 numberOfFiles:10 permission:PROT_WRITE]; 1500 mb total
+    
+
+    // iPhone 5s 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:150 numberOfFiles:10 permission:PROT_READ]; 1500 mb total
+    
+    // iPhone 4s 2011. 512 mb memory
+    // ONLY 1 FILE ALLOWED TO BE MAPPED
+
+
+     // Simulator
+    // [self memoryMapTestWithSizeInMb:500000000 numberOfFiles:10 permission:PROT_READ]; NO LIMIT
+    
+    
+    
+    // Mapping 100 files Max succes size:
+    
+    // iPad Air 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:19 numberOfFiles:100 permission:PROT_READ]; 1900 mb total
+    // [self memoryMapTestWithSizeInMb:19 numberOfFiles:100 permission:PROT_WRITE]; 1900 mb total
+
+    
+    // iPhone 5s 2013. 1 gb memory
+    // [self memoryMapTestWithSizeInMb:19 numberOfFiles:100 permission:PROT_READ]; 1900 mb total
+    
+    // iPhone 4s 2011. 512 mb memory
+    // ONLY 1 FILE ALLOWED TO BE MAPPED
+    
+    // Simulator
+    // [self memoryMapTestWithSizeInMb:500000000 numberOfFiles:100 permission:PROT_READ]; NO LIMIT
+
+
 
     
     return YES;
 }
 
 
-- (void)memoryMapTestWithSizeInMb:(int)mb permission:(int)permission numberOfFiles:(int)numberOfFiles;
+- (void)memoryMapTestWithSizeInMb:(int)mb numberOfFiles:(int)numberOfFiles permission:(int)permission;
 {
     size_t sizeInBytes = mb*1024*1024;
     
     for (int i=0;i<numberOfFiles;i++) {
-        [[NSFileManager defaultManager] createFileAtPath:[AppDelegate writeablePathForFile:[NSString stringWithFormat:@"file%i.realm", i]]
-                                                contents:nil
-                                              attributes:nil];
+        [[NSFileManager defaultManager] createFileAtPath:[NSString stringWithFormat:@"file%i.realm", i]
+                                                contents:[[NSMutableData alloc] initWithLength:0 ] // Setting size to sizeInBytes does not make any difference on the results
+                                              attributes:nil ];
     }
     
     const char *paths[numberOfFiles];
@@ -91,33 +147,6 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     return [documentsDirectory stringByAppendingPathComponent:fileName];
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
 @end
