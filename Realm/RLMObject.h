@@ -35,7 +35,7 @@
  Initialize an unpersisted instance of this object.
  Call addObject: on an RLMRealm to add standalone object to a realm.
  
- @see   addObject:
+ @see [RLMRealm addObject:]:
  */
 -(instancetype)init;
 
@@ -107,7 +107,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
      exception will be thrown if no default value for this property is specified. If a default
      value is specified it is set upon insertion into a Realm
      
-     @see defaultPropertyValues
+    @see [RLMObject defaultPropertyValues]
      */
     RLMPropertyAttributeRequired = 1 << 5,
     
@@ -174,17 +174,17 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 @end
 
 
-/**---------------------------------------------------------------------------------------
- *  @name RLMArray Property Declaration
- *  ---------------------------------------------------------------------------------------
- *
- * Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
- * with an RLMArray property by defining a protocol for the object type which the RLMArray will 
- * hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
- *
- * ie. RLM_OBJECT_PROTOCOL(ObjectType)
- *     \@property RLMArray<ObjectType> *arrayOfObjectTypes;
- */
+//---------------------------------------------------------------------------------------
+// @name RLMArray Property Declaration
+//---------------------------------------------------------------------------------------
+//
+// Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
+// with an RLMArray property by defining a protocol for the object type which the RLMArray will
+// hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
+//
+// ie. RLM_OBJECT_PROTOCOL(ObjectType)
+//     \@property RLMArray<ObjectType> *arrayOfObjectTypes;
+//
 #define RLM_OBJECT_PROTOCOL(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>        \
 @end

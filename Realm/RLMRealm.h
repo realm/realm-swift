@@ -299,21 +299,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 @class RLMSchema;
 
 @interface RLMRealm (Schema)
-/**---------------------------------------------------------------------------------------
- *  @name Realm and Object Schema
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Returns the schema used by this realm. This can be used to enumerate and introspect object
- types during migrations for dynamic introspection.
- 
- @see       RLMObjectSchema
- */
+//---------------------------------------------------------------------------------------
+// @name Realm and Object Schema
+//---------------------------------------------------------------------------------------
+//
+// Returns the schema used by this realm. This can be used to enumerate and introspect object
+// types during migrations for dynamic introspection.
+//
 @property (nonatomic, readonly) RLMSchema *schema;
 
-/**
- The schema version for this Realm.
- */
+//
+// The schema version for this Realm.
+// 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
 @end
@@ -336,8 +333,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
  
- @see               RLMMigrationRealm
  */
+ // FIXME: RLMMigrationRealm is not defined yet
+ // @see               RLMMigrationRealm
 + (void)ensureSchemaVersion:(NSUInteger)version usingBlock:(RLMMigrationBlock)block;
 
 /**
@@ -350,8 +348,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @param realmPath   The path of the relm to migrate.
  @param block       The block which migrates the Realm to the current version.
  
- @see               RLMMigrationRealm
  */
+ // FIXME: RLMMigrationRealm is not defined yet
+ // @see               RLMMigrationRealm
 + (void)ensureSchemaVersion:(NSUInteger)version
                      atPath:(NSString *)realmPath
                  usingBlock:(RLMMigrationBlock)block;
