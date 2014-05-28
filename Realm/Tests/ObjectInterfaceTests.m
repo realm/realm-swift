@@ -19,8 +19,34 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
+
+//
+// for custom accessor test
+//
+@interface CustomAccessors : RLMObject
+@property (getter = getThatName) NSString * name;
+@property (setter = setTheInt:) int age;
+@end
+
+@implementation CustomAccessors
+@end
 
 
+//
+// for subclass test
+//
+@interface InvalidSubclassObject : RLMTestObject
+@property NSString *invalid;
+@end
+
+@implementation InvalidSubclassObject
+@end
+
+
+//
+// for class extension test
+//
 @interface BaseClassTestObject : RLMObject
 @property NSInteger intCol;
 @end
@@ -34,10 +60,36 @@
 @end
 
 
-@interface ClassExtensionTest : RLMTestCase
 
+@interface ObjectInterfaceTests : RLMTestCase
 @end
-@implementation ClassExtensionTest
+
+@implementation ObjectInterfaceTests
+
+
+- (void)testCustomAccessors
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
+    XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
+    
+    [ca setTheInt:99];
+    XCTAssertEqual((int)ca.age, (int)99, @"age property should be 99");
+    [realm commitWriteTransaction];
+}
+
+- (void)testObjectSubclass
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    NSArray *obj = @[@1, @"throw"];
+    XCTAssertThrows([InvalidSubclassObject createInRealm:realm withObject:obj],
+                    @"Adding invalid object should throw");
+    [realm commitWriteTransaction];
+}
 
 - (void)testClassExtension
 {
