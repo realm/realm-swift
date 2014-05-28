@@ -349,6 +349,7 @@
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+/*
     if (tableView == self.realmTableColumnsView) {
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *columnNode = selectedTable.tableColumns[columnIndex];
@@ -381,6 +382,7 @@
                 break;
         }
     }
+*/
 }
 
 #pragma mark - Private methods
