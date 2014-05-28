@@ -18,16 +18,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
-#import "RLMObject.h"
-#import "RLMAccessor.h"
-#import "RLMObjectSchema.h"
+#import "RLMMigration.h"
+#import "RLMRealm.h"
 
-// RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor>
+@interface RLMMigration ()
 
-@property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic) RLMObjectSchema *schema;
++ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 
 @end
-

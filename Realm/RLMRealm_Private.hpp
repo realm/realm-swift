@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
+#import "RLMSchema.h"
 #import "RLMAccessor.h"
 
 #import <tightdb/group.hpp>
@@ -34,6 +35,15 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @interface RLMRealm ()
 @property (nonatomic, readonly) RLMTransactionMode transactionMode;
 @property (nonatomic, readonly) tightdb::Group *group;
+@property (nonatomic, readonly) NSUInteger schemaVersion;
+
+- (RLMSchema *)schema;
+
+// private constructor
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
 
 // call whenever creating an accessor to keep up to date accross transactions
 - (void)registerAccessor:(id<RLMAccessor>)accessor;
