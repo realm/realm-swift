@@ -21,7 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
@@ -48,7 +48,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassName) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -89,12 +89,10 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
                 return [NSData dataWithBytes:data.data() length:data.size()];
             });
         case 'k':
-//            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-//                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-//                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
-//            });
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yet supported" userInfo:nil];
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 return RLMGetAnyProperty(*obj.backingTable, obj.objectIndex, col);
@@ -150,22 +148,20 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 obj.backingTable->set_binary(col, obj.objectIndex, RLMBinaryDataForNSData(data));
             });
         case 'k':
-//            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
-//                if (!link || link.class == NSNull.class) {
-//                    // if null
-//                    obj.backingTable->nullify_link(col, obj.objectIndex);
-//                }
-//                else {
-//                    // add to Realm if not it it.
-//                    if (link.realm != obj.realm) {
-//                        [obj.realm addObject:link];
-//                    }
-//                    // set link
-//                    obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
-//                }
-//            });
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yet supported" userInfo:nil];
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
+                if (!link || link.class == NSNull.class) {
+                    // if null
+                    obj.backingTable->nullify_link(col, obj.objectIndex);
+                }
+                else {
+                    // add to Realm if not it it.
+                    if (link.realm != obj.realm) {
+                        [obj.realm addObject:link];
+                    }
+                    // set link
+                    obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
+                }
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
                 RLMSetAnyProperty(*obj.backingTable, obj.objectIndex, col, val);

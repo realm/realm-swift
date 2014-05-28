@@ -37,10 +37,10 @@
 @end
 
 
-@interface RLMLinkTests : RLMTestCase
+@interface LinkTests : RLMTestCase
 @end
 
-@implementation RLMLinkTests
+@implementation LinkTests
 
 - (void)testBasicLink {
     RLMRealm *realm = [self realmWithTestPath];
@@ -54,8 +54,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    RLMArray *owners = [realm objects:OwnerObject.class where:nil];
-    RLMArray *dogs = [realm objects:DogObject.class where:nil];
+    RLMArray *owners = [realm objects:OwnerObject.className where:nil];
+    RLMArray *dogs = [realm objects:DogObject.className where:nil];
     XCTAssertEqual(owners.count, 1, @"Expecting 1 owner");
     XCTAssertEqual(dogs.count, 1, @"Expecting 1 dog");
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -77,16 +77,17 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.class where:nil].count, 1, @"Expecting 1 owner");
-    XCTAssertEqual([realm objects:DogObject.class where:nil].count, 1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 1, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
     OwnerObject *fiel = [OwnerObject createInRealm:realm withObject:@[@"Fiel", NSNull.null]];
     fiel.dog = owner.dog;
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.class where:nil].count, 2, @"Expecting 2 owners");
-    XCTAssertEqual([realm objects:DogObject.class where:nil].count, 1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 2, @"Expecting 2 owners");
+    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
 }
 
 @end
+
