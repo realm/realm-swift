@@ -25,6 +25,8 @@
 #import <tightdb/string_data.hpp>
 #import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMRealm;
+
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
 
@@ -99,4 +101,12 @@ inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
     return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
 
+// Returns NSArray of RLMProperty objects for a given class name on an RLMRealm
+NSArray *RLMPropertiesForClassName(NSString *className, RLMRealm *realm);
+
+// Returns YES if values for className are valid. Otherwise throws exception.
+BOOL RLMValidateValuesForDictionary(NSDictionary *values, NSString *className, RLMRealm *realm);
+
+// Returns YES if values for className are valid. Otherwise throws exception.
+BOOL RLMValidateValuesForArray(NSArray *values, NSString *className, RLMRealm *realm);
 
