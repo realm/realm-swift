@@ -681,14 +681,23 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
+                    --ignore "Realm/RLMConstants.h" \
+                    --ignore "Realm/RLMArrayAccessor.h" \
+                    --ignore "Realm/RLMArrayAccessor.mm" \
+                    --ignore "Realm/RLMProperty.h" \
+                    --ignore "Realm/RLMProperty.m" \
+                    --ignore "Realm/RLMObjectSchema.h" \
+                    --ignore "Realm/RLMSchema.h" \
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
+                    --ignore "Realm/Tests/QueryTests.m" \
                     --ignore "Realm/Tests/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
         mkdir -p docs/output
+        rm -rf docs/output/$(sh build.sh get-version)
         mv docs/html docs/output/$(sh build.sh get-version)
         echo "Done generating HTML docs under docs/output/"
 
@@ -712,9 +721,17 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
+                    --ignore "Realm/RLMConstants.h" \
+                    --ignore "Realm/RLMArrayAccessor.h" \
+                    --ignore "Realm/RLMArrayAccessor.mm" \
+                    --ignore "Realm/RLMProperty.h" \
+                    --ignore "Realm/RLMProperty.m" \
+                    --ignore "Realm/RLMObjectSchema.h" \
+                    --ignore "Realm/RLMSchema.h" \
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
-                    --ignore "Realm/Tests" \
+                    --ignore "Realm/Tests/QueryTests.m" \
+                    --ignore "Realm/Tests/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
