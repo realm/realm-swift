@@ -468,7 +468,7 @@
     NSDictionary * const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
     NSArray * const keyPaths = inputKeyPathsAndValues.allKeys;
     
-    for (NSInteger i = 0; i < keyPaths.count; i++) {
+    for (NSUInteger i = 0; i < keyPaths.count; i++) {
         NSString *keyToDefault = keyPaths[i];
         NSMutableDictionary *dict = [inputKeyPathsAndValues mutableCopy];
         [dict removeObjectForKey:keyToDefault];
@@ -480,11 +480,11 @@
 
     // Test allObject for DefaultObject
     NSDictionary * const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
-    for (NSInteger i = 0; i < keyPaths.count; i++) {
+    for (NSUInteger i = 0; i < keyPaths.count; i++) {
         NSString *keyToDefault = keyPaths[i];
         DefaultObject *object = [DefaultObject allObjects][i];
         
-        for (NSInteger j = 0; j < keyPaths.count; j++) {
+        for (NSUInteger j = 0; j < keyPaths.count; j++) {
             NSString *key = keyPaths[j];
             if ([key isEqualToString:keyToDefault]) {
                 XCTAssertEqualObjects([object valueForKey:keyToDefault], defaultKeyPathsAndValues[keyToDefault], @"Value should match value in defaultPropertyValues method");
