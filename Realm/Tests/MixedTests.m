@@ -11,11 +11,11 @@
 @end
 
 
-@interface RLMMixedTests : RLMTestCase
+@interface MixedTests : RLMTestCase
 @property (nonatomic, strong) RLMRealm *realm;
 @end
 
-@implementation RLMMixedTests
+@implementation MixedTests
 
 #pragma mark - commons
 
