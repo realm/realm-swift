@@ -44,8 +44,8 @@
 
 /**
  Get the current RLMSchema for the migration. This object provides the ability to remove/rename object 
- clases. Each RLMObjectSchema object exposed by this object providee the ability to remove/rename/add 
- individual properties to existing object types.
+ classes. Each RLMObjectSchema object exposed by this object provide the ability to remove/rename/add
+ properties to existing object types.
 
  @see       RLMObjectSchema
  */

@@ -11,6 +11,8 @@
 		02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; };
 		02026CA519354DDF00E4EEF8 /* RLMMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.m */; };
 		02026CA619354DDF00E4EEF8 /* RLMMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.m */; };
+		02026CA8193562B400E4EEF8 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
+		02026CA9193562B400E4EEF8 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
 		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
@@ -139,6 +141,7 @@
 /* Begin PBXFileReference section */
 		02026CA119354DDF00E4EEF8 /* RLMMigration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration.h; sourceTree = "<group>"; };
 		02026CA219354DDF00E4EEF8 /* RLMMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMMigration.m; sourceTree = "<group>"; };
+		02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration_Private.h; sourceTree = "<group>"; };
 		02C4145E191DE49600F858D9 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C41462191DE49600F858D9 /* Realm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		02C41464191DE49600F858D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -263,6 +266,7 @@
 				02E4D692192E3DC40082808D /* RLMArrayAccessor.m */,
 				02E4D693192E3DC40082808D /* RLMConstants.h */,
 				02E4D694192E3DC40082808D /* RLMConstants.m */,
+				02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */,
 				02026CA119354DDF00E4EEF8 /* RLMMigration.h */,
 				02026CA219354DDF00E4EEF8 /* RLMMigration.m */,
 				02E4D695192E3DC40082808D /* RLMObject_Private.h */,
@@ -407,6 +411,7 @@
 				02E4D6E4192E3DC40082808D /* RLMUtil.h in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
+				02026CA8193562B400E4EEF8 /* RLMMigration_Private.h in Headers */,
 				02E4D6B0192E3DC40082808D /* RLMArray_Private.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -434,6 +439,7 @@
 				02E4D6B7192E3DC40082808D /* RLMArrayAccessor.h in Headers */,
 				02E4D6E5192E3DC40082808D /* RLMUtil.h in Headers */,
 				02E4D6CB192E3DC40082808D /* RLMObjectStore.h in Headers */,
+				02026CA9193562B400E4EEF8 /* RLMMigration_Private.h in Headers */,
 				02E4D6B1192E3DC40082808D /* RLMArray_Private.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

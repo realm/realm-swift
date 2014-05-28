@@ -67,21 +67,33 @@
 /**
  Delete an object class during a migration.
  
- @warning   It is only valid to call this method during a migration.
+ @warning   It's only valid to call this method during a migration. You are required to call 
+ this or <code>renameObjectClass:to:</code> when removing an ObjectClass from a Schema.
  
- @param objectClassName The name of the object class to delete from the global schema.
+ @param objectClassName The name of the object class to delete from the Schema.
  */
 - (void)deleteObjectClass:(NSString *)objectClassName;
 
 /**
- Rename an object class during a migration.
+ Rename an object class during a migration. You are required to call
+ this or <code>deleteObjectClass:</code> when removing an ObjectClass from a Schema.
  
- @warning   It is only valid to call this method during a migration.
+ @warning   It's only valid to call this method during a migration.
  
  @param objectClassName     The name of the object class to rename.
  @param newObjectClassName  The new object class name.
  */
 - (void)renameObjectClass:(NSString *)objectClassName to:(NSString *)newObjectClassName;
+
+/**
+ Add an object class during a migration.
+ 
+ @warning   It's only valid to call this method during a migration.
+ 
+ @param objectClassName The name of the object class to rename.
+ @param properties      An array of properties to add to the new object type.
+ */
+- (void)addObjectClass:(NSString *)objectClassName properties:(NSArray *)properties;
 
 @end
 

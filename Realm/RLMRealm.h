@@ -265,44 +265,34 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Named Object Storage and Retrieval
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Realm provides a top level key/value store for storing and accessing objects by NSString. This system can be
- extended with the RLMKeyValueStore interface to create nested namespaces as needed.
- */
-@interface RLMRealm (NamedObjects)
-
-/**
- Retrieve a persisted object with an NSString.
- 
- @usage RLMObject * object = RLMRealm.defaultRealm[@"name"];
- @param key The NSString used to identify an object
- 
- @return    RLMObject or nil if no object is stored for the given key.
- */
--(id)objectForKeyedSubscript:(id <NSCopying>)key;
-
-/**
- Store an object with an NSString key.
- 
- @usage RLMRealm.defaultRealm[@"name"] = object;
- @param obj     The object to be stored.
- @param key     The key that itentifies the object to be used for future lookups.
- */
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
-
-@end
-
-
-
-/**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
  *  ---------------------------------------------------------------------------------------
  */
 @class RLMMigration;
-typedef void (^RLMMigrationBlock)(RLMMigration *migration);
+
+/**
+ Migration block used to migrate a Realm.
+ 
+ In the migration block it is the implementer's responsibility to make the existing Schema
+ in the Realm compatible with the current ObjectSchema defined in each object interface definition.
+ 
+ Any Schema which can be updated to match the current schema by adding new object classes and
+ properties to existing classes can be considered compatible with the current Schema, and can
+ be migrated automatically.
+
+ Schema changes which involve the deltion of existing object classes or properties
+ are not automatically compatible, and the missing objects and properties must by
+ deleted manually in the migration block for a migration to succeed.
+ 
+ @param migration   RLMMigration object used to perform the migration. The migration object allows
+                    you to alter its Schema and to access objects in the Realm to populate added
+                    object classes and properties.
+ 
+ @return            Version number for the Realm after completing the migration. This version 
+                    number is accessible in future migrations through the <code>schemaVersion</code>
+                    property on the RLMMigration object.
+ */
+typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration);
 
 @interface RLMRealm (Migrations)
 
@@ -312,12 +302,11 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration);
  Must be called before the default Realm is accessed (otherwise throws). If the
  default Realm is at a version other than <code>version</code>, the migration is applied.
  
- @param version     The new schema version.
  @param block       The block which migrates the Realm to the current version.
  
  @see               RLMMigration
  */
-+ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
++ (void)applyMigrationBlock:(RLMMigrationBlock)block;
 
 /**
  Performs a migration on a Realm at a path.
@@ -325,14 +314,12 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration);
  Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
  If the Realm is at a version other than <code>version</code>, the migration is applied.
  
- @param version     The new schema version.
- @param realmPath   The path of the relm to migrate.
  @param block       The block which migrates the Realm to the current version.
- 
+ @param realmPath   The path of the relm to migrate.
+
  @see               RLMMigration
  */
-+ (void)setSchemaVersion:(NSUInteger)version
-                  atPath:(NSString *)realmPath
-      withMigrationBlock:(RLMMigrationBlock)block;
++ (void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath;
 
 @end
+

@@ -39,6 +39,12 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 
 - (RLMSchema *)schema;
 
+// private constructor
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
+
 // call whenever creating an accessor to keep up to date accross transactions
 - (void)registerAccessor:(id<RLMAccessor>)accessor;
 

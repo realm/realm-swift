@@ -18,31 +18,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMigration_Private.h"
-#import "RLMRealm_Private.hpp"
+#import "RLMMigration.h"
+#import "RLMRealm.h"
 
 @interface RLMMigration ()
-@property (nonatomic, strong) RLMRealm *realm;
-@end
 
-@implementation RLMMigration
-
-+ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error {
-    RLMMigration *migration = [RLMMigration new];
-    migration.realm = [RLMRealm realmWithPath:path readOnly:NO dynamic:YES error:error];
-    return migration;
-}
-
-- (NSUInteger)schemaVersion {
-    return _realm.schemaVersion;
-}
-
-- (RLMSchema *)schema {
-    return _realm.schema;
-}
-
-- (RLMArray *)allObjects:(NSString *)className {
-    return [_realm allObjects:className];
-}
++ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 
 @end

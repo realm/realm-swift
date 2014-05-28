@@ -56,18 +56,22 @@
 @interface RLMObjectSchema (Migrations)
 
 /**
- Delete an object's property during a migration.
+ Delete an object's property during a migration. You are required to call this or
+ <code>renameProperty:to:</code> when an existing property is no longer present in the 
+ current ObjectSchema.
  
- @warning   It is only valid to call this method during a migration.
+ @warning   It's only valid to call this method during a migration.
  
  @param propertyName The name of the property to delete from the global schema.
  */
 - (void)deleteProperty:(NSString *)propertyName;
 
 /**
- Rename an object's property during a migration.
+ Rename an object's property during a migration. You are required to call this or
+ <code>deleteProperty:</code> when an existing property is no longer present in the 
+ current ObjectSchema.
  
- @warning   It is only valid to call this method during a migration.
+ @warning   It's only valid to call this method during a migration.
  
  @param propertyName    The name of the property to rename.
  @param newPropertyName The new name of the property.
@@ -75,9 +79,10 @@
 - (void)renameProperty:(NSString *)propertyName to:(NSString *)newPropertyName;
 
 /**
- Add a property during a migration.
+ Add a property during a migration. This is an optional method that can be used to populate
+ added properties during migrations.
  
- @warning   It is only valid to call this method during a migration.
+ @warning   It's only valid to call this method during a migration.
  @warning   Any added properies must match the object schema defined in the 
             corresponding object interface at the end of a migration.
 
