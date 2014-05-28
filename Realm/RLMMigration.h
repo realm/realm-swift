@@ -19,9 +19,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMObjectSchema.h>
 
+@class RLMSchema;
 @class RLMArray;
 
 /**---------------------------------------------------------------------------------------

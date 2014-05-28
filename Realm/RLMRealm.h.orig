@@ -280,10 +280,11 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  properties to existing classes can be considered compatible with the current Schema, and can
  be migrated automatically.
 
- Schema changes involving the deletion of existing object classes or properties
- are not automatically compatible, and the missing objects and properties must be
- deleted manually in the migration block for the migration to succeed.
+ Schema changes which involve the deltion of existing object classes or properties
+ are not automatically compatible, and the missing objects and properties must by
+ deleted manually in the migration block for a migration to succeed.
  
+<<<<<<< HEAD
  @param migration   RLMMigration object used to perform the migration. The migration object allows
                     you to alter its Schema and to access objects in the Realm to populate added
                     object classes and properties.
@@ -293,6 +294,39 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
                     property on the RLMMigration object.
  */
 typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration);
+=======
+ @usage RLMRealm.defaultRealm[@"name"] = object;
+ @param obj     The object to be stored.
+ @param key     The key that itentifies the object to be used for future lookups.
+ */
+-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
+
+@end
+
+
+@class RLMSchema;
+
+@interface RLMRealm (Schema)
+//---------------------------------------------------------------------------------------
+// @name Realm and Object Schema
+//---------------------------------------------------------------------------------------
+//
+// Returns the schema used by this realm. This can be used to enumerate and introspect object
+// types during migrations for dynamic introspection.
+//
+@property (nonatomic, readonly) RLMSchema *schema;
+
+//
+// The schema version for this Realm.
+// 
+@property (nonatomic, readonly) NSUInteger schemaVersion;
+
+@end
+
+
+@class RLMMigrationRealm;
+typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
+>>>>>>> master
 
 @interface RLMRealm (Migrations)
 
@@ -315,7 +349,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration);
  If the Realm is at a version other than <code>version</code>, the migration is applied.
  
  @param block       The block which migrates the Realm to the current version.
- @param realmPath   The path of the Realm to migrate.
+ @param realmPath   The path of the relm to migrate.
 
  @see               RLMMigration
  */

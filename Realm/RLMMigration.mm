@@ -34,15 +34,15 @@
 }
 
 - (NSUInteger)schemaVersion {
-    return _realm.schemaVersion;
+    return self.realm.schemaVersion;
 }
 
 - (RLMSchema *)schema {
-    return _realm.schema;
+    return self.realm.schema;
 }
 
 - (RLMArray *)allObjects:(NSString *)className {
-    return [_realm allObjects:className];
+    return [self.realm allObjects:className];
 }
 
 @end
