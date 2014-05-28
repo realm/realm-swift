@@ -19,19 +19,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
-@interface RLMTestObject : RLMObject
-@property (nonatomic, copy) NSString *column;
+@interface RealmTests : RLMTestCase
 @end
 
-@implementation RLMTestObject
-@end
-
-@interface RLMRealmTests : RLMTestCase
-@end
-
-@implementation RLMRealmTests
+@implementation RealmTests
 
 #pragma mark - Tests
 
@@ -66,14 +60,6 @@
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
 }
 
-- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
-    RLMRealm *realm = [self realmWithTestPath];
-    [realm beginWriteTransaction];
-    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
-    [realm commitWriteTransaction];
-    
-    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
-}
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     NSString *realmFilePath = RLMRealmPathForFile(@"async.bg.realm");

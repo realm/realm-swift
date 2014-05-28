@@ -22,3 +22,6 @@
 
 @implementation AllTypesObject
 @end
+
+@implementation RLMTestObject
+@end
