@@ -392,4 +392,19 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testCreateInRealmWithMissingValue
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // This exception only gets thrown when there is no default vaule and it is for an NSObject property
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    
+    // This exception gets thrown when count of array does not match with object schema
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    
+    [realm commitWriteTransaction];
+}
+
 @end
