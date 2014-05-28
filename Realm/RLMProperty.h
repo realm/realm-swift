@@ -20,27 +20,26 @@
 
 
 #import <Foundation/Foundation.h>
-#import <objc/runtime.h>
-#import "RLMConstants.h"
+#import <Realm/RLMConstants.h>
 
 // object property definition
 @interface RLMProperty : NSObject
 
-@property (nonatomic, copy) NSString * name;
-@property (nonatomic, assign) RLMPropertyType type;
-@property (nonatomic, assign) NSUInteger column;
-@property (nonatomic, copy) id defaultValue;
+/**
+ Property name.
+ */
+@property (nonatomic, readonly) NSString * name;
 
-// link class used for RLMLink and RLMArray types
-@property (nonatomic, assign) Class linkClass;
-@property (nonatomic, assign) char objcType;
+/**
+ Property type.
+ */
+@property (nonatomic, readonly) RLMPropertyType type;
 
-// getter and setter names
-@property (nonatomic, copy) NSString * getterName;
-@property (nonatomic, copy) NSString * setterName;
-
-// creates a tdb property object from a runtime property
-+(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
+/**
+ Object class name - specify object types for RLMObject and RLMArray properties.
+ */
+@property (nonatomic, readonly) NSString *objectClassName;
 
 @end
+
 
