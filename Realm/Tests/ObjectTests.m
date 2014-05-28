@@ -373,7 +373,7 @@
     
     const NSInteger stringColIndex = 4;
     const NSInteger mixedColIndex = 9;
-    for (NSInteger i = 0; i < arrayValidAllTypes.count; i++) {
+    for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
         NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
         
         id obj = @"invalid";
