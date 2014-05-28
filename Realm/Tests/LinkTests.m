@@ -89,5 +89,34 @@
     XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
 }
 
+//- (void)testLinkRemoval {
+//    RLMRealm *realm = [self realmWithTestPath];
+//    
+//    OwnerObject *owner = [[OwnerObject alloc] init];
+//    owner.name = @"Tim";
+//    owner.dog = [[DogObject alloc] init];
+//    owner.dog.dogName = @"Harvie";
+//    
+//    [realm beginWriteTransaction];
+//    [realm addObject:owner];
+//    [realm commitWriteTransaction];
+//    
+//    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 1, @"Expecting 1 owner");
+//    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
+//    
+//    [realm beginWriteTransaction];
+//    [realm deleteObject:owner.dog];
+//    [realm commitWriteTransaction];
+//    
+//    // FIXME - re-enable once we fix accessor updates
+//    // XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+//
+//    // refresh owner and check
+//    owner = [realm allObjects:OwnerObject.className].firstObject;
+//    XCTAssertNotNil(owner, @"Should have 1 owner");
+//    XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+//    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 0, @"Expecting 0 dogs");
+//}
+
 @end
 
