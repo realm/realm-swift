@@ -100,13 +100,3 @@ inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
 inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
     return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
-
-// Returns NSArray of RLMProperty objects for a given class name on an RLMRealm
-NSArray *RLMPropertiesForClassName(NSString *className, RLMRealm *realm);
-
-// Returns YES if values for className are valid. Otherwise throws exception.
-BOOL RLMValidateValuesForDictionary(NSDictionary *values, NSString *className, RLMRealm *realm);
-
-// Returns YES if values for className are valid. Otherwise throws exception.
-BOOL RLMValidateValuesForArray(NSArray *values, NSString *className, RLMRealm *realm);
-

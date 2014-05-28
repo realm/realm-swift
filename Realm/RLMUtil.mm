@@ -20,10 +20,6 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
-#import "RLMRealm.h"
-#import "RLMSchema.h"
-#import "RLMProperty.h"
-#import "RLMObjectSchema.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -186,44 +182,4 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
         }
     }
-}
-
-NSArray *RLMPropertiesForClassName(NSString *className, RLMRealm *realm) {
-    RLMObjectSchema *desc = realm.schema[className];
-    NSArray *properties = desc.properties;
-    
-    return properties;
-}
-
-BOOL RLMValidateValuesForDictionary(NSDictionary *values, NSString *className, RLMRealm *realm) {
-    NSArray *properties = RLMPropertiesForClassName(className, realm);
-    
-    for (RLMProperty * property in properties) {
-        id value = values[property.name];
-        if (value) {
-            if (!RLMIsObjectOfType(value, property.type)) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-            }
-        }
-    }
-    
-    return YES;
-}
-
-BOOL RLMValidateValuesForArray(NSArray *values, NSString *className, RLMRealm *realm) {
-    NSArray *properties = RLMPropertiesForClassName(className, realm);
-    
-    if (values.count != properties.count) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-    }
-    
-    for (NSUInteger i = 0; i < values.count; i++) {
-        id value = values[i];
-        RLMProperty *property = properties[i];
-        if (!RLMIsObjectOfType(value, property.type)) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-        }
-    }
-    
-    return YES;
 }

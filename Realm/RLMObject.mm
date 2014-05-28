@@ -58,21 +58,44 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)values {
     id obj = [[self alloc] init];
     
+    RLMObjectSchema *desc = realm.schema[[self className]];
+    NSArray *properties = desc.properties;
+    
     // FIXME - this can be optimized by inserting directly into the table
     //  after validation, rather than populating the object first
-    if ([values isKindOfClass:NSDictionary.class] && RLMValidateValuesForDictionary(values, [self className], realm)) {
-        // if a dictionary, use key value coding to populate our object
-        for (NSString *key in values) {
-            [obj setValue:values[key] forKeyPath:key];
+    if ([values isKindOfClass:NSDictionary.class]) {
+        for (RLMProperty * property in properties) {
+            id value = values[property.name];
+            if (value) {
+                // Validate Value
+                if (RLMIsObjectOfType(value, property.type)) {
+                    [obj setValue:value forKeyPath:property.name];
+                }
+                else {
+                    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
+                }
+            }
         }
     }
-    else if ([values isKindOfClass:NSArray.class] && RLMValidateValuesForArray(values, [self className], realm)) {
+    else if ([values isKindOfClass:NSArray.class]) {
         // for arrays use property names as keys
         NSArray *array = values;
-        NSArray *properties = RLMPropertiesForClassName([self className], realm);
+        
+        if (array.count != properties.count) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
+        }
         
         for (NSUInteger i = 0; i < array.count; i++) {
-            [obj setValue:array[i] forKeyPath:[properties[i] name]];
+            id value = values[i];
+            RLMProperty *property = properties[i];
+            
+            // Validate Value
+            if (RLMIsObjectOfType(value, property.type)) {
+                [obj setValue:array[i] forKeyPath:property.name];
+            }
+            else {
+                @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
+            }
         }
     }
     
