@@ -1,0 +1,181 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		E8CD45FC193547D80074FDE7 /* Templates */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = E8CD45FD193547D80074FDE7 /* Build configuration list for PBXAggregateTarget "Templates" */;
+			buildPhases = (
+				E8CDFD171935489500E15D81 /* Install Templates */,
+			);
+			dependencies = (
+			);
+			name = Templates;
+			productName = Templates;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXFileReference section */
+		E821B6A319354B8400B2C3D8 /* install_templates_applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = install_templates_applescript; sourceTree = "<group>"; };
+		E8CDFD0E1935487A00E15D81 /* ___FILEBASENAME___.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "___FILEBASENAME___.h"; sourceTree = "<group>"; };
+		E8CDFD0F1935487A00E15D81 /* ___FILEBASENAME___.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "___FILEBASENAME___.m"; sourceTree = "<group>"; };
+		E8CDFD121935487A00E15D81 /* ___FILEBASENAME___.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "___FILEBASENAME___.h"; sourceTree = "<group>"; };
+		E8CDFD131935487A00E15D81 /* ___FILEBASENAME___.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "___FILEBASENAME___.m"; sourceTree = "<group>"; };
+		E8CDFD141935487A00E15D81 /* TemplateIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = TemplateIcon.icns; sourceTree = "<group>"; };
+		E8CDFD151935487A00E15D81 /* TemplateInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TemplateInfo.plist; sourceTree = "<group>"; };
+		E8CDFD161935487A00E15D81 /* install_templates.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install_templates.sh; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		E8CD45F5193547AF0074FDE7 = {
+			isa = PBXGroup;
+			children = (
+				E8CD4600193547E80074FDE7 /* Templates */,
+			);
+			sourceTree = "<group>";
+		};
+		E8CD4600193547E80074FDE7 /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				E8CDFD0C1935487A00E15D81 /* class_templates */,
+				E8CDFD101935487A00E15D81 /* file_templates */,
+				E8CDFD161935487A00E15D81 /* install_templates.sh */,
+				E821B6A319354B8400B2C3D8 /* install_templates_applescript */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		E8CDFD0C1935487A00E15D81 /* class_templates */ = {
+			isa = PBXGroup;
+			children = (
+				E8CDFD0D1935487A00E15D81 /* RLMObject */,
+			);
+			path = class_templates;
+			sourceTree = "<group>";
+		};
+		E8CDFD0D1935487A00E15D81 /* RLMObject */ = {
+			isa = PBXGroup;
+			children = (
+				E8CDFD0E1935487A00E15D81 /* ___FILEBASENAME___.h */,
+				E8CDFD0F1935487A00E15D81 /* ___FILEBASENAME___.m */,
+			);
+			path = RLMObject;
+			sourceTree = "<group>";
+		};
+		E8CDFD101935487A00E15D81 /* file_templates */ = {
+			isa = PBXGroup;
+			children = (
+				E8CDFD111935487A00E15D81 /* Realm Model Object.xctemplate */,
+			);
+			path = file_templates;
+			sourceTree = "<group>";
+		};
+		E8CDFD111935487A00E15D81 /* Realm Model Object.xctemplate */ = {
+			isa = PBXGroup;
+			children = (
+				E8CDFD121935487A00E15D81 /* ___FILEBASENAME___.h */,
+				E8CDFD131935487A00E15D81 /* ___FILEBASENAME___.m */,
+				E8CDFD141935487A00E15D81 /* TemplateIcon.icns */,
+				E8CDFD151935487A00E15D81 /* TemplateInfo.plist */,
+			);
+			path = "Realm Model Object.xctemplate";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		E8CD45F6193547AF0074FDE7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+			};
+			buildConfigurationList = E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmPlugin" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E8CD45F5193547AF0074FDE7;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E8CD45FC193547D80074FDE7 /* Templates */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E8CDFD171935489500E15D81 /* Install Templates */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Install Templates";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd Templates && osascript install_templates_applescript\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E8CD45FA193547AF0074FDE7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		E8CD45FB193547AF0074FDE7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		E8CD45FE193547D80074FDE7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8CD45FF193547D80074FDE7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E8CD45F9193547AF0074FDE7 /* Build configuration list for PBXProject "RealmPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8CD45FA193547AF0074FDE7 /* Debug */,
+				E8CD45FB193547AF0074FDE7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8CD45FD193547D80074FDE7 /* Build configuration list for PBXAggregateTarget "Templates" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8CD45FE193547D80074FDE7 /* Debug */,
+				E8CD45FF193547D80074FDE7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E8CD45F6193547AF0074FDE7 /* Project object */;
+}
