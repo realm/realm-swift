@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author       = "Realm"
   s.platform     = :ios, "6.0"
   s.library      = "stdc++.6"
-  s.documentation_url = "http://realm.io/docs/ios/#{s.version}/"
+  s.documentation_url = "http://realm.io/"
   s.public_header_files = "Realm.framework/Headers/*.h"
   s.vendored_frameworks = "Realm.framework"
   s.requires_arc = true
