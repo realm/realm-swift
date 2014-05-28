@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "container:Realm.xcodeproj">
+      location = "container:../Realm.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:examples/RealmTableViewExample/RealmTableViewExample.xcodeproj">
+      location = "group:RealmTableViewExample/RealmTableViewExample.xcodeproj">
    </FileRef>
 </Workspace>

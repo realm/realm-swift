@@ -5,36 +5,48 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>1F600DD6-35C0-4CED-AC25-BD150A4EF147</string>
+	<string>0128CD04-DF09-41EC-BCE7-D2819530B948</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Realm</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>27DAD893-8378-47AE-9BEA-A67062CF3368</key>
-		<string>https://github.com/Tightdb/tightdb_objc.git</string>
+		<key>2B060BAE-DC53-4714-8320-0F2206800927</key>
+		<string>ssh://github.com/tightdb/tightdb.git</string>
+		<key>62EE5957-7E23-4BBF-AF44-BC4FF2CE4BF2</key>
+		<string>ssh://github.com/Realm/realm-objc.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Realm.xcodeproj/project.xcworkspace</string>
+	<string>examples/Realm.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>27DAD893-8378-47AE-9BEA-A67062CF3368</key>
+		<key>2B060BAE-DC53-4714-8320-0F2206800927</key>
+		<string>../../../tightdb</string>
+		<key>62EE5957-7E23-4BBF-AF44-BC4FF2CE4BF2</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/Tightdb/tightdb_objc.git</string>
+	<string>ssh://github.com/Realm/realm-objc.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>27DAD893-8378-47AE-9BEA-A67062CF3368</string>
+	<string>62EE5957-7E23-4BBF-AF44-BC4FF2CE4BF2</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>27DAD893-8378-47AE-9BEA-A67062CF3368</string>
+			<string>62EE5957-7E23-4BBF-AF44-BC4FF2CE4BF2</string>
 			<key>IDESourceControlWCCName</key>
-			<string>tightdb_objc</string>
+			<string>realm-objc</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>2B060BAE-DC53-4714-8320-0F2206800927</string>
+			<key>IDESourceControlWCCName</key>
+			<string>tightdb</string>
 		</dict>
 	</array>
 </dict>
