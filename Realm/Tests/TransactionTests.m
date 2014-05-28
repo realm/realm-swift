@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-
+#import "RLMTestObjects.h"
 
 @interface SimpleMisuseObject : RLMObject
 @property (nonatomic, copy) NSString *stringCol;
@@ -30,16 +30,24 @@
 @end
 
 
-@interface MisuseTests : RLMTestCase
+@interface TransactionTests : RLMTestCase
 
 @end
 
-@implementation MisuseTests
+@implementation TransactionTests
 
+- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    [realm commitWriteTransaction];
+    
+    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
+}
 
--(void)testMisuse
-{
+-(void)testTransactionMisuse {
     RLMRealm *realm = [RLMRealm defaultRealm];
+    
     // Insert an object
     [realm beginWriteTransaction];
     SimpleMisuseObject *obj = [SimpleMisuseObject createInRealm:realm withObject:nil];
@@ -47,13 +55,11 @@
     obj.intCol = 10;
     [realm commitWriteTransaction];
     
-    
     XCTAssertThrows([SimpleMisuseObject createInRealm:realm withObject:nil], @"Outside write transaction");
-    
     XCTAssertThrows([realm commitWriteTransaction], @"No write transaction to close");
     
     [realm beginWriteTransaction];
-    XCTAssertThrows([realm beginWriteTransaction], @"Write transactino already in place");
+    XCTAssertThrows([realm beginWriteTransaction], @"Write transaction already in place");
     [realm commitWriteTransaction];
     
     XCTAssertThrows([realm rollbackWriteTransaction], @"No write transaction to rool-back");
