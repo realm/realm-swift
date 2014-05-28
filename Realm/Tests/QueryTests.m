@@ -56,10 +56,10 @@
 @implementation TestQueryObject
 @end
 
-@interface RLMQueryTests : RLMTestCase
+@interface QueryTests : RLMTestCase
 @end
 
-@implementation RLMQueryTests
+@implementation QueryTests
 
 #pragma mark - Tests
 
@@ -113,6 +113,8 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
+    XCTAssertEqual(all.count, 3, @"Expecting 3 results");
+
     RLMArray *some = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
     
     // query/order on array
