@@ -9,7 +9,6 @@ Pod::Spec.new do |s|
                    DESC
   s.homepage     = "http://realm.io"
   s.source       = { :http => "http://static.realm.io/downloads/ios/realm-ios-#{s.version}.zip" }
-  s.license      = { :type => "Copyright", :file => "LICENSE"}
   s.author       = "Realm"
   s.platform     = :ios, "6.0"
   s.library      = "stdc++.6"
@@ -17,4 +16,24 @@ Pod::Spec.new do |s|
   s.public_header_files = "Realm.framework/Headers/*.h"
   s.vendored_frameworks = "Realm.framework"
   s.requires_arc = true
+  s.license      = {
+    :type => "Copyright",
+    :text => <<-LICENSE
+                TIGHTDB CONFIDENTIAL
+                __________________
+
+                [2011] - [2014] TightDB Inc
+                All Rights Reserved.
+
+                NOTICE:  All information contained herein is, and remains
+                the property of TightDB Incorporated and its suppliers,
+                if any.  The intellectual and technical concepts contained
+                herein are proprietary to TightDB Incorporated
+                and its suppliers and may be covered by U.S. and Foreign Patents,
+                patents in process, and are protected by trade secret or copyright law.
+                Dissemination of this information or reproduction of this material
+                is strictly forbidden unless prior written permission is obtained
+                from TightDB Incorporated.
+                LICENSE
+                }
 end
