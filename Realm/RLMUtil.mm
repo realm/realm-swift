@@ -70,6 +70,14 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
+inline bool object_has_valid_type(id obj)
+{
+    return ([obj isKindOfClass:[NSString class]] ||
+            [obj isKindOfClass:[NSNumber class]] ||
+            [obj isKindOfClass:[NSDate class]] ||
+            [obj isKindOfClass:[NSData class]]);
+}
+
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
     switch (type) {
         case RLMPropertyTypeString:
@@ -102,7 +110,8 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
-            return [obj isKindOfClass:[NSObject class]];
+            return object_has_valid_type(obj);
+            
         // FIXME: missing entries
         case RLMPropertyTypeObject:
         case RLMPropertyTypeArray:
