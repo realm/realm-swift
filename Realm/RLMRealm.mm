@@ -418,6 +418,7 @@ static NSArray *s_objectDescriptors = nil;
     
     if (self.transactionMode == RLMTransactionModeWrite) {
         [self commitWriteTransaction];
+        NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
     }
     [self endReadTransaction];
 }

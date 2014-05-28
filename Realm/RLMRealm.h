@@ -299,21 +299,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 @class RLMSchema;
 
 @interface RLMRealm (Schema)
-/**---------------------------------------------------------------------------------------
- *  @name Realm and Object Schema
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Returns the schema used by this realm. This can be used to enumerate and introspect object
- types during migrations for dynamic introspection.
- 
- @see       RLMObjectSchema
- */
+//---------------------------------------------------------------------------------------
+// @name Realm and Object Schema
+//---------------------------------------------------------------------------------------
+//
+// Returns the schema used by this realm. This can be used to enumerate and introspect object
+// types during migrations for dynamic introspection.
+//
 @property (nonatomic, readonly) RLMSchema *schema;
 
-/**
- The schema version for this Realm.
- */
+//
+// The schema version for this Realm.
+// 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
 @end
