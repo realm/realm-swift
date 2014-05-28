@@ -27,6 +27,12 @@
 @end
 
 @implementation SimpleMisuseObject
+
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"stringCol" : @""};
+}
+
 @end
 
 
