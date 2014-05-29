@@ -57,13 +57,10 @@
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
-        // Block to test if object class ignores a property
-        BOOL(^isPropertyIgnoredByClass)(objc_property_t, Class) = ^(objc_property_t property, Class objectClass) {
-            NSString *propertyName = [NSString stringWithUTF8String:property_getName(property)];
-            return [[objectClass ignoredProperties] containsObject:propertyName];
-        };
+        NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
+        BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
         
-        if (!isPropertyIgnoredByClass(props[i], objectClass)) {
+        if (!ignored) { // Don't process ignored properties
             RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
             if (prop) {
                 [propArray addObject:prop];
