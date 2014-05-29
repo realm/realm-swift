@@ -269,15 +269,15 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     }
 }
 
-void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperation) {
+void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation) {
     if (betweenOperation) {
         if ([value isKindOfClass:[NSArray class]]) {
             NSArray *array = value;
             if (array.count == 2) {
-                if (!RLMIsObjectOfType(array.firstObject, type) ||
-                    !RLMIsObjectOfType(array.lastObject, type)) {
+                if (!RLMIsObjectValidForProperty(array.firstObject, prop) ||
+                    !RLMIsObjectValidForProperty(array.lastObject, prop)) {
                     @throw RLMPredicateException(@"Invalid value",
-                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", rlmtype_to_string(type)]);
+                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", rlmtype_to_string(prop.type)]);
                 }
             } else {
                 @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
@@ -286,8 +286,8 @@ void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperat
             @throw RLMPredicateException(@"Invalid value", @"object must be of type NSArray for BETWEEN operations");
         }
     } else {
-        if (!RLMIsObjectOfType(value, type)) {
-            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", rlmtype_to_string(type)]);
+        if (!RLMIsObjectValidForProperty(value, prop)) {
+            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", rlmtype_to_string(prop.type)]);
         }
     }
 }
@@ -298,17 +298,18 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
 {
     // validate object type
     NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
-    RLMPropertyType type = [desc[columnName] type];
+    RLMProperty *prop = desc[columnName];
     
     BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
-    validate_value_for_query(value, type, betweenOperation);
+    validate_value_for_query(value, prop, betweenOperation);
     
     if (betweenOperation) {
-        add_between_constraint_to_query(query, type, index, value);
+        add_between_constraint_to_query(query, prop.type, index, value);
         return;
     }
     
     // finally cast to native types and add query clause
+    RLMPropertyType type = prop.type;
     switch (type) {
         case tightdb::type_Bool:
             add_bool_constraint_to_query(query, operatorType, index,

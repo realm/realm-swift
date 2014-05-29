@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
 #import "RLMObject.h"
+#import "RLMProperty.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -79,8 +80,8 @@ inline bool object_has_valid_type(id obj)
             [obj isKindOfClass:[NSData class]]);
 }
 
-BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
-    switch (type) {
+BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
+    switch (property.type) {
         case RLMPropertyTypeString:
             return [obj isKindOfClass:[NSString class]];
         case RLMPropertyTypeBool:
@@ -112,9 +113,13 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return object_has_valid_type(obj);
-        case RLMPropertyTypeObject:
-            // only NSNull, nil, or objects which derive from RLMObject are valid for this type
-            return [obj isKindOfClass:RLMObject.class] || obj == nil || obj == NSNull.null;
+        case RLMPropertyTypeObject: {
+            // only NSNull, nil, or objects which derive from RLMObject and match the given
+            // object class are valid
+            BOOL isValidObject = RLMIsSubclass([obj class], [RLMObject class]) &&
+                                 [[[obj class] className] isEqualToString:property.objectClassName];
+            return isValidObject || obj == nil || obj == NSNull.null;
+        }
         // FIXME: missing entries
         case RLMPropertyTypeArray:
             break;

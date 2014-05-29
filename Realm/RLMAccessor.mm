@@ -157,7 +157,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                     obj.backingTable->nullify_link(col, obj.objectIndex);
                 }
                 else {
-                    // add to Realm if not it it.
+                    // add to Realm if not in it.
                     if (link.realm != obj.realm) {
                         [obj.realm addObject:link];
                     }
@@ -297,6 +297,14 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     }
 }
 
+// implement the class method className on accessors to return the className of the
+// base object
+inline void RLMImplementClassNameMethod(Class accessorClass, NSString *className) {
+    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
+    IMP imp = imp_implementationWithBlock(^{ return className; });
+    class_replaceMethod(metaClass, @selector(className), imp, "@:");
+}
+
 Class RLMCreateAccessorClass(Class objectClass,
                              RLMObjectSchema *schema,
                              NSString *accessorClassPrefix,
@@ -340,6 +348,9 @@ Class RLMCreateAccessorClass(Class objectClass,
         }
     }
     
+    // implement className for accessor to return base className
+    RLMImplementClassNameMethod(accClass, schema.className);
+    
     // cache and return
     [cache setObject:accClass forKey:objectClass];
     return accClass;
@@ -380,7 +391,11 @@ Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version) {
         // if we don't have this class, create a subclass or RLMObject
         dynamicClass = objc_allocateClassPair(RLMObject.class, dynamicName.UTF8String, 0);
         objc_registerClassPair(dynamicClass);
+        
+        // implement className for accessor to return base className
+        RLMImplementClassNameMethod(dynamicClass, schema.className);
     }
     return dynamicClass;
 }
+
 

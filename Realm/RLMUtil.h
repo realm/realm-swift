@@ -25,8 +25,10 @@
 #import <tightdb/string_data.hpp>
 #import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMProperty;
+
 // returns if the object can be inserted as the given type
-BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
+BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {

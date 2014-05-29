@@ -519,18 +519,4 @@ static NSArray *s_objectDescriptors = nil;
     return 0;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
--(id)objectForKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
-
-
 @end

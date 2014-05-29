@@ -19,20 +19,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMSchema.h"
 #import "RLMTestObjects.h"
-#import "XCTestCase+AsyncTesting.h"
+#import "RLMSchema.h"
 
 @interface RLMDynamicObject : RLMObject
 @property (nonatomic, copy) NSString *column;
 @property (nonatomic) NSInteger integer;
-
 @end
 
 @implementation RLMDynamicObject
 @end
 
-@interface RLMDynamicTests : RLMTestCase
+@interface DynamicTests : RLMTestCase
 @end
 
 @interface RLMRealm ()
@@ -42,7 +40,7 @@
                         error:(NSError **)outError;
 @end
 
-@implementation RLMDynamicTests
+@implementation DynamicTests
 
 #pragma mark - Tests
 
@@ -94,8 +92,11 @@
 
 - (void)testDynaimcTypes {
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
-    id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0];
-    id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now];
+    id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, NSNull.null];
+    
+    RLMTestObject *obj = [[RLMTestObject alloc] init];
+    obj.column = @"column";
+    id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
@@ -111,11 +112,20 @@
     XCTAssertEqual(array.count, 2, @"Should have 2 objects");
     
     RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 10; i++) {
         NSString *propName = [schema.properties[i] name];
         XCTAssertEqualObjects(obj1[i], array[0][propName], @"Invalid property value");
         XCTAssertEqualObjects(obj2[i], array[1][propName], @"Invalid property value");
     }
+    
+    // check sub object type
+    XCTAssertEqualObjects([schema.properties[10] objectClassName], @"RLMTestObject",
+                          @"Sub-object type in schema should be 'RLMTestObject'");
+    
+    // check object equality
+    XCTAssertNil(array[0][@"objectCol"], @"object should be nil");
+    XCTAssertEqualObjects(array[1][@"objectCol"][@"column"], @"column",
+                          @"Child object should have string value 'column'");
 }
 
 @end

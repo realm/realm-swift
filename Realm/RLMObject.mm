@@ -68,7 +68,7 @@
             id value = values[property.name];
             if (value) {
                 // Validate Value
-                if (RLMIsObjectOfType(value, property.type)) {
+                if (RLMIsObjectValidForProperty(value, property)) {
                     [obj setValue:value forKeyPath:property.name];
                 }
                 else {
@@ -90,7 +90,7 @@
             RLMProperty *property = properties[i];
             
             // Validate Value
-            if (RLMIsObjectOfType(value, property.type)) {
+            if (RLMIsObjectValidForProperty(value, property)) {
                 [obj setValue:array[i] forKeyPath:property.name];
             }
             else {
