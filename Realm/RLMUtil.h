@@ -25,8 +25,6 @@
 #import <tightdb/string_data.hpp>
 #import <tightdb/util/safe_int_ops.hpp>
 
-@class RLMRealm;
-
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
 
