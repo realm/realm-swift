@@ -88,13 +88,17 @@
 @end
 
 @interface IgnoredURLObject : RLMObject
+@property NSString *name;
 @property NSURL *url;
 @end
 
 @implementation IgnoredURLObject
-+ (NSArray *)ignoredProperties {
+
++ (NSArray *)ignoredProperties
+{
     return @[@"url"];
 }
+
 @end
 
 @interface ObjectTests : RLMTestCase
@@ -332,8 +336,33 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported property type should not throw");
+    XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
+                                               property type should not throw");
     [realm rollbackWriteTransaction];
+}
+
+- (void)testCanUseIgnoredProperty
+{
+    NSURL *url = [NSURL URLWithString:@"http://realm.io"];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    IgnoredURLObject *obj = [IgnoredURLObject new];
+    obj.name = @"Realm";
+    obj.url = url;
+    [realm addObject:obj];
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable inside a write block");
+    
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
+    
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
+    
+    XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
+    XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
 }
 
 - (void)testCreateInRealmValidationForDictionary
