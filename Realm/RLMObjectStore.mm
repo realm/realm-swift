@@ -109,8 +109,17 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     for (RLMProperty *prop in schema.properties) {
         // InsertionAccessr getter gets object from ivar
         id value = [object valueForKey:prop.name];
-        // InsertionAccssor setter inserts into table
-        [object setValue:value forKey:prop.name];
+        
+        // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
+        if (value) {
+            // InsertionAccssor setter inserts into table
+            [object setValue:value forKey:prop.name];
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"No value or default value specified for %@ property", prop.name]
+                                         userInfo:nil];
+        }
     }
     
     // we are in a read transaction so change accessor class to readwrite accessor
@@ -159,7 +168,7 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     
     // get acessor fot the object class
     Class accessorClass = RLMAccessorClassForObjectClass(objectClass, realm.schema[objectClassName]);
-    RLMObject *accessor = [[accessorClass alloc] init];
+    RLMObject *accessor = [[accessorClass alloc] initWithDefaultValues:NO];
     accessor.realm = realm;
     accessor.schema = realm.schema[objectClassName];
 

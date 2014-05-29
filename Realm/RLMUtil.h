@@ -98,5 +98,3 @@ inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
 inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
     return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
-
-

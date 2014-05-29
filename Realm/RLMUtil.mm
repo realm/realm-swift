@@ -27,6 +27,7 @@ inline bool nsnumber_is_like_bool(NSObject *obj)
     // @encode(BOOL) is 'B' on iOS 64 and 'c'
     // objcType is always 'c'. Therefore compare to "c".
     
+    // FIXME: Need to support @(false) which returns a data_type of 'i'
     return data_type[0] == 'c';
 }
 
@@ -69,6 +70,14 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
+inline bool object_has_valid_type(id obj)
+{
+    return ([obj isKindOfClass:[NSString class]] ||
+            [obj isKindOfClass:[NSNumber class]] ||
+            [obj isKindOfClass:[NSDate class]] ||
+            [obj isKindOfClass:[NSData class]]);
+}
+
 BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
     switch (type) {
         case RLMPropertyTypeString:
@@ -100,11 +109,12 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return NO;
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
-
+        case RLMPropertyTypeAny:
+            return object_has_valid_type(obj);
+            
         // FIXME: missing entries
         case RLMPropertyTypeObject:
         case RLMPropertyTypeArray:
-        case RLMPropertyTypeAny:
             break;
     }
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
@@ -183,7 +193,3 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
         }
     }
 }
-
-
-
-

@@ -25,6 +25,8 @@ The Objective-C API has been updated and your code will break!
 * Added `maxOfProperty:where:` on `RLMTable`
 * Added `toJSONString` on `RLMRealm`, `RLMTable` and `RLMView`
 * Added support for `NOT` operator in predicates
+* Added support for default values
+* Added validation support in `createInRealm:withObject:`
 
 ### Bugfixes
 
