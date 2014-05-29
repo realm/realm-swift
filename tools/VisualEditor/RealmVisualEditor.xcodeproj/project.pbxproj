@@ -13,8 +13,6 @@
 		840F97CF192B8B6F006B591E /* RLMRealmNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97CE192B8B6F006B591E /* RLMRealmNode.m */; };
 		840F97D9192CB0E9006B591E /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97D8192CB0E9006B591E /* RealmCore.framework */; };
 		840F97DF192CB2E6006B591E /* RealmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F97D8192CB0E9006B591E /* RealmCore.framework */; };
-		84684ABE1935D4EE00949A5A /* librealm-objc-dbg.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84684ABC1935D4EE00949A5A /* librealm-objc-dbg.4.dylib */; };
-		84684ABF1935D4EE00949A5A /* librealm-objc.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84684ABD1935D4EE00949A5A /* librealm-objc.4.dylib */; };
 		84A34A4F192E19C5005D6CC4 /* RLMApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */; };
 		84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E0F94F1921F3B900D6CA14 /* Cocoa.framework */; };
 		84E0F95A1921F3B900D6CA14 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9581921F3B900D6CA14 /* InfoPlist.strings */; };
@@ -50,24 +48,6 @@
 		840F97CE192B8B6F006B591E /* RLMRealmNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmNode.m; path = Classes/RLMRealmNode.m; sourceTree = "<group>"; };
 		840F97D0192C7B17006B591E /* RLMRealmOutlineNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRealmOutlineNode.h; path = Classes/RLMRealmOutlineNode.h; sourceTree = "<group>"; };
 		840F97D8192CB0E9006B591E /* RealmCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmCore.framework; path = RealmVisualEditor/Externals/Frameworks/RealmCore.framework; sourceTree = "<group>"; };
-		84684ABC1935D4EE00949A5A /* librealm-objc-dbg.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "librealm-objc-dbg.4.dylib"; path = "RealmVisualEditor/Externals/Frameworks/Realm/librealm-objc-dbg.4.dylib"; sourceTree = "<group>"; };
-		84684ABD1935D4EE00949A5A /* librealm-objc.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "librealm-objc.4.dylib"; path = "RealmVisualEditor/Externals/Frameworks/Realm/librealm-objc.4.dylib"; sourceTree = "<group>"; };
-		84684AC01935D54D00949A5A /* Realm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Realm.h; path = RealmVisualEditor/Externals/Frameworks/Realm/Realm.h; sourceTree = "<group>"; };
-		84684AC11935D54D00949A5A /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMAccessor.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMAccessor.h; sourceTree = "<group>"; };
-		84684AC21935D54D00949A5A /* RLMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArray.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMArray.h; sourceTree = "<group>"; };
-		84684AC31935D54D00949A5A /* RLMArrayAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArrayAccessor.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMArrayAccessor.h; sourceTree = "<group>"; };
-		84684AC41935D54D00949A5A /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMConstants.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMConstants.h; sourceTree = "<group>"; };
-		84684AC51935D54D00949A5A /* RLMObject_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObject_Private.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMObject_Private.h; sourceTree = "<group>"; };
-		84684AC61935D54D00949A5A /* RLMObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObject.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMObject.h; sourceTree = "<group>"; };
-		84684AC71935D54D00949A5A /* RLMObjectSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObjectSchema.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMObjectSchema.h; sourceTree = "<group>"; };
-		84684AC81935D54D00949A5A /* RLMObjectStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObjectStore.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMObjectStore.h; sourceTree = "<group>"; };
-		84684AC91935D54D00949A5A /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMProperty_Private.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMProperty_Private.h; sourceTree = "<group>"; };
-		84684ACA1935D54D00949A5A /* RLMProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMProperty.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMProperty.h; sourceTree = "<group>"; };
-		84684ACB1935D54D00949A5A /* RLMQueryUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQueryUtil.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMQueryUtil.h; sourceTree = "<group>"; };
-		84684ACC1935D54D00949A5A /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMRealm.h; sourceTree = "<group>"; };
-		84684ACD1935D54D00949A5A /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMSchema_Private.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMSchema_Private.h; sourceTree = "<group>"; };
-		84684ACE1935D54D00949A5A /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMSchema.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMSchema.h; sourceTree = "<group>"; };
-		84684ACF1935D54D00949A5A /* RLMUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMUtil.h; path = RealmVisualEditor/Externals/Frameworks/Realm/RLMUtil.h; sourceTree = "<group>"; };
 		84A34A4D192E19C5005D6CC4 /* RLMApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMApplicationDelegate.h; path = Classes/RLMApplicationDelegate.h; sourceTree = "<group>"; };
 		84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMApplicationDelegate.m; path = Classes/RLMApplicationDelegate.m; sourceTree = "<group>"; };
 		84E0F94C1921F3B900D6CA14 /* RealmVisualEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmVisualEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,9 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84684ABF1935D4EE00949A5A /* librealm-objc.4.dylib in Frameworks */,
 				840F97D9192CB0E9006B591E /* RealmCore.framework in Frameworks */,
-				84684ABE1935D4EE00949A5A /* librealm-objc-dbg.4.dylib in Frameworks */,
 				84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -145,8 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				840F97E1192CB376006B591E /* Headers */,
-				84684ABC1935D4EE00949A5A /* librealm-objc-dbg.4.dylib */,
-				84684ABD1935D4EE00949A5A /* librealm-objc.4.dylib */,
 			);
 			name = Realm;
 			sourceTree = "<group>";
@@ -154,22 +130,6 @@
 		840F97E1192CB376006B591E /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				84684AC01935D54D00949A5A /* Realm.h */,
-				84684AC11935D54D00949A5A /* RLMAccessor.h */,
-				84684AC21935D54D00949A5A /* RLMArray.h */,
-				84684AC31935D54D00949A5A /* RLMArrayAccessor.h */,
-				84684AC41935D54D00949A5A /* RLMConstants.h */,
-				84684AC51935D54D00949A5A /* RLMObject_Private.h */,
-				84684AC61935D54D00949A5A /* RLMObject.h */,
-				84684AC71935D54D00949A5A /* RLMObjectSchema.h */,
-				84684AC81935D54D00949A5A /* RLMObjectStore.h */,
-				84684AC91935D54D00949A5A /* RLMProperty_Private.h */,
-				84684ACA1935D54D00949A5A /* RLMProperty.h */,
-				84684ACB1935D54D00949A5A /* RLMQueryUtil.h */,
-				84684ACC1935D54D00949A5A /* RLMRealm.h */,
-				84684ACD1935D54D00949A5A /* RLMSchema_Private.h */,
-				84684ACE1935D54D00949A5A /* RLMSchema.h */,
-				84684ACF1935D54D00949A5A /* RLMUtil.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -512,7 +472,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				INFOPLIST_FILE = "RealmVisualEditor/RealmVisualEditor-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -539,7 +498,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks",
 				);
 				INFOPLIST_FILE = "RealmVisualEditor/RealmVisualEditor-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -572,6 +530,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks/Realm",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -595,6 +554,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
+					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks/Realm",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
