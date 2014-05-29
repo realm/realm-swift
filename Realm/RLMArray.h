@@ -22,11 +22,31 @@
 
 @class RLMObject;
 
+/**
+ 
+ RLMArrays contains RLMObjects of a single type.
+ 
+ They are used to hold the results of a query, or to hold multiple RLMObjects of the same type
+ on an RLMObject property (e.g. an RLMObject of class Person can have a property “dogs” that contains
+ an RLMArray of several RLMObjects of class Dog.)
+
+ 
+ **If your first property on the RLMObject class contained by the RLMArray is an NSString, you can also use keyed subscripting**:
+ 
+     myArray[@"foo"] // will return the first object whose first property is equal to “foo”
+     myArray[@"foo"] = someObject;
+ 
+ RLMArrays provide the same query interface as an RLMRealm, so you can easily chain queries
+ and do refinements on top of query results. This chaining is very efficient and will have
+ minimal impact on overall query performance.
+ */
+
+@interface RLMArray : NSObject<NSFastEnumeration>
+
 /**---------------------------------------------------------------------------------------
- *  @name Accessors and Getting Objects
+ *  @name Initializing & Accessing an Array
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray : NSObject<NSFastEnumeration>
 
 /** 
  Initialize an RLMArray.
@@ -47,9 +67,12 @@
  */
 @property (nonatomic, readonly) Class objectClass;
 
-@end
+#pragma mark -
 
-@interface RLMArray (Accessors)
+/**---------------------------------------------------------------------------------------
+ *  @name Reading Objects from an Array
+ * ---------------------------------------------------------------------------------------
+ */
 
 /**
  Returns the object at the index specified.
@@ -78,14 +101,14 @@
  */
 - (id)lastObject;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Adding, Removing, and Replacing Objects
+ *  @name Adding, Removing, and Replacing Objects on an Array
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Mutators)
 
 /**
  Adds an object to the end of the RLMArray.
@@ -155,14 +178,14 @@
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Object Queries
+ *  @name Querying an Array for Objects
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Queries)
 /**
  Gets the index of an object.
  
@@ -204,14 +227,14 @@
  */
 - (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Aggregate Queries
+ *  @name Querying for Aggregate Results on an Array
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Aggregates)
 
 /**
  Returns the minimum (lowest) value of the given property 
@@ -274,13 +297,12 @@
  */
 -(NSNumber *)averageOfProperty:(NSString *)property;
 
-@end
 
+#pragma mark -
 
-@interface RLMArray (JSONSerialization)
 
 /**---------------------------------------------------------------------------------------
- *  @name JSON Serialization
+ *  @name Serializing an Array to JSON
  *  ---------------------------------------------------------------------------------------
  */
 /**
@@ -290,10 +312,9 @@
  */
 - (NSString *)JSONString;
 
-@end
 
+#pragma mark -
 
-@interface RLMArray (IndexSubscripting)
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;

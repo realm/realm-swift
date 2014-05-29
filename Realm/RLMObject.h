@@ -1,33 +1,78 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
 @class RLMRealm;
 @class RLMArray;
 
-/**---------------------------------------------------------------------------------------
- *  @name Initializing a subclass of RLMObject
- *  ---------------------------------------------------------------------------------------
+
+/**
+ 
+ The sole purpose of RLMObject class is to be subclassed to store your own objects.
+ 
+ You can create model files easily using the following syntax:
+ 
+     // in Dog.h
+     @interface Dog : RLMObject
+ 
+     @property (nonatomic, copy)   NSString *name;
+     @property (nonatomic, strong) NSDate   *birthdate;
+     @property (nonatomic, assign) BOOL      adopted;
+ 
+     @end
+ 
+     // in Dog.m
+     @implementation Dog
+     @end //none needed
+ 
+ Supported property types are:
+ 
+ - `NSString`
+ - `NSNumber`, `int`, `float`, `double` and `long`
+ - `BOOL` or `bool`
+ - `NSDate`
+ - `NSData`
+ 
+ You can set which of these properties should be indexed, (stored) inline, unique, required
+ as well as delete rules for the links by implementing the attributesForProperty: method.
+ 
+ Similarly, you can set properties to ignore (i.e. transient properties you do not want
+ persisted to a Realm) by implementing ignoredProperties.
+ 
+ Finally you can set default values for properties by implementing defaultPropertyValues.
+ 
+ You can query an object directly via a the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ These methods allow you to easily query a custom subclass for instances of this class in the
+ default Realm. To search across Realms other than the defaut or across multiple object classes
+ use the interface on an RLMRealm instance.
+ 
  */
+
+
 @interface RLMObject : NSObject
+
+/**---------------------------------------------------------------------------------------
+ *  @name Creating & Initializing Objects
+ * ---------------------------------------------------------------------------------------
+ */
 
 /**
  Initialize a standalone RLMObject
@@ -38,6 +83,13 @@
  @see [RLMRealm addObject:]:
  */
 -(instancetype)init;
+
+/**
+ Helper to return the class name for an RLMObject subclass.
+ 
+ @return    The class name for a given class.
+ */
++ (NSString *)className;
 
 /**
  Create an RLMObject within a Realm with a given object.
@@ -75,78 +127,11 @@
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
-@end
-
 
 /**---------------------------------------------------------------------------------------
- *  @name Property Attributes
- *  ---------------------------------------------------------------------------------------
- * Attributes which can be returned when implementing attributesForProperty:
+ *  @name Customizing your Objects
+ * ---------------------------------------------------------------------------------------
  */
-
-typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
-    /**
-     Create an index for this property for improved search performance.
-     */
-    RLMPropertyAttributeIndexed = 1 << 2,
-    
-    /**
-     Store this property inline (de-normalization) which in some cases can improve performance. Setting this
-     attribute will result in objects being copied (rather than linked) when getting and setting this property.
-     */
-    RLMPropertyAttributeInlined = 1 << 3,
-
-    /**
-     The value for a property with this attribute must be unique across all objects of this type. An exception
-     will be thrown when setting a property with this attribute to a non-unique value.
-     */
-    RLMPropertyAttributeUnique = 1 << 4,
-
-    /**
-     This property value must be set before the object can be added to a Realm. If not set an
-     exception will be thrown if no default value for this property is specified. If a default
-     value is specified it is set upon insertion into a Realm
-     
-    @see [RLMObject defaultPropertyValues]
-     */
-    RLMPropertyAttributeRequired = 1 << 5,
-    
-    
-    /**---------------------------------------------------------------------------------------
-     *  @name Delete Rule Attributes
-     * ---------------------------------------------------------------------------------------
-     * Set the following attributes on RLMPropertyTypeObject or RLMPropertyTypeArray properties
-     * to customize a properties delete rules. These rules are mutually exclusive.
-     */
-
-    /**
-     When a parent object is deleted or a child property is nullified nothing is done.
-     This is the default delete rule.
-     */
-    RLMPropertyAttributeDeleteNever = 0,
-    
-    /**
-     Delete a child object (or object in an RLMArray) when the parent is deleted or the object is
-     nullified only if no other objects in the realm reference the object.
-     */
-    RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
-    
-    /**
-     Always delete a child object or object in a child array when the parent is deleted or the
-     reference in nullified. If other objects reference the same child object those references are
-     nullified.
-     */
-    RLMPropertyAttributeDeleteAlways = 1 << 1
-};
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Subclass Customization
- *  ---------------------------------------------------------------------------------------
- *
- * These methods can be overridden to customize the behavior of RLMObject subclasses.
- */
-@interface RLMObject (SubclassOverrides)
 
 /**
  Implement to set custom attributes for each property.
@@ -171,36 +156,11 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  */
 + (NSArray *)ignoredProperties;
 
-@end
-
-
-//---------------------------------------------------------------------------------------
-// @name RLMArray Property Declaration
-//---------------------------------------------------------------------------------------
-//
-// Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
-// with an RLMArray property by defining a protocol for the object type which the RLMArray will
-// hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
-//
-// ie. RLM_OBJECT_PROTOCOL(ObjectType)
-//     \@property RLMArray<ObjectType> *arrayOfObjectTypes;
-//
-#define RLM_OBJECT_PROTOCOL(RLM_OBJECT_SUBCLASS)\
-@protocol RLM_OBJECT_SUBCLASS <NSObject>        \
-@end
-
 
 /**---------------------------------------------------------------------------------------
- *  @name Querying the Default Realm
+ *  @name Querying Objects on the Default Realm
  *  ---------------------------------------------------------------------------------------
  */
-/*
- These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search across Realms other than the defaut or across multiple object classes
- use the interface on an RLMRealm instance.
- */
-
-@interface RLMObject (DefaultRealm)
 
 /**
  Get all objects of this type from the default Realm.
@@ -232,8 +192,8 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  */
 + (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
-@end
 
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
  *  @name Dynamic Accessors
@@ -243,19 +203,16 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  * ie. rlmObject[@"propertyName"] = object;
  *     id object = rlmObject[@"propertyName"];
  */
-@interface RLMObject (Accessors)
 
 -(id)objectForKeyedSubscript:(NSString *)key;
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
-@end
-
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name JSON Serialization
+ *  @name Serializing Objects to JSON
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMObject (JSONSerialization)
 /**
  Returns this object represented as a JSON string.
  
@@ -265,21 +222,20 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 
 @end
 
-
-/**---------------------------------------------------------------------------------------
- *  @name RLMObject Class Name
- *  ---------------------------------------------------------------------------------------
- */
-@interface RLMObject (ClassName)
-/**
- Helper to return the class name for an RLMObject subclass.
- 
- @return    The class name for a given class.
- */
-+ (NSString *)className;
-
+//---------------------------------------------------------------------------------------
+// @name RLMArray Property Declaration
+//---------------------------------------------------------------------------------------
+//
+// Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
+// with an RLMArray property by defining a protocol for the object type which the RLMArray will
+// hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
+//
+// ie. RLM_OBJECT_PROTOCOL(ObjectType)
+//     \@property RLMArray<ObjectType> *arrayOfObjectTypes;
+//
+#define RLM_OBJECT_PROTOCOL(RLM_OBJECT_SUBCLASS)\
+@protocol RLM_OBJECT_SUBCLASS <NSObject>        \
 @end
-
 
 
 

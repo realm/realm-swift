@@ -679,7 +679,6 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
                     --ignore "Realm/RLMArrayAccessor.h" \
                     --ignore "Realm/RLMArrayAccessor.mm" \
                     --ignore "Realm/RLMProperty.h" \
@@ -718,7 +717,6 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
                     --ignore "Realm/RLMArrayAccessor.h" \
                     --ignore "Realm/RLMArrayAccessor.mm" \
                     --ignore "Realm/RLMProperty.h" \
