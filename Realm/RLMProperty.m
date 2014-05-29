@@ -120,8 +120,8 @@
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // get object class and set type
-                const CGFloat prefixLength = 11;
-                const CGFloat suffixLength = 2;
+                const NSUInteger prefixLength = 11;
+                const NSUInteger suffixLength = 2;
                 _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-prefixLength-suffixLength)];
                 _type = RLMPropertyTypeArray;
                 
