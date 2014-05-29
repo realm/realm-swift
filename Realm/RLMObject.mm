@@ -110,6 +110,11 @@
     return nil;
 }
 
+// Ignored properties implementation
++ (NSArray *)ignoredProperties {
+    return nil;
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {
