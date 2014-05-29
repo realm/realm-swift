@@ -134,7 +134,7 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     if (object.realm.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
-    // move last row to row we are delting
+    // move last row to row we are deleting
     object.backingTable->move_last_over(object.objectIndex);
     // FIXME - fix all accessors
 }
