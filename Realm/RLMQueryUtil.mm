@@ -112,7 +112,7 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, rlmtype_to_string(datatype)]);
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype)]);
             break;
     }
 }
@@ -237,7 +237,7 @@ void add_between_constraint_to_query(tightdb::Query & query,
         }
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations", rlmtype_to_string(dataType)]);
+                                           [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations", RLMTypeToString(dataType)]);
     }
 }
 
@@ -277,7 +277,7 @@ void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation
                 if (!RLMIsObjectValidForProperty(array.firstObject, prop) ||
                     !RLMIsObjectValidForProperty(array.lastObject, prop)) {
                     @throw RLMPredicateException(@"Invalid value",
-                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", rlmtype_to_string(prop.type)]);
+                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
                 }
             } else {
                 @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
@@ -287,7 +287,7 @@ void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation
         }
     } else {
         if (!RLMIsObjectValidForProperty(value, prop)) {
-            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", rlmtype_to_string(prop.type)]);
+            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", RLMTypeToString(prop.type)]);
         }
     }
 }
@@ -339,7 +339,7 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %@ not supported", rlmtype_to_string(type)]);
+                                           [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);
     }
 }
 
@@ -434,15 +434,15 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
                                              [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason,
-                                              rlmtype_to_string(leftType),
-                                              rlmtype_to_string(rightType)]);
+                                              RLMTypeToString(leftType),
+                                              RLMTypeToString(rightType)]);
         }
     }
     else {
         @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
                                      [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason,
-                                      rlmtype_to_string(leftType),
-                                      rlmtype_to_string(rightType)]);
+                                      RLMTypeToString(leftType),
+                                      RLMTypeToString(rightType)]);
     }
 }
     

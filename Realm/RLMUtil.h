@@ -46,7 +46,7 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
 }
 
 // Translate an rlmtype to a string representation
-inline NSString *rlmtype_to_string(RLMPropertyType type) {
+inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
         case RLMPropertyTypeString:
             return @"string";
