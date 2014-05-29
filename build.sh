@@ -689,7 +689,8 @@ EOF
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
+                    --ignore "Realm/Tests/TransactionTests.m" \
+                    --ignore "Realm/Tests/ObjectTests.m" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
@@ -727,7 +728,8 @@ EOF
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
+                    --ignore "Realm/Tests/TransactionTests.m" \
+                    --ignore "Realm/Tests/ObjectTests.m" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
