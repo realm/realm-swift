@@ -19,6 +19,7 @@ build/
 # XCode
 xcuserdata/
 project.xcworkspace
+*.xccheckout
 DerivedData
 # sh build.sh build-iphone
 /iphone-lib/include
