@@ -349,40 +349,37 @@
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-/*
     if (tableView == self.realmTableColumnsView) {
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *columnNode = selectedTable.tableColumns[columnIndex];
+        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
         
-        switch (columnNode.columnType) {
-            case RLMTypeBool:
-            case RLMTypeInt: {
+        switch (propertyNode.type) {
+            case RLMPropertyTypeBool:
+            case RLMPropertyTypeInt: {
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
                 formatter.allowsFloats = NO;
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
-            case RLMTypeFloat:
-            case RLMTypeDouble: {
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeDouble: {
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
                 formatter.allowsFloats = YES;
                 formatter.numberStyle = NSNumberFormatterDecimalStyle;
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
-            case RLMTypeNone:
-            case RLMTypeString:
-            case RLMTypeBinary:
-            case RLMTypeDate:
-            case RLMTypeTable:
-            case RLMTypeMixed:
+            case RLMPropertyTypeString:
+            case RLMPropertyTypeData:
+            case RLMPropertyTypeDate:
+            case RLMPropertyTypeObject:
+            case RLMPropertyTypeArray:
                 break;
                 
             default:
                 break;
         }
     }
-*/
 }
 
 #pragma mark - Private methods
