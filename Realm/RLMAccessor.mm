@@ -91,7 +91,11 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
         case 'k':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+                id outObj = nil;
+                if (index != NSUIntegerMax) {
+                    outObj = RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+                }
+                return outObj;
             });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
