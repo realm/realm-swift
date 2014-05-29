@@ -89,13 +89,12 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
                 return [NSData dataWithBytes:data.data() length:data.size()];
             });
         case 'k':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-                id outObj = nil;
-                if (index != NSUIntegerMax) {
-                    outObj = RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+            return imp_implementationWithBlock(^id(id<RLMAccessor> obj) {
+                if (obj.backingTable->is_null_link(col, obj.objectIndex)) {
+                    return nil;
                 }
-                return outObj;
+                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
             });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
