@@ -486,8 +486,7 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-#FIXME https://app.asana.com/0/861870036984/12604665254221
-	realm_version="manual-version"
+	realm_version="$(sh build.sh get-version)"
 	FRAMEWORK=Realm.framework
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1

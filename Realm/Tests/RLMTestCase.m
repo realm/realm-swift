@@ -20,6 +20,9 @@
 
 #import "RLMTestCase.h"
 
+@interface RLMRealm ()
++ (void)clearRealmCache;
+@end
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
@@ -41,33 +44,50 @@ NSString *RLMTestRealmPath() {
     return RLMRealmPathForFile(@"test.realm");
 }
 
-NSString *RLMTestRealmPathLock() {
-    return RLMRealmPathForFile(@"test.realm.lock");
+NSString *RLMLockPath(NSString *path) {
+    return [path stringByAppendingString:@".lock"];
 }
+
+void RLMDeleteRealmFilesAtPath(NSString *path) {
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
+    }
+    
+    [[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:nil];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMLockPath(path)]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
+    }
+}
+
 
 @implementation RLMTestCase
 
-- (void)setUp {
-    // This method is run before every test method
++ (void)setUp {
     [super setUp];
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMDefaultRealmPath() stringByAppendingString:@".lock"] error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
     
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock() error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMTestRealmPath()]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
-    }
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMDefaultRealmPath()]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
-    }
+    // Delete Realm files
+    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
+    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
 + (void)tearDown {
-    // This method is run after all tests in a test method have run
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
     [super tearDown];
+    
+    // Reset realm cache
+    [RLMRealm clearRealmCache];
+    
+    // Delete Realm files
+    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
+    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+}
+
+- (void)invokeTest {
+    [RLMTestCase setUp];
+    @autoreleasepool {
+        [super invokeTest];
+    }
+    [RLMTestCase tearDown];
 }
 
 - (RLMRealm *)realmWithTestPath {
