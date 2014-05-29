@@ -251,13 +251,13 @@
     
     [realm beginWriteTransaction];
     
-    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0, @1.7,  @0.0,  @5.55, @"Instance 0"]];
-    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3, @4.21, @1.0,  @4.44, @"Instance 1"]];
-    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0,  @3.55, @99.9, @6.66, @"Instance 2"]];
-    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21, @1.0,  @1.0,  @7.77, @"Instance 3"]];
-    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0, @23.0, @7.4,  @8.88, @"Instance 4"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0,  @66.0, @1.01, @9.99, @"Instance 5"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0,  @66.0, @1.01, @9.99, @"Instance 6"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"Instance 2"]];
+    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"Instance 3"]];
+    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"Instance 4"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 5"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
     
     [realm commitWriteTransaction];
 

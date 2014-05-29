@@ -198,7 +198,7 @@
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
-
+    
     c.BoolCol   = NO;
     c.IntCol  = 54;
     c.FloatCol = 0.7f;
@@ -313,6 +313,98 @@
             }
         }        
     }
+}
+
+- (void)testCreateInRealmValidationForDictionary
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
+                                               @"intCol" : @54,
+                                               @"floatCol" : @0.7f,
+                                               @"doubleCol" : @0.8,
+                                               @"stringCol" : @"foo",
+                                               @"binaryCol" : bin1,
+                                               @"dateCol" : timeNow,
+                                               @"cBoolCol" : @NO,
+                                               @"longCol" : @(99),
+                                               @"mixedCol" : @"mixed"};
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSDictonary
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
+        NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
+        id obj = @"invalid";
+        if ([keyToInvalidate isEqualToString:@"stringCol"]) {
+            obj = @1;
+        }
+        
+        invalidInput[keyToInvalidate] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSDictionary
+        if (![keyToInvalidate isEqualToString:@"mixedCol"]) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmValidationForArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed"];
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSArray
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    const NSInteger stringColIndex = 4;
+    const NSInteger mixedColIndex = 9;
+    for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
+        NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
+        
+        id obj = @"invalid";
+        if (i == stringColIndex) {
+            obj = @1;
+        }
+        
+        invalidInput[i] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSArray
+        if (i != mixedColIndex) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmWithMissingValue
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // This exception only gets thrown when there is no default vaule and it is for an NSObject property
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    
+    // This exception gets thrown when count of array does not match with object schema
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    
+    [realm commitWriteTransaction];
 }
 
 @end
