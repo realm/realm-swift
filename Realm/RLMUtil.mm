@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
+#import "RLMObject.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -111,9 +112,10 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return object_has_valid_type(obj);
-            
-        // FIXME: missing entries
         case RLMPropertyTypeObject:
+            // only NSNull, nil, or objects which derive from RLMObject are valid for this type
+            return [obj isKindOfClass:RLMObject.class] || obj == nil || obj == NSNull.null;
+        // FIXME: missing entries
         case RLMPropertyTypeArray:
             break;
     }
