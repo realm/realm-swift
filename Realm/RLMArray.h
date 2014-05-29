@@ -113,7 +113,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param object  An object (of the same type as returned from the objectClass selector).
+ @param anObject  An object (of the same type as returned from the objectClass selector).
  @param index   The array index at which the object is inserted.
  */
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;

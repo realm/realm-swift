@@ -56,14 +56,15 @@
 @implementation TestQueryObject
 @end
 
-@interface RLMQueryTests : RLMTestCase
+@interface QueryTests : RLMTestCase
 @end
 
-@implementation RLMQueryTests
+@implementation QueryTests
 
 #pragma mark - Tests
 
-- (void)testBasicQuery {
+- (void)testBasicQuery
+{
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -80,10 +81,8 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
-- (void)testDefaultRealmQuery {
-    // delete default realm file
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-    
+- (void)testDefaultRealmQuery
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -102,13 +101,8 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
-- (void)testArrayQuery {
-    // delete default realm file
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *defaultRealmPath = [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:defaultRealmPath error:nil];
-    
+- (void)testArrayQuery
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -119,6 +113,8 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
+    XCTAssertEqual(all.count, 3, @"Expecting 3 results");
+
     RLMArray *some = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
     
     // query/order on array
@@ -241,32 +237,27 @@
     XCTAssertEqualObjects(o.stringCol, @"cc", @"Should be cc");
     
     
-    
     // sort by mixed column
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:@"mixedCol" where:nil], @"Sort on mixed col not supported");
     sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:YES];
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
     sortDesc = [NSSortDescriptor sortDescriptorWithKey:@"mixedCol" ascending:NO];
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
-
-
 }
 
 - (void)testTwoColumnComparisonQuery
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath()
-                                               error:nil];
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
     
-    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0, @1.7,  @0.0,  @5.55, @"Instance 0"]];
-    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3, @4.21, @1.0,  @4.44, @"Instance 1"]];
-    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0,  @3.55, @99.9, @6.66, @"Instance 2"]];
-    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21, @1.0,  @1.0,  @7.77, @"Instance 3"]];
-    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0, @23.0, @7.4,  @8.88, @"Instance 4"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0,  @66.0, @1.01, @9.99, @"Instance 5"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0,  @66.0, @1.01, @9.99, @"Instance 6"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"Instance 2"]];
+    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"Instance 3"]];
+    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"Instance 4"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 5"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
     
     [realm commitWriteTransaction];
 
@@ -349,24 +340,32 @@
                                               expectedReason:@"Property type mismatch between double and string"];
 }
 
-- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
+- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
+                                                   predicate:(NSString *)predicate
+                                               expectedCount:(NSUInteger)expectedCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                                      where:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, (unsigned long)expectedCount, (unsigned long)actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
+                   predicate, expectedCount, actualCount);
 }
 
-- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount
+- (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
+                                              expectedCount:(NSUInteger)expectedCount
 {
     RLMArray *queryResult = [TestQueryObject objectsWhere:predicate];
     NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %lu result(s), found %lu", predicate, (unsigned long)expectedCount, (unsigned long)actualCount);
+    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
+                   predicate, expectedCount, actualCount);
 }
 
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class predicate:(NSString *)predicate expectedCount:(NSUInteger)expectedCount expectedReason:(NSString *)expectedReason
+- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
+                                                 predicate:(NSString *)predicate
+                                             expectedCount:(NSUInteger)expectedCount
+                                            expectedReason:(NSString *)expectedReason
 {
     @try {
         RLMRealm *realm = [RLMRealm defaultRealm];
