@@ -87,7 +87,15 @@
 @implementation NoDefaultObject
 @end
 
+@interface IgnoredURLObject : RLMObject
+@property NSURL *url;
+@end
 
+@implementation IgnoredURLObject
++ (NSArray *)ignoredProperties {
+    return @[@"url"];
+}
+@end
 
 @interface ObjectTests : RLMTestCase
 @end
@@ -242,6 +250,8 @@
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 }
 
+#pragma mark - Default Property Values
+
 - (void)testNoDefaultPropertyValues
 {
     // Test alloc init does not crash for no defaultPropertyValues implementation
@@ -313,6 +323,17 @@
             }
         }        
     }
+}
+
+#pragma mark - Ignored Properties
+
+- (void)testIgnoredUnsupportedProperty
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported property type should not throw");
+    [realm rollbackWriteTransaction];
 }
 
 - (void)testCreateInRealmValidationForDictionary

@@ -22,7 +22,7 @@
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 #import <tightdb/table.hpp>
-
+#import "RLMObject_Private.h"
 
 // private properties
 @interface RLMObjectSchema ()
@@ -57,7 +57,11 @@
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
-        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
+        objc_property_t runtimeProp = props[i];
+        if ([objectClass isPropertyIgnored:runtimeProp]) {
+            continue;
+        }
+        RLMProperty *prop = [RLMProperty propertyForObjectProperty:runtimeProp column:propArray.count];
         if (prop) {
             [propArray addObject:prop];
         }

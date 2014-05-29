@@ -110,6 +110,16 @@
     return nil;
 }
 
+// Ignored properties implementation
++ (NSArray *)ignoredProperties {
+    return nil;
+}
+
++ (BOOL)isPropertyIgnored:(objc_property_t)property {
+    NSString *propertyName = [NSString stringWithUTF8String:property_getName(property)];
+    return [[[self class] ignoredProperties] containsObject:propertyName];
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {

@@ -21,10 +21,13 @@
 #import "RLMObject.h"
 #import "RLMAccessor.h"
 #import "RLMObjectSchema.h"
+#import <objc/runtime.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
--(instancetype)initWithDefaultValues:(BOOL)useDefaults;
+
+- (instancetype)initWithDefaultValues:(BOOL)useDefaults;
++ (BOOL)isPropertyIgnored:(objc_property_t)property;
 
 @property (nonatomic, readwrite) RLMRealm *realm;
 @property (nonatomic) RLMObjectSchema *schema;
