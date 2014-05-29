@@ -8,7 +8,7 @@ mkdir -p "$FILE_TEMPLATES_DIR"
 
 for dir in "file_templates/*/"
 do
-    cp -R "${dir%*/}" "$FILE_TEMPLATES_DIR"
+    cp -R ${dir%*/} "$FILE_TEMPLATES_DIR"
 done
 
 # Class Templates
@@ -19,10 +19,12 @@ TEMPLATE_INFO_PLIST_PATH="$OBJC_CLASS_TEMPLATES_DIR/TemplateInfo.plist"
 
 for dir in "class_templates/*/"
 do
-    cp -R "${dir%*/}" "$OBJC_CLASS_TEMPLATES_DIR"
+    cp -R ${dir%*/} "$OBJC_CLASS_TEMPLATES_DIR"
 
     PLIST_BUDDY=/usr/libexec/PlistBuddy
     class=$(basename $dir)
+
+    echo "Installing '$class' class template"
 
     $PLIST_BUDDY -c "Print :Options:1:Values:" "$TEMPLATE_INFO_PLIST_PATH" | grep $class >/dev/null
     rc=$?

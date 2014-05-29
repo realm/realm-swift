@@ -10,4 +10,11 @@
 
 @implementation ___FILEBASENAMEASIDENTIFIER___
 
+// Uncomment to specify default values for properties
+
+//+ (NSDictionary *)defaultPropertyValues
+//{
+//    return @{};
+//}
+
 @end

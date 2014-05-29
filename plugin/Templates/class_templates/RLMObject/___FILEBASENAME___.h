@@ -12,4 +12,6 @@
 // Add properties here to define the model
 @end
 
+// This protocol allows for typed collections. i.e.:
+// RLMArray<___FILEBASENAMEASIDENTIFIER___>
 RLM_OBJECT_PROTOCOL(___FILEBASENAMEASIDENTIFIER___)
