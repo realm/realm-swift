@@ -670,7 +670,6 @@ EOF
         echo "Generating HTML docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include docs/source/realm.png \
                     --output docs \
                     -v `sh build.sh get-version` \
                     --create-html \
@@ -691,7 +690,6 @@ EOF
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
                     --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
@@ -703,7 +701,6 @@ EOF
         echo "Generating docset docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include docs/source/realm.png \
                     --output docs/output/$(sh build.sh get-version)/ \
                     -v `sh build.sh get-version` \
                     --no-create-html \
@@ -731,7 +728,6 @@ EOF
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
                     --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
