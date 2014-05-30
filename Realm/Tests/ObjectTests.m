@@ -87,7 +87,19 @@
 @implementation NoDefaultObject
 @end
 
+@interface IgnoredURLObject : RLMObject
+@property NSString *name;
+@property NSURL *url;
+@end
 
+@implementation IgnoredURLObject
+
++ (NSArray *)ignoredProperties
+{
+    return @[@"url"];
+}
+
+@end
 
 @interface ObjectTests : RLMTestCase
 @end
@@ -198,7 +210,7 @@
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
-
+    
     c.BoolCol   = NO;
     c.IntCol  = 54;
     c.FloatCol = 0.7f;
@@ -209,11 +221,13 @@
     c.cBoolCol = false;
     c.longCol = 99;
     c.mixedCol = @"string";
+    c.objectCol = [[RLMTestObject alloc] init];
+    c.objectCol.column = @"c";
     
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withObject:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
-                                                     timeNow, @YES, @(-20), @2]];
+                                                     timeNow, @YES, @(-20), @2, NSNull.null]];
     [realm commitWriteTransaction];
     
     AllTypesObject* row1 = [AllTypesObject allObjects][0];
@@ -237,10 +251,14 @@
     XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
     XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
+    XCTAssertTrue([row1.objectCol.column isEqual:@"c"], @"row1.objectCol");
+    XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 }
+
+#pragma mark - Default Property Values
 
 - (void)testNoDefaultPropertyValues
 {
@@ -313,6 +331,140 @@
             }
         }        
     }
+}
+
+#pragma mark - Ignored Properties
+
+- (void)testIgnoredUnsupportedProperty
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
+                                               property type should not throw");
+    [realm rollbackWriteTransaction];
+}
+
+- (void)testCanUseIgnoredProperty
+{
+    NSURL *url = [NSURL URLWithString:@"http://realm.io"];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    IgnoredURLObject *obj = [IgnoredURLObject new];
+    obj.name = @"Realm";
+    obj.url = url;
+    [realm addObject:obj];
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable inside a write block");
+    
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
+    
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
+    
+    XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
+    XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
+}
+
+- (void)testCreateInRealmValidationForDictionary
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
+                                               @"intCol" : @54,
+                                               @"floatCol" : @0.7f,
+                                               @"doubleCol" : @0.8,
+                                               @"stringCol" : @"foo",
+                                               @"binaryCol" : bin1,
+                                               @"dateCol" : timeNow,
+                                               @"cBoolCol" : @NO,
+                                               @"longCol" : @(99),
+                                               @"mixedCol" : @"mixed",
+                                               @"objectCol": NSNull.null};
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSDictonary
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
+        NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
+        id obj = @"invalid";
+        if ([keyToInvalidate isEqualToString:@"stringCol"]) {
+            obj = @1;
+        }
+        
+        invalidInput[keyToInvalidate] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSDictionary
+        if (![keyToInvalidate isEqualToString:@"mixedCol"]) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmValidationForArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    // add test/link object to realm
+    [realm beginWriteTransaction];
+    RLMTestObject *to = [RLMTestObject createInRealm:realm withObject:@[@"c"]];
+    [realm commitWriteTransaction];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSArray
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    const NSInteger stringColIndex = 4;
+    const NSInteger mixedColIndex = 9;
+    for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
+        NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
+        
+        id obj = @"invalid";
+        if (i == stringColIndex) {
+            obj = @1;
+        }
+        
+        invalidInput[i] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSArray
+        if (i != mixedColIndex) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmWithMissingValue
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // This exception only gets thrown when there is no default vaule and it is for an NSObject property
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    
+    // This exception gets thrown when count of array does not match with object schema
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    
+    [realm commitWriteTransaction];
 }
 
 @end
