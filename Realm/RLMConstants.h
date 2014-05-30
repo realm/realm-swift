@@ -65,7 +65,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  
  Set this attribute on RLMPropertyTypeObject or RLMPropertyTypeArray properties
  to customize the properties’ delete rule. This rule is mutually exclusive with
- `RLMPropertyAttributeDeleteIfOnlyOwner` and `RLMPropertyAttributeDeleteAlways`.
+ `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteAlways`.
  */
     RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
     
@@ -76,7 +76,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  
  Set this attribute on RLMPropertyTypeObject or RLMPropertyTypeArray properties
  to customize the properties’ delete rule. This rule is mutually exclusive with
- `RLMPropertyAttributeDeleteIfOnlyOwner` and `RLMPropertyAttributeDeleteAlways`.
+ `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteIfOnlyOwner`.
  */
     RLMPropertyAttributeDeleteAlways = 1 << 1
 };

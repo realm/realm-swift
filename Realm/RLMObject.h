@@ -26,16 +26,15 @@
 
 /**
  
- The sole purpose of RLMObject class is to be subclassed to store your own objects.
- 
- You can create model files easily using the following syntax:
+ In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
+ This is the sole purpose of this class. For example:
  
      // in Dog.h
      @interface Dog : RLMObject
  
-     @property (nonatomic, copy)   NSString *name;
-     @property (nonatomic, strong) NSDate   *birthdate;
-     @property (nonatomic, assign) BOOL      adopted;
+     @property NSString *name;
+     @property NSDate   *birthdate;
+     @property BOOL      adopted;
  
      @end
  
@@ -46,22 +45,23 @@
  Supported property types are:
  
  - `NSString`
- - `NSNumber`, `int`, `float`, `double` and `long`
+ - `NSInteger`, `CGFloat`, `int`, `long`, `float`, and `double`
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
+ - Other objects subclassing `RLMObject`, so you can link RLMObjects together.
  
- You can set which of these properties should be indexed, (stored) inline, unique, required
+ You can set which of these properties should be indexed, stored inline, unique, required
  as well as delete rules for the links by implementing the attributesForProperty: method.
  
- Similarly, you can set properties to ignore (i.e. transient properties you do not want
+ You can set properties to ignore (i.e. transient properties you do not want
  persisted to a Realm) by implementing ignoredProperties.
  
- Finally you can set default values for properties by implementing defaultPropertyValues.
+ You can set default values for properties by implementing defaultPropertyValues.
  
- You can query an object directly via a the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search across Realms other than the defaut or across multiple object classes
+ default Realm. To search in a Realms other than the defaut Realm
  use the interface on an RLMRealm instance.
  
  */
@@ -87,7 +87,7 @@
 /**
  Helper to return the class name for an RLMObject subclass.
  
- @return    The class name for a given class.
+ @return    The class name for the model class.
  */
 + (NSString *)className;
 
@@ -158,7 +158,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Querying Objects on the Default Realm
+ *  @name Getting & Querying Objects on the Default Realm
  *  ---------------------------------------------------------------------------------------
  */
 

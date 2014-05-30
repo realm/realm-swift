@@ -24,21 +24,16 @@
 
 /**
  
- RLMArrays contains RLMObjects of a single type.
- 
- They are used to hold the results of a query, or to hold multiple RLMObjects of the same type
- on an RLMObject property (e.g. an RLMObject of class Person can have a property “dogs” that contains
- an RLMArray of several RLMObjects of class Dog.)
-
+ RLMArray is the primary container type in Realm.
+ Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  
  **If your first property on the RLMObject class contained by the RLMArray is an NSString, you can also use keyed subscripting**:
  
      myArray[@"foo"] // will return the first object whose first property is equal to “foo”
      myArray[@"foo"] = someObject;
  
- RLMArrays provide the same query interface as an RLMRealm, so you can easily chain queries
- and do refinements on top of query results. This chaining is very efficient and will have
- minimal impact on overall query performance.
+ RLMArrays queries via the same predicate as RLMObject or RLMRealm,
+ so you can easily chain queries to further filter query results.
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
@@ -70,7 +65,7 @@
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Reading Objects from an Array
+ *  @name Accessing Objects from an Array
  * ---------------------------------------------------------------------------------------
  */
 
@@ -106,7 +101,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Adding, Removing, and Replacing Objects on an Array
+ *  @name Adding, Removing, and Replacing Objects in an Array
  *  ---------------------------------------------------------------------------------------
  */
 
@@ -183,7 +178,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Querying an Array for Objects
+ *  @name Querying an Array
  *  ---------------------------------------------------------------------------------------
  */
 /**
@@ -232,7 +227,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Querying for Aggregate Results on an Array
+ *  @name Aggregating Property Value
  *  ---------------------------------------------------------------------------------------
  */
 
