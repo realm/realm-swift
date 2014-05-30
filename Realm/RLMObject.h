@@ -28,7 +28,7 @@
 /**
  
  In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
- This is the sole purpose of this class. For example:
+ You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
  
      // in Dog.h
      @interface Dog : RLMObject
@@ -196,14 +196,14 @@
 
 #pragma mark -
 
-/**---------------------------------------------------------------------------------------
- *  @name Dynamic Accessors
- *  ---------------------------------------------------------------------------------------
- *
- * Properties on RLMObjects can be accessed and set using keyed subscripting.
- * ie. rlmObject[@"propertyName"] = object;
- *     id object = rlmObject[@"propertyName"];
- */
+//---------------------------------------------------------------------------------------
+// @name Dynamic Accessors
+//---------------------------------------------------------------------------------------
+//
+// Properties on RLMObjects can be accessed and set using keyed subscripting.
+// ie. rlmObject[@"propertyName"] = object;
+//     id object = rlmObject[@"propertyName"];
+//
 
 -(id)objectForKeyedSubscript:(NSString *)key;
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
@@ -231,11 +231,12 @@
 // with an RLMArray property by defining a protocol for the object type which the RLMArray will
 // hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
 //
-// ie. RLM_OBJECT_PROTOCOL(ObjectType)
-//     \@property RLMArray<ObjectType> *arrayOfObjectTypes;
+// ie. RLM_ARRAY_TYPE(ObjectType)
 //
-#define RLM_OBJECT_PROTOCOL(RLM_OBJECT_SUBCLASS)\
-@protocol RLM_OBJECT_SUBCLASS <NSObject>        \
+//     @property RLMArray<ObjectType> *arrayOfObjectTypes;
+//
+#define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
+@protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 
 

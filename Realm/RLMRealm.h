@@ -37,7 +37,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  Obtains an instance of the default Realm.
  
  RLMRealm instances are reused when this is called multiple times from the same thread. The 
- default RLMRealm is persisted at `<Application_Home>/Documents/default.realm`.
+ default RLMRealm is persisted as default.realm under the Documents directory of your Application.
  
  @warning   RLMRealm instances are not thread safe and can not be shared across threads or 
             dispatch queues. You must get a separate RLMRealm instance for each thread and queue.

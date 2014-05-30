@@ -26,13 +26,9 @@
  
  RLMArray is the primary container type in Realm.
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
+ This is referred to in these docs as the “type” of the array.
  
- **If your first property on the RLMObject class contained by the RLMArray is an NSString, you can also use keyed subscripting**:
- 
-     myArray[@"foo"] // will return the first object whose first property is equal to “foo”
-     myArray[@"foo"] = someObject;
- 
- RLMArrays queries via the same predicate as RLMObject or RLMRealm,
+ RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
  so you can easily chain queries to further filter query results.
  */
 
@@ -46,21 +42,24 @@
 /** 
  Initialize an RLMArray.
  
- @param objectClassName     The class name of object this RLMArray will hold.
+ @warning Realm arrays are typed. You must specify an RLMObject class name during initialization
+          and can only add objects of this type to the array.
+ 
+ @param objectClassName     The class name of the RLMObjects this RLMArray will hold.
 
  @return                    An initialized RLMArray instance.
 */
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 /**
- Number of objects in the RLMArray.
+ Number of objects in the array.
  */
 @property (nonatomic, readonly) NSUInteger count;
 
 /**
- The object class of objects in the RLMArray.
+ The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
-@property (nonatomic, readonly) Class objectClass;
+@property (nonatomic, readonly) NSString *objectClassName;
 
 #pragma mark -
 
@@ -74,25 +73,25 @@
  
  @param index   The index to look up.
  
- @return An object.
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
- Returns the first object.
+ Returns the first object in the array.
  
- Returns nil if called on an empty RLMArray.
+ Returns `nil` if called on an empty RLMArray.
  
- @return An object (of the same type as returned from the objectClass selector).
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)firstObject;
 
 /**
- Returns the last object.
+ Returns the last object in the array.
 
- Returns nil if called on an empty RLMArray.
+ Returns `nil` if called on an empty RLMArray.
 
- @return An object (of the same type as returned from the objectClass selector).
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)lastObject;
 
@@ -106,21 +105,20 @@
  */
 
 /**
- Adds an object to the end of the RLMArray.
+ Adds an object to the end of the array.
  
  @warning This method can only be called during a write transaction.
  
- @param object  An object (of the same type as returned from the objectClass selector).
+ @param object  An RLMObject of the class contained by this RLMArray.
  */
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds an array of object to the bottom of the RLMTable.
+ Adds an array of objects at the end of the array.
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An NSArray or RLMArray of objects. The contained objects must be of the type returned
-                    from the objectClass selector.
+ @param objects     An NSArray or RLMArray of objects of the class contained by this RLMArray.
  */
 - (void)addObjectsFromArray:(id)objects;
 
@@ -131,7 +129,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param anObject  An object (of the same type as returned from the objectClass selector).
+ @param anObject  An object (of the same type as returned from the objectClassName selector).
  @param index   The array index at which the object is inserted.
  */
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
@@ -169,7 +167,7 @@
  @warning This method can only be called during a write transaction.
  
  @param index       The array index of the object to be replaced.
- @param anObject    An object (of the same type as returned from the objectClass selector).
+ @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
 
@@ -186,7 +184,7 @@
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param object  An object (of the same type as returned from the objectClass selector).
+ @param object  An object (of the same type as returned from the objectClassName selector).
  */
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
@@ -227,7 +225,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Aggregating Property Value
+ *  @name Aggregating Property Values
  *  ---------------------------------------------------------------------------------------
  */
 
@@ -236,9 +234,7 @@
  
  NSNumber *min = [array minOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to look for a minimum on. Only properties of type int, float and double are supported.
  
@@ -251,9 +247,7 @@
  
  NSNumber *max = [array maxOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
  
@@ -266,9 +260,7 @@
  
  NSNumber *sum = [array sumOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to calculate sum on. Only properties of type int, float and double are supported.
  
@@ -281,9 +273,7 @@
  
  NSNumber *average = [table averageOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to calculate average on. Only properties of type int, float and double are supported.
  
@@ -301,7 +291,7 @@
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns a JSON string of an RLMArray and all of its objects.
+ Returns the RLMArray and the RLMObjects it contains as a JSON string.
  
  @return    JSON string representation of this RLMArray.
  */
