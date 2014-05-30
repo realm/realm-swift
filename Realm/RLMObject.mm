@@ -187,7 +187,7 @@
 
 - (NSString *)description
 {
-    NSString *baseClassName = RLMClassNameFromAccessorClassName(self.className);
+    NSString *baseClassName = self.class.className;
     
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     

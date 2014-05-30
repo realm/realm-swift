@@ -376,20 +376,6 @@ Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
                                   NULL, RLMAccessorSetter, s_insertionAccessorCache);
 }
 
-NSString *RLMClassNameFromAccessorClassName(NSString *accessorClassName) {
-    NSArray *prefixes = @[@"RLMAccessor_",
-                          @"RLMReadOnly_",
-                          @"RLMInvalid_",
-                          @"RLMInserter_"];
-    NSString *className = accessorClassName;
-    for (NSString *prefix in prefixes) {
-        if ([accessorClassName rangeOfString:prefix].location == 0) {
-            className = [accessorClassName stringByReplacingOccurrencesOfString:prefix withString:@""];
-        }
-    }
-    return className;
-}
-
 // Dynamic accessor name for a classname
 inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
     return [NSString stringWithFormat:@"RLMDynamic_%@_Version_%lu", className, (unsigned long)version];

@@ -52,9 +52,6 @@ Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
-// get base class name from an accessor class name
-NSString *RLMClassNameFromAccessorClassName(NSString *accessorClassName);
-
 //
 // Dynamic accessor creation
 //
