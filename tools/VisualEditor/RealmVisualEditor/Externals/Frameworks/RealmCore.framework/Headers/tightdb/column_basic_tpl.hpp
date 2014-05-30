@@ -80,15 +80,15 @@ void BasicColumn<T>::clear()
     }
 
     ArrayParent* parent = m_array->get_parent();
-    std::size_t pndx = m_array->get_ndx_in_parent();
+    std::size_t ndx_in_parent = m_array->get_ndx_in_parent();
 
     // FIXME: ExceptionSafety: Array accessor as well as underlying
-    // array node is leaked if ArrayParent::update_child_ref() throws.
+    // array node is leaked if array->update_parent() throws.
 
     // Revert to generic array
-    BasicArray<T>* array = new BasicArray<T>(parent, pndx, m_array->get_alloc()); // Throws
-    if (parent)
-        parent->update_child_ref(pndx, array->get_ref()); // Throws
+    BasicArray<T>* array =
+        new BasicArray<T>(parent, ndx_in_parent, m_array->get_alloc()); // Throws
+    array->update_parent(); // Throws
 
     // Remove original node
     m_array->destroy_deep();
@@ -298,6 +298,70 @@ template<class T> ref_type BasicColumn<T>::write(size_t slice_offset, size_t sli
 }
 
 
+#ifdef TIGHTDB_ENABLE_REPLICATION
+
+template<class T>
+void BasicColumn<T>::refresh_after_advance_transact(std::size_t, const Spec&)
+{
+    // The type of the cached root array accessor may no longer match the
+    // underlying root node. In that case we need to replace it. Note that when
+    // the root node is an inner B+-tree node, then only the top array accessor
+    // of that node is cached. The top array accessor of an inner B+-tree node
+    // is of type Array.
+
+    ref_type root_ref = m_array->get_ref_from_parent();
+    MemRef root_mem(root_ref, m_array->get_alloc());
+    bool new_root_is_leaf = !Array::get_is_inner_bptree_node_from_header(root_mem.m_addr);
+    bool old_root_is_leaf = !m_array->is_inner_bptree_node();
+
+    bool root_type_changed = old_root_is_leaf != new_root_is_leaf;
+    if (!root_type_changed) {
+        // Keep, but refresh old root accessor
+        if (old_root_is_leaf) {
+            // Root is leaf
+            BasicArray<T>* root = static_cast<BasicArray<T>*>(m_array);
+            root->init_from_parent();
+            return;
+        }
+        // Root is inner node
+        Array* root = m_array;
+        root->init_from_parent();
+        return;
+    }
+
+    // Create new root accessor
+    Array* new_root;
+    ArrayParent* parent = m_array->get_parent();
+    std::size_t ndx_in_parent = m_array->get_ndx_in_parent();
+    Allocator& alloc = m_array->get_alloc();
+    if (new_root_is_leaf) {
+        // New root is leaf
+        new_root = new BasicArray<T>(root_mem, parent, ndx_in_parent, alloc); // Throws
+    }
+    else {
+        // New root is inner node
+        new_root = new Array(root_mem, parent, ndx_in_parent, alloc); // Throws
+    }
+
+    // Destroy old root accessor
+    if (old_root_is_leaf) {
+        // Old root is leaf
+        BasicArray<T>* old_root = static_cast<BasicArray<T>*>(m_array);
+        delete old_root;
+    }
+    else {
+        // Old root is inner node
+        Array* old_root = m_array;
+        delete old_root;
+    }
+
+    // Instate new root
+    m_array = new_root;
+}
+
+#endif // TIGHTDB_ENABLE_REPLICATION
+
+
 #ifdef TIGHTDB_DEBUG
 
 template<class T>
@@ -391,15 +455,14 @@ std::size_t BasicColumn<T>::find_first(T value, std::size_t begin, std::size_t e
 }
 
 template<class T>
-void BasicColumn<T>::find_all(Array &result, T value, std::size_t begin, std::size_t end) const
+void BasicColumn<T>::find_all(Column &result, T value, std::size_t begin, std::size_t end) const
 {
     TIGHTDB_ASSERT(begin <= size());
     TIGHTDB_ASSERT(end == npos || (begin <= end && end <= size()));
 
     if (root_is_leaf()) {
         std::size_t leaf_offset = 0;
-        static_cast<BasicArray<T>*>(m_array)->
-            find_all(result, value, leaf_offset, begin, end); // Throws
+        static_cast<BasicArray<T>*>(m_array)->find_all(&result, value, leaf_offset, begin, end); // Throws
         return;
     }
 
@@ -416,7 +479,7 @@ void BasicColumn<T>::find_all(Array &result, T value, std::size_t begin, std::si
         std::size_t ndx_in_leaf = p.second;
         std::size_t leaf_offset = ndx_in_tree - ndx_in_leaf;
         std::size_t end_in_leaf = std::min(leaf.size(), end - leaf_offset);
-        leaf.find_all(result, value, leaf_offset, ndx_in_leaf, end_in_leaf); // Throws
+        leaf.find_all(&result, value, leaf_offset, ndx_in_leaf, end_in_leaf); // Throws
         ndx_in_tree = leaf_offset + end_in_leaf;
     }
 }

@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <cstdlib>
 #include <cstdlib> // size_t
+#include <algorithm>
 
 #ifdef _MSC_VER
 #  include <win32/types.h>

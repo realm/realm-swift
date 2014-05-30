@@ -23,10 +23,6 @@
 #include <RealmCore/tightdb/column.hpp>
 #include <RealmCore/tightdb/array_basic.hpp>
 
-//
-// A BasicColumn can currently only be used for simple unstructured types like float, double.
-//
-
 namespace tightdb {
 
 template<class T> struct AggReturnType {
@@ -37,6 +33,12 @@ template<> struct AggReturnType<float> {
 };
 
 
+/// A basic column (BasicColumn<T>) is a single B+-tree, and the root
+/// of the column is the root of the B+-tree. All leaf nodes are
+/// single arrays of type BasicArray<T>.
+///
+/// A basic column can currently only be used for simple unstructured
+/// types like float, double.
 template<class T>
 class BasicColumn: public ColumnBase {
 public:
@@ -73,7 +75,7 @@ public:
     T minimum(std::size_t begin = 0, std::size_t end = npos,
               std::size_t limit = std::size_t(-1)) const;
     std::size_t find_first(T value, std::size_t begin = 0 , std::size_t end = npos) const;
-    void find_all(Array& result, T value, std::size_t begin = 0, std::size_t end = npos) const;
+    void find_all(Column& result, T value, std::size_t begin = 0, std::size_t end = npos) const;
 
     //@{
     /// Find the lower/upper bound for the specified value assuming
@@ -90,6 +92,10 @@ public:
     // Overrriding method in ColumnBase
     ref_type write(std::size_t, std::size_t, std::size_t,
                    _impl::OutputStream&) const TIGHTDB_OVERRIDE;
+
+#ifdef TIGHTDB_ENABLE_REPLICATION
+    void refresh_after_advance_transact(std::size_t, const Spec&) TIGHTDB_OVERRIDE;
+#endif
 
 #ifdef TIGHTDB_DEBUG
     void Verify() const TIGHTDB_OVERRIDE;

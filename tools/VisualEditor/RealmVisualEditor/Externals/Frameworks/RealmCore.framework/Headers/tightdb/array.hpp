@@ -183,16 +183,14 @@ class ArrayParent
 public:
     virtual ~ArrayParent() TIGHTDB_NOEXCEPT {}
 
-    // FIXME: Must be protected. Solve problem by having the Array constructor, that creates a new array, call it.
+protected:
     virtual void update_child_ref(std::size_t child_ndx, ref_type new_ref) = 0;
 
-protected:
     virtual ref_type get_child_ref(std::size_t child_ndx) const TIGHTDB_NOEXCEPT = 0;
 
 #ifdef TIGHTDB_DEBUG
     // Used only by Array::to_dot().
-    virtual std::pair<ref_type, std::size_t>
-    get_to_dot_parent(std::size_t ndx_in_parent) const = 0;
+    virtual std::pair<ref_type, std::size_t> get_to_dot_parent(std::size_t ndx_in_parent) const = 0;
 #endif
 
     friend class Array;
@@ -201,58 +199,52 @@ protected:
 
 /// Provides access to individual array nodes of the database.
 ///
-/// This class serves purely as an accessor, it assumes no ownership
-/// of the referenced memory.
+/// This class serves purely as an accessor, it assumes no ownership of the
+/// referenced memory.
 ///
-/// An array accessor can be in one of two states: attached or
-/// unattached. It is in the attached state if, and only if
-/// is_attached() returns true. Most non-static member functions of
-/// this class have undefined behaviour if the accessor is in the
-/// unattached state. The exceptions are: is_attached(), detach(),
-/// create(), init_from_ref(), init_from_mem(), has_parent(),
-/// get_parent(), set_parent(), get_ndx_in_parent(),
-/// adjust_ndx_in_parent().
+/// An array accessor can be in one of two states: attached or unattached. It is
+/// in the attached state if, and only if is_attached() returns true. Most
+/// non-static member functions of this class have undefined behaviour if the
+/// accessor is in the unattached state. The exceptions are: is_attached(),
+/// detach(), create(), init_from_ref(), init_from_mem(), init_from_parent(),
+/// has_parent(), get_parent(), set_parent(), get_ndx_in_parent(),
+/// set_ndx_in_parent(), adjust_ndx_in_parent(), and get_ref_from_parent().
 ///
-/// An array accessor contains information about the parent of the
-/// referenced array node. This 'reverse' reference is not explicitely
-/// present in the underlying node hierarchy, but it is needed when
-/// modifying an array. A modification may lead to relocation of the
-/// underlying array node, and the parent must be updated
-/// accordingly. Since this applies recursivly all the way to the root
-/// node, it is essential that the entire chain of parent accessors is
-/// constructed and propperly maintained when a particular array is
+/// An array accessor contains information about the parent of the referenced
+/// array node. This 'reverse' reference is not explicitely present in the
+/// underlying node hierarchy, but it is needed when modifying an array. A
+/// modification may lead to relocation of the underlying array node, and the
+/// parent must be updated accordingly. Since this applies recursivly all the
+/// way to the root node, it is essential that the entire chain of parent
+/// accessors is constructed and propperly maintained when a particular array is
 /// modified.
 ///
-/// The parent reference (`pointer to parent`, `index in parent`) is
-/// updated independently from the state of attachment to an
-/// underlying node. In particular, the parent reference remains valid
-/// and is unannfected by changes in attachment. These two aspects of
-/// the state of the accessor is updated independently, and it is
-/// entirely the responsibility of the caller to update them such that
-/// they are consistent with the underlying node hierarchy before
+/// The parent reference (`pointer to parent`, `index in parent`) is updated
+/// independently from the state of attachment to an underlying node. In
+/// particular, the parent reference remains valid and is unannfected by changes
+/// in attachment. These two aspects of the state of the accessor is updated
+/// independently, and it is entirely the responsibility of the caller to update
+/// them such that they are consistent with the underlying node hierarchy before
 /// calling any method that modifies the underlying array node.
 ///
-/// FIXME: This class currently has aspects of ownership, in
-/// particular the constructors that allocate underlying memory. On
-/// the other hand, the destructor never frees the memory. This is a
-/// disastrous situation, because it so easily becomes an obscure
-/// source of leaks. There are three options for a fix of which the
-/// third is most attractive but hardest to implement: (1) Remove all
-/// traces of ownership semantics, that is, remove the constructors
-/// that allocate memory, but keep the trivial copy constructor. For
-/// this to work, it is important that the constness of the accessor
-/// has nothing to do with the constness of the underlying memory,
-/// otherwise constness can be violated simply by copying the
-/// accessor. (2) Disallov copying but associate the constness of the
-/// accessor with the constness of the underlying memory. (3) Provide
-/// full ownership semantics like is done for Table accessors, and
-/// provide a proper copy constructor that really produces a copy of
-/// the array. For this to work, the class should assume ownership if,
-/// and only if there is no parent. A copy produced by a copy
-/// constructor will not have a parent. Even if the original was part
-/// of a database, the copy will be free-standing, that is, not be
-/// part of any database. For intra, or inter database copying, one
-/// would have to also specify the target allocator.
+/// FIXME: This class currently has fragments of ownership, in particular the
+/// constructors that allocate underlying memory. On the other hand, the
+/// destructor never frees the memory. This is a disastrous situation, because
+/// it so easily becomes an obscure source of leaks. There are three options for
+/// a fix of which the third is most attractive but hardest to implement: (1)
+/// Remove all traces of ownership semantics, that is, remove the constructors
+/// that allocate memory, but keep the trivial copy constructor. For this to
+/// work, it is important that the constness of the accessor has nothing to do
+/// with the constness of the underlying memory, otherwise constness can be
+/// violated simply by copying the accessor. (2) Disallov copying but associate
+/// the constness of the accessor with the constness of the underlying
+/// memory. (3) Provide full ownership semantics like is done for Table
+/// accessors, and provide a proper copy constructor that really produces a copy
+/// of the array. For this to work, the class should assume ownership if, and
+/// only if there is no parent. A copy produced by a copy constructor will not
+/// have a parent. Even if the original was part of a database, the copy will be
+/// free-standing, that is, not be part of any database. For intra, or inter
+/// database copying, one would have to also specify the target allocator.
 class Array: public ArrayParent {
 public:
 
@@ -262,21 +254,20 @@ public:
     /// Create an array in the unattached state.
     explicit Array(Allocator&) TIGHTDB_NOEXCEPT;
 
-    /// Initialize an array wrapper from the specified memory
-    /// reference.
+    /// Initialize an array wrapper from the specified memory reference.
     Array(MemRef, ArrayParent*, std::size_t ndx_in_parent, Allocator&) TIGHTDB_NOEXCEPT;
 
-    /// Initialize an array wrapper from the specified memory
-    /// reference. Note that the version taking a MemRef argument is
-    /// slightly faster, because it does not need to map the 'ref' to
-    /// a memory pointer.
+    /// Initialize an array wrapper from the specified memory reference. Note
+    /// that the version taking a MemRef argument is slightly faster, because it
+    /// does not need to map the 'ref' to a memory pointer.
     Array(ref_type, ArrayParent*, std::size_t ndx_in_parent, Allocator&) TIGHTDB_NOEXCEPT;
 
-    /// Create a new array as a copy of the specified array using the
-    /// specified allocator.
+    /// Create a new array as a copy of the specified array using the specified
+    /// allocator.
     Array(const Array&, Allocator&);
 
-    // Fastest way to instantiate an array, if you just want to utilize its methods
+    // Fastest way to instantiate an array, if you just want to utilize its
+    // methods
     struct no_prealloc_tag {};
     explicit Array(no_prealloc_tag) TIGHTDB_NOEXCEPT;
 
@@ -285,116 +276,112 @@ public:
     enum Type {
         type_Normal,
 
-        /// This array is the main array of an innner node of a
-        /// B+-tree as used in table columns.
+        /// This array is the main array of an innner node of a B+-tree as used
+        /// in table columns.
         type_InnerBptreeNode,
 
-        /// This array may contain refs to subarrays. An element whose
-        /// least significant bit is zero, is a ref pointing to a
-        /// subarray. An element whose least significant bit is one,
-        /// is just a value. It is the responsibility of the
-        /// application to ensure that non-ref values have their least
-        /// significant bit set. This will generally be done by
-        /// shifting the desired vlue to the left by one bit position,
-        /// and then setting the vacated bit to one.
+        /// This array may contain refs to subarrays. An element whose least
+        /// significant bit is zero, is a ref pointing to a subarray. An element
+        /// whose least significant bit is one, is just a value. It is the
+        /// responsibility of the application to ensure that non-ref values have
+        /// their least significant bit set. This will generally be done by
+        /// shifting the desired vlue to the left by one bit position, and then
+        /// setting the vacated bit to one.
         type_HasRefs
     };
 
-    /// FIXME: Deprecated. The constructor must not allocate anything
-    /// that the destructor does not deallocate.
+    /// FIXME: Deprecated. The constructor must not allocate anything that the
+    /// destructor does not deallocate.
     ///
-    /// Create a new array, and if \a parent and \a ndx_in_parent are
-    /// specified, update the parent to point to this new array.
+    /// Create a new array, and if \a parent and \a ndx_in_parent are specified,
+    /// update the parent to point to this new array.
     ///
-    /// Note that if no parent is specified, the caller assumes
-    /// ownership of the allocated underlying node. It is not owned by
-    /// the accessor.
+    /// Note that if no parent is specified, the caller assumes ownership of the
+    /// allocated underlying node. It is not owned by the accessor.
     ///
-    /// FIXME: If the Array class is to continue to function as an
-    /// accessor class and have no ownership of the underlying memory,
-    /// then this constructor must be removed. The problem is that
-    /// memory will be leaked when it is used to construct members of
-    /// a bigger class (such as Group) and something fails before the
-    /// constructor of the bigger class completes. Roughly speaking, a
-    /// resource must be allocated in the constructor when, and only
-    /// when it is released in the destructor (RAII). Anything else
-    /// constitutes a "disaster waiting to happen".
+    /// FIXME: If the Array class is to continue to function as an accessor
+    /// class and have no ownership of the underlying memory, then this
+    /// constructor must be removed. The problem is that memory will be leaked
+    /// when it is used to construct members of a bigger class (such as Group)
+    /// and something fails before the constructor of the bigger class
+    /// completes. Roughly speaking, a resource must be allocated in the
+    /// constructor when, and only when it is released in the destructor
+    /// (RAII). Anything else constitutes a "disaster waiting to happen".
     explicit Array(Type type = type_Normal, ArrayParent* = 0, std::size_t ndx_in_parent = 0,
                    Allocator& = Allocator::get_default());
 
-    /// Create a new empty array of the specified type and attach this
-    /// accessor to it. This does not modify the parent reference
-    /// information of this accessor.
+    /// Create a new empty array of the specified type and attach this accessor
+    /// to it. This does not modify the parent reference information of this
+    /// accessor.
     ///
-    /// Note that the caller assumes ownership of the allocated
-    /// underlying node. It is not owned by the accessor.
+    /// Note that the caller assumes ownership of the allocated underlying
+    /// node. It is not owned by the accessor.
     ///
     /// FIXME: Belongs in IntegerArray
     void create(Type, bool context_flag = false);
 
     /// Reinitialize this array accessor to point to the specified new
-    /// underlying memory. This does not modify the parent reference
-    /// information of this accessor.
+    /// underlying memory. This does not modify the parent reference information
+    /// of this accessor.
     void init_from_ref(ref_type) TIGHTDB_NOEXCEPT;
 
-    /// Same as init_from_ref(ref_type) but avoid the mapping of 'ref'
-    /// to memory pointer.
+    /// Same as init_from_ref(ref_type) but avoid the mapping of 'ref' to memory
+    /// pointer.
     void init_from_mem(MemRef) TIGHTDB_NOEXCEPT;
 
-    /// Update the parents reference to this child. This requires, of
-    /// course, that the parent information stored in this child is up
-    /// to date. If the parent pointer is set to null, this function
-    /// has no effect.
+    /// Same as `init_from_ref(get_ref_from_parent())`.
+    void init_from_parent() TIGHTDB_NOEXCEPT;
+
+    /// Update the parents reference to this child. This requires, of course,
+    /// that the parent information stored in this child is up to date. If the
+    /// parent pointer is set to null, this function has no effect.
     void update_parent();
 
-    /// Called in the context of Group::commit() to ensure that
-    /// attached accessors stay valid across a commit. Please note
-    /// that this works only for non-transactional commits. Accessors
-    /// obtained during a transaction are always detached when the
-    /// transaction ends.
+    /// Called in the context of Group::commit() to ensure that attached
+    /// accessors stay valid across a commit. Please note that this works only
+    /// for non-transactional commits. Accessors obtained during a transaction
+    /// are always detached when the transaction ends.
     ///
-    /// Returns true if, and only if the array has changed. If the
-    /// array has not cahnged, then its children are guaranteed to
-    /// also not have changed.
+    /// Returns true if, and only if the array has changed. If the array has not
+    /// cahnged, then its children are guaranteed to also not have changed.
     bool update_from_parent(std::size_t old_baseline) TIGHTDB_NOEXCEPT;
 
     /// Change the type of an already attached array node.
     ///
-    /// The effect of calling this function on an unattached accessor
-    /// is undefined.
+    /// The effect of calling this function on an unattached accessor is
+    /// undefined.
     void set_type(Type);
 
-    /// Construct a complete copy of this array (including its
-    /// subarrays) using the specified target allocator and return
-    /// just the reference to the underlying memory.
+    /// Construct a complete copy of this array (including its subarrays) using
+    /// the specified target allocator and return just the reference to the
+    /// underlying memory.
     MemRef clone_deep(Allocator& target_alloc) const;
 
     void move_assign(Array&) TIGHTDB_NOEXCEPT; // Move semantics for assignment
 
-    /// Construct an array of the specified type and size, and return
-    /// just the reference to the underlying memory. All elements will
-    /// be initialized to the specified value.
+    /// Construct an array of the specified type and size, and return just the
+    /// reference to the underlying memory. All elements will be initialized to
+    /// the specified value.
     ///
     /// FIXME: Belongs in IntegerArray
     static MemRef create_array(Type, bool context_flag, std::size_t size, int_fast64_t value,
                                Allocator&);
 
-    /// Construct an empty array of the specified type, and return
-    /// just the reference to the underlying memory.
+    /// Construct an empty array of the specified type, and return just the
+    /// reference to the underlying memory.
     ///
     /// FIXME: Belongs in IntegerArray
     static MemRef create_empty_array(Type, bool context_flag, Allocator&);
 
-    /// Construct a shallow copy of the specified slice of this array
-    /// using the specified target allocator. Subarrays will **not**
-    /// be cloned. See slice_and_clone_children() for an alternative.
+    /// Construct a shallow copy of the specified slice of this array using the
+    /// specified target allocator. Subarrays will **not** be cloned. See
+    /// slice_and_clone_children() for an alternative.
     ///
     /// FIXME: Belongs in IntegerArray
     MemRef slice(std::size_t offset, std::size_t size, Allocator& target_alloc) const;
 
-    /// Construct a deep copy of the specified slice of this array
-    /// using the specified target allocator. Subarrays will be
-    /// cloned.
+    /// Construct a deep copy of the specified slice of this array using the
+    /// specified target allocator. Subarrays will be cloned.
     ///
     /// FIXME: Belongs in IntegerArray
     MemRef slice_and_clone_children(std::size_t offset, std::size_t size,
@@ -404,36 +391,43 @@ public:
     bool has_parent() const TIGHTDB_NOEXCEPT;
     ArrayParent* get_parent() const TIGHTDB_NOEXCEPT;
 
-    /// Setting a new parent affects ownership of the attached array
-    /// node, if any. If a non-null parent is specified, and there was
-    /// no parent originally, then the caller passes ownership to the
-    /// parent, and vice versa. This assumes, of course, that the
-    /// change in parentship reflects a corresponding change in the
-    /// list of children in the affected parents.
+    /// Setting a new parent affects ownership of the attached array node, if
+    /// any. If a non-null parent is specified, and there was no parent
+    /// originally, then the caller passes ownership to the parent, and vice
+    /// versa. This assumes, of course, that the change in parentship reflects a
+    /// corresponding change in the list of children in the affected parents.
     void set_parent(ArrayParent* parent, std::size_t ndx_in_parent) TIGHTDB_NOEXCEPT;
 
     std::size_t get_ndx_in_parent() const TIGHTDB_NOEXCEPT;
+    void set_ndx_in_parent(std::size_t) TIGHTDB_NOEXCEPT;
     void adjust_ndx_in_parent(int diff) TIGHTDB_NOEXCEPT;
+
+    /// Get the ref of this array as known to the parent. The caller must ensure
+    /// that the parent information ('pointer to parent' and 'index in parent')
+    /// is correct before calling this function.
+    ref_type get_ref_from_parent() TIGHTDB_NOEXCEPT;
 
     bool is_attached() const TIGHTDB_NOEXCEPT;
 
-    /// Detach from the underlying array node. This method has no
-    /// effect if the accessor is currently unattached (idempotency).
+    /// Detach from the underlying array node. This method has no effect if the
+    /// accessor is currently unattached (idempotency).
     void detach() TIGHTDB_NOEXCEPT;
 
     std::size_t size() const TIGHTDB_NOEXCEPT;
     bool is_empty() const TIGHTDB_NOEXCEPT;
     Type get_type() const TIGHTDB_NOEXCEPT;
 
+    // Exists for find_all() because array.hpp cannot append results directly to a Column type (incomplete class)
+    static void add_to_column(Column* column, int64_t value);
+
     void insert(std::size_t ndx, int_fast64_t value);
     void add(int_fast64_t value);
 
-    /// This function is guaranteed to not throw if the current width
-    /// is sufficient for the specified value (e.g. if you have called
-    /// ensure_minimum_width(value)) and
-    /// get_alloc().is_read_only(get_ref()) returns false
-    /// (noexcept:array-set). Note that for a value of zero, the first
-    /// criterion is trivially satisfied.
+    /// This function is guaranteed to not throw if the current width is
+    /// sufficient for the specified value (e.g. if you have called
+    /// ensure_minimum_width(value)) and get_alloc().is_read_only(get_ref())
+    /// returns false (noexcept:array-set). Note that for a value of zero, the
+    /// first criterion is trivially satisfied.
     void set(std::size_t ndx, int64_t value);
 
     template<std::size_t w> void Set(std::size_t ndx, int64_t value);
@@ -449,81 +443,70 @@ public:
     int64_t front() const TIGHTDB_NOEXCEPT;
     int64_t back() const TIGHTDB_NOEXCEPT;
 
-    /// Remove the element at the specified index, and move elements
-    /// at higher indexes to the next lower index.
+    /// Remove the element at the specified index, and move elements at higher
+    /// indexes to the next lower index.
     ///
-    /// This function does **not** destroy removed subarrays. That is,
-    /// if the erased element is a 'ref' pointing to a subarray, then
-    /// that subarray will not be destroyed automatically.
+    /// This function does **not** destroy removed subarrays. That is, if the
+    /// erased element is a 'ref' pointing to a subarray, then that subarray
+    /// will not be destroyed automatically.
     ///
     /// This function guarantees that no exceptions will be thrown if
-    /// get_alloc().is_read_only(get_ref()) would return false before
-    /// the call. This is automatically guaranteed if the array is
-    /// used in a non-transactional context, or if the array has
-    /// already been successfully modified within the current write
-    /// transaction.
+    /// get_alloc().is_read_only(get_ref()) would return false before the
+    /// call. This is automatically guaranteed if the array is used in a
+    /// non-transactional context, or if the array has already been successfully
+    /// modified within the current write transaction.
     void erase(std::size_t ndx);
 
-    /// Same as erase(std::size_t), but remove all elements in the
-    /// specified range.
+    /// Same as erase(std::size_t), but remove all elements in the specified
+    /// range.
     ///
-    /// Please note that this function does **not** destroy removed
-    /// subarrays.
+    /// Please note that this function does **not** destroy removed subarrays.
     ///
     /// This function guarantees that no exceptions will be thrown if
-    /// get_alloc().is_read_only(get_ref()) would return false before
-    /// the call.
+    /// get_alloc().is_read_only(get_ref()) would return false before the call.
     void erase(std::size_t begin, std::size_t end);
 
-    /// Reduce the size of this array to the specified number of
-    /// elements. It is an error to specify a size that is greater
-    /// than the current size of this array. The effect of doing so is
-    /// undefined. This is just a shorthand for calling the ranged
-    /// erase() function with appropriate arguments.
+    /// Reduce the size of this array to the specified number of elements. It is
+    /// an error to specify a size that is greater than the current size of this
+    /// array. The effect of doing so is undefined. This is just a shorthand for
+    /// calling the ranged erase() function with appropriate arguments.
     ///
     /// Please note that this function does **not** destroy removed
-    /// subarrays. See clear_and_destroy_children() for an
-    /// alternative.
+    /// subarrays. See clear_and_destroy_children() for an alternative.
     ///
     /// This function guarantees that no exceptions will be thrown if
-    /// get_alloc().is_read_only(get_ref()) would return false before
-    /// the call.
+    /// get_alloc().is_read_only(get_ref()) would return false before the call.
     void truncate(std::size_t size);
 
-    /// Reduce the size of this array to the specified number of
-    /// elements. It is an error to specify a size that is greater
-    /// than the current size of this array. The effect of doing so is
-    /// undefined. Subarrays will be destroyed recursively, as if by a
-    /// call to `destroy_deep(ubarray_ref, alloc)`.
+    /// Reduce the size of this array to the specified number of elements. It is
+    /// an error to specify a size that is greater than the current size of this
+    /// array. The effect of doing so is undefined. Subarrays will be destroyed
+    /// recursively, as if by a call to `destroy_deep(ubarray_ref, alloc)`.
     ///
     /// This function is guaranteed not to throw if
     /// get_alloc().is_read_only(get_ref()) returns false.
     void truncate_and_destroy_children(std::size_t size);
 
-    /// Remove every element from this array. This is just a shorthand
-    /// for calling truncate(0).
+    /// Remove every element from this array. This is just a shorthand for
+    /// calling truncate(0).
     ///
     /// Please note that this function does **not** destroy removed
-    /// subarrays. See clear_and_destroy_children() for an
-    /// alternative.
+    /// subarrays. See clear_and_destroy_children() for an alternative.
     ///
     /// This function guarantees that no exceptions will be thrown if
-    /// get_alloc().is_read_only(get_ref()) would return false before
-    /// the call.
+    /// get_alloc().is_read_only(get_ref()) would return false before the call.
     void clear();
 
-    /// Remove every element in this array. Subarrays will be
-    /// destroyed recursively, as if by a call to
-    /// `destroy_deep(ubarray_ref, alloc)`. This is just a shorthand
-    /// for calling truncate_and_destroy_children(0).
+    /// Remove every element in this array. Subarrays will be destroyed
+    /// recursively, as if by a call to `destroy_deep(ubarray_ref, alloc)`. This
+    /// is just a shorthand for calling truncate_and_destroy_children(0).
     ///
     /// This function guarantees that no exceptions will be thrown if
-    /// get_alloc().is_read_only(get_ref()) would return false before
-    /// the call.
+    /// get_alloc().is_read_only(get_ref()) would return false before the call.
     void clear_and_destroy_children();
 
-    /// If neccessary, expand the representation so that it can store
-    /// the specified value.
+    /// If neccessary, expand the representation so that it can store the
+    /// specified value.
     void ensure_minimum_width(int64_t value);
 
     // Direct access methods
@@ -532,12 +515,12 @@ public:
 
     typedef StringData (*StringGetter)(void*, std::size_t); // Pre-declare getter function from string index
     size_t IndexStringFindFirst(StringData value, void* column, StringGetter get_func) const;
-    void   IndexStringFindAll(Array& result, StringData value, void* column, StringGetter get_func) const;
+    void   IndexStringFindAll(Column& result, StringData value, void* column, StringGetter get_func) const;
     size_t IndexStringCount(StringData value, void* column, StringGetter get_func) const;
     FindRes IndexStringFindAllNoCopy(StringData value, size_t& res_ref, void* column, StringGetter get_func) const;
 
-    /// This one may change the represenation of the array, so be
-    /// carefull if you call it after ensure_minimum_width().
+    /// This one may change the represenation of the array, so be carefull if
+    /// you call it after ensure_minimum_width().
     void set_all_to_zero();
 
     /// Add \a diff to the element at the specified index.
@@ -546,32 +529,30 @@ public:
     /// Add \a diff to all the elements in the specified index range.
     void adjust(std::size_t begin, std::size_t end, int_fast64_t diff);
 
-    /// Add \a diff to all elements that are greater than, or equal to
-    /// the specified limit.
+    /// Add \a diff to all elements that are greater than, or equal to the
+    /// specified limit.
     void adjust_ge(int_fast64_t limit, int_fast64_t diff);
 
     //@{
-    /// These are similar in spirit to std::move() and
-    /// std::move_backward from <algorithm>. \a dest_begin must not be
-    /// in the range [`begin`,`end`), and \a dest_end must not be in
-    /// the range (`begin`,`end`].
+    /// These are similar in spirit to std::move() and std::move_backward from
+    /// <algorithm>. \a dest_begin must not be in the range [`begin`,`end`), and
+    /// \a dest_end must not be in the range (`begin`,`end`].
     ///
     /// These functions are guaranteed to not throw if
-    /// get_alloc().is_read_only(get_ref()) returns false.
+    /// `get_alloc().is_read_only(get_ref())` returns false.
     void move(std::size_t begin, std::size_t end, std::size_t dest_begin);
     void move_backward(std::size_t begin, std::size_t end, std::size_t dest_end);
     //@}
 
     //@{
-    /// Find the lower/upper bound of the specified value in a
-    /// sequence of integers which must already be sorted ascendingly.
+    /// Find the lower/upper bound of the specified value in a sequence of
+    /// integers which must already be sorted ascendingly.
     ///
-    /// For an integer value '`v`', lower_bound_int(v) returns the
-    /// index '`l`' of the first element such that `get(l) &ge; v`,
-    /// and upper_bound_int(v) returns the index '`u`' of the first
-    /// element such that `get(u) &gt; v`. In both cases, if no such
-    /// element is found, the returned value is the number of elements
-    /// in the array.
+    /// For an integer value '`v`', lower_bound_int(v) returns the index '`l`'
+    /// of the first element such that `get(l) &ge; v`, and upper_bound_int(v)
+    /// returns the index '`u`' of the first element such that `get(u) &gt;
+    /// v`. In both cases, if no such element is found, the returned value is
+    /// the number of elements in the array.
     ///
     ///     3 3 3 4 4 4 5 6 7 9 9 9
     ///     ^     ^     ^     ^     ^
@@ -592,8 +573,8 @@ public:
     /// We currently use binary search. See for example
     /// http://www.tbray.org/ongoing/When/200x/2003/03/22/Binary.
     ///
-    /// FIXME: It may be worth considering if overall efficiency can
-    /// be improved by doing a linear search for short sequences.
+    /// FIXME: It may be worth considering if overall efficiency can be improved
+    /// by doing a linear search for short sequences.
     std::size_t lower_bound_int(int64_t value) const TIGHTDB_NOEXCEPT;
     std::size_t upper_bound_int(int64_t value) const TIGHTDB_NOEXCEPT;
     //@}
@@ -609,24 +590,27 @@ public:
     void sort();
     void ReferenceSort(Array& ref) const;
 
-    bool is_inner_bptree_node() const TIGHTDB_NOEXCEPT { return m_is_inner_bptree_node; }
+    /// This information is guaranteed to be cached in the array accessor.
+    bool is_inner_bptree_node() const TIGHTDB_NOEXCEPT;
 
     /// Returns true if type is either type_HasRefs or type_InnerColumnNode
-    bool has_refs() const TIGHTDB_NOEXCEPT { return m_has_refs; }
+    ///
+    /// This information is guaranteed to be cached in the array accessor.
+    bool has_refs() const TIGHTDB_NOEXCEPT;
 
-    // Columns and indexes can use the context bit to diffentiate leaf types
-    bool get_context_flag() const TIGHTDB_NOEXCEPT { return get_context_flag_from_header(); }
-    void set_context_flag(bool value) { set_header_context_flag(value); }
-    bool is_index_node() const  TIGHTDB_NOEXCEPT { return get_context_flag_from_header(); }
-    void set_is_index_node(bool value) { set_header_context_flag(value); }
+    /// This information is guaranteed to be cached in the array accessor.
+    ///
+    /// Columns and indexes can use the context bit to diffentiate leaf types
+    bool get_context_flag() const TIGHTDB_NOEXCEPT;
+    void set_context_flag(bool) TIGHTDB_NOEXCEPT;
 
-    ref_type get_ref() const TIGHTDB_NOEXCEPT { return m_ref; }
-    MemRef get_mem() const TIGHTDB_NOEXCEPT { return MemRef(get_header_from_data(m_data), m_ref); }
+    ref_type get_ref() const TIGHTDB_NOEXCEPT;
+    MemRef get_mem() const TIGHTDB_NOEXCEPT;
 
-    /// Destroy only the array that this accessor is attached to, not
-    /// the children of that array. See non-static destroy_deep() for
-    /// an alternative. If this accessor is already in the detached
-    /// state, this function has no effect (idempotency).
+    /// Destroy only the array that this accessor is attached to, not the
+    /// children of that array. See non-static destroy_deep() for an
+    /// alternative. If this accessor is already in the detached state, this
+    /// function has no effect (idempotency).
     void destroy() TIGHTDB_NOEXCEPT;
 
     /// Recursively destroy children (as if calling
@@ -636,28 +620,26 @@ public:
     /// state, this function has no effect (idempotency).
     void destroy_deep() TIGHTDB_NOEXCEPT;
 
-    /// Destroy only the array pointed to be the specified 'ref', not
-    /// its children. See static destroy_deep() for an alternative.
+    /// Destroy only the array pointed to be the specified 'ref', not its
+    /// children. See static destroy_deep() for an alternative.
     static void destroy(ref_type, Allocator&) TIGHTDB_NOEXCEPT;
 
-    /// Destroy the array pointed to be the specified 'ref' and all of
-    /// its children recursively.
+    /// Destroy the array pointed to be the specified 'ref' and all of its
+    /// children recursively.
     ///
-    /// This is done by freeing the array node pointed to by the
-    /// specified 'ref' after calling destroy_deep() on every
-    /// contained 'ref' element.
+    /// This is done by freeing the array node pointed to by the specified 'ref'
+    /// after calling destroy_deep() on every contained 'ref' element.
     static void destroy_deep(ref_type, Allocator&) TIGHTDB_NOEXCEPT;
 
     Allocator& get_alloc() const TIGHTDB_NOEXCEPT { return m_alloc; }
 
     // Serialization
 
-    /// Returns the position in the target where the first byte of
-    /// this array was written.
+    /// Returns the position in the target where the first byte of this array
+    /// was written.
     ///
-    /// The number of bytes that will be written by a non-recursive
-    /// invocation of this function is exactly the number returned by
-    /// get_byte_size().
+    /// The number of bytes that will be written by a non-recursive invocation
+    /// of this function is exactly the number returned by get_byte_size().
     template<class S>
     std::size_t write(S& target, bool recurse = true, bool persist = false) const;
 
@@ -703,7 +685,7 @@ public:
     std::size_t find_first(int64_t value, std::size_t start = 0,
                            std::size_t end = std::size_t(-1)) const;
 
-    void find_all(Array& result, int64_t value, std::size_t col_offset = 0,
+    void find_all(Column* result, int64_t value, std::size_t col_offset = 0,
                   std::size_t begin = 0, std::size_t end = std::size_t(-1)) const;
 
     std::size_t find_first(int64_t value, std::size_t begin = 0,
@@ -920,8 +902,6 @@ public:
     // FIXME: Should not be public
     mutable char* m_data; // Points to first byte after header
 
-    static bool is_index_node(ref_type, const Allocator&);
-
     static char* get_data_from_header(char*) TIGHTDB_NOEXCEPT;
     static char* get_header_from_data(char*) TIGHTDB_NOEXCEPT;
     static const char* get_data_from_header(const char*) TIGHTDB_NOEXCEPT;
@@ -1065,6 +1045,7 @@ protected:
     std::size_t m_width;    // Size of an element (meaning depend on type of array).
     bool m_is_inner_bptree_node; // This array is an inner node of B+-tree.
     bool m_has_refs;        // Elements whose first bit is zero are refs to subarrays.
+    bool m_context_flag;    // Meaning depends on context.
 
 private:
     ArrayParent* m_parent;
@@ -1209,7 +1190,7 @@ public:
             return false;
     }
 
-    void init(Action action, Array* akku, size_t limit)
+    void init(Action action, Column* akku, size_t limit)
     {
         m_match_count = 0;
         m_limit = limit;
@@ -1266,8 +1247,9 @@ public:
             m_state++;
             m_match_count = size_t(m_state);
         }
-        else if (action == act_FindAll)
-            (reinterpret_cast<Array*>(m_state))->add(index);
+        else if (action == act_FindAll) {
+            Array::add_to_column(reinterpret_cast<Column*>(m_state), index);
+        }
         else if (action == act_ReturnFirst) {
             m_state = index;
             return false;
@@ -1336,19 +1318,18 @@ public:
 
 
 
-// FIXME: Only members m_data, m_parent, m_ndx_in_parent, and m_alloc
-// should be initialized here. All other members must be initialized
-// by create() and init_from_*().
 inline Array::Array(Allocator& alloc) TIGHTDB_NOEXCEPT:
-    m_data(0), m_ref(0), m_size(0), m_capacity(0), m_width(std::size_t(-1)),
-    m_is_inner_bptree_node(false), m_parent(0), m_ndx_in_parent(0), m_alloc(alloc)
+    m_data(0),
+    m_parent(0),
+    m_ndx_in_parent(0),
+    m_alloc(alloc)
 {
 }
 
 inline Array::Array(Type type, ArrayParent* parent, std::size_t pndx, Allocator& alloc):
-    m_data(0), m_size(0), m_capacity(0), m_width(0), m_is_inner_bptree_node(false),
-    m_has_refs(false), m_parent(parent), m_ndx_in_parent(pndx), m_alloc(alloc),
-    m_lbound(0), m_ubound(0)
+    m_parent(parent),
+    m_ndx_in_parent(pndx),
+    m_alloc(alloc)
 {
     create(type); // Throws
     update_parent(); // Throws
@@ -1356,25 +1337,26 @@ inline Array::Array(Type type, ArrayParent* parent, std::size_t pndx, Allocator&
 
 inline Array::Array(MemRef mem, ArrayParent* parent, std::size_t ndx_in_parent,
                     Allocator& alloc) TIGHTDB_NOEXCEPT:
-    m_data(0), m_size(0), m_capacity(0), m_width(0), m_is_inner_bptree_node(false),
-    m_has_refs(false), m_parent(parent), m_ndx_in_parent(ndx_in_parent), m_alloc(alloc),
-    m_lbound(0), m_ubound(0)
+    m_parent(parent),
+    m_ndx_in_parent(ndx_in_parent),
+    m_alloc(alloc)
 {
     init_from_mem(mem);
 }
 
 inline Array::Array(ref_type ref, ArrayParent* parent, std::size_t pndx,
                     Allocator& alloc) TIGHTDB_NOEXCEPT:
-    m_data(0), m_size(0), m_capacity(0), m_width(0), m_is_inner_bptree_node(false),
-    m_has_refs(false), m_parent(parent), m_ndx_in_parent(pndx), m_alloc(alloc),
-    m_lbound(0), m_ubound(0)
+    m_parent(parent),
+    m_ndx_in_parent(pndx),
+    m_alloc(alloc)
 {
     init_from_ref(ref);
 }
 
 inline Array::Array(const Array& array, Allocator& alloc):
-    m_data(0), m_size(0), m_capacity(0), m_width(0), m_is_inner_bptree_node(false),
-    m_has_refs(false), m_parent(0), m_ndx_in_parent(0), m_alloc(alloc), m_lbound(0), m_ubound(0)
+    m_parent(0),
+    m_ndx_in_parent(0),
+    m_alloc(alloc)
 {
     MemRef mem = array.clone_deep(alloc); // Throws
     init_from_mem(mem);
@@ -1395,11 +1377,19 @@ inline void Array::create(Type type, bool context_flag)
     init_from_mem(mem);
 }
 
+
 inline void Array::init_from_ref(ref_type ref) TIGHTDB_NOEXCEPT
 {
     TIGHTDB_ASSERT(ref);
     char* header = m_alloc.translate(ref);
     init_from_mem(MemRef(header, ref));
+}
+
+
+inline void Array::init_from_parent() TIGHTDB_NOEXCEPT
+{
+    ref_type ref = get_ref_from_parent();
+    init_from_ref(ref);
 }
 
 
@@ -1463,13 +1453,36 @@ inline ref_type Array::get_as_ref(std::size_t ndx) const TIGHTDB_NOEXCEPT
     return to_ref(v);
 }
 
-
-inline bool Array::is_index_node(ref_type ref, const Allocator& alloc)
+inline bool Array::is_inner_bptree_node() const TIGHTDB_NOEXCEPT
 {
-    TIGHTDB_ASSERT(ref);
-    return get_context_flag_from_header(alloc.translate(ref));
+    return m_is_inner_bptree_node;
 }
 
+inline bool Array::has_refs() const TIGHTDB_NOEXCEPT
+{
+    return m_has_refs;
+}
+
+inline bool Array::get_context_flag() const TIGHTDB_NOEXCEPT
+{
+    return m_context_flag;
+}
+
+inline void Array::set_context_flag(bool value) TIGHTDB_NOEXCEPT
+{
+    m_context_flag = value;
+    set_header_context_flag(value);
+}
+
+inline ref_type Array::get_ref() const TIGHTDB_NOEXCEPT
+{
+    return m_ref;
+}
+
+inline MemRef Array::get_mem() const TIGHTDB_NOEXCEPT
+{
+    return MemRef(get_header_from_data(m_data), m_ref);
+}
 
 inline void Array::destroy() TIGHTDB_NOEXCEPT
 {
@@ -1514,14 +1527,14 @@ inline void Array::erase(std::size_t ndx)
 
 inline void Array::erase(std::size_t begin, std::size_t end)
 {
-    // This can throw, but only if array is currently in read-only
-    // memory.
-    if (begin != end)
+    if (begin != end) {
+        // This can throw, but only if array is currently in read-only memory.
         move(end, size(), begin); // Throws
 
-    // Update size (also in header)
-    m_size -= end - begin;
-    set_header_size(m_size);
+        // Update size (also in header)
+        m_size -= end - begin;
+        set_header_size(m_size);
+    }
 }
 
 inline void Array::clear()
@@ -1911,8 +1924,7 @@ template<class S> std::size_t Array::write(S& out, bool recurse, bool persist) c
     // Temp array for updated refs
     Array new_refs(Allocator::get_default());
     Type type = m_is_inner_bptree_node ? type_InnerBptreeNode : type_HasRefs;
-    bool context_flag = get_context_flag();
-    new_refs.create(type, context_flag); // Throws
+    new_refs.create(type, m_context_flag); // Throws
 
     try {
         // First write out all sub-arrays
@@ -1961,6 +1973,7 @@ inline MemRef Array::clone_deep(Allocator& target_alloc) const
 
 inline void Array::move_assign(Array& a) TIGHTDB_NOEXCEPT
 {
+    TIGHTDB_ASSERT(&get_alloc() == &a.get_alloc());
     // FIXME: Be carefull with the old parent info here. Should it be
     // copied?
 
@@ -2008,12 +2021,23 @@ inline std::size_t Array::get_ndx_in_parent() const TIGHTDB_NOEXCEPT
     return m_ndx_in_parent;
 }
 
+inline void Array::set_ndx_in_parent(std::size_t ndx) TIGHTDB_NOEXCEPT
+{
+    m_ndx_in_parent = ndx;
+}
+
 inline void Array::adjust_ndx_in_parent(int diff) TIGHTDB_NOEXCEPT
 {
     // Note that `diff` is promoted to an unsigned type, and that
     // C++03 still guarantees the expected result regardless of the
     // sizes of `int` and `decltype(m_ndx_in_parent)`.
     m_ndx_in_parent += diff;
+}
+
+inline ref_type Array::get_ref_from_parent() TIGHTDB_NOEXCEPT
+{
+    ref_type ref = m_parent->get_child_ref(m_ndx_in_parent);
+    return ref;
 }
 
 inline bool Array::is_attached() const TIGHTDB_NOEXCEPT

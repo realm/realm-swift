@@ -536,7 +536,7 @@ public:
     {
         // Simply return index of first table row which is >= start
         size_t r;
-        r = m_tv.get_ref_column().FindGTE(start, m_next, null_ptr);
+        r = m_tv.get_ref_column().find_gte(start, m_next);
 
         if (r >= end)
             return not_found;
@@ -922,7 +922,7 @@ protected:
 
 template <class TConditionFunction> class BinaryNode: public ParentNode {
 public:
-    template <Action TAction> int64_t find_all(Array* /*res*/, size_t /*start*/, size_t /*end*/, size_t /*limit*/, size_t /*source_column*/) {TIGHTDB_ASSERT(false); return 0;}
+    template <Action TAction> int64_t find_all(Column* /*res*/, size_t /*start*/, size_t /*end*/, size_t /*limit*/, size_t /*source_column*/) {TIGHTDB_ASSERT(false); return 0;}
 
     BinaryNode(BinaryData v, size_t column)
     {
@@ -977,7 +977,7 @@ protected:
 template <class TConditionFunction> class StringNode: public ParentNode {
 public:
     template <Action TAction>
-    int64_t find_all(Array*, size_t, size_t, size_t, size_t)
+    int64_t find_all(Column*, size_t, size_t, size_t, size_t)
     {
         TIGHTDB_ASSERT(false);
         return 0;
@@ -1118,7 +1118,7 @@ protected:
 template<> class StringNode<Equal>: public ParentNode {
 public:
     template <Action TAction>
-    int64_t find_all(Array*, size_t, size_t, size_t, size_t)
+    int64_t find_all(Column*, size_t, size_t, size_t, size_t)
     {
         TIGHTDB_ASSERT(false);
         return 0;
@@ -1381,7 +1381,7 @@ private:
 //
 class OrNode: public ParentNode {
 public:
-    template <Action TAction> int64_t find_all(Array*, size_t, size_t, size_t, size_t)
+    template <Action TAction> int64_t find_all(Column*, size_t, size_t, size_t, size_t)
     {
         TIGHTDB_ASSERT(false);
         return 0;
@@ -1468,7 +1468,7 @@ private:
 
 class NotNode: public ParentNode {
 public:
-    template <Action TAction> int64_t find_all(Array*, size_t, size_t, size_t, size_t)
+    template <Action TAction> int64_t find_all(Column*, size_t, size_t, size_t, size_t)
     {
         TIGHTDB_ASSERT(false);
         return 0;
@@ -1555,7 +1555,7 @@ private:
 // Compare two columns with eachother row-by-row
 template <class TConditionValue, class TConditionFunction> class TwoColumnsNode: public ParentNode {
 public:
-    template <Action TAction> int64_t find_all(Array* /*res*/, size_t /*start*/, size_t /*end*/, size_t /*limit*/, size_t /*source_column*/) {TIGHTDB_ASSERT(false); return 0;}
+    template <Action TAction> int64_t find_all(Column* /*res*/, size_t /*start*/, size_t /*end*/, size_t /*limit*/, size_t /*source_column*/) {TIGHTDB_ASSERT(false); return 0;}
 
     TwoColumnsNode(size_t column1, size_t column2)
     {

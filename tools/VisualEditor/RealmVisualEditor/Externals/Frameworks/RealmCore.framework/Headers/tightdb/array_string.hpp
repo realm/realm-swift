@@ -50,7 +50,7 @@ public:
                       std::size_t end = npos) const TIGHTDB_NOEXCEPT;
     std::size_t find_first(StringData value, std::size_t begin = 0,
                            std::size_t end = npos) const TIGHTDB_NOEXCEPT;
-    void find_all(Array& result, StringData value, std::size_t add_offset = 0,
+    void find_all(Column& result, StringData value, std::size_t add_offset = 0,
                   std::size_t begin = 0, std::size_t end = npos);
 
     /// Compare two string arrays for equality.

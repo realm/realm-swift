@@ -24,6 +24,7 @@
 
 #include <RealmCore/tightdb/util/features.h>
 #include <RealmCore/tightdb/group.hpp>
+//#include <RealmCore/tightdb/commit_log.hpp>
 
 namespace tightdb {
 
@@ -158,15 +159,27 @@ public:
     // Has db been modified since last transaction?
     bool has_changed();
 
-    // Read transactions
+    // Transactions:
+
+    // Begin a new read transaction. Accessors obtained prior to this point
+    // are invalid (if they weren't already) and new accessors must be
+    // obtained from the group returned.
     const Group& begin_read();
+
+    // End a read transaction. Accessors are detached.
     void end_read() TIGHTDB_NOEXCEPT;
 
-    // Write transactions
+    // Begin a new write transaction. Accessors obtained prior to this point
+    // are invalid (if they weren't already) and new accessors must be
+    // obtained from the group returned. It is illegal to call begin_write
+    // inside an active transaction.
     Group& begin_write();
-    void commit();
-    void rollback() TIGHTDB_NOEXCEPT;
 
+    // End the current write transaction. All accessors are detached.
+    void commit();
+
+    // End the current write transaction. All accessors are detached.
+    void rollback() TIGHTDB_NOEXCEPT;
 
     // Pinned transactions:
 
@@ -201,11 +214,10 @@ public:
     // unpin_read_transactions() while a transaction is in progress.
     void unpin_read_transactions();
 
-
 #ifdef TIGHTDB_DEBUG
     void test_ringbuf();
-    void zero_free_space();
 #endif
+
     /// If a stale .lock file is present when a SharedGroup is opened,
     /// an Exception of type PresumablyStaleLockFile will be thrown.
     /// The name of the stale lock file will be given as argument to the
@@ -228,19 +240,20 @@ public:
         LockFileButNoData(const std::string& msg) : std::runtime_error(msg) {}
     };
 
-    // Get a number identifying the version of the database made available
-    // for the last transaction started by begin_read or begin_write
-    uint_fast64_t get_last_transaction_version()
-    {
-        return m_version;
-    }
 private:
     struct SharedInfo;
+    struct ReadLockInfo {
+        uint_fast64_t   m_version;
+        uint_fast32_t   m_reader_idx;
+        ref_type        m_top_ref;
+        size_t          m_file_size;
+        ReadLockInfo() : m_version(std::numeric_limits<std::size_t>::max()), 
+                         m_reader_idx(0), m_top_ref(0), m_file_size(0) {};
+    };
 
     // Member variables
     Group      m_group;
-    uint_fast64_t   m_version;
-    uint_fast32_t   m_reader_idx;
+    ReadLockInfo m_readlock;
     uint_fast32_t   m_local_max_entry;
     util::File m_file;
     util::File::Map<SharedInfo> m_file_map; // Never remapped
@@ -268,9 +281,20 @@ private:
     void        ringbuf_put(const ReadCount& v);
     void        ringbuf_expand();
 
-    void grab_readlock(ref_type& new_top_ref, size_t& new_file_size, bool& same_as_before);
-    void release_readlock() TIGHTDB_NOEXCEPT;
+    // Grab the latest readlock and update readlock info. Compare latest against
+    // current (before updating) and determine if the version is the same as before.
+    // As a side effect update memory mapping to ensure that the ringbuffer entries
+    // referenced in the readlock info is accessible.
+    // The caller may provide an uninitialized readlock in which case same_as_before
+    // is given an undefined value.
+    void grab_latest_readlock(ReadLockInfo& readlock, bool& same_as_before);
+
+    // Release a specific readlock. The readlock info MUST have been obtained by a
+    // call to grab_latest_readlock().
+    void release_readlock(ReadLockInfo& readlock) TIGHTDB_NOEXCEPT;
+
     void do_begin_write();
+    void do_commit();
 
     // Must be called only by someone that has a lock on the write
     // mutex.
@@ -286,8 +310,47 @@ private:
 
     void do_async_commits();
 
+#ifdef TIGHTDB_ENABLE_REPLICATION
+
+    class TransactLogRegistry {
+    public:
+        /// Get all transaction logs between the specified versions. The number
+        /// of requested logs is exactly `to_version - from_version`. If this
+        /// number is greater than zero, the first requested log is the one that
+        /// brings the database from `from_version` to `from_version +
+        /// 1`. References to the requested logs are store in successive entries
+        /// of `logs_buffer`. The calee retains ownership of the memory
+        /// referenced by those entries.
+        virtual void get_commit_entries(uint_fast64_t from_version, uint_fast64_t to_version,
+                         BinaryData* logs_buffer) TIGHTDB_NOEXCEPT = 0;
+
+        /// Declare no further interest in the transaction logs between the
+        /// specified versions.
+        virtual void release_commit_entries(uint_fast64_t to_version) TIGHTDB_NOEXCEPT = 0;
+        virtual ~TransactLogRegistry() {}
+    };
+
+    // Advance the current read transaction to include latest state.
+    // All accessors are retained and synchronized to the new state
+    // according to the (to be) defined operational transform.
+    void advance_read(TransactLogRegistry& write_logs);
+
+    // Promote the current read transaction to a write transaction.
+    // CAUTION: This also synchronizes with latest state of the database,
+    // including synchronization of all accessors.
+    // FIXME: A version of this which does NOT synchronize with latest
+    // state will be made available later, once we are able to merge commits.
+    void promote_to_write(TransactLogRegistry& write_logs);
+
+    // End the current write transaction and transition atomically into
+    // a read transaction, WITHOUT synchronizing to external changes
+    // to data. All accessors are retained and continue to reflect the
+    // state at commit. 
+    void commit_and_continue_as_read();
+#endif
     friend class ReadTransaction;
     friend class WriteTransaction;
+    friend class LangBindHelper;
 };
 
 
@@ -375,14 +438,14 @@ private:
 // Implementation:
 
 inline SharedGroup::SharedGroup(const std::string& file, bool no_create, DurabilityLevel dlevel):
-    m_group(Group::shared_tag()), m_version(std::numeric_limits<std::size_t>::max()),
+    m_group(Group::shared_tag()),
     m_transactions_are_pinned(false)
 {
     open(file, no_create, dlevel);
 }
 
 inline SharedGroup::SharedGroup(unattached_tag) TIGHTDB_NOEXCEPT:
-    m_group(Group::shared_tag()), m_version(std::numeric_limits<std::size_t>::max()),
+    m_group(Group::shared_tag()),
     m_transactions_are_pinned(false)
 {
 }
@@ -394,7 +457,7 @@ inline bool SharedGroup::is_attached() const TIGHTDB_NOEXCEPT
 
 #ifdef TIGHTDB_ENABLE_REPLICATION
 inline SharedGroup::SharedGroup(Replication& repl):
-    m_group(Group::shared_tag()), m_version(std::numeric_limits<std::size_t>::max()),
+    m_group(Group::shared_tag()),
     m_transactions_are_pinned(false)
 {
     open(repl);

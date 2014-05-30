@@ -49,14 +49,12 @@ public:
     /// underlying node. It is not owned by the accessor.
     void create();
 
-    /// Reinitialize this array accessor to point to the specified new
-    /// underlying memory. This does not modify the parent reference
-    /// information of this accessor.
+    //@{
+    /// Overriding functions of Array
     void init_from_ref(ref_type) TIGHTDB_NOEXCEPT;
-
-    /// Same as init_from_ref(ref_type) but avoid the mapping of 'ref'
-    /// to memory pointer.
     void init_from_mem(MemRef) TIGHTDB_NOEXCEPT;
+    void init_from_parent() TIGHTDB_NOEXCEPT;
+    //@}
 
     bool is_empty() const TIGHTDB_NOEXCEPT;
     std::size_t size() const TIGHTDB_NOEXCEPT;
@@ -75,7 +73,7 @@ public:
                       std::size_t end = npos) const TIGHTDB_NOEXCEPT;
     std::size_t find_first(StringData value, std::size_t begin = 0,
                            std::size_t end = npos) const TIGHTDB_NOEXCEPT;
-    void find_all(Array &result, StringData value, std::size_t add_offset = 0,
+    void find_all(Column &result, StringData value, std::size_t add_offset = 0,
                   std::size_t begin = 0, std::size_t end = npos) const;
 
     /// Get the specified element without the cost of constructing an
@@ -142,6 +140,12 @@ inline void ArrayStringLong::init_from_ref(ref_type ref) TIGHTDB_NOEXCEPT
     TIGHTDB_ASSERT(ref);
     char* header = get_alloc().translate(ref);
     init_from_mem(MemRef(header, ref));
+}
+
+inline void ArrayStringLong::init_from_parent() TIGHTDB_NOEXCEPT
+{
+    ref_type ref = get_ref_from_parent();
+    init_from_ref(ref);
 }
 
 inline bool ArrayStringLong::is_empty() const TIGHTDB_NOEXCEPT

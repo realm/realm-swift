@@ -38,28 +38,69 @@ inline ColumnMixed::ColumnMixed(Allocator& alloc, Table* table, std::size_t colu
     create(alloc, table, column_ndx, parent, ndx_in_parent, ref);
 }
 
-inline ref_type ColumnMixed::get_subtable_ref(std::size_t row_idx) const TIGHTDB_NOEXCEPT
+inline void ColumnMixed::update_column_index(std::size_t new_col_ndx, const Spec& spec)
+    TIGHTDB_NOEXCEPT
 {
-    TIGHTDB_ASSERT(row_idx < m_types->size());
-    if (m_types->get(row_idx) != type_Table)
-        return 0;
-    return m_data->get_as_ref(row_idx);
+    m_types->update_column_index(new_col_ndx, spec);
+    m_data->update_column_index(new_col_ndx, spec);
+    if (m_binary_data)
+        m_binary_data->update_column_index(new_col_ndx, spec);
 }
 
-inline std::size_t ColumnMixed::get_subtable_size(std::size_t row_idx) const TIGHTDB_NOEXCEPT
+inline void ColumnMixed::adj_accessors_insert_rows(std::size_t row_ndx,
+                                                   std::size_t num_rows) TIGHTDB_NOEXCEPT
 {
-    ref_type top_ref = get_subtable_ref(row_idx);
+    m_data->adj_accessors_insert_rows(row_ndx, num_rows);
+}
+
+inline void ColumnMixed::adj_accessors_erase_row(std::size_t row_ndx) TIGHTDB_NOEXCEPT
+{
+    m_data->adj_accessors_erase_row(row_ndx);
+}
+
+inline void ColumnMixed::adj_accessors_move_last_over(std::size_t target_row_ndx,
+                                                      std::size_t last_row_ndx) TIGHTDB_NOEXCEPT
+{
+    m_data->adj_accessors_move_last_over(target_row_ndx, last_row_ndx);
+}
+
+inline ref_type ColumnMixed::get_subtable_ref(std::size_t row_ndx) const TIGHTDB_NOEXCEPT
+{
+    TIGHTDB_ASSERT(row_ndx < m_types->size());
+    if (m_types->get(row_ndx) != type_Table)
+        return 0;
+    return m_data->get_as_ref(row_ndx);
+}
+
+inline std::size_t ColumnMixed::get_subtable_size(std::size_t row_ndx) const TIGHTDB_NOEXCEPT
+{
+    ref_type top_ref = get_subtable_ref(row_ndx);
     if (top_ref == 0)
         return 0;
     return _impl::TableFriend::get_size_from_ref(top_ref, m_data->get_alloc());
 }
 
-inline Table* ColumnMixed::get_subtable_ptr(std::size_t row_idx) const
+inline Table* ColumnMixed::get_subtable_accessor(std::size_t row_ndx) const TIGHTDB_NOEXCEPT
 {
-    TIGHTDB_ASSERT(row_idx < m_types->size());
-    if (m_types->get(row_idx) != type_Table)
+    return m_data->get_subtable_accessor(row_ndx);
+}
+
+inline void ColumnMixed::discard_subtable_accessor(std::size_t row_ndx) TIGHTDB_NOEXCEPT
+{
+    m_data->discard_subtable_accessor(row_ndx);
+}
+
+inline Table* ColumnMixed::get_subtable_ptr(std::size_t row_ndx)
+{
+    TIGHTDB_ASSERT(row_ndx < m_types->size());
+    if (m_types->get(row_ndx) != type_Table)
         return 0;
-    return m_data->get_subtable_ptr(row_idx);
+    return m_data->get_subtable_ptr(row_ndx); // Throws
+}
+
+inline const Table* ColumnMixed::get_subtable_ptr(std::size_t subtable_ndx) const
+{
+    return const_cast<ColumnMixed*>(this)->get_subtable_ptr(subtable_ndx);
 }
 
 inline void ColumnMixed::detach_subtable_accessors() TIGHTDB_NOEXCEPT
@@ -373,5 +414,38 @@ inline std::size_t ColumnMixed::get_size_from_ref(ref_type root_ref,
     return Column::get_size_from_ref(types_ref, alloc);
 }
 
+#ifdef TIGHTDB_ENABLE_REPLICATION
+
+inline void ColumnMixed::recursive_mark_table_accessors_dirty() TIGHTDB_NOEXCEPT
+{
+    m_data->recursive_mark_table_accessors_dirty();
+}
+
+inline void ColumnMixed::refresh_after_advance_transact(std::size_t col_ndx, const Spec& spec)
+{
+    m_array->init_from_parent();
+    m_types->refresh_after_advance_transact(col_ndx, spec); // Throws
+    m_data->refresh_after_advance_transact(col_ndx, spec); // Throws
+    if (m_binary_data) {
+        TIGHTDB_ASSERT(m_array->size() == 3);
+        m_binary_data->refresh_after_advance_transact(col_ndx, spec); // Throws
+        return;
+    }
+    // See if m_binary_data needs to be created.
+    if (m_array->size() == 3) {
+        ref_type ref = m_array->get_as_ref(2);
+        m_binary_data = new ColumnBinary(ref, m_array, 2, m_array->get_alloc()); // Throws
+    }
+}
+
+inline void ColumnMixed::RefsColumn::refresh_after_advance_transact(std::size_t col_ndx,
+                                                                    const Spec& spec)
+{
+    ColumnSubtableParent::refresh_after_advance_transact(col_ndx, spec); // Throws
+    std::size_t spec_ndx_in_parent = 0; // Ignored because these are root tables
+    m_subtable_map.refresh_after_advance_transact(spec_ndx_in_parent); // Throws
+}
+
+#endif // TIGHTDB_ENABLE_REPLICATION
 
 } // namespace tightdb

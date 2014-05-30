@@ -49,13 +49,14 @@ public:
 
     size_t count(StringData value) const;
     size_t find_first(StringData value) const;
-    void   find_all(Array& result, StringData value) const;
-    void   distinct(Array& result) const;
+    void   find_all(Column& result, StringData value) const;
+    void   distinct(Column& result) const;
     FindRes find_all(StringData value, size_t& ref) const;
 
     void update_ref(StringData value, size_t old_row_ndx, size_t new_row_ndx);
 
 #ifdef TIGHTDB_DEBUG
+    void Verify() const TIGHTDB_OVERRIDE;
     void verify_entries(const AdaptiveStringColumn& column) const;
     void to_dot() const { to_dot(std::cerr); }
     void to_dot(std::ostream&, StringData title = StringData()) const;
@@ -126,7 +127,7 @@ inline StringIndex::StringIndex(ref_type ref, ArrayParent* parent, std::size_t n
                                 void* target_column, StringGetter get_func, Allocator& alloc):
     Column(ref, parent, ndx_in_parent, alloc), m_target_column(target_column), m_get_func(get_func)
 {
-    TIGHTDB_ASSERT(Array::is_index_node(ref, alloc));
+    TIGHTDB_ASSERT(Array::get_context_flag_from_header(alloc.translate(ref)));
 }
 
 

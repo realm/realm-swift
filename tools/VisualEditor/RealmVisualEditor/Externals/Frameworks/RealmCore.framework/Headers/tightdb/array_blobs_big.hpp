@@ -51,7 +51,7 @@ public:
                       std::size_t end = npos) const TIGHTDB_NOEXCEPT;
     std::size_t find_first(BinaryData value, bool is_string = false, std::size_t begin = 0,
                            std::size_t end = npos) const TIGHTDB_NOEXCEPT;
-    void find_all(Array& result, BinaryData value, bool is_string = false,
+    void find_all(Column& result, BinaryData value, bool is_string = false,
                   std::size_t add_offset = 0,
                   std::size_t begin = 0, std::size_t end = npos);
 

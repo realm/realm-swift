@@ -74,11 +74,15 @@ public:
     using Table::clear;
     using Table::remove;
     using Table::remove_last;
+    using Table::move_last_over;
     using Table::optimize;
     using Table::lookup;
     using Table::add_empty_row;
     using Table::insert_empty_row;
     using Table::aggregate;
+
+    using Table::get_backlink_count;
+    using Table::get_backlink;
 
     BasicTable(Allocator& alloc = Allocator::get_default()): Table(alloc)
     {
@@ -125,16 +129,17 @@ private:
         typedef _impl::FieldAccessor<BasicTable, col_idx, value_type, false> type;
     };
     typedef std::pair<BasicTable*, std::size_t> FieldInit;
-    typedef typename Spec::template ColNames<Field, FieldInit> RowAccessor;
 
     template<int col_idx> struct ConstField {
         typedef typename util::TypeAt<typename Spec::Columns, col_idx>::type value_type;
         typedef _impl::FieldAccessor<const BasicTable, col_idx, value_type, true> type;
     };
     typedef std::pair<const BasicTable*, std::size_t> ConstFieldInit;
-    typedef typename Spec::template ColNames<ConstField, ConstFieldInit> ConstRowAccessor;
 
 public:
+    typedef typename Spec::template ColNames<Field, FieldInit> RowAccessor;
+    typedef typename Spec::template ColNames<ConstField, ConstFieldInit> ConstRowAccessor;
+
     RowAccessor operator[](std::size_t row_idx) TIGHTDB_NOEXCEPT
     {
         return RowAccessor(std::make_pair(this, row_idx));
@@ -339,11 +344,6 @@ template<class Spec> class BasicTable<Spec>::Query:
 public:
     Query(const Query& q): Spec::template ColNames<QueryCol, Query*>(this), m_impl(q.m_impl) {}
     ~Query() TIGHTDB_NOEXCEPT {}
-
-    Query& tableview(const Array& arr) { m_impl.tableview(arr); return *this; }
-
-// Query& Query::tableview(const TableView& tv)
-// Query& Query::tableview(const Array &arr)
 
     Query& tableview(const typename BasicTable<Spec>::View& v)
     {

@@ -27,6 +27,10 @@
 namespace tightdb {
 
 
+/// A binary column (ColumnBinary) is a single B+-tree, and the root
+/// of the column is the root of the B+-tree. Leaf nodes are either of
+/// type ArrayBinary (array of small blobs) or ArrayBigBlobs (array of
+/// big blobs).
 class ColumnBinary: public ColumnBase {
 public:
     typedef BinaryData value_type;
@@ -67,6 +71,10 @@ public:
     // Overrriding method in ColumnBase
     ref_type write(std::size_t, std::size_t, std::size_t,
                    _impl::OutputStream&) const TIGHTDB_OVERRIDE;
+
+#ifdef TIGHTDB_ENABLE_REPLICATION
+    void refresh_after_advance_transact(std::size_t, const Spec&) TIGHTDB_OVERRIDE;
+#endif
 
 #ifdef TIGHTDB_DEBUG
     void Verify() const TIGHTDB_OVERRIDE;

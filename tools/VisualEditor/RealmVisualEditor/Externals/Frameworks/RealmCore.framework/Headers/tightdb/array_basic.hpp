@@ -48,7 +48,7 @@ public:
     void clear();
 
     std::size_t find_first(T value, std::size_t begin = 0 , std::size_t end = npos) const;
-    void find_all(Array& result, T value, std::size_t add_offset = 0,
+    void find_all(Column* result, T value, std::size_t add_offset = 0,
                   std::size_t begin = 0, std::size_t end = npos) const;
 
     std::size_t count(T value, std::size_t begin = 0, std::size_t end = npos) const;

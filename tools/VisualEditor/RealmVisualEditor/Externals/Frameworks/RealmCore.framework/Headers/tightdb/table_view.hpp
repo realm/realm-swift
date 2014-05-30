@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include <RealmCore/tightdb/table.hpp>
+#include <RealmCore/tightdb/column.hpp>
 
 namespace tightdb {
 
@@ -51,6 +52,11 @@ public:
     BinaryData  get_binary(size_t column_ndx, size_t row_ndx) const TIGHTDB_NOEXCEPT;
     Mixed       get_mixed(size_t column_ndx, size_t row_ndx) const TIGHTDB_NOEXCEPT;
     DataType    get_mixed_type(size_t column_ndx, size_t row_ndx) const TIGHTDB_NOEXCEPT;
+    std::size_t get_link(std::size_t column_ndx, std::size_t row_ndx) const TIGHTDB_NOEXCEPT;
+    TableRef    get_link_target(std::size_t column_ndx) TIGHTDB_NOEXCEPT;
+
+    // Links
+    bool is_null_link(std::size_t column_ndx, std::size_t row_ndx) const TIGHTDB_NOEXCEPT;
 
     // Subtables
     size_t      get_subtable_size(size_t column_ndx, size_t row_ndx) const TIGHTDB_NOEXCEPT;
@@ -119,7 +125,7 @@ public:
 protected:
     // Null if, and only if, the view is detached
     mutable TableRef m_table;
-    Array m_refs;
+    Column m_refs;
 
     /// Construct null view (no memory allocated).
     TableViewBase();
@@ -137,8 +143,8 @@ protected:
 
     void move_assign(TableViewBase*) TIGHTDB_NOEXCEPT;
 
-    Array& get_ref_column() TIGHTDB_NOEXCEPT;
-    const Array& get_ref_column() const TIGHTDB_NOEXCEPT;
+    Column& get_ref_column() TIGHTDB_NOEXCEPT;
+    const Column& get_ref_column() const TIGHTDB_NOEXCEPT;
 
     template<class R, class V> static R find_all_integer(V*, std::size_t, int64_t);
     template<class R, class V> static R find_all_float(V*, std::size_t, float);
@@ -217,7 +223,10 @@ public:
     void set_binary(size_t column_ndx, size_t row_ndx, BinaryData value);
     void set_mixed(size_t column_ndx, size_t row_ndx, Mixed value);
     void set_subtable(size_t column_ndx,size_t row_ndx, const Table* table);
+    void set_link(std::size_t column_ndx, std::size_t row_ndx, std::size_t target_row_ndx);
     void add_int(size_t column_ndx, int64_t value);
+
+    void nullify_link(std::size_t column_ndx, std::size_t row_ndx);
 
     // Deleting
     void clear();
@@ -345,7 +354,7 @@ inline TableViewBase::TableViewBase(Table* parent):
 
 inline TableViewBase::TableViewBase(const TableViewBase& tv):
     m_table(tv.m_table), 
-    m_refs(tv.m_refs, Allocator::get_default())
+    m_refs(tv.m_refs)
 {
     if (m_table)
         m_table->register_view(this);
@@ -353,7 +362,7 @@ inline TableViewBase::TableViewBase(const TableViewBase& tv):
 
 inline TableViewBase::TableViewBase(TableViewBase* tv) TIGHTDB_NOEXCEPT:
     m_table(tv->m_table), 
-    m_refs(tv->m_refs) // Note: This is a moving copy
+    m_refs(tv->m_refs) // Note: This is a moving copy. It detaches m_refs, so no need for explicit detach later
 {
     if (m_table) {
         m_table->unregister_view(tv);
@@ -361,7 +370,6 @@ inline TableViewBase::TableViewBase(TableViewBase* tv) TIGHTDB_NOEXCEPT:
         m_table->register_view(this);
     }
     tv->m_table = TableRef();
-    tv->m_refs.detach();
 }
 
 inline TableViewBase::~TableViewBase() TIGHTDB_NOEXCEPT
@@ -392,15 +400,16 @@ inline void TableViewBase::move_assign(TableViewBase* tv) TIGHTDB_NOEXCEPT
         // the implementation of the "registry of views" in Table.
         m_table->register_view(this);
     }
+
     m_refs.move_assign(tv->m_refs);
 }
 
-inline Array& TableViewBase::get_ref_column() TIGHTDB_NOEXCEPT
+inline Column& TableViewBase::get_ref_column() TIGHTDB_NOEXCEPT
 {
     return m_refs;
 }
 
-inline const Array& TableViewBase::get_ref_column() const TIGHTDB_NOEXCEPT
+inline const Column& TableViewBase::get_ref_column() const TIGHTDB_NOEXCEPT
 {
     return m_refs;
 }
@@ -548,6 +557,27 @@ inline size_t TableViewBase::get_subtable_size(size_t column_ndx, size_t row_ndx
 
     const size_t real_ndx = size_t(m_refs.get(row_ndx));
     return m_table->get_subtable_size(column_ndx, real_ndx);
+}
+
+inline std::size_t TableViewBase::get_link(std::size_t column_ndx, std::size_t row_ndx) const TIGHTDB_NOEXCEPT
+{
+    TIGHTDB_ASSERT_INDEX_AND_TYPE(column_ndx, row_ndx, type_Link);
+
+    const size_t real_ndx = size_t(m_refs.get(row_ndx));
+    return m_table->get_link(column_ndx, real_ndx);
+}
+
+inline TableRef TableViewBase::get_link_target(std::size_t column_ndx) TIGHTDB_NOEXCEPT
+{
+    return m_table->get_link_target(column_ndx);
+}
+
+inline bool TableViewBase::is_null_link(std::size_t column_ndx, std::size_t row_ndx) const TIGHTDB_NOEXCEPT
+{
+    TIGHTDB_ASSERT_INDEX_AND_TYPE(column_ndx, row_ndx, type_Link);
+
+    const size_t real_ndx = size_t(m_refs.get(row_ndx));
+    return m_table->is_null_link(column_ndx, real_ndx);
 }
 
 
@@ -943,6 +973,20 @@ inline void TableView::set_subtable(size_t column_ndx, size_t row_ndx, const Tab
     TIGHTDB_ASSERT_INDEX_AND_TYPE_TABLE_OR_MIXED(column_ndx, row_ndx);
     const size_t real_ndx = size_t(m_refs.get(row_ndx));
     m_table->set_subtable(column_ndx, real_ndx, value);
+}
+
+inline void TableView::set_link(std::size_t column_ndx, std::size_t row_ndx, std::size_t target_row_ndx)
+{
+    TIGHTDB_ASSERT_INDEX_AND_TYPE(column_ndx, row_ndx, type_Link);
+    const size_t real_ndx = size_t(m_refs.get(row_ndx));
+    m_table->set_link(column_ndx, real_ndx, target_row_ndx);
+}
+
+inline void TableView::nullify_link(std::size_t column_ndx, std::size_t row_ndx)
+{
+    TIGHTDB_ASSERT_INDEX_AND_TYPE(column_ndx, row_ndx, type_Link);
+    const size_t real_ndx = size_t(m_refs.get(row_ndx));
+    m_table->nullify_link(column_ndx, real_ndx);
 }
 
 

@@ -33,7 +33,7 @@ class ColumnStringEnum;
 class ColumnBinary;
 class ColumnTable;
 class ColumnMixed;
-
+class ColumnLink;
 
 } // namespace tightdb
 

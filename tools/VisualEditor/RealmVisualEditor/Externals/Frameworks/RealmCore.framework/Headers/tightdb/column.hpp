@@ -26,6 +26,7 @@
 #include <RealmCore/tightdb/util/unique_ptr.hpp>
 #include <RealmCore/tightdb/array.hpp>
 #include <RealmCore/tightdb/column_type.hpp>
+#include <RealmCore/tightdb/spec.hpp>
 #include <RealmCore/tightdb/impl/output_stream.hpp>
 #include <RealmCore/tightdb/query_conditions.hpp>
 
@@ -35,6 +36,8 @@ namespace tightdb {
 // Pre-definitions
 class Column;
 
+
+/// Base class for all column types.
 class ColumnBase {
 public:
     /// Get the number of entries in this column.
@@ -63,9 +66,10 @@ public:
     /// number of elements by one.
     virtual void move_last_over(std::size_t ndx) = 0;
 
-    virtual void adjust_column_index(int diff) TIGHTDB_NOEXCEPT;
-
     virtual bool IsIntColumn() const TIGHTDB_NOEXCEPT { return false; }
+
+    // Returns true if, and only if this column is an AdaptiveStringColumn.
+    virtual bool is_string_col() const TIGHTDB_NOEXCEPT;
 
     virtual void destroy() TIGHTDB_NOEXCEPT;
 
@@ -75,21 +79,10 @@ public:
     virtual bool has_index() const TIGHTDB_NOEXCEPT { return false; }
     virtual void set_index_ref(ref_type, ArrayParent*, std::size_t) {}
 
-    /// Called in the context of Group::commit() to ensure that
-    /// attached table accessors stay valid across a commit. Please
-    /// note that this works only for non-transactional commits. Table
-    /// accessors obtained during a transaction are always detached
-    /// when the transaction ends.
-    virtual void update_from_parent(std::size_t old_baseline) TIGHTDB_NOEXCEPT;
-
-    void detach_subtable_accessors() TIGHTDB_NOEXCEPT;
-
     Allocator& get_alloc() const TIGHTDB_NOEXCEPT { return m_array->get_alloc(); }
 
     /// Returns the 'ref' of the root array.
     ref_type get_ref() const TIGHTDB_NOEXCEPT { return m_array->get_ref(); }
-
-    void set_parent(ArrayParent*, std::size_t ndx_in_parent) TIGHTDB_NOEXCEPT;
 
     //@{
     /// Returns the array node at the root of this column, but note
@@ -123,6 +116,9 @@ public:
     const Array* GetBlock(std::size_t ndx, Array& arr, std::size_t& off,
                           bool use_retval = false) const TIGHTDB_NOEXCEPT;
 
+    inline void detach(void);
+    inline bool is_attached(void);
+
     static std::size_t get_size_from_type_and_ref(ColumnType, ref_type, Allocator&) TIGHTDB_NOEXCEPT;
 
     // These assume that the right column compile-time type has been
@@ -133,6 +129,44 @@ public:
     /// Write a slice of this column to the specified output stream.
     virtual ref_type write(std::size_t slice_offset, std::size_t slice_size,
                            std::size_t table_size, _impl::OutputStream&) const = 0;
+
+    void set_parent(ArrayParent*, std::size_t ndx_in_parent) TIGHTDB_NOEXCEPT;
+
+    /// Called when the table-level index of this column has changed. Column
+    /// classes that cache information pertaning to their position must override
+    /// this function.
+    virtual void update_column_index(std::size_t new_col_ndx, const Spec&) TIGHTDB_NOEXCEPT;
+
+    /// Called in the context of Group::commit() to ensure that
+    /// attached table accessors stay valid across a commit. Please
+    /// note that this works only for non-transactional commits. Table
+    /// accessors obtained during a transaction are always detached
+    /// when the transaction ends.
+    virtual void update_from_parent(std::size_t old_baseline) TIGHTDB_NOEXCEPT;
+
+    void detach_subtable_accessors() TIGHTDB_NOEXCEPT;
+
+    /// For columns that are able to contain subtables, this function returns
+    /// the pointer to the subtable accessor at the specified row index if it
+    /// exists, otherwise it returns null. For other column types, this function
+    /// returns null.
+    virtual Table* get_subtable_accessor(std::size_t row_ndx) const TIGHTDB_NOEXCEPT;
+
+    /// Detach and remove the subtable accessor at the specified row if it
+    /// exists. For column types that are unable to contain subtable, this
+    /// function does nothing.
+    virtual void discard_subtable_accessor(std::size_t row_ndx) TIGHTDB_NOEXCEPT;
+
+    virtual void adj_accessors_insert_rows(std::size_t row_ndx, std::size_t num_rows)
+        TIGHTDB_NOEXCEPT;
+    virtual void adj_accessors_erase_row(std::size_t row_ndx) TIGHTDB_NOEXCEPT;
+    virtual void adj_accessors_move_last_over(std::size_t target_row_ndx, std::size_t last_row_ndx)
+        TIGHTDB_NOEXCEPT;
+
+#ifdef TIGHTDB_ENABLE_REPLICATION
+    virtual void recursive_mark_table_accessors_dirty() TIGHTDB_NOEXCEPT;
+    virtual void refresh_after_advance_transact(std::size_t new_col_ndx, const Spec&) = 0;
+#endif
 
 #ifdef TIGHTDB_DEBUG
     // Must be upper case to avoid conflict with macro in Objective-C
@@ -152,6 +186,8 @@ protected:
 
     virtual std::size_t do_get_size() const TIGHTDB_NOEXCEPT = 0;
 
+    // Must be able to operate with only the Minimal Accessor Hierarchy
+    // Consistency Guarantee.
     virtual void do_detach_subtable_accessors() TIGHTDB_NOEXCEPT {}
 
     //@{
@@ -223,6 +259,11 @@ private:
 
 
 
+/// An integer column (Column) is a single B+-tree, and the root of
+/// the column is the root of the B+-tree. All leaf nodes are single
+/// arrays of type Array.
+///
+/// FIXME: Rename Column to IntegerColumn.
 class Column: public ColumnBase {
 public:
     typedef int64_t value_type;
@@ -232,11 +273,14 @@ public:
     explicit Column(Array::Type = Array::type_Normal, ArrayParent* = 0,
                     std::size_t ndx_in_parent = 0, Allocator& = Allocator::get_default());
     explicit Column(ref_type, ArrayParent* = 0, std::size_t ndx_in_parent = 0,
-                    Allocator& = Allocator::get_default()); // Throws
+                    Allocator& = Allocator::get_default());
+    Column(ArrayParent*, std::size_t ndx_in_parent, Allocator&); // Unattached
     Column(const Column&); // FIXME: Constness violation
     ~Column() TIGHTDB_NOEXCEPT TIGHTDB_OVERRIDE;
 
-    bool IsIntColumn() const TIGHTDB_NOEXCEPT { return true; }
+    // 'this' and 'column' must use same allocator
+    void move_assign(Column& column);
+    bool IsIntColumn() const TIGHTDB_NOEXCEPT{ return true; }
 
     std::size_t size() const TIGHTDB_NOEXCEPT;
     bool is_empty() const TIGHTDB_NOEXCEPT { return size() == 0; }
@@ -269,7 +313,7 @@ public:
     void adjust_ge(int_fast64_t limit, int_fast64_t diff);
 
     size_t find_first(int64_t value, std::size_t begin = 0, std::size_t end = npos) const;
-    void find_all(Array& result, int64_t value,
+    void find_all(Column& result, int64_t value,
                   std::size_t begin = 0, std::size_t end = npos) const;
 
     //@{
@@ -279,6 +323,9 @@ public:
     std::size_t lower_bound_int(int64_t value) const TIGHTDB_NOEXCEPT;
     std::size_t upper_bound_int(int64_t value) const TIGHTDB_NOEXCEPT;
     //@}
+
+    // return first element E for which E >= target or return -1 if none. Array must be sorted
+    size_t find_gte(int64_t target, size_t start) const;
 
     /// Compare two columns for equality.
     bool compare_int(const Column&) const;
@@ -290,7 +337,10 @@ public:
     ref_type write(std::size_t, std::size_t, std::size_t,
                    _impl::OutputStream&) const TIGHTDB_OVERRIDE;
 
-    // Debug
+#ifdef TIGHTDB_ENABLE_REPLICATION
+    void refresh_after_advance_transact(std::size_t, const Spec&) TIGHTDB_OVERRIDE;
+#endif
+
 #ifdef TIGHTDB_DEBUG
     virtual void Verify() const TIGHTDB_OVERRIDE;
     void to_dot(std::ostream&, StringData title) const TIGHTDB_OVERRIDE;
@@ -331,8 +381,19 @@ private:
 
 // Implementation:
 
-inline void ColumnBase::adjust_column_index(int) TIGHTDB_NOEXCEPT
+inline void ColumnBase::detach()
 {
+    m_array->detach();
+}
+
+inline bool ColumnBase::is_attached()
+{
+    return m_array->is_attached();
+}
+
+inline bool ColumnBase::is_string_col() const TIGHTDB_NOEXCEPT
+{
+    return false;
 }
 
 inline void ColumnBase::destroy() TIGHTDB_NOEXCEPT
@@ -341,10 +402,49 @@ inline void ColumnBase::destroy() TIGHTDB_NOEXCEPT
         m_array->destroy_deep();
 }
 
+inline void ColumnBase::update_column_index(std::size_t, const Spec&) TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
 inline void ColumnBase::detach_subtable_accessors() TIGHTDB_NOEXCEPT
 {
     do_detach_subtable_accessors();
 }
+
+inline Table* ColumnBase::get_subtable_accessor(std::size_t) const TIGHTDB_NOEXCEPT
+{
+    return 0;
+}
+
+inline void ColumnBase::discard_subtable_accessor(std::size_t) TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
+inline void ColumnBase::adj_accessors_insert_rows(std::size_t, std::size_t) TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
+inline void ColumnBase::adj_accessors_erase_row(std::size_t) TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
+inline void ColumnBase::adj_accessors_move_last_over(std::size_t, std::size_t) TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
+#ifdef TIGHTDB_ENABLE_REPLICATION
+
+inline void ColumnBase::recursive_mark_table_accessors_dirty() TIGHTDB_NOEXCEPT
+{
+    // Noop
+}
+
+#endif
 
 inline void ColumnBase::set_parent(ArrayParent* parent, std::size_t ndx_in_parent) TIGHTDB_NOEXCEPT
 {
@@ -441,7 +541,6 @@ inline ref_type ColumnBase::create(std::size_t size, Allocator& alloc, CreateHan
     std::size_t fixed_height = 0; // Not fixed
     return build(&rest_size, fixed_height, alloc, handler);
 }
-
 
 inline Column::Column(Allocator& alloc):
     ColumnBase(new Array(Array::type_Normal, null_ptr, 0, alloc))
@@ -542,6 +641,23 @@ inline std::size_t Column::upper_bound_int(int64_t value) const TIGHTDB_NOEXCEPT
     return ColumnBase::upper_bound(*this, value);
 }
 
+// For a *sorted* Column, return first element E for which E >= target or return -1 if none
+inline size_t Column::find_gte(int64_t target, size_t start) const
+{
+    // fixme: slow reference implementation. See Array::FindGTE for faster version
+    size_t ref = 0;
+    size_t idx;
+    for (idx = start; idx < size(); ++idx) {
+        if (get(idx) >= target) {
+            ref = idx;
+            break;
+        }
+    }
+    if (idx == size())
+        ref = not_found;
+
+    return ref;
+}
 
 } // namespace tightdb
 

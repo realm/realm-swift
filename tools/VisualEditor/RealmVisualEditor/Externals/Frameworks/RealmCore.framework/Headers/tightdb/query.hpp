@@ -64,7 +64,6 @@ public:
 
     // Conditions: Query only rows contained in tv
     Query& tableview(const TableView& tv); // throws
-    Query& tableview(const Array& arr); // throws
 
     // Conditions: int64_t
     Query& equal(size_t column_ndx, int64_t value);

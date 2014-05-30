@@ -29,6 +29,8 @@
 
 namespace tightdb {
 
+namespace _impl { class DescriptorFriend; }
+
 
 /// Accessor for table type descriptors.
 ///
@@ -272,6 +274,12 @@ public:
     bool operator!=(const Descriptor&) const TIGHTDB_NOEXCEPT;
     //@}
 
+    /// If the specified column is optimized to store only unique values, then
+    /// this function returns the number of unique values currently
+    /// stored. Otherwise it returns zero. This function is mainly intended for
+    /// debugging purposes.
+    std::size_t get_num_unique_values(std::size_t column_ndx) const;
+
     ~Descriptor() TIGHTDB_NOEXCEPT;
 
 private:
@@ -292,7 +300,7 @@ private:
     struct subdesc_entry {
         std::size_t m_column_ndx;
         Descriptor* m_subdesc;
-        subdesc_entry(std::size_t n, Descriptor* d): m_column_ndx(n), m_subdesc(d) {}
+        subdesc_entry(std::size_t column_ndx, Descriptor*);
     };
     typedef std::vector<subdesc_entry> subdesc_map;
     mutable subdesc_map m_subdesc_map;
@@ -358,13 +366,17 @@ private:
     // `begin_2` is the returned pointer.
     std::size_t* record_subdesc_path(std::size_t* begin, std::size_t* end) const TIGHTDB_NOEXCEPT;
 
+    // Returns a pointer to the accessor of the specified
+    // subdescriptor if that accessor exists, otherwise this function
+    // return null.
+    Descriptor* get_subdesc_accessor(std::size_t column_ndx) TIGHTDB_NOEXCEPT;
+
+    void adj_insert_column(std::size_t col_ndx) TIGHTDB_NOEXCEPT;
+    void adj_erase_column(std::size_t col_ndx) TIGHTDB_NOEXCEPT;
+
     friend class util::bind_ptr<Descriptor>;
     friend class util::bind_ptr<const Descriptor>;
-    friend class Table;
-
-#ifdef TIGHTDB_ENABLE_REPLICATION
-    friend class Replication;
-#endif
+    friend class _impl::DescriptorFriend;
 };
 
 
@@ -375,7 +387,7 @@ private:
 inline std::size_t Descriptor::get_column_count() const TIGHTDB_NOEXCEPT
 {
     TIGHTDB_ASSERT(is_attached());
-    return m_spec->get_column_count();
+    return m_spec->get_public_column_count();
 }
 
 inline StringData Descriptor::get_column_name(std::size_t ndx) const TIGHTDB_NOEXCEPT
@@ -398,9 +410,26 @@ inline std::size_t Descriptor::get_column_index(StringData name) const TIGHTDB_N
 
 inline std::size_t Descriptor::add_column(DataType type, StringData name, DescriptorRef* subdesc)
 {
-    std::size_t column_ndx = get_column_count();
+    std::size_t column_ndx = (type == type_BackLink) ? m_spec->get_column_count() : m_spec->get_public_column_count();
     insert_column(column_ndx, type, name, subdesc); // Throws
     return column_ndx;
+}
+
+inline void Descriptor::insert_column(std::size_t column_ndx, DataType type, StringData name,
+                                      DescriptorRef* subdesc)
+{
+    TIGHTDB_ASSERT(is_attached());
+    _impl::TableFriend::insert_column(*this, column_ndx, type, name); // Throws
+    adj_insert_column(column_ndx);
+    if (subdesc && type == type_Table)
+        *subdesc = get_subdescriptor(column_ndx);
+}
+
+inline void Descriptor::remove_column(std::size_t column_ndx)
+{
+    TIGHTDB_ASSERT(is_attached());
+    _impl::TableFriend::remove_column(*this, column_ndx); // Throws
+    adj_erase_column(column_ndx);
 }
 
 inline void Descriptor::rename_column(std::size_t column_ndx, StringData name)
@@ -468,6 +497,12 @@ inline bool Descriptor::is_attached() const TIGHTDB_NOEXCEPT
     return bool(m_root_table);
 }
 
+inline Descriptor::subdesc_entry::subdesc_entry(std::size_t n, Descriptor* d):
+    m_column_ndx(n),
+    m_subdesc(d)
+{
+}
+
 inline bool Descriptor::operator==(const Descriptor& d) const TIGHTDB_NOEXCEPT
 {
     TIGHTDB_ASSERT(is_attached());
@@ -479,6 +514,69 @@ inline bool Descriptor::operator!=(const Descriptor& d) const TIGHTDB_NOEXCEPT
 {
     return !(*this == d);
 }
+
+// The purpose of this class is to give internal access to some, but
+// not all of the non-public parts of the Descriptor class.
+class _impl::DescriptorFriend {
+public:
+    static Descriptor* create()
+    {
+        return new Descriptor; // Throws
+    }
+
+    static void attach(Descriptor& desc, Table* table, Descriptor* parent, Spec* spec)
+        TIGHTDB_NOEXCEPT
+    {
+        desc.attach(table, parent, spec);
+    }
+
+    static void detach(Descriptor& desc) TIGHTDB_NOEXCEPT
+    {
+        desc.detach();
+    }
+
+    static Table& root_table(Descriptor& desc) TIGHTDB_NOEXCEPT
+    {
+        return *desc.m_root_table;
+    }
+
+    static const Table& root_table(const Descriptor& desc) TIGHTDB_NOEXCEPT
+    {
+        return *desc.m_root_table;
+    }
+
+    static Spec* get_spec(Descriptor& desc) TIGHTDB_NOEXCEPT
+    {
+        return desc.m_spec;
+    }
+
+    static const Spec* get_spec(const Descriptor& desc) TIGHTDB_NOEXCEPT
+    {
+        return desc.m_spec;
+    }
+
+    static std::size_t* record_subdesc_path(const Descriptor& desc, std::size_t* begin,
+                                            std::size_t* end) TIGHTDB_NOEXCEPT
+    {
+        return desc.record_subdesc_path(begin, end);
+    }
+
+    static Descriptor* get_subdesc_accessor(Descriptor& desc, std::size_t column_ndx)
+        TIGHTDB_NOEXCEPT
+    {
+        return desc.get_subdesc_accessor(column_ndx);
+    }
+
+    static void adj_insert_column(Descriptor& desc, std::size_t col_ndx) TIGHTDB_NOEXCEPT
+    {
+        desc.adj_insert_column(col_ndx);
+    }
+
+    static void adj_erase_column(Descriptor& desc, std::size_t col_ndx) TIGHTDB_NOEXCEPT
+    {
+        desc.adj_erase_column(col_ndx);
+    }
+};
 
 } // namespace tightdb
 
