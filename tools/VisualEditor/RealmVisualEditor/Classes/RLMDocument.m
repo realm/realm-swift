@@ -236,7 +236,10 @@
                 return @"<Any>";
 
             case RLMPropertyTypeDate:
-                return @"<Date>";
+                if([propertyValue isKindOfClass:[NSDate class]]) {
+                    return propertyValue;
+                }
+                break;
 
             case RLMPropertyTypeArray:
                 return @"<Array>";
@@ -251,19 +254,6 @@
     
     return nil;
 }
-
-/*
- RLMPropertyTypeInt
- RLMPropertyTypeBool
- RLMPropertyTypeFloat
- RLMPropertyTypeDouble
- RLMPropertyTypeString
- RLMPropertyTypeData
- RLMPropertyTypeAny
- RLMPropertyTypeDate
- RLMPropertyTypeArray
- RLMPropertyTypeObject
- */
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
@@ -410,7 +400,8 @@
             column.type == RLMPropertyTypeFloat ||
             column.type == RLMPropertyTypeDouble ||
             column.type == RLMPropertyTypeString) {
-            tableColumn.editable = YES;
+            //tableColumn.editable = YES;
+            tableColumn.editable = NO;
         }
         else {
             tableColumn.editable = NO;
