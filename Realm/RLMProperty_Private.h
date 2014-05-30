@@ -33,11 +33,11 @@
 // private properties
 @property (nonatomic, readonly) NSUInteger column;
 @property (nonatomic, readonly) char objcType;
-@property (nonatomic, readonly) id defaultValue;
 
 // getter and setter names
-@property (nonatomic, copy) NSString * getterName;
-@property (nonatomic, copy) NSString * setterName;
+@property (nonatomic, copy) NSString *getterName;
+@property (nonatomic, copy) NSString *setterName;
+@property (nonatomic, copy) NSString *objectClassName;
 
 @end
 

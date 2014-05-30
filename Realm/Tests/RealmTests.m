@@ -19,19 +19,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
-@interface RLMTestObject : RLMObject
-@property (nonatomic, copy) NSString *column;
+@interface RealmTests : RLMTestCase
 @end
 
-@implementation RLMTestObject
-@end
-
-@interface RLMRealmTests : RLMTestCase
-@end
-
-@implementation RLMRealmTests
+@implementation RealmTests
 
 #pragma mark - Tests
 
@@ -66,20 +60,9 @@
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
 }
 
-- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
-    RLMRealm *realm = [self realmWithTestPath];
-    [realm beginWriteTransaction];
-    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
-    [realm commitWriteTransaction];
-    
-    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
-}
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
-    NSString *realmFilePath = RLMRealmPathForFile(@"async.bg.realm");
-    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
-    
-    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    RLMRealm *realm = [self realmWithTestPath];
     __block BOOL notificationFired = NO;
     [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
@@ -89,7 +72,7 @@
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
-        RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+        RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [RLMTestObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
@@ -101,10 +84,8 @@
 }
 
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
-    NSString *realmFilePath = RLMRealmPathForFile(@"async.bg.fast.realm");
-    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
-    
-    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    RLMRealm *realm = [self realmWithTestPath];
+
     __block BOOL notificationFired = NO;
     [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
@@ -114,7 +95,7 @@
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
-        RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+        RLMRealm *realm = [self realmWithTestPath];
         RLMTestObject *obj = [[RLMTestObject alloc] init];
         obj.column = @"string";
         [realm beginWriteTransaction];

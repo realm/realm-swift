@@ -25,8 +25,10 @@
 #import <tightdb/string_data.hpp>
 #import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMProperty;
+
 // returns if the object can be inserted as the given type
-BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
+BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
@@ -44,7 +46,7 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
 }
 
 // Translate an rlmtype to a string representation
-inline NSString *rlmtype_to_string(RLMPropertyType type) {
+inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
         case RLMPropertyTypeString:
             return @"string";
@@ -98,5 +100,3 @@ inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
 inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
     return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }
-
-

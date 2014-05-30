@@ -43,6 +43,13 @@ void throw_objc_exception(exception &ex) {
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
     @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
 }
+ 
+// create NSError from c++ exception
+inline NSError* make_realm_error(RLMError code, exception &ex) {
+    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
+}
 
 } // anonymous namespace
 
@@ -98,12 +105,10 @@ inline NSArray *realmsAtPath(NSString *path) {
     }
 }
 
-
-inline NSError* make_realm_error(RLMError code, exception &ex)
-{
-    NSMutableDictionary* details = [NSMutableDictionary dictionary];
-    [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
+inline void clearRealmCache() {
+    @synchronized(s_realmsPerPath) {
+        s_realmsPerPath = [NSMutableDictionary dictionary];
+    }
 }
 
 
@@ -134,7 +139,7 @@ static NSArray *s_objectDescriptors = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // initilize realm cache
-        s_realmsPerPath = [NSMutableDictionary dictionary];
+        clearRealmCache();
         
         // initialize object store
         RLMInitializeObjectStore();
@@ -285,6 +290,10 @@ static NSArray *s_objectDescriptors = nil;
     }
     
     return realm;
+}
+
++ (void)clearRealmCache {
+    clearRealmCache();
 }
 
 - (void)addNotificationBlock:(RLMNotificationBlock)block {
@@ -509,19 +518,5 @@ static NSArray *s_objectDescriptors = nil;
     // FIXME - store version in metadata table - will come with migration support
     return 0;
 }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
--(id)objectForKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
-
 
 @end

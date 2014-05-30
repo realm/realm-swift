@@ -20,6 +20,8 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
+#import "RLMObject.h"
+#import "RLMProperty.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -27,6 +29,7 @@ inline bool nsnumber_is_like_bool(NSObject *obj)
     // @encode(BOOL) is 'B' on iOS 64 and 'c'
     // objcType is always 'c'. Therefore compare to "c".
     
+    // FIXME: Need to support @(false) which returns a data_type of 'i'
     return data_type[0] == 'c';
 }
 
@@ -69,8 +72,16 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
-    switch (type) {
+inline bool object_has_valid_type(id obj)
+{
+    return ([obj isKindOfClass:[NSString class]] ||
+            [obj isKindOfClass:[NSNumber class]] ||
+            [obj isKindOfClass:[NSDate class]] ||
+            [obj isKindOfClass:[NSData class]]);
+}
+
+BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
+    switch (property.type) {
         case RLMPropertyTypeString:
             return [obj isKindOfClass:[NSString class]];
         case RLMPropertyTypeBool:
@@ -100,11 +111,17 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
             return NO;
         case RLMPropertyTypeData:
             return [obj isKindOfClass:[NSData class]];
-
-        // FIXME: missing entries
-        case RLMPropertyTypeObject:
-        case RLMPropertyTypeArray:
         case RLMPropertyTypeAny:
+            return object_has_valid_type(obj);
+        case RLMPropertyTypeObject: {
+            // only NSNull, nil, or objects which derive from RLMObject and match the given
+            // object class are valid
+            BOOL isValidObject = RLMIsSubclass([obj class], [RLMObject class]) &&
+                                 [[[obj class] className] isEqualToString:property.objectClassName];
+            return isValidObject || obj == nil || obj == NSNull.null;
+        }
+        // FIXME: missing entries
+        case RLMPropertyTypeArray:
             break;
     }
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
@@ -172,17 +189,14 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
             return d;
         }
-        // case RLMPropertyTypeObject:
-        // FIXME - implement when we switch over to the links branch
         case RLMPropertyTypeArray:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"RLMArray not yet supported" userInfo:nil];
+        
+        // for links and other unsupported types throw
+        case RLMPropertyTypeObject:
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
         }
     }
 }
-
-
-
-
