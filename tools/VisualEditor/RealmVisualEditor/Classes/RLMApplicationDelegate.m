@@ -12,20 +12,28 @@
 
 @interface RealmTestClass1 : RLMObject
 
-@property (nonatomic, readonly) NSInteger intValue;
+@property (nonatomic, readonly) NSInteger integerValue;
+@property (nonatomic, readonly) BOOL boolValue;
+@property (nonatomic, readonly) float floatValue;
+@property (nonatomic, readonly) float doubleValue;
 @property (nonatomic, readonly) NSString *stringValue;
+@property (nonatomic, readonly) NSDate *dateValue;
 
-+ (instancetype)createWithInt:(NSInteger)integer string:(NSString *)string;
++ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue float:(float)floatValue double:(double)doubleValue string:(NSString *)stringValue date:(NSDate *)dateValue;
 
 @end
 
 @implementation RealmTestClass1
 
-+ (instancetype)createWithInt:(NSInteger)integer string:(NSString *)string
++ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue float:(float)floatValue double:(double)doubleValue string:(NSString *)stringValue date:(NSDate *)dateValue
 {
     RealmTestClass1 *result = [[RealmTestClass1 alloc] init];
-    result->_intValue = integer;
-    result->_stringValue = string;
+    result->_integerValue = integerValue;
+    result->_boolValue = boolValue;
+    result->_floatValue = floatValue;
+    result->_doubleValue = doubleValue;
+    result->_stringValue = stringValue;
+    result->_dateValue = dateValue;
     return result;
 }
 
@@ -62,16 +70,16 @@
     
     [realm beginWriteTransaction];
     
-    [realm addObject:[RealmTestClass1 createWithInt:10 string:@"ten"]];
-    [realm addObject:[RealmTestClass1 createWithInt:20 string:@"twenty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:30 string:@"thirty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:40 string:@"fourty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:50 string:@"fifty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:60 string:@"sixty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:70 string:@"seventy"]];
-    [realm addObject:[RealmTestClass1 createWithInt:80 string:@"eighty"]];
-    [realm addObject:[RealmTestClass1 createWithInt:90 string:@"ninety"]];
-    [realm addObject:[RealmTestClass1 createWithInt:100 string:@"hundred"]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:10    bool:YES float:123.456 double:123456.789 string:@"ten"      date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:20    bool:YES float:23.4561 double:123456.789 string:@"twenty"   date:[NSDate distantPast]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:30    bool:YES float:3.45612 double:123456.789 string:@"thirty"   date:[NSDate distantFuture]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:40    bool:YES float:.456123 double:123456.789 string:@"fourty"   date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:50    bool:YES float:654.321 double:123456.789 string:@"fifty"    date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:60    bool:YES float:6543.21 double:123456.789 string:@"sixty"    date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:70    bool:YES float:65432.1 double:123456.789 string:@"seventy"  date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:80    bool:YES float:654321. double:123456.789 string:@"eighty"   date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:90    bool:YES float:123.456 double:123456.789 string:@"ninety"   date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:100   bool:YES float:123.456 double:123456.789 string:@"hundred"  date:[NSDate date]]];
     
     [realm commitWriteTransaction];
 }
