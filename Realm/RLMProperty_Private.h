@@ -37,8 +37,9 @@
 @property (nonatomic, readonly) char objcType;
 
 // getter and setter names
-@property (nonatomic, copy) NSString * getterName;
-@property (nonatomic, copy) NSString * setterName;
+@property (nonatomic, copy) NSString *getterName;
+@property (nonatomic, copy) NSString *setterName;
+@property (nonatomic, copy) NSString *objectClassName;
 
 @end
 

@@ -61,10 +61,8 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
             for (RLMProperty *prop in objectSchema.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
                 if (prop.type == RLMPropertyTypeObject) {
-//                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-//                    table->add_column_link(name, linkTable->get_index_in_parent());
-                    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                                   reason:@"Links not yest supported" userInfo:nil];
+                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+                    table->add_column_link(tightdb::type_Link, name, linkTable->get_index_in_parent());
                 }
                 else {
                     table->add_column((tightdb::DataType)prop.type, name);
@@ -139,14 +137,9 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     if (object.realm.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
-    // if last in table delete, otherwise replace with last
-    if (object.objectIndex == object.backingTable->size() - 1) {
-        object.backingTable->remove(object.objectIndex);
-    }
-    else {
-        object.backingTable->move_last_over(object.objectIndex);
-        // FIXME - fix all accessors
-    }
+    // move last row to row we are deleting
+    object.backingTable->move_last_over(object.objectIndex);
+    // FIXME - fix all accessors
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order) {
