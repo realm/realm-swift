@@ -21,7 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
@@ -48,7 +48,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassName) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -89,12 +89,13 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
                 return [NSData dataWithBytes:data.data() length:data.size()];
             });
         case 'k':
-//            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-//                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-//                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
-//            });
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yet supported" userInfo:nil];
+            return imp_implementationWithBlock(^id(id<RLMAccessor> obj) {
+                if (obj.backingTable->is_null_link(col, obj.objectIndex)) {
+                    return nil;
+                }
+                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 return RLMGetAnyProperty(*obj.backingTable, obj.objectIndex, col);
@@ -150,22 +151,20 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 obj.backingTable->set_binary(col, obj.objectIndex, RLMBinaryDataForNSData(data));
             });
         case 'k':
-//            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
-//                if (!link || link.class == NSNull.class) {
-//                    // if null
-//                    obj.backingTable->nullify_link(col, obj.objectIndex);
-//                }
-//                else {
-//                    // add to Realm if not it it.
-//                    if (link.realm != obj.realm) {
-//                        [obj.realm addObject:link];
-//                    }
-//                    // set link
-//                    obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
-//                }
-//            });
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yet supported" userInfo:nil];
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
+                if (!link || link.class == NSNull.class) {
+                    // if null
+                    obj.backingTable->nullify_link(col, obj.objectIndex);
+                }
+                else {
+                    // add to Realm if not in it.
+                    if (link.realm != obj.realm) {
+                        [obj.realm addObject:link];
+                    }
+                    // set link
+                    obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
+                }
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
                 RLMSetAnyProperty(*obj.backingTable, obj.objectIndex, col, val);
@@ -298,6 +297,14 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     }
 }
 
+// implement the class method className on accessors to return the className of the
+// base object
+inline void RLMImplementClassNameMethod(Class accessorClass, NSString *className) {
+    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
+    IMP imp = imp_implementationWithBlock(^{ return className; });
+    class_replaceMethod(metaClass, @selector(className), imp, "@:");
+}
+
 Class RLMCreateAccessorClass(Class objectClass,
                              RLMObjectSchema *schema,
                              NSString *accessorClassPrefix,
@@ -340,6 +347,9 @@ Class RLMCreateAccessorClass(Class objectClass,
             class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
         }
     }
+    
+    // implement className for accessor to return base className
+    RLMImplementClassNameMethod(accClass, schema.className);
     
     // cache and return
     [cache setObject:accClass forKey:objectClass];
@@ -394,7 +404,11 @@ Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version) {
         // if we don't have this class, create a subclass or RLMObject
         dynamicClass = objc_allocateClassPair(RLMObject.class, dynamicName.UTF8String, 0);
         objc_registerClassPair(dynamicClass);
+        
+        // implement className for accessor to return base className
+        RLMImplementClassNameMethod(dynamicClass, schema.className);
     }
     return dynamicClass;
 }
+
 
