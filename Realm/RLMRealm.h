@@ -99,7 +99,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Getting Notified of Changes to a Realm
+ *  @name Receiving Notification on Changes to a Realm
  * ---------------------------------------------------------------------------------------
  */
 
@@ -318,58 +318,5 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // The schema version for this Realm.
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
-
-#pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Migrating a Realm to a Newer Version
- * ---------------------------------------------------------------------------------------
- */
-/**
- Performs a migration on the default Realm.
- 
- Must be called before the default Realm is accessed (otherwise throws). If the
- default Realm is at a version other than `version`, the migration is applied.
- 
- The block has the following definition:
- 
-     typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
- 
- It receives the following parameter:
- 
- - `RLMMigrationRealm` \***realm**: the Realm to be migrated.
- 
- @param version     The current schema version.
- @param block       The block which migrates the Realm to the current version.
- 
- */
- // FIXME: RLMMigrationRealm is not defined yet
- // @see               RLMMigrationRealm
-+ (void)ensureSchemaVersion:(NSUInteger)version usingBlock:(RLMMigrationBlock)block;
-
-/**
- Performs a migration on a Realm at a path.
- 
- Must be called before the Realm at `realmPath` is accessed (otherwise throws).
- If the Realm is at a version other than `version`, the migration is applied.
- 
- The block has the following definition:
- 
-     typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
- 
- It receives the following parameter:
- 
- - `RLMMigrationRealm` \***realm**: the Realm to be migrated.
- 
- @param version     The current schema version.
- @param realmPath   The path of the relm to migrate.
- @param block       The block which migrates the Realm to the current version.
- 
- */
- // FIXME: RLMMigrationRealm is not defined yet
- // @see               RLMMigrationRealm
-+ (void)ensureSchemaVersion:(NSUInteger)version
-                     atPath:(NSString *)realmPath
-                 usingBlock:(RLMMigrationBlock)block;
 
 @end
