@@ -71,15 +71,15 @@
     [realm beginWriteTransaction];
     
     [realm addObject:[RealmTestClass1 instanceWithInt:10    bool:YES float:123.456 double:123456.789 string:@"ten"      date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:20    bool:YES float:23.4561 double:123456.789 string:@"twenty"   date:[NSDate distantPast]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:30    bool:YES float:3.45612 double:123456.789 string:@"thirty"   date:[NSDate distantFuture]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:40    bool:YES float:.456123 double:123456.789 string:@"fourty"   date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:50    bool:YES float:654.321 double:123456.789 string:@"fifty"    date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:60    bool:YES float:6543.21 double:123456.789 string:@"sixty"    date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:70    bool:YES float:65432.1 double:123456.789 string:@"seventy"  date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:80    bool:YES float:654321. double:123456.789 string:@"eighty"   date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:90    bool:YES float:123.456 double:123456.789 string:@"ninety"   date:[NSDate date]]];
-    [realm addObject:[RealmTestClass1 instanceWithInt:100   bool:YES float:123.456 double:123456.789 string:@"hundred"  date:[NSDate date]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:20    bool:NO  float:23.4561 double:987654.321 string:@"twenty"   date:[NSDate distantPast]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:30    bool:YES float:3.45612 double:1234.56789 string:@"thirty"   date:[NSDate distantFuture]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:40    bool:NO  float:.456123 double:9876.54321 string:@"fourty"   date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 7.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:50    bool:YES float:654.321 double:123.456789 string:@"fifty"    date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 7.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:60    bool:NO  float:6543.21 double:987.654321 string:@"sixty"    date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 1.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:70    bool:YES float:65432.1 double:12.3456789 string:@"seventy"  date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 1.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:80    bool:NO  float:654321. double:98.7654321 string:@"eighty"   date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:90    bool:YES float:123.456 double:1.23456789 string:@"ninety"   date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0]]];
+    [realm addObject:[RealmTestClass1 instanceWithInt:100   bool:NO  float:123.456 double:9.87654321 string:@"hundred"  date:[[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0]]];
     
     [realm commitWriteTransaction];
 }
