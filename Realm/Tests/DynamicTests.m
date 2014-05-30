@@ -33,11 +33,13 @@
 @interface DynamicTests : RLMTestCase
 @end
 
+// private realm methods
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
                         error:(NSError **)outError;
+- (RLMSchema *)schema;
 @end
 
 @implementation DynamicTests
