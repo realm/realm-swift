@@ -105,12 +105,20 @@
     return obj;
 }
 
+// default attributes for property implementation
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
+    return RLMPropertyAttributeDeleteNever;
+}
+#pragma clang diagnostic pop
+
 // default default values implementation
 + (NSDictionary *)defaultPropertyValues {
     return nil;
 }
 
-// Ignored properties implementation
+// default ignored properties implementation
 + (NSArray *)ignoredProperties {
     return nil;
 }
