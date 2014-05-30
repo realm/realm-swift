@@ -35,3 +35,8 @@
 //@property AgeTable      *tableCol;
 @end
 
+
+@interface RLMTestObject : RLMObject
+@property (nonatomic, copy) NSString *column;
+@end
+

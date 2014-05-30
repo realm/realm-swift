@@ -25,6 +25,8 @@
 // RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
 
+- (instancetype)initWithDefaultValues:(BOOL)useDefaults;
+
 @property (nonatomic, readwrite) RLMRealm *realm;
 @property (nonatomic) RLMObjectSchema *schema;
 
