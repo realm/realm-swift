@@ -40,7 +40,7 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
 // predicate exception
 NSException *RLMPredicateException(NSString *name, NSString *reason);
 
-// This macro generates an NSPredicate from either an an NSString with optional format va_list
+// This macro generates an NSPredicate from either an NSPredicate or an NSString with optional format va_list
 #define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
 if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     OUTPREDICATE = INPREDICATE;                            \
@@ -53,4 +53,3 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     NSString *reason = @"predicate must be either an NSPredicate or an NSString with optional format va_list";  \
     [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];                                 \
 }
-
