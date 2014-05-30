@@ -30,48 +30,48 @@
 @interface RLMObject : NSObject
 
 /**
- Initialize a standalone RLMObject
+ Initialize an standalone RLMObject
  
- Initialize an unpersisted instance of this object.
- Call addObject: on an RLMRealm to add standalone object to a realm.
+ Initializes an unpersisted RLMObject.
+ Call [RLMRealm addObject:] to add an RLMObject to a realm.
  
- @see [RLMRealm addObject:]:
+ @see [RLMRealm addObject:]
  */
 -(instancetype)init;
 
 /**
- Create an RLMObject within a Realm with a given object.
+ Creates an RLMObject instance from a given object and adds it to a specified RLMRealm, 
+ where it will be persisted.
  
- Creates an instance of this object and adds it to the given Realm populating
- the object with the given object.
+ @param realm   The RLMRealm instance to add the object to.
+ @param object  The object used to populate the RLMObject instance. This can be any key/value compliant
+                object, a JSON object such as those returned from the methods in [NSJSONSerialization](https://developer.apple.com/library/ios/documentation/foundation/reference/nsjsonserialization_class/Reference/Reference.html), 
+                or an [NSArray](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSArray_Class/NSArray.html)
+                that contains one object for each persisted property. 
  
- @param realm   The Realm in which this object is persisted.
- @param object  The object used to populate the object. This can be any key/value compliant
-                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
-                an NSArray with one object for each persisted property. An exception will be
-                thrown if all equired properties are not present or no default is provided.
-                When passing in an NSArray, all properties must be present and valid.
+ @exception RLMException  Thrown if all required properties are not present or no default is provided.
+                		  When passing in an NSArray, all properties must be present and valid.
  
  @see   defaultPropertyValues
  */
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
 
 /**
- Create an RLMObject within a Realm with a JSONString.
- 
- Creates an instance of this object and adds it to the given Realm populating
- the object with the data in the given JSONString.
- 
- @param realm       The Realm in which this object is persisted.
- @param JSONString  An NSString with valid JSON. An exception will be thrown if required properties are
- not present in the JSON for which defaults are not provided.
+ Creates an RLMObject instance from a JSONString and adds it to a specified RLMRealm,
+ where it will be persisted.
+  
+ @param realm       The RLMRealm instance to add the JSONString to.
+ @param JSONString  An NSString with valid JSON. 
+
+ @exception RLMException  An exception will be thrown if required properties are
+ 						  not present in the JSON for which defaults are not provided.
  
  @see   defaultPropertyValues
  */
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
- The Realm in which this object is persisted. Returns nil for standalone objects.
+ The RLMRealm instance in which this object is persisted. Returns nil for standalone objects.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
@@ -164,7 +164,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 + (NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to return an array of property names to ignore. These properties will not be persisted
+ Implement to return an NSArray of property names to ignore. These properties will not be persisted
  and are treated as transient.
  
  @return    NSArray of property names to igonre.
@@ -203,32 +203,34 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 @interface RLMObject (DefaultRealm)
 
 /**
- Get all objects of this type from the default Realm.
+ Retrieves all objects of the specified type from the default RLMRealm.
  
- @return    An RLMArray of all objects of this type in the default Realm.
+ @return    An RLMArray of all objects of the specified type that are stored the default RLMRealm.
  */
 + (RLMArray *)allObjects;
 
 /**
- Get objects matching the given predicate for this type from the default Realm.
+ Retrieves all objects that match the specified predicate and type from the default RLMRealm.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), 
+ a predicte string, or predicate format string
  which can accept variable arguments.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
+ @return    An RLMArray of RLMObjects from the default RLMRealm that match the specified predicate and subclass type
  */
 + (RLMArray *)objectsWhere:(id)predicate, ...;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate for this type from the default Realm.
+ Retrieves an ordered RLMArray of objects matching the specified predicate and type from the default RLMRealm.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate  The argument can be an NSPredicate, a predicte string, or predicate format string
  which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- the property name, or an NSSortDescriptor with the property name and order.
+ @param order  An NSString containing a property name, or an 
+ 			   NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) 
+	   		   containing a property name and order to sort the results by.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the predicate
- ordered by the given order.
+ @return  An RLMArray of RLMObjects from the default Realm that match the specified predicate and subclass type
+ ordered by the specified order.
  */
 + (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
@@ -257,9 +259,9 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  */
 @interface RLMObject (JSONSerialization)
 /**
- Returns this object represented as a JSON string.
+ Returns an RLMObject represented as a JSON string.
  
- @return    JSON string representation of this object.
+ @return  JSON string representation of the RLMObject.
  */
 - (NSString *)JSONString;
 
@@ -272,9 +274,9 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  */
 @interface RLMObject (ClassName)
 /**
- Helper to return the class name for an RLMObject subclass.
+ Returns the class name for an RLMObject.
  
- @return    The class name for a given class.
+ @return  The class name for a given RLMObject.
  */
 + (NSString *)className;
 
