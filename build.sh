@@ -693,10 +693,10 @@ EOF
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
-        sed -i -e '/RLMPropertyType/d' docs/html/index.html
-        sed -i -e '/RLMSortOrder/d' docs/html/index.html
-        sed -i -e '/RLMPropertyType/d' docs/html/hierarchy.html
-        sed -i -e '/RLMSortOrder/d' docs/html/hierarchy.html
+        sed -i '' -e'/RLMPropertyType/d' docs/html/index.html
+        sed -i '' -e'/RLMSortOrder/d' docs/html/index.html
+        sed -i '' -e'/RLMPropertyType/d' docs/html/hierarchy.html
+        sed -i '' -e'/RLMSortOrder/d' docs/html/hierarchy.html
         mkdir -p docs/output
         rm -rf docs/output/$(sh build.sh get-version)
         mv docs/html docs/output/$(sh build.sh get-version)
