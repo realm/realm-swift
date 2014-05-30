@@ -99,7 +99,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Receiving Notification on Changes to a Realm
+ *  @name Receiving Notification when a Realm Changes
  * ---------------------------------------------------------------------------------------
  */
 

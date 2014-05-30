@@ -159,7 +159,7 @@
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Getting & Querying Objects on the Default Realm
+ *  @name Getting & Querying Objects from the Default Realm
  *  ---------------------------------------------------------------------------------------
  */
 
