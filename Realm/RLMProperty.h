@@ -38,7 +38,7 @@
 /**
  Object class name - specify object types for RLMObject and RLMArray properties.
  */
-@property (nonatomic, readonly) NSString *objectClassName;
+@property (nonatomic, readonly, copy) NSString *objectClassName;
 
 @end
 
