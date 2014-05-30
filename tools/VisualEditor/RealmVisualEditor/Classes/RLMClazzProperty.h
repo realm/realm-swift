@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
-#import "Realm.h"
+#import <Realm/Realm.h>
 
 @interface RLMClazzProperty : NSObject
 

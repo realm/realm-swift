@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Realm/Realm.h>
 
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
-#import "Realm.h"
 
 @interface RLMClazzNode : NSObject <RLMRealmOutlineNode>
 
