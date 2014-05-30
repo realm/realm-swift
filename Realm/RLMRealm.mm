@@ -23,6 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #include <exception>
 #include <sstream>
@@ -532,5 +533,13 @@ static NSArray *s_objectDescriptors = nil;
 }
 #pragma GCC diagnostic pop
 
+- (BOOL)isPropertyIndexed:(NSString *)propertyName forClass:(NSString *)className {
+    NSString *tableName = self.schema.tableNamesForClass[className];
+    tightdb::TableRef table = self.group->get_table(tightdb::StringData(tableName.UTF8String, tableName.length));
+    
+    size_t column = table->get_column_index(RLMStringDataWithNSString(propertyName));
+    
+    return table->has_index(column);
+}
 
 @end
