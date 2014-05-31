@@ -27,9 +27,10 @@
 
 /**
  
+ ### Using RLMObject
  In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
  You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
- 
+
      // in Dog.h
      @interface Dog : RLMObject
  
@@ -43,6 +44,7 @@
      @implementation Dog
      @end //none needed
  
+ ### Realm Properties
  Supported property types are:
  
  - `NSString`
@@ -50,8 +52,9 @@
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
- - Other objects subclassing `RLMObject`, so you can link RLMObjects together.
+ - Other objects subclassing `RLMObject`, so you can link RLMObject instances together.
  
+ #### Customizing properties
  You can set which of these properties should be indexed, stored inline, unique, required
  as well as delete rules for the links by implementing the attributesForProperty: method.
  
@@ -60,10 +63,17 @@
  
  You can set default values for properties by implementing defaultPropertyValues.
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
- These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search in a Realms other than the defaut Realm
- use the interface on an RLMRealm instance.
+ ### Accessing & querying RLMObject from a Realm
+
+ You can query an RLMObject subclass directly via the following class methods: 
+
+ - allObjects
+ - objectsWhere:
+ - objectsOrderedBy:where:
+ - objectForKeyedSubscript:
+
+ These methods allow you to easily query a custom subclass for RLMObject instances in the
+ default Realm. To search in a Realm other than the defaut Realm, use the interface on an RLMRealm instance.
  
  */
 
@@ -76,19 +86,18 @@
  */
 
 /**
- Initialize an standalone RLMObject
+ Initialize an unpersisted, standalone RLMObject
  
- Initializes an unpersisted RLMObject.
- Call [RLMRealm addObject:] to add an RLMObject to a realm.
+ To add a standalone RLMObject to an RLMRealm, call [RLMRealm addObject:].
  
  @see [RLMRealm addObject:]
  */
 -(instancetype)init;
 
 /**
- Helper to return the class name for an RLMObject subclass.
+ Returns the class name of the RLMObject subclass.
  
- @return    The class name for the model class.
+ @return    The subclass name.
  */
 + (NSString *)className;
 
@@ -113,8 +122,8 @@
  Creates an RLMObject instance from a JSONString and adds it to a specified RLMRealm,
  where it will be persisted.
   
- @param realm       The RLMRealm instance to add the JSONString to.
- @param JSONString  An NSString with valid JSON. 
+ @param realm       The RLMRealm instance to add the RLMObject to.
+ @param JSONString  An NSString with valid JSON to create the RLMObject instance from. 
 
  @exception RLMException  An exception will be thrown if required properties are
  						  not present in the JSON for which defaults are not provided.
@@ -124,7 +133,8 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
- The RLMRealm instance in which this object is persisted. Returns nil for standalone objects.
+ Returns the RLMRealm instance in which this object is persisted, or nil if the instance
+ is a standalone RLMObject.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
@@ -135,25 +145,26 @@
  */
 
 /**
- Implement to set custom attributes for each property.
+ Set custom attributes for each property.
  
- @param propertyName    Name of property for which attributes have been requested.
- @return                Bitmask of property attributes for the given property.
+ @param propertyName    Name of the property whose attributes should be retrieved.
+ @return                A bitmask of property attributes for the specified property.
  */
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
 
 /**
- Implement to indicate the default values to be used for each property.
+ Indicates the default values to be used for each property of the RLMObject instance.
  
  @return    NSDictionary mapping property names to their default values.
  */
 + (NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to return an NSArray of property names to ignore. These properties will not be persisted
- and are treated as transient.
+ Returns an NSArray of property names to ignore.
+
+ Ignored properties will not be persisted and are treated as transient.
  
- @return    NSArray of property names to igonre.
+ @return    NSArray of ignored property names.
  */
 + (NSArray *)ignoredProperties;
 
@@ -164,50 +175,73 @@
  */
 
 /**
- Retrieves all objects of the specified type from the default RLMRealm.
+ Retrieves all RLMObject subclass instances of the same type from the default RLMRealm.
  
- @return    An RLMArray of all objects of the specified type that are stored the default RLMRealm.
+ To specify the type of RLMObject to retrieve, use [RLMRealm allObjects:].
+
+ @return    An RLMArray of all RLMObjects of the same type stored in the default RLMRealm.
+
+ @see [RLMRealm allObjects:]
  */
 + (RLMArray *)allObjects;
 
 /**
- Retrieves all objects that match the specified predicate and type from the default RLMRealm.
+ Retrieves all RLMObject instances of the same type that match the specified predicate from the default RLMRealm.
+
+ To specify the type of RLMObject to retrieve, use [RLMRealm objects:where:].
  
- @param predicate   The argument can be an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), 
- a predicte string, or predicate format string
- which can accept variable arguments.
+ @param predicate   An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), 
+ 					a predicte string, or predicate format string that can accept variable arguments.
  
- @return    An RLMArray of RLMObjects from the default RLMRealm that match the specified predicate and subclass type
+ @return    An RLMArray of RLMObjects from the default RLMRealm that match the specified predicate and type
+
+ @see [RLMRealm objects:where:]
  */
 + (RLMArray *)objectsWhere:(id)predicate, ...;
 
 /**
  Retrieves an ordered RLMArray of objects matching the specified predicate and type from the default RLMRealm.
  
- @param predicate  The argument can be an NSPredicate, a predicte string, or predicate format string
- which can accept variable arguments.
- @param order  An NSString containing a property name, or an 
- 			   NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) 
+ @param predicate  An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), 
+ 				   a predicte string, or predicate format string that can accept variable arguments.
+ @param order  An NSString containing a property name, or an [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) 
 	   		   containing a property name and order to sort the results by.
  
- @return  An RLMArray of RLMObjects from the default Realm that match the specified predicate and subclass type
- ordered by the specified order.
+ @return  An ordered RLMArray of RLMObjects from the default Realm that match the specified predicate and subclass type.
  */
 + (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
 
 #pragma mark -
 
-//---------------------------------------------------------------------------------------
-// @name Dynamic Accessors
-//---------------------------------------------------------------------------------------
-//
-// Properties on RLMObjects can be accessed and set using keyed subscripting.
-// ie. rlmObject[@"propertyName"] = object;
-//     id object = rlmObject[@"propertyName"];
-//
+/**---------------------------------------------------------------------------------------
+ * @name Dynamic Accessors
+ *---------------------------------------------------------------------------------------
+ */
 
+/**
+ Retrieves the property value of the specified key from the RLMObject.
+
+ @param key  The key of the property to be retrieved.
+
+ @return  The value of the specified property or `nil` if there is no value for the
+ 		  specified key.
+
+ Properties on RLMObjects can also be accessed using keyed subscripting, i.e. 
+ RLMObject[@"propertyName"] = object;
+ */
 -(id)objectForKeyedSubscript:(NSString *)key;
+
+/**
+ Sets a property value for the specified key in the RLMObject. 
+
+ @param obj  The object to be stored as the property value.
+
+ @param key  The key to use for future lookups of the property being saved.
+
+ Properties on RLMObjects can also be set using keyed subscripting, 
+ ie. RLMObject[@"propertyName"] = object;
+ */
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
 #pragma mark -
@@ -217,7 +251,7 @@
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns an RLMObject represented as a JSON string.
+ Returns a JSON string representation of the RLMObject instance.
  
  @return  JSON string representation of the RLMObject.
  */
