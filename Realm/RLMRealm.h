@@ -34,62 +34,66 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  * ---------------------------------------------------------------------------------------
  */
 /** 
- Obtains an instance of the default Realm.
+ Gets an instance of the default RLMRealm.
  
  RLMRealm instances are reused when this is called multiple times from the same thread. The 
  default RLMRealm is persisted as default.realm under the Documents directory of your Application.
  
- @warning   RLMRealm instances are not thread safe and can not be shared across threads or 
-            dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
+ @warning  RLMRealm instances are not thread safe and cannot be shared across threads or 
+            dispatch queues. You must create a separate RLMRealm instance for each thread and queue.
  
- @return The default RLMRealm instance for the current thread.
+ @return  The default RLMRealm instance for the current thread.
  */
 + (instancetype)defaultRealm;
 
 /**
- Obtains an RLMRealm instance persisted at a specific file.
+ Creates an RLMRealm instance and persists it in the specified file.
  
  RLMRealm instances are reused when this is called multiple times from the same thread.
  
- @warning   RLMRealm instances are not thread safe and can not be shared across threads or
- dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
+ @warning  RLMRealm instances are not thread safe and can not be shared across threads or
+ dispatch queues. You must create a separate RLMRealm instance for each thread and queue.
  
- @param path Path to the file you want the data saved in.
+ @param path  A path to the file you want the RLMRealm persisted in.
  
- @return An RLMRealm instance.
+ @return  A persisted RLMRealm instance.
  */
 + (instancetype)realmWithPath:(NSString *)path;
 
 /**
- Obtains an RLMRealm instance with persistence to a specific file with options.
+ Creates an RLMRealm instance and persists it in the specified file with options.
  
- @warning   RLMRealm instances are not thread safe and can not be shared across threads or
+ @warning  RLMRealm instances are not thread safe and can not be shared across threads or
  dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
  
- @param path        Path to the file you want the data saved in.
- @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
- @param error       Pass-by-reference for errors.
+ @param path  Path to the file you want the RLMRealm persisted in.
+ @param readonly  BOOL indicating if this RLMRealm is readonly (must use for readonly files)
+ @param error  A pass-by-reference for errors.
  
- @return An RLMRealm instance.
+ @exception realm:runloop_exception  Thrown if this method is called from a thread without a runloop
+
+ @return A persisted RLMRealm instance.
  */
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Make the default Realm in-memory only
+ Specifies that the default RLMRealm will be persisted in-memory only
  
- By default, the default Realm is persisted to disk unless this method is called.
+ The default RLMRealm is persisted to disk unless this method is called.
  
- @warning This must be called before any Realm instances are obtained (otherwise throws).
+ @warning This must be called before any RLMRealm instances are obtained or an exception will be thrown.
+
+ @exception 
  */
 + (void)useInMemoryDefaultRealm;
 
 /**
- Path to the file where this Realm is persisted.
+ Path to the file where this RLMRealm is persisted.
  */
 @property (nonatomic, readonly) NSString *path;
 
 /**
- Indicates if this Realm is read only
+ Indicates if this RLMRealm is read-only
  
  @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
@@ -104,7 +108,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  */
 
 /**
- Add a notification handler for changes in this RLMRealm.
+ Adds a notification handler that will be triggered by changes in this RLMRealm.
  
  The block has the following definition:
  
@@ -116,12 +120,13 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
     RLMRealmDidChangeNotification is the only notification currently supported.
  - `RLMRealm` \***realm**:           The realm for which this notification occurred
  
- @param block   A block which is called to process RLMRealm notifications.
+ @param block  The RLMNotificationBlock to be called to process notifications from this RLMRealm. 
+ 			   RLMRealmDidChangeNotification is the only notification currently supported.
  */
 - (void)addNotificationBlock:(RLMNotificationBlock)block;
 
 /**
- Remove a previously registered notification handler.
+ Removes a notification handler from this RLMRealm.
  
  The block has the following definition:
  
@@ -133,7 +138,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  RLMRealmDidChangeNotification is the only notification currently supported.
  - `RLMRealm` \***realm**:           The realm for which this notification occurred
  
- @param block   The block previously passed to addNotification: to remove.
+ @param block  The RLMNotificationBlock to remove.
  */
 - (void)removeNotificationBlock:(RLMNotificationBlock)block;
 
@@ -145,44 +150,45 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  */
 
 /**
- Begins a write transaction in an RLMRealm. 
+ Begins a write transaction to an RLMRealm.
  
  Only one write transaction can be open at a time. Calls to beginWriteTransaction from RLMRealm instances
  in other threads will block until the current write transaction terminates.
  
- In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm 
+ If writes were made in other threads or processes to other instances of the same RLMRealm, the RLMRealm 
  on which beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to
- the latest Realm version when this method is called.
+ the latest RLMRealm version when this method is called.
  */
 - (void)beginWriteTransaction;
 
 /**
- Commits all writes operations in the current write transaction. 
+ Commits all writes operations from the current write transaction. 
  
- After this is called the RLMRealm reverts back to being read-only.
+ After this is called, the RLMRealm reverts back to being read-only.
  */
 - (void)commitWriteTransaction;
 
 /**
- Abandon all write operations in the current write transaction terminating the transaction.
+ Abandons all write operations in the current write transaction and terminates the transaction.
  
- After this is called the RLMRealm reverts back to being read-only.
+ After this is called, the RLMRealm reverts back to being read-only.
  */
 - (void)rollbackWriteTransaction;
 
 /**
- Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
+ Updates an RLMRealm and all oustanding objects to point to the most recent data for this RLMRealm.
  */
 - (void)refresh;
 
 /**
- Set to YES to automacially update this Realm when changes happen in other threads.
+ Set to YES to automacially update this RLMRealm when changes occur in other threads.
 
- If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
- Notifications are sent immediately when a change is avaiable whether or not the Realm is automatically
+ Set to NO to require refresh to be manually called on the RLMRealm to update it to the lastest version.
+ 
+ Notifications are sent immediately when a change is avaiable whether or not the RLMRealm is automatically
  updated.
  
- Defaults to YES on the main thread, NO on all others.
+ Defaults to YES on the main thread, and NO on all others.
  */
 @property (nonatomic) BOOL autorefresh;
 
@@ -193,14 +199,14 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  * ---------------------------------------------------------------------------------------
  */
 /**
- Adds an object to be persistsed it in this Realm.
+ Adds an object to be persistsed in this RLMRealm.
  
  Once added, this object can be retrieved using the objectsWhere: selectors on RLMRealm and on
- subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
- also be added to the Realm if they are not already in it. If linked objects already belong to a
- different Realm an exception will be thrown.
+ subclasses of RLMObject. Once added, all linked (child) objects referenced by the specified object will
+ also be added to the RLMRealm if they are not already in it. If linked objects already belong to a
+ different RLMRealm an exception will be thrown.
  
- @param object  Object to be added to this Realm.
+ @param object  An object to be added to this Realm.
  */
 - (void)addObject:(RLMObject *)object;
 
