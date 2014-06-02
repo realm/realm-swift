@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C415041921B0C300F858D9"
-               BuildableName = "libRealm.a"
-               BlueprintName = "Realm-iOS"
+               BlueprintIdentifier = "421A99481933646F00F5E4D4"
+               BuildableName = "Framework-iOS"
+               BlueprintName = "Realm-iOS-framework"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,7 +26,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Release">
+      buildConfiguration = "Debug">
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -45,7 +45,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
