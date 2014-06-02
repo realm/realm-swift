@@ -120,7 +120,9 @@
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // get object class and set type
-                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
+                const NSUInteger prefixLength = 11;
+                const NSUInteger suffixLength = 2;
+                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-prefixLength-suffixLength)];
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
@@ -136,6 +138,7 @@
                 
                 // verify type
                 Class cls = NSClassFromString(self.objectClassName);
+                // FIXME: RLMArray does not inherit from RLMObject. Why is exception thrown?
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
                 }

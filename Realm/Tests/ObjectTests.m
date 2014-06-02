@@ -48,6 +48,15 @@
 @implementation KeyedObject
 @end
 
+RLM_OBJECT_PROTOCOL(KeyedObject);
+
+@interface SuperObject : RLMObject
+@property RLMArray<KeyedObject> *keys;
+@end
+
+@implementation SuperObject
+@end
+
 @interface DefaultObject : RLMObject
 @property int intCol;
 @property float floatCol;
