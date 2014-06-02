@@ -623,7 +623,7 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
+			shellPath = /bin/bash;
 			shellScript = "";
 		};
 		42FB4FE01936505000897620 /* Link with TightDB core library */ = {
