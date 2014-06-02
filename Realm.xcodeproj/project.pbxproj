@@ -38,7 +38,6 @@
 		02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAD193662AF00E4EEF8 /* LinkTests.m */; };
 		02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
 		02026CBA19379F6E00E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
-		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		02C41470191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -132,6 +131,9 @@
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
+		B1715462193CAFE700ED988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1715461193CAFE700ED988E /* Foundation.framework */; };
+		B1715463193CBD4100ED988E /* libtightdb.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B171545D193CAB6500ED988E /* libtightdb.9.dylib */; };
+		B1715465193CBFE500ED988E /* libtightdb.9.dylib in Resources */ = {isa = PBXBuildFile; fileRef = B1715464193CBFE500ED988E /* libtightdb.9.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -227,6 +229,10 @@
 		4D8D90AF192B7FC4004C89AA /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectInterfaceTests.m; sourceTree = "<group>"; };
 		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
+		B171545D193CAB6500ED988E /* libtightdb.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtightdb.9.dylib; path = "realm-core/libtightdb.9.dylib"; sourceTree = "<group>"; };
+		B171545F193CAC8C00ED988E /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		B1715461193CAFE700ED988E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		B1715464193CBFE500ED988E /* libtightdb.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtightdb.9.dylib; path = "realm-core/libtightdb.9.dylib"; sourceTree = "<group>"; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -238,7 +244,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */,
+				B1715463193CBD4100ED988E /* libtightdb.9.dylib in Frameworks */,
+				B1715462193CAFE700ED988E /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +370,7 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
+				B1715464193CBFE500ED988E /* libtightdb.9.dylib */,
 				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
@@ -385,6 +393,9 @@
 		E918909B177B677900653D7A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B1715461193CAFE700ED988E /* Foundation.framework */,
+				B171545F193CAC8C00ED988E /* Cocoa.framework */,
+				B171545D193CAB6500ED988E /* libtightdb.9.dylib */,
 				02C415401921B25B00F858D9 /* libstdc++.6.dylib */,
 				02C414C1191F3D1500F858D9 /* libstdc++.6.dylib */,
 				4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */,
@@ -583,6 +594,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1715465193CBFE500ED988E /* libtightdb.9.dylib in Resources */,
 				02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */,
 				4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */,
 			);
@@ -779,19 +791,20 @@
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/realm-core/include";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				LD_RUNPATH_SEARCH_PATHS = Resources;
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/realm-core";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -820,10 +833,14 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/realm-core/include";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				LD_RUNPATH_SEARCH_PATHS = Resources;
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/realm-core";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = framework;
 			};
