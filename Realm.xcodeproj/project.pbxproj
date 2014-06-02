@@ -649,7 +649,7 @@
 			);
 			name = "Build Framework";
 			outputPaths = (
-				"${SRC_ROOT}/build/${CONFIGURATION}/${PRODUCT_NAME}.framework",
+				"${SRCROOT}/build/${CONFIGURATION}/${PRODUCT_NAME}.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/sh build-framework.sh";

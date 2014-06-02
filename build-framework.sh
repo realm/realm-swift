@@ -3,7 +3,7 @@ set +u
 
 # lib/framework paths
 SF_FRAMEWORK_PATH="${SRCROOT}/build/${CONFIGURATION}/${PRODUCT_NAME}.framework"
-SF_COMBINED_PATH="${BUILD_DIR}/libRealm-combined.a"
+SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
 
 # very simple structure - it doesn't follow Apple's documentation
 /bin/rm -rf "${SF_FRAMEWORK_PATH}"

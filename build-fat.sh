@@ -49,15 +49,16 @@ fi
 
 # We have to build the other platform and combine with it and the core libraries
 REALM_TARGET_NAME=Realm-iOS
-SF_FAT_PATH="${BUILD_DIR}/libRealm-fat.a"
+SF_FAT_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-fat.a"
 SF_LIB_PATH="${BUILT_PRODUCTS_DIR}/libRealm.a"
 SF_OTHER_LIB_PATH="${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a"
-SF_COMBINED_PATH="${BUILD_DIR}/libRealm-combined.a"
+SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
 
 # Step 1 - build other platform
 xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
 
 # Step 2 - move files and make fat
+mkdir -p ${BUILD_DIR}/${CONFIGURATION}
 xcrun lipo -create ${SF_LIB_PATH} ${SF_OTHER_LIB_PATH} -output ${SF_FAT_PATH}
 
 # Step 3 - combine with tightdb
