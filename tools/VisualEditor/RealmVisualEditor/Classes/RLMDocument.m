@@ -80,7 +80,16 @@
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
     [super windowControllerDidLoadNib:aController];
-    // Add any code here that needs to be executed once the windowController has loaded the document's window.
+
+    [self.tableOutlineView expandItem:nil
+                       expandChildren:YES];
+    
+    id firstItem = presentedRealm.topLevelClazzes.firstObject;
+    if (firstItem != nil) {
+        NSInteger index = [self.tableOutlineView rowForItem:firstItem];
+        [self.tableOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                           byExtendingSelection:NO];
+    }
 }
 
 + (BOOL)autosavesInPlace
@@ -408,7 +417,6 @@
             column.type == RLMPropertyTypeFloat ||
             column.type == RLMPropertyTypeDouble ||
             column.type == RLMPropertyTypeString) {
-            //tableColumn.editable = YES;
             tableColumn.editable = NO;
         }
         else {
