@@ -68,7 +68,7 @@
             id value = values[property.name];
             if (value) {
                 // Validate Value
-                if (RLMIsObjectOfType(value, property.type)) {
+                if (RLMIsObjectValidForProperty(value, property)) {
                     [obj setValue:value forKeyPath:property.name];
                 }
                 else {
@@ -90,7 +90,7 @@
             RLMProperty *property = properties[i];
             
             // Validate Value
-            if (RLMIsObjectOfType(value, property.type)) {
+            if (RLMIsObjectValidForProperty(value, property)) {
                 [obj setValue:array[i] forKeyPath:property.name];
             }
             else {
@@ -105,8 +105,21 @@
     return obj;
 }
 
+// default attributes for property implementation
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
+    return RLMPropertyAttributeDeleteNever;
+}
+#pragma clang diagnostic pop
+
 // default default values implementation
 + (NSDictionary *)defaultPropertyValues {
+    return nil;
+}
+
+// default ignored properties implementation
++ (NSArray *)ignoredProperties {
     return nil;
 }
 

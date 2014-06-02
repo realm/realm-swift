@@ -21,8 +21,9 @@
 #import "RLMObjectSchema.h"
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
+#import "RLMSchema_Private.h"
 #import <tightdb/table.hpp>
-
+#import "RLMObject_Private.h"
 
 // private properties
 @interface RLMObjectSchema ()
@@ -57,9 +58,14 @@
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
-        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
-        if (prop) {
-            [propArray addObject:prop];
+        NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
+        BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
+        
+        if (!ignored) { // Don't process ignored properties
+            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
+            if (prop) {
+                [propArray addObject:prop];
+            }
         }
     }
     
@@ -85,8 +91,12 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                                        column:col];
-        
-        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+        if (prop.type == RLMPropertyTypeObject) {
+            // set link type for objects
+            tightdb::TableRef linkTable = table->get_link_target(col);
+            prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
+        }
+        else if (prop.type == RLMPropertyTypeArray) {
             @throw [NSException exceptionWithName:@"RLMNotImplementedException" reason:@"Not implemented." userInfo:nil];
         }
         
