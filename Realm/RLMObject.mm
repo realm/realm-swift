@@ -188,16 +188,15 @@
 - (NSString *)description
 {
     NSString *baseClassName = self.class.className;
-    
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
-    
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
     
     for (RLMProperty *property in objectSchema.properties) {
         [mString appendFormat:@"\t%@ = %@;\n", property.name, [self[property.name] description]];
     }
     [mString appendString:@"}"];
-    return [mString copy];
+    
+    return [NSString stringWithString:mString];
 }
 
 @end
