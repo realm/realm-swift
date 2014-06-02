@@ -376,7 +376,6 @@ Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
                                   NULL, RLMAccessorSetter, s_insertionAccessorCache);
 }
 
-
 // Dynamic accessor name for a classname
 inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
     return [NSString stringWithFormat:@"RLMDynamic_%@_Version_%lu", className, (unsigned long)version];
