@@ -632,7 +632,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "";
+			shellScript = "/usr/bin/curl -s http://static.realm.io/downloads/ios/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -rf ${SRCROOT}/realm-core ${SRCROOT}/realm_core\ncd ${SRCROOT}\n/usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/mv realm_core realm-core\n/bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip";
 		};
 		42FB4FE01936505000897620 /* Link with TightDB core library */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1050,6 +1050,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REALM_CORE_VERSION = 0.20.0;
 			};
 			name = Debug;
 		};
@@ -1057,6 +1058,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REALM_CORE_VERSION = 0.20.0;
 			};
 			name = Release;
 		};
