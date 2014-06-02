@@ -39,6 +39,27 @@
 
 @end
 
+@interface RealmTestClass2 : RLMObject
+
+@property (nonatomic, readonly) NSInteger integerValue;
+@property (nonatomic, readonly) BOOL boolValue;
+
++ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue;
+
+@end
+
+@implementation RealmTestClass2
+
++ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue
+{
+    RealmTestClass2 *result = [[RealmTestClass2 alloc] init];
+    result->_integerValue = integerValue;
+    result->_boolValue = boolValue;
+    return result;
+}
+
+@end
+
 @implementation RLMApplicationDelegate
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -80,6 +101,14 @@
     [realm addObject:[RealmTestClass1 instanceWithInt:80    bool:NO  float:654321. double:98.7654321 string:@"eighty"   date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0]]];
     [realm addObject:[RealmTestClass1 instanceWithInt:90    bool:YES float:123.456 double:1.23456789 string:@"ninety"   date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0]]];
     [realm addObject:[RealmTestClass1 instanceWithInt:100   bool:NO  float:123.456 double:9.87654321 string:@"hundred"  date:[[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0]]];
+    
+    [realm addObject:[RealmTestClass2 instanceWithInt:1111  bool:YES]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:2211  bool:YES]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:3322  bool:YES]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:4433  bool:NO]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:5544  bool:YES]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:6655  bool:YES]];
+    [realm addObject:[RealmTestClass2 instanceWithInt:7766  bool:NO]];
     
     [realm commitWriteTransaction];
 }
