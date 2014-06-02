@@ -816,6 +816,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -848,6 +849,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -885,6 +887,7 @@
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-Wall";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -919,6 +922,7 @@
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-Wall";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUNDLE_LOADER)";
