@@ -27,6 +27,26 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 
 /**
+ An RLMRealm instance models a Realm, the . Similiar in concept to a table in a traditional RDBMS 
+ such as MySQL, each Realm represents a data store that persists data as objects subclassed from RLMObject.
+ Each Realm can persist objects of mixed types.
+ 
+ ### Persistence
+ In Realm, data is persisted as RLMObject subclass instances, stored in an RLMRealm instance. Each RLMRealm
+ instance can be persisted in a specified file or in-memory.
+
+ ### Accessing & querying RLMRealm
+
+ Sets of RLMObjects can be retrieved either by subclass type, or using a predicate to query
+ for specific objects and object values. Sets are returned as RLMArray instances.
+
+ You can query an RLMRealm subclass directly via the following class methods:  
+
+  - allObjects:
+  - objects:where:
+  - objects:orderedBy:where:
+  - objectForKeyedSubscript:
+
  ### Change notifications<a name="notifications"></a>
  Realm supports a notification handler (RLMNotificationBlock) that can be attached to any Realm
  and is triggered by any changes to a Realm.

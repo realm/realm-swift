@@ -63,7 +63,7 @@
  
  You can set default values for properties by implementing defaultPropertyValues.
  
- ### Accessing & querying RLMObject from a Realm
+ ### Accessing & querying RLMObject
 
  You can query an RLMObject subclass directly via the following class methods: 
 
@@ -72,8 +72,8 @@
  - objectsOrderedBy:where:
  - objectForKeyedSubscript:
 
- These methods allow you to easily query a custom subclass for RLMObject instances in the
- default Realm. To search in a Realm other than the defaut Realm, use the interface on an RLMRealm instance.
+ These methods allow you to easily query the default Realm. To search in a Realm other than
+ the defaut Realm, use the interface on an RLMRealm instance.
  
  */
 
