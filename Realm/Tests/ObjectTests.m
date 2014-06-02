@@ -22,12 +22,6 @@
 #import "RLMTestObjects.h"
 #import <Realm/Realm.h>
 
-@interface RLMRealm (Private)
-
-- (BOOL)isPropertyIndexed:(NSString *)propertyName forClass:(NSString *)className;
-
-@end
-
 @interface SimpleObject : RLMObject
 @property NSString *name;
 @property int age;
@@ -528,8 +522,11 @@
 
 - (void)testIndex
 {
-    XCTAssertTrue([[RLMRealm defaultRealm] isPropertyIndexed:@"name" forClass:IndexedObject.className], @"indexed property should have an index");
-    XCTAssertFalse([[RLMRealm defaultRealm] isPropertyIndexed:@"age" forClass:IndexedObject.className], @"non-indexed property shouldn't have an index");
+    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    
+    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
 @end
