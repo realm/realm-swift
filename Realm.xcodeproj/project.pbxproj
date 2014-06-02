@@ -34,6 +34,8 @@
 		02C415411921B25B00F858D9 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C415401921B25B00F858D9 /* libstdc++.6.dylib */; };
 		02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
 		02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */; };
+		02CF6579193A3BB200E01CFD /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
+		02CF657A193A3BB200E01CFD /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
 		02E4D6AA192E3DC40082808D /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; };
 		02E4D6AB192E3DC40082808D /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68C192E3DC40082808D /* RLMAccessor.h */; };
@@ -165,6 +167,7 @@
 		02C415481921B94400F858D9 /* libtightdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb.a; path = ../../../../../usr/local/lib/libtightdb.a; sourceTree = "<group>"; };
 		02C415501921BF2500F858D9 /* Realm-iOSTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-iOSTests-Info.plist"; sourceTree = "<group>"; };
 		02C415521921BF3C00F858D9 /* Realm-iOS-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Realm-iOS-Prefix.pch"; sourceTree = "<group>"; };
+		02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArrayPropertyTests.m; sourceTree = "<group>"; };
 		02E4D68B192E3DC40082808D /* Realm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
 		02E4D68C192E3DC40082808D /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		02E4D68D192E3DC40082808D /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -307,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
+				02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */,
 				02026CB619379EB700E4EEF8 /* DynamicTests.m */,
 				02026CAD193662AF00E4EEF8 /* LinkTests.m */,
 				02E4D6E8192E58250082808D /* MixedTests.m */,
@@ -633,6 +637,7 @@
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
+				02CF6579193A3BB200E01CFD /* ArrayPropertyTests.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -671,6 +676,7 @@
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
 				4D8D90B1192B80F0004C89AA /* TransactionTests.m in Sources */,
 				4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
+				02CF657A193A3BB200E01CFD /* ArrayPropertyTests.m in Sources */,
 				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

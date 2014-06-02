@@ -38,7 +38,8 @@
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 // When getting the backingView using dot notation, the tableview is copied in core. Use _backingView instead when accessing.
 @property (nonatomic, assign) tightdb::TableView backingView;
-@property (nonatomic, copy) NSString *objectClassName;
+@property (nonatomic, assign) tightdb::LinkViewRef backingLinkView;
+@property (nonatomic, readwrite, copy) NSString *objectClassName;
 @end
 
 //
@@ -63,6 +64,16 @@
         self.objectClassName = objectClassName;
         self.backingQuery = query;
         _backingView = view;
+    }
+    return self;
+}
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                   view:(tightdb::LinkViewRef)view {
+    self = [super init];
+    if (self) {
+        self.objectClassName = objectClassName;
+        _backingLinkView = view;
     }
     return self;
 }

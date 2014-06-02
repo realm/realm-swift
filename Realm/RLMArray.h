@@ -40,12 +40,12 @@
 /**
  Number of objects in the RLMArray.
  */
-@property (nonatomic, readonly) NSUInteger count;
+@property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
  The object class of objects in the RLMArray.
  */
-@property (nonatomic, readonly) Class objectClass;
+@property (nonatomic, readonly, copy) NSString *objectClassName;
 
 @end
 

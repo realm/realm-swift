@@ -21,12 +21,15 @@
 #import "RLMArray.h"
 #import "RLMAccessor.h"
 #import <tightdb/query.hpp>
+#import <tightdb/link_view.hpp>
 
 // RLMArray private members and accessor
 @interface RLMArray () <RLMAccessor>
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName
                                   query:(tightdb::Query *)query
                                    view:(tightdb::TableView &)view;
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                                   view:(tightdb::LinkViewRef)view;
 @end
 
 

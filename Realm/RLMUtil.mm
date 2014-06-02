@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
 #import "RLMObject.h"
+#import "RLMArray.h"
 #import "RLMProperty.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
@@ -120,9 +121,21 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
                                  [[[obj class] className] isEqualToString:property.objectClassName];
             return isValidObject || obj == nil || obj == NSNull.null;
         }
-        // FIXME: missing entries
-        case RLMPropertyTypeArray:
-            break;
+        case RLMPropertyTypeArray: {
+            if ([obj isKindOfClass:RLMArray.class]) {
+                return [[(RLMArray *)obj objectClassName] isEqualToString:property.objectClassName];
+            }
+            if ([obj isKindOfClass:NSArray.class]) {
+                // check each element for compliance
+                for (id el in obj) {
+                    if (![el isKindOfClass:property.objectClassName]) {
+                        return NO;
+                    }
+                }
+                return YES;
+            }
+            return NO;
+        }
     }
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
 }

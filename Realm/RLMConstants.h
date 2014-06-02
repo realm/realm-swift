@@ -34,8 +34,8 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeDate     = 7,
     
     // Array/Linked object types
-    RLMPropertyTypeArray    = 5,
     RLMPropertyTypeObject   = 12,
+    RLMPropertyTypeArray    = 13,
 };
 
 

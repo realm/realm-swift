@@ -60,12 +60,18 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in objectSchema.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
-                if (prop.type == RLMPropertyTypeObject) {
-                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-                    table->add_column_link(tightdb::type_Link, name, linkTable->get_index_in_parent());
-                }
-                else {
-                    table->add_column((tightdb::DataType)prop.type, name);
+                switch (prop.type) {
+                    // for objects and arrays, we have to specify target table
+                    case RLMPropertyTypeObject:
+                    case RLMPropertyTypeArray:
+                    {
+                        tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+                        table->add_column_link(tightdb::DataType(prop.type), name, linkTable->get_index_in_parent());
+                        break;
+                    }
+                    default:
+                        table->add_column((tightdb::DataType)prop.type, name);
+                        break;
                 }
             }
         }

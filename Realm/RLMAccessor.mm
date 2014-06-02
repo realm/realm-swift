@@ -22,6 +22,7 @@
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject_Private.h"
+#import "RLMArray_Private.hpp"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
@@ -96,14 +97,14 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
                 NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
                 return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
             });
+        case 't':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
+                return [[RLMArray alloc] initWithObjectClassName:objectClassName view:linkView];
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 return RLMGetAnyProperty(*obj.backingTable, obj.objectIndex, col);
-            });
-        case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                RLMArray *array = obj[col];
-                return array;
             });
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
@@ -165,13 +166,24 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                     obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
                 }
             });
+        case 't':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id<NSFastEnumeration> val) {
+                tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
+                // remove all old
+                // FIXME: make sure delete rules don't purge objects
+                linkView->remove_all_links();
+                for (RLMObject *link in val) {
+                    // add to realm if needed
+                    if (link.realm != obj.realm) {
+                        [obj.realm addObject:link];
+                    }
+                    // set in link view
+                    linkView->add_link(link.objectIndex);
+                }
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
                 RLMSetAnyProperty(*obj.backingTable, obj.objectIndex, col, val);
-            });
-        case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
-                obj[col] = val;
             });
         default:
             @throw [NSException exceptionWithName:@"RLMException"
