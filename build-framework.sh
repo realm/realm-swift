@@ -12,12 +12,7 @@ SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
 # Step 1 - copy combined binary into framework
 xcrun cp ${SF_COMBINED_PATH} "${SF_FRAMEWORK_PATH}/${PRODUCT_NAME}"
 
-# Step 2
-# The -a ensures that the headers maintain the source modification date so that we don't constantly
-# cause propagating rebuilds of files that import these headers.
-# Headers with Private in the name are not public headers, and must not be copied.
-/bin/ls "${SRCROOT}/Realm" | grep -v Private | grep -e "\.h$" | while read header; do
-    /bin/cp -a "${SRCROOT}/Realm/${header}" "${SF_FRAMEWORK_PATH}/Headers/${header}"
-done
+# Step 2 - copy headers into framework
+xcrun cp -R "${BUILT_PRODUCTS_DIR}/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
 
 
