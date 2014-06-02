@@ -489,6 +489,41 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testObjectDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Init object before adding to realm
+    SimpleObject *soInit = [[SimpleObject alloc] init];
+    soInit.name = @"Peter";
+    soInit.age = 30;
+    soInit.hired = YES;
+    [realm addObject:soInit];
+    
+    // description asserts block
+    void(^descriptionAsserts)(NSString *) = ^(NSString *description) {
+        XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@30 description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"hired"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@YES description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+    };
+    
+    // Test description in write block
+    descriptionAsserts(soInit.description);
+    
+    [realm commitWriteTransaction];
+    
+    // Test description in read block
+    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    descriptionAsserts(objDescription);
+}
+
 #pragma mark - Indexing Tests
 
 - (void)testIndex

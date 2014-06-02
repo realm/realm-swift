@@ -305,7 +305,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return @(_backingView.average_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                           reason:@"averageOfProperty only supported fornam int, float and double properties."
+                                           reason:@"averageOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
     }
 }
