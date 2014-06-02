@@ -175,6 +175,14 @@
 
 #pragma mark - NSOutlineViewDelegate implementation
 
+- (NSString *)outlineView:(NSOutlineView *)outlineView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc item:(id)item mouseLocation:(NSPoint)mouseLocation
+{
+    if([item respondsToSelector:@selector(toolTipString)]) {
+        return [item toolTipString];
+    }
+    return nil;
+}
+
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
     NSOutlineView *outlineView = notification.object;

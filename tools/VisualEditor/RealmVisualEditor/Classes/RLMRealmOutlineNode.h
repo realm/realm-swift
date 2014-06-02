@@ -22,4 +22,8 @@
 
 - (id)nodeElementForColumnWithIndex:(NSInteger)index;
 
+@optional
+
+- (NSString *)toolTipString;
+
 @end

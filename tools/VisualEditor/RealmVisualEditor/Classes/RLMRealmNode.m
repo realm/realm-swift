@@ -68,13 +68,15 @@
     switch (index) {
         case 0:
             return _name;
-
-        case 1:
-            return _url;
             
         default:
             return nil;
     }
+}
+
+- (NSString *)toolTipString
+{
+    return _url;
 }
 
 #pragma mark - Private methods
