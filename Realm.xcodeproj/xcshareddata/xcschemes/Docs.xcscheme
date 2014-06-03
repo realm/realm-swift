@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4226D7DE193D0A7E00A56975"
-               BuildableName = "Appledoc"
-               BlueprintName = "Appledoc"
+               BuildableName = "Build Docs in docs/output/"
+               BlueprintName = "Build Docs in docs/output/"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

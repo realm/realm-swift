@@ -5,7 +5,7 @@
 # FIXME: and we must have a realm_core_osx too
 
 # Location
-REALM_CORE=realm_core
+REALM_CORE=core
 
 # Clean up old version
 rm -rf "$REALM_CORE"

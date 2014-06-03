@@ -41,14 +41,14 @@ fi
 
 # debug vs release
 if [[ "$CONFIGURATION" = "Debug" ]]; then
-    SF_CORE_PATH="${SRCROOT}/realm-core/libtightdb-ios-dbg.a"
+    SF_CORE_PATH="${SRCROOT}/core/ios/libtightdb-ios-dbg.a"
 else
-    SF_CORE_PATH="${SRCROOT}/realm-core/libtightdb-ios.a"
+    SF_CORE_PATH="${SRCROOT}/core/ios/libtightdb-ios.a"
 fi
 
 
 # We have to build the other platform and combine with it and the core libraries
-REALM_TARGET_NAME=Realm-iOS
+REALM_TARGET_NAME="Realm-iOS"
 SF_FAT_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-fat.a"
 SF_LIB_PATH="${BUILT_PRODUCTS_DIR}/libRealm.a"
 SF_OTHER_LIB_PATH="${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a"
