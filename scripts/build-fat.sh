@@ -48,7 +48,7 @@ fi
 
 
 # We have to build the other platform and combine with it and the core libraries
-REALM_TARGET_NAME="Realm-iOS"
+REALM_TARGET_NAME="Build for iOS"
 SF_FAT_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-fat.a"
 SF_LIB_PATH="${BUILT_PRODUCTS_DIR}/libRealm.a"
 SF_OTHER_LIB_PATH="${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a"

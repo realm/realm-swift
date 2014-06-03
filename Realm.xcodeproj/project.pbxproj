@@ -34,7 +34,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download Realm Core for iOS" */;
 			buildPhases = (
-				4236AC181934866000ADD527 /* Download from static.realm.io */,
+				4236AC181934866000ADD527 /* Download Precompiled Core for iOS */,
 			);
 			dependencies = (
 			);
@@ -696,19 +696,19 @@
 			shellPath = "/bin/sh scripts/build-docs.sh";
 			shellScript = "";
 		};
-		4236AC181934866000ADD527 /* Download from static.realm.io */ = {
+		4236AC181934866000ADD527 /* Download Precompiled Core for iOS */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download from static.realm.io";
+			name = "Download Precompiled Core for iOS";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if ! [ -f core/ios/ ]; then\n/usr/bin/curl -s http://static.realm.io/downloads/ios/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -rf ${SRCROOT}/core\ncd ${SRCROOT}\n/usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/mkdir -p core/\n/bin/mv realm_core core/ios\nfi";
+			shellScript = "if ! [ -f core/ios/ ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/ios/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/mkdir -p core/\n    /bin/mv realm_core core/ios\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
