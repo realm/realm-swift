@@ -457,52 +457,133 @@
     // Set the column names and cell type / formatting
     for (NSUInteger index = 0; index < columns.count; index++) {
         NSTableColumn *tableColumn = self.realmTableColumnsView.tableColumns[index];
-        RLMClazzProperty *rlmTableColumn = columns[index];
+    
+        RLMClazzProperty *property = columns[index];
+        NSString *columnName = property.name;
         
-        NSCell *cell;
-        switch (rlmTableColumn.type) {
+        switch (property.type) {
             case RLMPropertyTypeBool: {
-                NSButtonCell *buttonCell = [[NSButtonCell alloc] init];
-                [buttonCell setTitle:nil];
-                [buttonCell setAllowsMixedState:YES];
-                [buttonCell setButtonType:NSSwitchButton];
-                [buttonCell setAlignment:NSCenterTextAlignment];
-                [buttonCell setImagePosition:NSImageOnly];
-                [buttonCell setControlSize:NSSmallControlSize];
-                
-                cell = buttonCell;
+                [self initializeSwitcButtonTableColumn:tableColumn
+                                              withName:columnName
+                                             alignment:NSRightTextAlignment
+                                               toolTip:@"Boolean"];
                 break;
             }
-            case RLMPropertyTypeInt:
-            case RLMPropertyTypeFloat:
-            case RLMPropertyTypeDouble: {
-                cell = [[NSCell alloc] initTextCell:@""];
-                [cell setAlignment:NSRightTextAlignment];
                 
+            case RLMPropertyTypeInt: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                    toolTip:@"Integer"];
                 break;
-            }
-            case RLMPropertyTypeString:
-            case RLMPropertyTypeData:
-            case RLMPropertyTypeAny:
-            case RLMPropertyTypeDate:
-            case RLMPropertyTypeArray:
-            case RLMPropertyTypeObject: {
-                cell = [[NSCell alloc] initTextCell:@""];
-                [cell setAlignment:NSLeftTextAlignment];
             
+            }
+                
+            case RLMPropertyTypeFloat: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                    toolTip:@"Float"];
+                break;
+            }
+                
+            case RLMPropertyTypeDouble: {
+                [self initializeTableColumn:tableColumn 
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                    toolTip:@"Double"];
+                break;
+            }
+                
+            case RLMPropertyTypeString: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName 
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"String"];
+                break;
+            }
+                
+            case RLMPropertyTypeData: {
+                [self initializeTableColumn:tableColumn 
+                                   withName:columnName 
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"Data"];
+                break;
+            }
+                
+            case RLMPropertyTypeAny: {
+                [self initializeTableColumn:tableColumn 
+                                   withName:columnName 
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"Any"];
+                break;
+            }
+                
+            case RLMPropertyTypeDate: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"Date"];
+                break;
+            }
+                
+            case RLMPropertyTypeArray: {
+                [self initializeTableColumn:tableColumn 
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"Array"];
+                break;
+            }
+                
+            case RLMPropertyTypeObject: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                    toolTip:@"Link"];
                 break;
             }
         }
 
-        cell.editable = NO;
-        tableColumn.dataCell = cell;
-        
-        NSTableHeaderCell *headerCell = tableColumn.headerCell;
-        RLMClazzProperty *column = columns[index];
-        headerCell.stringValue = column.name;
+
     }
     
     [self.realmTableColumnsView reloadData];
+}
+
+- (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
+{
+    NSCell *cell = [[NSCell alloc] initTextCell:@""];
+    [cell setAlignment:alignment];
+    column.headerToolTip = toolTip;
+    
+    cell.editable = NO;
+    column.dataCell = cell;
+    
+    NSTableHeaderCell *headerCell = column.headerCell;
+    headerCell.stringValue = name;
+    
+    return cell;
+}
+
+- (NSCell *)initializeSwitcButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
+{
+    NSButtonCell *cell = [[NSButtonCell alloc] init];
+    [cell setTitle:nil];
+    [cell setAllowsMixedState:YES];
+    [cell setButtonType:NSSwitchButton];
+    [cell setAlignment:NSCenterTextAlignment];
+    [cell setImagePosition:NSImageOnly];
+    [cell setControlSize:NSSmallControlSize];
+
+    column.headerToolTip = toolTip;
+    
+    cell.editable = NO;
+    column.dataCell = cell;
+    
+    NSTableHeaderCell *headerCell = column.headerCell;
+    headerCell.stringValue = name;
+    
+    return cell;
 }
 
 @end
