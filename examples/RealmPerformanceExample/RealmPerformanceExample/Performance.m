@@ -86,7 +86,7 @@
   
     
     
-//#define initObject
+#define initObject
 #ifdef initObject
 
     // Add some rows
