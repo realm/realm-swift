@@ -20,12 +20,11 @@
 
 #import <sqlite3.h>
 #import <Realm/Realm.h>
-#import <Realm/RLMFast.h>
 
 #import "Performance.h"
 #import "Utils.h"
 
-@interface PerfObj : RLMRow
+@interface PerfObj : RLMObject
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, assign) NSInteger age;
@@ -37,13 +36,7 @@
 @implementation PerfObj
 @end
 
-RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
 
-@interface RLMView ()
-
--(int64_t)RLM_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-
-@end
 
 
 @implementation Performance
@@ -86,33 +79,30 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
     NSUInteger count = _size;
     
     [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    RLMRealm *manager = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-    [manager writeUsingBlock:^(RLMRealm *realm) {
-        // Create new table in realm
-        PerfTable *table = [PerfTable tableInRealm:realm named:@"employees"];
-        
+    RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
+    [realm beginWriteTransaction];
+    
         // Add some rows
-        for (NSUInteger i = 0; i < count; i++) {
-            [table addRow:nil];
-            PerfObj *perf = table.lastRow;
-            perf.name = @"Foo";
-            perf.age = (25 + (int)(drand48() * 4));
-            perf.hired = YES;
-            perf.spare = 0;
-        }
-        [table addRow:nil];
-        PerfObj *perf = table.lastRow;
-        perf.name = @"Sparse";
-        perf.age = 41;
-        perf.hired = NO;
-        perf.spare = 2;
-        
-        //NSLog(@"Age verify: %lld", [table RLM_intInColumnWithIndex:1 atRowIndex:1000]);
-
-    }];
+    for (NSUInteger i = 0; i < count; i++) {
+        PerfObj *perf = [[PerfObj alloc] init];
+        perf.name = @"Foo";
+        perf.age = (25 + (int)(drand48() * 4));
+        perf.hired = YES;
+        perf.spare = 0;
+        [realm addObject:perf];
+    }
+    
+    PerfObj *perf = [[PerfObj alloc] init];
+    perf.name = @"Sparse";
+    perf.age = 41;
+    perf.hired = NO;
+    perf.spare = 2;
+    
+    [realm addObject:perf];
+    
+    [realm commitWriteTransaction];
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -189,14 +179,14 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
         int count __block = 0;
-        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-            PerfTable *table = [PerfTable tableInRealm:realm named:@"employees"];
-
-            for (size_t i = 0; i < _rounds; i++) {
-                // Create query
-                RLMView *v = [table allWhere:[NSPredicate predicateWithFormat:@"age == %i", i]];
-                count += v.rowCount;
-            }
+        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
+        
+        for (size_t i = 0; i < _rounds; i++) {
+            // Create and execute query
+            RLMArray *v = [realm objects:[PerfObj className]
+                                   where:[NSPredicate predicateWithFormat:@"age == %i", i]];
+            count += v.count;
+        }
 
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         rlmTime = stop - start;
@@ -262,14 +252,14 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
         int count __block = 0;
-        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-            PerfTable *table = [PerfTable tableInRealm:realm named:@"employees"];
+        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
-            for (size_t i = 0; i < _rounds; i++) {
-                // Create query
-                RLMView *v = [table allWhere:[NSPredicate predicateWithFormat:@"name == %@", @"Sparse"]];
-                count += v.rowCount;
-            }
+        for (size_t i = 0; i < _rounds; i++) {
+            // Create and execute query
+            RLMArray *v = [realm objects:[PerfObj className]
+                                   where:[NSPredicate predicateWithFormat:@"name == %@", @"Sparse"]];
+            count += v.count;
+        }
 
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         rlmTime = stop - start;
@@ -337,15 +327,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
         int count __block = 0;
-        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-            PerfTable *table = [PerfTable tableInRealm:realm named:@"employees"];
+        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
-            for (size_t i = 0; i < _rounds; i++) {
-                // Create query
-                BOOL hired = i % 2;
-                RLMView *v = [table allWhere:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:hired]]];
-                count += v.rowCount;
-            }
+        for (size_t i = 0; i < _rounds; i++) {
+            // Create and execute query
+            BOOL hired = i % 2;
+            RLMArray *v = [realm objects:[PerfObj className]
+                                   where:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:hired]]];
+            count += v.count;
+        }
 
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         rlmTime = stop - start;
@@ -414,19 +404,17 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
         __block int counter = 0;
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-            PerfTable *diskTable = [realm tableWithName:@"employees" asTableClass:[PerfTable class] ];
+        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
+        // Create query (current employees between 20 and 30 years old)
+        RLMArray *res = [realm objects:[PerfObj className]
+                                 where:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber  numberWithBool:YES]]];
 
-            // Create query (current employees between 20 and 30 years old)
-        RLMView *res = [diskTable allWhere:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:YES]]];
 
-
-            int agesum = 0;
-            for (RLMRow *row in res) {
-                agesum += [row intInColumnWithIndex:1];
-                counter++;
-            }
-       
+        int agesum = 0;
+        for (PerfObj *row in res) {
+            agesum += row.age;
+            counter++;
+        }
 
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         rlmTime = stop - start;
@@ -442,19 +430,21 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
         __block int counter = 0;
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-            PerfTable *diskTable = [PerfTable tableInRealm:realm named:@"employees"];
+        RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
-            // Create query (current employees between 20 and 30 years old)
-        RLMView *res = [diskTable allWhere:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:YES]]];
+        // Create query (current employees between 20 and 30 years old)
+        RLMArray *res = [realm objects:[PerfObj className]
+                                 where:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:YES]]];
 
-            // Manually optimized loop to avoid row creation
-            int agesum = 0;
-            size_t count = [res rowCount];
-            for (size_t i = 0; i < count; ++i) {
-                agesum += [res RLM_intInColumnWithIndex:1 atRowIndex:i];
-                counter++;
-            }
+        // Manually optimized loop to avoid row creation
+        int agesum = 0;
+        size_t count = res.count;
+        
+        for (size_t i = 0; i < count; ++i) {
+            PerfObj *po = res[i];
+            agesum += po.age;
+            counter++;
+        }
 
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         rlmTime2 = stop - start;
@@ -511,20 +501,18 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
-        PerfTable *diskTable = [PerfTable tableInRealm:realm named:@"employees"];
+    RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
+    
+    RLMArray *allObjects = [realm allObjects:[PerfObj className]];
         
-        int agesum = 0;
-        for (PerfObj *row in diskTable) {
-            agesum += row.age;
-        }
-        NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"RLM Read and Unq.iterate in %.2f s", stop-start]];
-        });
-    
-    
-
+    int agesum = 0;
+    for (PerfObj *row in allObjects) {
+        agesum += row.age;
+    }
+    NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"RLM Read and Unq.iterate in %.2f s", stop-start]];
+    });
 }
 
 - (void)testWriteToDisk
@@ -552,38 +540,34 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PerfTable, PerfObj);
 -(void)testWriteTransaction
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"] error:nil];
+    RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
-    [realm writeUsingBlock:^(RLMRealm *realm) {
+    [realm beginWriteTransaction];
+    
+    // Add some rows
+    NSUInteger count = _size;
+    for (NSUInteger i = 0; i < count; i++) {
+        PerfObj *perf = [[PerfObj alloc] init];
+        perf.name = @"Foo";
+        perf.age = (25 + (int)(drand48() * 4));
+        perf.hired = YES;
+        perf.spare = 0;
+        [realm addObject:perf];
+    }
         
-        PerfTable *diskTable = [PerfTable tableInRealm:realm named:@"employees"];
-
-        // Add some rows
-        NSUInteger count = _size;
-        for (NSUInteger i = 0; i < count; i++) {
-            [diskTable addRow:nil];
-            PerfObj *perf = diskTable.lastRow;
-            perf.name = @"Foo";
-            perf.age = (25 + (int)(drand48() * 4));
-            perf.hired = YES;
-            perf.spare = 0;
-        }
+    PerfObj *perf = [[PerfObj alloc] init];
+    perf.name = @"Sparse";
+    perf.age = 41;
+    perf.hired = NO;
+    perf.spare = 2;
+    [realm addObject:perf];
         
-        [diskTable addRow:nil];
-        PerfObj *perf = diskTable.lastRow;
-        perf.name = @"Sparse";
-        perf.age = 41;
-        perf.hired = NO;
-        perf.spare = 2;
-        
-    }];
+    [realm commitWriteTransaction];
     
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Transaction Write %.2f s", stop-start]];
     });
 }
-
-
 
 @end
