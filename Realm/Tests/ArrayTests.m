@@ -38,6 +38,42 @@
 @implementation ArrayTests
 
 
+- (void)testFastEnumeration
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    
+    NSDate *dateMinInput = [NSDate date];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+    
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    
+    [realm commitWriteTransaction];
+    
+    
+    RLMArray *result = [realm objects:[AggregateObject className] where:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
+    
+    XCTAssertEqual(result.count, 10, @"10 objects added");
+    
+    int totalSum = 0;
+    
+    for (AggregateObject *ao in result) {
+        totalSum +=ao.intCol;
+    }
+    
+    XCTAssertEqual(totalSum, 100, @"total sum should be 100");
+}
+
 - (void)testObjectAggregate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
