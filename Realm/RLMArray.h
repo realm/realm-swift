@@ -59,7 +59,7 @@
 /**
  The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
-@property (nonatomic, readonly) NSString *objectClassName;
+@property (nonatomic, readonly, copy) NSString *objectClassName;
 
 #pragma mark -
 
