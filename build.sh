@@ -670,7 +670,6 @@ EOF
         echo "Generating HTML docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include docs/source/realm.png \
                     --output docs \
                     -v `sh build.sh get-version` \
                     --create-html \
@@ -680,7 +679,6 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
                     --ignore "Realm/RLMArrayAccessor.h" \
                     --ignore "Realm/RLMArrayAccessor.mm" \
                     --ignore "Realm/RLMProperty.h" \
@@ -690,11 +688,15 @@ EOF
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
+                    --ignore "Realm/Tests/TransactionTests.m" \
+                    --ignore "Realm/Tests/ObjectTests.m" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
+        sed -i '' -e'/RLMPropertyType/d' docs/html/index.html
+        sed -i '' -e'/RLMSortOrder/d' docs/html/index.html
+        sed -i '' -e'/RLMPropertyType/d' docs/html/hierarchy.html
+        sed -i '' -e'/RLMSortOrder/d' docs/html/hierarchy.html
         mkdir -p docs/output
         rm -rf docs/output/$(sh build.sh get-version)
         mv docs/html docs/output/$(sh build.sh get-version)
@@ -703,14 +705,13 @@ EOF
         echo "Generating docset docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include docs/source/realm.png \
                     --output docs/output/$(sh build.sh get-version)/ \
                     -v `sh build.sh get-version` \
                     --no-create-html \
                     --create-docset \
                     --publish-docset \
-                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm.atom" \
-                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm" \
+                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/api/realm.atom" \
+                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/api/realm" \
                     --docset-package-filename "realm" \
                     --docset-atom-filename "realm.atom" \
                     --docset-bundle-filename "realm.docset" \
@@ -720,7 +721,6 @@ EOF
                     --no-warn-invalid-crossref \
                     --no-warn-undocumented-object \
                     --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
                     --ignore "Realm/RLMArrayAccessor.h" \
                     --ignore "Realm/RLMArrayAccessor.mm" \
                     --ignore "Realm/RLMProperty.h" \
@@ -730,8 +730,8 @@ EOF
                     --ignore "Realm/RLMQueryUtil.h" \
                     --ignore "Realm/RLMUtil.h" \
                     --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
+                    --ignore "Realm/Tests/TransactionTests.m" \
+                    --ignore "Realm/Tests/ObjectTests.m" \
                     --template docs/templates \
                     --exit-threshold 1 \
                     Realm || exit 1
@@ -744,7 +744,7 @@ EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
     <sha1>$(sha1sum -b docs/output/$(sh build.sh get-version)/realm.tgz | cut -c 1-40)</sha1>
-    <url>http://static.realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz</url>
+    <url>http://static.realm.io/docs/ios/$(sh build.sh get-version)/api/realm.tgz</url>
 </entry>
 EOF
         mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/

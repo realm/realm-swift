@@ -632,9 +632,12 @@
 			files = (
 			);
 			inputPaths = (
+				"${BUILT_PRODUCTS_DIR}/libRealm.a",
+				"${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a",
 			);
 			name = "Build Fat Library";
 			outputPaths = (
+				"${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/sh build-fat.sh";
@@ -646,6 +649,7 @@
 			files = (
 			);
 			inputPaths = (
+				"${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a",
 			);
 			name = "Build Framework";
 			outputPaths = (

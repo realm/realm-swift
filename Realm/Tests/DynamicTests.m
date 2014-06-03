@@ -68,7 +68,7 @@
     // verify object type
     RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
     XCTAssertEqual(array.count, 2, @"Array should have 2 elements");
-    XCTAssertNotEqual(array.objectClass, RLMDynamicObject.class,
+    XCTAssertNotEqual(array.objectClassName, RLMDynamicObject.class,
                       @"Array class should by a dynamic object class");
 }
 
