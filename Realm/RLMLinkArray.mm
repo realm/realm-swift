@@ -152,10 +152,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 
 
 - (RLMArray *)copy {
-    RLMArray *array = [RLMArray arrayWithObjectClassName:self.objectClassName view:_backingLinkView];
-    array.realm = self.realm;
-    [array.realm registerAccessor:array];
-    return array;
+    return [RLMArray arrayWithObjectClassName:self.objectClassName view:_backingLinkView realm:self.realm];
 }
 
 - (NSString *)JSONString {

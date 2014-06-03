@@ -54,17 +54,23 @@
 
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                   query:(tightdb::Query *)query
-                                   view:(tightdb::TableView &)view {
+                                   view:(tightdb::TableView &)view
+                                  realm:(RLMRealm *)realm{
     RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
     ar.backingQuery = query;
     ar.backingView = view;
+    ar.realm = realm;
+    [realm registerAccessor:ar];
     return ar;
 }
 
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   view:(tightdb::LinkViewRef)view {
+                                   view:(tightdb::LinkViewRef)view
+                                  realm:(RLMRealm *)realm {
     RLMLinkArray *ar = [[RLMLinkArray alloc] initWithObjectClassName:objectClassName];
     ar.backingLinkView = view;
+    ar.realm = realm;
+    [realm registerAccessor:ar];
     return ar;
 }
 

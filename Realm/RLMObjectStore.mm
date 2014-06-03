@@ -162,10 +162,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateViewWithOrder(view, order, schema);
     
     // create and populate array
-    RLMArray *array = [RLMArray arrayWithObjectClassName:objectClassName query:query view:view];
-    array.realm = realm;
-    [realm registerAccessor:array];
-    return array;
+    return [RLMArray arrayWithObjectClassName:objectClassName query:query view:view realm:realm];
 }
 
 // Create accessor and register with realm

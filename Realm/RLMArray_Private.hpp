@@ -27,9 +27,11 @@
 @interface RLMArray () <RLMAccessor>
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    query:(tightdb::Query *)query
-                                    view:(tightdb::TableView &)view;
+                                    view:(tightdb::TableView &)view
+                                   realm:(RLMRealm *)realm;
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::LinkViewRef)view;
+                                    view:(tightdb::LinkViewRef)view
+                                   realm:(RLMRealm *)realm;;
 @end
 
 

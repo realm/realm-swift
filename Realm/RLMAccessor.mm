@@ -100,7 +100,7 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
         case 't':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
-                return [RLMArray arrayWithObjectClassName:objectClassName view:linkView];
+                return [RLMArray arrayWithObjectClassName:objectClassName view:linkView realm:obj.realm];
             });
         case '@':
             return imp_implementationWithBlock(^(RLMObject *obj) {
