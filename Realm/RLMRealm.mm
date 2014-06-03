@@ -115,7 +115,6 @@ inline void clearRealmCache() {
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
-@property (nonatomic) BOOL isReadOnly;
 @property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
@@ -156,7 +155,7 @@ static NSArray *s_objectDescriptors = nil;
                                              valueOptions:NSPointerFunctionsWeakMemory
                                                  capacity:128];
         _notificationHandlers = [NSMutableArray array];
-        _isReadOnly = readonly;
+        _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                         target:[RLMWeakTarget createWithRealm:self]
                                                       selector:@selector(checkForUpdate)
