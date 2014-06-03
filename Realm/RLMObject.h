@@ -212,7 +212,7 @@
  @param  predicate  An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), 
                     a predicate string, or predicate format string that can accept variable arguments.
  @param  order      An NSString containing a property name, or an [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) 
-	   		        containing a property name and order to sort the results by.
+                    containing a property name and order to sort the results by.
  
  @return            An ordered RLMArray of RLMObjects from the default Realm that match the specified predicate 
                     and subclass type.

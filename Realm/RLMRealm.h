@@ -96,8 +96,8 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  RLMRealm instances are reused when this is called multiple times from the same thread.
  
- @warning  	   RLMRealm instances are not thread safe and can not be shared across threads or
- 		       dispatch queues. You must create a separate RLMRealm instance for each thread and queue.
+ @warning      RLMRealm instances are not thread safe and can not be shared across threads or
+               dispatch queues. You must create a separate RLMRealm instance for each thread and queue.
  
  @param  path  The path to the file you want the RLMRealm persisted in.
  
@@ -321,10 +321,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /*
  Retrieves a persisted RLMObject with an NSString.
  
- @usage 	RLMObject * object = RLMRealm.defaultRealm[@"name"];
- @param 	key 	The NSString used to identify an object
+ @usage       RLMObject * object = RLMRealm.defaultRealm[@"name"];
+ @param  key  The NSString used to identify an object
  
- @return    RLMObject or nil if no object is stored for the specified key.
+ @return      RLMObject or nil if no object is stored for the specified key.
  */
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;
 

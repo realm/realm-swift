@@ -60,8 +60,8 @@
  
  @param  objectClassName  The name of the RLMObject subclass this RLMArray will hold.
 
- @warning  Realm arrays are typed. You must specify an RLMObject subclass name during initialization
-           and can only add objects of this type to the array.
+ @warning                 RLMArrays are typed. You must specify an RLMObject subclass name 
+                          during initialization and can only add objects of this type to the RLMArray.
 
  @return                  An initialized RLMArray instance.
 */
@@ -251,7 +251,7 @@
  Finds the minimum (lowest) value of the specified RLMObject property present in the RLMArray.
  
  @param  property  The property to look for a minimum on. Only RLMObject properties of type int, 
- 				   float and double are supported.
+                   float and double are supported.
  
  @warning          Properties with values of type RLMObject, RLMArray, and NSData are not supported.
  
