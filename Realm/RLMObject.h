@@ -172,6 +172,7 @@
  Ignored properties will not be persisted and are treated as transient.
  
  @return  NSArray of ignored property names.
+
  */
 + (NSArray *)ignoredProperties;
 

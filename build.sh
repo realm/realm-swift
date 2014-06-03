@@ -710,8 +710,8 @@ EOF
                     --no-create-html \
                     --create-docset \
                     --publish-docset \
-                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm.atom" \
-                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm" \
+                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/api/realm.atom" \
+                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/api/realm" \
                     --docset-package-filename "realm" \
                     --docset-atom-filename "realm.atom" \
                     --docset-bundle-filename "realm.docset" \
@@ -743,9 +743,8 @@ EOF
         cat >docs/output/$(sh build.sh get-version)/realm.xml <<EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
-    <url>
-        http://static.realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
-    </url>
+    <sha1>$(sha1sum -b docs/output/$(sh build.sh get-version)/realm.tgz | cut -c 1-40)</sha1>
+    <url>http://static.realm.io/docs/ios/$(sh build.sh get-version)/api/realm.tgz</url>
 </entry>
 EOF
         mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/

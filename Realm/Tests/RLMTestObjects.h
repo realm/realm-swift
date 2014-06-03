@@ -21,6 +21,10 @@
 #import <Foundation/Foundation.h>
 #import "RLMObject.h"
 
+@interface RLMTestObject : RLMObject
+@property (nonatomic, copy) NSString *column;
+@end
+
 @interface AllTypesObject : RLMObject
 @property BOOL           boolCol;
 @property int            intCol;
@@ -32,11 +36,9 @@
 @property bool           cBoolCol;
 @property long           longCol;
 @property id             mixedCol;
+@property RLMTestObject *objectCol;
 //@property AgeTable      *tableCol;
 @end
 
 
-@interface RLMTestObject : RLMObject
-@property (nonatomic, copy) NSString *column;
-@end
 

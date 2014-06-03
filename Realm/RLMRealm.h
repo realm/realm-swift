@@ -313,30 +313,31 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 
 #pragma mark -
 
-/*---------------------------------------------------------------------------------------
- *  @name Named Object Storage and Retrieval
- * ---------------------------------------------------------------------------------------
- */
+//---------------------------------------------------------------------------------------
+//@name Named Object Storage and Retrieval
+//---------------------------------------------------------------------------------------
+//
+// Realm provides a top level key/value store for storing and accessing objects by NSString.
+// This system can be extended with the RLMKeyValueStore interface to create nested
+// namespaces as needed.
 
-/*
- Retrieves a persisted RLMObject with an NSString.
- 
- @usage       RLMObject * object = RLMRealm.defaultRealm[@"name"];
- @param  key  The NSString used to identify an object
- 
- @return      RLMObject or nil if no object is stored for the specified key.
- */
--(id)objectForKeyedSubscript:(id <NSCopying>)key;
+// Retrieve a persisted object with an NSString.
+// 
+// @usage RLMObject * object = RLMRealm.defaultRealm[@"name"];
+// @param key The NSString used to identify an object
+// 
+// @return    RLMObject or nil if no object is stored for the given key.
+//
+//-(id)objectForKeyedSubscript:(id <NSCopying>)key;
 
-/*
- Store an object with an NSString key.
- 
- @usage RLMRealm.defaultRealm[@"name"] = object;
- @param obj     The object to be stored.
- @param key     The key that itentifies the object to be used for future lookups.
- */
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
+// Store an object with an NSString key.
+// 
+// @usage RLMRealm.defaultRealm[@"name"] = object;
+// @param obj     The object to be stored.
+// @param key     The key that itentifies the object to be used for future lookups.
+//
+//-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
 #pragma mark -
 
