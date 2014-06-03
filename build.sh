@@ -743,6 +743,7 @@ EOF
         cat >docs/output/$(sh build.sh get-version)/realm.xml <<EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
+    <sha1>$(sha1sum -b docs/output/$(sh build.sh get-version)/realm.tgz | cut -c 1-40)</sha1>
     <url>http://static.realm.io/docs/ios/$(sh build.sh get-version)/api/realm.tgz</url>
 </entry>
 EOF

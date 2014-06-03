@@ -68,7 +68,7 @@
             id value = values[property.name];
             if (value) {
                 // Validate Value
-                if (RLMIsObjectOfType(value, property.type)) {
+                if (RLMIsObjectValidForProperty(value, property)) {
                     [obj setValue:value forKeyPath:property.name];
                 }
                 else {
@@ -90,7 +90,7 @@
             RLMProperty *property = properties[i];
             
             // Validate Value
-            if (RLMIsObjectOfType(value, property.type)) {
+            if (RLMIsObjectValidForProperty(value, property)) {
                 [obj setValue:array[i] forKeyPath:property.name];
             }
             else {
@@ -183,6 +183,20 @@
 
 + (NSString *)className {
     return NSStringFromClass(self);
+}
+
+- (NSString *)description
+{
+    NSString *baseClassName = self.class.className;
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
+    RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
+    
+    for (RLMProperty *property in objectSchema.properties) {
+        [mString appendFormat:@"\t%@ = %@;\n", property.name, [self[property.name] description]];
+    }
+    [mString appendString:@"}"];
+    
+    return [NSString stringWithString:mString];
 }
 
 @end
