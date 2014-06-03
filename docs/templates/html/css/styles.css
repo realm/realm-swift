@@ -207,6 +207,7 @@ th {
 #dash { display:none; }
 #xcode { display:none; }
 
+#top_header #library img { padding-left: 10px; }
 
 #top_header #library #dash_img:hover ~ #dropdown { display: block; }
 #top_header #library #xcode_img:hover ~ #dropdown { display: block; }
