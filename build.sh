@@ -670,7 +670,6 @@ EOF
         echo "Generating HTML docs..."
 	xcodebuild -target Appledoc
         echo "Done generating Apple docset under docs/output/"
-
         exit 0
         ;;
 
