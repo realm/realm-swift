@@ -108,14 +108,14 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm, id 
 
 @interface RLMRealm (Notifications)
 /**
- Add a notification handler for changes in this RLMRealm. 
+ Add a notification handler for changes in this RLMRealm.
  
  Both the block and context are held onto as weak references so callers must hold onto
  a reference to the block. When the block is released the notifcation is automatically 
  unregistered.
  
  @param block   A block which is called to process RLMRealm notifications.
- @param context A contexts passed into the notification block.
+ @param context The context passed into the notification block. Can be nil.
 
  */
 - (void)addNotificationBlock:(RLMNotificationBlock)block context:(id)context;
