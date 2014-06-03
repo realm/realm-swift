@@ -26,6 +26,7 @@ build/
 # sh build.sh ios-framework
 # sh build.sh package-examples
 */Realm.framework
+Realm.framework
 
 # sh build.sh docs
 /docs/output

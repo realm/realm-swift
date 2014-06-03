@@ -86,7 +86,7 @@
   
     
     
-#define initObject
+//#define initObject
 #ifdef initObject
 
     // Add some rows
@@ -189,7 +189,7 @@
     {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-        int count __block = 0;
+        int count = 0;
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
         
         for (size_t i = 0; i < _rounds; i++) {
@@ -262,7 +262,7 @@
     {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-        int count __block = 0;
+        int count = 0;
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
         for (size_t i = 0; i < _rounds; i++) {
@@ -337,7 +337,7 @@
     {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-        int count __block = 0;
+        int count = 0;
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
         for (size_t i = 0; i < _rounds; i++) {
@@ -412,7 +412,7 @@
     // Realm (iterate using fastenumeration)
     NSTimeInterval rlmTime = 0;
     {
-        __block int counter = 0;
+        int counter = 0;
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
@@ -438,7 +438,7 @@
     // Realm (iterate using loop with manual lookup)
     NSTimeInterval rlmTime2 = 0;
     {
-        __block int counter = 0;
+        int counter = 0;
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
