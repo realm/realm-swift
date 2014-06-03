@@ -424,11 +424,15 @@
         NSCell *cell;
         switch (rlmTableColumn.type) {
             case RLMPropertyTypeBool: {
-                cell = [[NSButtonCell alloc] init];
-                [cell setTitle:nil];
-                [cell setAllowsMixedState:YES];
-                [(NSButtonCell *)cell setButtonType:NSSwitchButton];
-                [cell setAlignment:NSCenterTextAlignment];
+                NSButtonCell *buttonCell = [[NSButtonCell alloc] init];
+                [buttonCell setTitle:nil];
+                [buttonCell setAllowsMixedState:YES];
+                [buttonCell setButtonType:NSSwitchButton];
+                [buttonCell setAlignment:NSCenterTextAlignment];
+                [buttonCell setImagePosition:NSImageOnly];
+                [buttonCell setControlSize:NSSmallControlSize];
+                
+                cell = buttonCell;
                 break;
             }
             case RLMPropertyTypeInt:
@@ -452,6 +456,7 @@
             }
         }
 
+        // cell.editable = NO;
         tableColumn.dataCell = cell;
         tableColumn.editable = NO;
         
