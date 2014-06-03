@@ -272,6 +272,11 @@
     return nil;
 }
 
+- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    return NO;
+}
+
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.realmTableColumnsView) {
@@ -376,9 +381,15 @@
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
+            case RLMPropertyTypeDate: {
+                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                formatter.dateStyle = NSDateFormatterMediumStyle;
+                formatter.timeStyle = NSDateFormatterShortStyle;
+                ((NSCell *)cell).formatter = formatter;
+                break;
+            }
             case RLMPropertyTypeString:
             case RLMPropertyTypeData:
-            case RLMPropertyTypeDate:
             case RLMPropertyTypeObject:
             case RLMPropertyTypeArray:
                 break;
@@ -411,7 +422,6 @@
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
         
         // RLMClazzProperty *column = columns[index];
-        tableColumn.editable = NO;
         
         [self.realmTableColumnsView addTableColumn:tableColumn];
     }
@@ -456,10 +466,8 @@
             }
         }
 
-        // cell.editable = NO;
+        cell.editable = NO;
         tableColumn.dataCell = cell;
-        tableColumn.editable = NO;
-        
         
         NSTableHeaderCell *headerCell = tableColumn.headerCell;
         RLMClazzProperty *column = columns[index];
