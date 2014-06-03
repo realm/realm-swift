@@ -145,6 +145,7 @@
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
  *  @name Customizing your Objects
@@ -152,22 +153,25 @@
  */
 
 /**
- Implement to set custom attributes for each property.
- 
+ Implement this method to set custom attributes for each property of this RLMObject subclass.
+  
  @param  propertyName  Name of the property whose attributes should be retrieved.
  @return               A bitmask of property attributes for the specified property.
+ @see RLMPropertyAttributes
  */
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
 
 /**
- Implement to set the default values to be used for each property of the RLMObject instance.
+ Implement this method to set the default property values to use when creating instances of
+ this RLMObject subclass.
  
  @return  NSDictionary mapping property names to their default values.
  */
 + (NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to retrieve an NSArray of property names currently being ignored.
+ Implement this method to set property names to ignore when persisting an instance
+ of this RLMObject subclass.
 
  Ignored properties will not be persisted and are treated as transient.
  
