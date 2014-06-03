@@ -237,14 +237,14 @@
             case RLMPropertyTypeBool:
             case RLMPropertyTypeFloat:
             case RLMPropertyTypeDouble:
-                if([propertyValue isKindOfClass:[NSNumber class]]) {
+                if ([propertyValue isKindOfClass:[NSNumber class]]) {
                     return propertyValue;
                 }
                 break;
 
 
             case RLMPropertyTypeString:
-                if([propertyValue isKindOfClass:[NSString class]]) {
+                if ([propertyValue isKindOfClass:[NSString class]]) {
                     return propertyValue;
                 }
                 break;
@@ -256,7 +256,7 @@
                 return @"<Any>";
 
             case RLMPropertyTypeDate:
-                if([propertyValue isKindOfClass:[NSDate class]]) {
+                if ([propertyValue isKindOfClass:[NSDate class]]) {
                     return propertyValue;
                 }
                 break;
@@ -413,7 +413,7 @@
             RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
-            if([propertyValue isKindOfClass:[NSDate class]]) {
+            if ([propertyValue isKindOfClass:[NSDate class]]) {
                 NSDate *dateValue = (NSDate *)propertyValue;
                 
                 NSDateFormatter *formatter = [[NSDateFormatter alloc] init];

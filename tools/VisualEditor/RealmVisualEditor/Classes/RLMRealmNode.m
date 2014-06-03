@@ -94,7 +94,7 @@
     NSUInteger clazzCount = allObjectSchemas.count;
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:clazzCount];
     
-    for(NSUInteger index = 0; index < clazzCount; index++) {
+    for (NSUInteger index = 0; index < clazzCount; index++) {
         RLMObjectSchema *objectSchema = allObjectSchemas[index];        
         RLMClazzNode *tableNode = [[RLMClazzNode alloc] initWithSchema:objectSchema
                                                                inRealm:_realm];
