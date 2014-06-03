@@ -65,7 +65,10 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
                     table->add_column_link(tightdb::type_Link, name, linkTable->get_index_in_parent());
                 }
                 else {
-                    table->add_column((tightdb::DataType)prop.type, name);
+                    size_t column = table->add_column((tightdb::DataType)prop.type, name);
+                    if (prop.attributes & RLMPropertyAttributeIndexed) {
+                        table->set_index(column);
+                    }
                 }
             }
         }
@@ -181,6 +184,3 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     [accessor.realm registerAccessor:accessor];
     return accessor;
 }
-
-
-
