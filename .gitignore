@@ -11,6 +11,7 @@
 *.realm
 *.realm.lock
 
+# core
 realm-core
 
 # sh build.sh config
