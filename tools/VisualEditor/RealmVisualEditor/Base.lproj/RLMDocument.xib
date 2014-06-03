@@ -17,15 +17,15 @@
         <window title="Realm" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" appearanceType="lightContent" animationBehavior="default" id="xOd-HO-29H" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="133" y="235" width="640" height="402"/>
+            <rect key="contentRect" x="133" y="235" width="860" height="402"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
-                <rect key="frame" x="0.0" y="0.0" width="640" height="402"/>
+                <rect key="frame" x="0.0" y="0.0" width="860" height="402"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView focusRingType="none" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IXc-8a-g01">
-                        <rect key="frame" x="0.0" y="0.0" width="640" height="402"/>
+                        <rect key="frame" x="0.0" y="0.0" width="860" height="402"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <subviews>
                             <customView focusRingType="none" id="wGq-XQ-Lyz">
@@ -90,18 +90,18 @@
                                 </constraints>
                             </customView>
                             <customView id="XsG-4h-zWh">
-                                <rect key="frame" x="323" y="0.0" width="317" height="402"/>
+                                <rect key="frame" x="323" y="0.0" width="537" height="402"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3b6-BA-X5L">
-                                        <rect key="frame" x="0.0" y="0.0" width="317" height="402"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="537" height="402"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <clipView key="contentView" focusRingType="none" id="kRO-aN-FFM">
-                                            <rect key="frame" x="0.0" y="17" width="317" height="385"/>
+                                            <rect key="frame" x="0.0" y="17" width="537" height="385"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="cDp-e2-1cA" id="enp-HN-e6b">
-                                                    <rect key="frame" x="0.0" y="0.0" width="317" height="385"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="537" height="385"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -124,7 +124,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <tableHeaderView key="headerView" id="cDp-e2-1cA">
-                                            <rect key="frame" x="0.0" y="0.0" width="317" height="17"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="537" height="17"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableHeaderView>
                                     </scrollView>
@@ -138,7 +138,7 @@
                             </customView>
                         </subviews>
                         <holdingPriorities>
-                            <real value="250"/>
+                            <real value="346"/>
                             <real value="250"/>
                         </holdingPriorities>
                     </splitView>
@@ -150,6 +150,10 @@
                     <constraint firstAttribute="bottom" secondItem="IXc-8a-g01" secondAttribute="bottom" id="oqa-Wj-uil"/>
                 </constraints>
             </view>
+            <toolbar key="toolbar" implicitIdentifier="3CCA7848-E061-4F50-AE98-213126A41A8D" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="f8d-tJ-WYI">
+                <allowedToolbarItems/>
+                <defaultToolbarItems/>
+            </toolbar>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
