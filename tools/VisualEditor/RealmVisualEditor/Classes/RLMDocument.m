@@ -410,34 +410,51 @@
     for (NSUInteger index = 0; index < columnCount; index++) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
         
-        RLMClazzProperty *column = columns[index];
-        
-        if (column.type == RLMPropertyTypeBool ||
-            column.type == RLMPropertyTypeInt ||
-            column.type == RLMPropertyTypeFloat ||
-            column.type == RLMPropertyTypeDouble ||
-            column.type == RLMPropertyTypeString) {
-            tableColumn.editable = NO;
-        }
-        else {
-            tableColumn.editable = NO;
-        }
+        // RLMClazzProperty *column = columns[index];
+        tableColumn.editable = NO;
         
         [self.realmTableColumnsView addTableColumn:tableColumn];
     }
     
-    // Set the column names
+    // Set the column names and cell type / formatting
     for (NSUInteger index = 0; index < columns.count; index++) {
         NSTableColumn *tableColumn = self.realmTableColumnsView.tableColumns[index];
         RLMClazzProperty *rlmTableColumn = columns[index];
         
-        if(rlmTableColumn.type == RLMPropertyTypeBool) {
-            NSButtonCell *cell = [[NSButtonCell alloc] init];
-            [cell setTitle:nil];
-            [cell setAllowsMixedState:YES];
-            [cell setButtonType:NSSwitchButton];
-            tableColumn.dataCell = cell;
+        NSCell *cell;
+        switch (rlmTableColumn.type) {
+            case RLMPropertyTypeBool: {
+                cell = [[NSButtonCell alloc] init];
+                [cell setTitle:nil];
+                [cell setAllowsMixedState:YES];
+                [(NSButtonCell *)cell setButtonType:NSSwitchButton];
+                [cell setAlignment:NSCenterTextAlignment];
+                break;
+            }
+            case RLMPropertyTypeInt:
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeDouble: {
+                cell = [[NSCell alloc] initTextCell:@""];
+                [cell setAlignment:NSRightTextAlignment];
+                
+                break;
+            }
+            case RLMPropertyTypeString:
+            case RLMPropertyTypeData:
+            case RLMPropertyTypeAny:
+            case RLMPropertyTypeDate:
+            case RLMPropertyTypeArray:
+            case RLMPropertyTypeObject: {
+                cell = [[NSCell alloc] initTextCell:@""];
+                [cell setAlignment:NSLeftTextAlignment];
+            
+                break;
+            }
         }
+
+        tableColumn.dataCell = cell;
+        tableColumn.editable = NO;
+        
         
         NSTableHeaderCell *headerCell = tableColumn.headerCell;
         RLMClazzProperty *column = columns[index];
