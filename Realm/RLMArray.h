@@ -35,17 +35,17 @@
  RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
  so you can easily chain queries to further filter query results.
  
- ### Using keyed subscripts
+ ### Using indexed subscripting
 
- Realm supports keyed subscripts for accessing and setting RLMObjects in an RLMArray. 
+ Realm supports indexed subscripting to access & set RLMObjects in an RLMArray.
 
  For example, to put an RLMObject into an RLMArray, the syntax would look like this:
 
-       	myRLMArray[index] = myRLMObject;
+    myRLMArray[index] = myRLMObject;
 
  The syntax to retrieve the RLMObject stored at an index would look like this:
  
-       	RLMObject * myRLMObject = myRLMArray[index];
+    RLMObject * myRLMObject = myRLMArray[index];
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
@@ -191,6 +191,23 @@
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
 
+/**
+ Retrieves the RLMObject stored at the specified index in the RLMArray.
+ 
+ @param  index  The index of the RLMObject to be retrieved.
+ 
+ @return        The RLMObject stored at the specified index.
+ */
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
+
+/**
+ Replaces the RLMObject stored at the specified index in the RLMArray with a different RLMObject.
+ 
+ @param  newValue  The RLMObject to store at the specified index.
+ @param  index     The index of the RLMObject to be replaced.
+ */
+- (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
+
 
 #pragma mark -
 
@@ -309,26 +326,6 @@
  @return  A JSON string representation of this RLMArray and all its RLMObjects.
  */
 - (NSString *)JSONString;
-
-
-#pragma mark -
-
-/*
- Retrieves the RLMObject stored at the specified index in the RLMArray.
-
- @param  index  The index of the RLMObject to be retrieved.
-
- @return        The RLMObject stored at the specified index.
- */
-- (id)objectAtIndexedSubscript:(NSUInteger)index;
-
-/*
- Replaces the RLMObject stored at the specified index in the RLMArray with a different RLMObject.
-
- @param  newValue  The RLMObject to store at the specified index.
- @param  index     The index of the RLMObject to be replaced.
- */
-- (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
 
 @end
 

@@ -69,17 +69,17 @@
  These methods allow you to easily query the default Realm. To search in a Realm other than
  the defaut Realm, use the interface on an RLMRealm instance.
  
- ### Using keyed subscripts
+ ### Using keyed subscripting
 
- Realm also supports keyed subscripts for accessing and setting RLMObjects stored in an RLMRealm. 
+ Realm also supports keyed subscripting to access and set properties on RLMObjects. 
 
  For example, to set a property of an RLMObject with an NSString value, the syntax would look like this:
 
-       	myRLMObject[@"name"] = @"Tom";
+    myRLMObject[@"name"] = @"Tom";
 
  The syntax to retrieve the property from the RLMObject would look like this:
  
-       	NSString * myName = myRLMObject[@"name"];
+    NSString * myName = myRLMObject[@"name"];
 
  */
 
@@ -175,6 +175,39 @@
  */
 + (NSArray *)ignoredProperties;
 
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Accessing Properties on an Object
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ Retrieves the property value of the specified key from the RLMObject.
+ 
+ @param  key  The key of the property to be retrieved.
+ 
+ @return      The value of the specified property or `nil` if there is no value for the
+ specified key.
+ 
+ Properties on RLMObjects can also be accessed using keyed subscripting, i.e.
+ RLMObject[@"propertyName"] = object;
+ */
+-(id)objectForKeyedSubscript:(NSString *)key;
+
+/**
+ Sets a property value for the specified key in the RLMObject.
+ 
+ @param obj  The object to be stored as the property value.
+ 
+ @param key  The key to use for future lookups of the property being saved.
+ 
+ Properties on RLMObjects can also be set using keyed subscripting,
+ ie. RLMObject[@"propertyName"] = object;
+ */
+-(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
+
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
  *  @name Getting & Querying Objects from the Default Realm
@@ -218,39 +251,6 @@
                     and subclass type.
  */
 + (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
-
-#pragma mark -
-
-/*---------------------------------------------------------------------------------------
- * @name Dynamic Accessors
- *---------------------------------------------------------------------------------------
- */
-
-/*
- Retrieves the property value of the specified key from the RLMObject.
-
- @param  key  The key of the property to be retrieved.
-
- @return      The value of the specified property or `nil` if there is no value for the
-              specified key.
-
- Properties on RLMObjects can also be accessed using keyed subscripting, i.e. 
- RLMObject[@"propertyName"] = object;
- */
--(id)objectForKeyedSubscript:(NSString *)key;
-
-/*
- Sets a property value for the specified key in the RLMObject. 
-
- @param obj  The object to be stored as the property value.
-
- @param key  The key to use for future lookups of the property being saved.
-
- Properties on RLMObjects can also be set using keyed subscripting, 
- ie. RLMObject[@"propertyName"] = object;
- */
--(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
 #pragma mark -
 
