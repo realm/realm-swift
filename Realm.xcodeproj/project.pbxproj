@@ -214,7 +214,7 @@
 		02C414DE1921B07200F858D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		02C414EE1921B07200F858D9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		02C415051921B0C300F858D9 /* libRealm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRealm.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "RealmTests-iOS.xctest"; path = "Run Tests for iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		02C415121921B0C400F858D9 /* Run Tests for iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Run Tests for iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C415401921B25B00F858D9 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libstdc++.6.dylib"; sourceTree = DEVELOPER_DIR; };
 		02C415501921BF2500F858D9 /* Realm-iOSTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-iOSTests-Info.plist"; sourceTree = "<group>"; };
 		02C415521921BF3C00F858D9 /* Realm-iOS-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Realm-iOS-Prefix.pch"; sourceTree = "<group>"; };
@@ -417,7 +417,7 @@
 				02C4145E191DE49600F858D9 /* Build for Mac OS.framework */,
 				02C4146E191DE49600F858D9 /* RealmTests.xctest */,
 				02C415051921B0C300F858D9 /* libRealm.a */,
-				02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */,
+				02C415121921B0C400F858D9 /* Run Tests for iOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -577,7 +577,7 @@
 			);
 			name = "Run Tests for iOS";
 			productName = "Realm-iOSTests";
-			productReference = 02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */;
+			productReference = 02C415121921B0C400F858D9 /* Run Tests for iOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -708,7 +708,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if ! [ -f core/ios/ ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/ios/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/mkdir -p core/\n    /bin/mv realm_core core/ios\nfi";
+			shellScript = "if ! [ -d \"core/ios\" ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core/ios\n    /bin/mkdir -p core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/mv realm-core core/ios\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1006,10 +1006,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/ios/include";
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core/ios";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
@@ -1038,10 +1038,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/ios/include";
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core/ios";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
@@ -1080,7 +1080,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core/ios";
 				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1118,7 +1118,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core/ios";
 				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = (
 					"-framework",
