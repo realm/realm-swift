@@ -83,8 +83,13 @@
 
     RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
     [realm beginWriteTransaction];
+  
     
-        // Add some rows
+    
+#define initObject
+#ifdef initObject
+
+    // Add some rows
     for (NSUInteger i = 0; i < count; i++) {
         PerfObj *perf = [[PerfObj alloc] init];
         perf.name = @"Foo";
@@ -93,6 +98,12 @@
         perf.spare = 0;
         [realm addObject:perf];
     }
+#else
+    
+    for (NSUInteger i = 0; i < count; i++) {
+        [PerfObj createInRealm:realm withObject:@[@"Foo", @(25 + (int)(drand48() * 4)), @YES, @0]];
+    }
+#endif
     
     PerfObj *perf = [[PerfObj alloc] init];
     perf.name = @"Sparse";
