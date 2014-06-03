@@ -128,7 +128,7 @@ static NSArray *s_objectDescriptors = nil;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
-    NSMutableArray *_notificationHandlers;
+    NSMapTable *_notificationHandlers;
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
@@ -154,7 +154,7 @@ static NSArray *s_objectDescriptors = nil;
         _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                              valueOptions:NSPointerFunctionsWeakMemory
                                                  capacity:128];
-        _notificationHandlers = [NSMutableArray array];
+        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _isReadOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                         target:[RLMWeakTarget createWithRealm:self]
@@ -296,22 +296,15 @@ static NSArray *s_objectDescriptors = nil;
     clearRealmCache();
 }
 
-- (void)addNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers addObject:block];
-}
-
-- (void)removeNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers removeObject:block];
-}
-
-- (void)removeAllNotificationBlocks {
-    [_notificationHandlers removeAllObjects];
+- (void)addNotificationBlock:(RLMNotificationBlock)block context:(id)context {
+    [_notificationHandlers setObject:context forKey:block];
 }
 
 - (void)sendNotifications {
     // call this realms notification blocks
     for (RLMNotificationBlock block in _notificationHandlers) {
-        block(RLMRealmDidChangeNotification, self);
+        id context = [_notificationHandlers objectForKey:block];
+        block(RLMRealmDidChangeNotification, self, context);
     }
 }
 
