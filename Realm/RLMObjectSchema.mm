@@ -62,7 +62,10 @@
         BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
         
         if (!ignored) { // Don't process ignored properties
-            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
+            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
+                                                            attributes:[objectClass attributesForProperty:propertyName]
+                                                                column:propArray.count];
+            
             if (prop) {
                 [propArray addObject:prop];
             }

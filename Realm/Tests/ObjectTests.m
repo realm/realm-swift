@@ -20,9 +20,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMTestObjects.h"
-
 #import <Realm/Realm.h>
-
 
 @interface SimpleObject : RLMObject
 @property NSString *name;
@@ -97,6 +95,24 @@
 + (NSArray *)ignoredProperties
 {
     return @[@"url"];
+}
+
+@end
+
+@interface IndexedObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@end
+
+@implementation IndexedObject
+
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
+{
+    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
+    if ([propertyName isEqualToString:@"name"]) {
+        superAttributes |= RLMPropertyAttributeIndexed;
+    }
+    return superAttributes;
 }
 
 @end
@@ -465,6 +481,52 @@
     XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
     
     [realm commitWriteTransaction];
+}
+
+- (void)testObjectDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Init object before adding to realm
+    SimpleObject *soInit = [[SimpleObject alloc] init];
+    soInit.name = @"Peter";
+    soInit.age = 30;
+    soInit.hired = YES;
+    [realm addObject:soInit];
+    
+    // description asserts block
+    void(^descriptionAsserts)(NSString *) = ^(NSString *description) {
+        XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@30 description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"hired"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@YES description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+    };
+    
+    // Test description in write block
+    descriptionAsserts(soInit.description);
+    
+    [realm commitWriteTransaction];
+    
+    // Test description in read block
+    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    descriptionAsserts(objDescription);
+}
+
+#pragma mark - Indexing Tests
+
+- (void)testIndex
+{
+    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    
+    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
 @end

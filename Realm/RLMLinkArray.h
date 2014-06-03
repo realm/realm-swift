@@ -18,22 +18,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject.h"
-#import "RLMAccessor.h"
-#import "RLMObjectSchema.h"
+#import <Foundation/Foundation.h>
+#import "RLMArray_Private.hpp"
 
-// RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor>
+#import <tightdb/link_view.hpp>
 
-- (instancetype)initWithDefaultValues:(BOOL)useDefaults;
-
-@property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
-
-
-@property (nonatomic) RLMObjectSchema *schema;
-
+@interface RLMLinkArray : RLMArray
+@property (nonatomic, assign) tightdb::LinkViewRef backingLinkView;
 @end
 

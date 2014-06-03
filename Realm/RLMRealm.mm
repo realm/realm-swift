@@ -20,9 +20,11 @@
 
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #include <exception>
 #include <sstream>
@@ -466,8 +468,12 @@ static NSArray *s_objectDescriptors = nil;
 
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            TableRef tableRef = group->get_table(obj.backingTableIndex); // Throws
-            obj.backingTable = tableRef.get();
+            // FIXME - check is_attached
+            // FIXME - use row accessors
+            if ([obj isKindOfClass:RLMObject.class]) {
+                TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
+                [(RLMObject *)obj setBackingTable:tableRef.get()];
+            }
             obj.writable = writable;
         }
     }
@@ -518,5 +524,18 @@ static NSArray *s_objectDescriptors = nil;
     // FIXME - store version in metadata table - will come with migration support
     return 0;
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+-(id)objectForKeyedSubscript:(id <NSCopying>)key {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+
+-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+#pragma GCC diagnostic pop
 
 @end

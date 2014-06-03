@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#include <tightdb/table.hpp>
+#import <tightdb/table.hpp>
 #import "RLMRealm.h"
 
 //
@@ -28,13 +28,8 @@
 
 // implemented by all persisted objects
 @protocol RLMAccessor <NSObject>
-
 @property (nonatomic) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
 @property (nonatomic, assign) BOOL writable;
-
 @end
 
 
@@ -52,10 +47,7 @@ Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
-
 //
 // Dynamic accessor creation
 //
 Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version);
-
-

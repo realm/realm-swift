@@ -60,6 +60,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in objectSchema.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
+<<<<<<< HEAD
                 switch (prop.type) {
                     // for objects and arrays, we have to specify target table
                     case RLMPropertyTypeObject:
@@ -70,11 +71,19 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
                         break;
                     }
                     default:
-                    	size_t column = table->add_column((tightdb::DataType)prop.type, name);
-                    	if (prop.attributes & RLMPropertyAttributeIndexed) {
-                        	table->set_index(column);
-                   		}
+                        table->add_column((tightdb::DataType)prop.type, name);
                         break;
+=======
+                if (prop.type == RLMPropertyTypeObject) {
+                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+                    table->add_column_link(tightdb::type_Link, name, linkTable->get_index_in_parent());
+                }
+                else {
+                    size_t column = table->add_column((tightdb::DataType)prop.type, name);
+                    if (prop.attributes & RLMPropertyAttributeIndexed) {
+                        table->set_index(column);
+                    }
+>>>>>>> master
                 }
             }
         }
@@ -162,7 +171,9 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateViewWithOrder(view, order, schema);
     
     // create and populate array
-    RLMArray *array = [RLMArray arrayWithObjectClassName:objectClassName query:query view:view];
+    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:objectClassName query:query view:view];
+    array.backingTable = table.get();
+    array.backingTableIndex = array.backingTable->get_index_in_parent();
     array.realm = realm;
     [realm registerAccessor:array];
     return array;

@@ -29,9 +29,6 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize objectIndex = _objectIndex;
-@synthesize backingTableIndex = _backingTableIndex;
-@synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
 -(instancetype)init {
@@ -183,6 +180,20 @@
 
 + (NSString *)className {
     return NSStringFromClass(self);
+}
+
+- (NSString *)description
+{
+    NSString *baseClassName = self.class.className;
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
+    RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
+    
+    for (RLMProperty *property in objectSchema.properties) {
+        [mString appendFormat:@"\t%@ = %@;\n", property.name, [self[property.name] description]];
+    }
+    [mString appendString:@"}"];
+    
+    return [NSString stringWithString:mString];
 }
 
 @end

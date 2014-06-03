@@ -24,6 +24,7 @@
 
 // private properties
 @interface RLMProperty ()
+
 @property (nonatomic, assign) BOOL dynamic;
 @property (nonatomic, assign) BOOL nonatomic;
 
@@ -147,12 +148,15 @@
     }
 }
 
-+(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp column:(NSUInteger)column
++(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
+                              attributes:(RLMPropertyAttributes)attributes
+                                  column:(NSUInteger)column
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
+    prop->_attributes = attributes;
     prop->_column = column;
     
     // parse attributes
@@ -195,8 +199,4 @@
     return prop;
 }
 
-
 @end
-
-
-

@@ -25,11 +25,11 @@
 
 // RLMArray private members and accessor
 @interface RLMArray () <RLMAccessor>
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName
-                                  query:(tightdb::Query *)query
-                                   view:(tightdb::TableView &)view;
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName
-                                   view:(tightdb::LinkViewRef)view;
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                   query:(tightdb::Query *)query
+                                    view:(tightdb::TableView &)view;
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                    view:(tightdb::LinkViewRef)view;
 @end
 
 

@@ -18,7 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAccessor.h"
+#import "RLMObject_Private.h"
 #import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject_Private.h"
@@ -52,45 +52,45 @@ void RLMAccessorCacheInitialize() {
 IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassName) {
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return (int)obj.backingTable->get_int(col, obj.objectIndex);
             });
         case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return obj.backingTable->get_int(col, obj.objectIndex);
             });
         case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return obj.backingTable->get_float(col, obj.objectIndex);
             });
         case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return obj.backingTable->get_double(col, obj.objectIndex);
             });
         case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return obj.backingTable->get_bool(col, obj.objectIndex);
             });
         case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return obj.backingTable->get_bool(col, obj.objectIndex);
             });
         case 's':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMStringDataToNSString(obj.backingTable->get_string(col, obj.objectIndex));
             });
         case 'a':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 tightdb::DateTime dt = obj.backingTable->get_datetime(col, obj.objectIndex);
                 return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
             });
         case 'e':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 tightdb::BinaryData data = obj.backingTable->get_binary(col, obj.objectIndex);
                 return [NSData dataWithBytes:data.data() length:data.size()];
             });
         case 'k':
-            return imp_implementationWithBlock(^id(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^id(RLMObject *obj) {
                 if (obj.backingTable->is_null_link(col, obj.objectIndex)) {
                     return nil;
                 }
@@ -98,12 +98,12 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
                 return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
             });
         case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
-                return [[RLMArray alloc] initWithObjectClassName:objectClassName view:linkView];
+                return [RLMArray arrayWithObjectClassName:objectClassName view:linkView];
             });
         case '@':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+            return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMGetAnyProperty(*obj.backingTable, obj.objectIndex, col);
             });
         default:
@@ -115,44 +115,44 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
 IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, int val) {
                 obj.backingTable->set_int(col, obj.objectIndex, val);
             });
         case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, long val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, long val) {
                 obj.backingTable->set_int(col, obj.objectIndex, val);
             });
         case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, float val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, float val) {
                 obj.backingTable->set_float(col, obj.objectIndex, val);
             });
         case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, double val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, double val) {
                 obj.backingTable->set_double(col, obj.objectIndex, val);
             });
         case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, bool val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, bool val) {
                 obj.backingTable->set_bool(col, obj.objectIndex, val);
             });
         case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, BOOL val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, BOOL val) {
                 obj.backingTable->set_bool(col, obj.objectIndex, val);
             });
         case 's':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, NSString *val) {
                 obj.backingTable->set_string(col, obj.objectIndex, RLMStringDataWithNSString(val));
             });
         case 'a':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
+            return imp_implementationWithBlock(^(RLMObject *obj, NSDate *date) {
                 std::time_t time = date.timeIntervalSince1970;
                 obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
             });
         case 'e':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSData *data) {
+            return imp_implementationWithBlock(^(RLMObject *obj, NSData *data) {
                 obj.backingTable->set_binary(col, obj.objectIndex, RLMBinaryDataForNSData(data));
             });
         case 'k':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
+            return imp_implementationWithBlock(^(RLMObject *obj, RLMObject *link) {
                 if (!link || link.class == NSNull.class) {
                     // if null
                     obj.backingTable->nullify_link(col, obj.objectIndex);
@@ -167,7 +167,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 }
             });
         case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id<NSFastEnumeration> val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> val) {
                 tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
                 // remove all old
                 // FIXME: make sure delete rules don't purge objects
@@ -182,7 +182,7 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 }
             });
         case '@':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, id val) {
                 RLMSetAnyProperty(*obj.backingTable, obj.objectIndex, col, val);
             });
         default:
@@ -387,7 +387,6 @@ Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
     return RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
                                   NULL, RLMAccessorSetter, s_insertionAccessorCache);
 }
-
 
 // Dynamic accessor name for a classname
 inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {

@@ -26,7 +26,7 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMConstants.h"
-
+#import "RLMLinkArray.h"
 #import <objc/runtime.h>
 
 #import <tightdb/util/unique_ptr.hpp>
@@ -38,7 +38,6 @@
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 // When getting the backingView using dot notation, the tableview is copied in core. Use _backingView instead when accessing.
 @property (nonatomic, assign) tightdb::TableView backingView;
-@property (nonatomic, assign) tightdb::LinkViewRef backingLinkView;
 @property (nonatomic, readwrite, copy) NSString *objectClassName;
 @end
 
@@ -51,31 +50,22 @@
 
 @dynamic backingQuery;
 @synthesize realm = _realm;
-@synthesize objectIndex = _objectIndex;
-@synthesize backingTableIndex = _backingTableIndex;
-@synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                   query:(tightdb::Query *)query
                                    view:(tightdb::TableView &)view {
-    self = [super init];
-    if (self) {
-        self.objectClassName = objectClassName;
-        self.backingQuery = query;
-        _backingView = view;
-    }
-    return self;
+    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+    ar.backingQuery = query;
+    ar.backingView = view;
+    return ar;
 }
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    view:(tightdb::LinkViewRef)view {
-    self = [super init];
-    if (self) {
-        self.objectClassName = objectClassName;
-        _backingLinkView = view;
-    }
-    return self;
+    RLMLinkArray *ar = [[RLMLinkArray alloc] initWithObjectClassName:objectClassName];
+    ar.backingLinkView = view;
+    return ar;
 }
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
@@ -141,14 +131,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return nil;
 }
 
+- (void)addObjectsFromArray:(id)objects {
+    for (id obj in objects) {
+        [self addObject:obj];
+    }
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-- (void)addObjectsFromArray:(id)objects {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -200,10 +191,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 - (RLMArray *)copy {
     RLMArray *array = [[RLMArray alloc] initWithObjectClassName:_objectClassName];
     array.realm = _realm;
-    array.backingTable = _backingTable;
-    array.backingTableIndex = _backingTableIndex;
     array.backingQuery = new tightdb::Query(*_backingQuery);
-    array.backingView = array.backingTable->where(&_backingView).find_all();
+    array.backingView = _backingView.get_parent().where(&_backingView).find_all();
     [_realm registerAccessor:array];
     return array;
 }
@@ -316,7 +305,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
             return @(_backingView.average_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                           reason:@"averageOfProperty only supported fornam int, float and double properties."
+                                           reason:@"averageOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
     }
 }

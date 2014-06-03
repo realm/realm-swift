@@ -153,7 +153,7 @@
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClass selector).
  */
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
 
 @end
 
