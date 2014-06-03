@@ -24,6 +24,8 @@
 
 @optional
 
+- (BOOL)hasToolTip;
+
 - (NSString *)toolTipString;
 
 @end

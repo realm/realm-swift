@@ -74,6 +74,11 @@
     }
 }
 
+- (BOOL)hasToolTip
+{
+    return YES;
+}
+
 - (NSString *)toolTipString
 {
     return _url;

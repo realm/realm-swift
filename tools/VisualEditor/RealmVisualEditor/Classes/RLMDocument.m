@@ -186,9 +186,12 @@
 
 - (NSString *)outlineView:(NSOutlineView *)outlineView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc item:(id)item mouseLocation:(NSPoint)mouseLocation
 {
-    if([item respondsToSelector:@selector(toolTipString)]) {
-        return [item toolTipString];
+    if ([item respondsToSelector:@selector(hasToolTip)]) {
+        if ([item respondsToSelector:@selector(toolTipString)]) {
+            return [item toolTipString];
+        }
     }
+    
     return nil;
 }
 
@@ -398,6 +401,31 @@
                 break;
         }
     }
+}
+
+- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
+{
+    if (tableView == self.realmTableColumnsView) {
+        NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
+        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
+
+        if (propertyNode.type == RLMPropertyTypeDate) {
+            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+            NSObject *propertyValue = selectedInstance[propertyNode.name];
+            
+            if([propertyValue isKindOfClass:[NSDate class]]) {
+                NSDate *dateValue = (NSDate *)propertyValue;
+                
+                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                formatter.dateStyle = NSDateFormatterFullStyle;
+                formatter.timeStyle = NSDateFormatterFullStyle;
+                
+                return [formatter stringFromDate:dateValue];
+            }
+        }
+    }
+    
+    return nil;
 }
 
 #pragma mark - Private methods
