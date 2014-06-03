@@ -58,9 +58,7 @@
 
 /* Begin PBXFileReference section */
 		02026CCB193D039900E4EEF8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/Debug/Realm.framework; sourceTree = "<group>"; };
-		02026CCD193D041E00E4EEF8 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
 		02026CCF193D05D000E4EEF8 /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
-		02C415551921C26600F858D9 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
 		E80762D018FEFFD70071CFAB /* RealmTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -125,9 +123,7 @@
 		E80762D218FEFFD70071CFAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				02026CCD193D041E00E4EEF8 /* libRealm.a */,
 				02026CCB193D039900E4EEF8 /* Realm.framework */,
-				02C415551921C26600F858D9 /* libRealm.a */,
 				E807630718FF00F00071CFAB /* libstdc++.6.dylib */,
 				E80762D318FEFFD70071CFAB /* Foundation.framework */,
 				E80762D518FEFFD70071CFAB /* CoreGraphics.framework */,

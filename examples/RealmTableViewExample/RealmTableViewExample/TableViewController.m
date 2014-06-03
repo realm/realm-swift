@@ -38,7 +38,7 @@ static NSString * const kTableName = @"table";
 @interface TableViewController ()
 
 @property (nonatomic, strong) RLMArray *array;
-
+@property (nonatomic, strong) RLMNotificationBlock realmNotification;
 @end
 
 @implementation TableViewController
@@ -49,18 +49,20 @@ static NSString * const kTableName = @"table";
     [super viewDidLoad];
     [self setupUI];
 
-    // FIXME: Reset realm
-    //[[DemoObject allObjects] removeAllObjects];
-
-    // Set realm notification block
-    NSString *order = nil; // FIXME - crashes @"date"
-    [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        self.array = [DemoObject objectsOrderedBy:order where:nil];
-        [self.tableView reloadData];
-    }];
+    // Create and hold realm notification block
+    self.realmNotification = ^(NSString *note, RLMRealm *realm, id context) {
+        [context reloadData];
+    };
+    
+    // Set notification block
+    [RLMRealm.defaultRealm addNotificationBlock:self.realmNotification context:self];
     
     // Load initial data
-    self.array = [DemoObject objectsOrderedBy:order where:nil];
+    [self reloadData];
+}
+
+- (void)reloadData {
+    self.array = [DemoObject objectsOrderedBy:@"date" where:nil];
     [self.tableView reloadData];
 }
 

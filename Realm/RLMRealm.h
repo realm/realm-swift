@@ -104,23 +104,21 @@
  @param notification    The name of the incoming notification.
  @param realm           The realm for which this notification occurred.
  */
-typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm, id context);
 
 @interface RLMRealm (Notifications)
 /**
  Add a notification handler for changes in this RLMRealm.
  
- @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the
- only notification currently supported.
- */
-- (void)addNotificationBlock:(RLMNotificationBlock)block;
-
-/**
- Remove a previously registered notification handler.
+ Both the block and context are held onto as weak references so callers must hold onto
+ a reference to the block. When the block is released the notifcation is automatically 
+ unregistered.
  
- @param block   The block previously passed to addNotification: to remove.
+ @param block   A block which is called to process RLMRealm notifications.
+ @param context The context passed into the notification block. Can be nil.
+
  */
-- (void)removeNotificationBlock:(RLMNotificationBlock)block;
+- (void)addNotificationBlock:(RLMNotificationBlock)block context:(id)context;
 
 @end
 
