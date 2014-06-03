@@ -167,7 +167,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  Implement to return an array of property names to ignore. These properties will not be persisted
  and are treated as transient.
  
- @return    NSArray of property names to igonre.
+ @return    NSArray of property names to ignore.
  */
 + (NSArray *)ignoredProperties;
 
