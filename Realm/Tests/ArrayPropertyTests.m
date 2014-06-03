@@ -61,6 +61,30 @@
     // XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
 }
 
+
+-(void)testModifyDetatchedArray {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
+    XCTAssertNotNil(arObj.array, @"Should be able to get an empty array");
+    XCTAssertEqual(arObj.array.count, 0, @"Should start with no array elements");
+    
+    RLMTestObject *obj = [[RLMTestObject alloc] init];
+    obj.column = @"a";
+    RLMArray *array = arObj.array;
+    [array addObject:obj];
+    [array addObject:[RLMTestObject createInRealm:realm withObject:@[@"b"]]];
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(array.count, 2, @"Should have two elements in array");
+    XCTAssertEqualObjects([array[0] column], @"a", @"First element should have property valud 'a'");
+    XCTAssertEqualObjects([arObj.array[1] column], @"b", @"Second element should have property valud 'b'");
+    
+    // FIXME - link array accessor
+    // XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
+}
+
 -(void)testInsertArray {
     RLMRealm *realm = [self realmWithTestPath];
     

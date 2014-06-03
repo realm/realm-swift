@@ -19,19 +19,32 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
+#import "RLMLinkArray.h"
 #import "RLMAccessor.h"
 #import <tightdb/query.hpp>
 #import <tightdb/link_view.hpp>
 
 // RLMArray private members and accessor
-@interface RLMArray () <RLMAccessor>
+@interface RLMArray () <RLMAccessor> {
+    @protected
+    BOOL _writable;
+}
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    query:(tightdb::Query *)query
                                     view:(tightdb::TableView &)view
                                    realm:(RLMRealm *)realm;
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::LinkViewRef)view
-                                   realm:(RLMRealm *)realm;;
++ (RLMLinkArray *)arrayWithObjectClassName:(NSString *)objectClassName
+                                      view:(tightdb::LinkViewRef)view
+                                     realm:(RLMRealm *)realm;
 @end
+
+
+// FIXME - remove once we have self-updating LinkView accessors
+@interface RLMLinkArray ()
+// we need to hold onto this until LinkView accessors self update
+@property (nonatomic, strong) RLMObject *parentObject;
+@property (nonatomic, assign) NSUInteger arrayColumnInParent;
+@end
+
 
 

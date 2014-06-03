@@ -18,7 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMLinkArray.h"
+#import "RLMArray_Private.hpp"
 #import "RLMArrayAccessor.h"
 
 #import "RLMRealm_Private.hpp"
@@ -34,6 +34,16 @@
 //
 @implementation RLMLinkArray {
     tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
+}
+
+- (void)setWritable:(BOOL)writable {
+    if (writable) {
+        //object_setClass(self, RLMArray.class);
+    }
+    else {
+        //object_setClass(self, RLMArrayReadOnly.class);
+    }
+    _writable = writable;
 }
 
 - (NSUInteger)count {

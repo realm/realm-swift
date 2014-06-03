@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMArray_Private.hpp"
+#import "RLMArray.h"
 
 #import <tightdb/link_view.hpp>
 

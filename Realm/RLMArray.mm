@@ -49,8 +49,8 @@
 }
 
 @dynamic backingQuery;
+@dynamic writable;
 @synthesize realm = _realm;
-@synthesize writable = _writable;
 
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                   query:(tightdb::Query *)query
@@ -64,9 +64,9 @@
     return ar;
 }
 
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   view:(tightdb::LinkViewRef)view
-                                  realm:(RLMRealm *)realm {
++ (RLMLinkArray *)arrayWithObjectClassName:(NSString *)objectClassName
+                                      view:(tightdb::LinkViewRef)view
+                                     realm:(RLMRealm *)realm {
     RLMLinkArray *ar = [[RLMLinkArray alloc] initWithObjectClassName:objectClassName];
     ar.backingLinkView = view;
     ar.realm = realm;
