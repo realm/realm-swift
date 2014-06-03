@@ -24,7 +24,8 @@
 
 /**
  
- RLMArray is the primary container type in Realm.
+ RLMArray is the primary container type used in Realm for working with sets of RLMObjects. Primarily,
+ RLMArray is used to add sets to a RLMRealm or return sets from an RLMRealm in response to a query. 
  
  ### RLMArray vs. NSArray
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
@@ -33,6 +34,18 @@
  ### Chaining queries
  RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
  so you can easily chain queries to further filter query results.
+ 
+ ### Using keyed subscripts
+
+ Realm supports keyed subscripts for accessing and setting RLMObjects in an RLMArray. 
+
+ For example, to put an RLMObject into an RLMArray, the syntax would look like this:
+
+       	myRLMArray[index] = myRLMObject;
+
+ The syntax to retrieve the RLMObject stored at an index would look like this:
+ 
+       	RLMObject * myRLMObject = myRLMArray[index];
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
@@ -45,12 +58,12 @@
 /** 
  Initializes a typed RLMArray.
  
- @warning Realm arrays are typed. You must specify an RLMObject subclass name during initialization
-          and can only add objects of this type to the array.
- 
- @param objectClassName     The name of the RLMObject subclass this RLMArray will hold.
+ @param  objectClassName  The name of the RLMObject subclass this RLMArray will hold.
 
- @return                    An initialized RLMArray instance.
+ @warning  Realm arrays are typed. You must specify an RLMObject subclass name during initialization
+           and can only add objects of this type to the array.
+
+ @return                  An initialized RLMArray instance.
 */
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
@@ -74,9 +87,9 @@
 /**
  Returns the RLMObject at the specified RLMArray index.
  
- @param index   The index of the RLMObject to retrieve.
+ @param  index  The index of the RLMObject to retrieve.
  
- @return The RLMObject stored at the specified index.
+ @return        The RLMObject stored at the specified index.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
@@ -85,7 +98,7 @@
  
  Returns `nil` if called on an empty RLMArray.
  
- @return The first RLMObject in the RLMArray.
+ @return  The first RLMObject in the RLMArray.
  */
 - (id)firstObject;
 
@@ -94,7 +107,7 @@
 
  Returns `nil` if called on an empty RLMArray.
 
- @return The last RLMObject in the RLMArray.
+ @return  The last RLMObject in the RLMArray.
  */
 - (id)lastObject;
 
@@ -110,30 +123,30 @@
 /**
  Adds an RLMObject to the end of the RLMArray.
  
- @warning This method can only be called during a write transaction.
+ @warning        This method can only be called during a write transaction.
  
- @param object  The RLMObject to add to the end of the RLMArray.
+ @param  object  The RLMObject to add to the end of the RLMArray.
  */
 - (void)addObject:(RLMObject *)object;
 
 /**
  Adds an NSArray or RLMArray of RLMObjects to the end of the RLMArray.
  
- @warning This method can only be called during a write transaction.
+ @warning         This method can only be called during a write transaction.
  
- @param objects     An NSArray or RLMArray of objects to add to the end of the RLMArray.
+ @param  objects  An NSArray or RLMArray of objects to add to the end of the RLMArray.
  */
 - (void)addObjectsFromArray:(id)objects;
 
 /**
  Inserts an RLMObject into the RLMArray at the specified index.
  
- @param anObject  An object (of the same type as returned from the objectClassName selector).
- @param index   The array index to insert the RLMObject at.
+ @param  anObject  An object (of the same type as returned from the objectClassName selector).
+ @param  index     The array index to insert the RLMObject at.
  
- @warning This method can only be called during a write transaction.
+ @warning          This method can only be called during a write transaction.
  
- @exception Thrown if the specified index is greater than the number of RLMObjects in the RLMArray.
+ @exception        Thrown if the specified index is greater than the number of RLMObjects in the RLMArray.
 
  */
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
@@ -141,37 +154,38 @@
 /**
  Removes the RLMObject from the RLMArray at the specified index.
  
- @param index   The array index of the object to be removed.
+ @param  index  The array index of the object to be removed.
  
- @exception Thrown if the specified index is greater than the number of RLMObjects in the RLMArray.
+ @exception     Thrown if the specified index is greater than the number of RLMObjects in the RLMArray.
 
- @warning This method can only be called during a write transaction.
+ @warning       This method can only be called during a write transaction.
  */
 - (void)removeObjectAtIndex:(NSUInteger)index;
 
 /**
  Removes the last RLMObject in the RLMArray.
  
- @warning This method can only be called during a write transaction.
+ @warning  This method can only be called during a write transaction.
 */
 - (void)removeLastObject;
 
 /**
  Empties an RLMArray.
  
- @warning This method can only be called during a write transaction.
+ @warning  This method can only be called during a write transaction.
  */
 - (void)removeAllObjects;
 
 /**
  Replaces an RLMObject at the specified index with another RLMObject.
 
- @param index       The index of the RLMObject to be replaced.
- @param anObject    The RLMObject to add.
+ @param  index     The index of the RLMObject to be replaced.
+ @param  anObject  The RLMObject to add.
 
- @exception Thrown when called with an index greater than the number of RLMObjects in this RLMArray.
+ @exception        Thrown when called with an index greater than the number of RLMObjects 
+                   in this RLMArray.
 
- @warning This method can only be called during a write transaction.
+ @warning          This method can only be called during a write transaction.
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
 
@@ -186,27 +200,27 @@
 /**
  Retrieves the index of an RLMObject in the RLMArray.
  
- @param object  The RLMObject whose index shoudl be retrieved.
+ @param  object  The RLMObject whose index shoudl be retrieved.
  
- @return The index of the specified RLMObject. If not found, an NSNotFound instance is returned.
+ @return         The index of the specified RLMObject. If not found, an NSNotFound instance is returned.
  */
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
 /**
  Retrieves the index of the first RLMObject that matches the specified predicate.
  
- @param predicate   An NSPredicate, a predicte string, or predicate format string that can accept 
- 					variable arguments.
+ @param  predicate  An NSPredicate, a predicte string, or predicate format string that can accept 
+                    variable arguments.
  
- @return The index of the first matching RLMObject. If not found, an NSNotFound instance is returned.
+ @return            The index of the first matching RLMObject. If not found, an NSNotFound instance is returned.
  */
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
 
 /**
  Retrieves an RLMArray of all RLMObjects that match the specified predicate from the RLMArray.
  
- @param predicate   An NSPredicate, a predicte string, or predicate format string that can accept 
- 					variable arguments.
+ @param  predicate  An NSPredicate, a predicte string, or predicate format string that can accept 
+                    variable arguments.
  
  @return            An RLMArray of all the RLMObjects that matched the given predicate
  */
@@ -215,10 +229,10 @@
 /**
  Retrieves an ordered RLMArray of all RLMObjects that match the specified predicate from the RLMArray.
  
- @param predicate   An NSPredicate, a predicte string, or predicate format string that can accept 
- 					variable arguments.
- @param order       An NSString of the property name or an NSSortDescriptor with the property 
- 					name and order that the results should be sorted by.
+ @param  predicate  An NSPredicate, a predicte string, or predicate format string that can accept 
+                    variable arguments.
+ @param  order      An NSString of the property name or an NSSortDescriptor with the property 
+                    name and order that the results should be sorted by.
  
  @return            An ordered RLMArray of all the RLMObjects that matched the predicate.
  */
@@ -236,46 +250,46 @@
 /**
  Finds the minimum (lowest) value of the specified RLMObject property present in the RLMArray.
  
- @param property The property to look for a minimum on. Only RLMObject properties of type int, 
- 				 float and double are supported.
+ @param  property  The property to look for a minimum on. Only RLMObject properties of type int, 
+ 				   float and double are supported.
  
- @warning Properties with values of type RLMObject, RLMArray, and NSData are not supported.
+ @warning          Properties with values of type RLMObject, RLMArray, and NSData are not supported.
  
- @return The minimum value of the specified property.
+ @return           The minimum value of the specified property.
  */
 -(id)minOfProperty:(NSString *)property;
 
 /**
  Finds the maximum (highest) value of the specified RLMObject property present in the RLMArray.
  
- @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
+ @param  property  The property to look for a maximum on. Only properties of type int, float and double are supported.
  
- @warning Properties with values of type RLMObject, RLMArray, and NSData are not supported.
+ @warning          Properties with values of type RLMObject, RLMArray, and NSData are not supported.
 
- @return The maximum value for the specified property.
+ @return           The maximum value for the specified property.
  */
 -(id)maxOfProperty:(NSString *)property;
 
 /**
  Calculates the sum of all values for the specified RLMObject property in the RLMArray.
  
- @param property The property to calculate the sum on. Only properties of type int, float and double are supported.
+ @param  property  The property to calculate the sum on. Only properties of type int, float and double are supported.
  
- @warning Properties with values of type RLMObject, RLMArray, and NSData are not supported.
+ @warning          Properties with values of type RLMObject, RLMArray, and NSData are not supported.
 
- @return The sum of all values of the specified property over all objects in the RLMArray.
+ @return           The sum of all values of the specified property over all objects in the RLMArray.
  */
 -(NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
  Calculates the average of all values for the specified RLMObject property in the RLMArray.
   
- @param property The property to calculate the average on. Only properties of type int, float and double are supported.
+ @param  property  The property to calculate the average on. Only properties of type int, float and double are supported.
  
- @warning Properties with values of type RLMObject, RLMArray, and NSData are not supported.
+ @warning          Properties with values of type RLMObject, RLMArray, and NSData are not supported.
 
- @return    The average of all values of the specified property over all objects in the RLMArray. This will be 
- 			of type double for both float and double properties.
+ @return           The average of all values of the specified property over all objects in the RLMArray. This will be 
+                   of type double for both float and double properties.
  */
 -(NSNumber *)averageOfProperty:(NSString *)property;
 
@@ -290,7 +304,7 @@
 /**
  Returns the RLMArray and the RLMObjects it contains formatted as a JSON string.
  
- @return    A JSON string representation of this RLMArray and all its RLMObjects.
+ @return  A JSON string representation of this RLMArray and all its RLMObjects.
  */
 - (NSString *)JSONString;
 
@@ -300,17 +314,17 @@
 /**
  Retrieves the RLMObject stored at the specified index in the RLMArray.
 
- @param index The index of the RLMObject to be retrieved.
+ @param  index  The index of the RLMObject to be retrieved.
 
- @return The RLMObject stored at the specified index.
+ @return        The RLMObject stored at the specified index.
  */
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 /**
  Replaces the RLMObject stored at the specified index in the RLMArray with a different RLMObject.
 
- @param newValue The RLMObject to store at the specified index.
- @param index The index of the RLMObject to be replaced.
+ @param  newValue  The RLMObject to store at the specified index.
+ @param  index     The index of the RLMObject to be replaced.
  */
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
 
