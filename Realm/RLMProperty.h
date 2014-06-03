@@ -21,6 +21,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMObject.h>
 
 // object property definition
 @interface RLMProperty : NSObject
@@ -36,10 +37,13 @@
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
+ Property attributes.
+ */
+@property (nonatomic, readonly) RLMPropertyAttributes attributes;
+
+/**
  Object class name - specify object types for RLMObject and RLMArray properties.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 @end
-
-

@@ -23,6 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #include <exception>
 #include <sstream>
@@ -518,5 +519,18 @@ static NSArray *s_objectDescriptors = nil;
     // FIXME - store version in metadata table - will come with migration support
     return 0;
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+-(id)objectForKeyedSubscript:(id <NSCopying>)key {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+
+-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+#pragma GCC diagnostic pop
 
 @end

@@ -20,9 +20,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMTestObjects.h"
-
 #import <Realm/Realm.h>
-
 
 @interface SimpleObject : RLMObject
 @property NSString *name;
@@ -97,6 +95,24 @@
 + (NSArray *)ignoredProperties
 {
     return @[@"url"];
+}
+
+@end
+
+@interface IndexedObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@end
+
+@implementation IndexedObject
+
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
+{
+    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
+    if ([propertyName isEqualToString:@"name"]) {
+        superAttributes |= RLMPropertyAttributeIndexed;
+    }
+    return superAttributes;
 }
 
 @end
@@ -500,6 +516,17 @@
     // Test description in read block
     NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
     descriptionAsserts(objDescription);
+}
+
+#pragma mark - Indexing Tests
+
+- (void)testIndex
+{
+    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    
+    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
 @end
