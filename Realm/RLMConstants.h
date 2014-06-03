@@ -30,7 +30,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
     
 /**
  Store this property inline (de-normalization) which in some cases can improve performance. Setting this
- attribute will result in objects being copied (rather than linked) when getting and setting this property.
+ attribute will result in objects being copied (rather than linked) when setting this property.
  */
     RLMPropertyAttributeInlined = 1 << 3,
     
