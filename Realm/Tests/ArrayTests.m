@@ -31,12 +31,19 @@
 @implementation AggregateObject
 @end
 
+@interface PersonObject : RLMObject
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+@end
+
+@implementation PersonObject
+@end
 
 @interface ArrayTests : RLMTestCase
 @end
 
 @implementation ArrayTests
-
 
 - (void)testFastEnumeration
 {
@@ -199,6 +206,35 @@
     
     // Test operation not supported
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
+}
+
+- (void)testArrayDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    PersonObject *person1 = [[PersonObject alloc] init];
+    person1.name = @"Mary";
+    person1.age = 30;
+    person1.hired = YES;
+    [realm addObject:person1];
+    
+    PersonObject *person2 = [[PersonObject alloc] init];
+    person2.name = @"John";
+    person2.age = 24;
+    person2.hired = NO;
+    [realm addObject:person2];
+    
+    [realm commitWriteTransaction];
+    
+    NSString *description = [[PersonObject allObjects] description];
+    
+    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+    
+    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 }
 
 @end

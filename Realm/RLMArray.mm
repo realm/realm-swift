@@ -323,7 +323,22 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     [self replaceObjectAtIndex:index withObject:newValue];
 }
 
+#pragma mark - Superclass Overrides
+
+- (NSString *)description
+{
+    NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
+    for (RLMObject *object in self) {
+        // Indent child objects
+        NSString *objDescription = [object.description stringByReplacingOccurrencesOfString:@"\n"
+                                                                                 withString:@"\n\t"];
+        [mString appendFormat:@"\t%@,\n", objDescription];
+    }
+    // Remove last comma and newline characters
+    [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
+    [mString appendString:@"\n)"];
+    
+    return [NSString stringWithString:mString];
+}
+
 @end
-
-
-
