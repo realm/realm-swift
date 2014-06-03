@@ -1,6 +1,9 @@
 *~
 .DS_Store
 
+# core
+realm-core
+
 # sh build.sh config
 /Realm/config.mk
 
