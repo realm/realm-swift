@@ -46,3 +46,5 @@ realm-ios-*.zip
 # backup and crash files
 *.swp
 *~
+
+*.dylib
