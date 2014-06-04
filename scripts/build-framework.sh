@@ -15,4 +15,10 @@ xcrun cp ${SF_COMBINED_PATH} "${SF_FRAMEWORK_PATH}/${PRODUCT_NAME}"
 # Step 2 - copy headers into framework
 xcrun cp -R "${BUILT_PRODUCTS_DIR}/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
 
-
+cd "${SF_FRAMEWORK_PATH}"
+/bin/mkdir -p "Versions/A/Headers"
+/bin/mv Headers/Realm/* Versions/A/Headers/
+/bin/rm -rf Headers
+/bin/mv "${PRODUCT_NAME}" "Versions/A/${PRODUCT_NAME}"
+/bin/ln -fs "Versions/A/${PRODUCT_NAME}" "${PRODUCT_NAME}"
+/bin/ln -fs "Versions/A/Headers" "Headers"
