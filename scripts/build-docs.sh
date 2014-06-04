@@ -82,4 +82,3 @@ EOF
 
 mv ${SRCROOT}/docs/output/${realm_version}/publish/* ${SRCROOT}/docs/output/${realm_version}/
 rm -rf ${SRCROOT}/docs/output/${realm_version}/publish/
-rm -rf ${SRCROOT}/docs/output/${realm_version}/realm.docset
