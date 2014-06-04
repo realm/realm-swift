@@ -15,7 +15,7 @@
 *.realm.lock
 
 # core
-realm-core
+core
 
 # sh build.sh config
 /Realm/config.mk
