@@ -23,6 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #include <exception>
 #include <sstream>
@@ -531,6 +532,5 @@ static NSArray *s_objectDescriptors = nil;
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 #pragma GCC diagnostic pop
-
 
 @end

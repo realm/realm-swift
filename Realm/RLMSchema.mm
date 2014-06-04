@@ -26,25 +26,6 @@
 
 #import <objc/runtime.h>
 
-// NOTE: the object store uses a custom table namespace for storing data.
-// There current names used are:
-//  class_* - any table name beginning with class is used to store objects
-//            of the typename (the rest of the name after class)
-//  metadata - table used for realm metadata storage
-NSString *const c_objectTableNamePrefix = @"class_";
-NSString *const c_metadataTableName = @"metadata";
-
-inline NSString *RLMTableNameForClassName(NSString *className) {
-    return [c_objectTableNamePrefix stringByAppendingString:className];
-}
-
-inline NSString *RLMClasForTableName(NSString *tableName) {
-    if ([tableName hasPrefix:@"class_"]) {
-        return [tableName substringFromIndex:6];
-    }
-    return nil;
-}
-
 // RLMSchema private properties
 @interface RLMSchema ()
 @property (nonatomic, readwrite) NSArray *objectSchema;
@@ -127,7 +108,7 @@ static RLMSchema *s_sharedSchema;
     RLMSchema *schema = [[RLMSchema alloc] init];
     for (unsigned long i = 0; i < numTables; i++) {
         NSString *tableName = [NSString stringWithUTF8String:realm.group->get_table_name(i).data()];
-        NSString *className = RLMClasForTableName(tableName);
+        NSString *className = RLMClassForTableName(tableName);
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];

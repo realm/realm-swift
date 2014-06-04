@@ -39,7 +39,3 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 - (void)registerAccessor:(id<RLMAccessor>)accessor;
 
 @end
-
-
-
-
