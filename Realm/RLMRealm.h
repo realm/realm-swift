@@ -93,7 +93,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
-@property (nonatomic, readonly) BOOL isReadOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 
 #pragma mark -
