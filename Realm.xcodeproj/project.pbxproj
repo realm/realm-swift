@@ -696,7 +696,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "/usr/bin/curl -s http://static.realm.io/downloads/ios/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -rf ${SRCROOT}/realm-core\ncd ${SRCROOT}\n/usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip";
+			shellScript = "/usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -rf ${SRCROOT}/realm-core\ncd ${SRCROOT}\n/usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip";
 		};
 /* End PBXShellScriptBuildPhase section */
 
