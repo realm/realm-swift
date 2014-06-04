@@ -41,9 +41,9 @@ fi
 
 # debug vs release
 if [[ "$CONFIGURATION" = "Debug" ]]; then
-    SF_CORE_PATH="${SRCROOT}/realm-core/libtightdb-ios-dbg.a"
+    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios-dbg.a"
 else
-    SF_CORE_PATH="${SRCROOT}/realm-core/libtightdb-ios.a"
+    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios.a"
 fi
 
 

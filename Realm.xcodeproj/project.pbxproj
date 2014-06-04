@@ -692,7 +692,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if ! [ -d realm-core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/realm-core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\nfi";
+			shellScript = "if ! [ -d core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/core-${REALM_CORE_VERSION}.zip -o /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/core-${REALM_CORE_VERSION}.zip\n    mv realm-core core\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -982,10 +982,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
@@ -1014,10 +1014,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "include/$(PROJECT_NAME)";
@@ -1055,7 +1055,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1092,7 +1092,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1184,8 +1184,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -1224,8 +1224,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/realm-core/include";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/realm-core";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
 				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
