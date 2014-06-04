@@ -32,6 +32,15 @@
 @end
 
 
+@interface ToJsonObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@end
+
+@implementation ToJsonObject
+@end
+
+
 @interface ArrayTests : RLMTestCase
 @end
 
@@ -199,6 +208,20 @@
     
     // Test operation not supported
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
+}
+
+
+- (void)testArrayToJSONString
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [ToJsonObject createInRealm:realm withObject:@[@"name1", @1]];
+    [ToJsonObject createInRealm:realm withObject:@[@"name2", @2]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [ToJsonObject allObjects];
+    
+    [all JSONString];
 }
 
 @end

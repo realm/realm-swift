@@ -28,6 +28,8 @@
 #import "RLMConstants.h"
 
 #import <objc/runtime.h>
+#include <sstream>
+
 
 #import <tightdb/util/unique_ptr.hpp>
 
@@ -310,9 +312,13 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     }
 }
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+- (NSString *)JSONString
+{
+    std::ostringstream out;
+    _backingView.to_json(out);
+    std::string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
