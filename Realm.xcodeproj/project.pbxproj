@@ -192,8 +192,6 @@
 		02026CAA19363B5300E4EEF8 /* ArrayTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArrayTests.m; sourceTree = "<group>"; };
 		02026CAD193662AF00E4EEF8 /* LinkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkTests.m; sourceTree = "<group>"; };
 		02026CB619379EB700E4EEF8 /* DynamicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTests.m; sourceTree = "<group>"; };
-		02026CC6193CE3E900E4EEF8 /* build-fat.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-fat.sh"; sourceTree = "<group>"; };
-		02026CC7193CE3E900E4EEF8 /* build-framework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-framework.sh"; sourceTree = "<group>"; };
 		02026CC9193CF0BE00E4EEF8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = build/Release/Realm.framework; sourceTree = "<group>"; };
 		02C4145E191DE49600F858D9 /* Build for OSX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Build for OSX.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C41462191DE49600F858D9 /* Realm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
@@ -303,15 +301,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		02026CC2193CDAAF00E4EEF8 /* Build Scripts */ = {
-			isa = PBXGroup;
-			children = (
-				02026CC6193CE3E900E4EEF8 /* build-fat.sh */,
-				02026CC7193CE3E900E4EEF8 /* build-framework.sh */,
-			);
-			name = "Build Scripts";
-			sourceTree = "<group>";
-		};
 		02C41460191DE49600F858D9 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
@@ -402,7 +391,6 @@
 				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
-				02026CC2193CDAAF00E4EEF8 /* Build Scripts */,
 				E918909B177B677900653D7A /* Frameworks */,
 				E918909A177B677900653D7A /* Products */,
 			);
