@@ -167,7 +167,7 @@ static NSArray *s_objectDescriptors = nil;
         _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                              valueOptions:NSPointerFunctionsWeakMemory
                                                  capacity:128];
-        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsStrongMemory];
+        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                         target:[RLMWeakTarget createWithRealm:self]
