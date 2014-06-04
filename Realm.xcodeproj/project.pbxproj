@@ -19,15 +19,15 @@
 			name = "Realm-iOS-framework";
 			productName = "Framework-iOS";
 		};
-		4226D7DE193D0A7E00A56975 /* Appledoc */ = {
+		4226D7DE193D0A7E00A56975 /* Generate docs in docs/output */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Appledoc" */;
+			buildConfigurationList = 4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Generate docs in docs/output" */;
 			buildPhases = (
 				4226D7E2193D0A8600A56975 /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = Appledoc;
+			name = "Generate docs in docs/output";
 			productName = Appledoc;
 		};
 		4236AC141934864D00ADD527 /* Download binary core for iOS */ = {
@@ -613,7 +613,7 @@
 				421A99481933646F00F5E4D4 /* Realm-iOS-framework */,
 				02C415111921B0C400F858D9 /* RealmTests-iOS */,
 				4236AC141934864D00ADD527 /* Download binary core for iOS */,
-				4226D7DE193D0A7E00A56975 /* Appledoc */,
+				4226D7DE193D0A7E00A56975 /* Generate docs in docs/output */,
 			);
 		};
 /* End PBXProject section */
@@ -1297,13 +1297,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Appledoc" */ = {
+		4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Generate docs in docs/output" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4226D7DF193D0A7E00A56975 /* Debug */,
 				4226D7E0193D0A7E00A56975 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download binary core for iOS" */ = {
 			isa = XCConfigurationList;
