@@ -696,7 +696,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "/usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -rf ${SRCROOT}/realm-core\ncd ${SRCROOT}\n/usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n/bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip";
+			shellScript = "if ! [ -d realm-core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/realm-core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/realm-core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/realm-core-${REALM_CORE_VERSION}.zip\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1291,6 +1291,7 @@
 				4226D7E0193D0A7E00A56975 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download binary core for iOS" */ = {
 			isa = XCConfigurationList;
@@ -1299,7 +1300,6 @@
 				4236AC161934864E00ADD527 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 		E9189094177B677900653D7A /* Build configuration list for PBXProject "Realm" */ = {
 			isa = XCConfigurationList;
