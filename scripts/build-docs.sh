@@ -1,3 +1,5 @@
+PATH=/usr/local/bin:/usr/bin:$PATH
+
 realm_version_file="${SRCROOT}/Realm/Realm-Info.plist"
 realm_version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
 
