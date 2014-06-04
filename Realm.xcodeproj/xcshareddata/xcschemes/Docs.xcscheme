@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4145D191DE49600F858D9"
-               BuildableName = "Realm.framework"
-               BlueprintName = "Realm"
+               BlueprintIdentifier = "4226D7DE193D0A7E00A56975"
+               BuildableName = "Generate docs in docs/output"
+               BlueprintName = "Generate docs in docs/output"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4146D191DE49600F858D9"
-               BuildableName = "RealmTests.xctest"
-               BlueprintName = "RealmTests"
-               ReferencedContainer = "container:Realm.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
