@@ -73,9 +73,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex) {
 
 
 //
-//
 // Global RLMRealm instance cache
-//
 //
 static NSMutableDictionary *s_realmsPerPath;
 
@@ -112,19 +110,22 @@ inline void clearRealmCache() {
     }
 }
 
-// notification token simply holds onto the realm and the notification block
+//
+// Notification token - holds onto the realm and the notification block
+//
 @interface RLMNotificationToken : NSObject
 @property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, strong) RLMNotificationBlock block;
+@property (nonatomic, copy) RLMNotificationBlock block;
 @end
 
 @implementation RLMNotificationToken
 -(void)dealloc {
     if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold onto the RLMNotificationToken returned from addNotificationBlock and to call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end
+
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;

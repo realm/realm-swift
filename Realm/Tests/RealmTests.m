@@ -64,7 +64,7 @@
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
     __block BOOL notificationFired = NO;
-    id token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -88,7 +88,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     __block BOOL notificationFired = NO;
-     id token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
