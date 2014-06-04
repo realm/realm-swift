@@ -652,7 +652,7 @@
 				"${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh build-fat.sh";
+			shellPath = "/bin/sh scripts/build-fat.sh";
 			shellScript = "";
 		};
 		421A994E1933648E00F5E4D4 /* Build Framework */ = {
@@ -668,7 +668,7 @@
 				"${SRCROOT}/build/${CONFIGURATION}/${PRODUCT_NAME}.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh build-framework.sh";
+			shellPath = "/bin/sh scripts/build-framework.sh";
 			shellScript = "";
 		};
 		4226D7E2193D0A8600A56975 /* ShellScript */ = {
@@ -681,7 +681,7 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh build-doc.sh";
+			shellPath = "/bin/sh scripts/build-docs.sh";
 			shellScript = "";
 		};
 		4236AC181934866000ADD527 /* Download from static.realm.io */ = {
