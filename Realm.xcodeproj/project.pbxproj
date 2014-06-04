@@ -167,6 +167,13 @@
 			remoteGlobalIDString = 02C4145D191DE49600F858D9;
 			remoteInfo = Realm;
 		};
+		13052FD9193EC4DF007CD984 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9189091177B677900653D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4236AC141934864D00ADD527;
+			remoteInfo = "Download binary core for iOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -544,6 +551,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				13052FDA193EC4DF007CD984 /* PBXTargetDependency */,
 			);
 			name = "Realm-iOS";
 			productName = "Realm-iOS";
@@ -794,6 +802,11 @@
 			isa = PBXTargetDependency;
 			target = 02C4145D191DE49600F858D9 /* Realm */;
 			targetProxy = 02C41471191DE49600F858D9 /* PBXContainerItemProxy */;
+		};
+		13052FDA193EC4DF007CD984 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4236AC141934864D00ADD527 /* Download binary core for iOS */;
+			targetProxy = 13052FD9193EC4DF007CD984 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1291,7 +1304,6 @@
 				4226D7E0193D0A7E00A56975 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 		4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download binary core for iOS" */ = {
 			isa = XCConfigurationList;
@@ -1300,6 +1312,7 @@
 				4236AC161934864E00ADD527 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9189094177B677900653D7A /* Build configuration list for PBXProject "Realm" */ = {
 			isa = XCConfigurationList;
