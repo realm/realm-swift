@@ -704,8 +704,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "if ! [ -d core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/core-${REALM_CORE_VERSION}.zip\n    mv realm-core core\nfi";
+			shellPath = "/bin/bash scripts/download-core.sh";
+			shellScript = "";
 		};
 		42B00132193F2E7E00BEC9D0 /* Copy framework */ = {
 			isa = PBXShellScriptBuildPhase;
