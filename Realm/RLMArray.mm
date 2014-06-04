@@ -328,11 +328,18 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 - (NSString *)description
 {
     NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
+    NSUInteger index = 0;
     for (RLMObject *object in self) {
+        if (index >= 1000) {
+            NSLog(@"RLMArray too large to print entirely. Printed the first 1,000 items");
+            break;
+        }
+        
         // Indent child objects
         NSString *objDescription = [object.description stringByReplacingOccurrencesOfString:@"\n"
                                                                                  withString:@"\n\t"];
-        [mString appendFormat:@"\t%@,\n", objDescription];
+        [mString appendFormat:@"\t[%lu] %@,\n", (unsigned long)index, objDescription];
+        index++;
     }
     // Remove last comma and newline characters
     [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
