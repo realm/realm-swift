@@ -50,7 +50,6 @@
 		02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAD193662AF00E4EEF8 /* LinkTests.m */; };
 		02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
 		02026CBA19379F6E00E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
-		02026CBB193CD33100E4EEF8 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		02026D04193E31A300E4EEF8 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02026D02193E2E1100E4EEF8 /* libtightdb.a */; };
 		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
@@ -71,6 +70,7 @@
 		02C415411921B25B00F858D9 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C415401921B25B00F858D9 /* libstdc++.6.dylib */; };
 		02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
 		02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */; };
+		02CF657F193FB10F00E01CFD /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		02E4D6AA192E3DC40082808D /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6AB192E3DC40082808D /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68C192E3DC40082808D /* RLMAccessor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -282,7 +282,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02026CBB193CD33100E4EEF8 /* Realm.framework in Frameworks */,
+				02CF657F193FB10F00E01CFD /* Realm.framework in Frameworks */,
 				02C414C2191F3D1500F858D9 /* libstdc++.6.dylib in Frameworks */,
 				02C41470191DE49600F858D9 /* Cocoa.framework in Frameworks */,
 				02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */,
@@ -509,7 +509,6 @@
 				02C4145A191DE49600F858D9 /* Frameworks */,
 				02C4145B191DE49600F858D9 /* Headers */,
 				02C4145C191DE49600F858D9 /* Resources */,
-				42B00132193F2E7E00BEC9D0 /* Copy framework */,
 			);
 			buildRules = (
 			);
@@ -707,20 +706,6 @@
 			shellPath = /bin/bash;
 			shellScript = "if ! [ -d core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/core-${REALM_CORE_VERSION}.zip\n    mv realm-core core\nfi";
 		};
-		42B00132193F2E7E00BEC9D0 /* Copy framework */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy framework";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh scripts/copy-osx-framework.sh";
-			shellScript = "";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -860,7 +845,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COMBINE_HIDPI_IMAGES = YES;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/OSX";
+				CONFIGURATION_BUILD_DIR = "$(inherited)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -900,7 +885,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COMBINE_HIDPI_IMAGES = YES;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/OSX";
+				CONFIGURATION_BUILD_DIR = "$(inherited)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_NS_ASSERTIONS = NO;
