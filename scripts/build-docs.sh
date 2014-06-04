@@ -45,8 +45,8 @@ appledoc \
     --no-create-html \
     --create-docset \
     --publish-docset \
-    --docset-feed-url "http://realm.io/docs/ios/${realm_version}/realm.atom" \
-    --docset-package-url "http://realm.io/docs/ios/${realm_version}/realm" \
+    --docset-feed-url "http://realm.io/docs/ios/${realm_version}/api/realm.atom" \
+    --docset-package-url "http://realm.io/docs/ios/${realm_version}/api/realm" \
     --docset-package-filename "realm" \
     --docset-atom-filename "realm.atom" \
     --docset-bundle-filename "realm.docset" \
@@ -76,7 +76,7 @@ cat >${SRCROOT}/docs/output/${realm_version}/realm.xml <<EOF
 <entry>
     <version>${realm_version}</version>
     <sha1>$(sha1sum -b docs/output/${realm_version}/realm.tgz | cut -c 1-40)</sha1>
-    <url>http://static.realm.io/docs/ios/${realm_version}/realm.tgz</url>
+    <url>http://static.realm.io/docs/ios/${realm_version}/api/realm.tgz</url>
 </entry>
 EOF
 
