@@ -100,7 +100,9 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassNa
         case 't':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
-                RLMLinkArray *ar = [RLMArray arrayWithObjectClassName:objectClassName view:linkView realm:obj.realm];
+                RLMArrayLinkView *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
+                                                                             view:linkView
+                                                                            realm:obj.realm];
                 // FIXME - remove once LinkView accessors are self updating
                 ar.parentObject = obj;
                 ar.arrayColumnInParent = col;
@@ -175,14 +177,14 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 tightdb::LinkViewRef linkView = obj.backingTable->get_linklist(col, obj.objectIndex);
                 // remove all old
                 // FIXME: make sure delete rules don't purge objects
-                linkView->remove_all_links();
+                linkView->clear();
                 for (RLMObject *link in val) {
                     // add to realm if needed
                     if (link.realm != obj.realm) {
                         [obj.realm addObject:link];
                     }
                     // set in link view
-                    linkView->add_link(link.objectIndex);
+                    linkView->add(link.objectIndex);
                 }
             });
         case '@':

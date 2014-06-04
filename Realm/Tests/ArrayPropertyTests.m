@@ -57,8 +57,7 @@
     XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property valud 'b'");
     XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property valud 'a'");
 
-    // FIXME - link array accessor
-    // XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
+    XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
 }
 
 
@@ -81,10 +80,9 @@
     XCTAssertEqualObjects([array[0] column], @"a", @"First element should have property valud 'a'");
     XCTAssertEqualObjects([arObj.array[1] column], @"b", @"Second element should have property valud 'b'");
     
-    // FIXME - link array accessor
-    // XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
+    XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
-
+/*
 -(void)testInsertArray {
     RLMRealm *realm = [self realmWithTestPath];
     
@@ -93,7 +91,7 @@
     [realm beginWriteTransaction];
     [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", array]];
     [realm commitWriteTransaction];
-}
+}*/
 
 @end
 

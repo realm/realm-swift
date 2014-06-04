@@ -19,32 +19,89 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
-#import "RLMLinkArray.h"
 #import "RLMAccessor.h"
 #import <tightdb/query.hpp>
 #import <tightdb/link_view.hpp>
+#import <tightdb/table_view.hpp>
 
-// RLMArray private members and accessor
+//
+// RLMArray private properties/ivars for all subclasses
+//
+// NOTE: We put all sublass properties in the same class to keep
+//       the ivar layout the same - this allows us to switch implementations
+//       after creation
 @interface RLMArray () <RLMAccessor> {
-    @protected
+  @protected
+    // accessor ivars
+    RLMRealm *_realm;
     BOOL _writable;
+}
+@end
+
+
+//
+// LinkView backed RLMArray subclass
+//
+@interface RLMArrayLinkView : RLMArray {
+    // FIXME - make private once we have self updating accessors - for
+    //         now this gets set externally
+    @public
+    tightdb::LinkViewRef _backingLinkView;
+}
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                          view:(tightdb::LinkViewRef)view
+                                         realm:(RLMRealm *)realm;
+
+// FIXME - remove once we have self-updating LinkView accessors
+// we need to hold onto these until LinkView accessors self update
+@property (nonatomic, strong) RLMObject *parentObject;
+@property (nonatomic, assign) NSUInteger arrayColumnInParent;
+
+@end
+
+
+//
+// TableView backed RLMArray subclass
+//
+@interface RLMArrayTableView : RLMArray {
+    tightdb::TableView _backingView;
+    tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    query:(tightdb::Query *)query
                                     view:(tightdb::TableView &)view
                                    realm:(RLMRealm *)realm;
-+ (RLMLinkArray *)arrayWithObjectClassName:(NSString *)objectClassName
-                                      view:(tightdb::LinkViewRef)view
-                                     realm:(RLMRealm *)realm;
+
+// custom getter/setter for query - query lifcycle management
+// is different from other accessors and requires special treatment
+@property (nonatomic, assign) tightdb::Query *backingQuery;
+
 @end
 
 
-// FIXME - remove once we have self-updating LinkView accessors
-@interface RLMLinkArray ()
-// we need to hold onto this until LinkView accessors self update
-@property (nonatomic, strong) RLMObject *parentObject;
-@property (nonatomic, assign) NSUInteger arrayColumnInParent;
+//
+// Invalid and readonly RLMArray variants
+//
+
+// IMPORTANT NOTE: Do not add any ivars or properties to these sub-classes
+//                 we switch the class of RLMArray instances after creation
+
+// RLMArrayLinkView variant used when read only
+@interface RLMArrayLinkViewReadOnly : RLMArrayLinkView
 @end
+
+// RLMArrayLinkView variant used when invalidated
+@interface RLMArrayLinkViewInvalid : RLMArrayLinkView
+@end
+
+// RLMArrayTableView variant used when read only
+@interface RLMArrayTableViewReadOnly : RLMArrayTableView
+@end
+
+// RLMArrayTableView variant used when invalidated
+@interface RLMArrayTableViewInvalid : RLMArrayTableView
+@end
+
 
 
 

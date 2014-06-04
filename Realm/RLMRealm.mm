@@ -480,13 +480,13 @@ inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
             if ([obj isKindOfClass:RLMObject.class]) {
                 RLMRefreshObjectFromGroup(group, obj);
             }
-            else if([obj isKindOfClass:RLMLinkArray.class]) {
-                RLMLinkArray *ar = (RLMLinkArray *)obj;
+            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
+                RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
                 // update parent first
                 if(!ar.parentObject.backingTable->is_attached()) {
                     RLMRefreshObjectFromGroup(group, ar.parentObject);
                 }
-                ar.backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+                ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
             }
             obj.writable = writable;
         }
