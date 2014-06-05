@@ -39,18 +39,6 @@
  *  ---------------------------------------------------------------------------------------
  */
 
-/** 
- Initialize an RLMArray.
- 
- @warning Realm arrays are typed. You must specify an RLMObject class name during initialization
-          and can only add objects of this type to the array.
- 
- @param objectClassName     The class name of the RLMObjects this RLMArray will hold.
-
- @return                    An initialized RLMArray instance.
-*/
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-
 /**
  Number of objects in the array.
  */

@@ -428,7 +428,7 @@ EOF
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
-        xcodebuild -target Realm -configuration Release || exit 1
+        xcodebuild -target "OSX Library" -configuration Release || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -522,7 +522,7 @@ EOF
 
     "test")
         auto_configure || exit 1
-        xcodebuild -target Realm -scheme Realm test || exit 1
+        xcodebuild -target "OSX Library" -scheme OSX test || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -668,7 +668,7 @@ EOF
 
     "docs")
         echo "Generating HTML docs..."
-	xcodebuild -target Appledoc
+	xcodebuild -target "Generate docs in docs/output"
         echo "Done generating Apple docset under docs/output/"
         exit 0
         ;;

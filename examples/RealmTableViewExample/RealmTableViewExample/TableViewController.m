@@ -38,6 +38,7 @@ static NSString * const kTableName = @"table";
 @interface TableViewController ()
 
 @property (nonatomic, strong) RLMArray *array;
+@property (nonatomic, strong) RLMNotificationToken *notification;
 
 @end
 
@@ -49,13 +50,10 @@ static NSString * const kTableName = @"table";
     [super viewDidLoad];
     [self setupUI];
     
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    
     // Set realm notification block
-    __weak typeof(self)weakSelf = self;
-    [defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        __typeof(weakSelf)strongSelf = weakSelf;
-        [strongSelf reloadData];
+    __weak typeof(self) weakSelf = self;
+    self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        [weakSelf reloadData];
     }];
     [self reloadData];
 }
