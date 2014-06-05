@@ -19,17 +19,6 @@
 			name = "iOS Framework";
 			productName = "Framework-iOS";
 		};
-		429E394A19407EA7001DC9C1 /* DownloadCore */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 429E394D19407EA7001DC9C1 /* Build configuration list for PBXAggregateTarget "DownloadCore" */;
-			buildPhases = (
-				429E394E19407EAC001DC9C1 /* Download core */,
-			);
-			dependencies = (
-			);
-			name = DownloadCore;
-			productName = DownloadCore;
-		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -156,20 +145,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 02C4145D191DE49600F858D9;
 			remoteInfo = "OSX Framework";
-		};
-		429E394F194082EA001DC9C1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9189091177B677900653D7A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 429E394A19407EA7001DC9C1;
-			remoteInfo = DownloadCore;
-		};
-		429E395119408303001DC9C1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9189091177B677900653D7A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 429E394A19407EA7001DC9C1;
-			remoteInfo = DownloadCore;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -494,6 +469,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C4147C191DE49600F858D9 /* Build configuration list for PBXNativeTarget "OSX Framework" */;
 			buildPhases = (
+				429E39591940B7EE001DC9C1 /* Download core library */,
 				02C41459191DE49600F858D9 /* Sources */,
 				02C4145A191DE49600F858D9 /* Frameworks */,
 				02C4145B191DE49600F858D9 /* Headers */,
@@ -502,7 +478,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				429E395219408303001DC9C1 /* PBXTargetDependency */,
 			);
 			name = "OSX Framework";
 			productName = Realm;
@@ -531,6 +506,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C415211921B0C400F858D9 /* Build configuration list for PBXNativeTarget "iOS Library" */;
 			buildPhases = (
+				429E395A1940B830001DC9C1 /* Download core library */,
 				02C415011921B0C300F858D9 /* Sources */,
 				02C415021921B0C300F858D9 /* Frameworks */,
 				02C415031921B0C300F858D9 /* CopyFiles */,
@@ -540,7 +516,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				429E3950194082EA001DC9C1 /* PBXTargetDependency */,
 			);
 			name = "iOS Library";
 			productName = "Realm-iOS";
@@ -601,7 +576,6 @@
 				02C415041921B0C300F858D9 /* iOS Library */,
 				421A99481933646F00F5E4D4 /* iOS Framework */,
 				02C415111921B0C400F858D9 /* iOS Tests */,
-				429E394A19407EA7001DC9C1 /* DownloadCore */,
 			);
 		};
 /* End PBXProject section */
@@ -667,14 +641,28 @@
 			shellPath = "/bin/sh scripts/build-framework.sh";
 			shellScript = "";
 		};
-		429E394E19407EAC001DC9C1 /* Download core */ = {
+		429E39591940B7EE001DC9C1 /* Download core library */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download core";
+			name = "Download core library";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh scripts/download-core.sh";
+		};
+		429E395A1940B830001DC9C1 /* Download core library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Download core library";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -777,16 +765,6 @@
 			isa = PBXTargetDependency;
 			target = 02C4145D191DE49600F858D9 /* OSX Framework */;
 			targetProxy = 025CA43919403D6F005B5C58 /* PBXContainerItemProxy */;
-		};
-		429E3950194082EA001DC9C1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 429E394A19407EA7001DC9C1 /* DownloadCore */;
-			targetProxy = 429E394F194082EA001DC9C1 /* PBXContainerItemProxy */;
-		};
-		429E395219408303001DC9C1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 429E394A19407EA7001DC9C1 /* DownloadCore */;
-			targetProxy = 429E395119408303001DC9C1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1121,20 +1099,6 @@
 			};
 			name = Release;
 		};
-		429E394B19407EA7001DC9C1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		429E394C19407EA7001DC9C1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		E91890BD177B677900653D7A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1268,14 +1232,6 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
-		};
-		429E394D19407EA7001DC9C1 /* Build configuration list for PBXAggregateTarget "DownloadCore" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				429E394B19407EA7001DC9C1 /* Debug */,
-				429E394C19407EA7001DC9C1 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
 		};
 		E9189094177B677900653D7A /* Build configuration list for PBXProject "Realm" */ = {
 			isa = XCConfigurationList;
