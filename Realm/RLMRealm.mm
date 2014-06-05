@@ -73,9 +73,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex) {
 
 
 //
-//
 // Global RLMRealm instance cache
-//
 //
 static NSMutableDictionary *s_realmsPerPath;
 
@@ -112,6 +110,22 @@ inline void clearRealmCache() {
     }
 }
 
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
+@implementation RLMNotificationToken
+-(void)dealloc {
+    if (_realm || _block) {
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+    }
+}
+@end
+
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
@@ -128,7 +142,7 @@ static NSArray *s_objectDescriptors = nil;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
-    NSMutableArray *_notificationHandlers;
+    NSMapTable *_notificationHandlers;
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
@@ -154,7 +168,7 @@ static NSArray *s_objectDescriptors = nil;
         _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                              valueOptions:NSPointerFunctionsWeakMemory
                                                  capacity:128];
-        _notificationHandlers = [NSMutableArray array];
+        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                         target:[RLMWeakTarget createWithRealm:self]
@@ -296,22 +310,26 @@ static NSArray *s_objectDescriptors = nil;
     clearRealmCache();
 }
 
-- (void)addNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers addObject:block];
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
+    RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
+    token.realm = self;
+    token.block = block;
+    [_notificationHandlers setObject:token forKey:token];
+    return token;
 }
 
-- (void)removeNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers removeObject:block];
-}
-
-- (void)removeAllNotificationBlocks {
-    [_notificationHandlers removeAllObjects];
+- (void)removeNotification:(RLMNotificationToken *)token {
+    if (token) {
+        [_notificationHandlers removeObjectForKey:token];
+        token.realm = nil;
+        token.block = nil;
+    }
 }
 
 - (void)sendNotifications {
     // call this realms notification blocks
-    for (RLMNotificationBlock block in _notificationHandlers) {
-        block(RLMRealmDidChangeNotification, self);
+    for (RLMNotificationToken *token in _notificationHandlers) {
+        token.block(RLMRealmDidChangeNotification, self);
     }
 }
 
