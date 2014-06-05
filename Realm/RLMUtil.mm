@@ -134,6 +134,9 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
                 }
                 return YES;
             }
+            if (obj == NSNull.null) {
+                return YES;
+            }
             return NO;
         }
     }

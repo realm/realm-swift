@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
-#import "RLMSchema.h"
+#import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
@@ -31,14 +31,24 @@
 @synthesize realm = _realm;
 @synthesize writable = _writable;
 
+// standalone init
 -(instancetype)init {
-    return [self initWithDefaultValues:YES];
+    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+    
+    // set standalone accessor class
+    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.schema));
+    
+    return self;
 }
 
--(instancetype)initWithDefaultValues:(BOOL)useDefaults {
+- (instancetype)initWithRealm:(RLMRealm *)realm
+                       schema:(RLMObjectSchema *)schema
+                defaultValues:(BOOL)useDefaults {
     self = [super init];
     
     if (self) {
+        self.realm = realm;
+        self.schema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -48,7 +58,6 @@
             }
         }
     }
-    
     return self;
 }
 

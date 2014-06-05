@@ -19,32 +19,35 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
-#import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
+#import "RLMUtil.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 
 #import <objc/runtime.h>
 
-static NSMapTable *s_accessorCache;
-static NSMapTable *s_readOnlyAccessorCache;
-static NSMapTable *s_invalidAccessorCache;
-static NSMapTable *s_insertionAccessorCache;
+enum RLMAccessorTypes {
+    RLMAccessorTypeNormal = 0,
+    RLMAccessorTypeInvalid,
+    RLMAccessorTypeReadOnly,
+    RLMAccessorTypeInsertion,
+    RLMAccessorTypeStandalone,
+    RLMNumAccessorTypes
+};
+
+// accessor caches by type
+static NSMapTable *s_accessorCaches[RLMNumAccessorTypes];
 
 // initialize statics
 void RLMAccessorCacheInitialize() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_accessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                                valueOptions:NSPointerFunctionsOpaquePersonality];
-        s_invalidAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                                       valueOptions:NSPointerFunctionsOpaquePersonality];
-        s_readOnlyAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+        for (NSUInteger i = 0; i < RLMNumAccessorTypes; i++) {
+            s_accessorCaches[i] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                         valueOptions:NSPointerFunctionsOpaquePersonality];
-        s_insertionAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                                         valueOptions:NSPointerFunctionsOpaquePersonality];
+        }
     });
 }
 
@@ -248,6 +251,27 @@ IMP RLMAccessorInvalidSetter(NSUInteger col, char accessorCode) {
     return RLMAccessorExceptionSetter(col, accessorCode, c_invalidObjectMessage);
 }
 
+// getter for standalone
+IMP RLMAccessorStandaloneGetter(NSUInteger col, char accessorCode, NSString *objectClassName) {
+    // only override getters for RLMArray properties
+    if (accessorCode == 't') {
+        return imp_implementationWithBlock(^(RLMObject *obj) {
+            RLMProperty *prop = obj.schema.properties[col];
+            Class superClass = class_getSuperclass(obj.class);
+            IMP superGetter = class_getMethodImplementation(superClass, NSSelectorFromString(prop.getterName));
+            id val = superGetter(obj, NSSelectorFromString(prop.getterName));
+            if (!val) {
+                SEL setterSel = NSSelectorFromString(prop.setterName);
+                IMP setter = class_getMethodImplementation(obj.class, setterSel);
+                val = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
+                setter(obj, setterSel, val);
+            }
+            return val;
+        });
+    }
+    return nil;
+}
+
 // setter for readonly objects
 IMP RLMAccessorReadOnlySetter(NSUInteger col, char accessorCode) {
     return RLMAccessorExceptionSetter(col, accessorCode, @"Trying to set a property on a read-only object.");
@@ -357,12 +381,16 @@ Class RLMCreateAccessorClass(Class objectClass,
         if (getterGetter) {
             SEL getterSel = NSSelectorFromString(prop.getterName);
             IMP getterImp = getterGetter(prop.column, accessorCode, prop.objectClassName);
-            class_replaceMethod(accClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+            if (getterImp) {
+                class_replaceMethod(accClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+            }
         }
         if (setterGetter) {
             SEL setterSel = NSSelectorFromString(prop.setterName);
             IMP setterImp = setterGetter(prop.column, accessorCode);
-            class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+            if (setterImp) {
+                class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+            }
         }
     }
     
@@ -376,22 +404,27 @@ Class RLMCreateAccessorClass(Class objectClass,
 
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
-                                  RLMAccessorGetter, RLMAccessorSetter, s_accessorCache);
+                                  RLMAccessorGetter, RLMAccessorSetter, s_accessorCaches[RLMAccessorTypeNormal]);
 }
 
 Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMReadOnly_",
-                                  RLMAccessorGetter, RLMAccessorReadOnlySetter, s_readOnlyAccessorCache);
+                                  RLMAccessorGetter, RLMAccessorReadOnlySetter, s_accessorCaches[RLMAccessorTypeReadOnly]);
 }
 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMInvalid_",
-                                  RLMAccessorInvalidGetter, RLMAccessorInvalidSetter, s_invalidAccessorCache);
+                                  RLMAccessorInvalidGetter, RLMAccessorInvalidSetter, s_accessorCaches[RLMAccessorTypeInvalid]);
 }
 
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
-                                  NULL, RLMAccessorSetter, s_insertionAccessorCache);
+                                  NULL, RLMAccessorSetter, s_accessorCaches[RLMAccessorTypeInsertion]);
+}
+
+Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
+                                  RLMAccessorStandaloneGetter, NULL, s_accessorCaches[RLMAccessorTypeStandalone]);
 }
 
 // Dynamic accessor name for a classname

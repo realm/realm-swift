@@ -35,7 +35,7 @@
 @interface RLMArray : NSObject<NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
- *  @name Initializing & Accessing an Array
+ *  @name RLMArray Properties
  *  ---------------------------------------------------------------------------------------
  */
 

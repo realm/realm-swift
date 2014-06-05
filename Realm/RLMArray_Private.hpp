@@ -31,6 +31,9 @@
 //       the ivar layout the same - this allows us to switch implementations
 //       after creation
 @interface RLMArray () <RLMAccessor> {
+  @private
+    // array for standalone
+    NSMutableArray *_backingArray;
   @protected
     // accessor ivars
     RLMRealm *_realm;
@@ -48,6 +51,9 @@
  @return                    An initialized RLMArray instance.
  */
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+
+// create standalone array variant
++ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;
 
 @end
 

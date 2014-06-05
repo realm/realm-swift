@@ -33,6 +33,12 @@
     return self;
 }
 
++ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
+    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+    ar->_backingArray = [NSMutableArray array];
+    return ar;
+}
+
 - (RLMRealm *)realm {
     return _realm;
 }
@@ -87,87 +93,79 @@
     [self replaceObjectAtIndex:index withObject:newValue];
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+//
+// Stanalone RLMArray implementation
+//
+
+- (id)objectAtIndex:(NSUInteger)index {
+    return [_backingArray objectAtIndex:index];
+}
+
 - (NSUInteger)count {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    return _backingArray.count;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
-}
-
-- (id)objectAtIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    return [_backingArray countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    return [_backingArray insertObject:anObject atIndex:index];
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    return [_backingArray removeObjectAtIndex:index];
 }
-
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    return [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (RLMArray *)objectsWhere:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 -(id)minOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
-}
-
-- (void)refreshAccessor {
-    @throw [NSException exceptionWithName:@"RLMAbstractBaseClassException"
-                                   reason:@"Method not implemented in base class" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
 }
 
 #pragma GCC diagnostic pop

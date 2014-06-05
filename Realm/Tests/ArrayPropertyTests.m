@@ -52,7 +52,7 @@
     [array.array addObject:obj];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual(array.array.count, 3, @"Should have two elements in array");
+    XCTAssertEqual(array.array.count, 3, @"Should have three elements in array");
     XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property valud 'a'");
     XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property valud 'b'");
     XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property valud 'a'");
@@ -82,16 +82,43 @@
     
     XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
-/*
--(void)testInsertArray {
+
+-(void)testInsertMultiple {
     RLMRealm *realm = [self realmWithTestPath];
     
-    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:RLMTestObject.className];
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
+    RLMTestObject *child1 = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    RLMTestObject *child2 = [[RLMTestObject alloc] init];
+    child2.column = @"b";
+    [obj.array addObjectsFromArray:@[child2, child1]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *children = [realm allObjects:RLMTestObject.className];
+    XCTAssertEqualObjects([children[0] column], @"a", @"First child should be 'a'");
+    XCTAssertEqualObjects([children[1] column], @"b", @"Second child should be 'b'");
+}
+
+-(void)testStandalone {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
+    array.name = @"name";
+    XCTAssertNotNil(array.array, @"RLMArray property should get created on access");
+    
+    RLMTestObject *obj = [[RLMTestObject alloc] init];
+    obj.column = @"a";
+    [array.array addObject:obj];
+    [array.array addObject:obj];
     
     [realm beginWriteTransaction];
-    [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", array]];
+    [realm addObject:array];
     [realm commitWriteTransaction];
-}*/
+    
+    XCTAssertEqual(array.array.count, 2, @"Should have two elements in array");
+    XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property valud 'a'");
+    XCTAssertEqualObjects([array.array[1] column], @"a", @"Second element should have property valud 'a'");
+}
 
 @end
 

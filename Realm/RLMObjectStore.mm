@@ -98,12 +98,13 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     // if realm is not writable throw
     if (realm.transactionMode != RLMTransactionModeWrite) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only add an object to a Realm during a write transaction" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can only add an object to a Realm during a write transaction"
+                                     userInfo:nil];
     }
     
     // get table and create new row
-    Class objectClass = object.class;
-    NSString *objectClassName = NSStringFromClass(objectClass);
+    NSString *objectClassName = object.schema.className;
     object.realm = realm;
     object.schema = realm.schema[objectClassName];
     object.backingTable = RLMTableForObjectClass(realm, objectClassName).get();
@@ -112,6 +113,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
+    Class objectClass = NSClassFromString(objectClassName);
     object_setClass(object, RLMInsertionAccessorClassForObjectClass(objectClass, schema));
 
     // call our insertion setter to populate all properties in the table
@@ -172,9 +174,9 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     
     // get acessor fot the object class
     Class accessorClass = RLMAccessorClassForObjectClass(objectClass, realm.schema[objectClassName]);
-    RLMObject *accessor = [[accessorClass alloc] initWithDefaultValues:NO];
-    accessor.realm = realm;
-    accessor.schema = realm.schema[objectClassName];
+    RLMObject *accessor = [[accessorClass alloc] initWithRealm:realm
+                                                        schema:realm.schema[objectClassName]
+                                                 defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor.backingTable = table.get();
@@ -185,3 +187,5 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     [accessor.realm registerAccessor:accessor];
     return accessor;
 }
+
+

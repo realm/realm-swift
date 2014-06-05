@@ -43,9 +43,10 @@ void RLMAccessorCacheInitialize();
 
 // get accessor classes for an object class - generates classes if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 //
 // Dynamic accessor creation
