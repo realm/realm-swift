@@ -19,28 +19,6 @@
 			name = "iOS Framework";
 			productName = "Framework-iOS";
 		};
-		4226D7DE193D0A7E00A56975 /* Generate docs in docs/output */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Generate docs in docs/output" */;
-			buildPhases = (
-				4226D7E2193D0A8600A56975 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = "Generate docs in docs/output";
-			productName = Appledoc;
-		};
-		4236AC141934864D00ADD527 /* Download binary of Realm Core */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download binary of Realm Core" */;
-			buildPhases = (
-				4236AC181934866000ADD527 /* Download from static.realm.io */,
-			);
-			dependencies = (
-			);
-			name = "Download binary of Realm Core";
-			productName = "Download binary core for iOS";
-		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -167,20 +145,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 02C4145D191DE49600F858D9;
 			remoteInfo = Realm;
-		};
-		13052FD9193EC4DF007CD984 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9189091177B677900653D7A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4236AC141934864D00ADD527;
-			remoteInfo = "Download binary core for iOS";
-		};
-		13BCBB0C193EF60C0043EE76 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9189091177B677900653D7A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4236AC141934864D00ADD527;
-			remoteInfo = "Download binary of Realm Core";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -509,11 +473,11 @@
 				02C4145A191DE49600F858D9 /* Frameworks */,
 				02C4145B191DE49600F858D9 /* Headers */,
 				02C4145C191DE49600F858D9 /* Resources */,
+				0246203B19401CFA00F48D98 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				13BCBB0D193EF60C0043EE76 /* PBXTargetDependency */,
 			);
 			name = "OSX Library";
 			productName = Realm;
@@ -551,7 +515,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				13052FDA193EC4DF007CD984 /* PBXTargetDependency */,
 			);
 			name = "iOS Library";
 			productName = "Realm-iOS";
@@ -612,8 +575,6 @@
 				02C415041921B0C300F858D9 /* iOS Library */,
 				421A99481933646F00F5E4D4 /* iOS Framework */,
 				02C415111921B0C400F858D9 /* iOS Tests */,
-				4236AC141934864D00ADD527 /* Download binary of Realm Core */,
-				4226D7DE193D0A7E00A56975 /* Generate docs in docs/output */,
 			);
 		};
 /* End PBXProject section */
@@ -663,6 +624,19 @@
 			shellPath = "/bin/sh scripts/build-fat.sh";
 			shellScript = "";
 		};
+		0246203B19401CFA00F48D98 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh scripts/copy-osx-framework.sh";
+		};
 		421A994E1933648E00F5E4D4 /* Build Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -678,33 +652,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/sh scripts/build-framework.sh";
 			shellScript = "";
-		};
-		4226D7E2193D0A8600A56975 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh scripts/build-docs.sh";
-			shellScript = "";
-		};
-		4236AC181934866000ADD527 /* Download from static.realm.io */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Download from static.realm.io";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "if ! [ -d core ]; then\n    /usr/bin/curl -s http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip -o /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -rf ${SRCROOT}/core\n    cd ${SRCROOT}\n    /usr/bin/unzip /tmp/core-${REALM_CORE_VERSION}.zip\n    /bin/rm -f /tmp/core-${REALM_CORE_VERSION}.zip\n    mv realm-core core\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -802,16 +749,6 @@
 			isa = PBXTargetDependency;
 			target = 02C4145D191DE49600F858D9 /* OSX Library */;
 			targetProxy = 02C41471191DE49600F858D9 /* PBXContainerItemProxy */;
-		};
-		13052FDA193EC4DF007CD984 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4236AC141934864D00ADD527 /* Download binary of Realm Core */;
-			targetProxy = 13052FD9193EC4DF007CD984 /* PBXContainerItemProxy */;
-		};
-		13BCBB0D193EF60C0043EE76 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4236AC141934864D00ADD527 /* Download binary of Realm Core */;
-			targetProxy = 13BCBB0C193EF60C0043EE76 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1149,38 +1086,6 @@
 			};
 			name = Release;
 		};
-		4226D7DF193D0A7E00A56975 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		4226D7E0193D0A7E00A56975 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		4236AC151934864E00ADD527 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				REALM_CORE_VERSION = 0.20.0;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-			};
-			name = Debug;
-		};
-		4236AC161934864E00ADD527 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				REALM_CORE_VERSION = 0.20.0;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-			};
-			name = Release;
-		};
 		E91890BD177B677900653D7A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1310,24 +1215,6 @@
 			buildConfigurations = (
 				421A994A1933646F00F5E4D4 /* Debug */,
 				421A994B1933646F00F5E4D4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4226D7E1193D0A7E00A56975 /* Build configuration list for PBXAggregateTarget "Generate docs in docs/output" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4226D7DF193D0A7E00A56975 /* Debug */,
-				4226D7E0193D0A7E00A56975 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4236AC171934864E00ADD527 /* Build configuration list for PBXAggregateTarget "Download binary of Realm Core" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4236AC151934864E00ADD527 /* Debug */,
-				4236AC161934864E00ADD527 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
