@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "421A99481933646F00F5E4D4"
-               BuildableName = "Build Framework for iOS"
+               BuildableName = "iOS Framework"
                BlueprintName = "iOS Framework"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "02C415111921B0C400F858D9"
-               BuildableName = "Test for iOS.xctest"
+               BuildableName = "iOS Tests.xctest"
                BlueprintName = "iOS Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
