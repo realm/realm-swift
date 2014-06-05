@@ -329,9 +329,11 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 {
     NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
     NSUInteger index = 0;
+    NSUInteger skippedObjects = 0;
     for (RLMObject *object in self) {
-        if (index >= 1000) {
-            NSLog(@"RLMArray too large to print entirely. Printed the first 1,000 items");
+        // Only display the first 1000 objects
+        if (index == 1000) {
+            skippedObjects = [self count] - 1000;
             break;
         }
         
@@ -343,8 +345,10 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     }
     // Remove last comma and newline characters
     [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
-    [mString appendString:@"\n)"];
-    
+    if (skippedObjects > 0) {
+        [mString appendFormat:@"\n\t... %lu objects skipped.", (unsigned long)skippedObjects];
+    }
+    [mString appendFormat:@"\n)"];
     return [NSString stringWithString:mString];
 }
 
