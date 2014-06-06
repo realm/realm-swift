@@ -76,14 +76,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     NSUInteger batchCount = 0, index = state->state, count = self.count;
+    
+    __autoreleasing id *autoreleasingBuffer = (__autoreleasing id *)(void *)buffer;
     while (index < count && batchCount < len) {
-        buffer[batchCount++] = RLMCreateAccessorForArrayIndex(self, index++);
+        autoreleasingBuffer[batchCount++] = RLMCreateAccessorForArrayIndex(self, index++);
     }
     
-    void *selfPtr = (__bridge void *)self;
-    state->mutationsPtr = (unsigned long *)selfPtr;
-    state->state = index;
+    state->mutationsPtr = state->extra;
     state->itemsPtr = buffer;
+    state->state = index;
     return batchCount;
 }
 
