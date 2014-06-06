@@ -24,19 +24,15 @@
 
 @dynamic writable;
 @dynamic realm;
+@dynamic readOnly;
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     self = [super init];
     if (self) {
         _objectClassName = objectClassName;
+        _readOnly = NO;
     }
     return self;
-}
-
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
-    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-    ar->_backingArray = [NSMutableArray array];
-    return ar;
 }
 
 - (RLMRealm *)realm {
@@ -46,6 +42,14 @@
 - (BOOL)writable {
     return _writable;
 }
+
+- (BOOL)readOnly {
+    return _readOnly;
+}
+
+//
+// Generic implementations for all RLMArray variants
+//
 
 - (id)firstObject {
     if (self.count) {
@@ -93,9 +97,16 @@
     [self replaceObjectAtIndex:index withObject:newValue];
 }
 
+
 //
 // Stanalone RLMArray implementation
 //
+
++ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
+    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+    ar->_backingArray = [NSMutableArray array];
+    return ar;
+}
 
 - (id)objectAtIndex:(NSUInteger)index {
     return [_backingArray objectAtIndex:index];
@@ -120,6 +131,15 @@
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
     return [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
+
+- (NSUInteger)indexOfObject:(RLMObject *)object {
+    return [_backingArray indexOfObject:object];
+}
+
+
+//
+// Methods unsupported on standalone RLMArray instances
+//
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -153,22 +173,16 @@
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];
 }
-
-#pragma GCC diagnostic pop
 
 
 

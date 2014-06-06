@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 
 @interface AggregateObject : RLMObject
 @property int intCol;
@@ -36,7 +37,6 @@
 @end
 
 @implementation ArrayTests
-
 
 - (void)testFastEnumeration
 {
@@ -71,6 +71,19 @@
     }
     
     XCTAssertEqual(totalSum, 100, @"total sum should be 100");
+}
+
+- (void)testReadOnly
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"name"]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *array = [realm allObjects:RLMTestObject.className];
+    XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
+    XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
 }
 
 - (void)testObjectAggregate

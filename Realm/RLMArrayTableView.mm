@@ -43,6 +43,7 @@
     ar.backingQuery = query;
     ar->_backingView = view;
     ar->_realm = realm;
+    ar->_readOnly = YES;
     [realm registerAccessor:ar];
     
     // make readonly if not in write transaction
@@ -96,33 +97,23 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-- (void)removeLastObject {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-- (void)removeAllObjects {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
