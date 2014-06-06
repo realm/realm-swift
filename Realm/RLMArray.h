@@ -53,7 +53,7 @@
  Indicates if the RLMArray is readOnly. 
  YES for RLMArray instances returned from predicate queries and object enumeration.
  */
-@property (nonatomic, readonly) BOOL readOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 #pragma mark -
 
