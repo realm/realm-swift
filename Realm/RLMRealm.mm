@@ -478,32 +478,26 @@ static NSArray *s_objectDescriptors = nil;
     [_objects setObject:accessor forKey:accessor];
 }
 
-inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
-    TableRef tableRef = group->get_table([obj backingTableIndex]); // Throws
-    obj.backingTable = tableRef.get();
-}
-
 - (void)updateAllObjects {
     try {
-        // get the group
-        tightdb::Group *group = self.group;
+        // determine if in write transaction
         BOOL writable = (self.transactionMode == RLMTransactionModeWrite);
 
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            //
-            // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
-            //
             if ([obj isKindOfClass:RLMObject.class]) {
-                RLMRefreshObjectFromGroup(group, obj);
+                if (![(RLMObject *)obj row].is_attached()) {
+                    // FIXME - make object invalid
+                }
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
                 RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
-                // update parent first
-                if(!ar.parentObject.backingTable->is_attached()) {
-                    RLMRefreshObjectFromGroup(group, ar.parentObject);
+                if (ar.parentRow.is_attached()) {
+                    ar->_backingLinkView = ar.parentRow.get_linklist(ar.arrayColumnInParent);
                 }
-                ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+                else {
+                    // FIXME - make array invalid
+                }
             }
             obj.writable = writable;
         }

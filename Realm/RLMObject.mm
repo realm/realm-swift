@@ -111,11 +111,6 @@
     return obj;
 }
 
--(void)setBackingTable:(tightdb::Table *)backingTable {
-    _backingTable = backingTable;
-    _backingTableIndex = backingTable->get_index_in_parent();
-}
-
 // default attributes for property implementation
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"

@@ -103,7 +103,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->add(object.objectIndex);
+    _backingLinkView->add(object.row.get_index());
 }
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
@@ -111,7 +111,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->insert(index, object.objectIndex);
+    _backingLinkView->insert(index, object.row.get_index());
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
@@ -142,7 +142,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->set(index, object.objectIndex);
+    _backingLinkView->set(index, object.row.get_index());
 }
 
 - (NSString *)JSONString {

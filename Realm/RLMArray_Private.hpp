@@ -20,9 +20,11 @@
 
 #import "RLMArray.h"
 #import "RLMAccessor.h"
-#import <tightdb/query.hpp>
+
+#import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
+#import <tightdb/query.hpp>
 
 //
 // RLMArray private properties/ivars for all subclasses
@@ -74,7 +76,7 @@
 
 // FIXME - remove once we have self-updating LinkView accessors
 // we need to hold onto these until LinkView accessors self update
-@property (nonatomic, strong) RLMObject *parentObject;
+@property (nonatomic, assign) tightdb::Row parentRow;
 @property (nonatomic, assign) NSUInteger arrayColumnInParent;
 
 @end

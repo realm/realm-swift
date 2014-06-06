@@ -21,6 +21,7 @@
 #import "RLMObject.h"
 #import "RLMAccessor.h"
 #import "RLMObjectSchema.h"
+#import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
@@ -30,9 +31,7 @@
                 defaultValues:(BOOL)useDefaults;
 
 @property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
+@property (nonatomic, assign) tightdb::Row row;
 @property (nonatomic) RLMObjectSchema *schema;
 
 @end
