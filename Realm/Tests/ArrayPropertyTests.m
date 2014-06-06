@@ -53,9 +53,9 @@
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.array.count, 3, @"Should have three elements in array");
-    XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property valud 'a'");
-    XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property valud 'b'");
-    XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property valud 'a'");
+    XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property value 'a'");
 
     XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
 }
@@ -77,8 +77,8 @@
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.count, 2, @"Should have two elements in array");
-    XCTAssertEqualObjects([array[0] column], @"a", @"First element should have property valud 'a'");
-    XCTAssertEqualObjects([arObj.array[1] column], @"b", @"Second element should have property valud 'b'");
+    XCTAssertEqualObjects([array[0] column], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([arObj.array[1] column], @"b", @"Second element should have property value 'b'");
     
     XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
@@ -116,8 +116,8 @@
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.array.count, 2, @"Should have two elements in array");
-    XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property valud 'a'");
-    XCTAssertEqualObjects([array.array[1] column], @"a", @"Second element should have property valud 'a'");
+    XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[1] column], @"a", @"Second element should have property value 'a'");
 }
 
 @end
