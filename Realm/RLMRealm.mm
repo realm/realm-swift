@@ -480,7 +480,7 @@ static NSArray *s_objectDescriptors = nil;
 
 inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
     TableRef tableRef = group->get_table([obj backingTableIndex]); // Throws
-    [obj setBackingTable:tableRef.get()];
+    obj.backingTable = tableRef.get();
 }
 
 - (void)updateAllObjects {

@@ -66,7 +66,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
                     case RLMPropertyTypeArray:
                     {
                         tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-                        table->add_column_link(tightdb::DataType(prop.type), name, linkTable->get_index_in_parent());
+                        table->add_column_link(tightdb::DataType(prop.type), name, *linkTable);
                         break;
                     }
                     default:
@@ -109,7 +109,6 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     object.schema = realm.schema[objectClassName];
     object.backingTable = RLMTableForObjectClass(realm, objectClassName).get();
     object.objectIndex = object.backingTable->add_empty_row();
-    object.backingTableIndex = object.backingTable->get_index_in_parent();
     
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
@@ -180,7 +179,6 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor.backingTable = table.get();
-    accessor.backingTableIndex = table->get_index_in_parent();
     accessor.objectIndex = index;
     accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
     
