@@ -192,14 +192,12 @@
 {
     NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
     for (NSUInteger index = 0; index < self.count && index < 1000; index++) {
-
         // Indent child objects
-        NSString *objDescription = [[[self objectAtIndex:index] description] stringByReplacingOccurrencesOfString:@"\n"
-                                                                                                       withString:@"\n\t"];
+        NSString *objDescription = [[self[index] description] stringByReplacingOccurrencesOfString:@"\n"
+                                                                                        withString:@"\n\t"];
         [mString appendFormat:@"\t[%lu] %@,\n", (unsigned long)index, objDescription];
-        index++;
     }
-    
+
     // Only display the first 1000 objects
     NSUInteger skippedObjects = self.count > 1000 ? self.count - 1000 : 0;
     
