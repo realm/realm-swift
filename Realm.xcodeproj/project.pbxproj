@@ -475,6 +475,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C4147C191DE49600F858D9 /* Build configuration list for PBXNativeTarget "OSX Framework" */;
 			buildPhases = (
+				022C8BF61942893D00BCDB9D /* ShellScript */,
 				02C41459191DE49600F858D9 /* Sources */,
 				02C4145A191DE49600F858D9 /* Frameworks */,
 				02C4145B191DE49600F858D9 /* Headers */,
@@ -511,6 +512,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C415211921B0C400F858D9 /* Build configuration list for PBXNativeTarget "iOS Library" */;
 			buildPhases = (
+				022C8BF719428A8F00BCDB9D /* ShellScript */,
 				02C415011921B0C300F858D9 /* Sources */,
 				02C415021921B0C300F858D9 /* Frameworks */,
 				02C415031921B0C300F858D9 /* CopyFiles */,
@@ -628,6 +630,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/sh scripts/build-fat.sh";
 			shellScript = "";
+		};
+		022C8BF61942893D00BCDB9D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh scripts/download-ios-core.sh";
+		};
+		022C8BF719428A8F00BCDB9D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh scripts/download-ios-core.sh";
 		};
 		421A994E1933648E00F5E4D4 /* Build Framework */ = {
 			isa = PBXShellScriptBuildPhase;
