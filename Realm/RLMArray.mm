@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.hpp"
+#import "RLMObject.h"
 
 @implementation RLMArray
 
@@ -185,6 +186,33 @@
 }
 
 
+#pragma mark - Superclass Overrides
 
+- (NSString *)description
+{
+    NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
+    NSUInteger index = 0;
+    NSUInteger skippedObjects = 0;
+    for (RLMObject *object in self) {
+        // Only display the first 1000 objects
+        if (index == 1000) {
+            skippedObjects = [self count] - 1000;
+            break;
+        }
+        
+        // Indent child objects
+        NSString *objDescription = [object.description stringByReplacingOccurrencesOfString:@"\n"
+                                                                                 withString:@"\n\t"];
+        [mString appendFormat:@"\t[%lu] %@,\n", (unsigned long)index, objDescription];
+        index++;
+    }
+    // Remove last comma and newline characters
+    [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
+    if (skippedObjects > 0) {
+        [mString appendFormat:@"\n\t... %lu objects skipped.", (unsigned long)skippedObjects];
+    }
+    [mString appendFormat:@"\n)"];
+    return [NSString stringWithString:mString];
+}
 
 @end

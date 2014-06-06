@@ -28,13 +28,10 @@
 		02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAD193662AF00E4EEF8 /* LinkTests.m */; };
 		02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
 		02026CBA19379F6E00E4EEF8 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CB619379EB700E4EEF8 /* DynamicTests.m */; };
-		02026D04193E31A300E4EEF8 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02026D02193E2E1100E4EEF8 /* libtightdb.a */; };
-		0223DAEB1940EE720057A01F /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D15193E8F6400E4EEF8 /* RLMArray.mm */; };
-		0223DAEC1940EE720057A01F /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
-		0223DAED1940EE760057A01F /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D15193E8F6400E4EEF8 /* RLMArray.mm */; };
-		0223DAEE1940EE760057A01F /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
-		0223DAEF1940EE850057A01F /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
-		0223DAF01940EE8A0057A01F /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
+		022C8BE9194237BE00BCDB9D /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D15193E8F6400E4EEF8 /* RLMArray.mm */; };
+		022C8BEA194237BE00BCDB9D /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
+		022C8BEB194237C400BCDB9D /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D15193E8F6400E4EEF8 /* RLMArray.mm */; };
+		022C8BEC194237C400BCDB9D /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
 		025CA43C19404343005B5C58 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
@@ -126,6 +123,7 @@
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
+		B10CDE811941E4C6001F68C3 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414C1191F3D1500F858D9 /* libstdc++.6.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -243,8 +241,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B10CDE811941E4C6001F68C3 /* libstdc++.6.dylib in Frameworks */,
 				02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */,
-				02026D04193E31A300E4EEF8 /* libtightdb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -652,8 +650,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0223DAEB1940EE720057A01F /* RLMArray.mm in Sources */,
-				0223DAEC1940EE720057A01F /* RLMArrayLinkView.mm in Sources */,
+				022C8BE9194237BE00BCDB9D /* RLMArray.mm in Sources */,
+				022C8BEA194237BE00BCDB9D /* RLMArrayLinkView.mm in Sources */,
 				02E4D6D2192E3DC40082808D /* RLMProperty.m in Sources */,
 				02E4D6C2192E3DC40082808D /* RLMObject.mm in Sources */,
 				02E4D6C8192E3DC40082808D /* RLMObjectSchema.mm in Sources */,
@@ -673,7 +671,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0223DAEF1940EE850057A01F /* ArrayPropertyTests.m in Sources */,
 				02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */,
 				4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */,
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
@@ -693,8 +690,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0223DAED1940EE760057A01F /* RLMArray.mm in Sources */,
-				0223DAEE1940EE760057A01F /* RLMArrayLinkView.mm in Sources */,
+				022C8BEB194237C400BCDB9D /* RLMArray.mm in Sources */,
+				022C8BEC194237C400BCDB9D /* RLMArrayLinkView.mm in Sources */,
 				02E4D6D3192E3DC40082808D /* RLMProperty.m in Sources */,
 				02E4D6C3192E3DC40082808D /* RLMObject.mm in Sources */,
 				02E4D6C9192E3DC40082808D /* RLMObjectSchema.mm in Sources */,
@@ -714,7 +711,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0223DAF01940EE8A0057A01F /* ArrayPropertyTests.m in Sources */,
 				02026CBA19379F6E00E4EEF8 /* DynamicTests.m in Sources */,
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6EA192E58250082808D /* MixedTests.m in Sources */,
@@ -785,10 +781,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -797,7 +793,7 @@
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
@@ -823,7 +819,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_VERSION = A;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -834,7 +830,7 @@
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = "-ltightdb";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
@@ -849,7 +845,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -860,6 +856,7 @@
 					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -887,7 +884,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -899,6 +896,7 @@
 					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Realm/Realm-Prefix.pch";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1106,6 +1104,7 @@
 					"TIGHTDB_MAX_LIST_SIZE=4",
 					"DEBUG=1",
 					TIGHTDB_DEBUG,
+					TIGHTDB_HAVE_CONFIG,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1147,7 +1146,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = TIGHTDB_HAVE_CONFIG;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
