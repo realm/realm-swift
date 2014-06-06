@@ -121,7 +121,7 @@
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // get object class and set type
-                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
+                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-13)];
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
