@@ -237,7 +237,7 @@
     [realm commitWriteTransaction];
     
     NSString *description = [[PersonObject allObjects] description];
-
+    
     XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
     XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
     

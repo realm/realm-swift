@@ -58,6 +58,11 @@
     XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property value 'a'");
 
     XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
+    
+    // make sure we can fast enumerate
+    for (RLMObject *obj in array.array) {
+        XCTAssertTrue(obj.description.length, @"Object should have description");
+    }
 }
 
 

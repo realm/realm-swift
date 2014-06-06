@@ -32,6 +32,8 @@
 		022C8BEA194237BE00BCDB9D /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
 		022C8BEB194237C400BCDB9D /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D15193E8F6400E4EEF8 /* RLMArray.mm */; };
 		022C8BEC194237C400BCDB9D /* RLMArrayLinkView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */; };
+		022C8BED194254FA00BCDB9D /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
+		022C8BEE1942550000BCDB9D /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
 		025CA43C19404343005B5C58 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
@@ -671,6 +673,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				022C8BED194254FA00BCDB9D /* ArrayPropertyTests.m in Sources */,
 				02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */,
 				4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */,
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
@@ -711,6 +714,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				022C8BEE1942550000BCDB9D /* ArrayPropertyTests.m in Sources */,
 				02026CBA19379F6E00E4EEF8 /* DynamicTests.m in Sources */,
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6EA192E58250082808D /* MixedTests.m in Sources */,
