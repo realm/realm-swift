@@ -121,15 +121,15 @@
 }
 
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    return [_backingArray insertObject:anObject atIndex:index];
+    [_backingArray insertObject:anObject atIndex:index];
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    return [_backingArray removeObjectAtIndex:index];
+    [_backingArray removeObjectAtIndex:index];
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    return [_backingArray replaceObjectAtIndex:index withObject:anObject];
+    [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
