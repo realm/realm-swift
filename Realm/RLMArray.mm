@@ -44,7 +44,7 @@
     return _writable;
 }
 
-- (BOOL)readOnly {
+- (BOOL)isReadOnly {
     return _readOnly;
 }
 
@@ -190,21 +190,23 @@
 
 - (NSString *)description
 {
+    const NSUInteger maxObjects = 100;
     NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
-    unsigned long index = 0;
+    unsigned long index = 0, skipped = 0;
     for (NSObject *obj in self) {
         // Indent child objects
         NSString *objDescription = [obj.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
         [mString appendFormat:@"\t[%lu] %@,\n", index++, objDescription];
+        if (index >= maxObjects) {
+            skipped = self.count - maxObjects;
+            break;
+        }
     }
-    
-    // Only display the first 1000 objects
-    NSUInteger skippedObjects = self.count > 1000 ? self.count - 1000 : 0;
     
     // Remove last comma and newline characters
     [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
-    if (skippedObjects > 0) {
-        [mString appendFormat:@"\n\t... %lu objects skipped.", (unsigned long)skippedObjects];
+    if (skipped) {
+        [mString appendFormat:@"\n\t... %lu objects skipped.", skipped];
     }
     [mString appendFormat:@"\n)"];
     return [NSString stringWithString:mString];

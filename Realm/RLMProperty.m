@@ -105,6 +105,7 @@
             return YES;
         case '@':
         {
+            NSString *const arrayPrefix = @"@\"RLMArray<";
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
@@ -119,9 +120,9 @@
             else if ([type isEqualToString:@"@\"NSData\""]) {
                 _type = RLMPropertyTypeData;
             }
-            else if ([type hasPrefix:@"@\"RLMArray<"]) {
-                // get object class and set type
-                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-13)];
+            else if ([type hasPrefix:arrayPrefix]) {
+                // get object class from type string - @"RLMArray<objectClassName>"
+                _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
