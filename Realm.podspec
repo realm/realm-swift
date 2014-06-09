@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                = "Realm"
-  s.version             = "0.20.0"
+  s.version             = "0.21.0"
   s.summary             = "Realm is a fantastic object framework for iOS."
   s.description         = <<-DESC
                           Realm is an object framework for iOS. It aims to provide an easier way to handle data in your apps, whether you need in-memory objects, full database persistence, or a simple network cache.

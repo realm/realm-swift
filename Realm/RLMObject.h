@@ -121,7 +121,7 @@
  
  @see   defaultPropertyValues
  */
-+(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
+// +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.

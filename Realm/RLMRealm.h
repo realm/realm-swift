@@ -21,7 +21,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm;
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
@@ -93,7 +93,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
-@property (nonatomic, readonly) BOOL isReadOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 
 #pragma mark -
@@ -117,25 +117,20 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  - `RLMRealm` \***realm**:           The realm for which this notification occurred
  
  @param block   A block which is called to process RLMRealm notifications.
+ 
+ @return A token object which can later be passed to removeNotification:.
+         to remove this notification.
  */
-- (void)addNotificationBlock:(RLMNotificationBlock)block;
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
 
 /**
- Remove a previously registered notification handler.
+ Remove a previously registered notification handler using the token returned
+ from addNotificationBlock:
  
- The block has the following definition:
- 
-     typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
- 
- It receives the following parameters:
- 
- - `NSString` \***notification**:    The name of the incoming notification.
- RLMRealmDidChangeNotification is the only notification currently supported.
- - `RLMRealm` \***realm**:           The realm for which this notification occurred
- 
- @param block   The block previously passed to addNotification: to remove.
+ @param notificationToken   The token returned from addNotificationBlock: corresponding
+                            to the notification block to remove.
  */
-- (void)removeNotificationBlock:(RLMNotificationBlock)block;
+- (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
 #pragma mark -
 

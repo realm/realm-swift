@@ -35,31 +35,25 @@
 @interface RLMArray : NSObject<NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
- *  @name Initializing & Accessing an Array
+ *  @name RLMArray Properties
  *  ---------------------------------------------------------------------------------------
  */
-
-/** 
- Initialize an RLMArray.
- 
- @warning Realm arrays are typed. You must specify an RLMObject class name during initialization
-          and can only add objects of this type to the array.
- 
- @param objectClassName     The class name of the RLMObjects this RLMArray will hold.
-
- @return                    An initialized RLMArray instance.
-*/
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 /**
  Number of objects in the array.
  */
-@property (nonatomic, readonly) NSUInteger count;
+@property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
  The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
+
+/**
+ Indicates if the RLMArray is readOnly. 
+ YES for RLMArray instances returned from predicate queries and object enumeration.
+ */
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 #pragma mark -
 
@@ -169,7 +163,7 @@
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
 
 
 #pragma mark -

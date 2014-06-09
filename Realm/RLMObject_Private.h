@@ -25,9 +25,14 @@
 // RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
 
-- (instancetype)initWithDefaultValues:(BOOL)useDefaults;
+- (instancetype)initWithRealm:(RLMRealm *)realm
+                       schema:(RLMObjectSchema *)schema
+                defaultValues:(BOOL)useDefaults;
 
 @property (nonatomic, readwrite) RLMRealm *realm;
+@property (nonatomic, assign) NSUInteger objectIndex;
+@property (nonatomic, assign) NSUInteger backingTableIndex;
+@property (nonatomic, assign) tightdb::Table *backingTable;
 @property (nonatomic) RLMObjectSchema *schema;
 
 @end
