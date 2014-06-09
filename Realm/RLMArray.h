@@ -30,6 +30,12 @@
  
  RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
  so you can easily chain queries to further filter query results.
+ 
+ RLMArrays fulfill 2 primary purposes:
+ 
+ - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
+ - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
+ 
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
