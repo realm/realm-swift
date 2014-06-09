@@ -24,7 +24,6 @@
 @implementation RLMDocument {
     RLMRealmNode *presentedRealm;
     RLMClazzNode *selectedClazz;
-    NSUInteger selectedInstanceIndex;
 }
 
 - (instancetype)init
@@ -296,11 +295,6 @@
     return nil;
 }
 
-- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-    return NO;
-}
-
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.realmTableColumnsView) {
@@ -308,7 +302,7 @@
         RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
-        RLMObject *selectedObject = [selectedClazz instanceAtIndex:selectedInstanceIndex];
+        RLMObject *selectedObject = [selectedClazz instanceAtIndex:rowIndex];
 
         RLMRealm *realm = presentedRealm.realm;
         
@@ -354,10 +348,10 @@
                 break;
                 
             case RLMPropertyTypeString:
-                if ([object isKindOfClass:[NSNumber class]]) {
+                if ([object isKindOfClass:[NSString class]]) {
                     [realm beginWriteTransaction];
                     
-                    selectedObject[propertyName] = @(((NSNumber *)object).doubleValue);
+                    selectedObject[propertyName] = object;
                     
                     [realm commitWriteTransaction];
                 }
@@ -552,8 +546,6 @@
     for (NSUInteger index = 0; index < columnCount; index++) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
         
-        // RLMClazzProperty *column = columns[index];
-        
         [self.realmTableColumnsView addTableColumn:tableColumn];
     }
     
@@ -569,6 +561,7 @@
                 [self initializeSwitchButtonTableColumn:tableColumn
                                               withName:columnName
                                              alignment:NSRightTextAlignment
+                                               editable:YES
                                                toolTip:@"Boolean"];
                 break;
             }
@@ -577,6 +570,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSRightTextAlignment
+                                   editable:YES
                                     toolTip:@"Integer"];
                 break;
             
@@ -586,6 +580,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSRightTextAlignment
+                                   editable:YES
                                     toolTip:@"Float"];
                 break;
             }
@@ -594,6 +589,7 @@
                 [self initializeTableColumn:tableColumn 
                                    withName:columnName
                                   alignment:NSRightTextAlignment
+                                   editable:YES
                                     toolTip:@"Double"];
                 break;
             }
@@ -602,6 +598,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName 
                                   alignment:NSLeftTextAlignment
+                                   editable:YES
                                     toolTip:@"String"];
                 break;
             }
@@ -610,6 +607,7 @@
                 [self initializeTableColumn:tableColumn 
                                    withName:columnName 
                                   alignment:NSLeftTextAlignment
+                                   editable:NO
                                     toolTip:@"Data"];
                 break;
             }
@@ -618,6 +616,7 @@
                 [self initializeTableColumn:tableColumn 
                                    withName:columnName 
                                   alignment:NSLeftTextAlignment
+                                   editable:NO
                                     toolTip:@"Any"];
                 break;
             }
@@ -626,6 +625,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
+                                   editable:NO
                                     toolTip:@"Date"];
                 break;
             }
@@ -634,6 +634,7 @@
                 [self initializeTableColumn:tableColumn 
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
+                                   editable:NO
                                     toolTip:@"Array"];
                 break;
             }
@@ -642,6 +643,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
+                                   editable:NO
                                     toolTip:@"Link to  object"];
                 break;
             }
@@ -653,13 +655,13 @@
     [self.realmTableColumnsView reloadData];
 }
 
-- (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
+- (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
     NSCell *cell = [[NSCell alloc] initTextCell:@""];
     [cell setAlignment:alignment];
     column.headerToolTip = toolTip;
     
-    cell.editable = NO;
+    cell.editable = editable;
     column.dataCell = cell;
     
     NSTableHeaderCell *headerCell = column.headerCell;
@@ -668,7 +670,7 @@
     return cell;
 }
 
-- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
+- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment  editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
     NSButtonCell *cell = [[NSButtonCell alloc] init];
     [cell setTitle:nil];
@@ -680,7 +682,7 @@
 
     column.headerToolTip = toolTip;
     
-    cell.editable = NO;
+    cell.editable = editable;
     column.dataCell = cell;
     
     NSTableHeaderCell *headerCell = column.headerCell;
