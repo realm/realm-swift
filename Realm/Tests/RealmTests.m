@@ -41,21 +41,21 @@
     [RLMTestObject createInRealm:realm withObject:@[@"a"]];
     [RLMTestObject createInRealm:realm withObject:@[@"b"]];
     [RLMTestObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:RLMTestObject.className where:nil].count, 3, @"Expecting 3 objects");
+    XCTAssertEqual([[realm objects:[RLMTestObject className] where:nil] count], 3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
-    RLMArray *objects = [realm allObjects:RLMTestObject.className];
+    RLMArray *objects = [realm allObjects:[RLMTestObject className]];
     XCTAssertEqual(objects.count, 3, @"Expecting 3 objects");
     XCTAssertEqualObjects([objects.firstObject column], @"a", @"Expecting column to be 'a'");
 
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:RLMTestObject.className where:nil].count, 1, @"Expecting 1 object");
+    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, 1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
-    objects = [realm allObjects:RLMTestObject.className];
+    objects = [realm allObjects:[RLMTestObject className]];
     XCTAssertEqual(objects.count, 1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
 }
