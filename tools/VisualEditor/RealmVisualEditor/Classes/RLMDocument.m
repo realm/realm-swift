@@ -81,9 +81,11 @@
 {
     [super windowControllerDidLoadNib:aController];
 
+    // We want the class outline to be expandedas default
     [self.tableOutlineView expandItem:nil
                        expandChildren:YES];
     
+    // ... and the first class to be selected so something is displayed in the property pane.
     id firstItem = presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
         NSInteger index = [self.tableOutlineView rowForItem:firstItem];
@@ -119,8 +121,9 @@
 #pragma mnark - Public methods - NSDocument overrides
 
 - (NSString *)displayName {
-    if (presentedRealm.name != nil)
+    if (presentedRealm.name != nil) {
         return presentedRealm.name;
+    }
     
     return [super displayName];
 }
@@ -129,9 +132,11 @@
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
+
     if (item == nil) {
         return presentedRealm;
     }
+    // ... and second level nodes are all classes.
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
         return [outlineItem childNodeAtIndex:index];
@@ -142,9 +147,11 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
+    // The root node is expandable if we are presenting a realm
     if (item == nil) {
         return presentedRealm == nil;
     }
+    // ... otherwise the exandability check is re-delegated to the node in question.
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
         return outlineItem.isExpandable;
@@ -155,9 +162,11 @@
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
+    // There is always only one root node
     if (item == nil) {
         return 1;
     }
+    // ... otehrwise the number of child nodes are defined by the node in question.
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
         return outlineItem.numberOfChildNodes;
@@ -264,9 +273,23 @@
             case RLMPropertyTypeArray:
                 return @"<Array>";
 
-            case RLMPropertyTypeObject:
+            case RLMPropertyTypeObject: {
+                RLMObject *referredObject = (RLMObject *)propertyValue;
+                RLMRealm *realm = referredObject.realm;
+                RLMSchema *schema = realm.schema;
+                
+                RLMObjectSchema *objectSchema = [schema schemaForObject:NSStringFromClass([referredObject class])];                NSArray *properties = objectSchema.properties;
+                
+                NSString *result = @"";
+                for(RLMProperty *property in properties) {
+                    result = [result stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
+                }
+                
+                NSLog(@"Object link: %@", result);
+                
                 return @"<Object>";
-
+            }
+                
             default:
                 break;
         }
