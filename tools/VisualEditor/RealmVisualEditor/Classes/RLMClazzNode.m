@@ -55,6 +55,27 @@
     return allObjects[index];
 }
 
+- (NSUInteger)indexOfInstance:(RLMObject *)instance
+{    
+// Note: The indexOfObject method of RLMArray is not yet implemented so we have to perform the
+//       lookup as a simple linear search;
+    
+    RLMArray *allObjects = [sourceRealm allObjects:_schema.className];
+    NSUInteger index = 0;
+    for(RLMObject *classInstance in allObjects) {
+        if(classInstance == instance) {
+            return index;
+        }
+        index++;
+    }
+    
+    return NSNotFound;
+    
+/*
+    return [allObjects indexOfObject:instance];
+*/
+}
+
 #pragma mark - RLMRealmOutlineNode implementation
 
 - (BOOL)isRootNode

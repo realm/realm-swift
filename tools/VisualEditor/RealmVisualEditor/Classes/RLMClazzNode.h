@@ -25,4 +25,6 @@
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index;
 
+- (NSUInteger)indexOfInstance:(RLMObject *)instance;
+
 @end

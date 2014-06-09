@@ -12,6 +12,7 @@
 #import "RLMClazzNode.h"
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
+#import "RLMObject+ResolvedClass.h"
 
 @interface RLMDocument ()
 
@@ -50,6 +51,8 @@
                     RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
                                                                          url:absoluteURL.path];
                     presentedRealm = realm;
+                    
+                    
                 }
             }
             else {
@@ -81,15 +84,21 @@
 {
     [super windowControllerDidLoadNib:aController];
 
+    
+    // Perform some extra inititialization on the tableview
+    
+    [self.instancesTableView setDelegate:self];
+    [self.instancesTableView setDoubleAction:@selector(userDoubleClicked:)];
+    
     // We want the class outline to be expandedas default
-    [self.tableOutlineView expandItem:nil
+    [self.classesOutlineView expandItem:nil
                        expandChildren:YES];
     
     // ... and the first class to be selected so something is displayed in the property pane.
     id firstItem = presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
-        NSInteger index = [self.tableOutlineView rowForItem:firstItem];
-        [self.tableOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+        NSInteger index = [self.classesOutlineView rowForItem:firstItem];
+        [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
                            byExtendingSelection:NO];
     }
 }
@@ -275,19 +284,8 @@
 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
-                RLMRealm *realm = referredObject.realm;
-                RLMSchema *schema = realm.schema;
-                
-                RLMObjectSchema *objectSchema = [schema schemaForObject:NSStringFromClass([referredObject class])];                NSArray *properties = objectSchema.properties;
-                
-                NSString *result = @"";
-                for(RLMProperty *property in properties) {
-                    result = [result stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
-                }
-                
-                NSLog(@"Object link: %@", result);
-                
-                return @"<Object>";
+                RLMObjectSchema *objectSchema = [referredObject resolvedSchema];
+                return [NSString stringWithFormat:@"-> %@ instance", objectSchema.className];
             }
                 
             default:
@@ -399,6 +397,7 @@
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
+                
             case RLMPropertyTypeFloat:
             case RLMPropertyTypeDouble: {
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
@@ -407,6 +406,7 @@
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
+                
             case RLMPropertyTypeDate: {
                 NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
                 formatter.dateStyle = NSDateFormatterMediumStyle;
@@ -414,8 +414,12 @@
                 ((NSCell *)cell).formatter = formatter;
                 break;
             }
+                
+            case RLMPropertyTypeData: {
+                break;
+            }
+
             case RLMPropertyTypeString:
-            case RLMPropertyTypeData:
             case RLMPropertyTypeObject:
             case RLMPropertyTypeArray:
                 break;
@@ -432,26 +436,102 @@
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
 
-        if (propertyNode.type == RLMPropertyTypeDate) {
-            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
-            NSObject *propertyValue = selectedInstance[propertyNode.name];
-            
-            if ([propertyValue isKindOfClass:[NSDate class]]) {
-                NSDate *dateValue = (NSDate *)propertyValue;
-                
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                formatter.dateStyle = NSDateFormatterFullStyle;
-                formatter.timeStyle = NSDateFormatterFullStyle;
-                
-                return [formatter stringFromDate:dateValue];
+        RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+        NSObject *propertyValue = selectedInstance[propertyNode.name];
+        
+        switch (propertyNode.type) {
+            case RLMPropertyTypeDate: {
+                if ([propertyValue isKindOfClass:[NSDate class]]) {
+                    NSDate *dateValue = (NSDate *)propertyValue;
+                    
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    formatter.dateStyle = NSDateFormatterFullStyle;
+                    formatter.timeStyle = NSDateFormatterFullStyle;
+                    
+                    return [formatter stringFromDate:dateValue];
+                }
+                break;
             }
+                
+            case RLMPropertyTypeObject: {
+                if ([propertyValue isKindOfClass:[RLMObject class]]) {
+                    RLMObject *referredObject = (RLMObject *)propertyValue;
+                    RLMObjectSchema *objectSchema = [referredObject resolvedSchema];
+                    NSArray *properties = objectSchema.properties;
+                    
+                    NSString *toolTipString = @"";
+                    for(RLMProperty *property in properties) {
+                        toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
+                    }
+                    
+                    return toolTipString;
+                }
+                
+                break;
+            }
+                
+            default:
+                
+                break;
         }
     }
     
     return nil;
 }
 
-#pragma mark - Private methods
+#pragma mark - Public methods - NSTableView eventHandling
+
+- (void)userDoubleClicked:(id)sender
+{
+    NSInteger column = self.instancesTableView.clickedColumn;
+    NSInteger row = self.instancesTableView.clickedRow;
+    
+    if (column != -1 && row != -1) {
+        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[column];
+        
+        if (propertyNode.type == RLMPropertyTypeObject) {
+            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+            NSObject *propertyValue = selectedInstance[propertyNode.name];
+
+            if ([propertyValue isKindOfClass:[RLMObject class]]) {
+                RLMObject *linkedObject = (RLMObject *)propertyValue;
+                RLMObjectSchema *linkedObjectSchema = linkedObject.resolvedSchema;
+                
+                for (RLMClazzNode *clazzNode in presentedRealm.topLevelClazzes) {
+                    if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
+                        NSInteger index = [self.classesOutlineView rowForItem:clazzNode];
+                        
+                        [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                                             byExtendingSelection:NO];
+                        
+                        [self.instancesTableView reloadData];
+                        
+                        // Right now we just fetches the object index from the proxy object.
+                        // However, this must be changed later when the proxy object is made public
+                        // and provides some mean to retrieve the underlying RLMObject object.
+                        // Note: This selection of the linked object does not take any future row
+                        // sorting into account!!!
+                        NSNumber *indexNumber = [linkedObject valueForKeyPath:@"objectIndex"];
+                        NSUInteger instanceIndex = indexNumber.integerValue;
+
+                        if (instanceIndex != NSNotFound) {
+                            [self.instancesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:instanceIndex]
+                                                 byExtendingSelection:NO];
+                        }
+                        else {
+                            [self.instancesTableView selectRowIndexes:nil
+                                                 byExtendingSelection:NO];
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#pragma mark - Private methods - Table view construction
 
 - (void)updateSelectedClazz:(RLMClazzNode *)clazz
 {
@@ -486,7 +566,7 @@
         
         switch (property.type) {
             case RLMPropertyTypeBool: {
-                [self initializeSwitcButtonTableColumn:tableColumn
+                [self initializeSwitchButtonTableColumn:tableColumn
                                               withName:columnName
                                              alignment:NSRightTextAlignment
                                                toolTip:@"Boolean"];
@@ -562,7 +642,7 @@
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
-                                    toolTip:@"Link"];
+                                    toolTip:@"Link to  object"];
                 break;
             }
         }
@@ -588,7 +668,7 @@
     return cell;
 }
 
-- (NSCell *)initializeSwitcButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
+- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment toolTip:(NSString *)toolTip
 {
     NSButtonCell *cell = [[NSButtonCell alloc] init];
     [cell setTitle:nil];

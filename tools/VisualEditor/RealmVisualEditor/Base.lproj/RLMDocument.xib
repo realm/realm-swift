@@ -6,9 +6,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMDocument">
             <connections>
+                <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="PaJ-nM-bwz"/>
+                <outlet property="instancesTableView" destination="enp-HN-e6b" id="cbz-W9-jtf"/>
                 <outlet property="realmTableColumnsView" destination="enp-HN-e6b" id="qEl-zg-N9L"/>
                 <outlet property="realmTableOutlineView" destination="IMi-6Y-gQF" id="uY5-2F-1B1"/>
-                <outlet property="tableOutlineView" destination="IMi-6Y-gQF" id="LsV-7q-MaB"/>
                 <outlet property="window" destination="xOd-HO-29H" id="JIz-fz-R2o"/>
             </connections>
         </customObject>
@@ -100,7 +101,7 @@
                                             <rect key="frame" x="0.0" y="17" width="537" height="385"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="cDp-e2-1cA" id="enp-HN-e6b">
+                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="cDp-e2-1cA" id="enp-HN-e6b">
                                                     <rect key="frame" x="0.0" y="0.0" width="537" height="385"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>

@@ -10,6 +10,7 @@
 
 @interface RLMDocument : NSDocument <NSOutlineViewDataSource, NSOutlineViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
-@property (nonatomic, strong) IBOutlet NSOutlineView *tableOutlineView;
+@property (nonatomic, strong) IBOutlet NSOutlineView *classesOutlineView;
+@property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;
 
 @end

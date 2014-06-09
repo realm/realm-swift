@@ -43,7 +43,7 @@
 
 @property (nonatomic, readonly) NSInteger integerValue;
 @property (nonatomic, readonly) BOOL boolValue;
-@property (nonatomic, readonly) RealmTestClass1 *objectRefence;
+@property (nonatomic, readonly) RealmTestClass1 *objectReference;
 
 + (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue objectRef:(RealmTestClass1 *)objRef;
 
@@ -56,7 +56,7 @@
     RealmTestClass2 *result = [[RealmTestClass2 alloc] init];
     result->_integerValue = integerValue;
     result->_boolValue = boolValue;
-    result->_objectRefence = objRef;
+    result->_objectReference = objRef;
     return result;
 }
 
