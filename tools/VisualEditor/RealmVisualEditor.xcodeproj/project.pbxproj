@@ -246,7 +246,6 @@
 				84E0F9491921F3B900D6CA14 /* Frameworks */,
 				84E0F94A1921F3B900D6CA14 /* Resources */,
 				8467CC8E1938C17F0016B886 /* CopyFiles */,
-				84D798F61938780900FC76A0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -331,22 +330,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		84D798F61938780900FC76A0 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo OTOOL BEGIN\\n\notool -L RealmVisualEditor/Externals/Frameworks/RealmCore.framework/RealmCore\notool -L ../../build/Release/Realm.framework/Realm\necho OTOOL END";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		84E0F9481921F3B900D6CA14 /* Sources */ = {
