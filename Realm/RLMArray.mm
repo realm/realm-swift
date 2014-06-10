@@ -20,7 +20,6 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
-#include <sstream>
 
 @implementation RLMArray
 
@@ -178,15 +177,8 @@
 
 - (NSString *)JSONString
 {
-    std::ostringstream out;
-    _backingView.to_json(out);
-    std::string str = out.str();
-    
-    return [NSString stringWithUTF8String:str.c_str()];
+    return [self JSONString];
 }
-
-- (id)objectAtIndexedSubscript:(NSUInteger)index {
-    return [self objectAtIndex:index];
 
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
@@ -194,11 +186,6 @@
 
 }
 #pragma GCC diagnostic pop
-
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
-}
 
 
 #pragma mark - Superclass Overrides

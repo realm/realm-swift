@@ -152,6 +152,3 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 @end
-
-
-

@@ -27,6 +27,7 @@
 #import <objc/runtime.h>
 
 #import <tightdb/util/unique_ptr.hpp>
+#include <sstream>
 
 //
 // RLMArray implementation
@@ -258,8 +259,11 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    std::ostringstream out;
+    _backingView.to_json(out);
+    std::string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end
