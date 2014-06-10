@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteIfOnlyOwner` and `RLMPropertyAttributeDeleteAlways`.
  */
-//    RLMPropertyAttributeDeleteNever = 0,
+    RLMPropertyAttributeDeleteNever = 0,
     
 /**
  Delete a child object (or object in an RLMArray) when the parent is deleted or the object is
