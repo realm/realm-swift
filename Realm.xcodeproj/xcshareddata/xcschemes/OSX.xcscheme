@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4145D191DE49600F858D9"
+               BlueprintIdentifier = "E8F275161946647F00663173"
                BuildableName = "Realm.framework"
-               BlueprintName = "OSX Framework"
+               BlueprintName = "OSX"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,13 +26,13 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Release">
+      buildConfiguration = "Debug">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4146D191DE49600F858D9"
+               BlueprintIdentifier = "E8F275261946647F00663173"
                BuildableName = "OSX Tests.xctest"
                BlueprintName = "OSX Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
