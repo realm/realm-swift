@@ -148,7 +148,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+                                   reason:@"Not supported for links" userInfo:nil];
 }
 
 @end
