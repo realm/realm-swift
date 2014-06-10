@@ -179,6 +179,8 @@
                                    reason:@"Method not implemented" userInfo:nil];
 }
 
+#pragma GCC diagnostic pop
+
 - (NSString *)JSONString
 {
     return [self JSONString];

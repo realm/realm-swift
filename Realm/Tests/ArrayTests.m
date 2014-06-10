@@ -46,7 +46,17 @@
 @property NSInteger age;
 @end
 
+RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject type
+
+
 @implementation ToJsonObject
+@end
+
+@interface ToJsonObjectWithLinks : RLMObject
+@property RLMArray<ToJsonObject> *links;
+@end
+
+@implementation ToJsonObjectWithLinks
 @end
 
 
@@ -238,11 +248,20 @@
     [realm beginWriteTransaction];
     [ToJsonObject createInRealm:realm withObject:@[@"name1", @1]];
     [ToJsonObject createInRealm:realm withObject:@[@"name2", @2]];
+    
+    ToJsonObjectWithLinks *withLinks = [[ToJsonObjectWithLinks alloc] init];
+    withLinks.links = (RLMArray<ToJsonObject> *)[ToJsonObject allObjects];
+
+    [realm addObject:withLinks];
+    
     [realm commitWriteTransaction];
     
     RLMArray *all = [ToJsonObject allObjects];
     
-    [all JSONString];
+    NSString *json = [all JSONString];
+    XCTAssertNotNil(json, @"Should contain json string");
+    
+    XCTAssertThrows([withLinks.links JSONString], @"With links not supported");
 }
 
 - (void)testArrayDescription
