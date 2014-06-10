@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 
 @interface AggregateObject : RLMObject
 @property int intCol;
@@ -31,6 +32,14 @@
 @implementation AggregateObject
 @end
 
+@interface PersonObject : RLMObject
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+@end
+
+@implementation PersonObject
+@end
 
 @interface ToJsonObject : RLMObject
 @property NSString *name;
@@ -45,7 +54,6 @@
 @end
 
 @implementation ArrayTests
-
 
 - (void)testFastEnumeration
 {
@@ -80,6 +88,19 @@
     }
     
     XCTAssertEqual(totalSum, 100, @"total sum should be 100");
+}
+
+- (void)testReadOnly
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"name"]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *array = [realm allObjects:RLMTestObject.className];
+    XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
+    XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
 }
 
 - (void)testObjectAggregate
@@ -222,6 +243,32 @@
     RLMArray *all = [ToJsonObject allObjects];
     
     [all JSONString];
+}
+
+- (void)testArrayDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    for (NSInteger i = 0; i < 1012; ++i) {
+        PersonObject *person = [[PersonObject alloc] init];
+        person.name = @"Mary";
+        person.age = 24;
+        person.hired = YES;
+        [realm addObject:person];
+    }
+    [realm commitWriteTransaction];
+    
+    NSString *description = [[PersonObject allObjects] description];
+    
+    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+    
+    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+
+    XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+
 }
 
 @end

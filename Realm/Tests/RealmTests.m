@@ -64,7 +64,7 @@
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
     __block BOOL notificationFired = NO;
-    [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -79,7 +79,8 @@
     });
     
     [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
-    
+    [realm removeNotification:token];
+
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
 }
 
@@ -87,7 +88,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     __block BOOL notificationFired = NO;
-    [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -105,6 +106,7 @@
     
     // this should complete very fast before the timer
     [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
+    [realm removeNotification:token];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
