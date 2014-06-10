@@ -174,18 +174,15 @@
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
+- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
+}
 
 - (NSString *)JSONString
 {
     return [self JSONString];
 }
-
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
-
-}
-#pragma GCC diagnostic pop
 
 
 #pragma mark - Superclass Overrides
