@@ -15,7 +15,6 @@ RLM_ARRAY_TYPE(Dog)
 
 @interface Person : RLMObject
 @property NSString        *name;
-@property NSData          *picture;
 @property RLMArray<Dog>   *dogs;
 @end
 
@@ -27,9 +26,12 @@ RLM_ARRAY_TYPE(Dog)
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    UIViewController *rootVC = [[UIViewController alloc] init];
+    [self.window setRootViewController:rootVC];
+    
+    [self deleteRealmFile];
     
     // Create a standalone object
     Dog *mydog = [[Dog alloc] init];
@@ -62,19 +64,24 @@ RLM_ARRAY_TYPE(Dog)
     [realm beginWriteTransaction];
     [realm addObject:person];
     [realm commitWriteTransaction];
-    
-    // Query across objects
-    RLMArray *peopleWithDogNamesContainingX = [Person objectsWhere:@"dog.name contains 'x' for dog in dogs"];
-    NSLog(@"Number of people: %li", (unsigned long)peopleWithDogNamesContainingX.count);
 
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	^{
         RLMRealm *otherRealm = [RLMRealm	defaultRealm];
-        RLMArray *otherResults = [otherRealm objects:[Dog className] where:@"name contains 'rex'"];
+        RLMArray *otherResults = [otherRealm objects:[Dog className] where:@"name contains 'Rex'"];
         NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
     });
     
     return YES;
+}
+
+
+- (void)deleteRealmFile
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
 
 @end

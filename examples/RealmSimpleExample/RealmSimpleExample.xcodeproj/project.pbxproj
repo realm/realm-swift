@@ -19,7 +19,7 @@
 		4DE0B146194747F70092154B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B12E194747F70092154B /* UIKit.framework */; };
 		4DE0B14E194747F70092154B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DE0B14C194747F70092154B /* InfoPlist.strings */; };
 		4DE0B150194747F70092154B /* RealmSimpleExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B14F194747F70092154B /* RealmSimpleExampleTests.m */; };
-		4DE0B16C194748560092154B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B16B194748560092154B /* libc++.dylib */; };
+		4DE0B17019474C460092154B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B16B194748560092154B /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +86,7 @@
 		4DE0B14F194747F70092154B /* RealmSimpleExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmSimpleExampleTests.m; sourceTree = "<group>"; };
 		4DE0B159194748060092154B /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		4DE0B16B194748560092154B /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		4DE0B16E19474BEE0092154B /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DE0B16C194748560092154B /* libc++.dylib in Frameworks */,
+				4DE0B17019474C460092154B /* libc++.dylib in Frameworks */,
 				4DE0B12D194747F70092154B /* CoreGraphics.framework in Frameworks */,
 				4DE0B12F194747F70092154B /* UIKit.framework in Frameworks */,
 				4DE0B12B194747F70092154B /* Foundation.framework in Frameworks */,
@@ -136,6 +137,7 @@
 		4DE0B129194747F70092154B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DE0B16E19474BEE0092154B /* libstdc++.6.dylib */,
 				4DE0B16B194748560092154B /* libc++.dylib */,
 				4DE0B12A194747F70092154B /* Foundation.framework */,
 				4DE0B12C194747F70092154B /* CoreGraphics.framework */,
