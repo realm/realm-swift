@@ -74,10 +74,10 @@
     [realm commitWriteTransaction];
     
     // query on realm
-    XCTAssertEqual([realm objects:PersonQueryObject.className where:@"age > 28"].count, 2, @"Expecting 2 results");
-    
+    XCTAssertEqual([[realm objects:[PersonQueryObject className] where:@"age > 28"] count], 2, @"Expecting 2 results");
+
     // query on realm with order
-    RLMArray *results = [realm objects:PersonQueryObject.className orderedBy:@"age" where:@"age > 28"];
+    RLMArray *results = [realm objects:[PersonQueryObject className] orderedBy:@"age" where:@"age > 28"];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
