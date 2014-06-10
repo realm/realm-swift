@@ -84,10 +84,10 @@
     [realm commitWriteTransaction];
     
     // query on realm
-    XCTAssertEqual([realm objects:PersonQueryObject.className where:@"age > 28"].count, 2, @"Expecting 2 results");
+    XCTAssertEqual([realm objects:[PersonQueryObject className] where:@"age > 28"].count, (NSUInteger)2, @"Expecting 2 results");
     
     // query on realm with order
-    RLMArray *results = [realm objects:PersonQueryObject.className orderedBy:@"age" where:@"age > 28"];
+    RLMArray *results = [realm objects:[PersonQueryObject className] orderedBy:@"age" where:@"age > 28"];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -103,8 +103,8 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
-    XCTAssertEqual(all.count, 3, @"Expecting 3 results");
-    XCTAssertEqual([PersonQueryObject objectsWhere:@"age == 27"].count, 1, @"Expecting 1 results");
+    XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
+    XCTAssertEqual([PersonQueryObject objectsWhere:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 results");
     
     // with order
     RLMArray *results = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
@@ -123,13 +123,13 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
-    XCTAssertEqual(all.count, 3, @"Expecting 3 results");
+    XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
 
     RLMArray *some = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
     
     // query/order on array
-    XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1, @"Expecting 1 result");
-    XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0, @"Expecting 0 results");
+    XCTAssertEqual([all objectsWhere:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 result");
+    XCTAssertEqual([all objectsWhere:@"age == 28"].count, (NSUInteger)0, @"Expecting 0 results");
     some = [some objectsOrderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO] where:nil];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
