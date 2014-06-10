@@ -20,6 +20,8 @@
 
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
+#import "RLMArray_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
@@ -476,6 +478,11 @@ static NSArray *s_objectDescriptors = nil;
     [_objects setObject:accessor forKey:accessor];
 }
 
+inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
+    TableRef tableRef = group->get_table([obj backingTableIndex]); // Throws
+    obj.backingTable = tableRef.get();
+}
+
 - (void)updateAllObjects {
     try {
         // get the group
@@ -484,8 +491,20 @@ static NSArray *s_objectDescriptors = nil;
 
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            TableRef tableRef = group->get_table(obj.backingTableIndex); // Throws
-            obj.backingTable = tableRef.get();
+            //
+            // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
+            //
+            if ([obj isKindOfClass:RLMObject.class]) {
+                RLMRefreshObjectFromGroup(group, obj);
+            }
+            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
+                RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
+                // update parent first
+                if(!ar.parentObject.backingTable->is_attached()) {
+                    RLMRefreshObjectFromGroup(group, ar.parentObject);
+                }
+                ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+            }
             obj.writable = writable;
         }
     }

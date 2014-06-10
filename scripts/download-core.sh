@@ -1,5 +1,5 @@
 # Change version when new core is released
-REALM_CORE_VERSION=0.20.0
+REALM_CORE_VERSION=0.21.0
 
 if [ -z "${SRCROOT}" ]; then
     SRCROOT="$(pwd)"

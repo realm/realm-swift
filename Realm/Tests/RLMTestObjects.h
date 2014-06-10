@@ -25,6 +25,8 @@
 @property (nonatomic, copy) NSString *column;
 @end
 
+RLM_ARRAY_TYPE(RLMTestObject)
+
 @interface AllTypesObject : RLMObject
 @property BOOL           boolCol;
 @property int            intCol;
