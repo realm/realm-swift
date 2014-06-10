@@ -30,28 +30,28 @@
  In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
  You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
  
-     // in Dog.h
+     // Dog.h
      @interface Dog : RLMObject
- 
      @property NSString *name;
-     @property NSDate   *birthdate;
      @property BOOL      adopted;
- 
      @end
  
-     // in Dog.m
+     // Dog.m
      @implementation Dog
      @end //none needed
  
- Supported property types are:
+ ### Supported property types
  
  - `NSString`
  - `NSInteger`, `CGFloat`, `int`, `long`, `float`, and `double`
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
- - Other objects subclassing `RLMObject`, so you can link RLMObjects together.
+ - RLMObject subclasses, so you can have many-to-one relationships.
+ - `RLMArray<X>`, where X is an RLMObject subclass, so you can have many-to-many relationships.
  
+ ### Attributes for Properties
+
  You can set which of these properties should be indexed, stored inline, unique, required
  as well as delete rules for the links by implementing the attributesForProperty: method.
  
@@ -60,10 +60,15 @@
  
  You can set default values for properties by implementing defaultPropertyValues.
  
+ ### Querying
+ 
  You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search in a Realms other than the defaut Realm
- use the interface on an RLMRealm instance.
+ default Realm. To search in a Realms other than the defaut Realm  use the interface on an RLMRealm instance.
+ 
+ ### Relationships
+ 
+ See our [iOS guide](http://realm.io/docs/ios/latest) for more details.
  
  */
 
@@ -121,7 +126,7 @@
  
  @see   defaultPropertyValues
  */
-+(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
+// +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.

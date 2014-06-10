@@ -9,7 +9,7 @@
 
 ### Enhancements
 
-* None.
+* Added support for RLMArrayProperties.
 
 ### Bugfixes
 
