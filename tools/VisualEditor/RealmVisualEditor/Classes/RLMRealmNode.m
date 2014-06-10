@@ -10,6 +10,13 @@
 
 #import <Realm/Realm.h>
 
+@interface RLMRealm ()
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
+@end
+
 
 @implementation RLMRealmNode
 
@@ -27,7 +34,8 @@
 - (instancetype)initWithName:(NSString *)name url:(NSString *)url
 {
     if (self = [super init]) {
-        _realm = [RLMRealm realmWithPath:url];
+        NSError *error;
+        _realm = [RLMRealm realmWithPath:url readOnly:NO dynamic:YES error:&error];
         
         _name = name;
         _url = url;        
