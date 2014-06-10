@@ -274,6 +274,12 @@ static NSArray *s_objectDescriptors = nil;
     catch (File::AccessError &ex) {
         error = make_realm_error(RLMErrorFileAccessError, ex);
     }
+    catch (SharedGroup::PresumablyStaleLockFile &ex) {
+        error = make_realm_error(RLMErrorStaleLockFile, ex);
+    }
+    catch (SharedGroup::LockFileButNoData &ex) {
+        error = make_realm_error(RLMErrorLockFileButNoData, ex);
+    }
     catch (exception &ex) {
         error = make_realm_error(RLMErrorFail, ex);
     }

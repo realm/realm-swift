@@ -121,5 +121,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorFileNotFound          = 6,
     RLMErrorRollback              = 7,
     RLMErrorInvalidDatabase       = 8,
-    RLMErrorTableNotFound         = 9
+    RLMErrorTableNotFound         = 9,
+    RLMErrorStaleLockFile         = 10,
+    RLMErrorLockFileButNoData     = 11
 };
