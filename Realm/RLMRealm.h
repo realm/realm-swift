@@ -296,20 +296,4 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 //-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
 
-#pragma mark -
-
-//---------------------------------------------------------------------------------------
-// @name Realm and Object Schema
-//---------------------------------------------------------------------------------------
-//
-// Returns the schema used by this realm. This can be used to enumerate and introspect object
-// types during migrations for dynamic introspection.
-//
-@property (nonatomic, readonly) RLMSchema *schema;
-
-//
-// The schema version for this Realm.
-// 
-@property (nonatomic, readonly) NSUInteger schemaVersion;
-
 @end

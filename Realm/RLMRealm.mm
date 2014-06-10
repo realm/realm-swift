@@ -131,7 +131,6 @@ inline void clearRealmCache() {
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
-@property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
 
@@ -289,11 +288,11 @@ static NSArray *s_objectDescriptors = nil;
         [realm beginReadTransaction];
         
         // for dynamic realms, get schema from stored tables
-        realm.schema = [RLMSchema dynamicSchemaFromRealm:realm];
+        realm->_schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
         // set the schema for this realm
-        realm.schema = [RLMSchema sharedSchema];
+        realm->_schema = [RLMSchema sharedSchema];
         
         // initialize object store for this realm
         RLMEnsureRealmTablesExist(realm);
