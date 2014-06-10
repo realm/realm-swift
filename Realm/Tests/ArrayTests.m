@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMTestObjects.h"
 
 @interface AggregateObject : RLMObject
 @property int intCol;
@@ -31,12 +32,67 @@
 @implementation AggregateObject
 @end
 
+@interface PersonObject : RLMObject
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+@end
+
+@implementation PersonObject
+@end
 
 @interface ArrayTests : RLMTestCase
 @end
 
 @implementation ArrayTests
 
+- (void)testFastEnumeration
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    
+    NSDate *dateMinInput = [NSDate date];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+    
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    
+    [realm commitWriteTransaction];
+       
+    RLMArray *result = [realm objects:[AggregateObject className] where:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
+    
+    XCTAssertEqual(result.count, 10, @"10 objects added");
+    
+    int totalSum = 0;
+    
+    for (AggregateObject *ao in result) {
+        totalSum +=ao.intCol;
+    }
+    
+    XCTAssertEqual(totalSum, 100, @"total sum should be 100");
+}
+
+- (void)testReadOnly
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"name"]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *array = [realm allObjects:RLMTestObject.className];
+    XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
+    XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
+}
 
 - (void)testObjectAggregate
 {
@@ -164,6 +220,31 @@
     
     // Test operation not supported
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
+}
+
+- (void)testArrayDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    for (NSInteger i = 0; i < 1012; ++i) {
+        PersonObject *person = [[PersonObject alloc] init];
+        person.name = @"Mary";
+        person.age = 24;
+        person.hired = YES;
+        [realm addObject:person];
+    }
+    [realm commitWriteTransaction];
+    
+    NSString *description = [[PersonObject allObjects] description];
+    
+    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+    
+    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+
+    XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
 }
 
 @end

@@ -1,25 +1,25 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
-#import "RLMSchema.h"
+#import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMUtil.h"
@@ -29,19 +29,26 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize objectIndex = _objectIndex;
-@synthesize backingTableIndex = _backingTableIndex;
-@synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
+// standalone init
 -(instancetype)init {
-    return [self initWithDefaultValues:YES];
+    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+    
+    // set standalone accessor class
+    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.schema));
+    
+    return self;
 }
 
--(instancetype)initWithDefaultValues:(BOOL)useDefaults {
+- (instancetype)initWithRealm:(RLMRealm *)realm
+                       schema:(RLMObjectSchema *)schema
+                defaultValues:(BOOL)useDefaults {
     self = [super init];
     
     if (self) {
+        self.realm = realm;
+        self.schema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -51,7 +58,6 @@
             }
         }
     }
-    
     return self;
 }
 
@@ -103,6 +109,11 @@
     RLMAddObjectToRealm(obj, realm);
 
     return obj;
+}
+
+-(void)setBackingTable:(tightdb::Table *)backingTable {
+    _backingTable = backingTable;
+    _backingTableIndex = backingTable->get_index_in_parent();
 }
 
 // default attributes for property implementation
@@ -183,6 +194,20 @@
 
 + (NSString *)className {
     return NSStringFromClass(self);
+}
+
+- (NSString *)description
+{
+    NSString *baseClassName = self.class.className;
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
+    RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
+    
+    for (RLMProperty *property in objectSchema.properties) {
+        [mString appendFormat:@"\t%@ = %@;\n", property.name, [self[property.name] description]];
+    }
+    [mString appendString:@"}"];
+    
+    return [NSString stringWithString:mString];
 }
 
 @end

@@ -62,7 +62,10 @@
         BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
         
         if (!ignored) { // Don't process ignored properties
-            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
+            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
+                                                            attributes:[objectClass attributesForProperty:propertyName]
+                                                                column:propArray.count];
+            
             if (prop) {
                 [propArray addObject:prop];
             }
@@ -91,15 +94,12 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                                        column:col];
-        if (prop.type == RLMPropertyTypeObject) {
-            // set link type for objects
+        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+            // set link type for objects and arrays
             tightdb::TableRef linkTable = table->get_link_target(col);
             prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
         }
-        else if (prop.type == RLMPropertyTypeArray) {
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException" reason:@"Not implemented." userInfo:nil];
-        }
-        
+
         [propArray addObject:prop];
     }
     

@@ -38,6 +38,7 @@ static NSString * const kTableName = @"table";
 @interface TableViewController ()
 
 @property (nonatomic, strong) RLMArray *array;
+@property (nonatomic, strong) RLMNotificationToken *notification;
 
 @end
 
@@ -48,20 +49,13 @@ static NSString * const kTableName = @"table";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupUI];
-
-    // FIXME: Reset realm
-    //[[DemoObject allObjects] removeAllObjects];
-
-    // Set realm notification block
-    NSString *order = nil; // FIXME - crashes @"date"
-    [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        self.array = [DemoObject objectsOrderedBy:order where:nil];
-        [self.tableView reloadData];
-    }];
     
-    // Load initial data
-    self.array = [DemoObject objectsOrderedBy:order where:nil];
-    [self.tableView reloadData];
+    // Set realm notification block
+    __weak typeof(self) weakSelf = self;
+    self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        [weakSelf reloadData];
+    }];
+    [self reloadData];
 }
 
 #pragma mark - UI
@@ -111,6 +105,11 @@ static NSString * const kTableName = @"table";
 }
 
 #pragma mark - Actions
+
+- (void)reloadData {
+    self.array = [DemoObject objectsOrderedBy:@"date" where:nil];
+    [self.tableView reloadData];
+}
 
 - (void)backgroundAdd {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);

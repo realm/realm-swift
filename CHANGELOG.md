@@ -1,4 +1,40 @@
-0.11.0 Release notes (yyyy-MM-dd)
+0.21.0 Release notes (yyyy-MM-dd)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Added support for RLMArrayProperties.
+
+### Bugfixes
+
+* None.
+
+
+0.20.0 Release notes (2014-05-28)
+=============================================================
+
+Completely rewritten to be much more object oriented.
+
+### API breaking changes
+
+* Everything
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+
+0.11.0 Release notes (not released)
 =============================================================
 
 The Objective-C API has been updated and your code will break!

@@ -24,6 +24,7 @@
 
 // private properties
 @interface RLMProperty ()
+
 @property (nonatomic, assign) BOOL dynamic;
 @property (nonatomic, assign) BOOL nonatomic;
 
@@ -104,6 +105,7 @@
             return YES;
         case '@':
         {
+            NSString *const arrayPrefix = @"@\"RLMArray<";
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
@@ -118,9 +120,9 @@
             else if ([type isEqualToString:@"@\"NSData\""]) {
                 _type = RLMPropertyTypeData;
             }
-            else if ([type hasPrefix:@"@\"RLMArray<"]) {
-                // get object class and set type
-                _objectClassName = [type substringWithRange:NSMakeRange(11, type.length-5)];
+            else if ([type hasPrefix:arrayPrefix]) {
+                // get object class from type string - @"RLMArray<objectClassName>"
+                _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
@@ -147,12 +149,15 @@
     }
 }
 
-+(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp column:(NSUInteger)column
++(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
+                              attributes:(RLMPropertyAttributes)attributes
+                                  column:(NSUInteger)column
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
+    prop->_attributes = attributes;
     prop->_column = column;
     
     // parse attributes
@@ -195,8 +200,4 @@
     return prop;
 }
 
-
 @end
-
-
-

@@ -428,7 +428,7 @@ EOF
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
-        xcodebuild -target Realm -configuration Release || exit 1
+        xcodebuild -target "OSX Library" -configuration Release || exit 1
         realm_echo "Done building"
         exit 0
         ;;
@@ -522,7 +522,7 @@ EOF
 
     "test")
         auto_configure || exit 1
-        xcodebuild -target Realm -scheme Realm test || exit 1
+        xcodebuild -target "OSX Library" -scheme OSX test || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -668,91 +668,8 @@ EOF
 
     "docs")
         echo "Generating HTML docs..."
-        appledoc    --project-name Realm \
-                    --project-company "Realm" \
-                    --include docs/source/realm.png \
-                    --output docs \
-                    -v `sh build.sh get-version` \
-                    --create-html \
-                    --no-create-docset \
-                    --no-repeat-first-par \
-                    --no-warn-missing-arg \
-                    --no-warn-invalid-crossref \
-                    --no-warn-undocumented-object \
-                    --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
-                    --ignore "Realm/RLMArrayAccessor.h" \
-                    --ignore "Realm/RLMArrayAccessor.mm" \
-                    --ignore "Realm/RLMProperty.h" \
-                    --ignore "Realm/RLMProperty.m" \
-                    --ignore "Realm/RLMObjectSchema.h" \
-                    --ignore "Realm/RLMSchema.h" \
-                    --ignore "Realm/RLMQueryUtil.h" \
-                    --ignore "Realm/RLMUtil.h" \
-                    --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
-                    --template docs/templates \
-                    --exit-threshold 1 \
-                    Realm || exit 1
-        mkdir -p docs/output
-        rm -rf docs/output/$(sh build.sh get-version)
-        mv docs/html docs/output/$(sh build.sh get-version)
-        echo "Done generating HTML docs under docs/output/"
-
-        echo "Generating docset docs..."
-        appledoc    --project-name Realm \
-                    --project-company "Realm" \
-                    --include docs/source/realm.png \
-                    --output docs/output/$(sh build.sh get-version)/ \
-                    -v `sh build.sh get-version` \
-                    --no-create-html \
-                    --create-docset \
-                    --publish-docset \
-                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm.atom" \
-                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm" \
-                    --docset-package-filename "realm" \
-                    --docset-atom-filename "realm.atom" \
-                    --docset-bundle-filename "realm.docset" \
-                    --company-id "io.realm" \
-                    --no-repeat-first-par \
-                    --no-warn-missing-arg \
-                    --no-warn-invalid-crossref \
-                    --no-warn-undocumented-object \
-                    --no-warn-undocumented-member \
-                    --ignore "Realm/RLMConstants.h" \
-                    --ignore "Realm/RLMArrayAccessor.h" \
-                    --ignore "Realm/RLMArrayAccessor.mm" \
-                    --ignore "Realm/RLMProperty.h" \
-                    --ignore "Realm/RLMProperty.m" \
-                    --ignore "Realm/RLMObjectSchema.h" \
-                    --ignore "Realm/RLMSchema.h" \
-                    --ignore "Realm/RLMQueryUtil.h" \
-                    --ignore "Realm/RLMUtil.h" \
-                    --ignore "Realm/Tests/QueryTests.m" \
-                    --ignore "Realm/Tests/*" \
-                    --index-desc docs/source/index.md \
-                    --template docs/templates \
-                    --exit-threshold 1 \
-                    Realm || exit 1
-        echo "Generating Dash docs..."
-        (
-            cd docs/output/$(sh build.sh get-version)/
-            tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset
-        )
-        cat >docs/output/$(sh build.sh get-version)/realm.xml <<EOF
-<entry>
-    <version>$(sh build.sh get-version)</version>
-    <url>
-        http://static.realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
-    </url>
-</entry>
-EOF
-        mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/
-        rm -rf docs/output/$(sh build.sh get-version)/publish/
-        rm -rf docs/output/$(sh build.sh get-version)/realm.docset
+	xcodebuild -target "Generate docs in docs/output"
         echo "Done generating Apple docset under docs/output/"
-
         exit 0
         ;;
 

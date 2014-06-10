@@ -21,20 +21,23 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject;
-@class RLMArray;
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
+
+typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
+
 
 @interface RLMRealm : NSObject
 
 /**---------------------------------------------------------------------------------------
  *  @name Creating & Initializing a Realm
- *  ---------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  */
 /** 
  Obtains an instance of the default Realm.
  
  RLMRealm instances are reused when this is called multiple times from the same thread. The 
- default RLMRealm is persisted at `<Application_Home>/Documents/default.realm`.
+ default RLMRealm is persisted as default.realm under the Documents directory of your Application.
  
  @warning   RLMRealm instances are not thread safe and can not be shared across threads or 
             dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
@@ -90,46 +93,51 @@
  
  @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
-@property (nonatomic, readonly) BOOL isReadOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
-@end
+
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Notifications
- *  ---------------------------------------------------------------------------------------
+ *  @name Receiving Notification when a Realm Changes
+ * ---------------------------------------------------------------------------------------
  */
-/**
- Notification Block Type
- 
- @param notification    The name of the incoming notification.
- @param realm           The realm for which this notification occurred.
- */
-typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
-@interface RLMRealm (Notifications)
 /**
  Add a notification handler for changes in this RLMRealm.
  
- @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the
- only notification currently supported.
+ The block has the following definition:
+ 
+     typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
+ 
+ It receives the following parameters:
+ 
+ - `NSString` \***notification**:    The name of the incoming notification.
+    RLMRealmDidChangeNotification is the only notification currently supported.
+ - `RLMRealm` \***realm**:           The realm for which this notification occurred
+ 
+ @param block   A block which is called to process RLMRealm notifications.
+ 
+ @return A token object which can later be passed to removeNotification:.
+         to remove this notification.
  */
-- (void)addNotificationBlock:(RLMNotificationBlock)block;
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
 
 /**
- Remove a previously registered notification handler.
+ Remove a previously registered notification handler using the token returned
+ from addNotificationBlock:
  
- @param block   The block previously passed to addNotification: to remove.
+ @param notificationToken   The token returned from addNotificationBlock: corresponding
+                            to the notification block to remove.
  */
-- (void)removeNotificationBlock:(RLMNotificationBlock)block;
+- (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
-@end
-
+#pragma mark -
 
 /**---------------------------------------------------------------------------------------
  *  @name Writing to a Realm
- *  ---------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  */
-@interface RLMRealm (Transactions)
 
 /**
  Begins a write transaction in an RLMRealm. 
@@ -173,13 +181,11 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
-@end
+#pragma mark -
 
-
-@interface RLMRealm (ObjectAccessors)
 /**---------------------------------------------------------------------------------------
  *  @name Adding and Removing Objects from a Realm
- *  ---------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  */
 /**
  Adds an object to be persistsed it in this Realm.
@@ -214,12 +220,12 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**---------------------------------------------------------------------------------------
  *  @name Getting Objects from a Realm
- *  ---------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  */
 /**
  Get all objects of a given type in this Realm.
  
- @param className   The name of the RLMObject subclass to retrieve on eg. <code>MyClass.className</code>.
+ @param className   The name of the RLMObject subclass to retrieve on eg. `MyClass.className`.
  
  @return    An RLMArray of all objects in this realm of the given type.
  
@@ -261,67 +267,49 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
 
-@end
+#pragma mark -
+
+//---------------------------------------------------------------------------------------
+//@name Named Object Storage and Retrieval
+//---------------------------------------------------------------------------------------
+//
+// Realm provides a top level key/value store for storing and accessing objects by NSString.
+// This system can be extended with the RLMKeyValueStore interface to create nested
+// namespaces as needed.
+
+// Retrieve a persisted object with an NSString.
+// 
+// @usage RLMObject * object = RLMRealm.defaultRealm[@"name"];
+// @param key The NSString used to identify an object
+// 
+// @return    RLMObject or nil if no object is stored for the given key.
+//
+//-(id)objectForKeyedSubscript:(id <NSCopying>)key;
 
 
-/**---------------------------------------------------------------------------------------
- *  @name Realm Migrations
- *  ---------------------------------------------------------------------------------------
- */
-@class RLMMigration;
+// Store an object with an NSString key.
+// 
+// @usage RLMRealm.defaultRealm[@"name"] = object;
+// @param obj     The object to be stored.
+// @param key     The key that itentifies the object to be used for future lookups.
+//
+//-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
-/**
- Migration block used to migrate a Realm.
- 
- In the migration block it is the implementer's responsibility to make the existing Schema
- in the Realm compatible with the current ObjectSchema defined in each object interface definition.
- 
- Any Schema which can be updated to match the current schema by adding new object classes and
- properties to existing classes can be considered compatible with the current Schema, and can
- be migrated automatically.
 
- Schema changes involving the deletion of existing object classes or properties
- are not automatically compatible, and the missing objects and properties must be
- deleted manually in the migration block for the migration to succeed.
- 
- @param migration   RLMMigration object used to perform the migration. The migration object allows
-                    you to alter its Schema and to access objects in the Realm to populate added
-                    object classes and properties.
- 
- @param oldSchemaVersion    The schema version of the Realm which requires migration.
- 
- @return    Version number for the Realm after completing the migration. This version
-            number is accessible in future migrations through the <code>schemaVersion</code>
-            property on the RLMMigration object.
- */
-typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+#pragma mark -
 
-@interface RLMRealm (Migrations)
+//---------------------------------------------------------------------------------------
+// @name Realm and Object Schema
+//---------------------------------------------------------------------------------------
+//
+// Returns the schema used by this realm. This can be used to enumerate and introspect object
+// types during migrations for dynamic introspection.
+//
+@property (nonatomic, readonly) RLMSchema *schema;
 
-/**
- Performs a migration on the default Realm.
- 
- Must be called before the default Realm is accessed (otherwise throws). If the
- default Realm is at a version other than <code>version</code>, the migration is applied.
- 
- @param block       The block which migrates the Realm to the current version.
- 
- @see               RLMMigration
- */
-+ (void)applyMigrationBlock:(RLMMigrationBlock)block;
-
-/**
- Performs a migration on a Realm at a path.
- 
- Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
- If the Realm is at a version other than <code>version</code>, the migration is applied.
- 
- @param block       The block which migrates the Realm to the current version.
- @param realmPath   The path of the Realm to migrate.
-
- @see               RLMMigration
- */
-+ (void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath;
+//
+// The schema version for this Realm.
+// 
+@property (nonatomic, readonly) NSUInteger schemaVersion;
 
 @end
-

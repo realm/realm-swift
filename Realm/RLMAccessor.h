@@ -28,13 +28,8 @@
 
 // implemented by all persisted objects
 @protocol RLMAccessor <NSObject>
-
 @property (nonatomic) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
 @property (nonatomic, assign) BOOL writable;
-
 @end
 
 
@@ -48,14 +43,12 @@ void RLMAccessorCacheInitialize();
 
 // get accessor classes for an object class - generates classes if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-
+Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 //
 // Dynamic accessor creation
 //
 Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version);
-
-
