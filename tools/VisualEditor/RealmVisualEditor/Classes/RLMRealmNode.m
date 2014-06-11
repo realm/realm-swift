@@ -84,7 +84,7 @@
 {
     switch (index) {
         case 0:
-            return _name;
+            return @"Classes";
             
         default:
             return nil;
