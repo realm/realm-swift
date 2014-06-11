@@ -60,60 +60,43 @@
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
 }
 
-
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-    __block BOOL notificationFired = NO;
-    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        notificationFired = YES;
-        [self notify:XCTAsyncTestCaseStatusSucceeded];
-    }];
-    
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        RLMRealm *realm = [self realmWithTestPath];
+    __block RLMNotificationToken *token = nil;
+    [self testBefore:^(RLMRealm *realm) {
+        token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+            XCTAssertNotNil(realm, @"Realm should not be nil");
+            [self notify:XCTAsyncTestCaseStatusSucceeded];
+        }];
+    } async:^(RLMRealm *realm) {
         [realm beginWriteTransaction];
         [RLMTestObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
-    });
-    
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
-    [realm removeNotification:token];
-
-    XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
+    } completion:^(RLMRealm *realm) {
+        [realm removeNotification:token];
+    }];
 }
 
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-
-    __block BOOL notificationFired = NO;
-     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        notificationFired = YES;
-        [self notify:XCTAsyncTestCaseStatusSucceeded];
-    }];
-    
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        RLMRealm *realm = [self realmWithTestPath];
+    __block RLMNotificationToken *token = nil;
+    [self testBefore:^(RLMRealm *realm) {
+         token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+            XCTAssertNotNil(realm, @"Realm should not be nil");
+            [self notify:XCTAsyncTestCaseStatusSucceeded];
+        }];
+    } async:^(RLMRealm *realm) {
         RLMTestObject *obj = [[RLMTestObject alloc] init];
         obj.column = @"string";
         [realm beginWriteTransaction];
         [realm addObject:obj];
         [realm commitWriteTransaction];
-    });
-    
-    // this should complete very fast before the timer
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
-    [realm removeNotification:token];
-    
-    XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
-    
-    // get object
-    RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
-    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
-    XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
+    } completion:^(RLMRealm *realm) {
+        [realm removeNotification:token];
+        
+        // get object
+        RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
+        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
+        XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
+    }];
 }
 
 /* FIXME: disabled until we have per file compile options
@@ -154,6 +137,5 @@
  [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
  }
  */
-
 
 @end
