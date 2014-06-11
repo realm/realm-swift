@@ -46,7 +46,7 @@
 @property NSInteger age;
 @end
 
-RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject type
+RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject> type
 
 
 @implementation ToJsonObject
@@ -246,8 +246,8 @@ RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject type
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    [ToJsonObject createInRealm:realm withObject:@[@"name1", @1]];
-    [ToJsonObject createInRealm:realm withObject:@[@"name2", @2]];
+    [ToJsonObject createInRealm:realm withObject:@[@"Mary", @1]];
+    [ToJsonObject createInRealm:realm withObject:@[@"John", @2]];
     
     ToJsonObjectWithLinks *withLinks = [[ToJsonObjectWithLinks alloc] init];
     withLinks.links = (RLMArray<ToJsonObject> *)[ToJsonObject allObjects];
@@ -260,6 +260,13 @@ RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject type
     
     NSString *json = [all JSONString];
     XCTAssertNotNil(json, @"Should contain json string");
+    
+    XCTAssertTrue([json rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"JSONString\" on RLMArray");
+    XCTAssertTrue([json rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"JSONString\" on RLMArray");
+    
+    XCTAssertTrue([json rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"JSONString\" on RLMArray");
+    XCTAssertTrue([json rangeOfString:@"1"].location != NSNotFound, @"property values should be displayed when calling \"JSONString\" on RLMArray");
+
     
     XCTAssertThrows([withLinks.links JSONString], @"With links not supported");
 }
