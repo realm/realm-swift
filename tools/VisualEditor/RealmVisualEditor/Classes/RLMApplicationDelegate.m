@@ -128,7 +128,7 @@
     [realm addObject:tc2_2];
     [realm addObject:tc2_3];
     [realm addObject:tc2_4];
-    [realm addObject:tc2_5];
+    // [realm addObject:tc2_5];
     [realm addObject:tc2_6];
     
     [realm commitWriteTransaction];

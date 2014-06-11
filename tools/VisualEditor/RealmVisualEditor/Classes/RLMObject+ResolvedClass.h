@@ -11,6 +11,6 @@
 
 @interface RLMObject (Schema)
 
-- (RLMObjectSchema *)resolvedSchema;
+@property (nonatomic) RLMObjectSchema *schema;
 
 @end
