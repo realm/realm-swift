@@ -17,7 +17,6 @@
 		4DE0B144194747F70092154B /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B143194747F70092154B /* XCTest.framework */; };
 		4DE0B145194747F70092154B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B12A194747F70092154B /* Foundation.framework */; };
 		4DE0B146194747F70092154B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B12E194747F70092154B /* UIKit.framework */; };
-		4DE0B14E194747F70092154B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DE0B14C194747F70092154B /* InfoPlist.strings */; };
 		4DE0B17019474C460092154B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B16B194748560092154B /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
@@ -80,8 +79,6 @@
 		4DE0B13C194747F70092154B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DE0B142194747F70092154B /* RealmSimpleExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmSimpleExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE0B143194747F70092154B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4DE0B14B194747F70092154B /* RealmSimpleExampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmSimpleExampleTests-Info.plist"; sourceTree = "<group>"; };
-		4DE0B14D194747F70092154B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4DE0B159194748060092154B /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		4DE0B16B194748560092154B /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -116,7 +113,6 @@
 			children = (
 				4DE0B159194748060092154B /* Realm.xcodeproj */,
 				4DE0B130194747F70092154B /* RealmSimpleExample */,
-				4DE0B149194747F70092154B /* RealmSimpleExampleTests */,
 				4DE0B129194747F70092154B /* Frameworks */,
 				4DE0B128194747F70092154B /* Products */,
 			);
@@ -161,23 +157,6 @@
 				4DE0B133194747F70092154B /* InfoPlist.strings */,
 				4DE0B136194747F70092154B /* main.m */,
 				4DE0B138194747F70092154B /* RealmSimpleExample-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		4DE0B149194747F70092154B /* RealmSimpleExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				4DE0B14A194747F70092154B /* Supporting Files */,
-			);
-			path = RealmSimpleExampleTests;
-			sourceTree = "<group>";
-		};
-		4DE0B14A194747F70092154B /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4DE0B14B194747F70092154B /* RealmSimpleExampleTests-Info.plist */,
-				4DE0B14C194747F70092154B /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -315,7 +294,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DE0B14E194747F70092154B /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,14 +336,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DE0B134194747F70092154B /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		4DE0B14C194747F70092154B /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4DE0B14D194747F70092154B /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
