@@ -499,6 +499,7 @@ static NSArray *s_objectDescriptors = nil;
             // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
             //
             if ([obj isKindOfClass:RLMObject.class]) {
+                assert(!((RLMObject *)obj).backingTable->is_attached());
                 TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
                 ((RLMObject *)obj).backingTable = tableRef.get();
                 obj.writable = writable;
