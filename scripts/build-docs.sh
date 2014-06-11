@@ -1,10 +1,16 @@
-realm_version_file="Realm/Realm-Info.plist"
+#!/bin/sh
+
+if [ -z "${SRCROOT}" ]; then
+    SRCROOT="$(pwd)"
+fi
+
+realm_version_file="${SRCROOT}/Realm/Realm-Info.plist"
 realm_version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
 
 appledoc \
     --project-name Realm \
     --project-company "Realm" \
-    --output docs \
+    --output ${SRCROOT}/docs \
     -v ${realm_version} \
     --create-html \
     --no-create-docset \
@@ -24,23 +30,23 @@ appledoc \
     --ignore "Realm/Tests/QueryTests.m" \
     --ignore "Realm/Tests/TransactionTests.m" \
     --ignore "Realm/Tests/ObjectTests.m" \
-    --template docs/templates \
+    --template ${SRCROOT}/docs/templates \
     --exit-threshold 1 \
     Realm
 
-sed -i '' -e '/RLMPropertyType/d' docs/html/index.html
-sed -i '' -e '/RLMSortOrder/d' docs/html/index.html
-sed -i '' -e '/RLMPropertyType/d' docs/html/hierarchy.html
-sed -i '' -e '/RLMSortOrder/d' docs/html/hierarchy.html
+sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/index.html
+sed -i '' -e '/RLMSortOrder/d' ${SRCROOT}/docs/html/index.html
+sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/hierarchy.html
+sed -i '' -e '/RLMSortOrder/d' ${SRCROOT}/docs/html/hierarchy.html
 
-mkdir -p docs/output
-rm -rf docs/output/${realm_version}
-mv docs/html docs/output/${realm_version}
+mkdir -p ${SRCROOT}/docs/output
+rm -rf ${SRCROOT}/docs/output/${realm_version}
+mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
 appledoc \
     --project-name Realm \
     --project-company "Realm" \
-    --output docs/output/${realm_version}/ \
+    --output ${SRCROOT}/docs/output/${realm_version}/ \
     -v "${realm_version}" \
     --no-create-html \
     --create-docset \
@@ -67,18 +73,18 @@ appledoc \
     --ignore "Realm/Tests/QueryTests.m" \
     --ignore "Realm/Tests/TransactionTests.m" \
     --ignore "Realm/Tests/ObjectTests.m" \
-    --template docs/templates \
+    --template ${SRCROOT}/docs/templates \
     --exit-threshold 1 \
     Realm
 
-( cd docs/output/${realm_version}/ && tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset )
-cat >docs/output/${realm_version}/realm.xml <<EOF
+( cd ${SRCROOT}/docs/output/${realm_version}/ && tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset )
+cat >${SRCROOT}/docs/output/${realm_version}/realm.xml <<EOF
 <entry>
     <version>${realm_version}</version>
-    <sha1>$(shasum -b docs/output/${realm_version}/realm.tgz | cut -c 1-40)</sha1>
+    <sha1>$(sha1sum -b docs/output/${realm_version}/realm.tgz | cut -c 1-40)</sha1>
     <url>http://static.realm.io/docs/ios/${realm_version}/api/realm.tgz</url>
 </entry>
 EOF
 
-mv docs/output/${realm_version}/publish/* docs/output/${realm_version}/
-rm -rf docs/output/${realm_version}/publish/
+mv ${SRCROOT}/docs/output/${realm_version}/publish/* ${SRCROOT}/docs/output/${realm_version}/
+rm -rf ${SRCROOT}/docs/output/${realm_version}/publish/

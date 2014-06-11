@@ -147,7 +147,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm 
  on which beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to
- the latest Realm version when this method is called.
+ the latest Realm version when this method is called (if this happens it will also trigger a notification).
  */
 - (void)beginWriteTransaction;
 
@@ -174,7 +174,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  Set to YES to automacially update this Realm when changes happen in other threads.
 
  If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
- Notifications are sent immediately when a change is avaiable whether or not the Realm is automatically
+ Notifications are sent immediately when a change is available whether or not the Realm is automatically
  updated.
  
  Defaults to YES on the main thread, NO on all others.
@@ -236,11 +236,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Get objects matching the given predicate from the this Realm.
  
- In the future this method will be used to get an RLMArray with objects of mixed types. For now, you must
- specify an object type in the predicate of the form "Class = className". The preferred way to get objects
- of a single class is to use the class methods on RLMObject.
+ The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string 
+ @param className   The type of objects you are looking for (name of the class).
+ @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
                     which can accept variable arguments.
  
  @return    An RLMArray of results matching the given predicate.
@@ -252,10 +251,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Get an ordered array of objects matching the given predicate from the this Realm.
  
- In the future this method will be used to get an RLMArray with objects of mixed types. For now, you must
- specify an object type in the predicate of the form "Class = className". The preferred way to get objects
- of a single class is to use the class methods on RLMObject.
+ The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
+ @param className   The type of objects you are looking for (name of the class).
  @param order       This argument determines how the results are sorted. It can be an NSString containing
                     the property name, or an NSSortDescriptor with the property name and order.
  @param predicate   This argument can be an NSPredicate, a predicte string, or predicate format string
