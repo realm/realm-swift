@@ -17,7 +17,7 @@
                BlueprintIdentifier = "E8356ADA1947BED7009FC9F5"
                BuildableName = "Realm.framework"
                BlueprintName = "iOS Framework"
-               ReferencedContainer = "container:Realm.xcodeproj">
+               ReferencedContainer = "container:RealmSwift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "E8356AE41947BED7009FC9F5"
                BuildableName = "iOS Tests.xctest"
                BlueprintName = "iOS Tests"
-               ReferencedContainer = "container:Realm.xcodeproj">
+               ReferencedContainer = "container:RealmSwift.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

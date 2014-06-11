@@ -13,11 +13,11 @@ XCMODE=xcpretty # must be one of: xctool, xcpretty, xcodebuild
 
 xc(){
 	if [[ "$XCMODE" == "xctool" ]]; then
-		xctool -project Realm.xcodeproj $1
+		xctool -project RealmSwift.xcodeproj $1
 	elif [[ "$XCMODE" == "xcpretty" ]]; then
-		xcodebuild -project Realm.xcodeproj $1 | xcpretty
+		xcodebuild -project RealmSwift.xcodeproj $1 | xcpretty
 	elif [[ "$XCMODE" == "xcodebuild" ]]; then
-		xcodebuild -project Realm.xcodeproj $1
+		xcodebuild -project RealmSwift.xcodeproj $1
 	fi
 }
 
