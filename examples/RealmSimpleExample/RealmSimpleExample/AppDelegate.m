@@ -85,9 +85,9 @@ RLM_ARRAY_TYPE(Dog)
     [realm addObject:person];
     [realm commitWriteTransaction];
 
-    
+    // Thread-safety
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	^{
-        RLMRealm *otherRealm = [RLMRealm	defaultRealm];
+        RLMRealm *otherRealm = [RLMRealm defaultRealm];
         RLMArray *otherResults = [otherRealm objects:[Dog className] where:@"name contains 'Rex'"];
         NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
     });
