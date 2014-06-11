@@ -600,7 +600,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download_core";
+			shellScript = "sh scripts/download-core.sh";
 		};
 		022C8BF719428A8F00BCDB9D /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -614,7 +614,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download_core";
+			shellScript = "sh scripts/download-core.sh";
 		};
 		421A994E1933648E00F5E4D4 /* Build Framework */ = {
 			isa = PBXShellScriptBuildPhase;

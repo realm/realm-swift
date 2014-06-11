@@ -256,15 +256,13 @@ IMP RLMAccessorStandaloneGetter(NSUInteger col, char accessorCode, NSString *obj
     // only override getters for RLMArray properties
     if (accessorCode == 't') {
         return imp_implementationWithBlock(^(RLMObject *obj) {
-            typedef id (*getter_type)(RLMObject *, SEL);
             RLMProperty *prop = obj.schema.properties[col];
             Class superClass = class_getSuperclass(obj.class);
-            getter_type superGetter = (getter_type)class_getMethodImplementation(superClass, NSSelectorFromString(prop.getterName));
+            IMP superGetter = class_getMethodImplementation(superClass, NSSelectorFromString(prop.getterName));
             id val = superGetter(obj, NSSelectorFromString(prop.getterName));
             if (!val) {
                 SEL setterSel = NSSelectorFromString(prop.setterName);
-                typedef void (*setter_type)(RLMObject *, SEL, id);
-                setter_type setter = (setter_type)class_getMethodImplementation(obj.class, setterSel);
+                IMP setter = class_getMethodImplementation(obj.class, setterSel);
                 val = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
                 setter(obj, setterSel, val);
             }
