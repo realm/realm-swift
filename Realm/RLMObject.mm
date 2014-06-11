@@ -115,7 +115,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return RLMPropertyAttributeDeleteNever;
+    return (RLMPropertyAttributes)0;
+    // FIXME: return RLMPropertyAttributeDeleteNever;
 }
 #pragma clang diagnostic pop
 

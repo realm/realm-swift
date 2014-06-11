@@ -32,13 +32,13 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  Store this property inline (de-normalization) which in some cases can improve performance. Setting this
  attribute will result in objects being copied (rather than linked) when setting this property.
  */
-    RLMPropertyAttributeInlined = 1 << 3,
+//    RLMPropertyAttributeInlined = 1 << 3,
     
 /**
  The value for a property with this attribute must be unique across all objects of this type. An exception
  will be thrown when setting a property with this attribute to a non-unique value.
  */
-    RLMPropertyAttributeUnique = 1 << 4,
+//    RLMPropertyAttributeUnique = 1 << 4,
     
 /**
  This property value must be set before the object can be added to a Realm. If not set an
@@ -47,7 +47,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  
  @see [RLMObject defaultPropertyValues]
  */
-    RLMPropertyAttributeRequired = 1 << 5,
+//    RLMPropertyAttributeRequired = 1 << 5,
     
 /**
  When a parent object is deleted or a child property is nullified nothing is done.
@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteIfOnlyOwner` and `RLMPropertyAttributeDeleteAlways`.
  */
-    RLMPropertyAttributeDeleteNever = 0,
+//    RLMPropertyAttributeDeleteNever = 0,
     
 /**
  Delete a child object (or object in an RLMArray) when the parent is deleted or the object is
@@ -67,7 +67,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteAlways`.
  */
-    RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
+//    RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
     
 /**
  Always delete a child object or object in a child array when the parent is deleted or the
@@ -78,7 +78,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteIfOnlyOwner`.
  */
-    RLMPropertyAttributeDeleteAlways = 1 << 1
+//    RLMPropertyAttributeDeleteAlways = 1 << 1
 };
 
 // Make sure numbers match those in <tightdb/data_type.hpp>
@@ -121,5 +121,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorFileNotFound          = 6,
     RLMErrorRollback              = 7,
     RLMErrorInvalidDatabase       = 8,
-    RLMErrorTableNotFound         = 9
+    RLMErrorTableNotFound         = 9,
+    RLMErrorStaleLockFile         = 10,
+    RLMErrorLockFileButNoData     = 11
 };

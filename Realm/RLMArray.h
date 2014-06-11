@@ -30,6 +30,12 @@
  
  RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
  so you can easily chain queries to further filter query results.
+ 
+ RLMArrays fulfill 2 primary purposes:
+ 
+ - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
+ - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
+ 
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
@@ -53,7 +59,7 @@
  Indicates if the RLMArray is readOnly. 
  YES for RLMArray instances returned from predicate queries and object enumeration.
  */
-@property (nonatomic, readonly) BOOL readOnly;
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 #pragma mark -
 
@@ -187,7 +193,7 @@
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  */
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
@@ -195,7 +201,7 @@
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  
  @return            An RLMArray of objects that match the given predicate
@@ -205,7 +211,7 @@
 /**
  Get an ordered RLMArray of objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  @param order       This argument determines how the results are sorted. It can be an NSString containing
  t                  he property name, or an NSSortDescriptor with the property name and order.

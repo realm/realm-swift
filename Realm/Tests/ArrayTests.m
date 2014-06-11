@@ -70,7 +70,7 @@
        
     RLMArray *result = [realm objects:[AggregateObject className] where:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
     
-    XCTAssertEqual(result.count, 10, @"10 objects added");
+    XCTAssertEqual(result.count, (NSUInteger)10, @"10 objects added");
     
     int totalSum = 0;
     
@@ -237,7 +237,7 @@
     [realm commitWriteTransaction];
     
     NSString *description = [[PersonObject allObjects] description];
-
+    
     XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
     XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
     

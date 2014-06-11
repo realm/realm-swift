@@ -63,18 +63,18 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
                 switch (prop.type) {
                     // for objects and arrays, we have to specify target table
                     case RLMPropertyTypeObject:
-                    case RLMPropertyTypeArray:
-                    {
+                    case RLMPropertyTypeArray: {
                         tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
                         table->add_column_link(tightdb::DataType(prop.type), name, *linkTable);
                         break;
                     }
-                    default:
+                    default: {
                     	size_t column = table->add_column((tightdb::DataType)prop.type, name);
                     	if (prop.attributes & RLMPropertyAttributeIndexed) {
-                        	table->set_index(column);
-                   		}
+                            table->set_index(column);
+                        }
                         break;
+                    }
                 }
             }
         }
