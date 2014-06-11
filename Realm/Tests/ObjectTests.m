@@ -529,4 +529,59 @@
     XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
+#pragma mark - JSON tests
+
+- (void)testJSONString
+{
+    NSString *name = @"John Doe";
+    int age = 42;
+    BOOL hired = YES;
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    SimpleObject *so = [SimpleObject createInRealm:realm
+                                        withObject:@{@"name" : name, @"age" : @(age), @"hired" : @(hired)}];
+    [realm commitWriteTransaction];
+    
+    XCTAssertNotNil(so, @"object created from dictionary should not be nil");
+    
+    XCTAssertThrows([so JSONString], @"JSONString not yet implemented");
+    
+    // Uncomment the following once JSONString method is implemented
+    /*
+    NSString *jsonString = [so JSONString];
+    XCTAssertNotNil(jsonString, @"JSON string from object should not be nil");
+    
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error = nil;
+    id obj = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+    XCTAssertNotNil(obj, @"parsing of JSON string should not return nil");
+    XCTAssertNil(error, @"parsing of JSON string should not product error");
+    
+    if ([obj isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *dict = (NSDictionary*) obj;
+        NSString *dictName = [dict valueForKey:@"name"];
+        NSNumber *dictAge = [dict valueForKey:@"age"];
+        NSNumber *dictHired = [dict valueForKey:@"hired"];
+        XCTAssertNotNil(dictName, @"name should be in dictionary");
+        XCTAssertNotNil(dictAge, @"age should be in dictionary");
+        XCTAssertNotNil(dictHired, @"hired should be in dictionary");
+        
+        XCTAssertEqualObjects(dictName, name, @"names should match");
+        XCTAssertEqual([dictAge intValue], age, @"age values should match");
+        XCTAssertEqual([dictHired boolValue], hired, @"hired values should match");
+    } else {
+        XCTFail(@"object returned from JSON parsing should be a NSDictionary");
+    }
+     */
+}
+
+- (void)testCreateWithJSONString
+{
+    // uncomment when createInRealm:withJSONString: is available
+//    RLMRealm *realm = [RLMRealm defaultRealm];
+//    NSString *json = @"{ \"name\" : \"John Doe\", \"age\" : 42, \"hired\" : true }";
+//    XCTAssertNoThrow([SimpleObject createInRealm:realm withJSONString:json], @"object should be created from json");
+}
+
 @end
