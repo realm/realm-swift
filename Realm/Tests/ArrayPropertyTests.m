@@ -43,7 +43,7 @@
     [realm beginWriteTransaction];
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
     XCTAssertNotNil(array.array, @"Should be able to get an empty array");
-    XCTAssertEqual(array.array.count, 0, @"Should start with no array elements");
+    XCTAssertEqual(array.array.count, (NSUInteger)0, @"Should start with no array elements");
 
     RLMTestObject *obj = [[RLMTestObject alloc] init];
     obj.column = @"a";
@@ -52,7 +52,7 @@
     [array.array addObject:obj];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual(array.array.count, 3, @"Should have three elements in array");
+    XCTAssertEqual(array.array.count, (NSUInteger)3, @"Should have three elements in array");
     XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property value 'b'");
     XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property value 'a'");
@@ -72,7 +72,7 @@
     [realm beginWriteTransaction];
     ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
     XCTAssertNotNil(arObj.array, @"Should be able to get an empty array");
-    XCTAssertEqual(arObj.array.count, 0, @"Should start with no array elements");
+    XCTAssertEqual(arObj.array.count, (NSUInteger)0, @"Should start with no array elements");
     
     RLMTestObject *obj = [[RLMTestObject alloc] init];
     obj.column = @"a";
@@ -81,7 +81,7 @@
     [array addObject:[RLMTestObject createInRealm:realm withObject:@[@"b"]]];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual(array.count, 2, @"Should have two elements in array");
+    XCTAssertEqual(array.count, (NSUInteger)2, @"Should have two elements in array");
     XCTAssertEqualObjects([array[0] column], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([arObj.array[1] column], @"b", @"Second element should have property value 'b'");
     
@@ -120,10 +120,9 @@
     [realm addObject:array];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual(array.array.count, 2, @"Should have two elements in array");
+    XCTAssertEqual(array.array.count, (NSUInteger)2, @"Should have two elements in array");
     XCTAssertEqualObjects([array.array[0] column], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([array.array[1] column], @"a", @"Second element should have property value 'a'");
 }
 
 @end
-

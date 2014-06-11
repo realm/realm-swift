@@ -239,11 +239,10 @@ static NSArray *s_objectDescriptors = nil;
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop. \
-                                               Use an RLMTransactionManager read or write block \
-                                               instead.", NSStringFromSelector(_cmd)] userInfo:nil];
+                                               can only be called from a thread with a runloop.",
+                                               NSStringFromSelector(_cmd)] userInfo:nil];
     }
-
+    
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
@@ -273,6 +272,12 @@ static NSArray *s_objectDescriptors = nil;
     }
     catch (File::AccessError &ex) {
         error = make_realm_error(RLMErrorFileAccessError, ex);
+    }
+    catch (SharedGroup::PresumablyStaleLockFile &ex) {
+        error = make_realm_error(RLMErrorStaleLockFile, ex);
+    }
+    catch (SharedGroup::LockFileButNoData &ex) {
+        error = make_realm_error(RLMErrorLockFileButNoData, ex);
     }
     catch (exception &ex) {
         error = make_realm_error(RLMErrorFail, ex);

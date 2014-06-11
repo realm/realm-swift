@@ -89,7 +89,7 @@ RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject type
        
     RLMArray *result = [realm objects:[AggregateObject className] where:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
     
-    XCTAssertEqual(result.count, 10, @"10 objects added");
+    XCTAssertEqual(result.count, (NSUInteger)10, @"10 objects added");
     
     int totalSum = 0;
     

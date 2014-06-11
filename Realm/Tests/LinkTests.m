@@ -65,8 +65,8 @@
     
     RLMArray *owners = [realm objects:OwnerObject.className where:nil];
     RLMArray *dogs = [realm objects:DogObject.className where:nil];
-    XCTAssertEqual(owners.count, 1, @"Expecting 1 owner");
-    XCTAssertEqual(dogs.count, 1, @"Expecting 1 dog");
+    XCTAssertEqual(owners.count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual(dogs.count, (NSUInteger)1, @"Expecting 1 dog");
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
     XCTAssertEqualObjects([dogs[0] dogName], @"Harvie", @"Harvie is named Harvie");
     
@@ -86,16 +86,16 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 1, @"Expecting 1 owner");
-    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
-    OwnerObject *fiel = [OwnerObject createInRealm:realm withObject:@[@"Fiel", NSNull.null]];
+    OwnerObject *fiel = [OwnerObject createInRealm:realm withObject:@[@"Fiel", [NSNull null]]];
     fiel.dog = owner.dog;
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 2, @"Expecting 2 owners");
-    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)2, @"Expecting 2 owners");
+    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
 }
 
 - (void)testLinkRemoval {
@@ -110,8 +110,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.className where:nil].count, 1, @"Expecting 1 owner");
-    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
     [realm deleteObject:owner.dog];
@@ -121,10 +121,10 @@
     // XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
 
     // refresh owner and check
-    owner = [realm allObjects:OwnerObject.className].firstObject;
+    owner = [realm allObjects:[OwnerObject className]].firstObject;
     XCTAssertNotNil(owner, @"Should have 1 owner");
     XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
-    XCTAssertEqual([realm objects:DogObject.className where:nil].count, 0, @"Expecting 0 dogs");
+    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)0, @"Expecting 0 dogs");
 }
 
 - (void)testInvalidLinks {
