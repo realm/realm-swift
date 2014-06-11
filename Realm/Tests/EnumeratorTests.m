@@ -52,7 +52,7 @@
     }
     [realm commitWriteTransaction];
 
-    
+    // Get all objects
     RLMArray *people = [EnumPerson allObjects];
     
     // Iterate using for...in
@@ -79,7 +79,7 @@
     RLMArray *res = [EnumPerson objectsWhere:@"Hired = YES && Age >= 20 && Age <= 30"];
     
     
-    // 2: Iterate over the resulting RLMArray
+    // Iterate over the resulting RLMArray
     index = 0;
     for (EnumPerson *row in res) {
         XCTAssertTrue([row.Name isEqualToString:filteredArray[index][0]],
@@ -90,12 +90,6 @@
                        @"Hired in iteration should be equal to what was set.");
         index++;
     }
-    
-    predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
-        XCTAssertNil(bindings, @"Parameter must be used");
-        return [evaluatedArray[1] integerValue] == 21;
-    }];
-    filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
 }
 
 @end
