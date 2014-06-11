@@ -18,6 +18,7 @@
 		4DE0B145194747F70092154B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B12A194747F70092154B /* Foundation.framework */; };
 		4DE0B146194747F70092154B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B12E194747F70092154B /* UIKit.framework */; };
 		4DE0B17019474C460092154B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B16B194748560092154B /* libc++.dylib */; };
+		4DE0B18319486DD60092154B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE0B18219486DD60092154B /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		4DE0B143194747F70092154B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4DE0B159194748060092154B /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		4DE0B16B194748560092154B /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		4DE0B18219486DD60092154B /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DE0B17019474C460092154B /* libc++.dylib in Frameworks */,
+				4DE0B18319486DD60092154B /* Realm.framework in Frameworks */,
 				4DE0B12D194747F70092154B /* CoreGraphics.framework in Frameworks */,
 				4DE0B12F194747F70092154B /* UIKit.framework in Frameworks */,
 				4DE0B12B194747F70092154B /* Foundation.framework in Frameworks */,
@@ -130,6 +133,7 @@
 		4DE0B129194747F70092154B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DE0B18219486DD60092154B /* Realm.framework */,
 				4DE0B16B194748560092154B /* libc++.dylib */,
 				4DE0B12A194747F70092154B /* Foundation.framework */,
 				4DE0B12C194747F70092154B /* CoreGraphics.framework */,
@@ -418,14 +422,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = (
+					"${SRCROOT}/../../build/${CONFIGURATION}",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";
 				INFOPLIST_FILE = "RealmSimpleExample/RealmSimpleExample-Info.plist";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -436,14 +440,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = (
+					"${SRCROOT}/../../build/${CONFIGURATION}",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";
 				INFOPLIST_FILE = "RealmSimpleExample/RealmSimpleExample-Info.plist";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
