@@ -267,8 +267,7 @@ RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject> type
     XCTAssertTrue([json rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"JSONString\" on RLMArray");
     XCTAssertTrue([json rangeOfString:@"1"].location != NSNotFound, @"property values should be displayed when calling \"JSONString\" on RLMArray");
 
-    
-    XCTAssertThrows([withLinks.links JSONString], @"With links not supported");
+    XCTAssertThrows([withLinks.links JSONString], @"Array with links not supported");
 }
 
 - (void)testArrayDescription
