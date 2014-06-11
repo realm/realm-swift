@@ -12,12 +12,16 @@ XCMODE=xcpretty # must be one of: xctool, xcpretty, xcodebuild
 ######################################
 
 xc(){
+	PROJECT=Realm.xcodeproj
+	if xcode-select -p | grep Xcode6 --quiet; then
+		PROJECT=RealmSwift.xcodeproj
+	fi
 	if [[ "$XCMODE" == "xctool" ]]; then
-		xctool -project RealmSwift.xcodeproj $1
+		xctool -project $PROJECT $1
 	elif [[ "$XCMODE" == "xcpretty" ]]; then
-		xcodebuild -project RealmSwift.xcodeproj $1 | xcpretty
+		xcodebuild -project $PROJECT $1 | xcpretty
 	elif [[ "$XCMODE" == "xcodebuild" ]]; then
-		xcodebuild -project RealmSwift.xcodeproj $1
+		xcodebuild -project $PROJECT $1
 	fi
 }
 
