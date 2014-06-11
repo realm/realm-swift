@@ -82,7 +82,6 @@
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
     [super windowControllerDidLoadNib:aController];
-
     
     // Perform some extra inititialization on the tableview
     
@@ -126,7 +125,7 @@
     return YES;
 }
 
-#pragma mnark - Public methods - NSDocument overrides
+#pragma mark - Public methods - NSDocument overrides
 
 - (NSString *)displayName {
     if (presentedRealm.name != nil) {
