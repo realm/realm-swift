@@ -174,7 +174,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  Set to YES to automacially update this Realm when changes happen in other threads.
 
  If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
- Notifications are sent immediately when a change is avaiable whether or not the Realm is automatically
+ Notifications are sent immediately when a change is available whether or not the Realm is automatically
  updated.
  
  Defaults to YES on the main thread, NO on all others.
