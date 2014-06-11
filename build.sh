@@ -68,6 +68,13 @@ if [[ "$COMMAND" == "test-all" ]]; then
 	xc "-scheme OSX -configuration Release clean test"
 fi
 
+if [[ "$COMMAND" == "test-ci" ]]; then
+	sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+	sh build.sh test-all
+	sudo xcode-select -s /Applications/Xcode6-Beta.app/Contents/Developer
+	sh build.sh test-all
+fi
+
 ######################################
 # Docs
 ######################################
