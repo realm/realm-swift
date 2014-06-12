@@ -80,7 +80,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         }
         else {
             if (table->get_column_count() != objectSchema.properties.count) {
-                [realm rollbackWriteTransaction];
+                // FIXME - rollback
                 @throw [NSException exceptionWithName:@"RLMException" reason:@"Column count does not match interface - migration required"
                                              userInfo:nil];
             }
@@ -97,7 +97,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // if realm is not writable throw
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Can only add an object to a Realm during a write transaction"
                                      userInfo:nil];
@@ -143,7 +143,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 
 void RLMDeleteObjectFromRealm(RLMObject *object) {
     // if realm is not writable throw
-    if (object.realm.transactionMode != RLMTransactionModeWrite) {
+    if (!object.realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
     // move last row to row we are deleting
@@ -181,7 +181,7 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor->_row = (*table)[index];
-    accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
+    accessor.writable = realm.inWriteTransaction;
     
     [accessor.realm registerAccessor:accessor];
     return accessor;

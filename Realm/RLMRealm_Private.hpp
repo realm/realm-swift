@@ -23,16 +23,9 @@
 
 #import <tightdb/group.hpp>
 
-// RLMRealm transaction state
-typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
-    RLMTransactionModeNone = 0,
-    RLMTransactionModeRead,
-    RLMTransactionModeWrite
-};
-
 // RLMRealm private members
 @interface RLMRealm ()
-@property (nonatomic, readonly) RLMTransactionMode transactionMode;
+@property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) tightdb::Group *group;
 
 // call whenever creating an accessor to keep up to date accross transactions

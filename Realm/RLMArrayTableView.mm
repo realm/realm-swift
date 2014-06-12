@@ -47,7 +47,7 @@
     [realm registerAccessor:ar];
     
     // make readonly if not in write transaction
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         object_setClass(ar, RLMArrayTableViewReadOnly.class);
     }
     

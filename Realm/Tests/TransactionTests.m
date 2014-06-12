@@ -68,8 +68,6 @@
     XCTAssertThrows([realm beginWriteTransaction], @"Write transaction already in place");
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([realm rollbackWriteTransaction], @"No write transaction to rool-back");
-
     XCTAssertThrows([realm deleteObject:obj], @"Outside writetransaction");
 }
 
