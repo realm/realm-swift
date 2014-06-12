@@ -86,7 +86,6 @@ if [[ "$COMMAND" == "test-all" ]]; then
 fi
 
 if [[ "$COMMAND" == "verify" ]]; then
-	rm -rf core docs/output
 	sh build.sh docs
 	sh build.sh test-all $2
 	sh build.sh examples $2
