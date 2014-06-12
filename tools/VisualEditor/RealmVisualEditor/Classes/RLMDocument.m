@@ -141,7 +141,6 @@
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-
     if (item == nil) {
         return presentedRealm;
     }
@@ -175,7 +174,7 @@
     if (item == nil) {
         return 1;
     }
-    // ... otehrwise the number of child nodes are defined by the node in question.
+    // ... otherwise the number of child nodes are defined by the node in question.
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
         return outlineItem.numberOfChildNodes;
@@ -524,6 +523,20 @@
                     }
                 }
             }
+        }
+        else if(propertyNode.type == RLMPropertyTypeArray) {
+            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+            NSObject *propertyValue = selectedInstance[propertyNode.name];
+            
+            if ([propertyValue isKindOfClass:[RLMArray class]]) {
+                RLMArray *linkedArray = (RLMArray *)propertyValue;
+        
+                [selectedClazz displayChildArray:linkedArray
+                             fromObjectWithIndex:row];
+                
+                [self.classesOutlineView reloadData];
+            }
+            
         }
     }
 }

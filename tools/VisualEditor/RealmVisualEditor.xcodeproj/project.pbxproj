@@ -180,9 +180,9 @@
 		840F97CC192B81DB006B591E /* Display model */ = {
 			isa = PBXGroup;
 			children = (
-				84D7990419388E8900FC76A0 /* RLMClazzNode.h */,
 				84AA41AE1949CD7700A50F03 /* RLMArrayNode.h */,
 				84AA41AF1949CD7700A50F03 /* RLMArrayNode.m */,
+				84D7990419388E8900FC76A0 /* RLMClazzNode.h */,
 				84D7990519388E8900FC76A0 /* RLMClazzNode.m */,
 				84D7990619388E8900FC76A0 /* RLMClazzProperty.h */,
 				84D7990719388E8900FC76A0 /* RLMClazzProperty.m */,

@@ -60,7 +60,7 @@
     switch (index) {
         case 0:
             return self.schema.className;
-            
+        
         default:
             return nil;
     }

@@ -32,13 +32,6 @@
 
 #pragma mark - RLMObjectNode overrides
 
-- (RLMObject *)instanceAtIndex:(NSUInteger)index
-{
-    return displayedArray[index];
-}
-
-#pragma mark - RLMObjectNode overrides
-
 - (NSString *)name
 {
     return @"Array";
@@ -49,5 +42,20 @@
     return displayedArray.count;
 }
 
+- (RLMObject *)instanceAtIndex:(NSUInteger)index
+{
+    return displayedArray[index];
+}
+
+- (id)nodeElementForColumnWithIndex:(NSInteger)index
+{
+    switch (index) {
+        case 0:
+            return [NSString stringWithFormat:@"Array #%lu", (unsigned long)self.parentObjectIndex];
+            
+        default:
+            return nil;
+    }
+}
 
 @end
