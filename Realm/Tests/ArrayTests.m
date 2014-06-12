@@ -38,7 +38,16 @@
 @property BOOL hired;
 @end
 
+RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
+
 @implementation PersonObject
+@end
+
+@interface Company : RLMObject
+@property RLMArray<PersonObject> *employees;
+@end
+
+@implementation Company
 @end
 
 @interface ArrayTests : RLMTestCase
@@ -245,6 +254,59 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+}
+
+- (void)testDeleteLinksAndObjectsInArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    
+    PersonObject *po1 = [[PersonObject alloc] init];
+    po1.age = 40;
+    po1.name = @"Joe";
+    po1.hired = YES;
+    
+    PersonObject *po2 = [[PersonObject alloc] init];
+    po2.age = 30;
+    po2.name = @"John";
+    po2.hired = NO;
+    
+    [realm addObject:po1];
+    [realm addObject:po2];
+    
+    Company *company = [[Company alloc] init];
+    company.employees = (RLMArray<PersonObject> *)[PersonObject allObjects];
+    [realm addObject:company];
+    
+    [realm commitWriteTransaction];
+    
+    RLMArray *peopleInCompany = company.employees;
+    
+    // Delete the links to employees
+    XCTAssertThrows([peopleInCompany removeAllObjects], @"Not allowed in read transaction");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"No links should have been deleted");
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links to employees");
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)0, @"All links deleted when accessing via links");
+    
+    RLMArray *allPeople = [PersonObject allObjects];
+    XCTAssertEqual(allPeople.count, (NSUInteger)2, @"Only links should have been deleted, not the employees");
+    
+    
+    // Delete the actual employees
+    XCTAssertThrows([allPeople removeAllObjects], @"Not allowed in read transaction");
+    XCTAssertEqual(allPeople.count, (NSUInteger)2, @"No employees should have been deleted");
+
+    [realm beginWriteTransaction];
+    allPeople = [PersonObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
+
+    XCTAssertNoThrow([allPeople removeAllObjects], @"Should delete employees");
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(allPeople.count, (NSUInteger)0, @"All employees should have been deleted");
 }
 
 @end
