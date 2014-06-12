@@ -107,6 +107,8 @@
 		E8356B381947C10E009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B301947C034009FC9F5 /* Foundation.framework */; };
 		E8356B3A1947C141009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
 		E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B3F1947C19D009FC9F5 /* libc++.dylib */; };
+		E845F211194975940097EBDF /* PropertyTypeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = E845F210194975940097EBDF /* PropertyTypeTest.mm */; };
+		E845F212194975940097EBDF /* PropertyTypeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = E845F210194975940097EBDF /* PropertyTypeTest.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -208,6 +210,7 @@
 		E8356AE51947BED7009FC9F5 /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8356B301947C034009FC9F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E8356B3F1947C19D009FC9F5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
+		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -308,6 +311,7 @@
 				02E4D6E8192E58250082808D /* MixedTests.m */,
 				4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */,
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
+				E845F210194975940097EBDF /* PropertyTypeTest.mm */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
@@ -619,6 +623,7 @@
 				02E4D6BC192E3DC40082808D /* RLMConstants.m in Sources */,
 				02E4D6DC192E3DC40082808D /* RLMRealm.mm in Sources */,
 				02E4D6D6192E3DC40082808D /* RLMQueryUtil.mm in Sources */,
+				E845F211194975940097EBDF /* PropertyTypeTest.mm in Sources */,
 				02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
 				02E4D6B8192E3DC40082808D /* RLMArrayAccessors.mm in Sources */,
@@ -660,6 +665,7 @@
 				E8356B051947BF54009FC9F5 /* RLMObject.mm in Sources */,
 				E8356AFE1947BF54009FC9F5 /* RLMArrayLinkView.mm in Sources */,
 				E8356B021947BF54009FC9F5 /* RLMConstants.m in Sources */,
+				E845F212194975940097EBDF /* PropertyTypeTest.mm in Sources */,
 				E8356B081947BF54009FC9F5 /* RLMObjectSchema.mm in Sources */,
 				E8356B0A1947BF54009FC9F5 /* RLMObjectStore.mm in Sources */,
 				E8356AFD1947BF54009FC9F5 /* RLMArray.mm in Sources */,
