@@ -116,6 +116,7 @@
 		4D8D90B1192B80F0004C89AA /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* TransactionTests.m */; };
 		4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* TransactionTests.m */; };
 		4DE0B18D1948830D0092154B /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B18C1948830D0092154B /* EnumeratorTests.m */; };
+		4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B18C1948830D0092154B /* EnumeratorTests.m */; };
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
@@ -710,6 +711,7 @@
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6EA192E58250082808D /* MixedTests.m in Sources */,
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
+				4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */,
 				02026CAC19363B5300E4EEF8 /* ArrayTests.m in Sources */,
 				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
 				02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */,

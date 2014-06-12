@@ -37,13 +37,21 @@
 
 - (void)testEnum
 {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RLMArray *emptyPeople = [EnumPerson allObjects];
+    
+    // Enum for zero rows added
+    for (EnumPerson *row in emptyPeople) {
+        XCTFail(@"No objects should have been added %@", row);
+    }
+    
     NSArray *rowsArray = @[@[@"John", @20, @YES],
                            @[@"Mary", @21, @NO],
                            @[@"Lars", @21, @YES],
                            @[@"Phil", @43, @NO],
                            @[@"Anni", @54, @YES]];
     
-    RLMRealm *realm = [RLMRealm defaultRealm];
     
     // Add objects
     [realm beginWriteTransaction];
