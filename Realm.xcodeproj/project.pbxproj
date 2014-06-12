@@ -860,7 +860,7 @@
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_CFLAGS = "-Wall";
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -898,7 +898,7 @@
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_CFLAGS = "-Wall";
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1112,6 +1112,7 @@
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "";
@@ -1191,7 +1192,7 @@
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				OTHER_CFLAGS = "-Wall";
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1324,6 +1325,7 @@
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "";
@@ -1366,6 +1368,7 @@
 				OTHER_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "";
