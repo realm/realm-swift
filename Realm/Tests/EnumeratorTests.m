@@ -45,8 +45,8 @@
     
     RLMRealm *realm = [RLMRealm defaultRealm];
     
-    [realm beginWriteTransaction];
     // Add objects
+    [realm beginWriteTransaction];
     for (NSArray *rowArray in rowsArray) {
         [EnumPerson createInRealm:realm withObject:rowArray];
     }
@@ -70,14 +70,13 @@
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
         XCTAssertNil(bindings, @"Parameter must be used");
         return [evaluatedArray[2] boolValue] &&
-        [evaluatedArray[1] integerValue] >= 20 &&
-        [evaluatedArray[1] integerValue] <= 30;
+               [evaluatedArray[1] integerValue] >= 20 &&
+               [evaluatedArray[1] integerValue] <= 30;
     }];
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as RLMArray
     RLMArray *res = [EnumPerson objectsWhere:@"Hired = YES && Age >= 20 && Age <= 30"];
-    
     
     // Iterate over the resulting RLMArray
     index = 0;
