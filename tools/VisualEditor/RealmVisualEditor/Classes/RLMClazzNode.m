@@ -8,50 +8,69 @@
 
 #import "RLMClazzNode.h"
 
+#import "RLMArrayNode.h"
+
 @implementation RLMClazzNode {
 
-    RLMRealm *sourceRealm;
+    NSMutableArray *displayedArrays;
 }
-
-@synthesize schema = _schema;
-@dynamic name;
-@dynamic instanceCount;
-
-@synthesize propertyColumns = _propertyColumns;
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm
 {
-    if (self = [super init]) {
-        sourceRealm = realm;
-        _schema = schema;
-        _propertyColumns = [self constructColumnObjectsForScheme:schema];
+    if (self = [super initWithSchema:schema
+                             inRealm:realm]) {
+    
+        displayedArrays = [[NSMutableArray alloc] initWithCapacity:10];
     }
     return self;
 }
 
-#pragma mark - Public methods - Accessors
+#pragma mark - RLMObjectNode overrides
 
 - (NSString *)name
 {
-    return [_schema.className copy];
+    return [self.schema.className copy];
 }
 
 - (NSUInteger)instanceCount
 {
-    RLMArray *allObjects = [sourceRealm allObjects:_schema.className];
+    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
     return allObjects.count;
 }
 
-#pragma mark - Public methods
+#pragma mark - RLMRealmOutlineNode implementation
 
-- (BOOL)addInstanceWithValues:(NSArray *)values
+- (BOOL)isExpandable
 {
-    return NO;
+    return displayedArrays.count > 0;
 }
+
+- (NSUInteger)numberOfChildNodes
+{
+    return displayedArrays.count;
+}
+
+- (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
+{
+    return displayedArrays[index];
+}
+
+- (id)nodeElementForColumnWithIndex:(NSInteger)index
+{
+    switch (index) {
+        case 0:
+            return self.schema.className;
+            
+        default:
+            return nil;
+    }
+}
+
+#pragma mark - RLMObjectNode overrides
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
-    RLMArray *allObjects = [sourceRealm allObjects:_schema.className];
+    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
     return allObjects[index];
 }
 
@@ -60,7 +79,7 @@
 // Note: The indexOfObject method of RLMArray is not yet implemented so we have to perform the
 //       lookup as a simple linear search;
     
-    RLMArray *allObjects = [sourceRealm allObjects:_schema.className];
+    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
     NSUInteger index = 0;
     for(RLMObject *classInstance in allObjects) {
         if(classInstance == instance) {
@@ -76,59 +95,27 @@
 */
 }
 
-#pragma mark - RLMRealmOutlineNode implementation
+#pragma mark - Public methods
 
-- (BOOL)isRootNode
+- (void)displayChildArray:(RLMArray *)array fromObjectWithIndex:(NSUInteger)index
 {
-    return NO;
-}
-
-- (BOOL)isExpandable
-{
-    return NO;
-}
-
-- (NSUInteger)numberOfChildNodes
-{
-    return 0;
-}
-
-- (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
-{
-    return nil;
-}
-
-- (id)nodeElementForColumnWithIndex:(NSInteger)index
-{
-    switch (index) {
-        case 0:
-            return _schema.className;
-            
-        default:
-            return nil;
-    }
-}
-
-#pragma mark - Public methods - Accessors
-
-- (NSArray *)constructColumnObjectsForScheme:(RLMObjectSchema *)schema;
-{
-    NSArray *properties = schema.properties;
-    NSUInteger propertyCount = properties.count;
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithArray:array
+                                            withParentObjectIndex:index
+                                                            realm:self.realm];
     
-    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:propertyCount];
-    for (NSUInteger index = 0; index < propertyCount; index++) {
-        RLMProperty *property = properties[index];
-        NSString *propertyName = property.name;
-        RLMPropertyType propertyType = property.type;
-        
-        RLMClazzProperty *tableColumn = [[RLMClazzProperty alloc] initWithName:propertyName
-                                                                      type:propertyType];
-        [result addObject:tableColumn];
-    }
-    
-    return result;
+    [displayedArrays addObject:arrayNode];
 }
+
+- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index
+{
+
+}
+
+- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index
+{
+
+}
+
 
 @end
 

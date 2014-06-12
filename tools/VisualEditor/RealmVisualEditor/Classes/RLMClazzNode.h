@@ -7,24 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
 
-#import "RLMClazzProperty.h"
-#import "RLMRealmOutlineNode.h"
+#import "RLMObjectNode.h"
 
-@interface RLMClazzNode : NSObject <RLMRealmOutlineNode>
+@interface RLMClazzNode : RLMObjectNode
 
-@property (nonatomic, readonly) RLMObjectSchema *schema;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSArray *propertyColumns;
-@property (nonatomic, readonly) NSUInteger instanceCount;
+- (void)displayChildArray:(RLMArray *)array fromObjectWithIndex:(NSUInteger)index;
 
-- (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
+- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
 
-- (BOOL)addInstanceWithValues:(NSArray *)values;
-
-- (RLMObject *)instanceAtIndex:(NSUInteger)index;
-
-- (NSUInteger)indexOfInstance:(RLMObject *)instance;
+- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;
 
 @end
