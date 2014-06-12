@@ -505,7 +505,7 @@
 
 - (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
                                                  predicate:(NSString *)predicate
-                                             expectedCount:(NSUInteger)expectedCount
+                                             expectedCount:(NSUInteger)__unused expectedCount
                                             expectedReason:(NSString *)expectedReason
 {
     @try {
