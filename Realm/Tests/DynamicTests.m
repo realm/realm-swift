@@ -63,13 +63,13 @@
     // verify schema
     RLMObjectSchema *dynSchema = dyrealm.schema[@"RLMDynamicObject"];
     XCTAssertNotNil(dynSchema, @"Should be able to get object schema dynamically");
-    XCTAssertEqual(dynSchema.properties.count, 2, @"RLMDynamicObject should have 2 properties");
+    XCTAssertEqual(dynSchema.properties.count, (NSUInteger)2, @"RLMDynamicObject should have 2 properties");
     XCTAssertEqualObjects([dynSchema.properties[0] name], @"column", @"Invalid property name");
     XCTAssertEqual([(RLMProperty *)dynSchema.properties[1] type], RLMPropertyTypeInt, @"Invalid type");
     
     // verify object type
     RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
-    XCTAssertEqual(array.count, 2, @"Array should have 2 elements");
+    XCTAssertEqual(array.count, (NSUInteger)2, @"Array should have 2 elements");
     XCTAssertNotEqual(array.objectClassName, RLMDynamicObject.className,
                       @"Array class should by a dynamic object class");
 }
@@ -111,7 +111,7 @@
     // verify properties
     RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES error:nil];
     RLMArray *array = [dyrealm allObjects:AllTypesObject.className];
-    XCTAssertEqual(array.count, 2, @"Should have 2 objects");
+    XCTAssertEqual(array.count, (NSUInteger)2, @"Should have 2 objects");
     
     RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
     for (int i = 0; i < 10; i++) {

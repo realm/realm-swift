@@ -111,7 +111,7 @@
     return obj;
 }
 
--(void)setBackingTable:(tightdb::Table *)backingTable {
+-(void)setBackingTable:(tightdb::TableRef)backingTable {
     _backingTable = backingTable;
     _backingTableIndex = backingTable->get_index_in_parent();
 }
@@ -120,7 +120,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return RLMPropertyAttributeDeleteNever;
+    return (RLMPropertyAttributes)0;
+    // FIXME: return RLMPropertyAttributeDeleteNever;
 }
 #pragma clang diagnostic pop
 

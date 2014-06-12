@@ -1,1 +1,0 @@
-../src/generic.mk

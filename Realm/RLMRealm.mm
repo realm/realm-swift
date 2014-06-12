@@ -238,11 +238,10 @@ static NSArray *s_objectDescriptors = nil;
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop. \
-                                               Use an RLMTransactionManager read or write block \
-                                               instead.", NSStringFromSelector(_cmd)] userInfo:nil];
+                                               can only be called from a thread with a runloop.",
+                                               NSStringFromSelector(_cmd)] userInfo:nil];
     }
-
+    
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
@@ -272,6 +271,12 @@ static NSArray *s_objectDescriptors = nil;
     }
     catch (File::AccessError &ex) {
         error = make_realm_error(RLMErrorFileAccessError, ex);
+    }
+    catch (SharedGroup::PresumablyStaleLockFile &ex) {
+        error = make_realm_error(RLMErrorStaleLockFile, ex);
+    }
+    catch (SharedGroup::LockFileButNoData &ex) {
+        error = make_realm_error(RLMErrorLockFileButNoData, ex);
     }
     catch (exception &ex) {
         error = make_realm_error(RLMErrorFail, ex);
@@ -477,34 +482,36 @@ static NSArray *s_objectDescriptors = nil;
     [_objects setObject:accessor forKey:accessor];
 }
 
-inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
-    TableRef tableRef = group->get_table([obj backingTableIndex]); // Throws
-    obj.backingTable = tableRef.get();
-}
-
 - (void)updateAllObjects {
     try {
         // get the group
         tightdb::Group *group = self.group;
         BOOL writable = (self.transactionMode == RLMTransactionModeWrite);
 
+        // update arrays after updating all parent objects
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        NSMutableArray *arrays = [NSMutableArray array];
+        
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
             //
             // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
             //
             if ([obj isKindOfClass:RLMObject.class]) {
-                RLMRefreshObjectFromGroup(group, obj);
+                TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
+                ((RLMObject *)obj).backingTable = tableRef;
+                obj.writable = writable;
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
-                // update parent first
-                if(!ar.parentObject.backingTable->is_attached()) {
-                    RLMRefreshObjectFromGroup(group, ar.parentObject);
-                }
-                ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+                [arrays addObject:obj];
             }
-            obj.writable = writable;
+        }
+        
+        // update arrays
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        for (RLMArrayLinkView *ar in arrays) {
+            ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+            ar.writable = writable;
         }
     }
     catch (exception &ex) {

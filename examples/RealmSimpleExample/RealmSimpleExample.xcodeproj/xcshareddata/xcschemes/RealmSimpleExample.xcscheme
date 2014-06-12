@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4145D191DE49600F858D9"
-               BuildableName = "Realm.framework"
-               BlueprintName = "OSX Framework"
-               ReferencedContainer = "container:Realm.xcodeproj">
+               BlueprintIdentifier = "4DE0B126194747F70092154B"
+               BuildableName = "RealmSimpleExample.app"
+               BlueprintName = "RealmSimpleExample"
+               ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,13 +32,22 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4146D191DE49600F858D9"
-               BuildableName = "OSX Tests.xctest"
-               BlueprintName = "OSX Tests"
-               ReferencedContainer = "container:Realm.xcodeproj">
+               BlueprintIdentifier = "4DE0B141194747F70092154B"
+               BuildableName = "RealmSimpleExampleTests.xctest"
+               BlueprintName = "RealmSimpleExampleTests"
+               ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4DE0B126194747F70092154B"
+            BuildableName = "RealmSimpleExample.app"
+            BlueprintName = "RealmSimpleExample"
+            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -49,6 +58,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4DE0B126194747F70092154B"
+            BuildableName = "RealmSimpleExample.app"
+            BlueprintName = "RealmSimpleExample"
+            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -58,6 +76,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4DE0B126194747F70092154B"
+            BuildableName = "RealmSimpleExample.app"
+            BlueprintName = "RealmSimpleExample"
+            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
