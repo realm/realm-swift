@@ -266,8 +266,7 @@ static NSArray *s_objectDescriptors = nil;
         // create shared group
         realm->_writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
         realm->_replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
-        SharedGroup group(*realm->_replication);
-        realm->_sharedGroup.reset(&group);
+        realm->_sharedGroup.reset(new SharedGroup(*realm->_replication));
     }
     catch (File::PermissionDenied &ex) {
         error = make_realm_error(RLMErrorFilePermissionDenied, ex);
