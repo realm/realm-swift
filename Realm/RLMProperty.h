@@ -36,7 +36,7 @@
  
  @return A populated RLMProperty instance.
  */
-//+ (instancetype)propertyWithName:(NSString *)name type:(RLMPropertyType)type objectClassName:(NSString *)objectClassName;
++ (instancetype)propertyWithName:(NSString *)name type:(RLMPropertyType)type objectClassName:(NSString *)objectClassName;
 
 /**
  Property name.

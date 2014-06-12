@@ -30,7 +30,7 @@ void RLMInitializeObjectStore();
 
 // verifies and/or creates tables needed in a realm to store all object types
 // throws if current state of realm is not compatible with current objects
-void RLMEnsureRealmTablesExist(RLMRealm *realm);
+void RLMVerifyAndCreateTables(RLMRealm *realm);
 
 
 //
@@ -53,7 +53,5 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessors
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index);
-
-
 
 

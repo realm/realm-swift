@@ -22,6 +22,17 @@
 #import "RLMTestObjects.h"
 #import <Realm/Realm.h>
 
+//
+// Private Realm methods
+//
+@interface RLMRealm ()
+-(RLMSchema *)schema;
+@end
+
+
+//
+// Test Objects
+//
 @interface SimpleObject : RLMObject
 @property NSString *name;
 @property int age;
@@ -522,7 +533,7 @@
 
 - (void)testIndex
 {
-    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
     XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
     
     RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];

@@ -22,6 +22,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
+#import "RLMMigration_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
@@ -51,6 +52,7 @@ void throw_objc_exception(exception &ex) {
 inline NSError* make_realm_error(RLMError code, exception &ex) {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
+    [details setValue:@(code) forKey:@"Error Code"];
     return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
 }
 
@@ -285,6 +287,12 @@ static NSArray *s_objectDescriptors = nil;
         if (outError) {
             *outError = error;
         }
+        else {
+            // if no error provided, throw
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Error while opening the Realm"
+                                         userInfo:error.userInfo];
+        }
         return nil;
     }
     
@@ -300,7 +308,7 @@ static NSArray *s_objectDescriptors = nil;
         realm->_schema = [RLMSchema sharedSchema];
         
         // initialize object store for this realm
-        RLMEnsureRealmTablesExist(realm);
+        RLMVerifyAndCreateTables(realm);
         
         // cache main thread realm at this path
         cacheRealm(realm, path);
@@ -557,22 +565,27 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, outPredicate, order);
 }
 
--(NSUInteger)schemaVersion {
-    // FIXME - store version in metadata table - will come with migration support
-    return 0;
++ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError *__autoreleasing *)error {
+    [self applyMigrationBlock:block atPath:[RLMRealm defaultPath] error:error];
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
--(id)objectForKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
++(void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError *__autoreleasing *)error {
+    RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:error];
+    if (error) {
+        return;
+    }
+    
+    // start write transaction
+    [migration.realm beginWriteTransaction];
+    
+    // apply block and set new schema version
+    NSInteger oldVersion = RLMRealmSchemaVersion(migration.realm);
+    NSUInteger newVersion = block(migration, oldVersion);
+    RLMRealmSetSchemaVersion(migration.realm, newVersion);
+   
+    // end transaction
+    [migration.realm commitWriteTransaction];
 }
 
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
 
 @end

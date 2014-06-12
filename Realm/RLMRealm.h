@@ -21,11 +21,9 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigration, RLMNotificationToken;
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
-typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
-
 
 @interface RLMRealm : NSObject
 
@@ -264,6 +262,63 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @see       RLMObject objectsOrderedBy:where:
  */
 - (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
+
+
+#pragma mark -
+
+/**
+ Migration block used to migrate a Realm.
+ 
+ In the migration block it is the implementer's responsibility to make the existing Schema
+ in the Realm compatible with the current ObjectSchema defined in each object interface definition.
+ 
+ Any Schema which can be updated to match the current schema by adding new object classes and
+ properties to existing classes can be considered compatible with the current Schema, and can
+ be migrated automatically.
+ 
+ Schema changes involving the deletion of existing object classes or properties
+ are not automatically compatible, and the missing objects and properties must be
+ deleted manually in the migration block for the migration to succeed.
+ 
+ @param migration   RLMMigration object used to perform the migration. The migration object allows
+ you to alter its Schema and to access objects in the Realm to populate added
+ object classes and properties.
+ 
+ @param oldSchemaVersion    The schema version of the Realm which requires migration.
+ 
+ @return    Version number for the Realm after completing the migration. This version
+ number is accessible in future migrations through the <code>schemaVersion</code>
+ property on the RLMMigration object.
+ */
+typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+
+/**
+ Performs a migration on the default Realm.
+ 
+ Must be called before the default Realm is accessed (otherwise throws). If the
+ default Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param block       The block which migrates the Realm to the current version.
+ @param error       The error that occured while applying the migration if any.
+
+ @see               RLMMigration
+ */
++ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError **)error;
+
+/**
+ Performs a migration on a Realm at a path.
+ 
+ Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
+ If the Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param block       The block which migrates the Realm to the current version.
+ @param realmPath   The path of the Realm to migrate.
+ @param error       The error that occured while applying the migration if any.
+ 
+ @see               RLMMigration
+ */
++ (void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError **)error;
+
 
 #pragma mark -
 

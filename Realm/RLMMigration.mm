@@ -21,10 +21,6 @@
 #import "RLMMigration_Private.h"
 #import "RLMRealm_Private.hpp"
 
-@interface RLMMigration ()
-@property (nonatomic, strong) RLMRealm *realm;
-@end
-
 @implementation RLMMigration
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error {

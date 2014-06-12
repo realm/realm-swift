@@ -19,8 +19,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMigration.h"
+#import "RLMRealm.h"
 
 @interface RLMMigration ()
+
+@property (nonatomic, strong) RLMRealm *realm;
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 

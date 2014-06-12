@@ -21,6 +21,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMAccessor.h"
 #import "RLMQueryUtil.h"
@@ -37,54 +38,96 @@ void RLMInitializeObjectStore() {
     });
 }
 
+
 // get the table used to store object of objectClass
 inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                 NSString *className) {
     NSString *tableName = realm.schema.tableNamesForClass[className];
-    return realm.group->get_table(tightdb::StringData(tableName.UTF8String, tableName.length));
+    return realm.group->get_table(tableName.UTF8String);
 }
 
-void RLMEnsureRealmTablesExist(RLMRealm *realm) {
-    [realm beginWriteTransaction];
-    
-    // FIXME - support migrations
-    // first pass create tables
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
+
+// create a column for a property in a table
+void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) {
+    switch (prop.type) {
+            // for objects and arrays, we have to specify target table
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeArray: {
+            tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+            table->add_column_link(tightdb::DataType(prop.type), prop.name.UTF8String, *linkTable);
+            break;
+        }
+        default: {
+            size_t column = table->add_column((tightdb::DataType)prop.type, prop.name.UTF8String);
+            if (prop.attributes & RLMPropertyAttributeIndexed) {
+                table->set_index(column);
+            }
+            break;
+        }
     }
+}
+
+void RLMVerifyTable(tightdb::Table *table, RLMObjectSchema *objectSchema) {
+    // FIXME - handle case where columns are reordered in this method by reassigning property column indexes
+    // FIXME - this method should calculate all mismatched colums, and missing/extra columns, and include
+    //         all of this information in a single exception
+    // FIXME - verify property attributes
     
-    // second pass add columns
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-        
-        if (table->get_column_count() == 0) {
-            for (RLMProperty *prop in objectSchema.properties) {
-                tightdb::StringData name(prop.name.UTF8String, prop.name.length);
-                switch (prop.type) {
-                    // for objects and arrays, we have to specify target table
-                    case RLMPropertyTypeObject:
-                    case RLMPropertyTypeArray: {
-                        tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-                        table->add_column_link(tightdb::DataType(prop.type), name, *linkTable);
-                        break;
-                    }
-                    default: {
-                    	size_t column = table->add_column((tightdb::DataType)prop.type, name);
-                    	if (prop.attributes & RLMPropertyAttributeIndexed) {
-                            table->set_index(column);
-                        }
-                        break;
-                    }
-                }
+    // for now loop through all columns and ensure they are aligned
+    RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table className:objectSchema.className];
+    if (tableSchema.properties.count != objectSchema.properties.count) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Column count does not match interface - migration required"
+                                     userInfo:nil];
+    }
+
+    for (NSUInteger i = 0; i < objectSchema.properties.count; i++) {
+        RLMProperty *tableProp = tableSchema.properties[i];
+        RLMProperty *schemaProp = objectSchema.properties[i];
+        if (![tableProp.name isEqualToString:schemaProp.name]) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Existing property does not match interface - migration required"
+                                         userInfo:@{@"property num": @(i),
+                                                    @"existing property name": tableProp.name,
+                                                    @"new property name": schemaProp.name}];
+        }
+        if (tableProp.type != schemaProp.type) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Property types do not match - migration required"
+                                         userInfo:@{@"property name": tableProp.name,
+                                                    @"existing property type": RLMTypeToString(tableProp.type),
+                                                    @"new property type": RLMTypeToString(schemaProp.type)}];
+        }
+        if (tableProp.type == RLMPropertyTypeObject || tableProp.type == RLMPropertyTypeArray) {
+            if (![tableProp.objectClassName isEqualToString:schemaProp.objectClassName]) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Property objectClass does not match - migration required"
+                                             userInfo:@{@"property name": tableProp.name,
+                                                        @"existign objectClass": tableProp.objectClassName,
+                                                        @"new property name": schemaProp.objectClassName}];
             }
         }
-        else {
-            if (table->get_column_count() != objectSchema.properties.count) {
-                [realm rollbackWriteTransaction];
-                @throw [NSException exceptionWithName:@"RLMException" reason:@"Column count does not match interface - migration required"
-                                             userInfo:nil];
+    }
+}
+
+void RLMVerifyAndCreateTables(RLMRealm *realm) {
+    [realm beginWriteTransaction];
+    
+    // first pass create missing tables and verify existing
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
+        if (!table->is_empty()) {
+            RLMVerifyTable(table.get(), objectSchema);
+        }
+    }
+    
+    // second pass add columns to empty tables
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
+        if (table->is_empty()) {
+            for (RLMProperty *prop in objectSchema.properties) {
+                RLMCreateColumn(realm, table.get(), prop);
             }
-            // FIXME - verify columns match
         }
     }
     [realm commitWriteTransaction];

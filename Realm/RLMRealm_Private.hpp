@@ -36,9 +36,7 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @property (nonatomic, readonly) RLMTransactionMode transactionMode;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic) RLMSchema *schema;
-@property (nonatomic, readonly) NSUInteger schemaVersion;
-
-- (RLMSchema *)schema;
+@property (nonatomic) NSUInteger schemaVersion;
 
 // private constructor
 + (instancetype)realmWithPath:(NSString *)path

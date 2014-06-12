@@ -19,11 +19,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectSchema.h"
-#import "RLMUtil.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+#import "RLMUtil.h"
+
+#import <tightdb/table.hpp>
 
 // private properties
 @interface RLMObjectSchema ()

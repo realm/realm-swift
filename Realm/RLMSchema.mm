@@ -26,6 +26,11 @@
 
 #import <objc/runtime.h>
 
+NSString *const c_objectTableNamePrefix = @"class_";
+const char *c_metadataTableName = "metadata";
+const char *c_versionColumnName = "version";
+const size_t c_versionColumnIndex = 0;
+
 // RLMSchema private properties
 @interface RLMSchema ()
 @property (nonatomic, readwrite) NSArray *objectSchema;
@@ -127,6 +132,29 @@ static RLMSchema *s_sharedSchema;
     // set class array and mapping
     schema.objectSchema = schemaArray;
     return schema;
+}
+
+
+inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
+    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    if (table->is_empty()) {
+        // create columns
+        table->add_column(tightdb::type_Int, c_versionColumnName);
+        
+        // set initial version
+        table->add_empty_row();
+        (*table)[0].set_int(c_versionColumnIndex, 0);
+    }
+    return table;
+}
+
+NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
+    return (*RLMVersionTable(realm))[0].get_int(c_versionColumnIndex);
+
+}
+
+void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
+    (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
 }
 
 @end
