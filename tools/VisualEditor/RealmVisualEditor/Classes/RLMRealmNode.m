@@ -50,7 +50,7 @@
                              dynamic:YES
                                error:error];
     
-    if (error != nil) {
+    if (*error != nil) {
         NSLog(@"Realm was opened with error: %@", *error);
     }
     

@@ -31,7 +31,6 @@
     result->_doubleValue = doubleValue;
     result->_stringValue = stringValue;
     result->_dateValue = dateValue;
-    result->_arrayReference = arrayRef;
     return result;
 }
 
