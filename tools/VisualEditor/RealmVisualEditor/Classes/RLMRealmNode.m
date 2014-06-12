@@ -38,7 +38,6 @@
     if (self = [super init]) {
         _name = name;
         _url = url;        
-        _topLevelClazzes = [self constructTopLevelClazzes];
     }
     return self;
 }
@@ -52,6 +51,9 @@
     
     if (*error != nil) {
         NSLog(@"Realm was opened with error: %@", *error);
+    }
+    else {
+        _topLevelClazzes = [self constructTopLevelClazzes];    
     }
     
     return error != nil;

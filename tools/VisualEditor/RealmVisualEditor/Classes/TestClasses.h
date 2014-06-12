@@ -11,10 +11,8 @@
 
 @interface RealmTestClass0 : RLMObject
 
-@property (nonatomic, readonly) NSInteger integerValue;
-@property (nonatomic, readonly) NSString *stringValue;
-
-+ (instancetype)instanceWithInt:(NSInteger)integerValue string:(NSString *)stringValue;
+@property NSInteger integerValue;
+@property NSString *stringValue;
 
 @end
 
@@ -22,25 +20,21 @@ RLM_ARRAY_TYPE(RealmTestClass0)
 
 @interface RealmTestClass1 : RLMObject
 
-@property (nonatomic, readonly) NSInteger integerValue;
-@property (nonatomic, readonly) BOOL boolValue;
-@property (nonatomic, readonly) float floatValue;
-@property (nonatomic, readonly) double doubleValue;
-@property (nonatomic, readonly) NSString *stringValue;
-@property (nonatomic, readonly) NSDate *dateValue;
-@property (nonatomic, readonly) RLMArray<RealmTestClass0> *arrayReference;
-
-+ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue float:(float)floatValue double:(double)doubleValue string:(NSString *)stringValue date:(NSDate *)dateValue arrayRef:(RLMArray<RealmTestClass0> *)arrayRef;
+@property NSInteger integerValue;
+@property BOOL boolValue;
+@property float floatValue;
+@property double doubleValue;
+@property NSString *stringValue;
+@property NSDate *dateValue;
+@property RLMArray<RealmTestClass0> *arrayReference;
 
 @end
 
 @interface RealmTestClass2 : RLMObject
 
-@property (nonatomic, readonly) NSInteger integerValue;
-@property (nonatomic, readonly) BOOL boolValue;
-@property (nonatomic, readonly) RealmTestClass1 *objectReference;
-
-+ (instancetype)instanceWithInt:(NSInteger)integerValue bool:(BOOL)boolValue objectRef:(RealmTestClass1 *)objRef;
+@property NSInteger integerValue;
+@property BOOL boolValue;
+@property RealmTestClass1 *objectReference;
 
 @end
 

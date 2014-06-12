@@ -47,64 +47,43 @@
     
     [realm beginWriteTransaction];
     
-    RealmTestClass0 *tc0_0 = [RealmTestClass0 instanceWithInt:45 string:@"John"];
-    RealmTestClass0 *tc0_1 = [RealmTestClass0 instanceWithInt:23 string:@"Mary"];
-    RealmTestClass0 *tc0_2 = [RealmTestClass0 instanceWithInt:38 string:@"Peter"];
-    RealmTestClass0 *tc0_3 = [RealmTestClass0 instanceWithInt:12 string:@"Susan"];
-    RealmTestClass0 *tc0_4 = [RealmTestClass0 instanceWithInt:34 string:@"John"];
-    RealmTestClass0 *tc0_5 = [RealmTestClass0 instanceWithInt:75 string:@"James"];
-    RealmTestClass0 *tc0_6 = [RealmTestClass0 instanceWithInt:45 string:@"Gilbert"];
-    RealmTestClass0 *tc0_7 = [RealmTestClass0 instanceWithInt:45 string:@"Ann"];
-    
-    [realm addObjectsFromArray:@[tc0_0, tc0_1, tc0_2, tc0_3, tc0_4, tc0_5, tc0_6, tc0_7]];
-/*
-    RLMArray<RealmTestClass0> *ta_0 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_1 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_2 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_3 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_4 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_5 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_6 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_7 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_8 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    RLMArray<RealmTestClass0> *ta_9 = (RLMArray<RealmTestClass0> *)[[RLMArray alloc] initWithObjectClassName:NSStringFromClass([RealmTestClass0 class])];
-    
-    [realm addObjectsFromArray:@[ta_0, ta_1, ta_2, ta_3, ta_4, ta_5, ta_6, ta_7, ta_8, ta_9]];
-    
-    [ta_0 addObjectsFromArray:@[tc0_0, tc0_1, tc0_3]];
-    [ta_1 addObjectsFromArray:@[tc0_2]];
-    [ta_2 addObjectsFromArray:@[tc0_0, tc0_4]];
-    [ta_3 addObjectsFromArray:@[]];
-    [ta_4 addObjectsFromArray:@[tc0_5]];
-    [ta_5 addObjectsFromArray:@[tc0_1, tc0_2, tc0_3, tc0_4, tc0_5, tc0_6, tc0_7]];
-    [ta_6 addObjectsFromArray:@[tc0_6, tc0_7]];
-    [ta_7 addObjectsFromArray:@[tc0_7, tc0_6]];
-    [ta_8 addObjectsFromArray:@[]];
-    [ta_9 addObjectsFromArray:@[tc0_0]];
-*/    
-    RealmTestClass1 *tc1_0 = [RealmTestClass1 instanceWithInt:10    bool:YES float:123.456 double:123456.789 string:@"ten"      date:[NSDate date]                                                      arrayRef:nil];// ta_0];
-    RealmTestClass1 *tc1_1 = [RealmTestClass1 instanceWithInt:20    bool:NO  float:23.4561 double:987654.321 string:@"twenty"   date:[NSDate distantPast]                                               arrayRef:nil];// ta_1];
-    RealmTestClass1 *tc1_2 = [RealmTestClass1 instanceWithInt:30    bool:YES float:3.45612 double:1234.56789 string:@"thirty"   date:[NSDate distantFuture]                                             arrayRef:nil];// ta_2];
-    RealmTestClass1 *tc1_3 = [RealmTestClass1 instanceWithInt:40    bool:NO  float:.456123 double:9876.54321 string:@"fourty"   date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 7.0] arrayRef:nil];// ta_3];
-    RealmTestClass1 *tc1_4 = [RealmTestClass1 instanceWithInt:50    bool:YES float:654.321 double:123.456789 string:@"fifty"    date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 7.0] arrayRef:nil];// ta_4];
-    RealmTestClass1 *tc1_5 = [RealmTestClass1 instanceWithInt:60    bool:NO  float:6543.21 double:987.654321 string:@"sixty"    date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 1.0] arrayRef:nil];// ta_5];
-    RealmTestClass1 *tc1_6 = [RealmTestClass1 instanceWithInt:70    bool:YES float:65432.1 double:12.3456789 string:@"seventy"  date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 1.0] arrayRef:nil];// ta_6];
-    RealmTestClass1 *tc1_7 = [RealmTestClass1 instanceWithInt:80    bool:NO  float:654321. double:98.7654321 string:@"eighty"   date:[[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0] arrayRef:nil];// ta_7];
-    RealmTestClass1 *tc1_8 = [RealmTestClass1 instanceWithInt:90    bool:YES float:123.456 double:1.23456789 string:@"ninety"   date:[[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0] arrayRef:nil];// ta_8];
-    RealmTestClass1 *tc1_9 = [RealmTestClass1 instanceWithInt:100   bool:NO  float:123.456 double:9.87654321 string:@"hundred"  date:[[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0] arrayRef:nil];// ta_9];
-    
-    RealmTestClass2 *tc2_0 = [RealmTestClass2 instanceWithInt:1111  bool:YES objectRef:tc1_0];
-    RealmTestClass2 *tc2_1 = [RealmTestClass2 instanceWithInt:2211  bool:YES objectRef:tc1_2];
-    RealmTestClass2 *tc2_2 = [RealmTestClass2 instanceWithInt:3322  bool:YES objectRef:tc1_4];
-    RealmTestClass2 *tc2_3 = [RealmTestClass2 instanceWithInt:4433  bool:NO  objectRef:tc1_6];
-    RealmTestClass2 *tc2_4 = [RealmTestClass2 instanceWithInt:5544  bool:YES objectRef:tc1_8];
-//    RealmTestClass2 *tc2_5 = [RealmTestClass2 instanceWithInt:6655  bool:YES objectRef:nil];
-    RealmTestClass2 *tc2_6 = [RealmTestClass2 instanceWithInt:7766  bool:NO  objectRef:tc1_0];
-    
-    [realm addObjectsFromArray:@[tc1_0, tc1_1, tc1_2, tc1_3, tc1_4, tc1_5, tc1_6, tc1_7, tc1_8, tc1_9]];
-    
-    [realm addObjectsFromArray:@[tc2_0, tc2_1, tc2_2, tc2_2, tc2_3, tc2_4, tc2_6]];
-    // [realm addObject:tc2_5];
+    RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John"]];
+    RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary"]];
+    RealmTestClass0 *tc0_2 = [RealmTestClass0 createInRealm:realm withObject:@[@38, @"Peter"]];
+    RealmTestClass0 *tc0_3 = [RealmTestClass0 createInRealm:realm withObject:@[@12, @"Susan"]];
+    RealmTestClass0 *tc0_4 = [RealmTestClass0 createInRealm:realm withObject:@[@34, @"John"]];
+    RealmTestClass0 *tc0_5 = [RealmTestClass0 createInRealm:realm withObject:@[@75, @"James"]];
+    RealmTestClass0 *tc0_6 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Gilbert"]];
+    RealmTestClass0 *tc0_7 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Ann"]];
+  
+    RealmTestClass1 *tc1_0 = [RealmTestClass1 createInRealm:realm withObject:@[@1,      @YES,   @123.456f, @123456.789, @"ten",      [NSDate date],                                                      @[]]];
+    RealmTestClass1 *tc1_1 = [RealmTestClass1 createInRealm:realm withObject:@[@20,     @NO,    @23.4561f, @987654.321, @"twenty",   [NSDate distantPast],                                               @[]]];
+    RealmTestClass1 *tc1_2 = [RealmTestClass1 createInRealm:realm withObject:@[@30,     @YES,   @3.45612f, @1234.56789, @"thirty",   [NSDate distantFuture],                                             @[]]];
+    RealmTestClass1 *tc1_3 = [RealmTestClass1 createInRealm:realm withObject:@[@40,     @NO,    @.456123f, @9876.54321, @"fourty",   [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 7.0], @[]]];
+    RealmTestClass1 *tc1_4 = [RealmTestClass1 createInRealm:realm withObject:@[@50,     @YES,   @654.321f, @123.456789, @"fifty",    [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 7.0], @[]]];
+    RealmTestClass1 *tc1_5 = [RealmTestClass1 createInRealm:realm withObject:@[@60,     @NO,    @6543.21f, @987.654321, @"sixty",    [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 1.0], @[]]];
+    RealmTestClass1 *tc1_6 = [RealmTestClass1 createInRealm:realm withObject:@[@70,     @YES,   @65432.1f, @12.3456789, @"seventy",  [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 1.0], @[]]];
+    RealmTestClass1 *tc1_7 = [RealmTestClass1 createInRealm:realm withObject:@[@80,     @NO,    @654321.f, @98.7654321, @"eighty",   [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0], @[]]];
+    RealmTestClass1 *tc1_8 = [RealmTestClass1 createInRealm:realm withObject:@[@90,     @YES,   @123.456f, @1.23456789, @"ninety",   [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0], @[]]];
+    RealmTestClass1 *tc1_9 = [RealmTestClass1 createInRealm:realm withObject:@[@100,    @NO,    @123.456f, @9.87654321, @"hundred",  [[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0], @[]]];
+
+    [tc1_0.arrayReference addObjectsFromArray:@[tc0_0, tc0_1, tc0_3]];
+    [tc1_1.arrayReference addObjectsFromArray:@[tc0_2]];
+    [tc1_2.arrayReference addObjectsFromArray:@[tc0_0, tc0_4]];
+    [tc1_4.arrayReference addObjectsFromArray:@[tc0_5]];
+    [tc1_5.arrayReference addObjectsFromArray:@[tc0_1, tc0_2, tc0_3, tc0_4, tc0_5, tc0_6, tc0_7]];
+    [tc1_6.arrayReference addObjectsFromArray:@[tc0_6, tc0_7]];
+    [tc1_7.arrayReference addObjectsFromArray:@[tc0_7, tc0_6]];
+    [tc1_9.arrayReference addObjectsFromArray:@[tc0_0]];
+
+    [RealmTestClass2 createInRealm:realm withObject:@[@1111, @YES, tc1_0]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@2211, @YES, tc1_2]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@3322, @YES, tc1_4]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@4433, @NO,  tc1_6]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
+//    [RealmTestClass2 createInRealm:realm withObject:@[@6655, @YES, nil]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
+    [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];
     
     [realm commitWriteTransaction];
 }
