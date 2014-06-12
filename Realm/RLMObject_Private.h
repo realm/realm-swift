@@ -24,14 +24,16 @@
 #import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor>
+@interface RLMObject () <RLMAccessor> {
+  @public
+    tightdb::Row _row;
+}
 
 - (instancetype)initWithRealm:(RLMRealm *)realm
                        schema:(RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
 
 @property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, assign) tightdb::Row row;
 @property (nonatomic) RLMObjectSchema *schema;
 
 @end

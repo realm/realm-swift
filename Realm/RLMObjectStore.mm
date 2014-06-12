@@ -110,7 +110,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     size_t rowIndex = table->add_empty_row();
-    object.row = (*table)[rowIndex];
+    object->_row = (*table)[rowIndex];
 
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
@@ -147,7 +147,7 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
     // move last row to row we are deleting
-    object.row.get_table()->move_last_over(object.row.get_index());
+    object->_row.get_table()->move_last_over(object->_row.get_index());
     // FIXME - fix all accessors
 }
 
@@ -180,7 +180,7 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
                                                  defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    accessor.row = (*table)[index];
+    accessor->_row = (*table)[index];
     accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
     
     [accessor.realm registerAccessor:accessor];

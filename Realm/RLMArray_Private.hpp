@@ -73,12 +73,6 @@
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view
                                          realm:(RLMRealm *)realm;
-
-// FIXME - remove once we have self-updating LinkView accessors
-// we need to hold onto these until LinkView accessors self update
-@property (nonatomic, assign) tightdb::Row parentRow;
-@property (nonatomic, assign) NSUInteger arrayColumnInParent;
-
 @end
 
 

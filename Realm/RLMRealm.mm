@@ -491,17 +491,15 @@ static NSArray *s_objectDescriptors = nil;
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
             if ([obj isKindOfClass:RLMObject.class]) {
-                if (![(RLMObject *)obj row].is_attached()) {
+                if (!((RLMObject *)obj)->_row.is_attached()) {
                     // FIXME - make object invalid
+                    assert(0);
                 }
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
-                if (ar.parentRow.is_attached()) {
-                    ar->_backingLinkView = ar.parentRow.get_linklist(ar.arrayColumnInParent);
-                }
-                else {
-                    // FIXME - make array invalid
+                if (!((RLMArrayLinkView *)obj)->_backingLinkView->is_attached()) {
+                    // FIXME - make object invalid
+                    assert(0);
                 }
             }
             obj.writable = writable;
