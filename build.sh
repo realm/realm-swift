@@ -1,3 +1,17 @@
+#!/bin/sh
+
+# Usage: sh build.sh [command] [xcmode]
+# 
+#  command (required):
+#   download_core: downloads tightdb core
+#   ios: builds iOS framework with debug configuration
+#   osx: builds OSX framework with debug configuration
+#   test-ios: builds and tests iOS framework with debug configuration
+#   test-osx: builds and tests OSX framework with debug configuration
+#   docs: builds docs in docs/output
+# 
+#  xcmode (optional): xcodebuild (default), xcpretty or xctool
+
 ######################################
 # Variables
 ######################################
@@ -5,7 +19,8 @@
 PATH=/usr/local/bin:/usr/bin:$PATH
 COMMAND=$1
 REALM_CORE_VERSION=latest
-XCMODE=xcpretty # must be one of: xctool, xcpretty, xcodebuild
+XCMODE=$2
+: ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
 ######################################
 # Helpers
@@ -13,12 +28,12 @@ XCMODE=xcpretty # must be one of: xctool, xcpretty, xcodebuild
 
 xc(){
 	PROJECT=Realm.xcodeproj
-	if [[ "$XCMODE" == "xctool" ]]; then
-		xctool -project $PROJECT $1
+	if [[ "$XCMODE" == "xcodebuild" ]]; then
+		xcodebuild -project $PROJECT $1
 	elif [[ "$XCMODE" == "xcpretty" ]]; then
 		xcodebuild -project $PROJECT $1 | xcpretty
-	elif [[ "$XCMODE" == "xcodebuild" ]]; then
-		xcodebuild -project $PROJECT $1
+	elif [[ "$XCMODE" == "xctool" ]]; then
+		xctool -project $PROJECT $1
 	fi
 }
 
