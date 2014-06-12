@@ -36,22 +36,27 @@
 - (instancetype)initWithName:(NSString *)name url:(NSString *)url
 {
     if (self = [super init]) {
-        NSError *error;
-        _realm = [RLMRealm realmWithPath:url
-                                readOnly:NO
-                                 dynamic:YES
-                                   error:&error];
-        
-        if (error != nil) {
-            NSLog(@"Realm was opened with error: %@", error);
-        }
-        
         _name = name;
         _url = url;        
         _topLevelClazzes = [self constructTopLevelClazzes];
     }
     return self;
 }
+
+- (BOOL)connect:(NSError **)error
+{
+    _realm = [RLMRealm realmWithPath:_url
+                            readOnly:NO
+                             dynamic:YES
+                               error:error];
+    
+    if (error != nil) {
+        NSLog(@"Realm was opened with error: %@", *error);
+    }
+    
+    return error != nil;
+}
+
 
 - (void)addTable:(RLMClazzNode *)table
 {

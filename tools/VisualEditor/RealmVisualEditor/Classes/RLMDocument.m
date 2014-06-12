@@ -47,11 +47,16 @@
                     NSArray *fileNameComponents = [lastComponent componentsSeparatedByString:@"."];
                     NSString *realmName = [fileNameComponents firstObject];
                     
+                    NSError *error;
+                    
                     RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
                                                                          url:absoluteURL.path];
                     presentedRealm = realm;
                     
-                    
+                    if([realm connect:&error]) {
+                        NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
+                        [documentController noteNewRecentDocumentURL:absoluteURL];                    
+                    }
                 }
             }
             else {
@@ -71,11 +76,8 @@
     return nil;
 }
 
-
 - (NSString *)windowNibName
 {
-    // Override returning the nib file name of the document
-    // If you need to use a subclass of NSWindowController or if your document supports multiple NSWindowControllers, you should remove this method and override -makeWindowControllers instead.
     return @"RLMDocument";
 }
 

@@ -21,6 +21,8 @@
 
 - (instancetype)initWithName:(NSString *)name url:(NSString *)url;
 
+- (BOOL)connect:(NSError **)error;
+
 - (void)addTable:(RLMClazzNode *)table;
 
 @end
