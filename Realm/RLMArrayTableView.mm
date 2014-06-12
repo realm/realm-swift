@@ -115,6 +115,10 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
     _backingView.remove(index);
 }
 
+- (void)removeAllObjects {
+    _backingView.clear();
+}
+
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
