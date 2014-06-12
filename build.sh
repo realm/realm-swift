@@ -9,6 +9,8 @@
 #   test-ios: builds and tests iOS framework with debug configuration
 #   test-osx: builds and tests OSX framework with debug configuration
 #   docs: builds docs in docs/output
+#   examples: builds all examples in examples/
+#   verify: cleans core/ and docs/output/, then runs docs, test-all and examples
 # 
 #  xcmode (optional): xcodebuild (default), xcpretty or xctool
 
@@ -17,28 +19,31 @@
 ######################################
 
 PATH=/usr/local/bin:/usr/bin:$PATH
-COMMAND=$1
 REALM_CORE_VERSION=latest
+COMMAND=$1
 XCMODE=$2
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
 ######################################
-# Helpers
+# Xcode Helpers
 ######################################
 
 xc(){
-	PROJECT=Realm.xcodeproj
 	if [[ "$XCMODE" == "xcodebuild" ]]; then
-		xcodebuild -project $PROJECT $1
+		xcodebuild $1
 	elif [[ "$XCMODE" == "xcpretty" ]]; then
-		xcodebuild -project $PROJECT $1 | xcpretty
+		xcodebuild $1 | xcpretty
 	elif [[ "$XCMODE" == "xctool" ]]; then
-		xctool -project $PROJECT $1
+		xctool $1
 	fi
 }
 
+xcrealm(){
+	xc "-project Realm.xcodeproj $1"
+}
+
 ######################################
-# Download core
+# Download Core
 ######################################
 
 if [[ "$COMMAND" == "download_core" ]]; then
@@ -54,11 +59,11 @@ fi
 ######################################
 
 if [[ "$COMMAND" == "ios" ]]; then
-	xc "-scheme iOS"
+	xcrealm "-scheme iOS"
 fi
 
 if [[ "$COMMAND" == "osx" ]]; then
-	xc "-scheme OSX"
+	xcrealm "-scheme OSX"
 fi
 
 ######################################
@@ -66,18 +71,25 @@ fi
 ######################################
 
 if [[ "$COMMAND" == "test-ios" ]]; then
-	xc "-scheme iOS -sdk iphonesimulator test"
+	xcrealm "-scheme iOS -sdk iphonesimulator test"
 fi
 
 if [[ "$COMMAND" == "test-osx" ]]; then
-	xc "-scheme OSX test"
+	xcrealm "-scheme OSX test"
 fi
 
 if [[ "$COMMAND" == "test-all" ]]; then
-	xc "-scheme iOS -configuration Debug -sdk iphonesimulator clean test"
-	xc "-scheme iOS -configuration Release -sdk iphonesimulator clean test"
-	xc "-scheme OSX -configuration Debug clean test"
-	xc "-scheme OSX -configuration Release clean test"
+	xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean test"
+	xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean test"
+	xcrealm "-scheme OSX -configuration Debug clean test"
+	xcrealm "-scheme OSX -configuration Release clean test"
+fi
+
+if [[ "$COMMAND" == "verify" ]]; then
+	rm -rf core docs/output
+	sh build.sh docs
+	sh build.sh test-all $2
+	sh build.sh examples $2
 fi
 
 ######################################
@@ -86,4 +98,15 @@ fi
 
 if [[ "$COMMAND" == "docs" ]]; then
 	sh scripts/build-docs.sh
+fi
+
+######################################
+# Examples
+######################################
+
+if [[ "$COMMAND" == "examples" ]]; then
+	cd examples
+	xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build"
+	xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample clean build"
+	xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build"
 fi
