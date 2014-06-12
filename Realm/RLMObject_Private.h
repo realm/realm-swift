@@ -32,7 +32,7 @@
 @property (nonatomic, readwrite) RLMRealm *realm;
 @property (nonatomic, assign) NSUInteger objectIndex;
 @property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
+@property (nonatomic, assign) tightdb::TableRef backingTable;
 @property (nonatomic) RLMObjectSchema *schema;
 
 @end

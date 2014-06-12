@@ -111,7 +111,7 @@
     return obj;
 }
 
--(void)setBackingTable:(tightdb::Table *)backingTable {
+-(void)setBackingTable:(tightdb::TableRef)backingTable {
     _backingTable = backingTable;
     _backingTableIndex = backingTable->get_index_in_parent();
 }
