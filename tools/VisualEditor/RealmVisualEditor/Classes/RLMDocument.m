@@ -10,6 +10,7 @@
 
 #import "RLMRealmNode.h"
 #import "RLMClazzNode.h"
+#import "RLMArrayNode.h"
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMObject+ResolvedClass.h"
@@ -23,7 +24,7 @@
 
 @implementation RLMDocument {
     RLMRealmNode *presentedRealm;
-    RLMClazzNode *selectedClazz;
+    RLMObjectNode *selectedObjectNode;
 }
 
 - (instancetype)init
@@ -218,12 +219,18 @@
     if (outlineView == self.realmTableOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
         if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
-            [self updateSelectedClazz:selectedItem];
+            RLMClazzNode *classNode = (RLMClazzNode *)selectedItem;
+            [self updateSelectedObjectNode:classNode];
+            return;
+        }
+        else if([selectedItem isKindOfClass:[RLMArrayNode class]]) {
+            RLMArrayNode *arrayNode = (RLMArrayNode *)selectedItem;
+            [self updateSelectedObjectNode:arrayNode];
             return;
         }
     }
     
-    [self updateSelectedClazz:nil];
+    [self updateSelectedObjectNode:nil];
 }
 
 #pragma mark - NSTableViewDataSource implementation
@@ -231,7 +238,7 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.realmTableColumnsView) {
-        return selectedClazz.instanceCount;
+        return selectedObjectNode.instanceCount;
     }
     
     return 0;
@@ -244,9 +251,9 @@
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns
                                   indexOfObject:tableColumn];
         
-        RLMClazzProperty *clazzProperty = selectedClazz.propertyColumns[columnIndex];
+        RLMClazzProperty *clazzProperty = selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = clazzProperty.name;
-        RLMObject *selectedInstance = [selectedClazz instanceAtIndex:rowIndex];
+        RLMObject *selectedInstance = [selectedObjectNode instanceAtIndex:rowIndex];
         NSObject *propertyValue = selectedInstance[propertyName];
         
         switch (clazzProperty.type) {
@@ -301,10 +308,10 @@
 {
     if (tableView == self.realmTableColumnsView) {
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
-        RLMObject *selectedObject = [selectedClazz instanceAtIndex:rowIndex];
+        RLMObject *selectedObject = [selectedObjectNode instanceAtIndex:rowIndex];
 
         RLMRealm *realm = presentedRealm.realm;
         
@@ -383,7 +390,7 @@
 {
     if (tableView == self.realmTableColumnsView) {
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = selectedObjectNode.propertyColumns[columnIndex];
         
         switch (propertyNode.type) {
             case RLMPropertyTypeBool:
@@ -430,9 +437,9 @@
 {
     if (tableView == self.realmTableColumnsView) {
         NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = selectedObjectNode.propertyColumns[columnIndex];
 
-        RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+        RLMObject *selectedInstance = [selectedObjectNode instanceAtIndex:row];
         NSObject *propertyValue = selectedInstance[propertyNode.name];
         
         switch (propertyNode.type) {
@@ -483,10 +490,10 @@
     NSInteger row = self.instancesTableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMClazzProperty *propertyNode = selectedClazz.propertyColumns[column];
+        RLMClazzProperty *propertyNode = selectedObjectNode.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
-            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+            RLMObject *selectedInstance = [selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
 
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
@@ -525,14 +532,14 @@
             }
         }
         else if(propertyNode.type == RLMPropertyTypeArray) {
-            RLMObject *selectedInstance = [selectedClazz instanceAtIndex:row];
+            RLMObject *selectedInstance = [selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
         
-                [selectedClazz displayChildArray:linkedArray
-                             fromObjectWithIndex:row];
+                [((RLMClazzNode *)selectedObjectNode) displayChildArray:linkedArray
+                                                    fromObjectWithIndex:row];
                 
                 [self.classesOutlineView reloadData];
             }
@@ -543,12 +550,12 @@
 
 #pragma mark - Private methods - Table view construction
 
-- (void)updateSelectedClazz:(RLMClazzNode *)clazz
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
 {
-    selectedClazz = clazz;
+    selectedObjectNode = outlineNode;
 
     // How many properties does the clazz contains?
-    NSArray *columns = selectedClazz.propertyColumns;
+    NSArray *columns = outlineNode.propertyColumns;
     NSUInteger columnCount = columns.count;
 
     // We clear the table view from all old columns
