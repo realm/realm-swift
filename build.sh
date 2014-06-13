@@ -1,9 +1,17 @@
 #!/bin/sh
+
 ##################################################################################
 # Custom build tool for Realm Objective C binding.
 #
 # (C) Copyright 2011-2014 by realm.io.
 ##################################################################################
+
+# Warning: pipefail is not a POSIX compatible option, but on OS X it works just fine.
+#          OS X uses a POSIX complain version of bash as /bin/sh, but apparently it does
+#          not strip away this feature. Also, this will fail if somebody forces the script
+#          to be run with zsh.
+set -o pipefail
+
 PATH=/usr/local/bin:/usr/bin:/bin
 
 usage() {
@@ -34,11 +42,14 @@ EOF
 
 xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-            xcodebuild $1 || exit 1
+        xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-            xcodebuild $1 | xcpretty || exit 1
+        xcodebuild $1 | xcpretty -c
+        if [ "$?" -ne 0 ]; then
+            exit 1
+        fi
     elif [[ "$XCMODE" == "xctool" ]]; then
-            xctool $1 || exit 1
+        xctool $1 || exit 1
     fi
 }
 
