@@ -18,22 +18,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject.h"
-#import "RLMAccessor.h"
-#import "RLMObjectSchema.h"
+#import <UIKit/UIKit.h>
 
-// RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor>
+#import "AppDelegate.h"
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
-                defaultValues:(BOOL)useDefaults;
-
-@property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::TableRef backingTable;
-@property (nonatomic) RLMObjectSchema *schema;
-
-@end
-
+int main(int argc, char * argv[])
+{
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}
