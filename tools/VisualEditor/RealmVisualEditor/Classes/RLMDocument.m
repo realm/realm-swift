@@ -14,6 +14,7 @@
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMObject+ResolvedClass.h"
+#import "NSTableColumn+Resize.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
@@ -540,7 +541,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                         [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
                                              byExtendingSelection:NO];
                         
-                        [self.instancesTableView reloadData];
+                        [self updateTableView];
                         
                         // Right now we just fetches the object index from the proxy object.
                         // However, this must be changed later when the proxy object is made public
@@ -718,7 +719,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
     }
     
-    [self.realmTableColumnsView reloadData];
+    [self updateTableView];
 }
 
 - (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
@@ -755,6 +756,14 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     headerCell.stringValue = name;
     
     return cell;
+}
+
+- (void)updateTableView
+{
+    [self.instancesTableView reloadData];
+    for(NSTableColumn *column in self.instancesTableView.tableColumns) {
+        [column resizeToFitContents];
+    }
 }
 
 @end
