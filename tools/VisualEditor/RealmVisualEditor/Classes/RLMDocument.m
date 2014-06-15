@@ -287,13 +287,13 @@
 
             case RLMPropertyTypeArray: {
                 RLMArray *referredObject = (RLMArray *)propertyValue;
-                return [NSString stringWithFormat:@"<Array #%lu>", (unsigned long)referredObject.count];
+                return [NSString stringWithFormat:@"-> %@[%lu]", referredObject.objectClassName, (unsigned long)referredObject.count];
             }
                         
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
                 RLMObjectSchema *objectSchema = referredObject.schema;
-                return [NSString stringWithFormat:@"-> %@ instance", objectSchema.className];
+                return [NSString stringWithFormat:@"-> %@", objectSchema.className];
             }
                 
             default:
