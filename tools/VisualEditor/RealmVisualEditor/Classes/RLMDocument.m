@@ -15,6 +15,8 @@
 #import "RLMRealmOutlineNode.h"
 #import "RLMObject+ResolvedClass.h"
 
+const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+
 @interface RLMDocument ()
 
 @property (nonatomic, strong) IBOutlet NSOutlineView *realmTableOutlineView;
@@ -54,7 +56,7 @@
                                                                          url:absoluteURL.path];
                     presentedRealm = realm;
                     
-                    if([realm connect:&error]) {
+                    if ([realm connect:&error]) {
                         NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                         [documentController noteNewRecentDocumentURL:absoluteURL];                    
                     }
@@ -223,7 +225,7 @@
             [self updateSelectedObjectNode:classNode];
             return;
         }
-        else if([selectedItem isKindOfClass:[RLMArrayNode class]]) {
+        else if ([selectedItem isKindOfClass:[RLMArrayNode class]]) {
             RLMArrayNode *arrayNode = (RLMArrayNode *)selectedItem;
             [self updateSelectedObjectNode:arrayNode];
             return;
@@ -463,7 +465,7 @@
                     NSArray *properties = objectSchema.properties;
                     
                     NSString *toolTipString = @"";
-                    for(RLMProperty *property in properties) {
+                    for (RLMProperty *property in properties) {
                         toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
                     }
                     
@@ -472,7 +474,38 @@
                 
                 break;
             }
+            
+            case RLMPropertyTypeArray: {
+                if ([propertyValue isKindOfClass:[RLMArray class]]) {
+                    RLMArray *referredArray = (RLMArray *)propertyValue;
                 
+                    // In order to avoid that we procedure very long tooltips for arrays we have
+                    // an upper limit on how many entries we will display. If the total item count
+                    // of the array is within the limit we simply use the default description of
+                    // the array, otherwise we construct the tooltip explicitly by concatenating the
+                    // descriptions of the all the first array items within the limit + an ellipis.
+                    if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
+                        return referredArray.description;
+                    }
+                    else {
+                        NSString *result = @"";
+                        for (NSUInteger index = 0; index < kMaxNumberOfArrayEntriesInToolTip; index++) {
+                            RLMObject *arrayItem = referredArray[index];
+                            NSString *description = [arrayItem.description stringByReplacingOccurrencesOfString:@"\n"
+                                                                                                     withString:@"\n\t"];
+                            description = [NSString stringWithFormat:@"\t[%lu] %@", index, description];
+                            if (index < kMaxNumberOfArrayEntriesInToolTip - 1) {
+                                description = [description stringByAppendingString:@","];
+                            }
+                            result = [[result stringByAppendingString:description] stringByAppendingString:@"\n"];
+                        }
+                        result = [@"RLMArray (\n" stringByAppendingString:[result stringByAppendingString:@"\t...\n)"]];
+                        return result;
+                    }
+                }
+                break;
+            }
+            
             default:
                 
                 break;
@@ -531,7 +564,7 @@
                 }
             }
         }
-        else if(propertyNode.type == RLMPropertyTypeArray) {
+        else if (propertyNode.type == RLMPropertyTypeArray) {
             RLMObject *selectedInstance = [selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
