@@ -9,10 +9,11 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMObjectNode.h"
+#import "RLMArrayNode.h"
 
 @interface RLMClazzNode : RLMObjectNode
 
-- (void)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index;
+- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index;
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
 

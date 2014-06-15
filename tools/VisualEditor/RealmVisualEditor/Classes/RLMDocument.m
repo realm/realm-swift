@@ -538,12 +538,22 @@
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
         
-                [((RLMClazzNode *)selectedObjectNode) displayChildArray:linkedArray
-                                                   fromPropertyWithName:propertyNode.name
-                                                                  index:row];                
+                RLMClazzNode *selectedClassNode = (RLMClazzNode *)selectedObjectNode;
+                
+                RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:linkedArray
+                                                          fromPropertyWithName:propertyNode.name
+                                                                         index:row];
+                
                 [self.classesOutlineView reloadData];
+                
+                [self.classesOutlineView expandItem:selectedClassNode];
+                NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
+                if (index != NSNotFound) {
+                    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                                         byExtendingSelection:NO];
+                }
+
             }
-            
         }
     }
 }

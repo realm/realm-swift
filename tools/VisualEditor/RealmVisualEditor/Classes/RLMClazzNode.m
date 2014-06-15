@@ -8,8 +8,6 @@
 
 #import "RLMClazzNode.h"
 
-#import "RLMArrayNode.h"
-
 @implementation RLMClazzNode {
 
     NSMutableArray *displayedArrays;
@@ -97,7 +95,7 @@
 
 #pragma mark - Public methods
 
-- (void)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index
+- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index
 {
     RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithArray:array
                                             withReferringProperty:name
@@ -105,6 +103,8 @@
                                                             realm:self.realm];
                                
     [displayedArrays addObject:arrayNode];
+    
+    return arrayNode;
 }
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index
