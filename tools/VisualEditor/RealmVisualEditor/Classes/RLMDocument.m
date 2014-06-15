@@ -539,8 +539,8 @@
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
         
                 [((RLMClazzNode *)selectedObjectNode) displayChildArray:linkedArray
-                                                    fromObjectWithIndex:row];
-                
+                                                   fromPropertyWithName:propertyNode.name
+                                                                  index:row];                
                 [self.classesOutlineView reloadData];
             }
             

@@ -10,8 +10,9 @@
 
 @interface RLMArrayNode : RLMObjectNode
 
-@property (nonatomic, assign) NSUInteger parentObjectIndex;
+@property (nonatomic, copy) NSString *referringProperty;
+@property (nonatomic, assign) NSUInteger referringIndex;
 
-- (instancetype)initWithArray:(RLMArray *)array withParentObjectIndex:(NSUInteger)index realm:(RLMRealm *)realm;
+- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(NSString *)property referringIndex:(NSUInteger)index realm:(RLMRealm *)realm;
 
 @end

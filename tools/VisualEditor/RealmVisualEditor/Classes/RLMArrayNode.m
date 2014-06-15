@@ -13,9 +13,10 @@
     RLMArray *displayedArray;
 }
 
-@synthesize parentObjectIndex = _parentObjectIndex;
+@synthesize referringProperty = _referringProperty;
+@synthesize referringIndex = _referringIndex;
 
-- (instancetype)initWithArray:(RLMArray *)array withParentObjectIndex:(NSUInteger)index realm:(RLMRealm *)realm
+- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(NSString *)property referringIndex:(NSUInteger)index realm:(RLMRealm *)realm
 {
     NSString *objectClassName = array.objectClassName;
     RLMSchema *schema = realm.schema;
@@ -23,7 +24,8 @@
     
     if (self = [super initWithSchema:objectSchema
                              inRealm:realm]) {
-        _parentObjectIndex = index;
+        _referringProperty = property;
+        _referringIndex = index;
         displayedArray = array;
     }
 
@@ -51,7 +53,7 @@
 {
     switch (index) {
         case 0:
-            return [NSString stringWithFormat:@"Array #%lu", (unsigned long)self.parentObjectIndex];
+            return [NSString stringWithFormat:@"instance[%lu].%@", (unsigned long)self.referringIndex, _referringProperty];
             
         default:
             return nil;
