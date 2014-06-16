@@ -109,6 +109,8 @@
 		E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B3F1947C19D009FC9F5 /* libc++.dylib */; };
 		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
+		E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
+		E8B185E7194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -155,6 +157,13 @@
 			remoteInfo = "iOS Framework";
 		};
 		E845C3E2194F813D00A04C62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9189091177B677900653D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8356ADA1947BED7009FC9F5;
+			remoteInfo = "iOS Framework";
+		};
+		E8B185E8194FB4E500B4954B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E9189091177B677900653D7A /* Project object */;
 			proxyType = 1;
@@ -224,8 +233,10 @@
 		E8356B301947C034009FC9F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E8356B3F1947C19D009FC9F5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
-		E8B61934194922C00004F42C /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -321,22 +332,8 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
-				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
-				02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */,
-				02026CB619379EB700E4EEF8 /* DynamicTests.m */,
-				02026CAD193662AF00E4EEF8 /* LinkTests.m */,
-				02E4D6E8192E58250082808D /* MixedTests.m */,
-				4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */,
-				4D3F564E1923667700240A75 /* ObjectTests.m */,
-				E845F210194975940097EBDF /* PropertyTypeTest.mm */,
-				02C414D71921939D00F858D9 /* QueryTests.m */,
-				02C4147A191DE49600F858D9 /* RealmTests.m */,
-				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
-				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
-				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
-				E8E216C21949254300CF455E /* Objective-C Tests */,
-				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
-				E8E216C41949255600CF455E /* Swift Tests */,
+				E8E216C21949254300CF455E /* Objective-C */,
+				E8B185E2194FB48B00B4954B /* Swift */,
 				E8E216C31949254D00CF455E /* Common */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
 			);
@@ -370,7 +367,17 @@
 			name = OSX;
 			sourceTree = "<group>";
 		};
-		E8E216C21949254300CF455E /* Objective-C Tests */ = {
+		E8B185E2194FB48B00B4954B /* Swift */ = {
+			isa = PBXGroup;
+			children = (
+				E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */,
+				E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */,
+				E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */,
+			);
+			path = Swift;
+			sourceTree = "<group>";
+		};
+		E8E216C21949254300CF455E /* Objective-C */ = {
 			isa = PBXGroup;
 			children = (
 				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
@@ -380,34 +387,25 @@
 				02E4D6E8192E58250082808D /* MixedTests.m */,
 				4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */,
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
+				E845F210194975940097EBDF /* PropertyTypeTest.mm */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
+				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
+				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 			);
-			name = "Objective-C Tests";
+			name = "Objective-C";
 			sourceTree = "<group>";
 		};
 		E8E216C31949254D00CF455E /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
-				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 				02E4D6EE192E583A0082808D /* RLMTestObjects.h */,
 				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
 				02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */,
 				02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */,
 			);
 			name = Common;
-			sourceTree = "<group>";
-		};
-		E8E216C41949255600CF455E /* Swift Tests */ = {
-			isa = PBXGroup;
-			children = (
-				E8B61935194922C00004F42C /* SwiftRealmTests.swift */,
-				E8B61933194922C00004F42C /* OSX Tests-Bridging-Header.h */,
-				E8B61934194922C00004F42C /* iOS Tests-Bridging-Header.h */,
-			);
-			name = "Swift Tests";
 			sourceTree = "<group>";
 		};
 		E9189090177B677900653D7A = {
@@ -569,6 +567,7 @@
 				E8356B421947CD9F009FC9F5 /* PBXTargetDependency */,
 				E845C3E1194F813D00A04C62 /* PBXTargetDependency */,
 				E845C3E3194F813D00A04C62 /* PBXTargetDependency */,
+				E8B185E9194FB4E500B4954B /* PBXTargetDependency */,
 			);
 			name = "iOS Tests";
 			productName = "iOS FrameworkTests";
@@ -697,9 +696,9 @@
 				022C8BED194254FA00BCDB9D /* ArrayPropertyTests.m in Sources */,
 				02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */,
 				4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */,
+				E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */,
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6E9192E58250082808D /* MixedTests.m in Sources */,
-				E8B61936194922C00004F42C /* SwiftRealmTests.swift in Sources */,
 				02026CAB19363B5300E4EEF8 /* ArrayTests.m in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
 				02026CAE193662AF00E4EEF8 /* LinkTests.m in Sources */,
@@ -739,9 +738,9 @@
 				E8356B2D1947BF72009FC9F5 /* RLMTestObjects.m in Sources */,
 				E8356B2C1947BF72009FC9F5 /* RLMTestCase.m in Sources */,
 				E8356B291947BF69009FC9F5 /* QueryTests.m in Sources */,
+				E8B185E7194FB48B00B4954B /* SwiftRealmTests.swift in Sources */,
 				E8356B261947BF69009FC9F5 /* MixedTests.m in Sources */,
 				E8356B2A1947BF69009FC9F5 /* RealmTests.m in Sources */,
-				E8B61937194922C00004F42C /* SwiftRealmTests.swift in Sources */,
 				E8356B231947BF69009FC9F5 /* ArrayPropertyTests.m in Sources */,
 				E8356B221947BF69009FC9F5 /* ArrayTests.m in Sources */,
 				E8356B241947BF69009FC9F5 /* DynamicTests.m in Sources */,
@@ -790,6 +789,11 @@
 			isa = PBXTargetDependency;
 			target = E8356ADA1947BED7009FC9F5 /* iOS Framework */;
 			targetProxy = E845C3E2194F813D00A04C62 /* PBXContainerItemProxy */;
+		};
+		E8B185E9194FB4E500B4954B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8356ADA1947BED7009FC9F5 /* iOS Framework */;
+			targetProxy = E8B185E8194FB4E500B4954B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -915,7 +919,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/OSX Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/OSX Tests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -957,7 +961,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/OSX Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/OSX Tests-Bridging-Header.h";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -1080,7 +1084,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/iOS Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/iOS Tests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1115,7 +1119,7 @@
 				METAL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/iOS Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/iOS Tests-Bridging-Header.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
