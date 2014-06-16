@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +28,7 @@
 #include <exception>
 #include <sstream>
 
+#include <tightdb/version.hpp>
 #include <tightdb/group_shared.hpp>
 #include <tightdb/group.hpp>
 #include <tightdb/util/unique_ptr.hpp>
@@ -148,6 +147,10 @@ static NSArray *s_objectDescriptors = nil;
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
+}
+
++ (BOOL)isCoreDebug {
+    return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
 
 + (void)initialize {
@@ -483,34 +486,36 @@ static NSArray *s_objectDescriptors = nil;
     [_objects setObject:accessor forKey:accessor];
 }
 
-inline void RLMRefreshObjectFromGroup(tightdb::Group *group, RLMObject *obj) {
-    TableRef tableRef = group->get_table([obj backingTableIndex]); // Throws
-    obj.backingTable = tableRef.get();
-}
-
 - (void)updateAllObjects {
     try {
         // get the group
         tightdb::Group *group = self.group;
         BOOL writable = (self.transactionMode == RLMTransactionModeWrite);
 
+        // update arrays after updating all parent objects
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        NSMutableArray *arrays = [NSMutableArray array];
+        
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
             //
             // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
             //
             if ([obj isKindOfClass:RLMObject.class]) {
-                RLMRefreshObjectFromGroup(group, obj);
+                TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
+                ((RLMObject *)obj).backingTable = tableRef;
+                obj.writable = writable;
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                RLMArrayLinkView *ar = (RLMArrayLinkView *)obj;
-                // update parent first
-                if(!ar.parentObject.backingTable->is_attached()) {
-                    RLMRefreshObjectFromGroup(group, ar.parentObject);
-                }
-                ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+                [arrays addObject:obj];
             }
-            obj.writable = writable;
+        }
+        
+        // update arrays
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        for (RLMArrayLinkView *ar in arrays) {
+            ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+            ar.writable = writable;
         }
     }
     catch (exception &ex) {

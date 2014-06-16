@@ -107,8 +107,8 @@
 		E8356B381947C10E009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B301947C034009FC9F5 /* Foundation.framework */; };
 		E8356B3A1947C141009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
 		E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B3F1947C19D009FC9F5 /* libc++.dylib */; };
-		E8B61936194922C00004F42C /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B61935194922C00004F42C /* SwiftRealmTests.swift */; };
-		E8B61937194922C00004F42C /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B61935194922C00004F42C /* SwiftRealmTests.swift */; };
+		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
+		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +141,20 @@
 			remoteInfo = "iOS Framework";
 		};
 		E8356B411947CD9F009FC9F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9189091177B677900653D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8356ADA1947BED7009FC9F5;
+			remoteInfo = "iOS Framework";
+		};
+		E845C3E0194F813D00A04C62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9189091177B677900653D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8356ADA1947BED7009FC9F5;
+			remoteInfo = "iOS Framework";
+		};
+		E845C3E2194F813D00A04C62 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E9189091177B677900653D7A /* Project object */;
 			proxyType = 1;
@@ -201,7 +215,6 @@
 		02E4D6EB192E58320082808D /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		02E4D6EE192E583A0082808D /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		429E395319409432001DC9C1 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		4D8D90AF192B7FC4004C89AA /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectInterfaceTests.m; sourceTree = "<group>"; };
@@ -210,9 +223,9 @@
 		E8356AE51947BED7009FC9F5 /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8356B301947C034009FC9F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E8356B3F1947C19D009FC9F5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
-		E8B61933194922C00004F42C /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 		E8B61934194922C00004F42C /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
-		E8B61935194922C00004F42C /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
+		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,9 +241,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8356B361947C0EC009FC9F5 /* libc++.dylib in Frameworks */,
 				E8356B371947C102009FC9F5 /* Foundation.framework in Frameworks */,
+				E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */,
 				428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */,
+				E8356B361947C0EC009FC9F5 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,9 +260,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */,
-				E8356B321947C04E009FC9F5 /* Realm.framework in Frameworks */,
 				E8356B381947C10E009FC9F5 /* Foundation.framework in Frameworks */,
+				E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */,
+				E8356B321947C04E009FC9F5 /* Realm.framework in Frameworks */,
+				E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,7 +321,21 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
+				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
+				02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */,
+				02026CB619379EB700E4EEF8 /* DynamicTests.m */,
+				02026CAD193662AF00E4EEF8 /* LinkTests.m */,
+				02E4D6E8192E58250082808D /* MixedTests.m */,
+				4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */,
+				4D3F564E1923667700240A75 /* ObjectTests.m */,
+				E845F210194975940097EBDF /* PropertyTypeTest.mm */,
+				02C414D71921939D00F858D9 /* QueryTests.m */,
+				02C4147A191DE49600F858D9 /* RealmTests.m */,
+				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
+				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
+				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 				E8E216C21949254300CF455E /* Objective-C Tests */,
+				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
 				E8E216C41949255600CF455E /* Swift Tests */,
 				E8E216C31949254D00CF455E /* Common */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
@@ -406,9 +435,9 @@
 		E918909B177B677900653D7A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E8470A7A194F81DF0066632C /* XCTest.framework */,
 				E82827DB194778360090B385 /* iOS */,
 				E82827DC194778420090B385 /* OSX */,
-				4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -538,6 +567,8 @@
 			dependencies = (
 				E8356B3E1947C181009FC9F5 /* PBXTargetDependency */,
 				E8356B421947CD9F009FC9F5 /* PBXTargetDependency */,
+				E845C3E1194F813D00A04C62 /* PBXTargetDependency */,
+				E845C3E3194F813D00A04C62 /* PBXTargetDependency */,
 			);
 			name = "iOS Tests";
 			productName = "iOS FrameworkTests";
@@ -619,7 +650,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh scripts/download-core.sh";
+			shellScript = "sh build.sh download-core";
 		};
 		E8F67C601947D50A005920FC /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -633,7 +664,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh scripts/download-core.sh";
+			shellScript = "sh build.sh download-core";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -750,6 +781,16 @@
 			target = E8356ADA1947BED7009FC9F5 /* iOS Framework */;
 			targetProxy = E8356B411947CD9F009FC9F5 /* PBXContainerItemProxy */;
 		};
+		E845C3E1194F813D00A04C62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8356ADA1947BED7009FC9F5 /* iOS Framework */;
+			targetProxy = E845C3E0194F813D00A04C62 /* PBXContainerItemProxy */;
+		};
+		E845C3E3194F813D00A04C62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8356ADA1947BED7009FC9F5 /* iOS Framework */;
+			targetProxy = E845C3E2194F813D00A04C62 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -780,6 +821,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -820,6 +862,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -844,8 +887,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
@@ -861,7 +904,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -890,8 +933,8 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
@@ -903,7 +946,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -945,6 +988,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -985,6 +1029,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -1015,6 +1060,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1025,6 +1072,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -1052,12 +1100,15 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

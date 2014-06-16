@@ -1,11 +1,16 @@
 Pod::Spec.new do |s|
   s.name                = "Realm"
   s.version             = "0.21.0"
-  s.summary             = "Realm is a fantastic object framework for iOS."
+  s.summary             = "Realm is a modern data framework & database for iOS."
   s.description         = <<-DESC
-                          Realm is an object framework for iOS. It aims to provide an easier way to handle data in your apps, whether you need in-memory objects, full database persistence, or a simple network cache.
-                          Realm’s basic structures look like Objects & Arrays for your language, but provide additional features such as: querying, relationships & graphs, thread safety,easy in/out JSON Mapping & more.
-                          A C++ core underneath provides a memory-efficient implementation of these features, with RLMObjects usually consuming less RAM than native Objects. The core also provides an optional persistence layer that can automatically save & retrieve your objects from disk with very high performance.
+                          Realm is a modern data framework & database for iOS. You can use it purely in memory — or persist to disk with extraordinary performance.
+                          
+                          Realm’s data structures look like NSObjects and NSArrays, but provide additional features such as: querying, relationships & graphs, thread safety, and more.
+                          
+                          Realm is not built on SQLite. Instead, a custom C++ core is used to provide memory-efficient access to your data by using Realm objects, which usually consume less RAM than native objects. The core also provides an optional persistence layer that can automatically save and retrieve your objects from disk.
+
+                          Realm offers extraordinary performance compared to SQLite and other persistence solutions. It has been in development since 2011 and powers an app with over 1 million
+                          daily active users at a major mobile game company.
                           DESC
   s.homepage            = "http://realm.io"
   s.source              = { :http => "http://static.realm.io/downloads/ios/realm-ios-#{s.version}.zip" }
@@ -20,21 +25,18 @@ Pod::Spec.new do |s|
   s.license             = {
                             :type => "Copyright",
                             :text => <<-LICENSE
-                                        TIGHTDB CONFIDENTIAL
-                                        __________________
-                        
-                                        [2011] - [2014] TightDB Inc
-                                        All Rights Reserved.
-                        
-                                        NOTICE:  All information contained herein is, and remains
-                                        the property of TightDB Incorporated and its suppliers,
-                                        if any.  The intellectual and technical concepts contained
-                                        herein are proprietary to TightDB Incorporated
-                                        and its suppliers and may be covered by U.S. and Foreign Patents,
-                                        patents in process, and are protected by trade secret or copyright law.
-                                        Dissemination of this information or reproduction of this material
-                                        is strictly forbidden unless prior written permission is obtained
-                                        from TightDB Incorporated.
-                                        LICENSE
+                                        Copyright 2014 Realm Inc.
+
+                                        Licensed under the Apache License, Version 2.0 (the "License");
+                                        you may not use this file except in compliance with the License.
+                                        You may obtain a copy of the License at
+
+                                        http://www.apache.org/licenses/LICENSE-2.0
+
+                                        Unless required by applicable law or agreed to in writing, software
+                                        distributed under the License is distributed on an "AS IS" BASIS,
+                                        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                        See the License for the specific language governing permissions and
+                                        limitations under the License.
                           }
 end
