@@ -63,6 +63,9 @@ inline NSException *RLMException(NSString *message) {
 - (void)removeObjectAtIndex:(NSUInteger)index {
     @throw RLMException(c_arrayReadOnlyMessage);
 }
+- (void)removeAllObjects {
+    @throw RLMException(c_arrayReadOnlyMessage);
+}
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
     @throw RLMException(c_arrayReadOnlyMessage);
 }
