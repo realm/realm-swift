@@ -166,15 +166,15 @@
 
 - (void)testRealmInMemory2
 {
-        [RLMRealm useInMemoryDefaultRealm];
+    [RLMRealm useInMemoryDefaultRealm];
     
-        RLMRealm *realmInMemory = [RLMRealm defaultRealm];
-        [realmInMemory beginWriteTransaction];
-        [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
-        [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
-        [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
-        XCTAssertEqual([realmInMemory objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
-        [realmInMemory commitWriteTransaction];
+    RLMRealm *realmInMemory = [RLMRealm defaultRealm];
+    [realmInMemory beginWriteTransaction];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
+    XCTAssertEqual([realmInMemory objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    [realmInMemory commitWriteTransaction];
 }
 
 @end
