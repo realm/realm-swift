@@ -18,6 +18,12 @@ if [[ "$CONFIGURATION" = "Debug" ]]; then
 else
 	xcrun cp -R "${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
 fi
+
+# Step 3 - copy resources
+/bin/mkdir -p "${SF_FRAMEWORK_PATH}/Resources"
+xcrun cp "${SRCROOT}/CHANGELOG.md" "${SF_FRAMEWORK_PATH}/Resources"
+xcrun cp "${SRCROOT}/Realm/Realm-Info.plist" "${SF_FRAMEWORK_PATH}/Resources/Info.plist"
+
 cd "${SF_FRAMEWORK_PATH}"
 /bin/mkdir -p "Versions/A/Headers"
 /bin/mv Headers/Realm/* Versions/A/Headers/
