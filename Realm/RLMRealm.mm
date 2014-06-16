@@ -28,6 +28,7 @@
 #include <exception>
 #include <sstream>
 
+#include <tightdb/version.hpp>
 #include <tightdb/group_shared.hpp>
 #include <tightdb/group.hpp>
 #include <tightdb/util/unique_ptr.hpp>
@@ -146,6 +147,10 @@ static NSArray *s_objectDescriptors = nil;
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
+}
+
++ (BOOL)isCoreDebug {
+    return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
 
 + (void)initialize {

@@ -20,12 +20,26 @@
 #import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
+@interface RLMRealm ()
+
++ (BOOL)isCoreDebug;
+
+@end
+
 @interface RealmTests : RLMTestCase
 @end
 
 @implementation RealmTests
 
 #pragma mark - Tests
+
+- (void)testCoreDebug {
+#if DEBUG
+    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use libtightdb{-ios}-dbg");
+#else
+    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
+#endif
+}
 
 - (void)testRealmExists {
     RLMRealm *realm = [self realmWithTestPath];
