@@ -1,3 +1,9 @@
+#!/bin/sh
+
+if [ -z "${SRCROOT}" ]; then
+    SRCROOT="$(pwd)"
+fi
+
 realm_version_file="${SRCROOT}/Realm/Realm-Info.plist"
 realm_version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
 
@@ -75,7 +81,7 @@ appledoc \
 cat >${SRCROOT}/docs/output/${realm_version}/realm.xml <<EOF
 <entry>
     <version>${realm_version}</version>
-    <sha1>$(sha1sum -b docs/output/${realm_version}/realm.tgz | cut -c 1-40)</sha1>
+    <sha1>$(shasum -b docs/output/${realm_version}/realm.tgz | cut -c 1-40)</sha1>
     <url>http://static.realm.io/docs/ios/${realm_version}/api/realm.tgz</url>
 </entry>
 EOF

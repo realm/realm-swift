@@ -94,7 +94,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     NSString *objectClassName = [obj.class className];
     if (![objectClassName isEqualToString:expected]) {
-        @throw [NSException exceptionWithName:@"RLMExceptoin" reason:@"Attempting to insert wrong object type"
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
                                      userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
     }
 }
@@ -117,7 +117,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
     if (index >= _backingLinkView->size()) {
-        @throw [NSException exceptionWithName:@"RLMExceptoin"
+        @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Trying to remove object at invalid index" userInfo:nil];
     }
     _backingLinkView->remove(index);
@@ -137,7 +137,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
     RLMValidateObjectClass(object, self.objectClassName);
     if (index >= _backingLinkView->size()) {
-        @throw [NSException exceptionWithName:@"RLMExceptoin"
+        @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Trying to replace object at invalid index" userInfo:nil];
     }
     if (object.realm != self.realm) {
