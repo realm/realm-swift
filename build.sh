@@ -12,7 +12,7 @@
 #          to be run with zsh.
 set -o pipefail
 
-PATH=/usr/local/bin:/usr/bin:/bin
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec
 
 usage() {
 cat <<EOF
@@ -70,10 +70,21 @@ fi
 # Variables
 ######################################
 
-REALM_CORE_VERSION=latest
+# Xcode sets this variable - set to current directory if running standalone
+if [ -z "$SRCROOT" ]; then
+    SRCROOT="$(pwd)"
+fi
+
+# You can override the version of the core library
+# Otherwise, use the default value
+if [ -z "$REALM_CORE_VERSION" ]; then
+    REALM_CORE_VERSION=latest
+fi
+
 COMMAND="$1"
 XCMODE="$2"
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
+
 
 case "$COMMAND" in
 
@@ -86,7 +97,7 @@ case "$COMMAND" in
         xcrealm "-scheme OSX -configuration Debug clean" || exit 1
         xcrealm "-scheme OSX -configuration Release clean" || exit 1
         exit 0
-    ;;
+	;;
 
     ######################################
     # Download Core Library
@@ -101,7 +112,7 @@ case "$COMMAND" in
             echo "Consider removing the folder 'core' and rerun."
         fi
         exit 0
-    ;;
+	;;
 
     ######################################
     # Building
@@ -110,22 +121,22 @@ case "$COMMAND" in
         sh build.sh ios "$XCMODE" || exit 1
         sh build.sh osx "$XCMODE" || exit 1
         exit 0
-    ;;
+	;;
 
     "ios")
         xcrealm "-scheme iOS"
         exit 0
-    ;;
+	;;
 
     "osx")
         xcrealm "-scheme OSX"
         exit 0
-    ;;
+	;;
 
     "docs")
         sh scripts/build-docs.sh || exit 1
         exit 0
-    ;;
+	;;
 
     ######################################
     # Testing
@@ -135,41 +146,41 @@ case "$COMMAND" in
         #xcrealm "-scheme iOS -configuration Release -sdk iphoneos build test"
         xcrealm "-scheme OSX -configuration Release build test"
         exit 0
-    ;;
+	;;
 
     "test-debug")
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator build test"
         xcrealm "-scheme OSX -configuration Debug build test"
         exit 0
-    ;;
+	;;
 
     "test-all")
         sh build.sh test || exit 1
         sh build.sh test-debug || exit 1
         exit 0
-    ;;
+	;;
 
     "test-ios")
         xcrealm "-scheme iOS -sdk iphonesimulator test"
         exit 0
-    ;;
+	;;
 
     "test-osx")
         xcrealm "-scheme OSX test"
         exit 0
-    ;;
+	;;
 
     "test-cover")
         echo "Not yet implemented"
         exit 0
-    ;;
+	;;
 
     "verify")
         sh build.sh docs || exit 1
         sh build.sh test-all "$XCMODE" || exit 1
         sh build.sh examples "$XCMODE" || exit 1
         exit 0
-    ;;
+	;;
 
     ######################################
     # Docs
@@ -177,7 +188,7 @@ case "$COMMAND" in
     "docs")
         sh scripts/build-docs.sh || exit 1
         exit 0
-    ;;
+	;;
 
     ######################################
     # Examples
@@ -188,29 +199,28 @@ case "$COMMAND" in
         xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample clean build"
         xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build"
         exit 0
-    ;;
+	;;
 
     ######################################
     # Versioning
     ######################################
     "get-version")
         version_file="Realm/Realm-Info.plist"
-        echo "$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
+        echo "$(PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
         exit 0
-    ;;
-
+	;;
 
     "set-version")
         realm_version="$1"
         version_file="Realm/Realm-Info.plist"
 
-        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
-        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
+        PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         exit 0
         ;;
 
     *)
         usage
         exit 1
-    ;;
+	;;
 esac
