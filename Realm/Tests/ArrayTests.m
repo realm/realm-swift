@@ -271,8 +271,14 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     po2.name = @"John";
     po2.hired = NO;
     
+    PersonObject *po3 = [[PersonObject alloc] init];
+    po3.age = 25;
+    po3.name = @"Jill";
+    po3.hired = YES;
+    
     [realm addObject:po1];
     [realm addObject:po2];
+    [realm addObject:po3];
     
     Company *company = [[Company alloc] init];
     company.employees = (RLMArray<PersonObject> *)[PersonObject allObjects];
@@ -282,15 +288,22 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     
     RLMArray *peopleInCompany = company.employees;
     
-    // Delete the links to employees
-    XCTAssertThrows([peopleInCompany removeAllObjects], @"Not allowed in read transaction");
-    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"No links should have been deleted");
+    // Delete link to employee
+    XCTAssertThrows([peopleInCompany removeObjectAtIndex:1], @"Not allowed in read transaction");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)3, @"No links should have been deleted");
     
     [realm beginWriteTransaction];
-    XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links to employees");
+    XCTAssertNoThrow([peopleInCompany removeObjectAtIndex:1], @"Should delete link to employee");
     [realm commitWriteTransaction];
     
-    XCTAssertEqual(peopleInCompany.count, (NSUInteger)0, @"All links deleted when accessing via links");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"link deleted when accessing via links");
+    PersonObject *test = peopleInCompany[0];
+    XCTAssertEqual(test.age, po1.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
+    // XCTAssertEqualObjects(test, po1, @"Should be equal"); //FIXME, should work
+
+
     
     RLMArray *allPeople = [PersonObject allObjects];
     XCTAssertEqual(allPeople.count, (NSUInteger)2, @"Only links should have been deleted, not the employees");
