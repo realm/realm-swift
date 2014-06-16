@@ -39,8 +39,8 @@
   @protected
     // accessor ivars
     RLMRealm *_realm;
-    BOOL _writable;     // YES when in write transaction
-    BOOL _invalid;      // YES for invalidated objects
+    BOOL _RLMAccessor_writable;     // YES when in write transaction
+    BOOL _RLMAccessor_invalid;      // YES for invalidated objects
     BOOL _readOnly;     // YES for RLMArrays which are never mutable
 }
 

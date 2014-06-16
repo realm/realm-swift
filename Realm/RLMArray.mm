@@ -24,8 +24,8 @@
 @implementation RLMArray
 
 @dynamic RLMAccessor_invalid;
-@dynamic realm;
 @dynamic RLMAccessor_writable;
+@dynamic realm;
 @dynamic readOnly;
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
@@ -42,11 +42,11 @@
 }
 
 - (BOOL)RLMAccessor_writable {
-    return _writable;
+    return _RLMAccessor_writable;
 }
 
 - (BOOL)RLMAccessor_invalid {
-    return _invalid;
+    return _RLMAccessor_invalid;
 }
 
 - (BOOL)isReadOnly {

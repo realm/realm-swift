@@ -57,7 +57,7 @@
     else {
         object_setClass(self, RLMArrayLinkViewReadOnly.class);
     }
-    _writable = writable;
+    _RLMAccessor_writable = writable;
 }
 
 - (void)setRLMAccessor_Invalid:(BOOL)invalid {
@@ -67,7 +67,7 @@
     else {
         object_setClass(self, RLMArrayLinkView.class);
     }
-    _invalid = invalid;
+    _RLMAccessor_invalid = invalid;
 }
 
 - (NSUInteger)count {
