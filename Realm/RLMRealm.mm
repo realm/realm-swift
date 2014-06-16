@@ -140,8 +140,8 @@ static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    UniquePtr<SharedGroup> _sharedGroup;
-    UniquePtr<Group> _group;
+    SharedGroup *_sharedGroup;
+    Group *_group;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
@@ -266,7 +266,7 @@ static NSArray *s_objectDescriptors = nil;
         // create shared group
         realm->_writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
         realm->_replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
-        realm->_sharedGroup.reset(new SharedGroup(*realm->_replication));
+        realm->_sharedGroup = new SharedGroup(*realm->_replication);
     }
     catch (File::PermissionDenied &ex) {
         error = make_realm_error(RLMErrorFilePermissionDenied, ex);
@@ -295,7 +295,7 @@ static NSArray *s_objectDescriptors = nil;
     
     // begin read
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
-    realm->_group.reset(&group);
+    realm->_group = &group;
     
     if (dynamic) {
         // for dynamic realms, get schema from stored tables
@@ -420,6 +420,10 @@ static NSArray *s_objectDescriptors = nil;
         [self commitWriteTransaction];
         NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
     }
+    
+    if (_sharedGroup) {
+        delete _sharedGroup;
+    }
 }
 
 - (void)refresh {
@@ -472,7 +476,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (tightdb::Group *)group {
-    return _group.get();
+    return _group;
 }
 
 - (void)addObject:(RLMObject *)object {
