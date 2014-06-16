@@ -161,7 +161,7 @@
     [realmWithFile beginWriteTransaction];
     [RLMTestObject createInRealm:realmWithFile withObject:@[@"a"]];
     [realmWithFile commitWriteTransaction];
-    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Objects already added to the realm on file");
+    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
 }
 
 - (void)testRealmInMemory2
