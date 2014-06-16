@@ -32,4 +32,8 @@ NSString *RLMRealmPathForFile();
 
 - (RLMRealm *)realmWithTestPath;
 
+- (void)testBefore:(void (^)(RLMRealm *realm))before
+             async:(void (^)(RLMRealm *realm))async
+        completion:(void (^)(RLMRealm *realm))completion;
+
 @end

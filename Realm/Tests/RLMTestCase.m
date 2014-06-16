@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "XCTestCase+AsyncTesting.h"
 
 @interface RLMRealm ()
 + (void)clearRealmCache;
@@ -92,6 +93,25 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (RLMRealm *)realmWithTestPath {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+}
+
+- (void)testBefore:(void (^)(RLMRealm *realm))before
+             async:(void (^)(RLMRealm *realm))async
+        completion:(void (^)(RLMRealm *realm))completion {
+    NSString *randomFileName = [NSString stringWithFormat:@"%d.realm", arc4random()];
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMRealmPathForFile(randomFileName) readOnly:NO error:nil];
+    
+    before(realm);
+    
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        async(realm);
+    });
+    
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
+    completion(realm);
+    
+    RLMDeleteRealmFilesAtPath(RLMRealmPathForFile(randomFileName));
 }
 
 @end
