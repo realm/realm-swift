@@ -50,7 +50,7 @@
     return ar;
 }
 
-- (void)setWritable:(BOOL)writable {
+- (void)setRLMAccessor_writable:(BOOL)writable {
     if (writable) {
         object_setClass(self, RLMArrayLinkView.class);
     }
@@ -58,6 +58,16 @@
         object_setClass(self, RLMArrayLinkViewReadOnly.class);
     }
     _writable = writable;
+}
+
+- (void)setRLMAccessor_Invalid:(BOOL)invalid {
+    if (invalid) {
+        object_setClass(self, RLMArrayLinkViewInvalid.class);
+    }
+    else {
+        object_setClass(self, RLMArrayLinkView.class);
+    }
+    _invalid = invalid;
 }
 
 - (NSUInteger)count {

@@ -33,8 +33,9 @@
                        schema:(RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
 
+// namespace properteis to prevent collision with user properties
 @property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic) RLMObjectSchema *schema;
+@property (nonatomic) RLMObjectSchema *RLMObject_schema;
 
 @end
 

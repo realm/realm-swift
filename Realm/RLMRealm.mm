@@ -140,15 +140,16 @@ static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    SharedGroup *_sharedGroup;
-    Group *_group;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
     
-    UniquePtr<LangBindHelper::TransactLogRegistry> _writeLogs;
-    UniquePtr<Replication> _replication;
+    LangBindHelper::TransactLogRegistry *_writeLogs;
+    Replication *_replication;
+    SharedGroup *_sharedGroup;
+    
+    Group *_group;
 }
 
 + (void)initialize {
@@ -264,8 +265,8 @@ static NSArray *s_objectDescriptors = nil;
     NSError *error = nil;
     try {
         // create shared group
-        realm->_writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
-        realm->_replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
+        realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
+        realm->_replication = tightdb::makeWriteLogCollector(path.UTF8String);
         realm->_sharedGroup = new SharedGroup(*realm->_replication);
     }
     catch (File::PermissionDenied &ex) {
@@ -353,11 +354,9 @@ static NSArray *s_objectDescriptors = nil;
             // upgratde to write
             LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
             
-            // make all objects in this realm writable
-            [self updateAllObjects];
-            
-            // update state
+            // update state and make all objects in this realm writable
             _inWriteTransaction = YES;
+            [self updateAllObjects];
         }
         catch (std::exception& ex) {
             // File access errors are treated as exceptions here since they should not occur after the shared
@@ -374,8 +373,11 @@ static NSArray *s_objectDescriptors = nil;
     if (self.inWriteTransaction) {
         try {
             LangBindHelper::commit_and_continue_as_read(*_sharedGroup);
+            
+            // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
-
+            [self updateAllObjects];
+            
             // notify other realm istances of changes
             for (RLMRealm *realm in realmsAtPath(_path)) {
                 if (![realm isEqual:self]) {
@@ -424,6 +426,12 @@ static NSArray *s_objectDescriptors = nil;
     if (_sharedGroup) {
         delete _sharedGroup;
     }
+    if (_replication) {
+        delete _replication;
+    }
+    if (_writeLogs) {
+        delete _writeLogs;
+    }
 }
 
 - (void)refresh {
@@ -457,17 +465,17 @@ static NSArray *s_objectDescriptors = nil;
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
             if ([obj isKindOfClass:RLMObject.class]) {
                 if (!((RLMObject *)obj)->_row.is_attached()) {
-                    // FIXME - make object invalid
-                    assert(0);
+                    obj.RLMAccessor_invalid = YES;
+                    continue; // don't change writeable one invalid
                 }
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
                 if (!((RLMArrayLinkView *)obj)->_backingLinkView->is_attached()) {
-                    // FIXME - make object invalid
-                    assert(0);
+                    obj.RLMAccessor_invalid = YES;
+                    continue; // don't change writeable one invalid
                 }
             }
-            obj.writable = _inWriteTransaction;
+            obj.RLMAccessor_writable = _inWriteTransaction;
         }
     }
     catch (exception &ex) {

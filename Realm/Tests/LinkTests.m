@@ -114,11 +114,12 @@
     XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
-    [realm deleteObject:owner.dog];
+    DogObject *dog = owner.dog;
+    [realm deleteObject:dog];
     [realm commitWriteTransaction];
     
-    // FIXME - re-enable once we fix accessor updates
-    // XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+    XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+    XCTAssertThrows(dog.dogName, @"Dog object should be invalid after being deleted from the realm");
 
     // refresh owner and check
     owner = [realm allObjects:[OwnerObject className]].firstObject;
