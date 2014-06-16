@@ -115,6 +115,10 @@
 		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D8D90B1192B80F0004C89AA /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* TransactionTests.m */; };
 		4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* TransactionTests.m */; };
+		4DE0B176194855E30092154B /* PropertyTypeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B175194855E30092154B /* PropertyTypeTest.mm */; };
+		4DE0B177194855E30092154B /* PropertyTypeTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B175194855E30092154B /* PropertyTypeTest.mm */; };
+		4DE0B18D1948830D0092154B /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B18C1948830D0092154B /* EnumeratorTests.m */; };
+		4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B18C1948830D0092154B /* EnumeratorTests.m */; };
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
@@ -206,6 +210,8 @@
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		4D8D90AF192B7FC4004C89AA /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
+		4DE0B175194855E30092154B /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
+		4DE0B18C1948830D0092154B /* EnumeratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnumeratorTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectInterfaceTests.m; sourceTree = "<group>"; };
 		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E82827D91947782C0090B385 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -305,10 +311,12 @@
 				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
 				02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */,
 				02026CB619379EB700E4EEF8 /* DynamicTests.m */,
+				4DE0B18C1948830D0092154B /* EnumeratorTests.m */,
 				02026CAD193662AF00E4EEF8 /* LinkTests.m */,
 				02E4D6E8192E58250082808D /* MixedTests.m */,
 				4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */,
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
+				4DE0B175194855E30092154B /* PropertyTypeTest.mm */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
@@ -665,11 +673,13 @@
 				4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */,
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6E9192E58250082808D /* MixedTests.m in Sources */,
+				4DE0B18D1948830D0092154B /* EnumeratorTests.m in Sources */,
 				02026CAB19363B5300E4EEF8 /* ArrayTests.m in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
 				02026CAE193662AF00E4EEF8 /* LinkTests.m in Sources */,
 				02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */,
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
+				4DE0B176194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
@@ -706,11 +716,13 @@
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				02E4D6EA192E58250082808D /* MixedTests.m in Sources */,
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
+				4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */,
 				02026CAC19363B5300E4EEF8 /* ArrayTests.m in Sources */,
 				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
 				02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */,
 				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
+				4DE0B177194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				4D8D90B1192B80F0004C89AA /* TransactionTests.m in Sources */,
 				4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
 				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
@@ -768,9 +780,9 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb-dbg";
-				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
+				PRIVATE_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PrivateHeaders;
 				PRODUCT_NAME = Realm;
-				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
+				PUBLIC_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PublicHeaders;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = framework;
@@ -807,9 +819,9 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb";
-				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
+				PRIVATE_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PrivateHeaders;
 				PRODUCT_NAME = Realm;
-				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
+				PUBLIC_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PublicHeaders;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = framework;
@@ -832,7 +844,7 @@
 					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -845,7 +857,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-Wall";
@@ -874,7 +886,7 @@
 					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -883,7 +895,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-Wall";
@@ -988,7 +1000,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
@@ -1025,7 +1037,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
@@ -1138,9 +1150,9 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb-dbg";
-				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
+				PRIVATE_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PrivateHeaders;
 				PRODUCT_NAME = Realm;
-				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
+				PUBLIC_HEADERS_FOLDER_PATH = $CONTENTS_FOLDER_PATH/Contents/PublicHeaders;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = framework;
@@ -1176,7 +1188,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-Wall";
