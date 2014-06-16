@@ -155,5 +155,26 @@
  }
  */
 
+- (void)testRealmInMemory
+{
+    RLMRealm *realmWithFile = [RLMRealm defaultRealm];
+    [realmWithFile beginWriteTransaction];
+    [RLMTestObject createInRealm:realmWithFile withObject:@[@"a"]];
+    [realmWithFile commitWriteTransaction];
+    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Objects already added to the realm on file");
+}
+
+- (void)testRealmInMemory2
+{
+        [RLMRealm useInMemoryDefaultRealm];
+    
+        RLMRealm *realmInMemory = [RLMRealm defaultRealm];
+        [realmInMemory beginWriteTransaction];
+        [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
+        [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
+        [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
+        XCTAssertEqual([realmInMemory objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+        [realmInMemory commitWriteTransaction];
+}
 
 @end
