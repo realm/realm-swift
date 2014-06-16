@@ -54,7 +54,11 @@ xc() {
 }
 
 xcrealm() {
-    xc "-project Realm.xcodeproj $1"
+    PROJECT=Realm.xcodeproj
+    if xcode-select -p | grep Xcode6 --quiet; then
+        PROJECT=RealmSwift.xcodeproj
+    fi
+    xc "-project $PROJECT $1"
 }
 
 ######################################
@@ -131,8 +135,7 @@ case "$COMMAND" in
     # Testing
     ######################################
     "test")
-        # FIXME: how to run on a device?
-        #xcrealm "-scheme iOS -configuration Release -sdk iphoneos build test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator build test"
         xcrealm "-scheme OSX -configuration Release build test"
         exit 0
     ;;
@@ -144,6 +147,10 @@ case "$COMMAND" in
     ;;
 
     "test-all")
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        sh build.sh test || exit 1
+        sh build.sh test-debug || exit 1
+        sudo xcode-select -s /Applications/Xcode6-Beta.app/Contents/Developer
         sh build.sh test || exit 1
         sh build.sh test-debug || exit 1
         exit 0
