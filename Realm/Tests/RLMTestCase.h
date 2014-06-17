@@ -18,12 +18,11 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
+#import "RLMTestObjects.h"
 
 NSString *RLMTestRealmPath();
 NSString *RLMDefaultRealmPath();
 NSString *RLMRealmPathForFile();
-
-@class RLMRealm;
 
 @interface RLMTestCase : XCTestCase
 

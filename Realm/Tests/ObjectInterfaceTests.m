@@ -17,53 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-
-//
-// for custom accessor test
-//
-@interface CustomAccessors : RLMObject
-@property (getter = getThatName) NSString * name;
-@property (setter = setTheInt:) int age;
-@end
-
-@implementation CustomAccessors
-@end
-
-
-//
-// for subclass test
-//
-@interface InvalidSubclassObject : RLMTestObject
-@property NSString *invalid;
-@end
-
-@implementation InvalidSubclassObject
-@end
-
-
-//
-// for class extension test
-//
-@interface BaseClassTestObject : RLMObject
-@property NSInteger intCol;
-@end
-
-// Class extension, adding one more column
-@interface BaseClassTestObject ()
-@property (nonatomic, copy) NSString *stringCol;
-@end
-
-@implementation BaseClassTestObject
-@end
-
-
 
 @interface ObjectInterfaceTests : RLMTestCase
 @end
 
 @implementation ObjectInterfaceTests
-
 
 - (void)testCustomAccessors
 {
@@ -99,7 +57,6 @@
     bObject.stringCol = @"stringVal";
     [realm addObject:bObject];
     [realm commitWriteTransaction];
-    
     
     BaseClassTestObject *objectFromRealm = [BaseClassTestObject allObjects][0];
     XCTAssertEqual(1, objectFromRealm.intCol, @"Should be 1");

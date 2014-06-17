@@ -17,22 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-
-@interface ArrayPropertyObject : RLMObject
-@property NSString *name;
-@property RLMArray<RLMTestObject> *array;
-@end
-
-@implementation ArrayPropertyObject
-@end
-
 
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
 @implementation ArrayPropertyTests
-
 
 -(void)testPopulateEmptyArray {
     RLMRealm *realm = [self realmWithTestPath];

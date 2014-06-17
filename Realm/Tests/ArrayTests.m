@@ -17,36 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-
-@interface AggregateObject : RLMObject
-@property int intCol;
-@property float floatCol;
-@property double doubleCol;
-@property BOOL boolCol;
-@property NSDate *dateCol;
-@end
-
-@implementation AggregateObject
-@end
-
-@interface PersonObject : RLMObject
-@property NSString *name;
-@property int age;
-@property BOOL hired;
-@end
-
-RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
-
-@implementation PersonObject
-@end
-
-@interface Company : RLMObject
-@property RLMArray<PersonObject> *employees;
-@end
-
-@implementation Company
-@end
 
 @interface ArrayTests : RLMTestCase
 @end

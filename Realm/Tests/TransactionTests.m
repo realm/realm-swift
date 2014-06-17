@@ -17,30 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-
-@interface SimpleMisuseObject : RLMObject
-@property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, assign) NSInteger intCol;
-@end
-
-@implementation SimpleMisuseObject
-
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"stringCol" : @""};
-}
-
-@end
-
 
 @interface TransactionTests : RLMTestCase
-
 @end
 
 @implementation TransactionTests
 
-- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
+- (void)testRealmModifyObjectsOutsideOfWriteTransaction
+{
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
     RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
@@ -49,7 +33,8 @@
     XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
--(void)testTransactionMisuse {
+- (void)testTransactionMisuse
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     // Insert an object
@@ -70,6 +55,5 @@
 
     XCTAssertThrows([realm deleteObject:obj], @"Outside writetransaction");
 }
-
 
 @end
