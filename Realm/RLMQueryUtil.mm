@@ -16,12 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil_Private.hpp"
+#import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 
+#include <tightdb.hpp>
 using namespace tightdb;
-#include <tightdb/query_expression.hpp>
+
 
 NSString *const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException = @"RLMUnsupportedTypesFoundInPropertyComparisonException";
@@ -348,22 +349,24 @@ template<typename T>
 Expression *column_expression(NSComparisonPredicateOptions operatorType,
                                             NSUInteger leftColumn,
                                             NSUInteger rightColumn) {
-    tightdb::Column<T> *col1 = new tightdb::Columns<T>(leftColumn);
-    tightdb::Column<T> *col2 = new tightdb::Columns<T>(rightColumn);
+    Columns<T> *col1 = new Columns<T>(leftColumn);
+    Columns<T> *col2 = new Columns<T>(rightColumn);
 
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
-            return new Compare<tightdb::Equal, T>(col1, col2, true);
+            return new Compare<tightdb::Equal, T>(*col1, *col2, true);
         case NSNotEqualToPredicateOperatorType:
-            return new Compare<tightdb::NotEqual, T>(col1, col2, true);
+            return new Compare<tightdb::NotEqual, T>(*col1, *col2, true);
         case NSLessThanPredicateOperatorType:
-            return new Compare<tightdb::Less, T>(col1, col2, true);
+            return new Compare<tightdb::Less, T>(*col1, *col2, true);
         case NSGreaterThanPredicateOperatorType:
-            return new Compare<tightdb::Greater, T>(col1, col2, true);
+            return new Compare<tightdb::Greater, T>(*col1, *col2, true);
         case NSLessThanOrEqualToPredicateOperatorType:
-            return new Compare<tightdb::LessEqual, T>(col1, col2, true);
+            return new Compare<tightdb::LessEqual, T>(*col1, *col2, true);
         case NSGreaterThanOrEqualToPredicateOperatorType:
-            return new Compare<tightdb::GreaterEqual, T>(col1, col2, true);
+            return new Compare<tightdb::GreaterEqual, T>(*col1, *col2, true);
+        default:
+            @throw RLMPredicateException(@"Wrong operator", @"Wrong operator");
     }
 }
     
@@ -381,13 +384,13 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
     if (leftType == rightType) {
         switch (leftType) {
             case tightdb::type_Int:
-                query.and_query(*column_expression<int>(predicateOptions, left, right));
+                query.and_query(*column_expression<Int>(predicateOptions, left, right));
                 break;
             case tightdb::type_Float:
-                query.and_query(*column_expression<float>(predicateOptions, left, right));
+                query.and_query(*column_expression<Float>(predicateOptions, left, right));
                 break;
             case tightdb::type_Double:
-                query.and_query(*column_expression<double>(predicateOptions, left, right));
+                query.and_query(*column_expression<Double>(predicateOptions, left, right));
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,

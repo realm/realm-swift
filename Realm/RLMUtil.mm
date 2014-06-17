@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMUtil.h"
+#import "RLMUtil.hpp"
 #import "RLMObject.h"
 #import "RLMArray.h"
 #import "RLMProperty.h"

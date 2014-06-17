@@ -20,7 +20,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
-#import "RLMUtil.h"
+#import "RLMUtil.hpp"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 

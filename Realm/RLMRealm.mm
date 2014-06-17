@@ -22,8 +22,8 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil_Private.hpp"
+#import "RLMUtil.hpp"
 
 #include <exception>
 #include <sstream>
