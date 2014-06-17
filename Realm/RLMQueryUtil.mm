@@ -211,26 +211,26 @@ void add_between_constraint_to_query(tightdb::Query & query,
     id from = array.firstObject;
     id to = array.lastObject;
     switch (dataType) {
-        case tightdb::type_DateTime:
+        case type_DateTime:
             query.between_datetime(index,
                                    double([(NSDate *)from timeIntervalSince1970]),
                                    double([(NSDate *)to timeIntervalSince1970]));
             break;
-        case tightdb::type_Double:
+        case type_Double:
         {
             double fromDouble = [(NSNumber *)from doubleValue];
             double toDouble = [(NSNumber *)to doubleValue];
             query.between(index, fromDouble, toDouble);
             break;
         }
-        case tightdb::type_Float:
+        case type_Float:
         {
             float fromFloat = [(NSNumber *)from floatValue];
             float toFloat = [(NSNumber *)to floatValue];
             query.between(index, fromFloat, toFloat);
             break;
         }
-        case tightdb::type_Int:
+        case type_Int:
         {
             int fromInt = [(NSNumber *)from intValue];
             int toInt = [(NSNumber *)to intValue];
@@ -354,17 +354,17 @@ Expression *column_expression(NSComparisonPredicateOptions operatorType,
 
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
-            return new Compare<tightdb::Equal, T>(*col1, *col2, true);
+            return new Compare<Equal, T>(*col1, *col2, true);
         case NSNotEqualToPredicateOperatorType:
-            return new Compare<tightdb::NotEqual, T>(*col1, *col2, true);
+            return new Compare<NotEqual, T>(*col1, *col2, true);
         case NSLessThanPredicateOperatorType:
-            return new Compare<tightdb::Less, T>(*col1, *col2, true);
+            return new Compare<Less, T>(*col1, *col2, true);
         case NSGreaterThanPredicateOperatorType:
-            return new Compare<tightdb::Greater, T>(*col1, *col2, true);
+            return new Compare<Greater, T>(*col1, *col2, true);
         case NSLessThanOrEqualToPredicateOperatorType:
-            return new Compare<tightdb::LessEqual, T>(*col1, *col2, true);
+            return new Compare<LessEqual, T>(*col1, *col2, true);
         case NSGreaterThanOrEqualToPredicateOperatorType:
-            return new Compare<tightdb::GreaterEqual, T>(*col1, *col2, true);
+            return new Compare<GreaterEqual, T>(*col1, *col2, true);
         default:
             @throw RLMPredicateException(@"Wrong operator", @"Wrong operator");
     }
