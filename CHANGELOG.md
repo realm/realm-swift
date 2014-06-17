@@ -5,7 +5,7 @@
 
 ### API breaking changes
 
-* None.
+* All methods that previously accepted variadic arguments as a predicate now only accept NSPredicate
 
 ### Enhancements
 

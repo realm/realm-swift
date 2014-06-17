@@ -34,20 +34,5 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema 
 
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
 
-
 // predicate exception
 NSException *RLMPredicateException(NSString *name, NSString *reason);
-
-// This macro generates an NSPredicate from either an NSPredicate or an NSString with optional format va_list
-#define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
-if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
-    OUTPREDICATE = INPREDICATE;                            \
-} else if ([INPREDICATE isKindOfClass:[NSString class]]) { \
-    va_list args;                                          \
-    va_start(args, INPREDICATE);                           \
-    OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
-    va_end(args);                                          \
-} else if (INPREDICATE) {                                  \
-    NSString *reason = @"predicate must be either an NSPredicate or an NSString with optional format va_list";  \
-    [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];                                 \
-}

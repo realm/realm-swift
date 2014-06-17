@@ -191,32 +191,29 @@
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @param predicate   An NSPredicate to filter the array.
  */
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
+- (NSUInteger)indexOfObjectWhere:(NSPredicate *)predicate;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @param predicate   An NSPredicate to filter the array.
  
  @return            An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWhere:(id)predicate, ...;
+- (RLMArray *)objectsWhere:(NSPredicate *)predicate;
 
 /**
  Get an ordered RLMArray of objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
  @param order       This argument determines how the results are sorted. It can be an NSString containing
- t                  he property name, or an NSSortDescriptor with the property name and order.
+                    the property name, or an NSSortDescriptor with the property name and order.
+ @param predicate   An NSPredicate to filter the array.
  
  @return            An RLMArray of objects that match the predicate ordered by the given order.
  */
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objectsOrderedBy:(id)order where:(NSPredicate *)predicate;
 
 
 #pragma mark -

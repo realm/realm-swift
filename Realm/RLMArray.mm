@@ -142,12 +142,12 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWhere:(id)predicate, ... {
+- (RLMArray *)objectsWhere:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+- (RLMArray *)objectsOrderedBy:(id)order where:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
@@ -172,7 +172,7 @@
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+- (NSUInteger)indexOfObjectWhere:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];
 }

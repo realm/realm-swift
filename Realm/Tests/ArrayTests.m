@@ -123,8 +123,8 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     
     [realm commitWriteTransaction];
     
-    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
+    RLMArray *noArray = [AggregateObject objectsWhere:[NSPredicate predicateWithFormat:@"boolCol == NO"]];
+    RLMArray *yesArray = [AggregateObject objectsWhere:[NSPredicate predicateWithFormat:@"boolCol == YES"]];
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
