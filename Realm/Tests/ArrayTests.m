@@ -38,7 +38,16 @@
 @property BOOL hired;
 @end
 
+RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
+
 @implementation PersonObject
+@end
+
+@interface Company : RLMObject
+@property RLMArray<PersonObject> *employees;
+@end
+
+@implementation Company
 @end
 
 @interface ArrayTests : RLMTestCase
@@ -245,6 +254,77 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+}
+
+- (void)testDeleteLinksAndObjectsInArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    
+    PersonObject *po1 = [[PersonObject alloc] init];
+    po1.age = 40;
+    po1.name = @"Joe";
+    po1.hired = YES;
+    
+    PersonObject *po2 = [[PersonObject alloc] init];
+    po2.age = 30;
+    po2.name = @"John";
+    po2.hired = NO;
+    
+    PersonObject *po3 = [[PersonObject alloc] init];
+    po3.age = 25;
+    po3.name = @"Jill";
+    po3.hired = YES;
+    
+    [realm addObject:po1];
+    [realm addObject:po2];
+    [realm addObject:po3];
+    
+    Company *company = [[Company alloc] init];
+    company.employees = (RLMArray<PersonObject> *)[PersonObject allObjects];
+    [realm addObject:company];
+    
+    [realm commitWriteTransaction];
+    
+    RLMArray *peopleInCompany = company.employees;
+    
+    // Delete link to employee
+    XCTAssertThrows([peopleInCompany removeObjectAtIndex:1], @"Not allowed in read transaction");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)3, @"No links should have been deleted");
+    
+    [realm beginWriteTransaction];
+    XCTAssertThrows([peopleInCompany removeObjectAtIndex:3], @"Out of bounds");
+    XCTAssertNoThrow([peopleInCompany removeObjectAtIndex:1], @"Should delete link to employee");
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"link deleted when accessing via links");
+    PersonObject *test = peopleInCompany[0];
+    XCTAssertEqual(test.age, po1.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
+    //XCTAssertEqualObjects(test, po1, @"Should be equal"); //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+    
+    test = peopleInCompany[1];
+    XCTAssertEqual(test.age, po3.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po3.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
+    //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
+    
+    RLMArray *allPeople = [PersonObject allObjects];
+    XCTAssertEqual(allPeople.count, (NSUInteger)3, @"Only links should have been deleted, not the employees");
+    
+    
+    // Delete the actual employees
+    XCTAssertThrows([allPeople removeObjectAtIndex:1], @"Not allowed in read transaction");
+    XCTAssertEqual(allPeople.count, (NSUInteger)3, @"No employees should have been deleted");
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows([peopleInCompany removeObjectAtIndex:3], @"Out of bounds");
+    allPeople = [PersonObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
+
+    //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported
+    //XCTAssertEqual(allPeople.count, (NSUInteger)2, @" 1 employee should have been deleted");
+    [realm commitWriteTransaction];
 }
 
 @end
