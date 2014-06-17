@@ -90,8 +90,7 @@
     [realm deleteObject:owner.dog];
     [realm commitWriteTransaction];
     
-    // FIXME - re-enable once we fix accessor updates
-    // XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+    XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
 
     // refresh owner and check
     owner = [realm allObjects:[OwnerObject className]].firstObject;

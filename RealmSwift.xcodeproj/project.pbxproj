@@ -113,6 +113,8 @@
 		E856510D194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E856510E194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
 		E856510F194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
+		E89F13FA194FFAC40078736B /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */; };
+		E89F13FB194FFAC40078736B /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */; };
 		E8AED8AF194FEFA700181A7E /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */; };
 		E8AED8B0194FEFA700181A7E /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */; };
 		E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
@@ -244,6 +246,7 @@
 		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E856510A194FD0660058DBFC /* RLMNotificationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNotificationToken.h; sourceTree = "<group>"; };
 		E856510B194FD0660058DBFC /* RLMNotificationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMNotificationToken.m; sourceTree = "<group>"; };
+		E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
 		E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMixedTests.swift; sourceTree = "<group>"; };
 		E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "iOS Tests-Bridging-Header.h"; path = "Swift/iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSX Tests-Bridging-Header.h"; path = "Swift/OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -389,6 +392,7 @@
 				E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */,
 				E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */,
 				E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */,
+				E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */,
 			);
 			path = Swift;
 			sourceTree = "<group>";
@@ -727,6 +731,7 @@
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
+				E89F13FA194FFAC40078736B /* SwiftLinkTests.swift in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -772,6 +777,7 @@
 				E8356B2E1947BF72009FC9F5 /* XCTestCase+AsyncTesting.m in Sources */,
 				E8356B271947BF69009FC9F5 /* ObjectInterfaceTests.m in Sources */,
 				E8356B281947BF69009FC9F5 /* ObjectTests.m in Sources */,
+				E89F13FB194FFAC40078736B /* SwiftLinkTests.swift in Sources */,
 				E8356B251947BF69009FC9F5 /* LinkTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
