@@ -216,8 +216,8 @@ static NSArray *s_objectDescriptors = nil;
 + (void)useInMemoryDefaultRealm
 {
     @synchronized(s_realmsPerPath) {
-        if (s_realmsPerPath.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting an RLMRealm instance" userInfo:nil];
+        if (realmsAtPath(RLMRealm.defaultPath).count) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
         }
     }
     s_useInMemoryDefaultRealm = YES;
