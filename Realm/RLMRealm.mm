@@ -566,3 +566,11 @@ static NSArray *s_objectDescriptors = nil;
 #pragma GCC diagnostic pop
 
 @end
+
+@implementation RLMNotificationToken
+-(void)dealloc {
+    if (_realm || _block) {
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+    }
+}
+@end
