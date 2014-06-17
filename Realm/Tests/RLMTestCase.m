@@ -1,25 +1,26 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
 
+@interface RLMRealm ()
++ (void)clearRealmCache;
+@end
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
@@ -41,33 +42,50 @@ NSString *RLMTestRealmPath() {
     return RLMRealmPathForFile(@"test.realm");
 }
 
-NSString *RLMTestRealmPathLock() {
-    return RLMRealmPathForFile(@"test.realm.lock");
+NSString *RLMLockPath(NSString *path) {
+    return [path stringByAppendingString:@".lock"];
 }
+
+void RLMDeleteRealmFilesAtPath(NSString *path) {
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
+    }
+    
+    [[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:nil];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMLockPath(path)]) {
+        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
+    }
+}
+
 
 @implementation RLMTestCase
 
-- (void)setUp {
-    // This method is run before every test method
++ (void)setUp {
     [super setUp];
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMDefaultRealmPath() stringByAppendingString:@".lock"] error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
     
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock() error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMTestRealmPath()]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
-    }
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMDefaultRealmPath()]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete test realm" userInfo:nil];
-    }
+    // Delete Realm files
+    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
+    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
 + (void)tearDown {
-    // This method is run after all tests in a test method have run
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
     [super tearDown];
+    
+    // Reset realm cache
+    [RLMRealm clearRealmCache];
+    
+    // Delete Realm files
+    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
+    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+}
+
+- (void)invokeTest {
+    [RLMTestCase setUp];
+    @autoreleasepool {
+        [super invokeTest];
+    }
+    [RLMTestCase tearDown];
 }
 
 - (RLMRealm *)realmWithTestPath {

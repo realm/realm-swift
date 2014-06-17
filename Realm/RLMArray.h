@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -22,87 +20,103 @@
 
 @class RLMObject;
 
-/**---------------------------------------------------------------------------------------
- *  @name Accessors and Getting Objects
- *  ---------------------------------------------------------------------------------------
+/**
+ 
+ RLMArray is the primary container type in Realm.
+ Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
+ This is referred to in these docs as the “type” of the array.
+ 
+ RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
+ so you can easily chain queries to further filter query results.
+ 
+ RLMArrays fulfill 2 primary purposes:
+ 
+ - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
+ - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
+ 
  */
+
 @interface RLMArray : NSObject<NSFastEnumeration>
 
-/** 
- Initialize an RLMArray.
- 
- @param objectClassName     The class name of object this RLMArray will hold.
-
- @return                    An initialized RLMArray instance.
-*/
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+/**---------------------------------------------------------------------------------------
+ *  @name RLMArray Properties
+ *  ---------------------------------------------------------------------------------------
+ */
 
 /**
- Number of objects in the RLMArray.
+ Number of objects in the array.
  */
-@property (nonatomic, readonly) NSUInteger count;
+@property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The object class of objects in the RLMArray.
+ The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
-@property (nonatomic, readonly) Class objectClass;
+@property (nonatomic, readonly, copy) NSString *objectClassName;
 
-@end
+/**
+ Indicates if the RLMArray is readOnly. 
+ YES for RLMArray instances returned from predicate queries and object enumeration.
+ */
+@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
-@interface RLMArray (Accessors)
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Accessing Objects from an Array
+ * ---------------------------------------------------------------------------------------
+ */
 
 /**
  Returns the object at the index specified.
  
  @param index   The index to look up.
  
- @return An object.
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
- Returns the first object.
+ Returns the first object in the array.
  
- Returns nil if called on an empty RLMArray.
+ Returns `nil` if called on an empty RLMArray.
  
- @return An object (of the same type as returned from the objectClass selector).
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)firstObject;
 
 /**
- Returns the last object.
+ Returns the last object in the array.
 
- Returns nil if called on an empty RLMArray.
+ Returns `nil` if called on an empty RLMArray.
 
- @return An object (of the same type as returned from the objectClass selector).
+ @return An RLMObject of the class contained by this RLMArray.
  */
 - (id)lastObject;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Adding, Removing, and Replacing Objects
+ *  @name Adding, Removing, and Replacing Objects in an Array
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Mutators)
 
 /**
- Adds an object to the end of the RLMArray.
+ Adds an object to the end of the array.
  
  @warning This method can only be called during a write transaction.
  
- @param object  An object (of the same type as returned from the objectClass selector).
+ @param object  An RLMObject of the class contained by this RLMArray.
  */
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds an array of object to the bottom of the RLMTable.
+ Adds an array of objects at the end of the array.
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An NSArray or RLMArray of objects. The contained objects must be of the type returned
-                    from the objectClass selector.
+ @param objects     An NSArray or RLMArray of objects of the class contained by this RLMArray.
  */
 - (void)addObjectsFromArray:(id)objects;
 
@@ -113,7 +127,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param anObject  An object (of the same type as returned from the objectClass selector).
+ @param anObject  An object (of the same type as returned from the objectClassName selector).
  @param index   The array index at which the object is inserted.
  */
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
@@ -151,24 +165,24 @@
  @warning This method can only be called during a write transaction.
  
  @param index       The array index of the object to be replaced.
- @param anObject    An object (of the same type as returned from the objectClass selector).
+ @param anObject    An object (of the same type as returned from the objectClassName selector).
  */
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject;
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Object Queries
+ *  @name Querying an Array
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Queries)
 /**
  Gets the index of an object.
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param object  An object (of the same type as returned from the objectClass selector).
+ @param object  An object (of the same type as returned from the objectClassName selector).
  */
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
@@ -177,7 +191,7 @@
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  */
 - (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
@@ -185,7 +199,7 @@
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  
  @return            An RLMArray of objects that match the given predicate
@@ -195,7 +209,7 @@
 /**
  Get an ordered RLMArray of objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
+ @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
                     which can accept variable arguments.
  @param order       This argument determines how the results are sorted. It can be an NSString containing
  t                  he property name, or an NSSortDescriptor with the property name and order.
@@ -204,23 +218,21 @@
  */
 - (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
-@end
+
+#pragma mark -
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Aggregate Queries
+ *  @name Aggregating Property Values
  *  ---------------------------------------------------------------------------------------
  */
-@interface RLMArray (Aggregates)
 
 /**
  Returns the minimum (lowest) value of the given property 
  
  NSNumber *min = [array minOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to look for a minimum on. Only properties of type int, float and double are supported.
  
@@ -233,9 +245,7 @@
  
  NSNumber *max = [array maxOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
  
@@ -248,9 +258,7 @@
  
  NSNumber *sum = [array sumOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to calculate sum on. Only properties of type int, float and double are supported.
  
@@ -263,9 +271,7 @@
  
  NSNumber *average = [table averageOfProperty:@"age"];
  
- @warning You can only use this method on properties with the following types: int, float & double.
- @bug Properties of type NSDate or NSString are not supported (yet).
- @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
  
  @param property The property to calculate average on. Only properties of type int, float and double are supported.
  
@@ -274,26 +280,24 @@
  */
 -(NSNumber *)averageOfProperty:(NSString *)property;
 
-@end
 
+#pragma mark -
 
-@interface RLMArray (JSONSerialization)
 
 /**---------------------------------------------------------------------------------------
- *  @name JSON Serialization
+ *  @name Serializing an Array to JSON
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns a JSON string of an RLMArray and all of its objects.
+ Returns the RLMArray and the RLMObjects it contains as a JSON string.
  
  @return    JSON string representation of this RLMArray.
  */
 - (NSString *)JSONString;
 
-@end
 
+#pragma mark -
 
-@interface RLMArray (IndexSubscripting)
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;

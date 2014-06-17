@@ -1,25 +1,33 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
+
+
+@interface NonRealmPersonObject : NSObject
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) NSInteger age;
+@end
+
+@implementation NonRealmPersonObject
+@end
+
 
 @interface PersonQueryObject : RLMObject
 @property (nonatomic, copy) NSString *name;
@@ -56,10 +64,10 @@
 @implementation TestQueryObject
 @end
 
-@interface RLMQueryTests : RLMTestCase
+@interface QueryTests : RLMTestCase
 @end
 
-@implementation RLMQueryTests
+@implementation QueryTests
 
 #pragma mark - Tests
 
@@ -74,10 +82,10 @@
     [realm commitWriteTransaction];
     
     // query on realm
-    XCTAssertEqual([realm objects:PersonQueryObject.className where:@"age > 28"].count, 2, @"Expecting 2 results");
+    XCTAssertEqual([realm objects:[PersonQueryObject className] where:@"age > 28"].count, (NSUInteger)2, @"Expecting 2 results");
     
     // query on realm with order
-    RLMArray *results = [realm objects:PersonQueryObject.className orderedBy:@"age" where:@"age > 28"];
+    RLMArray *results = [realm objects:[PersonQueryObject className] orderedBy:@"age" where:@"age > 28"];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -93,8 +101,8 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
-    XCTAssertEqual(all.count, 3, @"Expecting 3 results");
-    XCTAssertEqual([PersonQueryObject objectsWhere:@"age == 27"].count, 1, @"Expecting 1 results");
+    XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
+    XCTAssertEqual([PersonQueryObject objectsWhere:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 results");
     
     // with order
     RLMArray *results = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
@@ -113,11 +121,13 @@
     
     // query on class
     RLMArray *all = [PersonQueryObject allObjects];
+    XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
+
     RLMArray *some = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
     
     // query/order on array
-    XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1, @"Expecting 1 result");
-    XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0, @"Expecting 0 results");
+    XCTAssertEqual([all objectsWhere:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 result");
+    XCTAssertEqual([all objectsWhere:@"age == 28"].count, (NSUInteger)0, @"Expecting 0 results");
     some = [some objectsOrderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO] where:nil];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
@@ -243,19 +253,150 @@
     XCTAssertThrows([AllPropertyTypesObject objectsOrderedBy:sortDesc where:nil], @"Sort on mixed col not supported");
 }
 
+- (void)testClassMisuse
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // class not derived from RLMObject
+    XCTAssertThrows([realm objects:@"NonRealmPersonObject" where:@"age > 25"], @"invalid object type");
+    XCTAssertThrows([realm objects:@"NonRealmPersonObject" orderedBy:@"age" where:@"age > 25"], @"invalid object type");
+
+    // empty string for class name
+    XCTAssertThrows([realm objects:@"" where:@"age > 25"], @"missing class name");
+    XCTAssertThrows([realm objects:@"" orderedBy:@"age" where:@"age > 25"], @"missing class name");
+
+    // nil class name
+    XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
+    XCTAssertThrows([realm objects:nil orderedBy:@"age" where:@"age > 25"], @"nil class name");
+}
+
+- (void)testPredicateValidUse
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    NSString *className = AllPropertyTypesObject.className;
+    
+    // boolean false
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == no"], @"== no");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == No"], @"== No");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == NO"], @"== NO");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == false"], @"== false");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == False"], @"== False");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == FALSE"], @"== FALSE");
+
+    // boolean true
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == yes"], @"== yes");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == Yes"], @"== Yes");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == YES"], @"== YES");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == true"], @"== true");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == True"], @"== True");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == TRUE"], @"== TRUE");
+    
+    // inequality
+    XCTAssertNoThrow([realm objects:className where:@"boolCol != YES"], @"!= YES");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol <> YES"], @"<> YES");
+    
+    // string comparisons
+    XCTAssertNoThrow([realm objects:className where:@"stringCol BEGINSWITH 'test'"], @"BEGINSWITH");
+    XCTAssertNoThrow([realm objects:className where:@"stringCol CONTAINS 'test'"], @"CONTAINS");
+    XCTAssertNoThrow([realm objects:className where:@"stringCol ENDSWITH 'test'"], @"ENDSWITH");
+
+    // ANY
+    XCTAssertNoThrow([realm objects:className where:@"ANY intCol > 5"], @"ANY int > constant");
+
+    // ALL
+    XCTAssertNoThrow([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
+}
+
+- (void)testPredicateNotSupported
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    NSString *className = PersonQueryObject.className;
+
+    // LIKE
+    XCTAssertThrows([realm objects:className where:@"name LIKE 'Smith'"], @"LIKE");
+
+    // IN
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"stringCol IN %@",
+                              @[@"Moe", @"Larry", @"Curly"]];
+    XCTAssertThrows([realm objects:className where:predicate], @"IN array");
+    
+    // testing for null
+    XCTAssertThrows([realm objects:className where:@"stringCol = nil"], @"test for nil");
+}
+
+- (void)testPredicateMisuse
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    NSString *className = PersonQueryObject.className;
+    
+    // invalid column/property name
+    XCTAssertThrows([realm objects:className where:@"height > 72"], @"invalid column");
+    
+    // wrong/invalid data types
+    XCTAssertThrows([realm objects:className where:@"age != xyz"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"name == 3"], @"invalid type");
+    
+    className = AllPropertyTypesObject.className;
+    
+    XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"dateCol == 7"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"doubleCol == The"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"floatCol == Bar"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"intCol == Baz"], @"invalid type");
+    
+    className = PersonQueryObject.className;
+    
+    // compare two constants
+    XCTAssertThrows([realm objects:className where:@"3 == 3"], @"comparing 2 constants");
+
+    // invalid strings
+    XCTAssertThrows([realm objects:className where:@""], @"empty string");
+    XCTAssertThrows([realm objects:className where:@"age"], @"column name only");
+    XCTAssertThrows([realm objects:className where:@"sdlfjasdflj"], @"gibberish");
+    XCTAssertThrows([realm objects:className where:@"age * 25"], @"invalid operator");
+    XCTAssertThrows([realm objects:className where:@"age === 25"], @"invalid operator");
+    XCTAssertThrows([realm objects:className where:@","], @"comma");
+    XCTAssertThrows([realm objects:className where:@"()"], @"parens");
+
+
+    // abuse of BETWEEN
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN 25"], @"between with a scalar");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN Foo"], @"between with a string");
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
+    XCTAssertThrows([realm objects:className where:pred], @"between with array of 1 item");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @2, @3]];
+    XCTAssertThrows([realm objects:className where:pred], @"between with array of 3 items");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
+    XCTAssertThrows([realm objects:className where:pred], @"between with array of 3 items");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
+    XCTAssertThrows([realm objects:className where:pred], @"between with dictionary");
+    
+    pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
+    XCTAssertThrows([realm objects:className where:pred], @"invalid property/column");
+    
+
+}
+
 - (void)testTwoColumnComparisonQuery
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
     
-    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0, @1.7,  @0.0,  @5.55, @"Instance 0"]];
-    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3, @4.21, @1.0,  @4.44, @"Instance 1"]];
-    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0,  @3.55, @99.9, @6.66, @"Instance 2"]];
-    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21, @1.0,  @1.0,  @7.77, @"Instance 3"]];
-    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0, @23.0, @7.4,  @8.88, @"Instance 4"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0,  @66.0, @1.01, @9.99, @"Instance 5"]];
-    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0,  @66.0, @1.01, @9.99, @"Instance 6"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [TestQueryObject createInRealm:realm withObject:@[@1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [TestQueryObject createInRealm:realm withObject:@[@2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"Instance 2"]];
+    [TestQueryObject createInRealm:realm withObject:@[@3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"Instance 3"]];
+    [TestQueryObject createInRealm:realm withObject:@[@4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"Instance 4"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 5"]];
+    [TestQueryObject createInRealm:realm withObject:@[@15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
     
     [realm commitWriteTransaction];
 

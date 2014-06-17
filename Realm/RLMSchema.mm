@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -25,25 +23,6 @@
 #import "RLMUtil.h"
 
 #import <objc/runtime.h>
-
-// NOTE: the object store uses a custom table namespace for storing data.
-// There current names used are:
-//  class_* - any table name beginning with class is used to store objects
-//            of the typename (the rest of the name after class)
-//  metadata - table used for realm metadata storage
-NSString *const c_objectTableNamePrefix = @"class_";
-NSString *const c_metadataTableName = @"metadata";
-
-inline NSString *RLMTableNameForClassName(NSString *className) {
-    return [c_objectTableNamePrefix stringByAppendingString:className];
-}
-
-inline NSString *RLMClasForTableName(NSString *tableName) {
-    if ([tableName hasPrefix:@"class_"]) {
-        return [tableName substringFromIndex:6];
-    }
-    return nil;
-}
 
 // RLMSchema private properties
 @interface RLMSchema ()
@@ -127,7 +106,7 @@ static RLMSchema *s_sharedSchema;
     RLMSchema *schema = [[RLMSchema alloc] init];
     for (unsigned long i = 0; i < numTables; i++) {
         NSString *tableName = [NSString stringWithUTF8String:realm.group->get_table_name(i).data()];
-        NSString *className = RLMClasForTableName(tableName);
+        NSString *className = RLMClassForTableName(tableName);
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];

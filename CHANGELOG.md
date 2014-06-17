@@ -1,4 +1,41 @@
-0.11.0 Release notes (yyyy-MM-dd)
+0.21.0 Release notes (yyyy-MM-dd)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Added support for RLMArrayProperties.
+* Added support for creating in-memory default realm.
+
+### Bugfixes
+
+* None.
+
+
+0.20.0 Release notes (2014-05-28)
+=============================================================
+
+Completely rewritten to be much more object oriented.
+
+### API breaking changes
+
+* Everything
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+
+0.11.0 Release notes (not released)
 =============================================================
 
 The Objective-C API has been updated and your code will break!
@@ -25,6 +62,8 @@ The Objective-C API has been updated and your code will break!
 * Added `maxOfProperty:where:` on `RLMTable`
 * Added `toJSONString` on `RLMRealm`, `RLMTable` and `RLMView`
 * Added support for `NOT` operator in predicates
+* Added support for default values
+* Added validation support in `createInRealm:withObject:`
 
 ### Bugfixes
 

@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -60,14 +58,21 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in objectSchema.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
-                if (prop.type == RLMPropertyTypeObject) {
-//                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-//                    table->add_column_link(name, linkTable->get_index_in_parent());
-                    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                                   reason:@"Links not yest supported" userInfo:nil];
-                }
-                else {
-                    table->add_column((tightdb::DataType)prop.type, name);
+                switch (prop.type) {
+                    // for objects and arrays, we have to specify target table
+                    case RLMPropertyTypeObject:
+                    case RLMPropertyTypeArray: {
+                        tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+                        table->add_column_link(tightdb::DataType(prop.type), name, *linkTable);
+                        break;
+                    }
+                    default: {
+                    	size_t column = table->add_column((tightdb::DataType)prop.type, name);
+                    	if (prop.attributes & RLMPropertyAttributeIndexed) {
+                            table->set_index(column);
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -91,28 +96,38 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     // if realm is not writable throw
     if (realm.transactionMode != RLMTransactionModeWrite) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only add an object to a Realm during a write transaction" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can only add an object to a Realm during a write transaction"
+                                     userInfo:nil];
     }
     
     // get table and create new row
-    Class objectClass = object.class;
-    NSString *objectClassName = NSStringFromClass(objectClass);
+    NSString *objectClassName = object.schema.className;
     object.realm = realm;
     object.schema = realm.schema[objectClassName];
-    object.backingTable = RLMTableForObjectClass(realm, objectClassName).get();
+    object.backingTable = RLMTableForObjectClass(realm, objectClassName);
     object.objectIndex = object.backingTable->add_empty_row();
-    object.backingTableIndex = object.backingTable->get_index_in_parent();
     
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
+    Class objectClass = NSClassFromString(objectClassName);
     object_setClass(object, RLMInsertionAccessorClassForObjectClass(objectClass, schema));
 
     // call our insertion setter to populate all properties in the table
     for (RLMProperty *prop in schema.properties) {
         // InsertionAccessr getter gets object from ivar
         id value = [object valueForKey:prop.name];
-        // InsertionAccssor setter inserts into table
-        [object setValue:value forKey:prop.name];
+        
+        // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
+        if (value) {
+            // InsertionAccssor setter inserts into table
+            [object setValue:value forKey:prop.name];
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"No value or default value specified for %@ property", prop.name]
+                                         userInfo:nil];
+        }
     }
     
     // we are in a read transaction so change accessor class to readwrite accessor
@@ -127,14 +142,9 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     if (object.realm.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
-    // if last in table delete, otherwise replace with last
-    if (object.objectIndex == object.backingTable->size() - 1) {
-        object.backingTable->remove(object.objectIndex);
-    }
-    else {
-        object.backingTable->move_last_over(object.objectIndex);
-        // FIXME - fix all accessors
-    }
+    // move last row to row we are deleting
+    object.backingTable->move_last_over(object.objectIndex);
+    // FIXME - fix all accessors
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order) {
@@ -151,12 +161,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateViewWithOrder(view, order, schema);
     
     // create and populate array
-    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:objectClassName query:query view:view];
-    array.backingTable = table.get();
-    array.backingTableIndex = array.backingTable->get_index_in_parent();
-    array.realm = realm;
-    [realm registerAccessor:array];
-    return array;
+    return [RLMArrayTableView arrayWithObjectClassName:objectClassName query:query view:view realm:realm];
 }
 
 // Create accessor and register with realm
@@ -166,19 +171,17 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     
     // get acessor fot the object class
     Class accessorClass = RLMAccessorClassForObjectClass(objectClass, realm.schema[objectClassName]);
-    RLMObject *accessor = [[accessorClass alloc] init];
-    accessor.realm = realm;
-    accessor.schema = realm.schema[objectClassName];
+    RLMObject *accessor = [[accessorClass alloc] initWithRealm:realm
+                                                        schema:realm.schema[objectClassName]
+                                                 defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    accessor.backingTable = table.get();
-    accessor.backingTableIndex = table->get_index_in_parent();
+    accessor.backingTable = table;
     accessor.objectIndex = index;
     accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
     
     [accessor.realm registerAccessor:accessor];
     return accessor;
 }
-
 
 

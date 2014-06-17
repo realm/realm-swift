@@ -1,32 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMObject_Private.h"
+#import "RLMArray_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #include <exception>
 #include <sstream>
 
+#include <tightdb/version.hpp>
 #include <tightdb/group_shared.hpp>
 #include <tightdb/group.hpp>
 #include <tightdb/util/unique_ptr.hpp>
@@ -42,6 +44,13 @@ namespace {
 void throw_objc_exception(exception &ex) {
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
     @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
+}
+ 
+// create NSError from c++ exception
+inline NSError* make_realm_error(RLMError code, exception &ex) {
+    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
 }
 
 } // anonymous namespace
@@ -65,9 +74,7 @@ void throw_objc_exception(exception &ex) {
 
 
 //
-//
 // Global RLMRealm instance cache
-//
 //
 static NSMutableDictionary *s_realmsPerPath;
 
@@ -98,23 +105,37 @@ inline NSArray *realmsAtPath(NSString *path) {
     }
 }
 
-
-inline NSError* make_realm_error(RLMError code, exception &ex)
-{
-    NSMutableDictionary* details = [NSMutableDictionary dictionary];
-    [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
+inline void clearRealmCache() {
+    @synchronized(s_realmsPerPath) {
+        s_realmsPerPath = [NSMutableDictionary dictionary];
+    }
 }
+
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
+@implementation RLMNotificationToken
+-(void)dealloc {
+    if (_realm || _block) {
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+    }
+}
+@end
 
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
-@property (nonatomic) BOOL isReadOnly;
 @property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
 
 NSString *const c_defaultRealmFileName = @"default.realm";
+static BOOL s_useInMemoryDefaultRealm = NO;
 static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
@@ -123,10 +144,14 @@ static NSArray *s_objectDescriptors = nil;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
-    NSMutableArray *_notificationHandlers;
+    NSMapTable *_notificationHandlers;
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
+}
+
++ (BOOL)isCoreDebug {
+    return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
 
 + (void)initialize {
@@ -134,7 +159,7 @@ static NSArray *s_objectDescriptors = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // initilize realm cache
-        s_realmsPerPath = [NSMutableDictionary dictionary];
+        clearRealmCache();
         
         // initialize object store
         RLMInitializeObjectStore();
@@ -149,8 +174,8 @@ static NSArray *s_objectDescriptors = nil;
         _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                              valueOptions:NSPointerFunctionsWeakMemory
                                                  capacity:128];
-        _notificationHandlers = [NSMutableArray array];
-        _isReadOnly = readonly;
+        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
+        _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                         target:[RLMWeakTarget createWithRealm:self]
                                                       selector:@selector(checkForUpdate)
@@ -193,8 +218,12 @@ static NSArray *s_objectDescriptors = nil;
 
 + (void)useInMemoryDefaultRealm
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @synchronized(s_realmsPerPath) {
+        if (realmsAtPath(RLMRealm.defaultPath).count) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
+        }
+    }
+    s_useInMemoryDefaultRealm = YES;
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -218,15 +247,14 @@ static NSArray *s_objectDescriptors = nil;
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop. \
-                                               Use an RLMTransactionManager read or write block \
-                                               instead.", NSStringFromSelector(_cmd)] userInfo:nil];
+                                               can only be called from a thread with a runloop.",
+                                               NSStringFromSelector(_cmd)] userInfo:nil];
     }
-
+    
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
-        // if already open with different read permissions then throw
+        // if already opened with different read permissions then throw
         if (realm.isReadOnly != readonly) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Realm at path already opened with different read permissions"
@@ -242,7 +270,11 @@ static NSArray *s_objectDescriptors = nil;
     
     NSError *error = nil;
     try {
-        realm->_sharedGroup.reset(new SharedGroup(path.UTF8String));
+        if (s_useInMemoryDefaultRealm && [path isEqualToString:RLMRealm.defaultPath]) { // Only for default realm
+            realm->_sharedGroup.reset(new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly));
+        } else {
+            realm->_sharedGroup.reset(new SharedGroup(path.UTF8String));
+        }
     }
     catch (File::PermissionDenied &ex) {
         error = make_realm_error(RLMErrorFilePermissionDenied, ex);
@@ -252,6 +284,12 @@ static NSArray *s_objectDescriptors = nil;
     }
     catch (File::AccessError &ex) {
         error = make_realm_error(RLMErrorFileAccessError, ex);
+    }
+    catch (SharedGroup::PresumablyStaleLockFile &ex) {
+        error = make_realm_error(RLMErrorStaleLockFile, ex);
+    }
+    catch (SharedGroup::LockFileButNoData &ex) {
+        error = make_realm_error(RLMErrorLockFileButNoData, ex);
     }
     catch (exception &ex) {
         error = make_realm_error(RLMErrorFail, ex);
@@ -287,22 +325,30 @@ static NSArray *s_objectDescriptors = nil;
     return realm;
 }
 
-- (void)addNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers addObject:block];
++ (void)clearRealmCache {
+    clearRealmCache();
 }
 
-- (void)removeNotificationBlock:(RLMNotificationBlock)block {
-    [_notificationHandlers removeObject:block];
+- (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
+    RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
+    token.realm = self;
+    token.block = block;
+    [_notificationHandlers setObject:token forKey:token];
+    return token;
 }
 
-- (void)removeAllNotificationBlocks {
-    [_notificationHandlers removeAllObjects];
+- (void)removeNotification:(RLMNotificationToken *)token {
+    if (token) {
+        [_notificationHandlers removeObjectForKey:token];
+        token.realm = nil;
+        token.block = nil;
+    }
 }
 
 - (void)sendNotifications {
     // call this realms notification blocks
-    for (RLMNotificationBlock block in _notificationHandlers) {
-        block(RLMRealmDidChangeNotification, self);
+    for (RLMNotificationToken *token in _notificationHandlers) {
+        token.block(RLMRealmDidChangeNotification, self);
     }
 }
 
@@ -455,11 +501,30 @@ static NSArray *s_objectDescriptors = nil;
         tightdb::Group *group = self.group;
         BOOL writable = (self.transactionMode == RLMTransactionModeWrite);
 
+        // update arrays after updating all parent objects
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        NSMutableArray *arrays = [NSMutableArray array];
+        
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            TableRef tableRef = group->get_table(obj.backingTableIndex); // Throws
-            obj.backingTable = tableRef.get();
-            obj.writable = writable;
+            //
+            // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
+            //
+            if ([obj isKindOfClass:RLMObject.class]) {
+                TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
+                ((RLMObject *)obj).backingTable = tableRef;
+                obj.writable = writable;
+            }
+            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
+                [arrays addObject:obj];
+            }
+        }
+        
+        // update arrays
+        // FIXME - onces rows use auto-updating accesors this will no longer be needed
+        for (RLMArrayLinkView *ar in arrays) {
+            ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
+            ar.writable = writable;
         }
     }
     catch (exception &ex) {
@@ -522,6 +587,5 @@ static NSArray *s_objectDescriptors = nil;
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 #pragma GCC diagnostic pop
-
 
 @end

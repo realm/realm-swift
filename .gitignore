@@ -1,48 +1,48 @@
 *~
 .DS_Store
 
+# Merge files
+*.orig
+
+# Binaries
+*.dylib
+*.a
+*.o
+*.d
+*.libdeps
+*.zip
+*.realm
+*.realm.lock
+
+# core
+core
+
 # sh build.sh config
 /Realm/config.mk
 
-# sh build.sh build
-/Realm/*.o
-/Realm/*.d
-/Realm/*.dylib
-
 # sh build.sh test
-*.realm
-*.realm.lock
-/Realm/Tests/*.o
-/Realm/Tests/*.d
 build/
 
-# XCode
-xcuserdata/
-project.xcworkspace
-DerivedData
 # sh build.sh build-iphone
 /iphone-lib/include
-/iphone-lib/librealm-objc-ios.a
-/iphone-lib/librealm-objc-ios-dbg.a
-Realm/*.dylib
-Realm/*.a
-Realm/*.libdeps
 
 # sh build.sh ios-framework
-/Realm.framework
-realm-ios-*.zip
+# sh build.sh package-examples
+*/Realm.framework
+Realm.framework
 
 # sh build.sh docs
 /docs/output
 
-# sh build.sh package-examples
-/examples/*.zip
-/examples/*/Realm.framework
-/examples/*/*.xcodeproj/*.bak
+# XCode
+*.bak
+xcuserdata/
+project.xcworkspace
+*.xccheckout
+DerivedData
 
-# AppCode specific files
+# AppCode
 .idea/
 *.iml
 # backup and crash files
 *.swp
-*~

@@ -1,28 +1,24 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
 #import "RLMTestObjects.h"
-
 #import <Realm/Realm.h>
-
 
 @interface SimpleObject : RLMObject
 @property NSString *name;
@@ -40,14 +36,6 @@
 @implementation AgeObject
 @end
 
-@interface InvalidSubclassObject : AgeObject
-@property NSString *invalid;
-@end
-
-@implementation InvalidSubclassObject
-@end
-
-
 @interface KeyedObject : RLMObject
 @property NSString * name;
 @property int objID;
@@ -56,32 +44,81 @@
 @implementation KeyedObject
 @end
 
-
-@interface CustomAccessors : RLMObject
-@property (getter = getThatName) NSString * name;
-@property (setter = setTheInt:) int age;
-@end
-
-@implementation CustomAccessors
-@end
-
-
-@interface AggregateObject : RLMObject
+@interface DefaultObject : RLMObject
 @property int intCol;
 @property float floatCol;
 @property double doubleCol;
 @property BOOL boolCol;
 @property NSDate *dateCol;
+@property NSString *stringCol;
+@property NSData *binaryCol;
+@property id mixedCol;
 @end
 
-@implementation AggregateObject
+@implementation DefaultObject
+
++ (NSDictionary *)defaultPropertyValues
+{
+    NSString *binaryString = @"binary";
+    NSData *binaryData = [binaryString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    return @{@"intCol" : @12,
+             @"floatCol" : @88.9f,
+             @"doubleCol" : @1002.892,
+             @"boolCol" : @YES,
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:999999],
+             @"stringCol" : @"potato",
+             @"binaryCol" : binaryData,
+             @"mixedCol" : @"foo"};
+}
+
 @end
 
+@interface NoDefaultObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
 
-@interface RLMObjectTests : RLMTestCase
 @end
 
-@implementation RLMObjectTests
+@implementation NoDefaultObject
+@end
+
+@interface IgnoredURLObject : RLMObject
+@property NSString *name;
+@property NSURL *url;
+@end
+
+@implementation IgnoredURLObject
+
++ (NSArray *)ignoredProperties
+{
+    return @[@"url"];
+}
+
+@end
+
+@interface IndexedObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@end
+
+@implementation IndexedObject
+
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
+{
+    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
+    if ([propertyName isEqualToString:@"name"]) {
+        superAttributes |= RLMPropertyAttributeIndexed;
+    }
+    return superAttributes;
+}
+
+@end
+
+@interface ObjectTests : RLMTestCase
+@end
+
+@implementation ObjectTests
 
 -(void)testObjectInit
 {
@@ -154,19 +191,6 @@
     XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
 }
 
-- (void)testCustomAccessors
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    
-    [realm beginWriteTransaction];
-    CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
-    XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
-        
-    [ca setTheInt:99];
-    XCTAssertEqual((int)ca.age, (int)99, @"age property should be 99");
-    [realm commitWriteTransaction];
-}
-
 - (void)testObjectCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -188,145 +212,6 @@
     XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
-- (void)testObjectAggregate
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    
-    [realm beginWriteTransaction];
-    
-    NSDate *dateMinInput = [NSDate date];
-    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
-    
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    
-    [realm commitWriteTransaction];
-        
-    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
-    
-    // SUM ::::::::::::::::::::::::::::::::::::::::::::::
-    // Test int sum
-    XCTAssertEqual([noArray sumOfProperty:@"intCol"].integerValue, (NSInteger)4, @"Sum should be 4");
-    XCTAssertEqual([yesArray sumOfProperty:@"intCol"].integerValue, (NSInteger)0, @"Sum should be 0");
-        
-    // Test float sum
-    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"floatCol"].floatValue, (float)0.0f, 0.1f, @"Sum should be 0.0");
-    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"floatCol"].floatValue, (float)7.2f, 0.1f, @"Sum should be 7.2");
-        
-    // Test double sum
-    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"doubleCol"].doubleValue, (double)10.0, 0.1f, @"Sum should be 10.0");
-    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"doubleCol"].doubleValue, (double)0.0, 0.1f, @"Sum should be 0.0");
-        
-    // Test invalid column name
-    XCTAssertThrows([yesArray sumOfProperty:@"foo"], @"Should throw exception");
-        
-    // Test operation not supported
-    XCTAssertThrows([yesArray sumOfProperty:@"boolCol"], @"Should throw exception");
-    
-    
-    // Average ::::::::::::::::::::::::::::::::::::::::::::::
-    // Test int average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"intCol"].doubleValue, (double)1.0, 0.1f, @"Average should be 1.0");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"intCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
-    
-    // Test float average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"floatCol"].doubleValue, (double)0.0f, 0.1f, @"Average should be 0.0");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"floatCol"].doubleValue, (double)1.2f, 0.1f, @"Average should be 1.2");
-    
-    // Test double average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"doubleCol"].doubleValue, (double)2.5, 0.1f, @"Average should be 2.5");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"doubleCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
-    
-    // Test invalid column name
-    XCTAssertThrows([yesArray averageOfProperty:@"foo"], @"Should throw exception");
-    
-    // Test operation not supported
-    XCTAssertThrows([yesArray averageOfProperty:@"boolCol"], @"Should throw exception");
-    
-    // MIN ::::::::::::::::::::::::::::::::::::::::::::::
-    // Test int min
-    NSNumber *min = [noArray minOfProperty:@"intCol"];
-    XCTAssertEqual(min.intValue, (NSInteger)1, @"Minimum should be 1");
-    min = [yesArray minOfProperty:@"intCol"];
-    XCTAssertEqual(min.intValue, (NSInteger)0, @"Minimum should be 0");
-    
-    // Test float min
-    min = [noArray minOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(min.floatValue, (float)0.0f, 0.1f, @"Minimum should be 0.0f");
-    min = [yesArray minOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(min.floatValue, (float)1.2f, 0.1f, @"Minimum should be 1.2f");
-    
-    // Test double min
-    min = [noArray minOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(min.doubleValue, (double)2.5, 0.1f, @"Minimum should be 1.5");
-    min = [yesArray minOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(min.doubleValue, (double)0.0, 0.1f, @"Minimum should be 0.0");
-    
-    // Test date min
-    NSDate *dateMinOutput = [noArray minOfProperty:@"dateCol"];
-    XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, @"Minimum should be dateMaxInput");
-    dateMinOutput = [yesArray minOfProperty:@"dateCol"];
-    XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, @"Minimum should be dateMinInput");
-    
-    // Test invalid column name
-    XCTAssertThrows([noArray minOfProperty:@"foo"], @"Should throw exception");
-    
-    // Test operation not supported
-    XCTAssertThrows([noArray minOfProperty:@"boolCol"], @"Should throw exception");
-    
-    
-    // MAX ::::::::::::::::::::::::::::::::::::::::::::::
-    // Test int max
-    NSNumber *max = [noArray maxOfProperty:@"intCol"];
-    XCTAssertEqual(max.integerValue, (NSInteger)1, @"Maximum should be 8");
-    max = [yesArray maxOfProperty:@"intCol"];
-    XCTAssertEqual(max.integerValue, (NSInteger)0, @"Maximum should be 10");
-    
-    // Test float max
-    max = [noArray maxOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(max.floatValue, (float)0.0f, 0.1f, @"Maximum should be 0.0f");
-    max = [yesArray maxOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(max.floatValue, (float)1.2f, 0.1f, @"Maximum should be 1.2f");
-    
-    // Test double max
-    max = [noArray maxOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(max.doubleValue, (double)2.5, 0.1f, @"Maximum should be 3.5");
-    max = [yesArray maxOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(max.doubleValue, (double)0.0, 0.1f, @"Maximum should be 0.0");
-    
-    // Test date max
-    NSDate *dateMaxOutput = [noArray maxOfProperty:@"dateCol"];
-    XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, @"Maximum should be dateMaxInput");
-    dateMaxOutput = [yesArray maxOfProperty:@"dateCol"];
-    XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, @"Maximum should be dateMinInput");
-    
-    // Test invalid column name
-    XCTAssertThrows([noArray maxOfProperty:@"foo"], @"Should throw exception");
-    
-    // Test operation not supported
-    XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
-}
-
-- (void)testObjectSubclass
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    
-    [realm beginWriteTransaction];
-    NSArray *obj = @[@1, @"throw"];
-    XCTAssertThrows([InvalidSubclassObject createInRealm:realm withObject:obj],
-                    @"Adding invalid object should throw");
-    [realm commitWriteTransaction];
-}
-
 - (void)testDataTypes
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -339,7 +224,7 @@
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
-
+    
     c.BoolCol   = NO;
     c.IntCol  = 54;
     c.FloatCol = 0.7f;
@@ -350,11 +235,13 @@
     c.cBoolCol = false;
     c.longCol = 99;
     c.mixedCol = @"string";
+    c.objectCol = [[RLMTestObject alloc] init];
+    c.objectCol.column = @"c";
     
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withObject:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
-                                                     timeNow, @YES, @(-20), @2]];
+                                                     timeNow, @YES, @(-20), @2, NSNull.null]];
     [realm commitWriteTransaction];
     
     AllTypesObject* row1 = [AllTypesObject allObjects][0];
@@ -378,10 +265,266 @@
     XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
     XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
+    XCTAssertTrue([row1.objectCol.column isEqual:@"c"], @"row1.objectCol");
+    XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
+}
 
+#pragma mark - Default Property Values
+
+- (void)testNoDefaultPropertyValues
+{
+    // Test alloc init does not crash for no defaultPropertyValues implementation
+    XCTAssertNoThrow(([[SimpleObject alloc] init]), @"Not implementing defaultPropertyValues should not crash");
+}
+
+- (void)testNoDefaultAdd
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Test #1
+    SimpleObject *simpleObject = [[SimpleObject alloc] init];
+    XCTAssertThrows(([realm addObject:simpleObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    
+    // Test #2
+    NoDefaultObject *noDefaultObject = [[NoDefaultObject alloc] init];
+    XCTAssertThrows(([realm addObject:noDefaultObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    
+    // Test #3
+    noDefaultObject.stringCol = @"foo";
+    XCTAssertNoThrow(([realm addObject:noDefaultObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testDefaultValues
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    const int inputInt = 98;
+    const float inputFloat = 231.0f;
+    const double inputDouble = 123732.9231;
+    const BOOL inputBool = NO;
+    NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
+    NSString * const inputString = @"Westeros";
+    NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
+    id inputMixed = @"Tyrion";
+    
+    NSDictionary * const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
+    NSArray * const keyPaths = inputKeyPathsAndValues.allKeys;
+    
+    for (NSUInteger i = 0; i < keyPaths.count; i++) {
+        NSString *keyToDefault = keyPaths[i];
+        NSMutableDictionary *dict = [inputKeyPathsAndValues mutableCopy];
+        [dict removeObjectForKey:keyToDefault];
+        
+        [DefaultObject createInRealm:realm withObject:dict];
+    }
+    
+    [realm commitWriteTransaction];
+
+    // Test allObject for DefaultObject
+    NSDictionary * const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
+    for (NSUInteger i = 0; i < keyPaths.count; i++) {
+        NSString *keyToDefault = keyPaths[i];
+        DefaultObject *object = [DefaultObject allObjects][i];
+        
+        for (NSUInteger j = 0; j < keyPaths.count; j++) {
+            NSString *key = keyPaths[j];
+            if ([key isEqualToString:keyToDefault]) {
+                XCTAssertEqualObjects([object valueForKey:keyToDefault], defaultKeyPathsAndValues[keyToDefault], @"Value should match value in defaultPropertyValues method");
+            }
+            else {
+                XCTAssertEqualObjects([object valueForKey:key], inputKeyPathsAndValues[key], @"Value should match value that object was initialized with");
+            }
+        }        
+    }
+}
+
+#pragma mark - Ignored Properties
+
+- (void)testIgnoredUnsupportedProperty
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
+                                               property type should not throw");
+    [realm rollbackWriteTransaction];
+}
+
+- (void)testCanUseIgnoredProperty
+{
+    NSURL *url = [NSURL URLWithString:@"http://realm.io"];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    IgnoredURLObject *obj = [IgnoredURLObject new];
+    obj.name = @"Realm";
+    obj.url = url;
+    [realm addObject:obj];
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable inside a write block");
+    
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
+    
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
+    
+    XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
+    XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
+}
+
+- (void)testCreateInRealmValidationForDictionary
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
+                                               @"intCol" : @54,
+                                               @"floatCol" : @0.7f,
+                                               @"doubleCol" : @0.8,
+                                               @"stringCol" : @"foo",
+                                               @"binaryCol" : bin1,
+                                               @"dateCol" : timeNow,
+                                               @"cBoolCol" : @NO,
+                                               @"longCol" : @(99),
+                                               @"mixedCol" : @"mixed",
+                                               @"objectCol": NSNull.null};
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSDictonary
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:dictValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    for (NSString *keyToInvalidate in dictValidAllTypes.allKeys) {
+        NSMutableDictionary *invalidInput = [dictValidAllTypes mutableCopy];
+        id obj = @"invalid";
+        if ([keyToInvalidate isEqualToString:@"stringCol"]) {
+            obj = @1;
+        }
+        
+        invalidInput[keyToInvalidate] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSDictionary
+        if (![keyToInvalidate isEqualToString:@"mixedCol"]) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmValidationForArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    // add test/link object to realm
+    [realm beginWriteTransaction];
+    RLMTestObject *to = [RLMTestObject createInRealm:realm withObject:@[@"c"]];
+    [realm commitWriteTransaction];
+    
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    
+    [realm beginWriteTransaction];
+    
+    // Test NSArray
+    XCTAssertNoThrow(([AllTypesObject createInRealm:realm withObject:arrayValidAllTypes]), @"Creating object with valid value types should not throw exception");
+    
+    const NSInteger stringColIndex = 4;
+    const NSInteger mixedColIndex = 9;
+    for (NSUInteger i = 0; i < arrayValidAllTypes.count; i++) {
+        NSMutableArray *invalidInput = [arrayValidAllTypes mutableCopy];
+        
+        id obj = @"invalid";
+        if (i == stringColIndex) {
+            obj = @1;
+        }
+        
+        invalidInput[i] = obj;
+        
+        // Ignoring test for mixedCol since only NSObjects can go in NSArray
+        if (i != mixedColIndex) {
+            XCTAssertThrows(([AllTypesObject createInRealm:realm withObject:invalidInput]), @"Creating object with invalid value types should throw exception");
+        }
+    }
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmWithMissingValue
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // This exception only gets thrown when there is no default vaule and it is for an NSObject property
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    
+    // This exception gets thrown when count of array does not match with object schema
+    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    
+    [realm commitWriteTransaction];
+}
+
+- (void)testObjectDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Init object before adding to realm
+    SimpleObject *soInit = [[SimpleObject alloc] init];
+    soInit.name = @"Peter";
+    soInit.age = 30;
+    soInit.hired = YES;
+    [realm addObject:soInit];
+    
+    // description asserts block
+    void(^descriptionAsserts)(NSString *) = ^(NSString *description) {
+        XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@30 description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+        
+        XCTAssertTrue([description rangeOfString:@"hired"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
+        XCTAssertTrue([description rangeOfString:[@YES description]].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
+    };
+    
+    // Test description in write block
+    descriptionAsserts(soInit.description);
+    
+    [realm commitWriteTransaction];
+    
+    // Test description in read block
+    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    descriptionAsserts(objDescription);
+}
+
+#pragma mark - Indexing Tests
+
+- (void)testIndex
+{
+    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    
+    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
 @end
