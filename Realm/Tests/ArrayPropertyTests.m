@@ -23,7 +23,8 @@
 
 @implementation ArrayPropertyTests
 
--(void)testPopulateEmptyArray {
+- (void)testPopulateEmptyArray
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
@@ -51,8 +52,8 @@
     }
 }
 
-
--(void)testModifyDetatchedArray {
+- (void)testModifyDetatchedArray
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
@@ -74,7 +75,8 @@
     XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
 
--(void)testInsertMultiple {
+- (void)testInsertMultiple
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
@@ -90,7 +92,8 @@
     XCTAssertEqualObjects([children[1] column], @"b", @"Second child should be 'b'");
 }
 
--(void)testStandalone {
+- (void)testStandalone
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
