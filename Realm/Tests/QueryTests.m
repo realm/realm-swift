@@ -19,51 +19,6 @@
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
 
-
-@interface NonRealmPersonObject : NSObject
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) NSInteger age;
-@end
-
-@implementation NonRealmPersonObject
-@end
-
-
-@interface PersonQueryObject : RLMObject
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) NSInteger age;
-@end
-
-@implementation PersonQueryObject
-@end
-
-
-@interface AllPropertyTypesObject : RLMObject
-@property (nonatomic, assign) BOOL boolCol;
-@property (nonatomic, copy) NSDate *dateCol;
-@property (nonatomic, assign) double doubleCol;
-@property (nonatomic, assign) float floatCol;
-@property (nonatomic, assign) NSInteger intCol;
-@property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, copy) id mixedCol;
-@end
-
-@implementation AllPropertyTypesObject
-@end
-
-@interface TestQueryObject : RLMObject
-@property (nonatomic, assign) NSInteger int1;
-@property (nonatomic, assign) NSInteger int2;
-@property (nonatomic, assign) float float1;
-@property (nonatomic, assign) float float2;
-@property (nonatomic, assign) double double1;
-@property (nonatomic, assign) double double2;
-@property (nonatomic, copy) NSString *recordTag;
-@end
-
-@implementation TestQueryObject
-@end
-
 @interface QueryTests : RLMTestCase
 @end
 

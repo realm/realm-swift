@@ -17,32 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
-
-@interface DogObject : RLMObject
-@property NSString *dogName;
-@end
-
-@implementation DogObject
-@end
-
-@interface OwnerObject : RLMObject
-@property NSString *name;
-@property DogObject *dog;
-@end
-
-@implementation OwnerObject
-@end
-
-@interface CircleObject : RLMObject
-@property NSString *data;
-@property CircleObject *next;
-@end
-
-@implementation CircleObject
-@end
-
 
 @interface LinkTests : RLMTestCase
 @end

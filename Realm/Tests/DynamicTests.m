@@ -17,16 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
 #import "RLMSchema.h"
-
-@interface RLMDynamicObject : RLMObject
-@property (nonatomic, copy) NSString *column;
-@property (nonatomic) NSInteger integer;
-@end
-
-@implementation RLMDynamicObject
-@end
 
 @interface DynamicTests : RLMTestCase
 @end

@@ -18,17 +18,7 @@
 
 #import "RLMTestCase.h"
 
-@interface EnumPerson : RLMObject
-@property NSString * Name;
-@property int Age;
-@property bool Hired;
-@end
-
-@implementation EnumPerson
-@end
-
 @interface EnumeratorTests : RLMTestCase
-
 @end
 
 @implementation EnumeratorTests
