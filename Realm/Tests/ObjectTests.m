@@ -43,7 +43,7 @@
     [realm beginWriteTransaction];
     [realm addObject:nil]; // EXC_BAD_ACCESS
     [realm commitWriteTransaction];
-    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1);
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
 
 -(void)testAddRLMObject
