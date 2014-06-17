@@ -554,20 +554,16 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, nil, nil);
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(id)predicate, ... {
+- (RLMArray *)objects:(NSString *)objectClassName withPredicateFormat:(NSString *)predicateFormat, ...
+{
     NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClassName, outPredicate, nil);
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objects:objectClassName withPredicate:outPredicate];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName orderedBy:(id)order where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClassName, outPredicate, order);
+- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate
+{
+    return RLMGetObjects(self, objectClassName, predicate, nil);
 }
 
 -(NSUInteger)schemaVersion {
