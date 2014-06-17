@@ -123,7 +123,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+- (NSUInteger)indexOfObjectWhere:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -145,24 +145,16 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                                  realm:_realm];
 }
 
-- (RLMArray *)objectsWhere:(id)predicate, ... {
-    // validate predicate
-    NSPredicate *outPred;
-    RLM_PREDICATE(predicate, outPred);
-    
-    // copy array and apply new predicate creating a new query and view
+- (RLMArray *)objectsWhere:(NSPredicate *)predicate {
+    // copy array and apply predicate creating a new query and view
     RLMArrayTableView *array = [self copy];
     RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[self.objectClassName]);
     array->_backingView = array.backingQuery->find_all();
     return array;
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    // validate predicate
-    NSPredicate *outPred;
-    RLM_PREDICATE(predicate, outPred);
-    
-    // copy array and apply new predicate
+- (RLMArray *)objectsOrderedBy:(id)order where:(NSPredicate *)predicate {
+    // copy array and apply predicate
     RLMArrayTableView *array = [self copy];
     RLMObjectSchema *schema = array.realm.schema[self.objectClassName];
     RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
