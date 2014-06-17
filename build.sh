@@ -150,7 +150,7 @@ case "$COMMAND" in
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
         sh build.sh test || exit 1
         sh build.sh test-debug || exit 1
-        sudo xcode-select -s /Applications/Xcode6-Beta.app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer
         sh build.sh test || exit 1
         sh build.sh test-debug || exit 1
         exit 0
