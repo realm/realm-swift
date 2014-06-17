@@ -5,7 +5,7 @@
 
 ### API breaking changes
 
-* None.
+* Rename schemaForObject: to schemaForClassName: on RLMSchema 
 
 ### Enhancements
 
