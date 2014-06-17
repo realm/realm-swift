@@ -111,10 +111,6 @@
 		E840C1AA1950A9F100A7E017 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E840C1A81950A9F100A7E017 /* LICENSE */; };
 		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
-		E856510C194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E856510D194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E856510E194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
-		E856510F194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
 		E87A31F619500DEB0033871D /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87A31F519500DEB0033871D /* SwiftDynamicTests.swift */; };
 		E87A31F719500DEB0033871D /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87A31F519500DEB0033871D /* SwiftDynamicTests.swift */; };
 		E89F13FA194FFAC40078736B /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */; };
@@ -253,8 +249,6 @@
 		E840C1A81950A9F100A7E017 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		E856510A194FD0660058DBFC /* RLMNotificationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNotificationToken.h; sourceTree = "<group>"; };
-		E856510B194FD0660058DBFC /* RLMNotificationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMNotificationToken.m; sourceTree = "<group>"; };
 		E87A31F519500DEB0033871D /* SwiftDynamicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDynamicTests.swift; sourceTree = "<group>"; };
 		E87A31F81950101D0033871D /* RLMPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPrivate.h; sourceTree = "<group>"; };
 		E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
@@ -323,8 +317,6 @@
 				02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */,
 				02E4D693192E3DC40082808D /* RLMConstants.h */,
 				02E4D694192E3DC40082808D /* RLMConstants.m */,
-				E856510A194FD0660058DBFC /* RLMNotificationToken.h */,
-				E856510B194FD0660058DBFC /* RLMNotificationToken.m */,
 				02E4D695192E3DC40082808D /* RLMObject_Private.h */,
 				02E4D696192E3DC40082808D /* RLMObject.h */,
 				02E4D697192E3DC40082808D /* RLMObject.mm */,
@@ -493,7 +485,6 @@
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */,
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
-				E856510C194FD0660058DBFC /* RLMNotificationToken.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6E4192E3DC40082808D /* RLMUtil.h in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,
@@ -519,7 +510,6 @@
 				E8356B111947BF54009FC9F5 /* RLMRealm.h in Headers */,
 				E8356B0C1947BF54009FC9F5 /* RLMProperty.h in Headers */,
 				E8356AFC1947BF54009FC9F5 /* RLMArray.h in Headers */,
-				E856510D194FD0660058DBFC /* RLMNotificationToken.h in Headers */,
 				E8356B161947BF54009FC9F5 /* RLMUtil.h in Headers */,
 				E8356AF91947BF54009FC9F5 /* RLMAccessor.h in Headers */,
 				E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.h in Headers */,
@@ -726,7 +716,6 @@
 				02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
 				02E4D6B8192E3DC40082808D /* RLMArrayAccessors.mm in Sources */,
-				E856510E194FD0660058DBFC /* RLMNotificationToken.m in Sources */,
 				02E4D6B4192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */,
 			);
@@ -775,7 +764,6 @@
 				E8356B081947BF54009FC9F5 /* RLMObjectSchema.mm in Sources */,
 				E8356B0A1947BF54009FC9F5 /* RLMObjectStore.mm in Sources */,
 				E8356AFD1947BF54009FC9F5 /* RLMArray.mm in Sources */,
-				E856510F194FD0660058DBFC /* RLMNotificationToken.m in Sources */,
 				E8356B001947BF54009FC9F5 /* RLMArrayAccessors.mm in Sources */,
 				E8356B121947BF54009FC9F5 /* RLMRealm.mm in Sources */,
 			);

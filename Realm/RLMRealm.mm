@@ -20,7 +20,6 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMConstants.h"
-#import "RLMNotificationToken.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
