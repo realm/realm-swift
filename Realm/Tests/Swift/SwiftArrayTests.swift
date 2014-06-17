@@ -41,7 +41,7 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let result = realm.objects(AggregateObject.className(), `where`: NSPredicate(format: "intCol < \(100)"))
+        let result = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "intCol < \(100)"))
         
         XCTAssertEqual(result.count, 10, "10 objects added")
         
@@ -91,8 +91,8 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let noArray = realm.objects(AggregateObject.className(), `where`: NSPredicate(format: "boolCol == NO"))
-        let yesArray = realm.objects(AggregateObject.className(), `where`: NSPredicate(format: "boolCol == YES"))
+        let noArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "boolCol == NO"))
+        let yesArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "boolCol == YES"))
         
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum

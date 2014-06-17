@@ -32,8 +32,8 @@ class SwiftLinkTests: RLMTestCase {
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        let owners = realm.objects(OwnerObject.className(), `where`: nil)
-        let dogs = realm.objects(DogObject.className(), `where`: nil)
+        let owners = realm.objects(OwnerObject.className(), withPredicate: nil)
+        let dogs = realm.objects(DogObject.className(), withPredicate: nil)
         XCTAssertEqual(owners.count, 1, "Expecting 1 owner")
         XCTAssertEqual(dogs.count, 1, "Expecting 1 dog")
         XCTAssertEqualObjects((owners[0] as OwnerObject).name, "Tim", "Tim is named Tim")
@@ -55,16 +55,16 @@ class SwiftLinkTests: RLMTestCase {
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(realm.objects(OwnerObject.className(), `where`: nil).count, 1, "Expecting 1 owner")
-        XCTAssertEqual(realm.objects(DogObject.className(), `where`: nil).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(OwnerObject.className(), withPredicate: nil).count, 1, "Expecting 1 owner")
+        XCTAssertEqual(realm.objects(DogObject.className(), withPredicate: nil).count, 1, "Expecting 1 dog")
         
         realm.beginWriteTransaction()
         let fiel = OwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
         fiel.dog = owner.dog
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(realm.objects(OwnerObject.className(), `where`: nil).count, 2, "Expecting 2 owners")
-        XCTAssertEqual(realm.objects(DogObject.className(), `where`: nil).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(OwnerObject.className(), withPredicate: nil).count, 2, "Expecting 2 owners")
+        XCTAssertEqual(realm.objects(DogObject.className(), withPredicate: nil).count, 1, "Expecting 1 dog")
     }
     
     func testLinkRemoval() {
@@ -79,8 +79,8 @@ class SwiftLinkTests: RLMTestCase {
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(realm.objects(OwnerObject.className(), `where`: nil).count, 1, "Expecting 1 owner")
-        XCTAssertEqual(realm.objects(DogObject.className(), `where`: nil).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(OwnerObject.className(), withPredicate: nil).count, 1, "Expecting 1 owner")
+        XCTAssertEqual(realm.objects(DogObject.className(), withPredicate: nil).count, 1, "Expecting 1 dog")
         
         realm.beginWriteTransaction()
         realm.deleteObject(owner.dog)
@@ -92,7 +92,7 @@ class SwiftLinkTests: RLMTestCase {
         let owner2 = realm.allObjects(OwnerObject.className()).firstObject
         XCTAssertNotNil(owner, "Should have 1 owner")
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
-        XCTAssertEqual(realm.objects(DogObject.className(), `where`: nil).count, 0, "Expecting 0 dogs")
+        XCTAssertEqual(realm.objects(DogObject.className(), withPredicate: nil).count, 0, "Expecting 0 dogs")
     }
     
     // Note: can't test testInvalidLinks() as Swift doesn't have exception handling

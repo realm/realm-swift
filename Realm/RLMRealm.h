@@ -24,7 +24,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 
 //
-// Notification token - holds onto the realm and the notification block
+// Notification token - holds on to the realm and the notification block
 //
 @interface RLMNotificationToken : NSObject
 @end
