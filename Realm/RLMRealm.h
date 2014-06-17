@@ -236,14 +236,13 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
  @param className   The type of objects you are looking for (name of the class).
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
-                    which can accept variable arguments.
+ @param predicate   An NSPredicate to filter the array.
  
  @return    An RLMArray of results matching the given predicate.
  
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className where:(NSPredicate *)predicate;
 
 /**
  Get an ordered array of objects matching the given predicate from the this Realm.
@@ -253,14 +252,13 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  @param className   The type of objects you are looking for (name of the class).
  @param order       This argument determines how the results are sorted. It can be an NSString containing
                     the property name, or an NSSortDescriptor with the property name and order.
- @param predicate   This argument can be an NSPredicate, a predicte string, or predicate format string
- which can accept variable arguments.
+ @param predicate   An NSPredicate to filter the array.
  
  @return    An RLMArray of results matching the predicate ordered by the given order.
  
  @see       RLMObject objectsOrderedBy:where:
  */
-- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(NSPredicate *)predicate;
 
 #pragma mark -
 

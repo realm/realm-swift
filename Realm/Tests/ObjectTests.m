@@ -205,11 +205,11 @@
     [AgeObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([AgeObject objectsWhere:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([AgeObject objectsWhere:[NSPredicate predicateWithFormat:@"age == 23"]].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([AgeObject objectsWhere:[NSPredicate predicateWithFormat:@"age >= 10"]].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([AgeObject objectsWhere:[NSPredicate predicateWithFormat:@"age == 1"]].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([AgeObject objectsWhere:[NSPredicate predicateWithFormat:@"age == 2"]].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([AgeObject objectsWhere:[NSPredicate predicateWithFormat:@"age < 30"]].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes

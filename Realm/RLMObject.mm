@@ -170,20 +170,12 @@
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWhere:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, nil);
++ (RLMArray *)objectsWhere:(NSPredicate *)predicate {
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
 }
 
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, order);
++ (RLMArray *)objectsOrderedBy:(id)order where:(NSPredicate *)predicate {
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, order);
 }
 
 - (NSString *)JSONString {
