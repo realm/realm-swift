@@ -135,6 +135,7 @@ inline void clearRealmCache() {
 
 
 NSString *const c_defaultRealmFileName = @"default.realm";
+static BOOL s_useInMemoryDefaultRealm = NO;
 static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
@@ -217,8 +218,12 @@ static NSArray *s_objectDescriptors = nil;
 
 + (void)useInMemoryDefaultRealm
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @synchronized(s_realmsPerPath) {
+        if (realmsAtPath(RLMRealm.defaultPath).count) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
+        }
+    }
+    s_useInMemoryDefaultRealm = YES;
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -249,7 +254,7 @@ static NSArray *s_objectDescriptors = nil;
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
-        // if already open with different read permissions then throw
+        // if already opened with different read permissions then throw
         if (realm.isReadOnly != readonly) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Realm at path already opened with different read permissions"
@@ -265,7 +270,11 @@ static NSArray *s_objectDescriptors = nil;
     
     NSError *error = nil;
     try {
-        realm->_sharedGroup.reset(new SharedGroup(path.UTF8String));
+        if (s_useInMemoryDefaultRealm && [path isEqualToString:RLMRealm.defaultPath]) { // Only for default realm
+            realm->_sharedGroup.reset(new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly));
+        } else {
+            realm->_sharedGroup.reset(new SharedGroup(path.UTF8String));
+        }
     }
     catch (File::PermissionDenied &ex) {
         error = make_realm_error(RLMErrorFilePermissionDenied, ex);

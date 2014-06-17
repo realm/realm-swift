@@ -10,6 +10,7 @@
 ### Enhancements
 
 * Added support for RLMArrayProperties.
+* Added support for creating in-memory default realm.
 
 ### Bugfixes
 
