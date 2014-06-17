@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm.h>
+#import "RLMRealm.h"
 
 /**
  RLMNotificationToken holds on to the realm and the notification block

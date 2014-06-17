@@ -109,6 +109,10 @@
 		E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B3F1947C19D009FC9F5 /* libc++.dylib */; };
 		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
+		E856510C194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E856510D194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E856510E194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
+		E856510F194FD0660058DBFC /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E856510B194FD0660058DBFC /* RLMNotificationToken.m */; };
 		E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
 		E8B185E7194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
 /* End PBXBuildFile section */
@@ -234,6 +238,8 @@
 		E8356B3F1947C19D009FC9F5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		E856510A194FD0660058DBFC /* RLMNotificationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNotificationToken.h; sourceTree = "<group>"; };
+		E856510B194FD0660058DBFC /* RLMNotificationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMNotificationToken.m; sourceTree = "<group>"; };
 		E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
@@ -295,6 +301,8 @@
 				02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */,
 				02E4D693192E3DC40082808D /* RLMConstants.h */,
 				02E4D694192E3DC40082808D /* RLMConstants.m */,
+				E856510A194FD0660058DBFC /* RLMNotificationToken.h */,
+				E856510B194FD0660058DBFC /* RLMNotificationToken.m */,
 				02E4D695192E3DC40082808D /* RLMObject_Private.h */,
 				02E4D696192E3DC40082808D /* RLMObject.h */,
 				02E4D697192E3DC40082808D /* RLMObject.mm */,
@@ -391,8 +399,6 @@
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
-				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
-				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 			);
 			name = "Objective-C";
 			sourceTree = "<group>";
@@ -400,6 +406,8 @@
 		E8E216C31949254D00CF455E /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
+				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 				02E4D6EE192E583A0082808D /* RLMTestObjects.h */,
 				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
 				02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */,
@@ -455,6 +463,7 @@
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */,
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
+				E856510C194FD0660058DBFC /* RLMNotificationToken.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6E4192E3DC40082808D /* RLMUtil.h in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,
@@ -480,6 +489,7 @@
 				E8356B111947BF54009FC9F5 /* RLMRealm.h in Headers */,
 				E8356B0C1947BF54009FC9F5 /* RLMProperty.h in Headers */,
 				E8356AFC1947BF54009FC9F5 /* RLMArray.h in Headers */,
+				E856510D194FD0660058DBFC /* RLMNotificationToken.h in Headers */,
 				E8356B161947BF54009FC9F5 /* RLMUtil.h in Headers */,
 				E8356AF91947BF54009FC9F5 /* RLMAccessor.h in Headers */,
 				E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.h in Headers */,
@@ -684,6 +694,7 @@
 				02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
 				02E4D6B8192E3DC40082808D /* RLMArrayAccessors.mm in Sources */,
+				E856510E194FD0660058DBFC /* RLMNotificationToken.m in Sources */,
 				02E4D6B4192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */,
 			);
@@ -726,6 +737,7 @@
 				E8356B081947BF54009FC9F5 /* RLMObjectSchema.mm in Sources */,
 				E8356B0A1947BF54009FC9F5 /* RLMObjectStore.mm in Sources */,
 				E8356AFD1947BF54009FC9F5 /* RLMArray.mm in Sources */,
+				E856510F194FD0660058DBFC /* RLMNotificationToken.m in Sources */,
 				E8356B001947BF54009FC9F5 /* RLMArrayAccessors.mm in Sources */,
 				E8356B121947BF54009FC9F5 /* RLMRealm.mm in Sources */,
 			);

@@ -82,7 +82,7 @@
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     }];
     
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
@@ -106,7 +106,7 @@
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     }];
     
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         RLMTestObject *obj = [[RLMTestObject alloc] init];
@@ -117,7 +117,7 @@
     });
     
     // this should complete very fast before the timer
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
     [realm removeNotification:token];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
