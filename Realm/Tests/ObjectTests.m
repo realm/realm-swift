@@ -27,7 +27,7 @@
 // The class is defined using categories below.
 @end
 
-#pragma mark PropertylessObject
+#pragma mark EmptyObjects
 
 @interface PropertylessObject : RLMObject
 @end
@@ -35,16 +35,35 @@
 @implementation PropertylessObject
 @end
 
-@implementation ObjectTests (PropertylessObject)
+@implementation ObjectTests (EmptyObjects)
 
--(void)testPropertylessObject
+-(void)testAddNil
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:nil]; // EXC_BAD_ACCESS
+    [realm commitWriteTransaction];
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1);
+}
+
+-(void)testAddRLMObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    RLMObject *obj = [[RLMObject alloc] init];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1); // FAILS with count 0.
+}
+
+-(void)testAddPropertylessObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     PropertylessObject *obj = [[PropertylessObject alloc] init];
     [realm addObject:obj];
     [realm commitWriteTransaction];
-    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1);
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1); // FAILS with count 0.
 }
 
 @end
