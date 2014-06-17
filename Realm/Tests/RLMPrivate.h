@@ -15,11 +15,12 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-//
-//  Use this file to import your target's public headers that you would like to expose to Swift.
-//
 
-#import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-#import "XCTestCase+AsyncTesting.h"
-#import "RLMPrivate.h"
+@interface RLMRealm ()
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
+
+@end

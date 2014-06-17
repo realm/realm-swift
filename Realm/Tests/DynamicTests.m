@@ -18,15 +18,9 @@
 
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
+#import "RLMPrivate.h"
 
 @interface DynamicTests : RLMTestCase
-@end
-
-@interface RLMRealm ()
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                      dynamic:(BOOL)dynamic
-                        error:(NSError **)outError;
 @end
 
 @implementation DynamicTests
@@ -57,8 +51,8 @@
     // verify object type
     RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
     XCTAssertEqual(array.count, (NSUInteger)2, @"Array should have 2 elements");
-    XCTAssertNotEqual(array.objectClassName, RLMDynamicObject.className,
-                      @"Array class should by a dynamic object class");
+    XCTAssertEqualObjects(array.objectClassName, RLMDynamicObject.className,
+                          @"Array class should by a dynamic object class");
 }
 
 - (void)testDynaimcProperties {
