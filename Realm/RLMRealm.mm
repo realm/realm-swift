@@ -17,12 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
-#import "RLMObject_Private.h"
+
 #import "RLMArray_Private.hpp"
-#import "RLMObjectStore.h"
 #import "RLMConstants.h"
+#import "RLMNotificationToken.h"
+#import "RLMObject_Private.h"
+#import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
+#import "RLMSchema_Private.h"
 #import "RLMUtil.h"
 
 #include <exception>
@@ -110,23 +112,6 @@ inline void clearRealmCache() {
         s_realmsPerPath = [NSMutableDictionary dictionary];
     }
 }
-
-//
-// Notification token - holds onto the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
-@end
-
-@implementation RLMNotificationToken
--(void)dealloc {
-    if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
-    }
-}
-@end
-
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
