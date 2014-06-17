@@ -146,7 +146,7 @@
 
 @end
 
-@implementation ObjectTests (other)
+@implementation ObjectTests (Other)
 
 -(void)testObjectInit
 {
