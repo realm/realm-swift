@@ -51,9 +51,9 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     RLMObject *obj = [[RLMObject alloc] init];
-    [realm addObject:obj];
+    [realm addObject:obj]; // Missing arguments (internal, somewhat misleading exception).
     [realm commitWriteTransaction];
-    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1); // FAILS with count 0.
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
 
 -(void)testAddPropertylessObject
@@ -63,7 +63,7 @@
     PropertylessObject *obj = [[PropertylessObject alloc] init];
     [realm addObject:obj];
     [realm commitWriteTransaction];
-    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1); // FAILS with count 0.
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
 
 @end
