@@ -123,7 +123,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSPredicate *)predicate {
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ... {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -145,23 +150,32 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                                  realm:_realm];
 }
 
-- (RLMArray *)objectsWhere:(NSPredicate *)predicate {
-    // copy array and apply predicate creating a new query and view
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
+    // validate predicate
+    NSPredicate *outPred;
+    RLM_PREDICATE(predicateFormat, outPred);
+    return [self objectsWithPredicate:outPred];
+}
+
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
+    // copy array and apply new predicate creating a new query and view
     RLMArrayTableView *array = [self copy];
     RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[self.objectClassName]);
     array->_backingView = array.backingQuery->find_all();
     return array;
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(NSPredicate *)predicate {
-    // copy array and apply predicate
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+{
+    // copy array and apply new predicate
     RLMArrayTableView *array = [self copy];
     RLMObjectSchema *schema = array.realm.schema[self.objectClassName];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
     tightdb::TableView view = array.backingQuery->find_all();
     
     // apply order
-    RLMUpdateViewWithOrder(view, order, schema);
+    RLMUpdateViewWithOrder(view, schema, property, ascending);
     array->_backingView = view;
     return array;
 }
@@ -256,6 +270,3 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 @end
-
-
-

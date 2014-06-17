@@ -187,7 +187,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Adds an object to be persistsed it in this Realm.
  
- Once added, this object can be retrieved using the objectsWhere: selectors on RLMRealm and on
+ Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
  also be added to the Realm if they are not already in it. If linked objects already belong to a
  different Realm an exception will be thrown.
@@ -235,30 +235,28 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
- @param className   The type of objects you are looking for (name of the class).
- @param predicate   An NSPredicate to filter the array.
+ @param className       The type of objects you are looking for (name of the class).
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsWhere:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className where:(NSPredicate *)predicate;
+- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered array of objects matching the given predicate from the this Realm.
+ Get objects matching the given predicate from the this Realm.
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
  @param className   The type of objects you are looking for (name of the class).
- @param order       This argument determines how the results are sorted. It can be an NSString containing
-                    the property name, or an NSSortDescriptor with the property name and order.
- @param predicate   An NSPredicate to filter the array.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of results matching the predicate ordered by the given order.
+ @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsOrderedBy:where:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(NSPredicate *)predicate;
+- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -304,15 +302,5 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // The schema version for this Realm.
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
-
-@end
-
-//
-// Notification token - holds onto the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
 
 @end
