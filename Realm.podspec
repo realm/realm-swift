@@ -15,12 +15,11 @@ Pod::Spec.new do |s|
   s.homepage            = "http://realm.io"
   s.source              = { :http => "http://static.realm.io/downloads/ios/realm-ios-#{s.version}.zip" }
   s.author              = { "Realm" => "help@realm.io" }
-  s.platform            = :ios, "7.0"
-  s.library             = "stdc++.6"
+  s.platform            = :ios, "6.0"
+  s.library             = "c++"
   s.requires_arc        = true
-  s.social_media_url    = 'https://twitter.com/realm'
-  s.documentation_url   = "http://realm.io/"
-  s.public_header_files = "Realm.framework/Headers/*.h"
+  s.social_media_url    = "https://twitter.com/realm"
+  s.documentation_url   = "http://realm.io/docs/ios/#{s.version}"
   s.vendored_frameworks = "Realm.framework"
   spec.license          = { :type => 'Apache 2.0', :file => 'LICENSE' }
 end
