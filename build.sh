@@ -131,8 +131,7 @@ case "$COMMAND" in
     # Testing
     ######################################
     "test")
-        # FIXME: how to run on a device?
-        #xcrealm "-scheme iOS -configuration Release -sdk iphoneos build test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator build test"
         xcrealm "-scheme OSX -configuration Release build test"
         exit 0
     ;;
