@@ -573,10 +573,20 @@ static NSArray *s_objectDescriptors = nil;
 
 @end
 
+// Notification Token
+
+@interface RLMNotificationToken ()
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
 @implementation RLMNotificationToken
--(void)dealloc {
+- (void)dealloc
+{
     if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold \
+              on to the RLMNotificationToken returned from addNotificationBlock and call \
+              removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end

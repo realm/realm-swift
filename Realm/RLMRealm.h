@@ -313,8 +313,4 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // Notification token - holds onto the realm and the notification block
 //
 @interface RLMNotificationToken : NSObject
-
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
-
 @end
