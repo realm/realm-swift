@@ -50,8 +50,8 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    RLMObject *obj = [[RLMObject alloc] init];
-    [realm addObject:obj]; // Missing arguments (internal, somewhat misleading exception).
+    RLMObject *obj = [[RLMObject alloc] init]; // Missing arguments (internal exception).
+    [realm addObject:obj];
     [realm commitWriteTransaction];
     XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
