@@ -37,7 +37,7 @@
 
 @implementation ObjectTests (EmptyObjects)
 
--(void)testAddNil
+- (void)testAddNil
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -46,7 +46,7 @@
     XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
 
--(void)testAddRLMObject
+- (void)testAddRLMObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -56,7 +56,7 @@
     XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
 }
 
--(void)testAddPropertylessObject
+- (void)testAddPropertylessObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
