@@ -313,30 +313,30 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
     // finally cast to native types and add query clause
     RLMPropertyType type = prop.type;
     switch (type) {
-        case tightdb::type_Bool:
+        case type_Bool:
             add_bool_constraint_to_query(query, operatorType, index,
                                          bool([(NSNumber *)value boolValue]));
             break;
-        case tightdb::type_DateTime:
+        case type_DateTime:
             add_datetime_constraint_to_query(query, operatorType, index,
                                              double([(NSDate *)value timeIntervalSince1970]));
             break;
-        case tightdb::type_Double:
+        case type_Double:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value doubleValue]);
             break;
-        case tightdb::type_Float:
+        case type_Float:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value floatValue]);
             break;
-        case tightdb::type_Int:
+        case type_Int:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value intValue]);
             break;
-        case tightdb::type_String:
+        case type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
             break;
-        case tightdb::type_Binary:
+        case type_Binary:
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
         default:
@@ -383,13 +383,13 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
     if (leftType == rightType) {
         switch (leftType) {
-            case tightdb::type_Int:
+            case type_Int:
                 query.and_query(*column_expression<Int>(predicateOptions, left, right));
                 break;
-            case tightdb::type_Float:
+            case type_Float:
                 query.and_query(*column_expression<Float>(predicateOptions, left, right));
                 break;
-            case tightdb::type_Double:
+            case type_Double:
                 query.and_query(*column_expression<Double>(predicateOptions, left, right));
                 break;
             default:
