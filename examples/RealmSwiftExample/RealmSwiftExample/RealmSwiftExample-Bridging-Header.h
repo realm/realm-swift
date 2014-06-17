@@ -15,20 +15,8 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+//
+//  Use this file to import your target's public headers that you would like to expose to Swift.
+//
 
-#import "AppDelegate.h"
-#import "TableViewController.h"
-
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:
-                                      [[TableViewController alloc] initWithStyle:UITableViewStylePlain]];
-    [self.window makeKeyAndVisible];
-    return YES;
-}
-
-@end
+#import "DemoObject.h"

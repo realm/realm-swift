@@ -16,19 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
-#import "TableViewController.h"
+import UIKit
 
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:
-                                      [[TableViewController alloc] initWithStyle:UITableViewStylePlain]];
-    [self.window makeKeyAndVisible];
-    return YES;
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+                            
+    var window: UIWindow?
+    
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
+        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        self.window!.rootViewController = UINavigationController(rootViewController: TableViewController(style: UITableViewStyle.Plain))
+        self.window!.makeKeyAndVisible()
+        return true
+    }
 }
-
-@end
