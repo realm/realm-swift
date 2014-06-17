@@ -23,6 +23,8 @@
 #import "TestClasses.h"
 #import "RLMArray+Extension.h"
 
+NSString *const kRealmFileExension = @"realm";
+
 @implementation RLMApplicationDelegate
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -41,15 +43,30 @@
     return NO;
 }
 
-- (IBAction)generatedTestDb:(id)sender
+#pragma mark - Event handling
+
+- (IBAction)generatedDemoDatabase:(id)sender
 {
+    // Find the document directory using it as default location for realm file.
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *directories = [fileManager URLsForDirectory:NSDocumentDirectory
                                                inDomains:NSUserDomainMask];
     NSURL *url = [directories firstObject];
-    url = [url URLByAppendingPathComponent:@"test123.realm"];
-    NSString *path = url.path;
     
+    // Prompt the user for location af new realm file.
+    [self showSavePanelStringFromDirectory:url completionHandler:^(BOOL userSelectesFile, NSURL *selectedFile) {
+        if(userSelectesFile) {
+            [self createAndPopulateDemoDatabaseAtUrl:selectedFile];
+        }
+    }];
+}
+
+#pragma mark - Private methods
+
+- (void)createAndPopulateDemoDatabaseAtUrl:(NSURL *)url
+{
+    NSString *path = url.path;
+
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithPath:path
                                      readOnly:NO
@@ -65,7 +82,7 @@
     RealmTestClass0 *tc0_5 = [RealmTestClass0 createInRealm:realm withObject:@[@75, @"James"]];
     RealmTestClass0 *tc0_6 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Gilbert"]];
     RealmTestClass0 *tc0_7 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Ann"]];
-  
+    
     RealmTestClass1 *tc1_0 = [RealmTestClass1 createInRealm:realm withObject:@[@1,      @YES,   @123.456f, @123456.789, @"ten",      [NSDate date],                                                      @[]]];
     RealmTestClass1 *tc1_1 = [RealmTestClass1 createInRealm:realm withObject:@[@20,     @NO,    @23.4561f, @987654.321, @"twenty",   [NSDate distantPast],                                               @[]]];
     RealmTestClass1 *tc1_2 = [RealmTestClass1 createInRealm:realm withObject:@[@30,     @YES,   @3.45612f, @1234.56789, @"thirty",   [NSDate distantFuture],                                             @[]]];
@@ -76,7 +93,7 @@
     RealmTestClass1 *tc1_7 = [RealmTestClass1 createInRealm:realm withObject:@[@80,     @NO,    @654321.f, @98.7654321, @"eighty",   [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0], @[]]];
     RealmTestClass1 *tc1_8 = [RealmTestClass1 createInRealm:realm withObject:@[@90,     @YES,   @123.456f, @1.23456789, @"ninety",   [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0], @[]]];
     RealmTestClass1 *tc1_9 = [RealmTestClass1 createInRealm:realm withObject:@[@100,    @NO,    @123.456f, @9.87654321, @"hundred",  [[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0], @[]]];
-
+    
     [tc1_0.arrayReference addObjectsFromArray:@[tc0_0, tc0_1, tc0_3]];
     [tc1_1.arrayReference addObjectsFromArray:@[tc0_2]];
     [tc1_2.arrayReference addObjectsFromArray:@[tc0_0, tc0_4]];
@@ -85,17 +102,49 @@
     [tc1_6.arrayReference addObjectsFromArray:@[tc0_6, tc0_7]];
     [tc1_7.arrayReference addObjectsFromArray:@[tc0_7, tc0_6]];
     [tc1_9.arrayReference addObjectsFromArray:@[tc0_0]];
-
+    
     [RealmTestClass2 createInRealm:realm withObject:@[@1111, @YES, tc1_0]];
     [RealmTestClass2 createInRealm:realm withObject:@[@2211, @YES, tc1_2]];
     [RealmTestClass2 createInRealm:realm withObject:@[@3322, @YES, tc1_4]];
     [RealmTestClass2 createInRealm:realm withObject:@[@4433, @NO,  tc1_6]];
     [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
-//    [RealmTestClass2 createInRealm:realm withObject:@[@6655, @YES, nil]];
+    //    [RealmTestClass2 createInRealm:realm withObject:@[@6655, @YES, nil]];
     [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
     [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];
     
     [realm commitWriteTransaction];
+}
+
+- (void)showSavePanelStringFromDirectory:(NSURL *)directoryUrl completionHandler:(void(^)(BOOL userSelectesFile, NSURL *selectedFile))completion
+{
+    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    
+    // Restrict the file type to whatever you like
+    savePanel.allowedFileTypes = @[kRealmFileExension];
+    
+    // Set the starting directory
+    savePanel.directoryURL = directoryUrl;
+    
+    // And show another dialog headline than "Save"
+    savePanel.title = @"Generate";
+    savePanel.prompt = @"Generate";
+    
+    // Perform other setup
+    // Use a completion handler -- this is a block which takes one argument
+    // which corresponds to the button that was clicked
+    [savePanel beginWithCompletionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            
+            // Close panel before handling errors
+            [savePanel orderOut:self];
+            
+            // Notify caller about the file selected
+            completion(YES, savePanel.URL);
+        }
+        else {
+            completion(NO, nil);
+        }
+    }];
 }
 
 @end

@@ -99,10 +99,10 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Tools" id="y0u-fA-7CK">
                         <items>
-                            <menuItem title="Generate test db" id="sHB-lE-A0K">
+                            <menuItem title="Generate demo database" id="sHB-lE-A0K">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="generatedTestDb:" target="-1" id="CiV-xY-OMi"/>
+                                    <action selector="generatedDemoDatabase:" target="-1" id="9cb-1W-suN"/>
                                 </connections>
                             </menuItem>
                         </items>
