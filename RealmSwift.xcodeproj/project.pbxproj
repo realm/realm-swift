@@ -117,6 +117,8 @@
 		E8AED8B0194FEFA700181A7E /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */; };
 		E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
 		E8B185E7194FB48B00B4954B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */; };
+		E8B6A707194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */; };
+		E8B6A708194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -246,6 +248,7 @@
 		E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "iOS Tests-Bridging-Header.h"; path = "Swift/iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSX Tests-Bridging-Header.h"; path = "Swift/OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
+		E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -385,6 +388,7 @@
 			children = (
 				E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */,
 				E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */,
+				E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */,
 			);
 			path = Swift;
 			sourceTree = "<group>";
@@ -710,6 +714,7 @@
 			files = (
 				022C8BED194254FA00BCDB9D /* ArrayPropertyTests.m in Sources */,
 				02026CB919379F6800E4EEF8 /* DynamicTests.m in Sources */,
+				E8B6A707194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift in Sources */,
 				4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */,
 				E8B185E6194FB48B00B4954B /* SwiftRealmTests.swift in Sources */,
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
@@ -754,6 +759,7 @@
 			files = (
 				E8356B2D1947BF72009FC9F5 /* RLMTestObjects.m in Sources */,
 				E8356B2C1947BF72009FC9F5 /* RLMTestCase.m in Sources */,
+				E8B6A708194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift in Sources */,
 				E8356B291947BF69009FC9F5 /* QueryTests.m in Sources */,
 				E8B185E7194FB48B00B4954B /* SwiftRealmTests.swift in Sources */,
 				E8356B261947BF69009FC9F5 /* MixedTests.m in Sources */,

@@ -25,7 +25,7 @@
 
 - (void)testCustomAccessors
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
     CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
@@ -38,7 +38,7 @@
 
 - (void)testObjectSubclass
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
     NSArray *obj = @[@1, @"throw"];
@@ -49,7 +49,7 @@
 
 - (void)testClassExtension
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
     BaseClassTestObject *bObject = [[BaseClassTestObject alloc ] init];
@@ -58,7 +58,7 @@
     [realm addObject:bObject];
     [realm commitWriteTransaction];
     
-    BaseClassTestObject *objectFromRealm = [BaseClassTestObject allObjects][0];
+    BaseClassTestObject *objectFromRealm = [realm allObjects:[BaseClassTestObject className]][0];
     XCTAssertEqual(1, objectFromRealm.intCol, @"Should be 1");
     XCTAssertEqualObjects(@"stringVal", objectFromRealm.stringCol, @"Should be stringVal");
 }
