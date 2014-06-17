@@ -128,6 +128,8 @@
 		E82827DF19477A9D0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82827D91947782C0090B385 /* Foundation.framework */; };
 		E841FBDF194FCB04006A0521 /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E841FBDD194FCB04006A0521 /* RLMNotificationToken.h */; };
 		E841FBE0194FCB04006A0521 /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E841FBDD194FCB04006A0521 /* RLMNotificationToken.h */; };
+		E870366719502D2900D0EB8A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E870366619502D2900D0EB8A /* LICENSE */; };
+		E870366819502D2900D0EB8A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E870366619502D2900D0EB8A /* LICENSE */; };
 		E841FBE1194FCB04006A0521 /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E841FBDE194FCB04006A0521 /* RLMNotificationToken.m */; };
 		E841FBE2194FCB04006A0521 /* RLMNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = E841FBDE194FCB04006A0521 /* RLMNotificationToken.m */; };
 /* End PBXBuildFile section */
@@ -220,6 +222,7 @@
 		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E82827D91947782C0090B385 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E841FBDD194FCB04006A0521 /* RLMNotificationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNotificationToken.h; sourceTree = "<group>"; };
+		E870366619502D2900D0EB8A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E841FBDE194FCB04006A0521 /* RLMNotificationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMNotificationToken.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -370,6 +373,7 @@
 			isa = PBXGroup;
 			children = (
 				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
+				E870366619502D2900D0EB8A /* LICENSE */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
 				E918909B177B677900653D7A /* Frameworks */,
@@ -574,6 +578,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E870366719502D2900D0EB8A /* LICENSE in Resources */,
 				4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -582,6 +587,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E870366819502D2900D0EB8A /* LICENSE in Resources */,
 				E82827DE19477A3F0090B385 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
