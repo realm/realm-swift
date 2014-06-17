@@ -20,6 +20,37 @@
 #import "RLMTestObjects.h"
 #import <Realm/Realm.h>
 
+@interface ObjectTests : RLMTestCase
+@end
+
+@implementation ObjectTests
+// The class is defined using categories below.
+@end
+
+#pragma mark PropertylessObject
+
+@interface PropertylessObject : RLMObject
+@end
+
+@implementation PropertylessObject
+@end
+
+@implementation ObjectTests (PropertylessObject)
+
+-(void)testPropertylessObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    PropertylessObject *obj = [[PropertylessObject alloc] init];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)1);
+}
+
+@end
+
+#pragma mark Other
+
 @interface SimpleObject : RLMObject
 @property NSString *name;
 @property int age;
@@ -115,10 +146,7 @@
 
 @end
 
-@interface ObjectTests : RLMTestCase
-@end
-
-@implementation ObjectTests
+@implementation ObjectTests (other)
 
 -(void)testObjectInit
 {
