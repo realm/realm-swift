@@ -107,6 +107,8 @@
 		E8356B381947C10E009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B301947C034009FC9F5 /* Foundation.framework */; };
 		E8356B3A1947C141009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
 		E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B3F1947C19D009FC9F5 /* libc++.dylib */; };
+		E840C1A91950A9F100A7E017 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E840C1A81950A9F100A7E017 /* LICENSE */; };
+		E840C1AA1950A9F100A7E017 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E840C1A81950A9F100A7E017 /* LICENSE */; };
 		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E856510C194FD0660058DBFC /* RLMNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = E856510A194FD0660058DBFC /* RLMNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -248,6 +250,7 @@
 		E8356AE51947BED7009FC9F5 /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8356B301947C034009FC9F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E8356B3F1947C19D009FC9F5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
+		E840C1A81950A9F100A7E017 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E845F210194975940097EBDF /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 		E8470A7A194F81DF0066632C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E856510A194FD0660058DBFC /* RLMNotificationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNotificationToken.h; sourceTree = "<group>"; };
@@ -446,6 +449,7 @@
 			isa = PBXGroup;
 			children = (
 				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
+				E840C1A81950A9F100A7E017 /* LICENSE */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
 				E918909B177B677900653D7A /* Frameworks */,
@@ -658,6 +662,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E840C1A91950A9F100A7E017 /* LICENSE in Resources */,
 				4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -666,6 +671,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E840C1AA1950A9F100A7E017 /* LICENSE in Resources */,
 				E8356B2F1947C023009FC9F5 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
