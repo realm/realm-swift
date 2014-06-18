@@ -139,16 +139,6 @@ static NSString * const kTableName = @"table";
     [realm commitWriteTransaction];
 }
 
-- (void)deleteAll
-{
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm beginWriteTransaction];
-    for (DemoObject *obj in self.array) {
-        [realm deleteObject:obj];
-    }
-    [realm commitWriteTransaction];
-}
-
 #pragma - Helpers
 
 - (NSString *)randomString

@@ -21,7 +21,8 @@
 
 @implementation RLMArray
 
-@dynamic writable;
+@dynamic RLMAccessor_invalid;
+@dynamic RLMAccessor_writable;
 @dynamic realm;
 @dynamic readOnly;
 
@@ -38,8 +39,12 @@
     return _realm;
 }
 
-- (BOOL)writable {
-    return _writable;
+- (BOOL)RLMAccessor_writable {
+    return _RLMAccessor_writable;
+}
+
+- (BOOL)RLMAccessor_invalid {
+    return _RLMAccessor_invalid;
 }
 
 - (BOOL)isReadOnly {
