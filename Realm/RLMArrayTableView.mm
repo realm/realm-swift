@@ -45,21 +45,31 @@
     [realm registerAccessor:ar];
     
     // make readonly if not in write transaction
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         object_setClass(ar, RLMArrayTableViewReadOnly.class);
     }
     
     return ar;
 }
 
-- (void)setWritable:(BOOL)writable {
+- (void)setRLMAccessor_writable:(BOOL)writable {
     if (writable) {
         object_setClass(self, RLMArrayTableView.class);
     }
     else {
         object_setClass(self, RLMArrayTableViewReadOnly.class);
     }
-    _writable = writable;
+    _RLMAccessor_writable = writable;
+}
+
+- (void)setRLMAccessor_Invalid:(BOOL)invalid {
+    if (invalid) {
+        object_setClass(self, RLMArrayTableViewInvalid.class);
+    }
+    else {
+        object_setClass(self, RLMArrayTableView.class);
+    }
+    _RLMAccessor_invalid = invalid;
 }
 
 - (NSUInteger)count {
