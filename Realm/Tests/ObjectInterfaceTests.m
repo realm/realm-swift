@@ -18,6 +18,42 @@
 
 #import "RLMTestCase.h"
 
+#pragma mark - Test Objects
+
+#pragma mark CustomAccessors
+
+@interface CustomAccessors : RLMObject
+@property (getter = getThatName) NSString *name;
+@property (setter = setTheInt:)  int age;
+@end
+
+@implementation CustomAccessors
+@end
+
+#pragma mark InvalidSubclassObject
+
+@interface InvalidSubclassObject : StringObject
+@property NSString *invalid;
+@end
+
+@implementation InvalidSubclassObject
+@end
+
+#pragma mark BaseClassStringObject
+
+@interface BaseClassStringObject : RLMObject
+@property NSInteger intCol;
+@end
+
+@interface BaseClassStringObject ()
+@property NSString *stringCol;
+@end
+
+@implementation BaseClassStringObject
+@end
+
+#pragma mark - Tests
+
 @interface ObjectInterfaceTests : RLMTestCase
 @end
 
@@ -52,13 +88,13 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    BaseClassTestObject *bObject = [[BaseClassTestObject alloc ] init];
+    BaseClassStringObject *bObject = [[BaseClassStringObject alloc ] init];
     bObject.intCol = 1;
     bObject.stringCol = @"stringVal";
     [realm addObject:bObject];
     [realm commitWriteTransaction];
     
-    BaseClassTestObject *objectFromRealm = [BaseClassTestObject allObjects][0];
+    BaseClassStringObject *objectFromRealm = [BaseClassStringObject allObjects][0];
     XCTAssertEqual(1, objectFromRealm.intCol, @"Should be 1");
     XCTAssertEqualObjects(@"stringVal", objectFromRealm.stringCol, @"Should be stringVal");
 }

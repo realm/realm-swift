@@ -19,6 +19,18 @@
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
 
+#pragma mark - Test Objects
+
+@interface CircleObject : RLMObject
+@property NSString *data;
+@property CircleObject *next;
+@end
+
+@implementation CircleObject
+@end
+
+#pragma mark - Tests
+
 @interface LinkTests : RLMTestCase
 @end
 
@@ -111,7 +123,7 @@
     [realm beginWriteTransaction];
     XCTAssertThrows([realm addObject:owner], @"dogName not set on linked object");
     
-    RLMTestObject *to = [RLMTestObject createInRealm:realm withObject:@[@"testObject"]];
+    StringObject *to = [StringObject createInRealm:realm withObject:@[@"testObject"]];
     NSArray *args = @[@"Tim", to];
     XCTAssertThrows([OwnerObject createInRealm:realm withObject:args], @"Inserting wrong object type should throw");
     [realm commitWriteTransaction];
