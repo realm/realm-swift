@@ -373,10 +373,10 @@ Expression *column_expression(NSComparisonPredicateOptions operatorType,
 void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
-    NSUInteger left = RLMValidatedColumnIndex(scheme, leftColumnName);
+    NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
     RLMPropertyType leftType = [scheme[leftColumnName] type];
     
-    NSUInteger right = RLMValidatedColumnIndex(scheme, rightColumnName);
+    NSUInteger rightIndex = RLMValidatedColumnIndex(scheme, rightColumnName);
     RLMPropertyType rightType = [scheme[rightColumnName] type];
     
     // TODO: Should we handle special case where left row is the same as right row (tautology)
@@ -384,16 +384,16 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     if (leftType == rightType) {
         switch (leftType) {
             case type_Bool:
-                query.and_query(*column_expression<Bool>(predicateOptions, left, right));
+                query.and_query(*column_expression<Bool>(predicateOptions, leftIndex, rightIndex));
                 break;
             case type_Int:
-                query.and_query(*column_expression<Int>(predicateOptions, left, right));
+                query.and_query(*column_expression<Int>(predicateOptions, leftIndex, rightIndex));
                 break;
             case type_Float:
-                query.and_query(*column_expression<Float>(predicateOptions, left, right));
+                query.and_query(*column_expression<Float>(predicateOptions, leftIndex, rightIndex));
                 break;
             case type_Double:
-                query.and_query(*column_expression<Double>(predicateOptions, left, right));
+                query.and_query(*column_expression<Double>(predicateOptions, leftIndex, rightIndex));
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
