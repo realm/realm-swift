@@ -82,7 +82,7 @@
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as RLMArray
-    RLMArray *res = [EnumPerson objectsWhere:@"Hired = YES && Age >= 20 && Age <= 30"];
+    RLMArray *res = [EnumPerson objectsWithPredicateFormat:@"Hired = YES && Age >= 20 && Age <= 30"];
     
     // Iterate over the resulting RLMArray
     index = 0;
