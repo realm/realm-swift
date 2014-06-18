@@ -25,10 +25,15 @@
 
 NSString *const kRealmFileExension = @"realm";
 
+const NSUInteger kTopTipDelay = 250;
+
 @implementation RLMApplicationDelegate
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay)
+                                              forKey:@"NSInitialToolTipDelay"];
+    
     NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
     [self.fileMenu performActionForItemAtIndex:openFileIndex];    
 }
