@@ -327,55 +327,37 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         RLMObject *selectedObject = [selectedObjectNode instanceAtIndex:rowIndex];
 
         RLMRealm *realm = presentedRealm.realm;
+
+        [realm beginWriteTransaction];
         
         switch (propertyNode.type) {
             case RLMPropertyTypeBool:
                 if ([object isKindOfClass:[NSNumber class]]) {
-                    [realm beginWriteTransaction];
-                    
                     selectedObject[propertyName] = @(((NSNumber *)object).boolValue);
-                    
-                    [realm commitWriteTransaction];
                 }
                 break;
 
             case RLMPropertyTypeInt:
                 if ([object isKindOfClass:[NSNumber class]]) {
-                    [realm beginWriteTransaction];
-                    
                     selectedObject[propertyName] = @(((NSNumber *)object).integerValue);
-                    
-                    [realm commitWriteTransaction];
                 }
                 break;
 
             case RLMPropertyTypeFloat:
                 if ([object isKindOfClass:[NSNumber class]]) {
-                    [realm beginWriteTransaction];
-                    
                     selectedObject[propertyName] = @(((NSNumber *)object).floatValue);
-                    
-                    [realm commitWriteTransaction];
                 }
                 break;
 
             case RLMPropertyTypeDouble:
                 if ([object isKindOfClass:[NSNumber class]]) {
-                    [realm beginWriteTransaction];
-                    
                     selectedObject[propertyName] = @(((NSNumber *)object).doubleValue);
-                    
-                    [realm commitWriteTransaction];
                 }
                 break;
                 
             case RLMPropertyTypeString:
                 if ([object isKindOfClass:[NSString class]]) {
-                    [realm beginWriteTransaction];
-                    
                     selectedObject[propertyName] = object;
-                    
-                    [realm commitWriteTransaction];
                 }
                 break;
                 
@@ -388,8 +370,9 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             default:
                 break;
         }
+        
+        [realm commitWriteTransaction];
     }
-//    NSArray *row = [selectedTable rowAtIndex:rowIndex];
 }
 
 #pragma mark - NSTableViewDelegate implementation
