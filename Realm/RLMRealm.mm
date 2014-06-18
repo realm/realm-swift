@@ -34,6 +34,24 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+// Notification Token
+
+@interface RLMNotificationToken ()
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
+@implementation RLMNotificationToken
+- (void)dealloc
+{
+    if (_realm || _block) {
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold \
+              on to the RLMNotificationToken returned from addNotificationBlock and call \
+              removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+    }
+}
+@end
+
 using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
@@ -110,23 +128,6 @@ inline void clearRealmCache() {
         s_realmsPerPath = [NSMutableDictionary dictionary];
     }
 }
-
-//
-// Notification token - holds onto the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
-@end
-
-@implementation RLMNotificationToken
--(void)dealloc {
-    if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
-    }
-}
-@end
-
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
