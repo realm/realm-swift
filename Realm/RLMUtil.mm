@@ -142,21 +142,21 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
 }
 
 
-void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj) {
+void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj) {
 //    if (obj == nil) {
 //        table.nullify_link(col_ndx, row_ndx);
 //        return;
 //    }
     if ([obj isKindOfClass:[NSString class]]) {
-        table.set_mixed(col_ndx, row_ndx, RLMStringDataWithNSString(obj));
+        row.set_mixed(col_ndx, RLMStringDataWithNSString(obj));
         return;
     }
     if ([obj isKindOfClass:[NSDate class]]) {
-        table.set_mixed(col_ndx, row_ndx, tightdb::DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
+        row.set_mixed(col_ndx, tightdb::DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
         return;
     }
     if ([obj isKindOfClass:[NSData class]]) {
-        table.set_mixed(col_ndx, row_ndx, RLMBinaryDataForNSData(obj));
+        row.set_mixed(col_ndx, RLMBinaryDataForNSData(obj));
         return;
     }
     if ([obj isKindOfClass:[NSNumber class]]) {
@@ -166,25 +166,25 @@ void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col
             case 'i':
             case 's':
             case 'l':
-                table.set_mixed(col_ndx, row_ndx, (int64_t)[(NSNumber *)obj longValue]);
+                row.set_mixed(col_ndx, (int64_t)[(NSNumber *)obj longValue]);
                 return;
             case 'f':
-                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj floatValue]);
+                row.set_mixed(col_ndx, [(NSNumber *)obj floatValue]);
                 return;
             case 'd':
-                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj doubleValue]);
+                row.set_mixed(col_ndx, [(NSNumber *)obj doubleValue]);
                 return;
             case 'B':
             case 'c':
-                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj boolValue] == YES);
+                row.set_mixed(col_ndx, [(NSNumber *)obj boolValue] == YES);
                 return;
         }
     }
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
 }
 
-id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx) {
-    tightdb::Mixed mixed = table.get_mixed(col_ndx, row_ndx);
+id RLMGetAnyProperty(tightdb::Row row, NSUInteger col_ndx) {
+    tightdb::Mixed mixed = row.get_mixed(col_ndx);
     switch (mixed.get_type()) {
         case RLMPropertyTypeString:
             return RLMStringDataToNSString(mixed.get_string());

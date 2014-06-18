@@ -449,28 +449,22 @@
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 <= double2" expectedCount:6];
 
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"int1 == float1"
-                                              expectedReason:@"Property type mismatch between int and float"];
+                                                   predicate:@"int1 == float1"];
     
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"float2 >= double1"
-                                              expectedReason:@"Property type mismatch between float and double"];
+                                                   predicate:@"float2 >= double1"];
     
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"double2 <= int2"
-                                              expectedReason:@"Property type mismatch between double and int"];
+                                                   predicate:@"double2 <= int2"];
     
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"int2 != recordTag"
-                                              expectedReason:@"Property type mismatch between int and string"];
+                                                   predicate:@"int2 != recordTag"];
     
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"float1 > recordTag"
-                                              expectedReason:@"Property type mismatch between float and string"];
+                                                   predicate:@"float1 > recordTag"];
     
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[TestQueryObject class]
-                                                   predicate:@"double1 < recordTag"
-                                              expectedReason:@"Property type mismatch between double and string"];
+                                                   predicate:@"double1 < recordTag"];
 }
 
 - (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
@@ -497,23 +491,9 @@
 
 - (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
                                                  predicate:(NSString *)predicate
-                                            expectedReason:(NSString *)expectedReason
 {
-    @try {
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        
-        RLMArray *queryResult = [realm objects:NSStringFromClass(class)
-                                         where:predicate];
-        NSUInteger actualCount = queryResult.count;
-#pragma unused(actualCount)
-        
-        XCTFail(@"Predicate: %@ - exception expected.", predicate);
-    }
-    @catch (NSException *exception) {
-        if (![expectedReason isEqualToString:exception.reason]) {
-            XCTFail(@"Exception reason: expected \"%@\" received @\"%@\"", expectedReason, exception.reason);
-        }
-    }
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertThrows([realm objects:NSStringFromClass(class) where:predicate], @"Invalid predicate should throw");
 }
 
 @end

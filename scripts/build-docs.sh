@@ -1,11 +1,12 @@
 #!/bin/sh
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec
 
 if [ -z "${SRCROOT}" ]; then
     SRCROOT="$(pwd)"
 fi
 
 realm_version_file="${SRCROOT}/Realm/Realm-Info.plist"
-realm_version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
+realm_version="$(PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
 
 appledoc \
     --project-name Realm \
