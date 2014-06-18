@@ -370,7 +370,7 @@ Expression *column_expression(NSComparisonPredicateOptions operatorType,
     }
 }
     
-void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
+void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
     NSUInteger left = RLMValidatedColumnIndex(scheme, leftColumnName);
@@ -383,6 +383,9 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
     if (leftType == rightType) {
         switch (leftType) {
+            case type_Bool:
+                query.and_query(*column_expression<Bool>(predicateOptions, left, right));
+                break;
             case type_Int:
                 query.and_query(*column_expression<Int>(predicateOptions, left, right));
                 break;
