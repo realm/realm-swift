@@ -22,6 +22,7 @@
 		84AA41C6194B67D200A50F03 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AA41C4194B67D200A50F03 /* Realm.framework */; };
 		84AA41C9194E108B00A50F03 /* NSTableColumn+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA41C8194E108B00A50F03 /* NSTableColumn+Resize.m */; };
 		84AA41CA194E108B00A50F03 /* NSTableColumn+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA41C8194E108B00A50F03 /* NSTableColumn+Resize.m */; };
+		84BCA6041951BD07008FC850 /* realm.icns in Resources */ = {isa = PBXBuildFile; fileRef = 84BCA6031951BD07008FC850 /* realm.icns */; };
 		84D7990B19388E8900FC76A0 /* RLMClazzNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7990519388E8900FC76A0 /* RLMClazzNode.m */; };
 		84D7990C19388E8900FC76A0 /* RLMClazzProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7990719388E8900FC76A0 /* RLMClazzProperty.m */; };
 		84D7990D19388E8900FC76A0 /* RLMRealmNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7990919388E8900FC76A0 /* RLMRealmNode.m */; };
@@ -118,6 +119,7 @@
 		84AA41C4194B67D200A50F03 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug/Realm.framework"; sourceTree = "<group>"; };
 		84AA41C7194E108B00A50F03 /* NSTableColumn+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSTableColumn+Resize.h"; path = "Classes/NSTableColumn+Resize.h"; sourceTree = "<group>"; };
 		84AA41C8194E108B00A50F03 /* NSTableColumn+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSTableColumn+Resize.m"; path = "Classes/NSTableColumn+Resize.m"; sourceTree = "<group>"; };
+		84BCA6031951BD07008FC850 /* realm.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = realm.icns; sourceTree = "<group>"; };
 		84D7990419388E8900FC76A0 /* RLMClazzNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMClazzNode.h; path = Classes/RLMClazzNode.h; sourceTree = "<group>"; };
 		84D7990519388E8900FC76A0 /* RLMClazzNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMClazzNode.m; path = Classes/RLMClazzNode.m; sourceTree = "<group>"; };
 		84D7990619388E8900FC76A0 /* RLMClazzProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMClazzProperty.h; path = Classes/RLMClazzProperty.h; sourceTree = "<group>"; };
@@ -229,6 +231,18 @@
 			name = Aux;
 			sourceTree = "<group>";
 		};
+		84BCA5FE1951BC99008FC850 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				84BCA6031951BD07008FC850 /* realm.icns */,
+				84E0F9571921F3B900D6CA14 /* RealmVisualEditor-Info.plist */,
+				84E0F9581921F3B900D6CA14 /* InfoPlist.strings */,
+				84E0F95D1921F3B900D6CA14 /* RealmVisualEditor-Prefix.pch */,
+				84E0F95E1921F3B900D6CA14 /* Credits.rtf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		84E0F9431921F3B900D6CA14 = {
 			isa = PBXGroup;
 			children = (
@@ -278,6 +292,7 @@
 				84E0F9641921F3B900D6CA14 /* RLMDocument.xib */,
 				84E0F9671921F3B900D6CA14 /* MainMenu.xib */,
 				84E0F96A1921F3B900D6CA14 /* Images.xcassets */,
+				84BCA5FE1951BC99008FC850 /* Resources */,
 				84E0F9561921F3B900D6CA14 /* Supporting Files */,
 			);
 			path = RealmVisualEditor;
@@ -286,11 +301,7 @@
 		84E0F9561921F3B900D6CA14 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				84E0F9571921F3B900D6CA14 /* RealmVisualEditor-Info.plist */,
-				84E0F9581921F3B900D6CA14 /* InfoPlist.strings */,
 				84E0F95B1921F3B900D6CA14 /* main.m */,
-				84E0F95D1921F3B900D6CA14 /* RealmVisualEditor-Prefix.pch */,
-				84E0F95E1921F3B900D6CA14 /* Credits.rtf */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -431,6 +442,7 @@
 			files = (
 				84E0F95A1921F3B900D6CA14 /* InfoPlist.strings in Resources */,
 				84E0F96B1921F3B900D6CA14 /* Images.xcassets in Resources */,
+				84BCA6041951BD07008FC850 /* realm.icns in Resources */,
 				84E0F9601921F3B900D6CA14 /* Credits.rtf in Resources */,
 				84E0F9661921F3B900D6CA14 /* RLMDocument.xib in Resources */,
 				84E0F9691921F3B900D6CA14 /* MainMenu.xib in Resources */,
