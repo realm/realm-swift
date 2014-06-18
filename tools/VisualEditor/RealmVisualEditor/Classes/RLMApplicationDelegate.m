@@ -38,12 +38,26 @@ const NSUInteger kTopTipDelay = 250;
     [self.fileMenu performActionForItemAtIndex:openFileIndex];    
 }
 
-- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
+- (BOOL)application:(NSApplication *)application openFile:(NSString *)filename
+{
+    NSURL *fileUrl = [NSURL URLWithString:[@"file://" stringByAppendingString:filename]];
+    
+    NSDocumentController *documentController = [[NSDocumentController alloc] init];
+    [documentController openDocumentWithContentsOfURL:fileUrl
+                                              display:YES
+                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
+                                        NSLog(@"Error %@", error);
+                                    }];
+    
+    return YES;
+}
+
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)application
 {
     return NO;
 }
 
-- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)flag
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)application hasVisibleWindows:(BOOL)flag
 {
     return NO;
 }
@@ -90,9 +104,6 @@ const NSUInteger kTopTipDelay = 250;
 
                 NSUInteger response = [alert runModal];
                 if (response == NSAlertFirstButtonReturn) {
-                    // NSError *error;
-                    //NSDocument *newRealm = [[NSDocument alloc] initWithContentsOfURL:selectedFile ofType:@"realm" error:&error];
-
                     NSDocumentController *documentController = [[NSDocumentController alloc] init];
                     [documentController openDocumentWithContentsOfURL:selectedFile
                                                               display:YES
