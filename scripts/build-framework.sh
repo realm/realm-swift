@@ -1,3 +1,6 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+
 set -e
 set +u
 
@@ -6,29 +9,29 @@ SF_FRAMEWORK_PATH="${SRCROOT}/build/${CONFIGURATION}/${PRODUCT_NAME}.framework"
 SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
 
 # very simple structure - it doesn't follow Apple's documentation
-/bin/rm -rf "${SF_FRAMEWORK_PATH}"
-/bin/mkdir -p "${SF_FRAMEWORK_PATH}/Headers"
+rm -rf "${SF_FRAMEWORK_PATH}"
+mkdir -p "${SF_FRAMEWORK_PATH}/Headers"
 
 # Step 1 - copy combined binary into framework
-xcrun cp ${SF_COMBINED_PATH} "${SF_FRAMEWORK_PATH}/${PRODUCT_NAME}"
+cp ${SF_COMBINED_PATH} "${SF_FRAMEWORK_PATH}/${PRODUCT_NAME}"
 
 # Step 2 - copy headers into framework
 if [[ "$CONFIGURATION" = "Debug" ]]; then
-	xcrun cp -R "${BUILT_PRODUCTS_DIR}/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
+    cp -R "${BUILT_PRODUCTS_DIR}/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
 else
-	xcrun cp -R "${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
+    cp -R "${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/include/Realm" "${SF_FRAMEWORK_PATH}/Headers"
 fi
 
 # Step 3 - copy resources
-/bin/mkdir -p "${SF_FRAMEWORK_PATH}/Resources"
+mkdir -p "${SF_FRAMEWORK_PATH}/Resources"
 xcrun cp "${SRCROOT}/LICENSE" "${SF_FRAMEWORK_PATH}/Resources"
 xcrun cp "${SRCROOT}/CHANGELOG.md" "${SF_FRAMEWORK_PATH}/Resources"
 xcrun cp "${SRCROOT}/Realm/Realm-Info.plist" "${SF_FRAMEWORK_PATH}/Resources/Info.plist"
 
 cd "${SF_FRAMEWORK_PATH}"
-/bin/mkdir -p "Versions/A/Headers"
-/bin/mv Headers/Realm/* Versions/A/Headers/
-/bin/rm -rf Headers
-/bin/mv "${PRODUCT_NAME}" "Versions/A/${PRODUCT_NAME}"
-/bin/ln -fs "Versions/A/${PRODUCT_NAME}" "${PRODUCT_NAME}"
-/bin/ln -fs "Versions/A/Headers" "Headers"
+mkdir -p "Versions/A/Headers"
+mv Headers/Realm/* Versions/A/Headers/
+rm -rf Headers
+mv "${PRODUCT_NAME}" "Versions/A/${PRODUCT_NAME}"
+ln -fs "Versions/A/${PRODUCT_NAME}" "${PRODUCT_NAME}"
+ln -fs "Versions/A/Headers" "Headers"

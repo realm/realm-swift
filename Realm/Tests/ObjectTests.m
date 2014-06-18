@@ -356,7 +356,6 @@
     [realm beginWriteTransaction];
     XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
                                                property type should not throw");
-    [realm rollbackWriteTransaction];
 }
 
 - (void)testCanUseIgnoredProperty
