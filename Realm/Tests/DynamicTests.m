@@ -74,9 +74,11 @@
     // verify properties
     RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES error:nil];
     RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
-    XCTAssertEqualObjects(array[0][@"integer"], @1, @"First object should have column value 1");
-    XCTAssertEqualObjects(array[1][@"column"], @"column2", @"Second object should have column value column2");
-    XCTAssertThrows(array[0][@"invalid"], @"Invalid column name should throw");
+    
+    RLMObject *o1 = array[0], *o2 = array[1];
+    XCTAssertEqualObjects(o1[@"integer"], @1, @"First object should have column value 1");
+    XCTAssertEqualObjects(o2[@"column"], @"column2", @"Second object should have column value column2");
+    XCTAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
 }
 
 - (void)testDynaimcTypes {

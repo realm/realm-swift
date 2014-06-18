@@ -156,13 +156,6 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
- Abandon all write operations in the current write transaction terminating the transaction.
- 
- After this is called the RLMRealm reverts back to being read-only.
- */
-- (void)rollbackWriteTransaction;
-
-/**
  Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
  */
 - (void)refresh;
