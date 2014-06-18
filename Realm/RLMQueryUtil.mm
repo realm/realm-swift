@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMQueryUtil_Private.hpp"
+#import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 
