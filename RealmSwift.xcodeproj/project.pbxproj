@@ -49,11 +49,11 @@
 		02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A9192E3DC40082808D /* RLMUtil.mm */; };
 		02E4D6E9192E58250082808D /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6E8192E58250082808D /* MixedTests.m */; };
 		02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
-		428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		4D8D90B2192B825E004C89AA /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8D90AF192B7FC4004C89AA /* TransactionTests.m */; };
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
+		E821E89F19523C0F00885A5F /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E821E89E19523C0F00885A5F /* XCTest.framework */; };
 		E8356AF81947BF54009FC9F5 /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8356AF91947BF54009FC9F5 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68C192E3DC40082808D /* RLMAccessor.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356AFA1947BF54009FC9F5 /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D68D192E3DC40082808D /* RLMAccessor.mm */; };
@@ -100,7 +100,6 @@
 		E8356B2D1947BF72009FC9F5 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
 		E8356B2E1947BF72009FC9F5 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */; };
 		E8356B2F1947C023009FC9F5 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
-		E8356B321947C04E009FC9F5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356ADB1947BED7009FC9F5 /* Realm.framework */; };
 		E8356B331947C064009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8356B301947C034009FC9F5 /* Foundation.framework */; };
 		E8356B361947C0EC009FC9F5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E395319409432001DC9C1 /* libc++.dylib */; };
 		E8356B371947C102009FC9F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
@@ -110,7 +109,6 @@
 		E840C1A91950A9F100A7E017 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E840C1A81950A9F100A7E017 /* LICENSE */; };
 		E840C1AA1950A9F100A7E017 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E840C1A81950A9F100A7E017 /* LICENSE */; };
 		E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
-		E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8470A7A194F81DF0066632C /* XCTest.framework */; };
 		E87A31F619500DEB0033871D /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87A31F519500DEB0033871D /* SwiftDynamicTests.swift */; };
 		E87A31F719500DEB0033871D /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87A31F519500DEB0033871D /* SwiftDynamicTests.swift */; };
 		E89F13FA194FFAC40078736B /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89F13F9194FFAC40078736B /* SwiftLinkTests.swift */; };
@@ -242,6 +240,7 @@
 		4D8D90AF192B7FC4004C89AA /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectInterfaceTests.m; sourceTree = "<group>"; };
 		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
+		E821E89E19523C0F00885A5F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E8356ADB1947BED7009FC9F5 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8356AE51947BED7009FC9F5 /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8356B301947C034009FC9F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -255,8 +254,7 @@
 		E89F13FC194FFE040078736B /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; };
 		E8A741A6195094EC000EFD52 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayTests.swift; sourceTree = "<group>"; };
 		E8AED8AE194FEFA700181A7E /* SwiftMixedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMixedTests.swift; sourceTree = "<group>"; };
-		E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "iOS Tests-Bridging-Header.h"; path = "Swift/iOS Tests-Bridging-Header.h"; sourceTree = "<group>"; };
-		E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OSX Tests-Bridging-Header.h"; path = "Swift/OSX Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E8B185E3194FB48B00B4954B /* Realm-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Realm-Bridging-Header.h"; path = "Swift/Realm-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8B185E5194FB48B00B4954B /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E8B6A706194FF7C4009EFED9 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -276,7 +274,6 @@
 			files = (
 				E8356B371947C102009FC9F5 /* Foundation.framework in Frameworks */,
 				E8470A7B194F81DF0066632C /* XCTest.framework in Frameworks */,
-				428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */,
 				E8356B361947C0EC009FC9F5 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -294,9 +291,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8356B381947C10E009FC9F5 /* Foundation.framework in Frameworks */,
-				E8470A7C194F81E60066632C /* XCTest.framework in Frameworks */,
-				E8356B321947C04E009FC9F5 /* Realm.framework in Frameworks */,
 				E8356B401947C19D009FC9F5 /* libc++.dylib in Frameworks */,
+				E821E89F19523C0F00885A5F /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,8 +362,7 @@
 		02C41475191DE49600F858D9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E8B185E3194FB48B00B4954B /* iOS Tests-Bridging-Header.h */,
-				E8B185E4194FB48B00B4954B /* OSX Tests-Bridging-Header.h */,
+				E8B185E3194FB48B00B4954B /* Realm-Bridging-Header.h */,
 				02C41476191DE49600F858D9 /* RealmTests-Info.plist */,
 			);
 			name = "Supporting Files";
@@ -376,6 +371,7 @@
 		E82827DB194778360090B385 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				E821E89E19523C0F00885A5F /* XCTest.framework */,
 				E8356B301947C034009FC9F5 /* Foundation.framework */,
 				E8356B3F1947C19D009FC9F5 /* libc++.dylib */,
 			);
@@ -385,6 +381,7 @@
 		E82827DC194778420090B385 /* OSX */ = {
 			isa = PBXGroup;
 			children = (
+				E8470A7A194F81DF0066632C /* XCTest.framework */,
 				02C414DE1921B07200F858D9 /* Foundation.framework */,
 				429E395319409432001DC9C1 /* libc++.dylib */,
 			);
@@ -463,7 +460,6 @@
 		E918909B177B677900653D7A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E8470A7A194F81DF0066632C /* XCTest.framework */,
 				E82827DB194778360090B385 /* iOS */,
 				E82827DC194778420090B385 /* OSX */,
 			);
@@ -875,6 +871,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
+				PRODUCT_MODULE_NAME = Realm;
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
 				SDKROOT = macosx;
@@ -916,6 +913,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb";
 				PRIVATE_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/PrivateHeaders";
+				PRODUCT_MODULE_NAME = Realm;
 				PRODUCT_NAME = Realm;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(BUILD_DIR)/$(CONFIGURATION)/OSX/$(PRODUCT_NAME).framework/Versions/$(FRAMEWORK_VERSION)/Headers";
 				SDKROOT = macosx;
@@ -963,7 +961,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/OSX Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/Realm-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -1005,7 +1003,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/OSX Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/Realm-Bridging-Header.h";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -1044,6 +1042,7 @@
 				METAL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
+				PRODUCT_MODULE_NAME = Realm;
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1084,6 +1083,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = "-ltightdb-ios";
+				PRODUCT_MODULE_NAME = Realm;
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1106,10 +1106,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1128,7 +1126,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/iOS Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/Realm-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1146,10 +1144,8 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1163,7 +1159,7 @@
 				METAL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/iOS Tests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Tests/Swift/Realm-Bridging-Header.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
