@@ -509,6 +509,61 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     return nil;
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    if (tableView == self.realmTableColumnsView) {
+        NSUInteger columnIndex = [self.realmTableColumnsView.tableColumns indexOfObject:tableColumn];
+        RLMClazzProperty *propertyNode = selectedObjectNode.propertyColumns[columnIndex];
+        
+        if (propertyNode.type == RLMPropertyTypeDate) {
+            // Create a frame which covers the cell to be edited
+            NSRect frame = [tableView frameOfCellAtColumn:[[tableView tableColumns] indexOfObject:tableColumn]
+                                                      row:row];
+            
+            frame.origin.x += frame.size.width;
+            frame.size.width = 280;
+            frame.size.height = 150;
+            
+            // Set up a date picker with no border or background
+            NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
+            datepicker.bordered = YES;
+            datepicker.drawsBackground = YES;
+            datepicker.datePickerStyle = NSClockAndCalendarDatePickerStyle;
+            datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
+            
+            RLMObject *selectedObject = [selectedObjectNode instanceAtIndex:row];
+            NSString *propertyName = propertyNode.name;
+            
+            datepicker.dateValue = selectedObject[propertyName];
+            
+            // Create a menu with a single menu item, and set the date picker as the menu item's view
+            NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@""
+                                                          action:NULL
+                                                   keyEquivalent:@""];
+            item.view = datepicker;
+            [menu addItem:item];
+            
+            // Display the menu, and if the user pressed enter rather than clicking away or hitting escape then process our new timestamp
+            BOOL userAcceptedEdit = [menu popUpMenuPositioningItem:nil
+                                                        atLocation:frame.origin
+                                                            inView:tableView];
+            if (userAcceptedEdit) {
+                RLMRealm *realm = presentedRealm.realm;
+                
+                [realm beginWriteTransaction];
+                selectedObject[propertyName] = datepicker.dateValue;
+                [realm commitWriteTransaction];
+            }
+        }
+        else {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
 #pragma mark - Public methods - NSTableView eventHandling
 
 - (void)userDoubleClicked:(id)sender
@@ -685,7 +740,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
-                                   editable:NO
+                                   editable:YES
                                     toolTip:@"Date"];
                 break;
             }
@@ -718,37 +773,48 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 - (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
     NSCell *cell = [[NSCell alloc] initTextCell:@""];
-    [cell setAlignment:alignment];
-    column.headerToolTip = toolTip;
-    
-    cell.editable = editable;
-    column.dataCell = cell;
-    
-    NSTableHeaderCell *headerCell = column.headerCell;
-    headerCell.stringValue = name;
+
+    [self initializeTabelColumn:column
+                       withCell:cell
+                           name:name
+                      alignment:alignment
+                       editable:editable
+                        toolTip:toolTip];
     
     return cell;
 }
 
-- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment  editable:(BOOL)editable toolTip:(NSString *)toolTip
+- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
     NSButtonCell *cell = [[NSButtonCell alloc] init];
-    [cell setTitle:nil];
-    [cell setAllowsMixedState:YES];
-    [cell setButtonType:NSSwitchButton];
-    [cell setAlignment:NSCenterTextAlignment];
-    [cell setImagePosition:NSImageOnly];
-    [cell setControlSize:NSSmallControlSize];
-
-    column.headerToolTip = toolTip;
     
+    cell.title = nil;
+    cell.allowsMixedState = YES;
+    cell.buttonType =NSSwitchButton;
+    cell.alignment = NSCenterTextAlignment;
+    cell.imagePosition = NSImageOnly;
+    cell.controlSize = NSSmallControlSize;
+
+    [self initializeTabelColumn:column
+                       withCell:cell
+                           name:name
+                      alignment:alignment
+                       editable:editable
+                        toolTip:toolTip];
+    
+    return cell;
+}
+
+- (void)initializeTabelColumn:(NSTableColumn *)column withCell:(NSCell *)cell name:(NSString *) name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
+{
+    cell.alignment = alignment;
     cell.editable = editable;
+
     column.dataCell = cell;
+    column.headerToolTip = toolTip;
     
     NSTableHeaderCell *headerCell = column.headerCell;
     headerCell.stringValue = name;
-    
-    return cell;
 }
 
 - (void)updateTableView
