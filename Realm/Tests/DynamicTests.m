@@ -31,8 +31,8 @@
 #pragma mark - Test Objects
 
 @interface DynamicObject : RLMObject
-@property NSString *string;
-@property NSInteger integer;
+@property NSString *stringCol;
+@property NSInteger intCol;
 @end
 
 @implementation DynamicObject
@@ -65,7 +65,7 @@
     RLMObjectSchema *dynSchema = dyrealm.schema[@"DynamicObject"];
     XCTAssertNotNil(dynSchema, @"Should be able to get object schema dynamically");
     XCTAssertEqual(dynSchema.properties.count, (NSUInteger)2, @"DynamicObject should have 2 properties");
-    XCTAssertEqualObjects([dynSchema.properties[0] name], @"string", @"Invalid property name");
+    XCTAssertEqualObjects([dynSchema.properties[0] name], @"stringCol", @"Invalid property name");
     XCTAssertEqual([(RLMProperty *)dynSchema.properties[1] type], RLMPropertyTypeInt, @"Invalid type");
     
     // verify object type
@@ -90,8 +90,8 @@
     RLMArray *array = [dyrealm allObjects:@"DynamicObject"];
     
     RLMObject *o1 = array[0], *o2 = array[1];
-    XCTAssertEqualObjects(o1[@"integer"], @1, @"First object should have column value 1");
-    XCTAssertEqualObjects(o2[@"string"], @"column2", @"Second object should have string value column2");
+    XCTAssertEqualObjects(o1[@"intCol"], @1, @"First object should have column value 1");
+    XCTAssertEqualObjects(o2[@"stringCol"], @"column2", @"Second object should have string value column2");
     XCTAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
 }
 
@@ -100,7 +100,7 @@
     id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, NSNull.null];
     
     StringObject *obj = [[StringObject alloc] init];
-    obj.string = @"string";
+    obj.stringCol = @"string";
     id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
@@ -129,7 +129,7 @@
     
     // check object equality
     XCTAssertNil(array[0][@"objectCol"], @"object should be nil");
-    XCTAssertEqualObjects(array[1][@"objectCol"][@"string"], @"string",
+    XCTAssertEqualObjects(array[1][@"objectCol"][@"stringCol"], @"string",
                           @"Child object should have string value 'string'");
 }
 

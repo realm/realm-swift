@@ -44,16 +44,16 @@
     XCTAssertEqual(array.array.count, (NSUInteger)0, @"Should start with no array elements");
 
     StringObject *obj = [[StringObject alloc] init];
-    obj.string = @"a";
+    obj.stringCol = @"a";
     [array.array addObject:obj];
     [array.array addObject:[StringObject createInRealm:realm withObject:@[@"b"]]];
     [array.array addObject:obj];
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.array.count, (NSUInteger)3, @"Should have three elements in array");
-    XCTAssertEqualObjects([array.array[0] string], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([array.array[1] string], @"b", @"Second element should have property value 'b'");
-    XCTAssertEqualObjects([array.array[2] string], @"a", @"Third element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[1] stringCol], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqualObjects([array.array[2] stringCol], @"a", @"Third element should have property value 'a'");
 
     RLMArray *arrayProp = array.array;
     XCTAssertThrows([arrayProp addObject:obj], @"Adding array object outside a transaction should throw");
@@ -74,15 +74,15 @@
     XCTAssertEqual(arObj.array.count, (NSUInteger)0, @"Should start with no array elements");
     
     StringObject *obj = [[StringObject alloc] init];
-    obj.string = @"a";
+    obj.stringCol = @"a";
     RLMArray *array = arObj.array;
     [array addObject:obj];
     [array addObject:[StringObject createInRealm:realm withObject:@[@"b"]]];
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.count, (NSUInteger)2, @"Should have two elements in array");
-    XCTAssertEqualObjects([array[0] string], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([arObj.array[1] string], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqualObjects([array[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([arObj.array[1] stringCol], @"b", @"Second element should have property value 'b'");
     
     XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
@@ -94,13 +94,13 @@
     ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
     StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
-    child2.string = @"b";
+    child2.stringCol = @"b";
     [obj.array addObjectsFromArray:@[child2, child1]];
     [realm commitWriteTransaction];
     
     RLMArray *children = [realm allObjects:StringObject.className];
-    XCTAssertEqualObjects([children[0] string], @"a", @"First child should be 'a'");
-    XCTAssertEqualObjects([children[1] string], @"b", @"Second child should be 'b'");
+    XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
+    XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }
 
 -(void)testStandalone {
@@ -111,7 +111,7 @@
     XCTAssertNotNil(array.array, @"RLMArray property should get created on access");
     
     StringObject *obj = [[StringObject alloc] init];
-    obj.string = @"a";
+    obj.stringCol = @"a";
     [array.array addObject:obj];
     [array.array addObject:obj];
     
@@ -120,8 +120,8 @@
     [realm commitWriteTransaction];
     
     XCTAssertEqual(array.array.count, (NSUInteger)2, @"Should have two elements in array");
-    XCTAssertEqualObjects([array.array[0] string], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([array.array[1] string], @"a", @"Second element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([array.array[1] stringCol], @"a", @"Second element should have property value 'a'");
 }
 
 @end

@@ -132,14 +132,14 @@
     IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@20]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj0.integer, 10,  @"integer should be 10");
-    XCTAssertEqual(obj1.integer, 20, @"integer should be 20");
+    XCTAssertEqual(obj0.intCol, 10,  @"integer should be 10");
+    XCTAssertEqual(obj1.intCol, 20, @"integer should be 20");
 
     [realm beginWriteTransaction];
-    obj0.integer = 7;
+    obj0.intCol = 7;
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj0.integer, 7,  @"integer should be 7");
+    XCTAssertEqual(obj0.intCol, 7,  @"integer should be 7");
 }
 
 - (void)testKeyedSubscripting
@@ -174,11 +174,11 @@
     [IntObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([IntObject objectsWhere:@"integer == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([IntObject objectsWhere:@"integer >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([IntObject objectsWhere:@"integer == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([IntObject objectsWhere:@"integer == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([IntObject objectsWhere:@"integer < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([IntObject objectsWhere:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([IntObject objectsWhere:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([IntObject objectsWhere:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([IntObject objectsWhere:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([IntObject objectsWhere:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes
@@ -205,7 +205,7 @@
     c.longCol = 99;
     c.mixedCol = @"string";
     c.objectCol = [[StringObject alloc] init];
-    c.objectCol.string = @"c";
+    c.objectCol.stringCol = @"c";
     
     [realm addObject:c];
 
@@ -234,7 +234,7 @@
     XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
     XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
-    XCTAssertTrue([row1.objectCol.string isEqual:@"c"], @"row1.objectCol");
+    XCTAssertTrue([row1.objectCol.stringCol isEqual:@"c"], @"row1.objectCol");
     XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
@@ -260,7 +260,7 @@
     XCTAssertThrows(([realm addObject:stringObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
     
     // Test #2
-    stringObject.string = @"";
+    stringObject.stringCol = @"";
     XCTAssertNoThrow(([realm addObject:stringObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
     
     // Test #3

@@ -58,7 +58,7 @@
     // test again after write transaction
     RLMArray *objects = [realm allObjects:StringObject.className];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
-    XCTAssertEqualObjects([objects.firstObject string], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
@@ -68,7 +68,7 @@
     
     objects = [realm allObjects:[StringObject className]];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
-    XCTAssertEqualObjects([objects.firstObject string], @"b", @"Expecting column to be 'b'");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
 
@@ -109,7 +109,7 @@
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         StringObject *obj = [[StringObject alloc] init];
-        obj.string = @"string";
+        obj.stringCol = @"string";
         [realm beginWriteTransaction];
         [realm addObject:obj];
         [realm commitWriteTransaction];
@@ -124,7 +124,7 @@
     // get object
     RLMArray *objects = [realm objects:StringObject.className where:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-    XCTAssertEqualObjects([objects[0] string], @"string", @"Value of first column should be 'string'");
+    XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
 /* FIXME: disabled until we have per file compile options

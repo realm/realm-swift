@@ -26,7 +26,7 @@
 
 @interface StringObject : RLMObject
 
-@property NSString *string;
+@property NSString *stringCol;
 
 @end
 
@@ -34,7 +34,7 @@
 
 @interface IntObject : RLMObject
 
-@property int integer;
+@property int intCol;
 
 @end
 

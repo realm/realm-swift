@@ -30,7 +30,7 @@
     StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([obj setString:@"throw"], @"Setter should throw when called outside of transaction.");
+    XCTAssertThrows([obj setStringCol:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
 - (void)testTransactionMisuse
