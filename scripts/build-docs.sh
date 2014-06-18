@@ -78,7 +78,13 @@ appledoc \
     --exit-threshold 1 \
     Realm
 
-( cd ${SRCROOT}/docs/output/${realm_version}/ && tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset )
+# Compress the docset
+(
+    cd ${SRCROOT}/docs/output/${realm_version}/
+    tar --exclude='.DS_Store' -cvzf realm-docset.tgz realm.docset || exit 1
+    rm -rf realm.docset || exit 1
+)
+
 cat >${SRCROOT}/docs/output/${realm_version}/realm.xml <<EOF
 <entry>
     <version>${realm_version}</version>

@@ -24,8 +24,9 @@ fi
 
 # Step 3 - copy resources
 mkdir -p "${SF_FRAMEWORK_PATH}/Resources"
-cp "${SRCROOT}/CHANGELOG.md" "${SF_FRAMEWORK_PATH}/Resources"
-cp "${SRCROOT}/Realm/Realm-Info.plist" "${SF_FRAMEWORK_PATH}/Resources/Info.plist"
+xcrun cp "${SRCROOT}/LICENSE" "${SF_FRAMEWORK_PATH}/Resources"
+xcrun cp "${SRCROOT}/CHANGELOG.md" "${SF_FRAMEWORK_PATH}/Resources"
+xcrun cp "${SRCROOT}/Realm/Realm-Info.plist" "${SF_FRAMEWORK_PATH}/Resources/Info.plist"
 
 cd "${SF_FRAMEWORK_PATH}"
 mkdir -p "Versions/A/Headers"
