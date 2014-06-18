@@ -20,14 +20,14 @@
 
 #pragma mark - Test Objects
 
-#pragma mark CustomAccessors
+#pragma mark CustomAccessorsObject
 
-@interface CustomAccessors : RLMObject
+@interface CustomAccessorsObject : RLMObject
 @property (getter = getThatName) NSString *name;
 @property (setter = setTheInt:)  int age;
 @end
 
-@implementation CustomAccessors
+@implementation CustomAccessorsObject
 @end
 
 #pragma mark InvalidSubclassObject
@@ -59,12 +59,12 @@
 
 @implementation ObjectInterfaceTests
 
-- (void)testCustomAccessors
+- (void)testCustomAccessorsObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
+    CustomAccessorsObject *ca = [CustomAccessorsObject createInRealm:realm withObject:@[@"name", @2]];
     XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
     
     [ca setTheInt:99];
