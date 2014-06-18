@@ -18,16 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm;
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
-
-//
-// Notification token - holds onto the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-@end
 
 @interface RLMRealm : NSObject
 
@@ -305,4 +299,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
+@end
+
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
 @end
