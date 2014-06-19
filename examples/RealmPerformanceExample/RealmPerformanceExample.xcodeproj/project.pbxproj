@@ -65,7 +65,6 @@
 		410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		42515D77194729DD001C3DDF /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		42515D8919472A0F001C3DDF /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		4D143CE318F6C44E00CEFF65 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		4DFD432D191A5CD300ABBFFE /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RealmPerformanceExample/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		4DFD432E191A5CD300ABBFFE /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RealmPerformanceExample/AppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -140,7 +139,6 @@
 			children = (
 				42515D8919472A0F001C3DDF /* libc++.dylib */,
 				4DFD4341191A5E1500ABBFFE /* Realm.framework */,
-				4D143CE318F6C44E00CEFF65 /* libstdc++.6.dylib */,
 				E9D58B4E1541A375009150B1 /* UIKit.framework */,
 				E9D58B501541A375009150B1 /* Foundation.framework */,
 				E9D58B521541A375009150B1 /* CoreGraphics.framework */,
