@@ -68,10 +68,10 @@ RLM_ARRAY_TYPE(Dog)
     [realm commitWriteTransaction];
     
     // Query
-    RLMArray *results = [realm objects:[Dog className] where:@"name contains 'x'"];
+    RLMArray *results = [realm objects:[Dog className] withPredicateFormat:@"name contains 'x'"];
     
     // Queries are chainable!
-    RLMArray *results2 = [results objectsWhere:@"age > 8"];
+    RLMArray *results2 = [results objectsWithPredicateFormat:@"age > 8"];
     NSLog(@"Number of dogs: %li", (unsigned long)results2.count);
     
     // Link objects
@@ -86,7 +86,7 @@ RLM_ARRAY_TYPE(Dog)
     // Thread-safety
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	^{
         RLMRealm *otherRealm = [RLMRealm defaultRealm];
-        RLMArray *otherResults = [otherRealm objects:[Dog className] where:@"name contains 'Rex'"];
+        RLMArray *otherResults = [otherRealm objects:[Dog className] withPredicateFormat:@"name contains 'Rex'"];
         NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
     });
     
