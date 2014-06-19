@@ -21,11 +21,11 @@ Usage: sh $0 command [argument]
 command:
   download-core:         downloads core library (binary version)
   clean [xcmode]:        clean up/remove all generated files
-  build [xcmode]:        builds iOS and OS X frameworks with debug configuration
-  test-ios [xcmode]:     tests iOS framework with debug configuration
-  test-osx [xcmode]:     tests OSX framework with debug configuration
-  test [xcmode]:         tests iOS and OS X frameworks with debug configuration
-  test-release [xcmode]: tests iOS and OS X frameworks with release configuration
+  build [xcmode]:        builds iOS and OS X frameworks with release configuration
+  test-ios [xcmode]:     tests iOS framework with release configuration
+  test-osx [xcmode]:     tests OSX framework with release configuration
+  test [xcmode]:         tests iOS and OS X frameworks with release configuration
+  test-debug [xcmode]:   tests iOS and OS X frameworks with debug configuration
   test-all [xcmode]:     tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
   examples [xcmode]:     builds all examples in examples/
   verify [xcmode]:       cleans, removes docs/output/, then runs docs, test-all and examples
@@ -131,12 +131,12 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        xcrealm "-scheme iOS"
+        xcrealm "-scheme iOS -configuration Release"
         exit 0
         ;;
 
     "osx")
-        xcrealm "-scheme OSX"
+        xcrealm "-scheme OSX -configuration Release"
         exit 0
         ;;
 
@@ -154,29 +154,29 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-release")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Release build test"
+    "test-debug")
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator build test"
+        xcrealm "-scheme OSX -configuration Debug build test"
         exit 0
         ;;
 
     "test-all")
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
         sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-release "$XCMODE" || exit 1
+        sh build.sh test-debug "$XCMODE" || exit 1
         sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer
         sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-release "$XCMODE" || exit 1
+        sh build.sh test-debug "$XCMODE" || exit 1
         exit 0
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
         exit 0
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX test"
+        xcrealm "-scheme OSX -configuration Release test"
         exit 0
         ;;
 
