@@ -115,10 +115,41 @@
 
 @end
 
+@interface BaseObject : RLMObject
+@property NSInteger alpha;
+@end
+
+@implementation BaseObject
+// No methods necessary.
+@end
+
+@interface SubclassObject : BaseObject
+@property NSInteger beta;
+@end
+
+@implementation SubclassObject
+// No methods necessary.
+@end
+
 @interface ObjectTests : RLMTestCase
 @end
 
 @implementation ObjectTests
+
+#pragma mark ObjectModularisation
+
+- (void)testSubclassing
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    SubclassObject *obj = [[SubclassObject alloc] init]; // Missing arguments (internal exception).
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([[SubclassObject allObjects] count], (NSUInteger)1,
+                   "Sub-subclasses of RLMObject get stored in Realm.");
+}
+
+#pragma mark Other
 
 -(void)testObjectInit
 {
