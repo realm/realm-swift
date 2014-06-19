@@ -17,36 +17,21 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
+
+#pragma mark - Test Objects
 
 @interface AggregateObject : RLMObject
-@property int intCol;
-@property float floatCol;
-@property double doubleCol;
-@property BOOL boolCol;
+@property int     intCol;
+@property float   floatCol;
+@property double  doubleCol;
+@property BOOL    boolCol;
 @property NSDate *dateCol;
 @end
 
 @implementation AggregateObject
 @end
 
-@interface PersonObject : RLMObject
-@property NSString *name;
-@property int age;
-@property BOOL hired;
-@end
-
-RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
-
-@implementation PersonObject
-@end
-
-@interface Company : RLMObject
-@property RLMArray<PersonObject> *employees;
-@end
-
-@implementation Company
-@end
+#pragma mark - Tests
 
 @interface ArrayTests : RLMTestCase
 @end
@@ -93,10 +78,10 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
-    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"name"]];
+    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"name"]];
     [realm commitWriteTransaction];
     
-    RLMArray *array = [realm allObjects:RLMTestObject.className];
+    RLMArray *array = [realm allObjects:StringObject.className];
     XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
     XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
 }
@@ -235,7 +220,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     
     [realm beginWriteTransaction];
     for (NSInteger i = 0; i < 1012; ++i) {
-        PersonObject *person = [[PersonObject alloc] init];
+        EmployeeObject *person = [[EmployeeObject alloc] init];
         person.name = @"Mary";
         person.age = 24;
         person.hired = YES;
@@ -243,7 +228,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     }
     [realm commitWriteTransaction];
     
-    NSString *description = [[PersonObject allObjects] description];
+    NSString *description = [[EmployeeObject allObjects] description];
     
     XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
     XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
@@ -259,17 +244,17 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     
-    PersonObject *po1 = [[PersonObject alloc] init];
+    EmployeeObject *po1 = [[EmployeeObject alloc] init];
     po1.age = 40;
     po1.name = @"Joe";
     po1.hired = YES;
     
-    PersonObject *po2 = [[PersonObject alloc] init];
+    EmployeeObject *po2 = [[EmployeeObject alloc] init];
     po2.age = 30;
     po2.name = @"John";
     po2.hired = NO;
     
-    PersonObject *po3 = [[PersonObject alloc] init];
+    EmployeeObject *po3 = [[EmployeeObject alloc] init];
     po3.age = 25;
     po3.name = @"Jill";
     po3.hired = YES;
@@ -278,8 +263,8 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     [realm addObject:po2];
     [realm addObject:po3];
     
-    Company *company = [[Company alloc] init];
-    company.employees = (RLMArray<PersonObject> *)[PersonObject allObjects];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
     [realm addObject:company];
     
     [realm commitWriteTransaction];
@@ -296,7 +281,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     [realm commitWriteTransaction];
     
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"link deleted when accessing via links");
-    PersonObject *test = peopleInCompany[0];
+    EmployeeObject *test = peopleInCompany[0];
     XCTAssertEqual(test.age, po1.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
     XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
@@ -308,7 +293,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
     XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
     //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
     
-    RLMArray *allPeople = [PersonObject allObjects];
+    RLMArray *allPeople = [EmployeeObject allObjects];
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"Only links should have been deleted, not the employees");
     
     
@@ -318,7 +303,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
 
     [realm beginWriteTransaction];
     XCTAssertThrows([allPeople removeObjectAtIndex:3], @"Out of bounds");
-    allPeople = [PersonObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
+    allPeople = [EmployeeObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
 
     //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported
     //XCTAssertEqual(allPeople.count, (NSUInteger)2, @" 1 employee should have been deleted");

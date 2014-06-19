@@ -19,26 +19,81 @@
 #import <Foundation/Foundation.h>
 #import "RLMObject.h"
 
-@interface RLMTestObject : RLMObject
-@property (nonatomic, copy) NSString *column;
+#pragma mark - Abstract Objects
+#pragma mark -
+
+#pragma mark StringObject
+
+@interface StringObject : RLMObject
+
+@property NSString *stringCol;
+
 @end
 
-RLM_ARRAY_TYPE(RLMTestObject)
+#pragma mark IntObject
+
+@interface IntObject : RLMObject
+
+@property int intCol;
+
+@end
+
+RLM_ARRAY_TYPE(StringObject)
+
+#pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-@property BOOL           boolCol;
-@property int            intCol;
-@property float          floatCol;
-@property double         doubleCol;
-@property NSString      *stringCol;
-@property NSData        *binaryCol;
-@property NSDate        *dateCol;
-@property bool           cBoolCol;
-@property long           longCol;
-@property id             mixedCol;
-@property RLMTestObject *objectCol;
-//@property AgeTable      *tableCol;
+
+@property BOOL          boolCol;
+@property int           intCol;
+@property float         floatCol;
+@property double        doubleCol;
+@property NSString     *stringCol;
+@property NSData       *binaryCol;
+@property NSDate       *dateCol;
+@property bool          cBoolCol;
+@property long          longCol;
+@property id            mixedCol;
+@property StringObject *objectCol;
+
 @end
 
+#pragma mark - Real Life Objects
+#pragma mark -
 
+#pragma mark EmployeeObject
 
+@interface EmployeeObject : RLMObject
+
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+
+@end
+
+RLM_ARRAY_TYPE(EmployeeObject)
+
+#pragma mark CompanyObject
+
+@interface CompanyObject : RLMObject
+
+@property RLMArray<EmployeeObject> *employees;
+
+@end
+
+#pragma mark DogObject
+
+@interface DogObject : RLMObject
+
+@property NSString *dogName;
+
+@end
+
+#pragma mark OwnerObject
+
+@interface OwnerObject : RLMObject
+
+@property NSString *name;
+@property DogObject *dog;
+
+@end
