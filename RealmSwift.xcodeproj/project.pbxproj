@@ -37,7 +37,7 @@
 		02E4D6CE192E3DC40082808D /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69D192E3DC40082808D /* RLMProperty_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		02E4D6D0192E3DC40082808D /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69E192E3DC40082808D /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6D2192E3DC40082808D /* RLMProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.m */; };
-		02E4D6D4192E3DC40082808D /* RLMQueryUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		02E4D6D4192E3DC40082808D /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		02E4D6D6192E3DC40082808D /* RLMQueryUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */; };
 		02E4D6D8192E3DC40082808D /* RLMRealm_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A2192E3DC40082808D /* RLMRealm_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		02E4D6DA192E3DC40082808D /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A3192E3DC40082808D /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,7 +45,7 @@
 		02E4D6DE192E3DC40082808D /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A5192E3DC40082808D /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		02E4D6E0192E3DC40082808D /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A6192E3DC40082808D /* RLMSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A7192E3DC40082808D /* RLMSchema.mm */; };
-		02E4D6E4192E3DC40082808D /* RLMUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A8192E3DC40082808D /* RLMUtil.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		02E4D6E4192E3DC40082808D /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A8192E3DC40082808D /* RLMUtil.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A9192E3DC40082808D /* RLMUtil.mm */; };
 		02E4D6E9192E58250082808D /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6E8192E58250082808D /* MixedTests.m */; };
 		02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
@@ -82,7 +82,7 @@
 		E8356B0B1947BF54009FC9F5 /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69D192E3DC40082808D /* RLMProperty_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356B0C1947BF54009FC9F5 /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69E192E3DC40082808D /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8356B0D1947BF54009FC9F5 /* RLMProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.m */; };
-		E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356B0F1947BF54009FC9F5 /* RLMQueryUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */; };
 		E8356B101947BF54009FC9F5 /* RLMRealm_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A2192E3DC40082808D /* RLMRealm_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356B111947BF54009FC9F5 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A3192E3DC40082808D /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -90,7 +90,7 @@
 		E8356B131947BF54009FC9F5 /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A5192E3DC40082808D /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356B141947BF54009FC9F5 /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A6192E3DC40082808D /* RLMSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8356B151947BF54009FC9F5 /* RLMSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A7192E3DC40082808D /* RLMSchema.mm */; };
-		E8356B161947BF54009FC9F5 /* RLMUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A8192E3DC40082808D /* RLMUtil.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E8356B161947BF54009FC9F5 /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A8192E3DC40082808D /* RLMUtil.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8356B171947BF54009FC9F5 /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A9192E3DC40082808D /* RLMUtil.mm */; };
 		E8356B221947BF69009FC9F5 /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAA19363B5300E4EEF8 /* ArrayTests.m */; };
 		E8356B231947BF69009FC9F5 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
@@ -222,7 +222,7 @@
 		02E4D69D192E3DC40082808D /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty_Private.h; sourceTree = "<group>"; };
 		02E4D69E192E3DC40082808D /* RLMProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty.h; sourceTree = "<group>"; };
 		02E4D69F192E3DC40082808D /* RLMProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMProperty.m; sourceTree = "<group>"; };
-		02E4D6A0192E3DC40082808D /* RLMQueryUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMQueryUtil.h; sourceTree = "<group>"; };
+		02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMQueryUtil.hpp; sourceTree = "<group>"; };
 		02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMQueryUtil.mm; sourceTree = "<group>"; };
 		02E4D6A2192E3DC40082808D /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
 		02E4D6A3192E3DC40082808D /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm.h; sourceTree = "<group>"; };
@@ -230,7 +230,7 @@
 		02E4D6A5192E3DC40082808D /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
 		02E4D6A6192E3DC40082808D /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema.h; sourceTree = "<group>"; };
 		02E4D6A7192E3DC40082808D /* RLMSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSchema.mm; sourceTree = "<group>"; };
-		02E4D6A8192E3DC40082808D /* RLMUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUtil.h; sourceTree = "<group>"; };
+		02E4D6A8192E3DC40082808D /* RLMUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUtil.hpp; sourceTree = "<group>"; };
 		02E4D6A9192E3DC40082808D /* RLMUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUtil.mm; sourceTree = "<group>"; };
 		02E4D6E8192E58250082808D /* MixedTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MixedTests.m; sourceTree = "<group>"; };
 		02E4D6EB192E58320082808D /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
@@ -323,7 +323,7 @@
 				02E4D69D192E3DC40082808D /* RLMProperty_Private.h */,
 				02E4D69E192E3DC40082808D /* RLMProperty.h */,
 				02E4D69F192E3DC40082808D /* RLMProperty.m */,
-				02E4D6A0192E3DC40082808D /* RLMQueryUtil.h */,
+				02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */,
 				02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */,
 				02E4D6A2192E3DC40082808D /* RLMRealm_Private.hpp */,
 				02E4D6A3192E3DC40082808D /* RLMRealm.h */,
@@ -331,7 +331,7 @@
 				02E4D6A5192E3DC40082808D /* RLMSchema_Private.h */,
 				02E4D6A6192E3DC40082808D /* RLMSchema.h */,
 				02E4D6A7192E3DC40082808D /* RLMSchema.mm */,
-				02E4D6A8192E3DC40082808D /* RLMUtil.h */,
+				02E4D6A8192E3DC40082808D /* RLMUtil.hpp */,
 				02E4D6A9192E3DC40082808D /* RLMUtil.mm */,
 				02C41461191DE49600F858D9 /* Supporting Files */,
 			);
@@ -480,9 +480,9 @@
 				02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */,
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
-				02E4D6E4192E3DC40082808D /* RLMUtil.h in Headers */,
+				02E4D6E4192E3DC40082808D /* RLMUtil.hpp in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,
-				02E4D6D4192E3DC40082808D /* RLMQueryUtil.h in Headers */,
+				02E4D6D4192E3DC40082808D /* RLMQueryUtil.hpp in Headers */,
 				02E4D6CE192E3DC40082808D /* RLMProperty_Private.h in Headers */,
 				02E4D6BE192E3DC40082808D /* RLMObject_Private.h in Headers */,
 				02E4D6DE192E3DC40082808D /* RLMSchema_Private.h in Headers */,
@@ -504,9 +504,9 @@
 				E8356B111947BF54009FC9F5 /* RLMRealm.h in Headers */,
 				E8356B0C1947BF54009FC9F5 /* RLMProperty.h in Headers */,
 				E8356AFC1947BF54009FC9F5 /* RLMArray.h in Headers */,
-				E8356B161947BF54009FC9F5 /* RLMUtil.h in Headers */,
+				E8356B161947BF54009FC9F5 /* RLMUtil.hpp in Headers */,
 				E8356AF91947BF54009FC9F5 /* RLMAccessor.h in Headers */,
-				E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.h in Headers */,
+				E8356B0E1947BF54009FC9F5 /* RLMQueryUtil.hpp in Headers */,
 				E8356B091947BF54009FC9F5 /* RLMObjectStore.h in Headers */,
 				E8356B0B1947BF54009FC9F5 /* RLMProperty_Private.h in Headers */,
 				E8356B101947BF54009FC9F5 /* RLMRealm_Private.hpp in Headers */,
