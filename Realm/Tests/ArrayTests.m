@@ -287,7 +287,7 @@
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"No employees should have been deleted");
 
     [realm beginWriteTransaction];
-    XCTAssertThrows([peopleInCompany removeObjectAtIndex:3], @"Out of bounds");
+    XCTAssertThrows([allPeople removeObjectAtIndex:3], @"Out of bounds");
     allPeople = [EmployeeObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
 
     //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported
