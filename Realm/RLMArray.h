@@ -189,35 +189,48 @@
 /**
  Gets the index of the first object matching the predicate.
  
- Returns NSNotFound if the object is not found in this RLMArray.
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @return    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...;
+
+/**
+ Gets the index of the first object matching the predicate.
+ 
+ @param predicate   The predicate to filter the objects.
+ 
+ @return    Index of object or NSNotFound if the object is not found in this RLMArray.
+ */
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @param predicateFormat The predicate format string which can accept variable arguments.
+ 
+ @return                An RLMArray of objects that match the given predicate
+ */
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
+
+/**
+ Get objects matching the given predicate in the RLMArray.
+ 
+ @param predicate   The predicate to filter the objects.
  
  @return            An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWhere:(id)predicate, ...;
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate in the RLMArray.
+ Get a sorted RLMArray from an existing RLMArray
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- t                  he property name, or an NSSortDescriptor with the property name and order.
+ @param property    The property name to sort by.
+ @param ascending   The direction to sort by.
  
- @return            An RLMArray of objects that match the predicate ordered by the given order.
+ @return    An RLMArray sorted by the specified property.
  */
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 
 #pragma mark -
 

@@ -53,7 +53,7 @@
     [RLMTestObject createInRealm:realm withObject:@[@"a"]];
     [RLMTestObject createInRealm:realm withObject:@[@"b"]];
     [RLMTestObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([realm objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
@@ -64,7 +64,7 @@
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual([realm objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
     objects = [realm allObjects:[RLMTestObject className]];
@@ -123,7 +123,7 @@
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
     // get object
-    RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
+    RLMArray *objects = [realm objects:RLMTestObject.className withPredicate:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
     XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
 }
@@ -185,7 +185,7 @@
     [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
     [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
     [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([realmInMemory objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([realmInMemory objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realmInMemory commitWriteTransaction];
 }
 
