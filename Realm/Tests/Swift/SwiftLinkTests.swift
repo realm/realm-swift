@@ -95,8 +95,6 @@ class SwiftLinkTests: RLMTestCase {
         XCTAssertEqual(realm.objects(DogObject.className(), withPredicate: nil).count, 0, "Expecting 0 dogs")
     }
     
-    // Note: can't test testInvalidLinks() as Swift doesn't have exception handling
-    
     func testCircularLinks() {
         let realm = realmWithTestPath()
         
