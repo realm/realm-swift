@@ -67,74 +67,41 @@
     XCTAssertEqual(objectSchemas.count, expectedTypes.count, @"Expecting %lu object schemas in database", (unsigned long)expectedTypes.count);
     
     // Test 2: Does the object schema array contained the expected schemas?
+    NSUInteger identifiedTypesCount = 0;
     for (NSString *expectedType in expectedTypes) {
-        [self performIndexAccessTestOnObjectSchemas:objectSchemas
-                                     withSchemaName:expectedType
-                                      expectedCount:1];
-    }
-
-    [self performIndexAccessTestOnObjectSchemas:objectSchemas
-                                 withSchemaName:unexpectedType
-                                  expectedCount:0];
-    
-    // Test 3: Test querying object schemas using schemaForClassName:
-    for (NSString *expectedType in expectedTypes) {
-        [self performQueryAccessTestOnRealmSchema:schema
-                                   withSchemaName:expectedType
-                                         expected:YES];
-    }
-
-    [self performQueryAccessTestOnRealmSchema:schema
-                               withSchemaName:unexpectedType
-                                     expected:NO];
-    
-    // Test 4: Test querying object schemas using subscription
-    for (NSString *expectedType in expectedTypes) {
-        [self performSubscriptionAccessTestOnRealmSchema:schema
-                                          withSchemaName:expectedType
-                                                expected:YES];
-    }
-    [self performSubscriptionAccessTestOnRealmSchema:schema
-                                      withSchemaName:unexpectedType
-                                            expected:NO];
-}
-
-- (void)performIndexAccessTestOnObjectSchemas:(NSArray *)objectSchemas withSchemaName:(NSString *)className expectedCount:(NSUInteger)expectedCount
-{
-    NSUInteger occurrenceCount = 0;
-    
-    for (RLMObjectSchema *objectSchema in objectSchemas) {
-        if ([objectSchema.className isEqualToString:className]) {
-            occurrenceCount++;
+        NSUInteger occurrenceCount = 0;
+        
+        for (RLMObjectSchema *objectSchema in objectSchemas) {
+            if ([objectSchema.className isEqualToString:expectedType]) {
+                occurrenceCount++;
+            }
+        }
+        
+        XCTAssertEqual(occurrenceCount, (NSUInteger)1, @"Expecting single occurrence of object schema for type %@ found %lu", expectedType, occurrenceCount);
+        
+        if (occurrenceCount > 0) {
+            identifiedTypesCount++;
         }
     }
-    
-    XCTAssertEqual(occurrenceCount, expectedCount, @"Expecting %lu occurrence of object schema for type %@ found %lu", expectedCount, className, (unsigned long)occurrenceCount);
-}
 
-- (void)performQueryAccessTestOnRealmSchema:(RLMSchema *)realmSchema withSchemaName:(NSString *)className expected:(BOOL)expected
-{
-    BOOL found = [realmSchema schemaForClassName:className] != nil;
+    // Test 3: Do the object schema array have unexpected schemas?
+    XCTAssertEqual(identifiedTypesCount, expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", identifiedTypesCount, expectedTypes.count);
     
-    if (expected) {
-        XCTAssertTrue(found, @"Expecting to find type %@ in realm using query, found none", className);
+    // Test 4: Test querying object schemas using schemaForClassName: for expected types
+    for (NSString *expectedType in expectedTypes) {
+        XCTAssertNotNil([schema schemaForClassName:expectedType], @"Expecting to find object schema for type %@ in realm using query, found none", expectedType);
     }
-    else {
-        XCTAssertFalse(found, @"Expecting not to find type %@ in realm using query, found one", className);
-    }
-}
 
-- (void)performSubscriptionAccessTestOnRealmSchema:(RLMSchema *)realmSchema withSchemaName:(NSString *)className expected:(BOOL)expected
-{
-    BOOL found = realmSchema[className] != nil;
+    // Test 5: Test querying object schemas using schemaForClassName: for unexpected types
+    XCTAssertNil([schema schemaForClassName:unexpectedType], @"Expecting not to find object schema for type %@ in realm using query, did find", unexpectedType);
     
-    if (expected) {
-        XCTAssertTrue(found, @"Expecting to find type %@ in realm using subscription, found none", className);
-    }
-    else {
-        XCTAssertFalse(found, @"Expecting not to find type %@ in realm using subscription, found one", className);
+    // Test 6: Test querying object schemas using subscription for unexpected types
+    for (NSString *expectedType in expectedTypes) {
+        XCTAssertNotNil(schema[expectedType], @"Expecting to find object schema for type %@ in realm using subscription, found none", expectedType);
     }
     
+    // Test 7: Test querying object schemas using subscription for unexpected types
+    XCTAssertNil(schema[unexpectedType], @"Expecting not to find object schema for type %@ in realm using subscription, did find", unexpectedType);
 }
 
 @end
