@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +20,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema.h"
 #import "RLMObjectStore.h"
-#import "RLMQueryUtil.h"
+#import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
 #import <objc/runtime.h>
 
@@ -47,21 +45,31 @@
     [realm registerAccessor:ar];
     
     // make readonly if not in write transaction
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         object_setClass(ar, RLMArrayTableViewReadOnly.class);
     }
     
     return ar;
 }
 
-- (void)setWritable:(BOOL)writable {
+- (void)setRLMAccessor_writable:(BOOL)writable {
     if (writable) {
         object_setClass(self, RLMArrayTableView.class);
     }
     else {
         object_setClass(self, RLMArrayTableViewReadOnly.class);
     }
-    _writable = writable;
+    _RLMAccessor_writable = writable;
+}
+
+- (void)setRLMAccessor_Invalid:(BOOL)invalid {
+    if (invalid) {
+        object_setClass(self, RLMArrayTableViewInvalid.class);
+    }
+    else {
+        object_setClass(self, RLMArrayTableView.class);
+    }
+    _RLMAccessor_invalid = invalid;
 }
 
 - (NSUInteger)count {
@@ -108,11 +116,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    if (index >= _backingView.size()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Trying to remove object at invalid index" userInfo:nil];
-    }
-    _backingView.remove(index);
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
@@ -125,7 +130,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ... {
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Not yet implemented" userInfo:nil];
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -147,11 +157,16 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
                                                  realm:_realm];
 }
 
-- (RLMArray *)objectsWhere:(id)predicate, ... {
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
     // validate predicate
     NSPredicate *outPred;
-    RLM_PREDICATE(predicate, outPred);
-    
+    RLM_PREDICATE(predicateFormat, outPred);
+    return [self objectsWithPredicate:outPred];
+}
+
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
     // copy array and apply new predicate creating a new query and view
     RLMArrayTableView *array = [self copy];
     RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[self.objectClassName]);
@@ -159,19 +174,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
     return array;
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    // validate predicate
-    NSPredicate *outPred;
-    RLM_PREDICATE(predicate, outPred);
-    
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+{
     // copy array and apply new predicate
     RLMArrayTableView *array = [self copy];
     RLMObjectSchema *schema = array.realm.schema[self.objectClassName];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, schema);
     tightdb::TableView view = array.backingQuery->find_all();
     
     // apply order
-    RLMUpdateViewWithOrder(view, order, schema);
+    RLMUpdateViewWithOrder(view, schema, property, ascending);
     array->_backingView = view;
     return array;
 }
@@ -266,6 +277,3 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 @end
-
-
-

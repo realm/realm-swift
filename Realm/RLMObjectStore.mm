@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -23,8 +21,8 @@
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMAccessor.h"
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil.hpp"
+#import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
 
@@ -80,7 +78,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         }
         else {
             if (table->get_column_count() != objectSchema.properties.count) {
-                [realm rollbackWriteTransaction];
+                // FIXME - rollback
                 @throw [NSException exceptionWithName:@"RLMException" reason:@"Column count does not match interface - migration required"
                                              userInfo:nil];
             }
@@ -97,19 +95,21 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // if realm is not writable throw
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Can only add an object to a Realm during a write transaction"
                                      userInfo:nil];
     }
     
     // get table and create new row
-    NSString *objectClassName = object.schema.className;
+    NSString *objectClassName = object.RLMObject_schema.className;
     object.realm = realm;
-    object.schema = realm.schema[objectClassName];
-    object.backingTable = RLMTableForObjectClass(realm, objectClassName);
-    object.objectIndex = object.backingTable->add_empty_row();
+    object.RLMObject_schema = realm.schema[objectClassName];
     
+    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
+    size_t rowIndex = table->add_empty_row();
+    object->_row = (*table)[rowIndex];
+
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
     Class objectClass = NSClassFromString(objectClassName);
@@ -141,15 +141,15 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 
 void RLMDeleteObjectFromRealm(RLMObject *object) {
     // if realm is not writable throw
-    if (object.realm.transactionMode != RLMTransactionModeWrite) {
+    if (!object.realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
     }
     // move last row to row we are deleting
-    object.backingTable->move_last_over(object.objectIndex);
+    object->_row.get_table()->move_last_over(object->_row.get_index());
     // FIXME - fix all accessors
 }
 
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order) {
+RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
     // get table for this calss
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     
@@ -160,10 +160,13 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     
     // create view and sort
     tightdb::TableView view = query->find_all();
-    RLMUpdateViewWithOrder(view, order, schema);
+    RLMUpdateViewWithOrder(view, schema, order, YES);
     
     // create and populate array
-    return [RLMArrayTableView arrayWithObjectClassName:objectClassName query:query view:view realm:realm];
+    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
+                                                                             query:query view:view
+                                                                             realm:realm];
+    return array;
 }
 
 // Create accessor and register with realm
@@ -178,9 +181,8 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
                                                  defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    accessor.backingTable = table;
-    accessor.objectIndex = index;
-    accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
+    accessor->_row = (*table)[index];
+    accessor.RLMAccessor_writable = realm.inWriteTransaction;
     
     [accessor.realm registerAccessor:accessor];
     return accessor;

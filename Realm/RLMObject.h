@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +60,7 @@
  
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realms other than the defaut Realm  use the interface on an RLMRealm instance.
  
@@ -178,26 +176,20 @@
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWhere:(id)predicate, ...;
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate for this type from the default Realm.
+ Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- the property name, or an NSSortDescriptor with the property name and order.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the predicate
- ordered by the given order.
+ @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -243,6 +235,3 @@
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
-
-
-

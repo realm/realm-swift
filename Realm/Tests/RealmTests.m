@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -22,12 +20,26 @@
 #import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
+@interface RLMRealm ()
+
++ (BOOL)isCoreDebug;
+
+@end
+
 @interface RealmTests : RLMTestCase
 @end
 
 @implementation RealmTests
 
 #pragma mark - Tests
+
+- (void)testCoreDebug {
+#if DEBUG
+    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use libtightdb{-ios}-dbg");
+#else
+    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
+#endif
+}
 
 - (void)testRealmExists {
     RLMRealm *realm = [self realmWithTestPath];
@@ -41,7 +53,7 @@
     [RLMTestObject createInRealm:realm withObject:@[@"a"]];
     [RLMTestObject createInRealm:realm withObject:@[@"b"]];
     [RLMTestObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([realm objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
@@ -52,7 +64,7 @@
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual([realm objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
     objects = [realm allObjects:[RLMTestObject className]];
@@ -64,7 +76,7 @@
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
     __block BOOL notificationFired = NO;
-    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -88,7 +100,7 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     __block BOOL notificationFired = NO;
-     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
+     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -111,7 +123,7 @@
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
     // get object
-    RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
+    RLMArray *objects = [realm objects:RLMTestObject.className withPredicate:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
     XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
 }
@@ -155,5 +167,26 @@
  }
  */
 
+- (void)testRealmInMemory
+{
+    RLMRealm *realmWithFile = [RLMRealm defaultRealm];
+    [realmWithFile beginWriteTransaction];
+    [RLMTestObject createInRealm:realmWithFile withObject:@[@"a"]];
+    [realmWithFile commitWriteTransaction];
+    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
+}
+
+- (void)testRealmInMemory2
+{
+    [RLMRealm useInMemoryDefaultRealm];
+    
+    RLMRealm *realmInMemory = [RLMRealm defaultRealm];
+    [realmInMemory beginWriteTransaction];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
+    [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
+    XCTAssertEqual([realmInMemory objects:[RLMTestObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    [realmInMemory commitWriteTransaction];
+}
 
 @end

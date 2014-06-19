@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -191,35 +189,48 @@
 /**
  Gets the index of the first object matching the predicate.
  
- Returns NSNotFound if the object is not found in this RLMArray.
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @return    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ...;
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...;
+
+/**
+ Gets the index of the first object matching the predicate.
+ 
+ @param predicate   The predicate to filter the objects.
+ 
+ @return    Index of object or NSNotFound if the object is not found in this RLMArray.
+ */
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
+ @param predicateFormat The predicate format string which can accept variable arguments.
+ 
+ @return                An RLMArray of objects that match the given predicate
+ */
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
+
+/**
+ Get objects matching the given predicate in the RLMArray.
+ 
+ @param predicate   The predicate to filter the objects.
  
  @return            An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWhere:(id)predicate, ...;
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate in the RLMArray.
+ Get a sorted RLMArray from an existing RLMArray
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
-                    which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- t                  he property name, or an NSSortDescriptor with the property name and order.
+ @param property    The property name to sort by.
+ @param ascending   The direction to sort by.
  
- @return            An RLMArray of objects that match the predicate ordered by the given order.
+ @return    An RLMArray sorted by the specified property.
  */
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 
 #pragma mark -
 

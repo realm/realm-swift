@@ -1,23 +1,20 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-
 
 #import <Foundation/Foundation.h>
 
@@ -25,7 +22,6 @@
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
-
 
 @interface RLMRealm : NSObject
 
@@ -159,13 +155,6 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
- Abandon all write operations in the current write transaction terminating the transaction.
- 
- After this is called the RLMRealm reverts back to being read-only.
- */
-- (void)rollbackWriteTransaction;
-
-/**
  Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
  */
 - (void)refresh;
@@ -190,7 +179,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Adds an object to be persistsed it in this Realm.
  
- Once added, this object can be retrieved using the objectsWhere: selectors on RLMRealm and on
+ Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
  also be added to the Realm if they are not already in it. If linked objects already belong to a
  different Realm an exception will be thrown.
@@ -238,32 +227,28 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
- @param className   The type of objects you are looking for (name of the class).
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
-                    which can accept variable arguments.
+ @param className       The type of objects you are looking for (name of the class).
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsWhere:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered array of objects matching the given predicate from the this Realm.
+ Get objects matching the given predicate from the this Realm.
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
  @param className   The type of objects you are looking for (name of the class).
- @param order       This argument determines how the results are sorted. It can be an NSString containing
-                    the property name, or an NSSortDescriptor with the property name and order.
- @param predicate   This argument can be an NSPredicate, a predicte string, or predicate format string
- which can accept variable arguments.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of results matching the predicate ordered by the given order.
+ @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsOrderedBy:where:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -310,4 +295,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
+@end
+
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
 @end

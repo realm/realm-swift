@@ -1,23 +1,20 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-
 
 #import "TableViewController.h"
 #import <Realm/Realm.h>
@@ -46,7 +43,8 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - View Lifecycle
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     [self setupUI];
     
@@ -60,7 +58,8 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - UI
 
-- (void)setupUI {
+- (void)setupUI
+{
     self.title = @"TableViewExample";
     self.navigationItem.leftBarButtonItem =
         [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
@@ -75,11 +74,13 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return self.array.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID];
     
     if (!cell) {
@@ -95,7 +96,8 @@ static NSString * const kTableName = @"table";
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
-                                            forRowAtIndexPath:(NSIndexPath *)indexPath {
+                                            forRowAtIndexPath:(NSIndexPath *)indexPath
+{
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
@@ -106,12 +108,14 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - Actions
 
-- (void)reloadData {
-    self.array = [DemoObject objectsOrderedBy:@"date" where:nil];
+- (void)reloadData
+{
+    self.array = [[DemoObject allObjects] arraySortedByProperty:@"date" ascending:YES];
     [self.tableView reloadData];
 }
 
-- (void)backgroundAdd {
+- (void)backgroundAdd
+{
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // Import many items in a background thread
     dispatch_async(queue, ^{
@@ -127,29 +131,23 @@ static NSString * const kTableName = @"table";
     });
 }
 
-- (void)add {
+- (void)add
+{
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
     [DemoObject createInRealm:realm withObject:@[[self randomString], [self randomDate]]];
     [realm commitWriteTransaction];
 }
 
-- (void)deleteAll {
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm beginWriteTransaction];
-    for (DemoObject *obj in self.array) {
-        [realm deleteObject:obj];
-    }
-    [realm commitWriteTransaction];
-}
-
 #pragma - Helpers
 
-- (NSString *)randomString {
+- (NSString *)randomString
+{
     return [NSString stringWithFormat:@"Title %d", arc4random()];
 }
 
-- (NSDate *)randomDate {
+- (NSDate *)randomDate
+{
     return [NSDate dateWithTimeIntervalSince1970:arc4random()];
 }
 

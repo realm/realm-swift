@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -24,16 +22,35 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil.hpp"
+#import "RLMUtil.hpp"
 
 #include <exception>
 #include <sstream>
 
+#include <tightdb/version.hpp>
 #include <tightdb/group_shared.hpp>
-#include <tightdb/group.hpp>
+#include <tightdb/commit_log.hpp>
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/lang_bind_helper.hpp>
+
+// Notification Token
+
+@interface RLMNotificationToken ()
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
+@implementation RLMNotificationToken
+- (void)dealloc
+{
+    if (_realm || _block) {
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold \
+              on to the RLMNotificationToken returned from addNotificationBlock and call \
+              removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+    }
+}
+@end
 
 using namespace std;
 using namespace tightdb;
@@ -112,23 +129,6 @@ inline void clearRealmCache() {
     }
 }
 
-//
-// Notification token - holds onto the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
-@end
-
-@implementation RLMNotificationToken
--(void)dealloc {
-    if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold on to the RLMNotificationToken returned from addNotificationBlock and call removeNotification: when you no longer wish to recieve RLMRealm notifications.");
-    }
-}
-@end
-
-
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
 @property (nonatomic, readwrite) RLMSchema *schema;
@@ -136,18 +136,25 @@ inline void clearRealmCache() {
 
 
 NSString *const c_defaultRealmFileName = @"default.realm";
+static BOOL s_useInMemoryDefaultRealm = NO;
 static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    UniquePtr<SharedGroup> _sharedGroup;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
     
-    tightdb::Group *_readGroup;
-    tightdb::Group *_writeGroup;
+    LangBindHelper::TransactLogRegistry *_writeLogs;
+    Replication *_replication;
+    SharedGroup *_sharedGroup;
+    
+    Group *_group;
+}
+
++ (BOOL)isCoreDebug {
+    return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
 
 + (void)initialize {
@@ -214,8 +221,12 @@ static NSArray *s_objectDescriptors = nil;
 
 + (void)useInMemoryDefaultRealm
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    @synchronized(s_realmsPerPath) {
+        if (realmsAtPath(RLMRealm.defaultPath).count) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
+        }
+    }
+    s_useInMemoryDefaultRealm = YES;
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -246,7 +257,7 @@ static NSArray *s_objectDescriptors = nil;
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
-        // if already open with different read permissions then throw
+        // if already opened with different read permissions then throw
         if (realm.isReadOnly != readonly) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Realm at path already opened with different read permissions"
@@ -262,7 +273,13 @@ static NSArray *s_objectDescriptors = nil;
     
     NSError *error = nil;
     try {
-        realm->_sharedGroup.reset(new SharedGroup(path.UTF8String));
+        if (s_useInMemoryDefaultRealm && [path isEqualToString:RLMRealm.defaultPath]) { // Only for default realm
+            realm->_sharedGroup = new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly);
+        } else {
+        	realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
+        	realm->_replication = tightdb::makeWriteLogCollector(path.UTF8String);
+        	realm->_sharedGroup = new SharedGroup(*realm->_replication);
+        }
     }
     catch (File::PermissionDenied &ex) {
         error = make_realm_error(RLMErrorFilePermissionDenied, ex);
@@ -289,25 +306,23 @@ static NSArray *s_objectDescriptors = nil;
         return nil;
     }
     
+    // begin read
+    Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
+    realm->_group = &group;
+    
     if (dynamic) {
-        // begin read transaction
-        [realm beginReadTransaction];
-        
         // for dynamic realms, get schema from stored tables
         realm.schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
         // set the schema for this realm
         realm.schema = [RLMSchema sharedSchema];
-        
+
         // initialize object store for this realm
         RLMEnsureRealmTablesExist(realm);
         
         // cache main thread realm at this path
         cacheRealm(realm, path);
-        
-        // begin read transaction
-        [realm beginReadTransaction];
     }
     
     return realm;
@@ -340,56 +355,19 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
-- (RLMTransactionMode)transactionMode {
-    if (_readGroup != NULL) {
-        return RLMTransactionModeRead;
-    }
-    if (_writeGroup != NULL) {
-        return RLMTransactionModeWrite;
-    }
-    return RLMTransactionModeNone;
-    
-}
-
-- (void)beginReadTransaction {
-    if (self.transactionMode == RLMTransactionModeNone) {
-        try {
-            _readGroup = (tightdb::Group *)&_sharedGroup->begin_read();
-            [self updateAllObjects];
-        }
-        catch (exception &ex) {
-            throw_objc_exception(ex);
-        }
-    }
-}
-
-- (void)endReadTransaction {
-    if (self.transactionMode == RLMTransactionModeRead) {
-        try {
-            _sharedGroup->end_read();
-            _readGroup = NULL;
-        }
-        catch (std::exception& ex) {
-            throw_objc_exception(ex);
-        }
-    }
-}
-
 - (void)beginWriteTransaction {
-    if (self.transactionMode != RLMTransactionModeWrite) {
+    if (!self.inWriteTransaction) {
         try {
             // if we are moving the transaction forward, send local notifications
             if (_sharedGroup->has_changed()) {
                 [self sendNotifications];
             }
             
-            // end current read
-            [self endReadTransaction];
+            // upgratde to write
+            LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
             
-            // create group
-            _writeGroup = &_sharedGroup->begin_write();
-            
-            // make all objects in this realm writable
+            // update state and make all objects in this realm writable
+            _inWriteTransaction = YES;
             [self updateAllObjects];
         }
         catch (std::exception& ex) {
@@ -404,13 +382,14 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)commitWriteTransaction {
-    if (self.transactionMode == RLMTransactionModeWrite) {
+    if (self.inWriteTransaction) {
         try {
-            _sharedGroup->commit();
-            _writeGroup = NULL;
+            LangBindHelper::commit_and_continue_as_read(*_sharedGroup);
             
-            [self beginReadTransaction];
-
+            // update state and make all objects in this realm read-only
+            _inWriteTransaction = NO;
+            [self updateAllObjects];
+            
             // notify other realm istances of changes
             for (RLMRealm *realm in realmsAtPath(_path)) {
                 if (![realm isEqual:self]) {
@@ -429,6 +408,7 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
+/*
 - (void)rollbackWriteTransaction {
     if (self.transactionMode == RLMTransactionModeWrite) {
         try {
@@ -443,31 +423,39 @@ static NSArray *s_objectDescriptors = nil;
     } else {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't roll-back a non-existing writetransaction" userInfo:nil];
     }
-}
+}*/
 
 - (void)dealloc
 {
     [_updateTimer invalidate];
     _updateTimer = nil;
     
-    if (self.transactionMode == RLMTransactionModeWrite) {
+    if (self.inWriteTransaction) {
         [self commitWriteTransaction];
         NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
     }
-    [self endReadTransaction];
+    
+    if (_sharedGroup) {
+        delete _sharedGroup;
+    }
+    if (_replication) {
+        delete _replication;
+    }
+    if (_writeLogs) {
+        delete _writeLogs;
+    }
 }
 
 - (void)refresh {
     try {
         // no-op if writing
-        if (self.transactionMode == RLMTransactionModeWrite) {
+        if (self.inWriteTransaction) {
             return;
         }
         
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
-            [self endReadTransaction];
-            [self beginReadTransaction];
+            LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
             [self updateAllObjects];
             
             // send notification that someone else changed the realm
@@ -485,34 +473,21 @@ static NSArray *s_objectDescriptors = nil;
 
 - (void)updateAllObjects {
     try {
-        // get the group
-        tightdb::Group *group = self.group;
-        BOOL writable = (self.transactionMode == RLMTransactionModeWrite);
-
-        // update arrays after updating all parent objects
-        // FIXME - onces rows use auto-updating accesors this will no longer be needed
-        NSMutableArray *arrays = [NSMutableArray array];
-        
         // refresh all outstanding objects
         for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            //
-            // FIXME - check is_attached instead of all of this nonsense one we have self-updating accessors
-            //
             if ([obj isKindOfClass:RLMObject.class]) {
-                TableRef tableRef = group->get_table([(RLMObject *)obj backingTableIndex]); // Throws
-                ((RLMObject *)obj).backingTable = tableRef;
-                obj.writable = writable;
+                if (!((RLMObject *)obj)->_row.is_attached()) {
+                    obj.RLMAccessor_invalid = YES;
+                    continue; // don't change writeable one invalid
+                }
             }
             else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                [arrays addObject:obj];
+                if (!((RLMArrayLinkView *)obj)->_backingLinkView->is_attached()) {
+                    obj.RLMAccessor_invalid = YES;
+                    continue; // don't change writeable one invalid
+                }
             }
-        }
-        
-        // update arrays
-        // FIXME - onces rows use auto-updating accesors this will no longer be needed
-        for (RLMArrayLinkView *ar in arrays) {
-            ar->_backingLinkView = ar.parentObject.backingTable->get_linklist(ar.arrayColumnInParent, ar.parentObject.objectIndex);
-            ar.writable = writable;
+            obj.RLMAccessor_writable = _inWriteTransaction;
         }
     }
     catch (exception &ex) {
@@ -521,7 +496,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (tightdb::Group *)group {
-    return _writeGroup ? _writeGroup : _readGroup;
+    return _group;
 }
 
 - (void)addObject:(RLMObject *)object {
@@ -542,20 +517,16 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, nil, nil);
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(id)predicate, ... {
+- (RLMArray *)objects:(NSString *)objectClassName withPredicateFormat:(NSString *)predicateFormat, ...
+{
     NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClassName, outPredicate, nil);
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objects:objectClassName withPredicate:outPredicate];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName orderedBy:(id)order where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(self, objectClassName, outPredicate, order);
+- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate
+{
+    return RLMGetObjects(self, objectClassName, predicate, nil);
 }
 
 -(NSUInteger)schemaVersion {

@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -218,11 +216,11 @@
     [AgeObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([AgeObject objectsWhere:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes
@@ -369,7 +367,6 @@
     [realm beginWriteTransaction];
     XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
                                                property type should not throw");
-    [realm rollbackWriteTransaction];
 }
 
 - (void)testCanUseIgnoredProperty
@@ -389,7 +386,7 @@
     
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
     
-    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
     
     XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
@@ -525,7 +522,7 @@
     [realm commitWriteTransaction];
     
     // Test description in read block
-    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    NSString *objDescription = [[[SimpleObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
 }
 
