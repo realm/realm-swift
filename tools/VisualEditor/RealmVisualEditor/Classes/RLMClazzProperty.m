@@ -12,21 +12,27 @@
 
 @implementation RLMClazzProperty
 
-@synthesize name = _name;
-@synthesize type = _type;
-
-- (instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type;
+- (instancetype)initWithProperty:(RLMProperty *)property;
 {
     if (self = [super init]) {
-        _name = [name copy];
-        _type = type;
+        _property = property;
     }
     return self;
 }
 
+- (NSString *)name
+{
+    return _property.name;
+}
+
+- (RLMPropertyType)type
+{
+    return _property.type;
+}
+
 - (Class)clazz
 {
-    switch (_type) {
+    switch (self.type) {
         case RLMPropertyTypeBool:
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:

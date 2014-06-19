@@ -95,13 +95,12 @@
 
 #pragma mark - Public methods
 
-- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index
+- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
 {
     RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithArray:array
-                                            withReferringProperty:name
-                                                   referringIndex:index
+                                            withReferringProperty:property
+                                                         onObject:object
                                                             realm:self.realm];
-                               
     [displayedArrays addObject:arrayNode];
     
     return arrayNode;

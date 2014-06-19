@@ -10,22 +10,21 @@
 
 @implementation RLMArrayNode {
 
+    RLMProperty *referringProperty;
+    RLMObject *referringObject;
     RLMArray *displayedArray;
 }
 
-@synthesize referringProperty = _referringProperty;
-@synthesize referringIndex = _referringIndex;
-
-- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(NSString *)property referringIndex:(NSUInteger)index realm:(RLMRealm *)realm
+- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
-    NSString *objectClassName = array.objectClassName;
-    RLMSchema *schema = realm.schema;
-    RLMObjectSchema *objectSchema = [schema schemaForObject:objectClassName];
+    NSString *elementTypeName = property.objectClassName;
+    RLMSchema *realmSchema = realm.schema;
+    RLMObjectSchema *elementSchema = [realmSchema schemaForObject:elementTypeName];
     
-    if (self = [super initWithSchema:objectSchema
+    if (self = [super initWithSchema:elementSchema
                              inRealm:realm]) {
-        _referringProperty = property;
-        _referringIndex = index;
+        referringProperty = property;
+        referringObject = object;
         displayedArray = array;
     }
 
@@ -53,11 +52,23 @@
 {
     switch (index) {
         case 0:
-            return [NSString stringWithFormat:@"instance[%lu].%@", (unsigned long)self.referringIndex, _referringProperty];
+            return [NSString stringWithFormat:@"%@<%@>", referringProperty.name, referringProperty.objectClassName];
             
         default:
             return nil;
     }
+}
+
+#pragma mark - RLMRealmOutlineNode implementation
+
+- (BOOL)hasToolTip
+{
+    return YES;
+}
+
+- (NSString *)toolTipString
+{
+    return referringObject.description;
 }
 
 @end

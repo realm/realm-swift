@@ -22,11 +22,6 @@
 
 @implementation RLMRealmNode
 
-@synthesize realm = _realm;
-@synthesize name = _name;
-@synthesize url = _url;
-@synthesize topLevelClazzes = _topLevelClazzes;
-
 - (instancetype)init
 {
     return self = [self initWithName:@"Unknown name"
@@ -91,7 +86,7 @@
 {
     switch (index) {
         case 0:
-            return @"Classes";
+            return @"CLASSES";
             
         default:
             return nil;

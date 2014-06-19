@@ -215,6 +215,18 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 #pragma mark - NSOutlineViewDelegate implementation
 
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
+{
+    // The top level node should not be collapsed.
+    return item != presentedRealm;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowOutlineCellForItem:(id)item
+{
+    // The top level node should not display the toggle triangle.
+    return item != presentedRealm;
+}
+
 - (NSString *)outlineView:(NSOutlineView *)outlineView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc item:(id)item mouseLocation:(NSPoint)mouseLocation
 {
     if ([item respondsToSelector:@selector(hasToolTip)]) {
@@ -623,8 +635,8 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 RLMClazzNode *selectedClassNode = (RLMClazzNode *)selectedObjectNode;
                 
                 RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:linkedArray
-                                                          fromPropertyWithName:propertyNode.name
-                                                                         index:row];
+                                                                  fromProperty:propertyNode.property
+                                                                        object:selectedInstance];
                 
                 [self.classesOutlineView reloadData];
                 

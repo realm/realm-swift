@@ -10,8 +10,6 @@
 
 @implementation RLMObjectNode
 
-@synthesize realm = _realm;
-@synthesize schema = _schema;
 @dynamic name;
 @dynamic instanceCount;
 
@@ -87,12 +85,8 @@
     
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:propertyCount];
     for (NSUInteger index = 0; index < propertyCount; index++) {
-        RLMProperty *property = properties[index];
-        NSString *propertyName = property.name;
-        RLMPropertyType propertyType = property.type;
-        
-        RLMClazzProperty *tableColumn = [[RLMClazzProperty alloc] initWithName:propertyName
-                                                                          type:propertyType];
+        RLMProperty *property = properties[index];        
+        RLMClazzProperty *tableColumn = [[RLMClazzProperty alloc] initWithProperty:property];
         [result addObject:tableColumn];
     }
     

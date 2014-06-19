@@ -13,7 +13,7 @@
 
 @interface RLMClazzNode : RLMObjectNode
 
-- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromPropertyWithName:(NSString *)name index:(NSUInteger)index;
+- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
 

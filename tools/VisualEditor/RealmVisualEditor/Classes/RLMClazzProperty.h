@@ -11,10 +11,11 @@
 
 @interface RLMClazzProperty : NSObject
 
+@property (nonatomic, readonly) RLMProperty *property;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) RLMPropertyType type;
 @property (nonatomic, readonly) Class clazz;
 
-- (instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type;
+- (instancetype)initWithProperty:(RLMProperty *)property;
 
 @end
