@@ -60,7 +60,7 @@
  
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realms other than the defaut Realm  use the interface on an RLMRealm instance.
  
@@ -176,26 +176,20 @@
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWhere:(id)predicate, ...;
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate for this type from the default Realm.
+ Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- the property name, or an NSSortDescriptor with the property name and order.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the predicate
- ordered by the given order.
+ @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -241,6 +235,3 @@
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
-
-
-

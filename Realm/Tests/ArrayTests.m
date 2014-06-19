@@ -60,7 +60,7 @@
     
     [realm commitWriteTransaction];
        
-    RLMArray *result = [realm objects:[AggregateObject className] where:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
+    RLMArray *result = [realm objects:[AggregateObject className] withPredicate:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
     
     XCTAssertEqual(result.count, (NSUInteger)10, @"10 objects added");
     
@@ -108,8 +108,8 @@
     
     [realm commitWriteTransaction];
     
-    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
+    RLMArray *noArray = [AggregateObject objectsWithPredicateFormat:@"boolCol == NO"];
+    RLMArray *yesArray = [AggregateObject objectsWithPredicateFormat:@"boolCol == YES"];
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum

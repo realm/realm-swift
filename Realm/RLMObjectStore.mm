@@ -149,7 +149,7 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     // FIXME - fix all accessors
 }
 
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order) {
+RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
     // get table for this calss
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     
@@ -160,7 +160,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     
     // create view and sort
     tightdb::TableView view = query->find_all();
-    RLMUpdateViewWithOrder(view, order, schema);
+    RLMUpdateViewWithOrder(view, schema, order, YES);
     
     // create and populate array
     __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName

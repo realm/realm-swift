@@ -174,11 +174,11 @@
     [IntObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([IntObject objectsWhere:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([IntObject objectsWhere:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([IntObject objectsWhere:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([IntObject objectsWhere:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([IntObject objectsWhere:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes
@@ -345,7 +345,7 @@
     
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
     
-    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
     
     XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
@@ -481,7 +481,7 @@
     [realm commitWriteTransaction];
     
     // Test description in read block
-    NSString *objDescription = [[[EmployeeObject objectsWhere:nil] firstObject] description];
+    NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
 }
 

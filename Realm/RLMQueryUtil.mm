@@ -546,46 +546,31 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectS
     }
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema *schema) {
-    if (order) {
-        NSString *propName;
-        BOOL ascending = YES;
-        
-        // if not NSSortDescriptor or string then throw
-        if ([order isKindOfClass:NSSortDescriptor.class]) {
-            propName = [(NSSortDescriptor *)order key];
-            ascending = [(NSSortDescriptor *)order ascending];
-        }
-        else if ([order isKindOfClass:NSString.class]) {
-            propName = order;
-        }
-        else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid object for order - must use property name or NSSortDescriptor"
-                                         userInfo:nil];
-        }
-        
-        // validate
-        RLMProperty *prop = schema[propName];
-        if (!prop) {
-            @throw RLMPredicateException(@"Invalid sort column",
-                                         [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
-        }
-        
-        switch (prop.type) {
-            case RLMPropertyTypeBool:
-            case RLMPropertyTypeDate:
-            case RLMPropertyTypeDouble:
-            case RLMPropertyTypeFloat:
-            case RLMPropertyTypeInt:
-            case RLMPropertyTypeString:
-                view.sort(prop.column, ascending);
-                break;
-                
-            default:
-                @throw RLMPredicateException(@"Invalid sort column type",
-                                             @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
-        }
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSString *property, BOOL ascending)
+{
+    if (!property || property.length == 0) {
+        return;
+    }
+    
+    // validate
+    RLMProperty *prop = schema[property];
+    if (!prop) {
+        @throw RLMPredicateException(@"Invalid sort column",
+                                     [NSString stringWithFormat:@"Column named '%@' not found.", property]);
+    }
+    
+    switch (prop.type) {
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeString:
+            view.sort(prop.column, ascending);
+            break;
+            
+        default:
+            @throw RLMPredicateException(@"Invalid sort column type",
+                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
     }
 }
-

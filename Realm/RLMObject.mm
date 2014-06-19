@@ -183,20 +183,16 @@
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWhere:(id)predicate, ... {
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
     NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, nil);
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objectsWithPredicate:outPredicate];
 }
 
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, order);
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
 }
 
 - (NSString *)JSONString {

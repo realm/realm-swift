@@ -29,8 +29,8 @@ extern NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException;
 // apply the given predicate to the passed in query, returning the updated query
 void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectSchema *schema);
 
-// apply a sort (column name or NSSortDescriptor) to an existing view
-void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema *schema);
+// sort an existing view by the specified property name and direction
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSString *property, BOOL ascending);
 
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
 
@@ -38,16 +38,14 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
 // predicate exception
 NSException *RLMPredicateException(NSString *name, NSString *reason);
 
-// This macro generates an NSPredicate from either an NSPredicate or an NSString with optional format va_list
-#define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
-if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
-    OUTPREDICATE = INPREDICATE;                            \
-} else if ([INPREDICATE isKindOfClass:[NSString class]]) { \
-    va_list args;                                          \
-    va_start(args, INPREDICATE);                           \
-    OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
-    va_end(args);                                          \
-} else if (INPREDICATE) {                                  \
-    NSString *reason = @"predicate must be either an NSPredicate or an NSString with optional format va_list";  \
-    [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];                                 \
+// This macro generates an NSPredicate from an NSString with optional format va_list
+#define RLM_PREDICATE(IN_PREDICATE_FORMAT, OUT_PREDICATE)   \
+if ([IN_PREDICATE_FORMAT isKindOfClass:[NSString class]]) { \
+    va_list args;                                           \
+    va_start(args, IN_PREDICATE_FORMAT);                    \
+    OUT_PREDICATE = [NSPredicate predicateWithFormat:IN_PREDICATE_FORMAT arguments:args]; \
+    va_end(args);                                           \
+} else if (IN_PREDICATE_FORMAT) {                           \
+    NSString *reason = @"predicate must be an NSString with optional format va_list"; \
+    [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];       \
 }
