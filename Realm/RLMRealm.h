@@ -18,16 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm;
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
-
-//
-// Notification token - holds on to the realm and the notification block
-//
-@interface RLMNotificationToken : NSObject
-@end
 
 @interface RLMRealm : NSObject
 
@@ -159,13 +153,6 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  After this is called the RLMRealm reverts back to being read-only.
  */
 - (void)commitWriteTransaction;
-
-/**
- Abandon all write operations in the current write transaction terminating the transaction.
- 
- After this is called the RLMRealm reverts back to being read-only.
- */
-- (void)rollbackWriteTransaction;
 
 /**
  Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
@@ -308,4 +295,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
+@end
+
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
 @end

@@ -5,12 +5,17 @@
 
 ### API breaking changes
 
-* All methods that previously accepted variadic arguments as a predicate now only accept NSPredicate
+* Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
+* Removed -indexOfObjectWhere:, -objectsWhere: and -objectsOrderedBy:where: from RLMArray
+* Removed +objectsWhere: and +objectsOrderedBy:where: from RLMObject
 
 ### Enhancements
 
 * Added support for RLMArrayProperties.
 * Added support for creating in-memory default realm.
+* Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
+* Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
+* Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
 
 ### Bugfixes
 

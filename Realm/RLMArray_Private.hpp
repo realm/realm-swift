@@ -18,9 +18,11 @@
 
 #import "RLMArray.h"
 #import "RLMAccessor.h"
-#import <tightdb/query.hpp>
+
+#import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
+#import <tightdb/query.hpp>
 
 //
 // RLMArray private properties/ivars for all subclasses
@@ -35,7 +37,8 @@
   @protected
     // accessor ivars
     RLMRealm *_realm;
-    BOOL _writable;     // YES when in write transaction
+    BOOL _RLMAccessor_writable;     // YES when in write transaction
+    BOOL _RLMAccessor_invalid;      // YES for invalidated objects
     BOOL _readOnly;     // YES for RLMArrays which are never mutable
 }
 
@@ -69,12 +72,6 @@
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view
                                          realm:(RLMRealm *)realm;
-
-// FIXME - remove once we have self-updating LinkView accessors
-// we need to hold onto these until LinkView accessors self update
-@property (nonatomic, strong) RLMObject *parentObject;
-@property (nonatomic, assign) NSUInteger arrayColumnInParent;
-
 @end
 
 

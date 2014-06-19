@@ -44,7 +44,8 @@
     XCTAssertEqualObjects([array.array[1] column], @"b", @"Second element should have property value 'b'");
     XCTAssertEqualObjects([array.array[2] column], @"a", @"Third element should have property value 'a'");
 
-    XCTAssertThrows([array.array addObject:obj], @"Adding array object outside a transaction should throw");
+    RLMArray *arrayProp = array.array;
+    XCTAssertThrows([arrayProp addObject:obj], @"Adding array object outside a transaction should throw");
     
     // make sure we can fast enumerate
     for (RLMObject *obj in array.array) {
