@@ -20,6 +20,7 @@
 #import <objc/runtime.h>
 
 #import <tightdb/table.hpp>
+#import <tightdb/row.hpp>
 #import <tightdb/string_data.hpp>
 #import <tightdb/util/safe_int_ops.hpp>
 
@@ -71,8 +72,8 @@ inline NSString *RLMTypeToString(RLMPropertyType type) {
 }
 
 // Getter and Setter for RLMPropertyTypeAny properties
-id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx);
-void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj);
+id RLMGetAnyProperty(tightdb::Row row, NSUInteger col_ndx);
+void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj);
 
 
 // String conversion utilities

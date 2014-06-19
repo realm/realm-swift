@@ -21,7 +21,8 @@
 
 @implementation RLMArray
 
-@dynamic writable;
+@dynamic RLMAccessor_invalid;
+@dynamic RLMAccessor_writable;
 @dynamic realm;
 @dynamic readOnly;
 
@@ -38,8 +39,12 @@
     return _realm;
 }
 
-- (BOOL)writable {
-    return _writable;
+- (BOOL)RLMAccessor_writable {
+    return _RLMAccessor_writable;
+}
+
+- (BOOL)RLMAccessor_invalid {
+    return _RLMAccessor_invalid;
 }
 
 - (BOOL)isReadOnly {
@@ -142,12 +147,20 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWhere:(id)predicate, ... {
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+}
+
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+{
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
@@ -172,7 +185,14 @@
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...
+{
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
+{
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];
 }

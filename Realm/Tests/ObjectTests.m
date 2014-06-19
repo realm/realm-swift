@@ -244,11 +244,11 @@
     [AgeObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([AgeObject objectsWhere:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes
@@ -395,7 +395,6 @@
     [realm beginWriteTransaction];
     XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
                                                property type should not throw");
-    [realm rollbackWriteTransaction];
 }
 
 - (void)testCanUseIgnoredProperty
@@ -415,7 +414,7 @@
     
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
     
-    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
     
     XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
@@ -551,7 +550,7 @@
     [realm commitWriteTransaction];
     
     // Test description in read block
-    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    NSString *objDescription = [[[SimpleObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
 }
 

@@ -110,7 +110,7 @@ static NSString * const kTableName = @"table";
 
 - (void)reloadData
 {
-    self.array = [DemoObject objectsOrderedBy:@"date" where:nil];
+    self.array = [[DemoObject allObjects] arraySortedByProperty:@"date" ascending:YES];
     [self.tableView reloadData];
 }
 
@@ -136,16 +136,6 @@ static NSString * const kTableName = @"table";
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
     [DemoObject createInRealm:realm withObject:@[[self randomString], [self randomDate]]];
-    [realm commitWriteTransaction];
-}
-
-- (void)deleteAll
-{
-    RLMRealm *realm = RLMRealm.defaultRealm;
-    [realm beginWriteTransaction];
-    for (DemoObject *obj in self.array) {
-        [realm deleteObject:obj];
-    }
     [realm commitWriteTransaction];
 }
 

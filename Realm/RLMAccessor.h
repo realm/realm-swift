@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <tightdb/table.hpp>
 #import "RLMRealm.h"
 
 //
@@ -26,8 +25,15 @@
 
 // implemented by all persisted objects
 @protocol RLMAccessor <NSObject>
-@property (nonatomic) RLMRealm *realm;
-@property (nonatomic, assign) BOOL writable;
+
+// we don't namespace realm as it is public
+// this means users can't create properties names realm
+@property (nonatomic, readonly) RLMRealm *realm;
+
+// we need to namesapce these properties for RLMObject, so that users
+// don't try to create properties with the same names.
+@property (nonatomic, assign) BOOL RLMAccessor_writable;
+@property (nonatomic, assign) BOOL RLMAccessor_invalid;
 @end
 
 
