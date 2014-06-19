@@ -88,9 +88,10 @@
 
     // Add some rows
     for (NSUInteger i = 0; i < count; i++) {
+        const int rand_age = 25 + (rand() % 4);
         PerfObj *perf = [[PerfObj alloc] init];
         perf.name = @"Foo";
-        perf.age = (25 + (int)(drand48() * 4));
+        perf.age = rand_age;
         perf.hired = YES;
         perf.spare = 0;
         [realm addObject:perf];
