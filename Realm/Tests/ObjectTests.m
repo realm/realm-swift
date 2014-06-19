@@ -231,12 +231,13 @@
                    @"<  operator in numeric predicate.");
     XCTAssertEqual([AgeObject objectsWithPredicateFormat:@"age != 3"].count, (NSUInteger)7,
                    @"!= operator in numeric predicate.");
-    // NB! Should work once we support the BETWEEN operator (it's supported in core).
-    //
-    // XCTAssertEqual([AgeObject
-    //                objectsWithPredicateFormat:@"age BETWEEN {2, 3}"].count, (NSUInteger)5,
-    //               @"BETWEEN operator in numeric predicate.");
-
+    
+    RLMArray *results = [AgeObject objectsWithPredicateFormat:@"age BETWEEN %@", @[@2, @3]];
+    XCTAssertEqual(results.count, (NSUInteger)5, @"BETWEEN operator in numeric predicate.");
+    
+    results = [AgeObject objectsWithPredicateFormat:@"age BETWEEN {2, 3}"];
+    XCTAssertEqual(results.count, (NSUInteger)5, @"BETWEEN operator in numeric predicate.");
+    
     @try {
         [AgeObject objectsWithPredicateFormat:@"age BEGINSWITH 3"];
     }
