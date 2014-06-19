@@ -14,17 +14,13 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>realm.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>io.realm.objectdatabase</string>
+			<string>DocumentType</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>????</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSItemContentTypes</key>
-			<array/>
-			<key>LSTypeIsPackage</key>
-			<integer>0</integer>
 			<key>NSDocumentClass</key>
 			<string>RLMDocument</string>
 		</dict>
@@ -47,8 +43,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>0001</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSHumanReadableCopyright</key>
