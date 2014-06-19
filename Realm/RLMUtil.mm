@@ -96,6 +96,8 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeInt:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 return nsnumber_is_like_integer(obj);
+            } else if ([obj isKindOfClass:NSClassFromString(@"NSConstantValueExpression")]) {
+                return nsnumber_is_like_integer([(NSExpression *)obj constantValue]);
             }
             return NO;
         case RLMPropertyTypeFloat:

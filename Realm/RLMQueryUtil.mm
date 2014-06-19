@@ -50,9 +50,11 @@ namespace {
 // validate that we support the passed in expression type
 NSExpressionType validated_expression_type(NSExpression *expression) {
     if (expression.expressionType != NSConstantValueExpressionType &&
-        expression.expressionType != NSKeyPathExpressionType) {
+        expression.expressionType != NSKeyPathExpressionType &&
+        expression.expressionType != NSAggregateExpressionType) {
         @throw RLMPredicateException(@"Invalid expression type",
-                                       @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
+                                     @"Only support NSConstantValueExpressionType, \
+                                     NSKeyPathExpressionType and NSAggregateExpressionType");
     }
     return expression.expressionType;
 }
@@ -204,12 +206,20 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
     }
 }
 
+id normalizedValue(id value) {
+    if ([value isKindOfClass:NSClassFromString(@"NSConstantValueExpression")]) {
+        return [(NSExpression *)value constantValue];
+    }
+    return value;
+}
+
 void add_between_constraint_to_query(tightdb::Query & query,
                                      RLMPropertyType dataType,
                                      NSUInteger index,
                                      NSArray *array) {
-    id from = array.firstObject;
-    id to = array.lastObject;
+    id from = normalizedValue(array.firstObject);
+    id to = normalizedValue(array.lastObject);
+    
     switch (dataType) {
         case type_DateTime:
             query.between_datetime(index,
