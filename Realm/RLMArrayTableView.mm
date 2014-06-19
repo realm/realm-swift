@@ -116,11 +116,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    if (index >= _backingView.size()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Trying to remove object at invalid index" userInfo:nil];
-    }
-    _backingView.remove(index);
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
