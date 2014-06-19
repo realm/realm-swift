@@ -136,7 +136,7 @@
 
 @implementation ObjectTests
 
-#pramga mark ObjectModularisation
+#pragma mark ObjectModularisation
 
 - (void)testSubclassing
 {
