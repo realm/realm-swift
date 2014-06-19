@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectSchema.h"
-#import "RLMUtil.h"
+#import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import <tightdb/table.hpp>
