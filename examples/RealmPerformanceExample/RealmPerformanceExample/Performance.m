@@ -94,10 +94,6 @@
         perf.hired = YES;
         perf.spare = 0;
         [realm addObject:perf];
-        
-        if(i % 1000 == 0) {
-            NSLog(@"Inserting now %lu", (unsigned long)i);
-        }
     }
 #else
     
