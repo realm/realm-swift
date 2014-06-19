@@ -20,6 +20,12 @@
 #import "RLMTestObjects.h"
 #import <Realm/Realm.h>
 
+@interface PropertylessObject : RLMObject
+@end
+
+@implementation PropertylessObject
+@end
+
 @interface SimpleObject : RLMObject
 @property NSString *name;
 @property int age;
@@ -119,6 +125,39 @@
 @end
 
 @implementation ObjectTests
+
+#pragma mark EmptyObjects
+
+- (void)testAddNil
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:nil]; // EXC_BAD_ACCESS
+    [realm commitWriteTransaction];
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
+}
+
+- (void)testAddRLMObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    RLMObject *obj = [[RLMObject alloc] init]; // Missing arguments (internal exception).
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
+}
+
+- (void)testAddPropertylessObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    PropertylessObject *obj = [[PropertylessObject alloc] init];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([PropertylessObject allObjects].count, (NSUInteger)0);
+}
+
+#pragma mark Other
 
 -(void)testObjectInit
 {
