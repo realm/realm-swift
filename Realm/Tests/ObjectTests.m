@@ -154,7 +154,7 @@
     PropertylessObject *obj = [[PropertylessObject alloc] init];
     [realm addObject:obj];
     [realm commitWriteTransaction];
-    XCTAssertEqual([RLMObject allObjects].count, (NSUInteger)0);
+    XCTAssertEqual([PropertylessObject allObjects].count, (NSUInteger)0);
 }
 
 #pragma mark Other
