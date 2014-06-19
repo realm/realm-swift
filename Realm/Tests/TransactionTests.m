@@ -27,10 +27,10 @@
 {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
+    XCTAssertThrows([obj setStringCol:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
 - (void)testTransactionMisuse
@@ -39,12 +39,10 @@
     
     // Insert an object
     [realm beginWriteTransaction];
-    SimpleMisuseObject *obj = [SimpleMisuseObject createInRealm:realm withObject:nil];
-    obj.stringCol = @"stringVal";
-    obj.intCol = 10;
+    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([SimpleMisuseObject createInRealm:realm withObject:nil], @"Outside write transaction");
+    XCTAssertThrows([StringObject createInRealm:realm withObject:@[@"a"]], @"Outside write transaction");
     XCTAssertThrows([realm commitWriteTransaction], @"No write transaction to close");
     
     [realm beginWriteTransaction];

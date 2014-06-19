@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "XCTestCase+AsyncTesting.h"
 
 @interface MixedTests : RLMTestCase
 @end
@@ -70,5 +71,7 @@
     XCTAssertEqual([MixedObject allObjects].count, (NSUInteger)0, @"0 rows expected");
     [realm commitWriteTransaction];
 }
+
+
 
 @end

@@ -18,175 +18,81 @@
 
 #import "RLMTestObjects.h"
 
-#pragma mark - RLMTestObject
+#pragma mark - Abstract Objects
+#pragma mark -
 
-@implementation RLMTestObject
+#pragma mark StringObject
+
+@implementation StringObject
 @end
 
-#pragma mark - AllTypesObject
+#pragma mark IntObject
+
+@implementation IntObject
+@end
+
+#pragma mark AllTypesObject
 
 @implementation AllTypesObject
 @end
 
-#pragma mark - AggregateObject
+#pragma mark - Real Life Objects
+#pragma mark -
 
-@implementation AggregateObject
+#pragma mark EmployeeObject
+
+@implementation EmployeeObject
 @end
 
-#pragma mark - PersonObject
+#pragma mark CompanyObject
 
-@implementation PersonObject
+@implementation CompanyObject
 @end
 
-#pragma mark - Company
-
-@implementation Company
-@end
-
-#pragma mark - ArrayPropertyObject
-
-@implementation ArrayPropertyObject
-@end
-
-#pragma mark - RLMDynamicObject
-
-@implementation RLMDynamicObject
-@end
-
-#pragma mark - EnumPerson
-
-@implementation EnumPerson
-@end
-
-#pragma mark - DogObject
+#pragma mark DogObject
 
 @implementation DogObject
 @end
 
-#pragma mark - OwnerObject
+#pragma mark OwnerObject
 
 @implementation OwnerObject
 @end
 
-#pragma mark - CircleObject
+#pragma mark - Specific Use Objects
+#pragma mark -
 
-@implementation CircleObject
-@end
-
-#pragma mark - MixedObject
+#pragma mark MixedObject
 
 @implementation MixedObject
 @end
 
-#pragma mark - CustomAccessors
+#pragma mark CustomAccessorsObject
 
-@implementation CustomAccessors
+@implementation CustomAccessorsObject
 @end
 
-#pragma mark - InvalidSubclassObject
+#pragma mark BaseClassStringObject
 
-@implementation InvalidSubclassObject
+@implementation BaseClassStringObject
 @end
 
-#pragma mark - BaseClassTestObject
+#pragma mark CircleObject
 
-@implementation BaseClassTestObject
+@implementation CircleObject
 @end
 
-#pragma mark - SimpleObject
+#pragma mark ArrayPropertyObject
 
-@implementation SimpleObject
+@implementation ArrayPropertyObject
 @end
 
-#pragma mark - AgeObject
+#pragma mark DynamicObject
 
-@implementation AgeObject
+@implementation DynamicObject
 @end
 
-#pragma mark - KeyedObject
+#pragma mark AggregateObject
 
-@implementation KeyedObject
-@end
-
-#pragma mark - DefaultObject
-
-@implementation DefaultObject
-
-+ (NSDictionary *)defaultPropertyValues
-{
-    NSString *binaryString = @"binary";
-    NSData *binaryData = [binaryString dataUsingEncoding:NSUTF8StringEncoding];
-    
-    return @{@"intCol" : @12,
-             @"floatCol" : @88.9f,
-             @"doubleCol" : @1002.892,
-             @"boolCol" : @YES,
-             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:999999],
-             @"stringCol" : @"potato",
-             @"binaryCol" : binaryData,
-             @"mixedCol" : @"foo"};
-}
-
-@end
-
-#pragma mark - NoDefaultObject
-
-@implementation NoDefaultObject
-@end
-
-#pragma mark - IgnoredURLObject
-
-@implementation IgnoredURLObject
-
-+ (NSArray *)ignoredProperties
-{
-    return @[@"url"];
-}
-
-@end
-
-#pragma mark - IndexedObject
-
-@implementation IndexedObject
-
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
-{
-    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
-    if ([propertyName isEqualToString:@"name"]) {
-        superAttributes |= RLMPropertyAttributeIndexed;
-    }
-    return superAttributes;
-}
-
-@end
-
-#pragma mark - NonRealmPersonObject
-
-@implementation NonRealmPersonObject
-@end
-
-#pragma mark - PersonQueryObject
-
-@implementation PersonQueryObject
-@end
-
-#pragma mark - AllPropertyTypesObject
-
-@implementation AllPropertyTypesObject
-@end
-
-#pragma mark - TestQueryObject
-
-@implementation TestQueryObject
-@end
-
-#pragma mark - SimpleMisuseObject
-
-@implementation SimpleMisuseObject
-
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"stringCol" : @""};
-}
-
+@implementation AggregateObject
 @end

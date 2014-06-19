@@ -63,10 +63,10 @@ class SwiftArrayTests: RLMTestCase {
         let realm = realmWithTestPath()
         
         realm.beginWriteTransaction()
-        let obj = RLMTestObject.createInRealm(realm, withObject: ["name"])
+        let obj = StringObject.createInRealm(realm, withObject: ["name"])
         realm.commitWriteTransaction()
         
-        let array = realm.allObjects(RLMTestObject.className())
+        let array = realm.allObjects(StringObject.className())
         XCTAssertTrue(array.readOnly, "Array returned from query should be readonly")
     }
     
@@ -177,7 +177,7 @@ class SwiftArrayTests: RLMTestCase {
         realm.beginWriteTransaction()
         
         for i in 0..1012 {
-            let person = PersonObject()
+            let person = EmployeeObject()
             person.name = "Mary"
             person.age = 24
             person.hired = true
@@ -186,15 +186,15 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let description = realm.allObjects(PersonObject.className()).description
+        let description = realm.allObjects(EmployeeObject.className()).description
         
-        XCTAssertTrue((description as NSString).rangeOfString("name").location != NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue((description as NSString).rangeOfString("Mary").location != NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
         
-        XCTAssertTrue((description as NSString).rangeOfString("age").location != NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue((description as NSString).rangeOfString("24").location != NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
         
-        XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
     
     func testDeleteLinksAndObjectsInArray() {
@@ -202,17 +202,17 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.beginWriteTransaction()
         
-        let po1 = PersonObject()
+        let po1 = EmployeeObject()
         po1.age = 40
         po1.name = "Joe"
         po1.hired = true
         
-        let po2 = PersonObject()
+        let po2 = EmployeeObject()
         po2.age = 30
         po2.name = "John"
         po2.hired = false
         
-        let po3 = PersonObject()
+        let po3 = EmployeeObject()
         po3.age = 25
         po3.name = "Jill"
         po3.hired = true
@@ -221,8 +221,8 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(po2)
         realm.addObject(po3)
         
-        let company = Company()
-        company.employees = realm.allObjects(PersonObject.className())
+        let company = CompanyObject()
+        company.employees = realm.allObjects(EmployeeObject.className())
         realm.addObject(company)
         
         realm.commitWriteTransaction()
@@ -236,19 +236,19 @@ class SwiftArrayTests: RLMTestCase {
         
         XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
         
-        var test = peopleInCompany[0] as PersonObject
+        var test = peopleInCompany[0] as EmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        test = peopleInCompany[1] as PersonObject
+        test = peopleInCompany[1] as EmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        let allPeople = realm.allObjects(PersonObject.className())
+        let allPeople = realm.allObjects(EmployeeObject.className())
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
     }
 }

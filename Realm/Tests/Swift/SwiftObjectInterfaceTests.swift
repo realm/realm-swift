@@ -25,7 +25,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
     func testCustomAccessors() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let ca = CustomAccessors.createInRealm(realm, withObject: ["name", 2])
+        let ca = CustomAccessorsObject.createInRealm(realm, withObject: ["name", 2])
         XCTAssertEqualObjects(ca.name, "name", "name property should be name.")
         ca.age = 99
         XCTAssertEqual(ca.age, 99, "age property should be 99")
@@ -36,13 +36,13 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         let realm = realmWithTestPath()
         
         realm.beginWriteTransaction()
-        let bObject = BaseClassTestObject()
+        let bObject = BaseClassStringObject()
         bObject.intCol = 1
         bObject.stringCol = "stringVal"
         realm.addObject(bObject)
         realm.commitWriteTransaction()
         
-        let objectFromRealm = realm.allObjects(BaseClassTestObject.className())[0] as BaseClassTestObject
+        let objectFromRealm = realm.allObjects(BaseClassStringObject.className())[0] as BaseClassStringObject
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqualObjects(objectFromRealm.stringCol, "stringVal", "Should be stringVal")
     }

@@ -18,49 +18,53 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMObject.h"
+#import "RLMRealm.h"
 
-#pragma mark - RLMTestObject
+#pragma mark - Abstract Objects
+#pragma mark -
 
-@interface RLMTestObject : RLMObject
+#pragma mark StringObject
 
-@property (nonatomic, copy) NSString *column;
+@interface StringObject : RLMObject
+
+@property NSString *stringCol;
 
 @end
 
-RLM_ARRAY_TYPE(RLMTestObject)
+#pragma mark IntObject
 
-#pragma mark - AllTypesObject
-
-@interface AllTypesObject : RLMObject
-@property BOOL           boolCol;
-@property int            intCol;
-@property float          floatCol;
-@property double         doubleCol;
-@property NSString      *stringCol;
-@property NSData        *binaryCol;
-@property NSDate        *dateCol;
-@property bool           cBoolCol;
-@property long           longCol;
-@property id             mixedCol;
-@property RLMTestObject *objectCol;
-//@property AgeTable      *tableCol;
-@end
-
-#pragma mark - AggregateObject
-
-@interface AggregateObject : RLMObject
+@interface IntObject : RLMObject
 
 @property int intCol;
-@property float floatCol;
-@property double doubleCol;
-@property BOOL boolCol;
-@property NSDate *dateCol;
 
 @end
 
-#pragma mark - PersonObject
+RLM_ARRAY_TYPE(StringObject)
 
-@interface PersonObject : RLMObject
+#pragma mark AllTypesObject
+
+@interface AllTypesObject : RLMObject
+
+@property BOOL          boolCol;
+@property int           intCol;
+@property float         floatCol;
+@property double        doubleCol;
+@property NSString     *stringCol;
+@property NSData       *binaryCol;
+@property NSDate       *dateCol;
+@property bool          cBoolCol;
+@property long          longCol;
+@property id            mixedCol;
+@property StringObject *objectCol;
+
+@end
+
+#pragma mark - Real Life Objects
+#pragma mark -
+
+#pragma mark EmployeeObject
+
+@interface EmployeeObject : RLMObject
 
 @property NSString *name;
 @property int age;
@@ -68,45 +72,17 @@ RLM_ARRAY_TYPE(RLMTestObject)
 
 @end
 
-RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
+RLM_ARRAY_TYPE(EmployeeObject)
 
-#pragma mark - Company
+#pragma mark CompanyObject
 
-@interface Company : RLMObject
+@interface CompanyObject : RLMObject
 
-@property RLMArray<PersonObject> *employees;
-
-@end
-
-#pragma mark - ArrayPropertyObject
-
-@interface ArrayPropertyObject : RLMObject
-
-@property NSString *name;
-@property RLMArray<RLMTestObject> *array;
+@property RLMArray<EmployeeObject> *employees;
 
 @end
 
-#pragma mark - RLMDynamicObject
-
-@interface RLMDynamicObject : RLMObject
-
-@property (nonatomic, copy) NSString *column;
-@property (nonatomic) NSInteger integer;
-
-@end
-
-#pragma mark - EnumPerson
-
-@interface EnumPerson : RLMObject
-
-@property NSString * Name;
-@property int Age;
-@property bool Hired;
-
-@end
-
-#pragma mark - DogObject
+#pragma mark DogObject
 
 @interface DogObject : RLMObject
 
@@ -114,7 +90,7 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
 
 @end
 
-#pragma mark - OwnerObject
+#pragma mark OwnerObject
 
 @interface OwnerObject : RLMObject
 
@@ -123,7 +99,43 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
 
 @end
 
-#pragma mark - CircleObject
+#pragma mark - Specific Use Objects
+#pragma mark -
+
+#pragma mark MixedObject
+
+@interface MixedObject : RLMObject
+
+@property BOOL hired;
+@property id other;
+@property NSInteger age;
+
+@end
+
+#pragma mark CustomAccessorsObject
+
+@interface CustomAccessorsObject : RLMObject
+
+@property (getter = getThatName) NSString *name;
+@property (setter = setTheInt:)  int age;
+
+@end
+
+#pragma mark BaseClassStringObject
+
+@interface BaseClassStringObject : RLMObject
+
+@property NSInteger intCol;
+
+@end
+
+@interface BaseClassStringObject ()
+
+@property NSString *stringCol;
+
+@end
+
+#pragma mark CircleObject
 
 @interface CircleObject : RLMObject
 
@@ -132,167 +144,43 @@ RLM_ARRAY_TYPE(PersonObject)  //Defines an RLMArray<PersonObject> type
 
 @end
 
-#pragma mark - MixedObject
+#pragma mark ArrayPropertyObject
 
-@interface MixedObject : RLMObject
+@interface ArrayPropertyObject : RLMObject
 
-@property (nonatomic, assign) BOOL hired;
-@property (nonatomic, strong) id other;
-@property (nonatomic, assign) NSInteger age;
-
-@end
-
-#pragma mark - CustomAccessors
-
-@interface CustomAccessors : RLMObject
-
-@property (getter = getThatName) NSString * name;
-@property (setter = setTheInt:) int age;
+@property NSString *name;
+@property RLMArray<StringObject> *array;
 
 @end
 
-#pragma mark - InvalidSubclassObject
+#pragma mark - Class Extension
 
-@interface InvalidSubclassObject : RLMTestObject
+@interface RLMRealm ()
 
-@property NSString *invalid;
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
 
 @end
 
-#pragma mark - BaseClassTestObject
+#pragma mark DynamicObject
 
-@interface BaseClassTestObject : RLMObject
+@interface DynamicObject : RLMObject
 
+@property NSString *stringCol;
 @property NSInteger intCol;
 
 @end
 
-@interface BaseClassTestObject ()
+#pragma mark AggregateObject
 
-@property (nonatomic, copy) NSString *stringCol;
+@interface AggregateObject : RLMObject
 
-@end
-
-#pragma mark - SimpleObject
-
-@interface SimpleObject : RLMObject
-
-@property NSString *name;
-@property int age;
-@property BOOL hired;
-
-@end
-
-#pragma mark - AgeObject
-
-@interface AgeObject : RLMObject
-
-@property int age;
-
-@end
-
-#pragma mark - KeyedObject
-
-@interface KeyedObject : RLMObject
-
-@property NSString * name;
-@property int objID;
-
-@end
-
-#pragma mark - DefaultObject
-
-@interface DefaultObject : RLMObject
-
-@property int intCol;
-@property float floatCol;
-@property double doubleCol;
-@property BOOL boolCol;
+@property int     intCol;
+@property float   floatCol;
+@property double  doubleCol;
+@property BOOL    boolCol;
 @property NSDate *dateCol;
-@property NSString *stringCol;
-@property NSData *binaryCol;
-@property id mixedCol;
-
-@end
-
-#pragma mark - NoDefaultObject
-
-@interface NoDefaultObject : RLMObject
-
-@property NSString *stringCol;
-@property int intCol;
-
-@end
-
-#pragma mark - IgnoredURLObject
-
-@interface IgnoredURLObject : RLMObject
-
-@property NSString *name;
-@property NSURL *url;
-
-@end
-
-#pragma mark - IndexedObject
-
-@interface IndexedObject : RLMObject
-
-@property NSString *name;
-@property NSInteger age;
-
-@end
-
-#pragma mark - NonRealmPersonObject
-
-@interface NonRealmPersonObject : NSObject
-
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) NSInteger age;
-
-@end
-
-#pragma mark - PersonQueryObject
-
-@interface PersonQueryObject : RLMObject
-
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) NSInteger age;
-
-@end
-
-#pragma mark - AllPropertyTypesObject
-
-@interface AllPropertyTypesObject : RLMObject
-
-@property (nonatomic, assign) BOOL boolCol;
-@property (nonatomic, copy) NSDate *dateCol;
-@property (nonatomic, assign) double doubleCol;
-@property (nonatomic, assign) float floatCol;
-@property (nonatomic, assign) NSInteger intCol;
-@property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, copy) id mixedCol;
-
-@end
-
-#pragma mark - TestQueryObject
-
-@interface TestQueryObject : RLMObject
-
-@property (nonatomic, assign) NSInteger int1;
-@property (nonatomic, assign) NSInteger int2;
-@property (nonatomic, assign) float float1;
-@property (nonatomic, assign) float float2;
-@property (nonatomic, assign) double double1;
-@property (nonatomic, assign) double double2;
-@property (nonatomic, copy) NSString *recordTag;
-
-@end
-
-#pragma mark - SimpleMisuseObject
-
-@interface SimpleMisuseObject : RLMObject
-
-@property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, assign) NSInteger intCol;
 
 @end

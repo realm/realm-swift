@@ -18,17 +18,30 @@
 
 #import "RLMTestCase.h"
 
+#pragma mark - Test Objects
+
+#pragma mark InvalidSubclassObject
+
+@interface InvalidSubclassObject : StringObject
+@property NSString *invalid;
+@end
+
+@implementation InvalidSubclassObject
+@end
+
+#pragma mark - Tests
+
 @interface ObjectInterfaceTests : RLMTestCase
 @end
 
 @implementation ObjectInterfaceTests
 
-- (void)testCustomAccessors
+- (void)testCustomAccessorsObject
 {
-    RLMRealm *realm = self.realmWithTestPath;
+    RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
+    CustomAccessorsObject *ca = [CustomAccessorsObject createInRealm:realm withObject:@[@"name", @2]];
     XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
     
     [ca setTheInt:99];
@@ -38,7 +51,7 @@
 
 - (void)testObjectSubclass
 {
-    RLMRealm *realm = self.realmWithTestPath;
+    RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
     NSArray *obj = @[@1, @"throw"];
@@ -49,16 +62,16 @@
 
 - (void)testClassExtension
 {
-    RLMRealm *realm = self.realmWithTestPath;
+    RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    BaseClassTestObject *bObject = [[BaseClassTestObject alloc ] init];
+    BaseClassStringObject *bObject = [[BaseClassStringObject alloc ] init];
     bObject.intCol = 1;
     bObject.stringCol = @"stringVal";
     [realm addObject:bObject];
     [realm commitWriteTransaction];
     
-    BaseClassTestObject *objectFromRealm = [realm allObjects:[BaseClassTestObject className]][0];
+    BaseClassStringObject *objectFromRealm = [BaseClassStringObject allObjects][0];
     XCTAssertEqual(1, objectFromRealm.intCol, @"Should be 1");
     XCTAssertEqualObjects(@"stringVal", objectFromRealm.stringCol, @"Should be stringVal");
 }

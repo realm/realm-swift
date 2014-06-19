@@ -27,10 +27,10 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMArray *emptyPeople = [EnumPerson allObjects];
+    RLMArray *emptyPeople = [EmployeeObject allObjects];
     
     // Enum for zero rows added
-    for (EnumPerson *row in emptyPeople) {
+    for (EmployeeObject *row in emptyPeople) {
         XCTFail(@"No objects should have been added %@", row);
     }
     
@@ -44,21 +44,21 @@
     // Add objects
     [realm beginWriteTransaction];
     for (NSArray *rowArray in rowsArray) {
-        [EnumPerson createInRealm:realm withObject:rowArray];
+        [EmployeeObject createInRealm:realm withObject:rowArray];
     }
     [realm commitWriteTransaction];
 
     // Get all objects
-    RLMArray *people = [EnumPerson allObjects];
+    RLMArray *people = [EmployeeObject allObjects];
     
     // Iterate using for...in
     NSUInteger index = 0;
-    for (EnumPerson *row in people) {
-        XCTAssertTrue([row.Name isEqualToString:rowsArray[index][0]],
+    for (EmployeeObject *row in people) {
+        XCTAssertTrue([row.name isEqualToString:rowsArray[index][0]],
                       @"Name in iteration should be equal to what was set.");
-        XCTAssertEqual(row.Age, (int)[rowsArray[index][1] integerValue],
+        XCTAssertEqual(row.age, (int)[rowsArray[index][1] integerValue],
                        @"Age in iteration should be equal to what was set.");
-        XCTAssertEqual(row.Hired, (bool)[rowsArray[index][2] boolValue],
+        XCTAssertEqual(row.hired, (bool)[rowsArray[index][2] boolValue],
                        @"Hired in iteration should be equal to what was set.");
         index++;
     }
@@ -72,16 +72,16 @@
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as RLMArray
-    RLMArray *res = [EnumPerson objectsWithPredicateFormat:@"Hired = YES && Age >= 20 && Age <= 30"];
+    RLMArray *res = [EmployeeObject objectsWithPredicateFormat:@"hired = YES && age >= 20 && age <= 30"];
     
     // Iterate over the resulting RLMArray
     index = 0;
-    for (EnumPerson *row in res) {
-        XCTAssertTrue([row.Name isEqualToString:filteredArray[index][0]],
+    for (EmployeeObject *row in res) {
+        XCTAssertTrue([row.name isEqualToString:filteredArray[index][0]],
                       @"Name in iteration should be equal to what was set.");
-        XCTAssertEqual(row.Age, (int)[filteredArray[index][1] integerValue],
+        XCTAssertEqual(row.age, (int)[filteredArray[index][1] integerValue],
                        @"Age in iteration should be equal to what was set.");
-        XCTAssertEqual(row.Hired, (bool)[filteredArray[index][2] boolValue],
+        XCTAssertEqual(row.hired, (bool)[filteredArray[index][2] boolValue],
                        @"Hired in iteration should be equal to what was set.");
         index++;
     }
