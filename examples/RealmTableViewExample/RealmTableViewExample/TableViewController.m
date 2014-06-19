@@ -110,7 +110,7 @@ static NSString * const kTableName = @"table";
 
 - (void)reloadData
 {
-    self.array = [DemoObject objectsOrderedBy:@"date" where:nil];
+    self.array = [[DemoObject allObjects] arraySortedByProperty:@"date" ascending:YES];
     [self.tableView reloadData];
 }
 
