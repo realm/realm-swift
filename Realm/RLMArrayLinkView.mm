@@ -21,7 +21,7 @@
 #import "RLMObject_Private.h"
 #import "RLMSchema.h"
 #import "RLMObjectStore.h"
-#import "RLMQueryUtil.h"
+#import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
 
 #import <objc/runtime.h>
@@ -42,20 +42,30 @@
     [realm registerAccessor:ar];
     
     // make readonly if not in write transaction
-    if (realm.transactionMode != RLMTransactionModeWrite) {
+    if (!realm.inWriteTransaction) {
         object_setClass(ar, RLMArrayLinkViewReadOnly.class);
     }
     return ar;
 }
 
-- (void)setWritable:(BOOL)writable {
+- (void)setRLMAccessor_writable:(BOOL)writable {
     if (writable) {
         object_setClass(self, RLMArrayLinkView.class);
     }
     else {
         object_setClass(self, RLMArrayLinkViewReadOnly.class);
     }
-    _writable = writable;
+    _RLMAccessor_writable = writable;
+}
+
+- (void)setRLMAccessor_Invalid:(BOOL)invalid {
+    if (invalid) {
+        object_setClass(self, RLMArrayLinkViewInvalid.class);
+    }
+    else {
+        object_setClass(self, RLMArrayLinkView.class);
+    }
+    _RLMAccessor_invalid = invalid;
 }
 
 - (NSUInteger)count {
@@ -102,7 +112,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->add(object.objectIndex);
+    _backingLinkView->add(object->_row.get_index());
 }
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
@@ -110,7 +120,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->insert(index, object.objectIndex);
+    _backingLinkView->insert(index, object->_row.get_index());
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
@@ -141,7 +151,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->set(index, object.objectIndex);
+    _backingLinkView->set(index, object->_row.get_index());
 }
 
 - (NSString *)JSONString {

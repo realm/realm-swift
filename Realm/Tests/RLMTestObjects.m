@@ -18,8 +18,43 @@
 
 #import "RLMTestObjects.h"
 
+#pragma mark - Abstract Objects
+#pragma mark -
+
+#pragma mark StringObject
+
+@implementation StringObject
+@end
+
+#pragma mark IntObject
+
+@implementation IntObject
+@end
+
+#pragma mark AllTypesObject
+
 @implementation AllTypesObject
 @end
 
-@implementation RLMTestObject
+#pragma mark - Real Life Objects
+#pragma mark -
+
+#pragma mark EmployeeObject
+
+@implementation EmployeeObject
+@end
+
+#pragma mark CompanyObject
+
+@implementation CompanyObject
+@end
+
+#pragma mark DogObject
+
+@implementation DogObject
+@end
+
+#pragma mark OwnerObject
+
+@implementation OwnerObject
 @end

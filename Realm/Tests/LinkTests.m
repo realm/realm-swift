@@ -17,23 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
-@interface DogObject : RLMObject
-@property NSString *dogName;
-@end
-
-@implementation DogObject
-@end
-
-@interface OwnerObject : RLMObject
-@property NSString *name;
-@property DogObject *dog;
-@end
-
-@implementation OwnerObject
-@end
+#pragma mark - Test Objects
 
 @interface CircleObject : RLMObject
 @property NSString *data;
@@ -43,6 +29,7 @@
 @implementation CircleObject
 @end
 
+#pragma mark - Tests
 
 @interface LinkTests : RLMTestCase
 @end
@@ -61,8 +48,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    RLMArray *owners = [realm objects:OwnerObject.className where:nil];
-    RLMArray *dogs = [realm objects:DogObject.className where:nil];
+    RLMArray *owners = [realm objects:OwnerObject.className withPredicate:nil];
+    RLMArray *dogs = [realm objects:DogObject.className withPredicate:nil];
     XCTAssertEqual(owners.count, (NSUInteger)1, @"Expecting 1 owner");
     XCTAssertEqual(dogs.count, (NSUInteger)1, @"Expecting 1 dog");
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -84,16 +71,16 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 owner");
-    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
     OwnerObject *fiel = [OwnerObject createInRealm:realm withObject:@[@"Fiel", [NSNull null]]];
     fiel.dog = owner.dog;
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)2, @"Expecting 2 owners");
-    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] withPredicate:nil].count, (NSUInteger)2, @"Expecting 2 owners");
+    XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 dog");
 }
 
 - (void)testLinkRemoval {
@@ -108,21 +95,22 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:[OwnerObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 owner");
-    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 dog");
+    XCTAssertEqual([realm objects:[OwnerObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 dog");
     
     [realm beginWriteTransaction];
-    [realm deleteObject:owner.dog];
+    DogObject *dog = owner.dog;
+    [realm deleteObject:dog];
     [realm commitWriteTransaction];
     
-    // FIXME - re-enable once we fix accessor updates
-    // XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+    XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
+    XCTAssertThrows(dog.dogName, @"Dog object should be invalid after being deleted from the realm");
 
     // refresh owner and check
     owner = [realm allObjects:[OwnerObject className]].firstObject;
     XCTAssertNotNil(owner, @"Should have 1 owner");
     XCTAssertNil(owner.dog, @"Dog should be nullified when deleted");
-    XCTAssertEqual([realm objects:[DogObject className] where:nil].count, (NSUInteger)0, @"Expecting 0 dogs");
+    XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)0, @"Expecting 0 dogs");
 }
 
 - (void)testInvalidLinks {
@@ -135,12 +123,14 @@
     [realm beginWriteTransaction];
     XCTAssertThrows([realm addObject:owner], @"dogName not set on linked object");
     
-    RLMTestObject *to = [RLMTestObject createInRealm:realm withObject:@[@"testObject"]];
+    StringObject *to = [StringObject createInRealm:realm withObject:@[@"testObject"]];
     NSArray *args = @[@"Tim", to];
     XCTAssertThrows([OwnerObject createInRealm:realm withObject:args], @"Inserting wrong object type should throw");
     [realm commitWriteTransaction];
 }
 
+// FIXME - disable until we fix commit log issue which break transacions when leaking realm objects
+/*
 - (void)testCircularLinks {
     RLMRealm *realm = [self realmWithTestPath];
     
@@ -153,10 +143,10 @@
     obj.next.data = @"b";
     [realm commitWriteTransaction];
     
-    obj = [realm allObjects:CircleObject.className].firstObject;
-    XCTAssertEqualObjects(obj.data, @"b", @"data should be 'b'");
-    XCTAssertEqualObjects(obj.data, obj.next.data, @"objects should be equal");
-}
+    CircleObject *obj1 = [realm allObjects:CircleObject.className].firstObject;
+    XCTAssertEqualObjects(obj1.data, @"b", @"data should be 'b'");
+    XCTAssertEqualObjects(obj1.data, obj.next.data, @"objects should be equal");
+}*/
 
 @end
 

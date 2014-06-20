@@ -42,8 +42,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
 // get objects of a given class
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, id order);
-
+RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order);
 
 //
 // Accessor Creation
@@ -51,7 +50,3 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessors
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index);
-
-
-
-
