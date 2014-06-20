@@ -1,75 +1,39 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-#import <Realm/Realm.h>
 
-//
-// Private Realm methods
-//
-@interface RLMRealm ()
--(RLMSchema *)schema;
-@end
+#pragma mark - Test Objects
 
-
-//
-// Test Objects
-//
-@interface SimpleObject : RLMObject
-@property NSString *name;
-@property int age;
-@property BOOL hired;
-@end
-
-@implementation SimpleObject
-@end
-
-@interface AgeObject : RLMObject
-@property int age;
-@end
-
-@implementation AgeObject
-@end
-
-@interface KeyedObject : RLMObject
-@property NSString * name;
-@property int objID;
-@end
-
-@implementation KeyedObject
-@end
+#pragma mark DefaultObject
 
 @interface DefaultObject : RLMObject
-@property int intCol;
-@property float floatCol;
-@property double doubleCol;
-@property BOOL boolCol;
-@property NSDate *dateCol;
+@property int       intCol;
+@property float     floatCol;
+@property double    doubleCol;
+@property BOOL      boolCol;
+@property NSDate   *dateCol;
 @property NSString *stringCol;
-@property NSData *binaryCol;
-@property id mixedCol;
+@property NSData   *binaryCol;
+@property id        mixedCol;
 @end
 
 @implementation DefaultObject
-
 + (NSDictionary *)defaultPropertyValues
 {
     NSString *binaryString = @"binary";
@@ -84,17 +48,9 @@
              @"binaryCol" : binaryData,
              @"mixedCol" : @"foo"};
 }
-
 @end
 
-@interface NoDefaultObject : RLMObject
-@property NSString *stringCol;
-@property int intCol;
-
-@end
-
-@implementation NoDefaultObject
-@end
+#pragma mark IgnoredURLObject
 
 @interface IgnoredURLObject : RLMObject
 @property NSString *name;
@@ -102,13 +58,13 @@
 @end
 
 @implementation IgnoredURLObject
-
 + (NSArray *)ignoredProperties
 {
     return @[@"url"];
 }
-
 @end
+
+#pragma mark IndexedObject
 
 @interface IndexedObject : RLMObject
 @property NSString *name;
@@ -116,7 +72,6 @@
 @end
 
 @implementation IndexedObject
-
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
 {
     RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
@@ -125,8 +80,15 @@
     }
     return superAttributes;
 }
-
 @end
+
+#pragma mark - Private
+
+@interface RLMRealm ()
+@property (nonatomic) RLMSchema *schema;
+@end
+
+#pragma mark - Tests
 
 @interface ObjectTests : RLMTestCase
 @end
@@ -140,17 +102,17 @@
     [realm beginWriteTransaction];
     
     // Init object before adding to realm
-    SimpleObject *soInit = [[SimpleObject alloc] init];
+    EmployeeObject *soInit = [[EmployeeObject alloc] init];
     soInit.name = @"Peter";
     soInit.age = 30;
     soInit.hired = YES;
     [realm addObject:soInit];
     
     // Create object while adding to realm using NSArray
-    SimpleObject *soUsingArray = [SimpleObject createInRealm:realm withObject:@[@"John", @40, @NO]];
+    EmployeeObject *soUsingArray = [EmployeeObject createInRealm:realm withObject:@[@"John", @40, @NO]];
     
     // Create object while adding to realm using NSDictionary
-    SimpleObject *soUsingDictionary = [SimpleObject createInRealm:realm withObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    EmployeeObject *soUsingDictionary = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
     
     [realm commitWriteTransaction];
     
@@ -172,26 +134,26 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    AgeObject *obj0 = [AgeObject createInRealm:realm withObject:@[@10]];
-    AgeObject *obj1 = [AgeObject createInRealm:realm withObject:@[@20]];
+    IntObject *obj0 = [IntObject createInRealm:realm withObject:@[@10]];
+    IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@20]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj0.age, 10,  @"Age should be 10");
-    XCTAssertEqual(obj1.age, 20, @"Age should be 20");
+    XCTAssertEqual(obj0.intCol, 10,  @"integer should be 10");
+    XCTAssertEqual(obj1.intCol, 20, @"integer should be 20");
 
     [realm beginWriteTransaction];
-    obj0.age = 7;
+    obj0.intCol = 7;
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj0.age, 7,  @"Age should be 7");
+    XCTAssertEqual(obj0.intCol, 7,  @"integer should be 7");
 }
 
 - (void)testKeyedSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    KeyedObject *obj0 = [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test1", @"objID" : @24}];
-    KeyedObject *obj1 = [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test2", @"objID" : @25}];
+    EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withObject:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
+    EmployeeObject *obj1 = [EmployeeObject createInRealm:realm withObject:@{@"name" : @"Test2", @"age" : @25, @"hired": @YES}];
     [realm commitWriteTransaction];
     
     XCTAssertEqualObjects(obj0[@"name"], @"Test1",  @"Name should be Test1");
@@ -209,20 +171,20 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    [AgeObject createInRealm:realm withObject:(@[@23])];
-    [AgeObject createInRealm:realm withObject:(@[@23])];
-    [AgeObject createInRealm:realm withObject:(@[@22])];
-    [AgeObject createInRealm:realm withObject:(@[@29])];
-    [AgeObject createInRealm:realm withObject:(@[@2])];
-    [AgeObject createInRealm:realm withObject:(@[@24])];
-    [AgeObject createInRealm:realm withObject:(@[@21])];
+    [IntObject createInRealm:realm withObject:(@[@23])];
+    [IntObject createInRealm:realm withObject:(@[@23])];
+    [IntObject createInRealm:realm withObject:(@[@22])];
+    [IntObject createInRealm:realm withObject:(@[@29])];
+    [IntObject createInRealm:realm withObject:(@[@2])];
+    [IntObject createInRealm:realm withObject:(@[@24])];
+    [IntObject createInRealm:realm withObject:(@[@21])];
     [realm commitWriteTransaction];
   
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([AgeObject objectsWhere:@"age >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([AgeObject objectsWhere:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
 - (void)testDataTypes
@@ -248,8 +210,8 @@
     c.cBoolCol = false;
     c.longCol = 99;
     c.mixedCol = @"string";
-    c.objectCol = [[RLMTestObject alloc] init];
-    c.objectCol.column = @"c";
+    c.objectCol = [[StringObject alloc] init];
+    c.objectCol.stringCol = @"c";
     
     [realm addObject:c];
 
@@ -278,7 +240,7 @@
     XCTAssertEqual(row2.cBoolCol, (bool)true,           @"row2.cBoolCol");
     XCTAssertEqual(row1.longCol, 99L,                   @"row1.IntCol");
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
-    XCTAssertTrue([row1.objectCol.column isEqual:@"c"], @"row1.objectCol");
+    XCTAssertTrue([row1.objectCol.stringCol isEqual:@"c"], @"row1.objectCol");
     XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
 
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
@@ -290,7 +252,7 @@
 - (void)testNoDefaultPropertyValues
 {
     // Test alloc init does not crash for no defaultPropertyValues implementation
-    XCTAssertNoThrow(([[SimpleObject alloc] init]), @"Not implementing defaultPropertyValues should not crash");
+    XCTAssertNoThrow(([[EmployeeObject alloc] init]), @"Not implementing defaultPropertyValues should not crash");
 }
 
 - (void)testNoDefaultAdd
@@ -300,16 +262,17 @@
     [realm beginWriteTransaction];
     
     // Test #1
-    SimpleObject *simpleObject = [[SimpleObject alloc] init];
-    XCTAssertThrows(([realm addObject:simpleObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    StringObject *stringObject = [[StringObject alloc] init];
+    XCTAssertThrows(([realm addObject:stringObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
     
     // Test #2
-    NoDefaultObject *noDefaultObject = [[NoDefaultObject alloc] init];
-    XCTAssertThrows(([realm addObject:noDefaultObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
+    stringObject.stringCol = @"";
+    XCTAssertNoThrow(([realm addObject:stringObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
     
     // Test #3
-    noDefaultObject.stringCol = @"foo";
-    XCTAssertNoThrow(([realm addObject:noDefaultObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
+//    FIXME: Test should pass
+//    IntObject *intObj = [[IntObject alloc] init];
+//    XCTAssertThrows(([realm addObject:intObj]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
     
     [realm commitWriteTransaction];
 }
@@ -369,7 +332,6 @@
     [realm beginWriteTransaction];
     XCTAssertNoThrow([IgnoredURLObject new], @"Creating a new object with an (ignored) unsupported \
                                                property type should not throw");
-    [realm rollbackWriteTransaction];
 }
 
 - (void)testCanUseIgnoredProperty
@@ -389,7 +351,7 @@
     
     XCTAssertEqual(obj.url, url, @"ignored properties should still be assignable and gettable outside a write block");
     
-    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWhere:nil] firstObject];
+    IgnoredURLObject *obj2 = [[IgnoredURLObject objectsWithPredicate:nil] firstObject];
     XCTAssertNotNil(obj2, @"object with ignored property should still be stored and accessible through the realm");
     
     XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
@@ -445,7 +407,7 @@
     
     // add test/link object to realm
     [realm beginWriteTransaction];
-    RLMTestObject *to = [RLMTestObject createInRealm:realm withObject:@[@"c"]];
+    StringObject *to = [StringObject createInRealm:realm withObject:@[@"c"]];
     [realm commitWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
@@ -486,10 +448,10 @@
     [realm beginWriteTransaction];
     
     // This exception only gets thrown when there is no default vaule and it is for an NSObject property
-    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
+    XCTAssertThrows(([EmployeeObject createInRealm:realm withObject:@{@"age" : @27, @"hired" : @YES}]), @"Missing values in NSDictionary should throw default value exception");
     
     // This exception gets thrown when count of array does not match with object schema
-    XCTAssertThrows(([SimpleObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
+    XCTAssertThrows(([EmployeeObject createInRealm:realm withObject:@[@27, @YES]]), @"Missing values in NSDictionary should throw default value exception");
     
     [realm commitWriteTransaction];
 }
@@ -501,7 +463,7 @@
     [realm beginWriteTransaction];
     
     // Init object before adding to realm
-    SimpleObject *soInit = [[SimpleObject alloc] init];
+    EmployeeObject *soInit = [[EmployeeObject alloc] init];
     soInit.name = @"Peter";
     soInit.age = 30;
     soInit.hired = YES;
@@ -525,7 +487,7 @@
     [realm commitWriteTransaction];
     
     // Test description in read block
-    NSString *objDescription = [[[SimpleObject objectsWhere:nil] firstObject] description];
+    NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
 }
 
@@ -536,7 +498,7 @@
     RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
     XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
     
-    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
     XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 

@@ -1,9 +1,12 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+
 set -e
 set +u
 
 # Avoid recursively calling this script.
 if [[ $SF_MASTER_SCRIPT_RUNNING ]]; then
-  exit 0
+    exit 0
 fi
 set -u
 export SF_MASTER_SCRIPT_RUNNING=1
@@ -13,30 +16,30 @@ export SF_MASTER_SCRIPT_RUNNING=1
 # https://github.com/kstenerud/iOS-Universal-Framework
 
 if [[ "$SDK_NAME" =~ ([A-Za-z]+) ]]; then
-  SF_SDK_PLATFORM=${BASH_REMATCH[1]}
+    SF_SDK_PLATFORM=${BASH_REMATCH[1]}
 else
-  echo "Could not find platform name from SDK_NAME: $SDK_NAME"
-  exit 1
+    echo "Could not find platform name from SDK_NAME: $SDK_NAME"
+    exit 1
 fi
 
 if [[ "$SDK_NAME" =~ ([0-9]+.*$) ]]; then
-  SF_SDK_VERSION=${BASH_REMATCH[1]}
+    SF_SDK_VERSION=${BASH_REMATCH[1]}
 else
-  echo "Could not find sdk version from SDK_NAME: $SDK_NAME"
-  exit 1
+    echo "Could not find sdk version from SDK_NAME: $SDK_NAME"
+    exit 1
 fi
 
 if [[ "$SF_SDK_PLATFORM" = "iphoneos" ]]; then
-  SF_OTHER_PLATFORM=iphonesimulator
+    SF_OTHER_PLATFORM=iphonesimulator
 else
-  SF_OTHER_PLATFORM=iphoneos
+    SF_OTHER_PLATFORM=iphoneos
 fi
 
 if [[ "$BUILT_PRODUCTS_DIR" =~ (.*)$SF_SDK_PLATFORM$ ]]; then
-  SF_OTHER_BUILT_PRODUCTS_DIR="${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}"
+    SF_OTHER_BUILT_PRODUCTS_DIR="${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}"
 else
-  echo "Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR"
-  exit 1
+    echo "Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR"
+    exit 1
 fi
 
 # debug vs release
@@ -45,7 +48,6 @@ if [[ "$CONFIGURATION" = "Debug" ]]; then
 else
     SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios.a"
 fi
-
 
 # We have to build the other platform and combine with it and the core libraries
 REALM_TARGET_NAME="iOS Library"
@@ -61,7 +63,5 @@ xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" 
 mkdir -p ${BUILD_DIR}/${CONFIGURATION}
 xcrun lipo -create ${SF_LIB_PATH} ${SF_OTHER_LIB_PATH} -output ${SF_FAT_PATH}
 
-# Step 3 - combine with tightdb
+# Step 3 - combine with core library
 xcrun libtool -static -o ${SF_COMBINED_PATH} ${SF_FAT_PATH} ${SF_CORE_PATH}
-
-

@@ -1,20 +1,18 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +21,8 @@
 
 @implementation RLMArray
 
-@dynamic writable;
+@dynamic RLMAccessor_invalid;
+@dynamic RLMAccessor_writable;
 @dynamic realm;
 @dynamic readOnly;
 
@@ -40,8 +39,12 @@
     return _realm;
 }
 
-- (BOOL)writable {
-    return _writable;
+- (BOOL)RLMAccessor_writable {
+    return _RLMAccessor_writable;
+}
+
+- (BOOL)RLMAccessor_invalid {
+    return _RLMAccessor_invalid;
 }
 
 - (BOOL)isReadOnly {
@@ -144,12 +147,20 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWhere:(id)predicate, ... {
+- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+}
+
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+{
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
@@ -174,7 +185,14 @@
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...
+{
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
+{
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];
 }

@@ -1,37 +1,25 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
 #import "RLMSchema.h"
 
-@interface RLMDynamicObject : RLMObject
-@property (nonatomic, copy) NSString *column;
-@property (nonatomic) NSInteger integer;
-@end
-
-@implementation RLMDynamicObject
-@end
-
-@interface DynamicTests : RLMTestCase
-@end
+#pragma mark - Class Extensions
 
 // private realm methods
 @interface RLMRealm ()
@@ -40,6 +28,21 @@
                       dynamic:(BOOL)dynamic
                         error:(NSError **)outError;
 - (RLMSchema *)schema;
+@end
+
+#pragma mark - Test Objects
+
+@interface DynamicObject : RLMObject
+@property NSString *stringCol;
+@property NSInteger intCol;
+@end
+
+@implementation DynamicObject
+@end
+
+#pragma mark - Tests
+
+@interface DynamicTests : RLMTestCase
 @end
 
 @implementation DynamicTests
@@ -51,8 +54,8 @@
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
         [realm beginWriteTransaction];
-        [RLMDynamicObject createInRealm:realm withObject:@[@"column1", @1]];
-        [RLMDynamicObject createInRealm:realm withObject:@[@"column2", @2]];
+        [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
+        [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
         [realm commitWriteTransaction];
     }
     
@@ -61,16 +64,16 @@
     XCTAssertEqual([dyrealm class], [RLMRealm class], @"realm should be of class RLMDynamicRealm");
     
     // verify schema
-    RLMObjectSchema *dynSchema = dyrealm.schema[@"RLMDynamicObject"];
+    RLMObjectSchema *dynSchema = dyrealm.schema[@"DynamicObject"];
     XCTAssertNotNil(dynSchema, @"Should be able to get object schema dynamically");
-    XCTAssertEqual(dynSchema.properties.count, (NSUInteger)2, @"RLMDynamicObject should have 2 properties");
-    XCTAssertEqualObjects([dynSchema.properties[0] name], @"column", @"Invalid property name");
+    XCTAssertEqual(dynSchema.properties.count, (NSUInteger)2, @"DynamicObject should have 2 properties");
+    XCTAssertEqualObjects([dynSchema.properties[0] name], @"stringCol", @"Invalid property name");
     XCTAssertEqual([(RLMProperty *)dynSchema.properties[1] type], RLMPropertyTypeInt, @"Invalid type");
     
     // verify object type
-    RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
+    RLMArray *array = [dyrealm allObjects:@"DynamicObject"];
     XCTAssertEqual(array.count, (NSUInteger)2, @"Array should have 2 elements");
-    XCTAssertNotEqual(array.objectClassName, RLMDynamicObject.className,
+    XCTAssertNotEqual(array.objectClassName, DynamicObject.className,
                       @"Array class should by a dynamic object class");
 }
 
@@ -79,25 +82,27 @@
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
         [realm beginWriteTransaction];
-        [RLMDynamicObject createInRealm:realm withObject:@[@"column1", @1]];
-        [RLMDynamicObject createInRealm:realm withObject:@[@"column2", @2]];
+        [DynamicObject createInRealm:realm withObject:@[@"column1", @1]];
+        [DynamicObject createInRealm:realm withObject:@[@"column2", @2]];
         [realm commitWriteTransaction];
     }
     
     // verify properties
     RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES error:nil];
-    RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
-    XCTAssertEqualObjects(array[0][@"integer"], @1, @"First object should have column value 1");
-    XCTAssertEqualObjects(array[1][@"column"], @"column2", @"Second object should have column value column2");
-    XCTAssertThrows(array[0][@"invalid"], @"Invalid column name should throw");
+    RLMArray *array = [dyrealm allObjects:@"DynamicObject"];
+    
+    RLMObject *o1 = array[0], *o2 = array[1];
+    XCTAssertEqualObjects(o1[@"intCol"], @1, @"First object should have column value 1");
+    XCTAssertEqualObjects(o2[@"stringCol"], @"column2", @"Second object should have string value column2");
+    XCTAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
 }
 
 - (void)testDynaimcTypes {
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
     id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, NSNull.null];
     
-    RLMTestObject *obj = [[RLMTestObject alloc] init];
-    obj.column = @"column";
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringCol = @"string";
     id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22, now, obj];
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
@@ -121,15 +126,13 @@
     }
     
     // check sub object type
-    XCTAssertEqualObjects([schema.properties[10] objectClassName], @"RLMTestObject",
-                          @"Sub-object type in schema should be 'RLMTestObject'");
+    XCTAssertEqualObjects([schema.properties[10] objectClassName], @"StringObject",
+                          @"Sub-object type in schema should be 'StringObject'");
     
     // check object equality
     XCTAssertNil(array[0][@"objectCol"], @"object should be nil");
-    XCTAssertEqualObjects(array[1][@"objectCol"][@"column"], @"column",
-                          @"Child object should have string value 'column'");
+    XCTAssertEqualObjects(array[1][@"objectCol"][@"stringCol"], @"string",
+                          @"Child object should have string value 'string'");
 }
 
 @end
-
-

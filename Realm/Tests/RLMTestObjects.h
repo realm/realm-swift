@@ -1,46 +1,99 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 #import "RLMObject.h"
 
-@interface RLMTestObject : RLMObject
-@property (nonatomic, copy) NSString *column;
+#pragma mark - Abstract Objects
+#pragma mark -
+
+#pragma mark StringObject
+
+@interface StringObject : RLMObject
+
+@property NSString *stringCol;
+
 @end
 
-RLM_ARRAY_TYPE(RLMTestObject)
+#pragma mark IntObject
+
+@interface IntObject : RLMObject
+
+@property int intCol;
+
+@end
+
+RLM_ARRAY_TYPE(StringObject)
+
+#pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-@property BOOL           boolCol;
-@property int            intCol;
-@property float          floatCol;
-@property double         doubleCol;
-@property NSString      *stringCol;
-@property NSData        *binaryCol;
-@property NSDate        *dateCol;
-@property bool           cBoolCol;
-@property long           longCol;
-@property id             mixedCol;
-@property RLMTestObject *objectCol;
-//@property AgeTable      *tableCol;
+
+@property BOOL          boolCol;
+@property int           intCol;
+@property float         floatCol;
+@property double        doubleCol;
+@property NSString     *stringCol;
+@property NSData       *binaryCol;
+@property NSDate       *dateCol;
+@property bool          cBoolCol;
+@property long          longCol;
+@property id            mixedCol;
+@property StringObject *objectCol;
+
 @end
 
+#pragma mark - Real Life Objects
+#pragma mark -
 
+#pragma mark EmployeeObject
 
+@interface EmployeeObject : RLMObject
+
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+
+@end
+
+RLM_ARRAY_TYPE(EmployeeObject)
+
+#pragma mark CompanyObject
+
+@interface CompanyObject : RLMObject
+
+@property RLMArray<EmployeeObject> *employees;
+
+@end
+
+#pragma mark DogObject
+
+@interface DogObject : RLMObject
+
+@property NSString *dogName;
+
+@end
+
+#pragma mark OwnerObject
+
+@interface OwnerObject : RLMObject
+
+@property NSString *name;
+@property DogObject *dog;
+
+@end

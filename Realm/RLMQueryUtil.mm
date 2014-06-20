@@ -1,26 +1,28 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil.hpp"
+#import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
+
+#include <tightdb.hpp>
+using namespace tightdb;
+
 
 NSString *const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException = @"RLMUnsupportedTypesFoundInPropertyComparisonException";
@@ -209,26 +211,26 @@ void add_between_constraint_to_query(tightdb::Query & query,
     id from = array.firstObject;
     id to = array.lastObject;
     switch (dataType) {
-        case tightdb::type_DateTime:
+        case type_DateTime:
             query.between_datetime(index,
                                    double([(NSDate *)from timeIntervalSince1970]),
                                    double([(NSDate *)to timeIntervalSince1970]));
             break;
-        case tightdb::type_Double:
+        case type_Double:
         {
             double fromDouble = [(NSNumber *)from doubleValue];
             double toDouble = [(NSNumber *)to doubleValue];
             query.between(index, fromDouble, toDouble);
             break;
         }
-        case tightdb::type_Float:
+        case type_Float:
         {
             float fromFloat = [(NSNumber *)from floatValue];
             float toFloat = [(NSNumber *)to floatValue];
             query.between(index, fromFloat, toFloat);
             break;
         }
-        case tightdb::type_Int:
+        case type_Int:
         {
             int fromInt = [(NSNumber *)from intValue];
             int toInt = [(NSNumber *)to intValue];
@@ -311,30 +313,30 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
     // finally cast to native types and add query clause
     RLMPropertyType type = prop.type;
     switch (type) {
-        case tightdb::type_Bool:
+        case type_Bool:
             add_bool_constraint_to_query(query, operatorType, index,
                                          bool([(NSNumber *)value boolValue]));
             break;
-        case tightdb::type_DateTime:
+        case type_DateTime:
             add_datetime_constraint_to_query(query, operatorType, index,
                                              double([(NSDate *)value timeIntervalSince1970]));
             break;
-        case tightdb::type_Double:
+        case type_Double:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value doubleValue]);
             break;
-        case tightdb::type_Float:
+        case type_Float:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value floatValue]);
             break;
-        case tightdb::type_Int:
+        case type_Int:
             add_numeric_constraint_to_query(query, type, operatorType,
                                             index, [(NSNumber *)value intValue]);
             break;
-        case tightdb::type_String:
+        case type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
             break;
-        case tightdb::type_Binary:
+        case type_Binary:
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
         default:
@@ -343,7 +345,32 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
     }
 }
 
-void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
+template<typename T>
+Expression *column_expression(NSComparisonPredicateOptions operatorType,
+                                            NSUInteger leftColumn,
+                                            NSUInteger rightColumn) {
+    Columns<T> *col1 = new Columns<T>(leftColumn);
+    Columns<T> *col2 = new Columns<T>(rightColumn);
+
+    switch (operatorType) {
+        case NSEqualToPredicateOperatorType:
+            return new Compare<Equal, T>(*col1, *col2, true);
+        case NSNotEqualToPredicateOperatorType:
+            return new Compare<NotEqual, T>(*col1, *col2, true);
+        case NSLessThanPredicateOperatorType:
+            return new Compare<Less, T>(*col1, *col2, true);
+        case NSGreaterThanPredicateOperatorType:
+            return new Compare<Greater, T>(*col1, *col2, true);
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return new Compare<LessEqual, T>(*col1, *col2, true);
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return new Compare<GreaterEqual, T>(*col1, *col2, true);
+        default:
+            @throw RLMPredicateException(@"Wrong operator", @"Wrong operator");
+    }
+}
+    
+void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
     NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
@@ -356,81 +383,18 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, tightdb::Query
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
     if (leftType == rightType) {
         switch (leftType) {
-            case tightdb::type_Int:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_int(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_int(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_int(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_int(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+            case type_Bool:
+                query.and_query(*column_expression<Bool>(predicateOptions, leftIndex, rightIndex));
                 break;
-                
-            case tightdb::type_Float:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_float(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_float(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_float(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_float(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+            case type_Int:
+                query.and_query(*column_expression<Int>(predicateOptions, leftIndex, rightIndex));
                 break;
-                
-            case tightdb::type_Double:
-                switch (predicateOptions) {
-                    case NSEqualToPredicateOperatorType:
-                        query.equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSNotEqualToPredicateOperatorType:
-                        query.not_equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanPredicateOperatorType:
-                        query.less_double(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanPredicateOperatorType:
-                        query.greater_double(leftIndex, rightIndex);
-                        break;
-                    case NSLessThanOrEqualToPredicateOperatorType:
-                        query.less_equal_double(leftIndex, rightIndex);
-                        break;
-                    case NSGreaterThanOrEqualToPredicateOperatorType:
-                        query.greater_equal_double(leftIndex, rightIndex);
-                        break;
-                    default:
-                        break;
-                }
+            case type_Float:
+                query.and_query(*column_expression<Float>(predicateOptions, leftIndex, rightIndex));
                 break;
-                
+            case type_Double:
+                query.and_query(*column_expression<Double>(predicateOptions, leftIndex, rightIndex));
+                break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
                                              [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason,
@@ -548,46 +512,31 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectS
     }
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema *schema) {
-    if (order) {
-        NSString *propName;
-        BOOL ascending = YES;
-        
-        // if not NSSortDescriptor or string then throw
-        if ([order isKindOfClass:NSSortDescriptor.class]) {
-            propName = [(NSSortDescriptor *)order key];
-            ascending = [(NSSortDescriptor *)order ascending];
-        }
-        else if ([order isKindOfClass:NSString.class]) {
-            propName = order;
-        }
-        else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid object for order - must use property name or NSSortDescriptor"
-                                         userInfo:nil];
-        }
-        
-        // validate
-        RLMProperty *prop = schema[propName];
-        if (!prop) {
-            @throw RLMPredicateException(@"Invalid sort column",
-                                         [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
-        }
-        
-        switch (prop.type) {
-            case RLMPropertyTypeBool:
-            case RLMPropertyTypeDate:
-            case RLMPropertyTypeDouble:
-            case RLMPropertyTypeFloat:
-            case RLMPropertyTypeInt:
-            case RLMPropertyTypeString:
-                view.sort(prop.column, ascending);
-                break;
-                
-            default:
-                @throw RLMPredicateException(@"Invalid sort column type",
-                                             @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
-        }
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSString *property, BOOL ascending)
+{
+    if (!property || property.length == 0) {
+        return;
+    }
+    
+    // validate
+    RLMProperty *prop = schema[property];
+    if (!prop) {
+        @throw RLMPredicateException(@"Invalid sort column",
+                                     [NSString stringWithFormat:@"Column named '%@' not found.", property]);
+    }
+    
+    switch (prop.type) {
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeString:
+            view.sort(prop.column, ascending);
+            break;
+            
+        default:
+            @throw RLMPredicateException(@"Invalid sort column type",
+                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
     }
 }
-

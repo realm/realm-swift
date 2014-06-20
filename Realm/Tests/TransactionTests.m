@@ -1,77 +1,55 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// TIGHTDB CONFIDENTIAL
-// __________________
+// Copyright 2014 Realm Inc.
 //
-//  [2011] - [2014] TightDB Inc
-//  All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-// NOTICE:  All information contained herein is, and remains
-// the property of TightDB Incorporated and its suppliers,
-// if any.  The intellectual and technical concepts contained
-// herein are proprietary to TightDB Incorporated
-// and its suppliers and may be covered by U.S. and Foreign Patents,
-// patents in process, and are protected by trade secret or copyright law.
-// Dissemination of this information or reproduction of this material
-// is strictly forbidden unless prior written permission is obtained
-// from TightDB Incorporated.
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
-
-@interface SimpleMisuseObject : RLMObject
-@property (nonatomic, copy) NSString *stringCol;
-@property (nonatomic, assign) NSInteger intCol;
-@end
-
-@implementation SimpleMisuseObject
-
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"stringCol" : @""};
-}
-
-@end
-
 
 @interface TransactionTests : RLMTestCase
-
 @end
 
 @implementation TransactionTests
 
-- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
+- (void)testRealmModifyObjectsOutsideOfWriteTransaction
+{
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
+    XCTAssertThrows([obj setStringCol:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
--(void)testTransactionMisuse {
+- (void)testTransactionMisuse
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     // Insert an object
     [realm beginWriteTransaction];
-    SimpleMisuseObject *obj = [SimpleMisuseObject createInRealm:realm withObject:nil];
-    obj.stringCol = @"stringVal";
-    obj.intCol = 10;
+    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([SimpleMisuseObject createInRealm:realm withObject:nil], @"Outside write transaction");
+    XCTAssertThrows([StringObject createInRealm:realm withObject:@[@"a"]], @"Outside write transaction");
     XCTAssertThrows([realm commitWriteTransaction], @"No write transaction to close");
     
     [realm beginWriteTransaction];
     XCTAssertThrows([realm beginWriteTransaction], @"Write transaction already in place");
     [realm commitWriteTransaction];
     
-    XCTAssertThrows([realm rollbackWriteTransaction], @"No write transaction to rool-back");
-
     XCTAssertThrows([realm deleteObject:obj], @"Outside writetransaction");
 }
-
 
 @end
