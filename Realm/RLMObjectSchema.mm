@@ -24,6 +24,15 @@
 #import "RLMObject_Private.h"
 #import "RLMSwiftSupport.h"
 
+static NSMutableDictionary *s_mangledClassMap;
+
+Class RLMClassFromString(NSString *className) {
+    if ([s_mangledClassMap.allKeys containsObject:className]) {
+        className = s_mangledClassMap[className];
+    }
+    return NSClassFromString(className);
+}
+
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
@@ -51,10 +60,17 @@
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
     NSArray *ignoredPropertiesForClass = [objectClass ignoredProperties];
-    NSString *className = NSStringFromClass(objectClass);
+    struct RLMParsedClass parsedClass = RLMParsedClassFromClass(objectClass);
     
-    // Swift classes all begin with _T
-    if ([className rangeOfString:@"_T"].location == 0) {
+    if (parsedClass.type == RLMClassTypeSwift) {
+        // Map class name to demangled class name
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            s_mangledClassMap = [NSMutableDictionary dictionary];
+        });
+        
+        s_mangledClassMap[parsedClass.name] = parsedClass.mangledName;
+        
         // get ivars (Swift properties behave like ObjC ivars)
         unsigned int ivarCount;
         Ivar *ivars = class_copyIvarList(objectClass, &ivarCount);
@@ -100,7 +116,7 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = className;
+    schema.className = parsedClass.name;
     return schema;
 }
 

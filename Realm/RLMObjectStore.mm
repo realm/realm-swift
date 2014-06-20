@@ -112,7 +112,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 
     // change object class to insertion accessor
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    Class objectClass = NSClassFromString(objectClassName);
+    Class objectClass = RLMClassFromString(objectClassName);
     object_setClass(object, RLMInsertionAccessorClassForObjectClass(objectClass, schema));
 
     // call our insertion setter to populate all properties in the table

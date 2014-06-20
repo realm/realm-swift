@@ -16,10 +16,84 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// Code from here: https://github.com/johnno1962/XprobePlugin/blob/master/Classes/Xprobe.mm#L1491
-
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+
+#pragma mark - Swift class name parsing
+
+// Code adapted from this Swift version: https://gist.github.com/jpsim/1b86d116808cb4e9bc30
+
+typedef NS_ENUM(NSInteger, RLMClassType) {
+    RLMClassTypeSwift,
+    RLMClassTypeObjectiveC
+};
+
+struct RLMParsedClass {
+    RLMClassType type;
+    NSString *name;
+    
+    NSString *mangledName;
+    NSString *moduleName;
+};
+
+inline RLMParsedClass RLMParsedClassFromClass(Class aClass) {
+    // Swift mangling details found here: http://www.eswick.com/2014/06/inside-swift
+    
+    NSString *originalName = NSStringFromClass(aClass);
+    
+    struct RLMParsedClass parsedClass;
+    
+    if ([originalName rangeOfString:@"_T"].location != 0) {
+        // Not a Swift symbol
+        parsedClass.type = RLMClassTypeObjectiveC;
+        parsedClass.name = originalName;
+        return parsedClass;
+    }
+    
+    parsedClass.type = RLMClassTypeSwift;
+    parsedClass.mangledName = originalName;
+    
+    NSUInteger originalNameLength = originalName.length;
+    NSUInteger cursor = 4;
+    NSString *substring = [originalName substringWithRange:NSMakeRange(cursor, originalNameLength - cursor)];
+    
+    // Module
+    NSUInteger moduleLength = substring.integerValue;
+    NSUInteger moduleLengthLength = [NSString stringWithFormat:@"%lu", (unsigned long)moduleLength].length;
+    parsedClass.moduleName = [substring substringWithRange:NSMakeRange(moduleLengthLength, moduleLength)];
+    
+    // Update cursor and substring
+    cursor += moduleLengthLength + moduleLength;
+    substring = [originalName substringWithRange:NSMakeRange(cursor, originalNameLength - cursor)];
+    
+    // Class name
+    NSUInteger classLength = substring.integerValue;
+    NSUInteger classLengthLength = [NSString stringWithFormat:@"%lu", (unsigned long)classLength].length;
+    parsedClass.name = [substring substringWithRange:NSMakeRange(classLengthLength, classLength)];
+    
+    return parsedClass;
+}
+
+#pragma mark - Swift ivar encoding detection
+
+// Code from here (MIT-licensed): https://github.com/johnno1962/XprobePlugin/blob/master/Classes/Xprobe.mm#L1491
+//
+//  Created by John Holdsworth on 17/05/2014.
+//  Copyright (c) 2014 John Holdsworth. All rights reserved.
+//
+//  For full licensing term see https://github.com/johnno1962/XprobePlugin
+//
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+//  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+//  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+//  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+//  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+//  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+//  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+//  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
 
 struct _swift_class;
 
