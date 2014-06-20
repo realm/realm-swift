@@ -22,11 +22,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		02026CA319354DDF00E4EEF8 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; };
 		02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; };
 		02026CA519354DDF00E4EEF8 /* RLMMigration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.mm */; };
 		02026CA619354DDF00E4EEF8 /* RLMMigration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.mm */; };
-		02026CA8193562B400E4EEF8 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
 		02026CA9193562B400E4EEF8 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
 		02026CAB19363B5300E4EEF8 /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAA19363B5300E4EEF8 /* ArrayTests.m */; };
 		02026CAC19363B5300E4EEF8 /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02026CAA19363B5300E4EEF8 /* ArrayTests.m */; };
