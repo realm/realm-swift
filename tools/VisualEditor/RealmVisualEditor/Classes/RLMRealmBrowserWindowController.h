@@ -20,15 +20,17 @@
 
 #import "RLMDocument.h"
 #import "RLMClassOutlineViewController.h"
+#import "RLMInstanceTableViewController.h"
 
-@interface RLMRealmBrowserWindowController : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>
+extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
+
+@interface RLMRealmBrowserWindowController : NSWindowController
 
 @property (nonatomic, weak) RLMDocument *modelDocument;
 
 @property (nonatomic, strong) IBOutlet RLMClassOutlineViewController *outlineViewController;
-@property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;
+@property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
-- (void)updateTableView;
 
 @end

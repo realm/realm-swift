@@ -1,50 +1,24 @@
-////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+//  RLMInstanceTableViewController.m
+//  RealmVisualEditor
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+//  Created by Jesper Zuschlag on 20/06/14.
+//  Copyright (c) 2014 Realm inc. All rights reserved.
 //
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-////////////////////////////////////////////////////////////////////////////
+
+#import "RLMInstanceTableViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
-
 #import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
 
-const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+@implementation RLMInstanceTableViewController
 
-@implementation RLMRealmBrowserWindowController
-
-#pragma mark - NSWindowsController overrides
-
-- (void)windowDidLoad
+- (void)viewDidLoad
 {
     // Perform some extra inititialization on the tableview
     
-    [self.instancesTableView setDelegate:self];
-    [self.instancesTableView setDoubleAction:@selector(userDoubleClicked:)];
-    
-    // We want the class outline to be expandedas default
-    [self.outlineViewController.classesOutlineView expandItem:nil
-                         expandChildren:YES];
-    
-    // ... and the first class to be selected so something is displayed in the property pane.
-    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
-    if (firstItem != nil) {
-        NSInteger index = [self.outlineViewController.classesOutlineView rowForItem:firstItem];
-        [self.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                                   byExtendingSelection:NO];
-    }
+    // [self.instancesTableView setDoubleAction:@selector(userDoubleClicked:)];
 }
 
 #pragma mark - NSTableViewDataSource implementation
@@ -52,7 +26,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.instancesTableView) {
-        return self.modelDocument.selectedObjectNode.instanceCount;
+        return self.parentWindowController. modelDocument.selectedObjectNode.instanceCount;
     }
     
     return 0;
@@ -65,9 +39,9 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         NSUInteger columnIndex = [self.instancesTableView.tableColumns
                                   indexOfObject:tableColumn];
         
-        RLMClazzProperty *clazzProperty = self.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *clazzProperty = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = clazzProperty.name;
-        RLMObject *selectedInstance = [self.self.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
+        RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
         NSObject *propertyValue = selectedInstance[propertyName];
         
         switch (clazzProperty.type) {
@@ -122,12 +96,12 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
-        RLMObject *selectedObject = [self.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
+        RLMObject *selectedObject = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
         
-        RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         
         [realm beginWriteTransaction];
         
@@ -187,7 +161,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
         
         switch (propertyNode.type) {
             case RLMPropertyTypeBool:
@@ -234,9 +208,9 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
         
-        RLMObject *selectedInstance = [self.modelDocument.selectedObjectNode instanceAtIndex:row];
+        RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
         NSObject *propertyValue = selectedInstance[propertyNode.name];
         
         switch (propertyNode.type) {
@@ -314,7 +288,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
         
         if (propertyNode.type == RLMPropertyTypeDate) {
             // Create a frame which covers the cell to be edited
@@ -333,7 +307,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
             datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
             
-            RLMObject *selectedObject = [self.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedObject = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
             NSString *propertyName = propertyNode.name;
             
             datepicker.dateValue = selectedObject[propertyName];
@@ -351,7 +325,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                                                         atLocation:frame.origin
                                                             inView:tableView];
             if (userAcceptedEdit) {
-                RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+                RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
                 
                 [realm beginWriteTransaction];
                 selectedObject[propertyName] = datepicker.dateValue;
@@ -368,28 +342,28 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 #pragma mark - Public methods - NSTableView eventHandling
 
-- (void)userDoubleClicked:(id)sender
+- (IBAction)userDoubleClicked:(id)sender
 {
     NSInteger column = self.instancesTableView.clickedColumn;
     NSInteger row = self.instancesTableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMClazzProperty *propertyNode = self.modelDocument.selectedObjectNode.propertyColumns[column];
+        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
-            RLMObject *selectedInstance = [self.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
                 RLMObject *linkedObject = (RLMObject *)propertyValue;
                 RLMObjectSchema *linkedObjectSchema = linkedObject.schema;
                 
-                for (RLMClazzNode *clazzNode in self.modelDocument.presentedRealm.topLevelClazzes) {
+                for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        NSInteger index = [self.outlineViewController.classesOutlineView rowForItem:clazzNode];
+                        NSInteger index = [self.parentWindowController.outlineViewController.classesOutlineView rowForItem:clazzNode];
                         
-                        [self.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                             byExtendingSelection:NO];
+                        [self.parentWindowController.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                                                                   byExtendingSelection:NO];
                         
                         [self updateTableView];
                         
@@ -416,29 +390,37 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             }
         }
         else if (propertyNode.type == RLMPropertyTypeArray) {
-            RLMObject *selectedInstance = [self.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
                 
-                RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.modelDocument.selectedObjectNode;
+                RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.parentWindowController.modelDocument.selectedObjectNode;
                 
                 RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:linkedArray
                                                                   fromProperty:propertyNode.property
                                                                         object:selectedInstance];
-                
+/*
                 [self.outlineViewController.classesOutlineView reloadData];
                 
                 [self.outlineViewController.classesOutlineView expandItem:selectedClassNode];
                 NSInteger index = [self.outlineViewController.classesOutlineView rowForItem:arrayNode];
                 if (index != NSNotFound) {
                     [self.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                         byExtendingSelection:NO];
+                                                               byExtendingSelection:NO];
                 }
-                
+*/                
             }
         }
+    }
+}
+
+- (void)updateTableView
+{
+    [self.instancesTableView reloadData];
+    for(NSTableColumn *column in self.instancesTableView.tableColumns) {
+        [column resizeToFitContents];
     }
 }
 
@@ -446,7 +428,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
 {
-    self.modelDocument.selectedObjectNode = outlineNode;
+    self.parentWindowController.modelDocument.selectedObjectNode = outlineNode;
     
     // How many properties does the clazz contains?
     NSArray *columns = outlineNode.propertyColumns;
@@ -619,12 +601,5 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     headerCell.stringValue = name;
 }
 
-- (void)updateTableView
-{
-    [self.instancesTableView reloadData];
-    for(NSTableColumn *column in self.instancesTableView.tableColumns) {
-        [column resizeToFitContents];
-    }
-}
 
 @end

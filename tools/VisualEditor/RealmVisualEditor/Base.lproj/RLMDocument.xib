@@ -6,8 +6,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
             <connections>
-                <outlet property="instancesTableView" destination="enp-HN-e6b" id="cbz-W9-jtf"/>
                 <outlet property="outlineViewController" destination="hSp-0t-Gbg" id="wTv-NH-RZX"/>
+                <outlet property="tableViewController" destination="X01-Pz-1Ve" id="3ep-TB-FsM"/>
                 <outlet property="window" destination="xOd-HO-29H" id="JIz-fz-R2o"/>
             </connections>
         </customObject>
@@ -107,8 +107,9 @@
                                                     <tableViewGridLines key="gridStyleMask" vertical="YES" horizontal="YES"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <connections>
-                                                        <outlet property="dataSource" destination="-2" id="T6O-Yd-0na"/>
-                                                        <outlet property="delegate" destination="-2" id="J0x-0X-OOV"/>
+                                                        <action selector="userDoubleClicked:" target="X01-Pz-1Ve" id="cK2-R8-gRT"/>
+                                                        <outlet property="dataSource" destination="X01-Pz-1Ve" id="GhO-Zd-xr8"/>
+                                                        <outlet property="delegate" destination="X01-Pz-1Ve" id="FW0-Gv-Asq"/>
                                                     </connections>
                                                 </tableView>
                                             </subviews>
@@ -180,6 +181,12 @@
             <connections>
                 <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="inH-pi-Hwr"/>
                 <outlet property="parentWindowController" destination="-2" id="UwQ-DI-ttX"/>
+            </connections>
+        </customObject>
+        <customObject id="X01-Pz-1Ve" customClass="RLMInstanceTableViewController">
+            <connections>
+                <outlet property="instancesTableView" destination="enp-HN-e6b" id="YrN-eD-dlY"/>
+                <outlet property="parentWindowController" destination="-2" id="zrl-bi-GWW"/>
             </connections>
         </customObject>
     </objects>
