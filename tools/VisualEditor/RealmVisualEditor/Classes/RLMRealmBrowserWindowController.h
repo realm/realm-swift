@@ -18,6 +18,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface RLMRealmBrowserWindowController : NSWindowController
+#import "RLMDocument.h"
+#import "RLMClassOutlineViewController.h"
+
+@interface RLMRealmBrowserWindowController : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>
+
+@property (nonatomic, weak) RLMDocument *modelDocument;
+
+@property (nonatomic, strong) IBOutlet RLMClassOutlineViewController *outlineViewController;
+@property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;
+
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
+- (void)updateTableView;
 
 @end

@@ -18,9 +18,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface RLMDocument : NSDocument <NSOutlineViewDataSource, NSOutlineViewDelegate, NSTableViewDataSource, NSTableViewDelegate>
+#import "RLMRealmNode.h"
 
-@property (nonatomic, strong) IBOutlet NSOutlineView *classesOutlineView;
-@property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;
+@interface RLMDocument : NSDocument
+
+@property (nonatomic, strong) IBOutlet RLMRealmNode *presentedRealm;
+@property (nonatomic, strong) IBOutlet RLMObjectNode *selectedObjectNode;
+
 
 @end

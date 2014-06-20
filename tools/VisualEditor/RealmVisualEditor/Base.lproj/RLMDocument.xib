@@ -4,12 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="RLMDocument">
+        <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
             <connections>
-                <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="PaJ-nM-bwz"/>
                 <outlet property="instancesTableView" destination="enp-HN-e6b" id="cbz-W9-jtf"/>
-                <outlet property="realmTableColumnsView" destination="enp-HN-e6b" id="qEl-zg-N9L"/>
-                <outlet property="realmTableOutlineView" destination="IMi-6Y-gQF" id="uY5-2F-1B1"/>
+                <outlet property="outlineViewController" destination="hSp-0t-Gbg" id="wTv-NH-RZX"/>
                 <outlet property="window" destination="xOd-HO-29H" id="JIz-fz-R2o"/>
             </connections>
         </customObject>
@@ -18,7 +16,7 @@
         <window title="Realm" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" appearanceType="lightContent" animationBehavior="default" id="xOd-HO-29H" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="133" y="235" width="860" height="402"/>
+            <rect key="contentRect" x="921" y="485" width="860" height="402"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
@@ -62,8 +60,8 @@
                                                         </tableColumn>
                                                     </tableColumns>
                                                     <connections>
-                                                        <outlet property="dataSource" destination="-2" id="U1a-c4-HxQ"/>
-                                                        <outlet property="delegate" destination="-2" id="9bZ-ps-W97"/>
+                                                        <outlet property="dataSource" destination="hSp-0t-Gbg" id="Ysl-BR-v6p"/>
+                                                        <outlet property="delegate" destination="hSp-0t-Gbg" id="CW4-45-uk0"/>
                                                     </connections>
                                                 </outlineView>
                                             </subviews>
@@ -178,6 +176,12 @@
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
         </window>
+        <customObject id="hSp-0t-Gbg" customClass="RLMClassOutlineViewController">
+            <connections>
+                <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="inH-pi-Hwr"/>
+                <outlet property="parentWindowController" destination="-2" id="UwQ-DI-ttX"/>
+            </connections>
+        </customObject>
     </objects>
     <resources>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
