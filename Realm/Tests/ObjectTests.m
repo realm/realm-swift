@@ -200,10 +200,6 @@
                    @"<  operator in numeric predicate.");
     XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol != 3"].count, (NSUInteger)7,
                    @"!= operator in numeric predicate.");
-    // Should work once we support NSAggregateExpressionType.
-    // XCTAssertEqual([IntObject
-    //                objectsWithPredicateFormat:@"intCol BETWEEN {2,3}"].count,
-    //               (NSUInteger)7, @"!= operator in numeric predicate.");
 
     // varargs don't play nice with macros
     NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
