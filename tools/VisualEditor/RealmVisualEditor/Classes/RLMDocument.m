@@ -23,6 +23,7 @@
 #import "RLMArrayNode.h"
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
+#import "RLMRealmBrowserWindowController.h"
 #import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
 
@@ -90,6 +91,15 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     return nil;
 }
 
+#pragma mark - Public methods - NSDocument overrides - Creating and Managing Window Controllers
+
+- (void)makeWindowControllers
+{
+    RLMRealmBrowserWindowController *windowController = [[RLMRealmBrowserWindowController alloc] initWithWindowNibName:self.windowNibName
+                                                                                                                 owner:self];
+    [self addWindowController:windowController];
+}
+
 - (NSString *)windowNibName
 {
     return @"RLMDocument";
@@ -117,31 +127,23 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     }
 }
 
-+ (BOOL)autosavesInPlace
-{
-    return YES;
-}
+#pragma mark - Public methods - NSDocument overrides - Loading Document Data
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
-    // Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
-    // You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-    NSException *exception = [NSException exceptionWithName:@"UnimplementedMethod" reason:[NSString stringWithFormat:@"%@ is unimplemented", NSStringFromSelector(_cmd)] userInfo:nil];
-    @throw exception;
+    // As we do not use the usual file handling mechanism we just returns nil (but it is necessary
+    // to override this method as the default implementation throws an exception.
     return nil;
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
-    // Insert code here to read your document from the given data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning NO.
-    // You can also choose to override -readFromFileWrapper:ofType:error: or -readFromURL:ofType:error: instead.
-    // If you override either of these, you should also override -isEntireFileLoaded to return NO if the contents are lazily loaded.
-    NSException *exception = [NSException exceptionWithName:@"UnimplementedMethod" reason:[NSString stringWithFormat:@"%@ is unimplemented", NSStringFromSelector(_cmd)] userInfo:nil];
-    @throw exception;
+    // As we do not use the usual file handling mechanism we just returns YES (but it is necessary
+    // to override this method as the default implementation throws an exception.
     return YES;
 }
 
-#pragma mark - Public methods - NSDocument overrides
+#pragma mark - Public methods - NSDocument overrides - Managing Document Windows
 
 - (NSString *)displayName {
     if (presentedRealm.name != nil) {
