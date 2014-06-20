@@ -43,6 +43,8 @@ EOF
 # Xcode Helpers
 ######################################
 
+XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
+
 xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
@@ -58,8 +60,8 @@ xc() {
 
 xcrealm() {
     PROJECT=Realm.xcodeproj
-    if xcode-select -p | grep Xcode6 --quiet; then
-        PROJECT=RealmSwift.xcodeproj
+    if [[ "$XCVERSION" == "6" ]]; then
+        PROJECT=Realm-Xcode6.xcodeproj
     fi
     xc "-project $PROJECT $1"
 }
@@ -205,7 +207,7 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        if xcode-select -p | grep Xcode6 --quiet; then
+        if [[ "$XCVERSION" == "6" ]]; then
             xc "-project RealmSwiftExample/RealmSwiftExample.xcodeproj -scheme RealmSwiftExample clean build"
         fi
         xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build"

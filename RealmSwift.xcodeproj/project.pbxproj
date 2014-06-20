@@ -627,7 +627,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "RealmSwift" */;
+			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "Realm-Xcode6" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1298,7 +1298,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E9189094177B677900653D7A /* Build configuration list for PBXProject "RealmSwift" */ = {
+		E9189094177B677900653D7A /* Build configuration list for PBXProject "Realm-Xcode6" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E91890BD177B677900653D7A /* Debug */,
