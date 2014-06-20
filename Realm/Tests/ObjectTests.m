@@ -123,6 +123,17 @@
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
 }
 
+- (void)testObjectdEqual
+{
+    RLMTestObject *o1 = [[RLMTestObject alloc] init];
+    o1.column = @"value";
+    
+    RLMTestObject *o2 = [[RLMTestObject alloc] init];
+    o2.column = @"value";
+    
+    // XCTAssertEqualObjects(o1, o2, @"Objects should be equsl"); FIXME
+}
+
 - (void)testObjectSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
