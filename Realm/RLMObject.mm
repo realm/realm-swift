@@ -42,6 +42,16 @@
     return self;
 }
 
+
+-(instancetype)initWithObject:(id)values {
+    id obj = [self init];
+    RLMObjectSchema *desc = RLMSchema.sharedSchema[self.class.className];
+    
+    RLMPopulateObjectWithValues(desc, values, obj);
+    
+    return obj;
+}
+
 - (instancetype)initWithRealm:(RLMRealm *)realm
                        schema:(RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults {
@@ -66,45 +76,8 @@
     id obj = [[self alloc] init];
     
     RLMObjectSchema *desc = realm.schema[[self className]];
-    NSArray *properties = desc.properties;
     
-    // FIXME - this can be optimized by inserting directly into the table
-    //  after validation, rather than populating the object first
-    if ([values isKindOfClass:NSDictionary.class]) {
-        for (RLMProperty * property in properties) {
-            id value = values[property.name];
-            if (value) {
-                // Validate Value
-                if (RLMIsObjectValidForProperty(value, property)) {
-                    [obj setValue:value forKeyPath:property.name];
-                }
-                else {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-                }
-            }
-        }
-    }
-    else if ([values isKindOfClass:NSArray.class]) {
-        // for arrays use property names as keys
-        NSArray *array = values;
-        
-        if (array.count != properties.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-        }
-        
-        for (NSUInteger i = 0; i < array.count; i++) {
-            id value = values[i];
-            RLMProperty *property = properties[i];
-            
-            // Validate Value
-            if (RLMIsObjectValidForProperty(value, property)) {
-                [obj setValue:array[i] forKeyPath:property.name];
-            }
-            else {
-                @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-            }
-        }
-    }
+    RLMPopulateObjectWithValues(desc, values, obj);
     
     // insert populated object into store
     RLMAddObjectToRealm(obj, realm);

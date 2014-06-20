@@ -88,6 +88,10 @@
  */
 -(instancetype)init;
 
+
+- (instancetype)initWithObject:(id)object;
+
+
 /**
  Helper to return the class name for an RLMObject subclass.
  
