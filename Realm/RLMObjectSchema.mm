@@ -22,6 +22,7 @@
 #import "RLMSchema_Private.h"
 #import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+#import "RLMSwiftSupport.h"
 
 // private properties
 @interface RLMObjectSchema ()
@@ -49,6 +50,28 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
+    NSArray *ignoredPropertiesForClass = [objectClass ignoredProperties];
+    NSString *className = NSStringFromClass(objectClass);
+    
+    // Swift classes all begin with _T
+    if ([className rangeOfString:@"_T"].location == 0) {
+        // get ivars (Swift properties behave like ObjC ivars)
+        unsigned int ivarCount;
+        Ivar *ivars = class_copyIvarList(objectClass, &ivarCount);
+        for (unsigned int i = 0; i < ivarCount; i++) {
+            NSString *ivarName = [NSString stringWithUTF8String:ivar_getName(ivars[i])];
+            
+            BOOL ignored = [ignoredPropertiesForClass containsObject:ivarName];
+            
+            if (ignored) { // Don't process ignored properties
+                continue;
+            }
+            
+            objc_property_attribute_t attrs[] = { { "T", ivar_getRLMTypeEncodingSwift(ivars[i], objectClass) } };
+            class_addProperty(objectClass, ivarName.UTF8String, attrs, 1);
+        }
+    }
+    
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -57,16 +80,18 @@
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
-        BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
+        BOOL ignored = [ignoredPropertiesForClass containsObject:propertyName];
         
-        if (!ignored) { // Don't process ignored properties
-            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
-                                                            attributes:[objectClass attributesForProperty:propertyName]
-                                                                column:propArray.count];
-            
-            if (prop) {
-                [propArray addObject:prop];
-            }
+        if (ignored) { // Don't process ignored properties
+            continue;
+        }
+        
+        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
+                                                        attributes:[objectClass attributesForProperty:propertyName]
+                                                            column:propArray.count];
+        
+        if (prop) {
+            [propArray addObject:prop];
         }
     }
     
@@ -75,7 +100,7 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = NSStringFromClass(objectClass);
+    schema.className = className;
     return schema;
 }
 
