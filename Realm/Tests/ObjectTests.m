@@ -207,6 +207,7 @@
 
     @try {
         [IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"];
+        XCTFail(@"Invalid operator in numeric predicate.");
     }
     @catch (NSException *exception) {
         XCTAssertEqualObjects(exception.name,
