@@ -89,6 +89,14 @@
 -(instancetype)init;
 
 
+/**
+ Initialize a standalone RLMObject with values from an NSArray or NSDictionary
+ 
+ Initialize an unpersisted instance of this object.
+ Call addObject: on an RLMRealm to add standalone object to a realm.
+ 
+ @see [RLMRealm addObject:]:
+ */
 - (instancetype)initWithObject:(id)object;
 
 
