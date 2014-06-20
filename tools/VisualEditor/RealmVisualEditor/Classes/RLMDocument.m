@@ -531,16 +531,17 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             // Create a frame which covers the cell to be edited
             NSRect frame = [tableView frameOfCellAtColumn:[[tableView tableColumns] indexOfObject:tableColumn]
                                                       row:row];
-            
-            frame.origin.x += frame.size.width;
-            frame.size.width = 280;
-            frame.size.height = 150;
+
+            frame.origin.x -= [tableView intercellSpacing].width * 0.5;
+            frame.origin.y -= [tableView intercellSpacing].height * 0.5;
+            frame.size.width += [tableView intercellSpacing].width * 0.5;
+            frame.size.height = 23;
             
             // Set up a date picker with no border or background
             NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
-            datepicker.bordered = YES;
-            datepicker.drawsBackground = YES;
-            datepicker.datePickerStyle = NSClockAndCalendarDatePickerStyle;
+            datepicker.bordered = NO;
+            datepicker.drawsBackground = NO;
+            datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
             datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
             
             RLMObject *selectedObject = [selectedObjectNode instanceAtIndex:row];
@@ -771,7 +772,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
                                    editable:NO
-                                    toolTip:@"Link to  object"];
+                                    toolTip:@"Link to object"];
                 break;
             }
         }
