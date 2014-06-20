@@ -22,7 +22,7 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark StringObject
+#pragma mark OneTypeObjects
 
 @interface StringObject : RLMObject
 
@@ -30,11 +30,15 @@
 
 @end
 
-#pragma mark IntObject
-
 @interface IntObject : RLMObject
 
 @property int intCol;
+
+@end
+
+@interface BoolObject : RLMObject
+
+@property BOOL boolCol;
 
 @end
 

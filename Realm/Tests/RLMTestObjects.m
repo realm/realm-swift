@@ -21,14 +21,15 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark StringObject
+#pragma mark OneTypeObjects
 
 @implementation StringObject
 @end
 
-#pragma mark IntObject
-
 @implementation IntObject
+@end
+
+@implementation BoolObject
 @end
 
 #pragma mark AllTypesObject

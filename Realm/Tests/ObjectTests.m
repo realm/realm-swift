@@ -181,6 +181,24 @@
     XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
 }
 
+- (void)testBooleanPredicate
+{
+    XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol == TRUE"].count,
+                   (NSUInteger)0, @"== operator in bool predicate.");
+    XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol != TRUE"].count,
+                   (NSUInteger)0, @"== operator in bool predicate.");
+
+    @try {
+        [BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"];
+        XCTFail("Invalid operator in bool predicate.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"Invalid operator in bool predicate.");
+    }
+}
+
 - (void)testDataTypes
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
