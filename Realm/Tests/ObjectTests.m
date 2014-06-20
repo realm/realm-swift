@@ -204,7 +204,9 @@
     // XCTAssertEqual([IntObject
     //                objectsWithPredicateFormat:@"intCol BETWEEN {2,3}"].count,
     //               (NSUInteger)7, @"!= operator in numeric predicate.");
-    NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"age BETWEEN %@", @[@2,@3]].count;
+
+    // varargs don't play nice with macros
+    NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
     XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
 
     @try {
