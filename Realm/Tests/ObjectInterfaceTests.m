@@ -20,6 +20,16 @@
 
 #pragma mark - Test Objects
 
+#pragma mark CustomAccessorsObject
+
+@interface CustomAccessorsObject : RLMObject
+@property (getter = getThatName) NSString *name;
+@property (setter = setTheInt:)  int age;
+@end
+
+@implementation CustomAccessorsObject
+@end
+
 #pragma mark InvalidSubclassObject
 
 @interface InvalidSubclassObject : StringObject
@@ -27,6 +37,19 @@
 @end
 
 @implementation InvalidSubclassObject
+@end
+
+#pragma mark BaseClassStringObject
+
+@interface BaseClassStringObject : RLMObject
+@property NSInteger intCol;
+@end
+
+@interface BaseClassStringObject ()
+@property NSString *stringCol;
+@end
+
+@implementation BaseClassStringObject
 @end
 
 #pragma mark - Tests

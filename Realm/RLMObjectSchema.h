@@ -19,9 +19,6 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMProperty.h>
 
-// Provide class from demangled class name
-Class RLMClassFromString(NSString *className);
-
 /**---------------------------------------------------------------------------------------
  *  @name Object Schema
  * ---------------------------------------------------------------------------------------

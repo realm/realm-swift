@@ -18,6 +18,18 @@
 
 #import "RLMTestCase.h"
 
+#pragma mark - Test Objects
+
+@interface ArrayPropertyObject : RLMObject
+@property NSString *name;
+@property RLMArray<StringObject> *array;
+@end
+
+@implementation ArrayPropertyObject
+@end
+
+#pragma mark - Tests
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 

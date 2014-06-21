@@ -19,6 +19,18 @@
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
 
+#pragma mark - Test Objects
+
+@interface CircleObject : RLMObject
+@property NSString *data;
+@property CircleObject *next;
+@end
+
+@implementation CircleObject
+@end
+
+#pragma mark - Tests
+
 @interface LinkTests : RLMTestCase
 @end
 

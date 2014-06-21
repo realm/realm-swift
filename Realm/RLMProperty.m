@@ -19,7 +19,6 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject.h"
-#import "RLMObjectSchema.h"
 
 // private properties
 @interface RLMProperty ()
@@ -125,7 +124,7 @@
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
-                Class cls = RLMClassFromString(self.objectClassName);
+                Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
                 }
@@ -136,7 +135,7 @@
                 _type = RLMPropertyTypeObject;
                 
                 // verify type
-                Class cls = RLMClassFromString(self.objectClassName);
+                Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
                 }
