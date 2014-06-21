@@ -18,21 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#pragma mark - Test Objects
-
-@interface AggregateObject : RLMObject
-@property int     intCol;
-@property float   floatCol;
-@property double  doubleCol;
-@property BOOL    boolCol;
-@property NSDate *dateCol;
-@end
-
-@implementation AggregateObject
-@end
-
-#pragma mark - Tests
-
 @interface ArrayTests : RLMTestCase
 @end
 
