@@ -40,20 +40,11 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqualObjects((array.array[1] as StringObject).stringCol, "b", "Second element should have property value 'b'")
         XCTAssertEqualObjects((array.array[2] as StringObject).stringCol, "a", "Third element should have property value 'a'")
         
-        // Index-based enumeration
-        for idx in 0..array.array.count {
-            let obj = array.array[idx] as StringObject
-            XCTAssertFalse(obj.description.isEmpty, "Object should have description")
+        for obj in (array.array as RLMArray) {
+            if let obj = obj as? StringObject {
+                XCTAssertFalse(obj.description.isEmpty, "Object should have description")
+            }
         }
-        
-        // FIXME: Can't enumerate
-//        // make sure we can fast enumerate
-//        for obj in array.array {
-//            XCTAssertTrue(obj.description.length > 0, "Object should have description")
-//        }
-//        for (index, obj) in enumerate(array.array) {
-//            XCTAssertTrue(obj.description.length > 0, "Object should have description")
-//        }
     }
     
     func testModifyDetatchedArray() {

@@ -41,19 +41,16 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let result = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let result: RLMArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "intCol < \(100)"))
         
         XCTAssertEqual(result.count, 10, "10 objects added")
         
         var totalSum: CInt = 0
         
-        // FIXME: Fast enumeration should work here
-        // for ao in result {
-        //     totalSum += ao.intCol
-        // }
-        for idx in 0..result.count {
-            let ao = result[idx] as AggregateObject
-            totalSum += ao.intCol
+        for ao in result {
+            if let ao = ao as? AggregateObject {
+                totalSum += ao.intCol
+            }
         }
         
         XCTAssertEqual(totalSum, 100, "total sum should be 100")

@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8356ADA1947BED7009FC9F5"
+               BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
                BuildableName = "Realm.framework"
-               BlueprintName = "iOS Framework"
+               BlueprintName = "iOS"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8356AE41947BED7009FC9F5"
+               BlueprintIdentifier = "E856D1DE195614A400FB2FCF"
                BuildableName = "iOS Tests.xctest"
                BlueprintName = "iOS Tests"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
