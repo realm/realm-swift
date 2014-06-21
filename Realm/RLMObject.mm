@@ -21,6 +21,7 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
+#import "RLMSwiftSupport.h"
 
 #import <objc/runtime.h>
 
@@ -200,8 +201,9 @@
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-+ (NSString *)className {
-    return NSStringFromClass(self);
++ (NSString *)className
+{
+    return RLMParsedClassFromClass(self).name;
 }
 
 - (NSString *)description
