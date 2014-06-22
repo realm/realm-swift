@@ -199,6 +199,87 @@
     }
 }
 
+- (void)testStringComparisonInPredicate
+{
+    // First, supported operators and options.
+    // Make sure that case-sensitivity is handled the right way round.
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:(@[@"x"])];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH 'X'"].count,
+                   (NSUInteger)0, @"Case-sensitive BEGINSWITH operator in string comparison.");
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH[c] 'X'"].count,
+                   (NSUInteger)1, @"Case-insensitive BEGINSWITH operator in string comparison.");
+
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ENDSWITH 'X'"].count,
+                   (NSUInteger)0, @"ENDSWITH operator in string comparison.");
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ENDSWITH[c] 'X'"].count,
+                   (NSUInteger)1, @"Case-insensitive ENDSWITH operator in string comparison.");
+
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol CONTAINS 'X'"].count,
+                   (NSUInteger)0, @"CONTAINS operator in string comparison.");
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol CONTAINS[c] 'X'"].count,
+                   (NSUInteger)1, @"Case-insensitive CONTAINS operator in string comparison.");
+
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol == 'X'"].count,
+                   (NSUInteger)0, @"== operator in string comparison.");
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ==[c] 'X'"].count,
+                   (NSUInteger)1, @"Case-insensitive == operator in string comparison.");
+
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol != 'X'"].count,
+                   (NSUInteger)1, @"!= operator in string comparison.");
+    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol !=[c] 'X'"].count,
+                   (NSUInteger)0, @"Case-insenstive != operator in string comparison.");
+
+    // Unsupported (but valid) modifiers.
+    @try {
+        [StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH[d] 'X'"];
+        XCTFail("Diachritic insensitivity is not supported.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid predicate option",
+                              @"Diachritic insensitivity is not supported.");
+    }
+
+    // Unsupported (but valid) operators.
+    @try {
+        [StringObject objectsWithPredicateFormat:@"stringCol LIKE 'X'"];
+        XCTFail("LIKE not supported for string comparison.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"LIKE not supported for string comparison.");
+    }
+
+    @try {
+        [StringObject objectsWithPredicateFormat:@"stringCol MATCHES 'X'"];
+        XCTFail("MATCHES not supported in string comparison.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"MATCHES not supported in string comparison.");
+    }
+
+    // Invalid operators.
+    @try {
+        [StringObject objectsWithPredicateFormat:@"stringCol >= 'X'"];
+        XCTFail("Invalid operator in string comparison.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"Invalid operator in string comparison.");
+    }
+}
+
+
+
 - (void)testDataTypes
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
