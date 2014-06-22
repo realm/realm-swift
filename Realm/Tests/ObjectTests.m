@@ -17,6 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMPredicateGen.h"
+
+#define OP_TYPE NSPredicateOperatorType
+#define OP_OPTIONS NSComparisonPredicateOptions
 
 #pragma mark - Test Objects
 
@@ -206,37 +210,47 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:(@[@"x"])];
+    [StringObject createInRealm:realm withObject:(@[@"a"])];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH 'X'"].count,
+    NSExpression *alpha = [NSExpression expressionForConstantValue:@"A"];
+
+    NSUInteger (^count)(OP_TYPE, OP_OPTIONS) = ^(OP_TYPE type, OP_OPTIONS options) {
+        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"stringCol"
+                                                         expression: alpha
+                                                               type: type
+                                                            options: options];
+        return [StringObject objectsWithPredicate: pred].count;
+    };
+
+    XCTAssertEqual(count(NSBeginsWithPredicateOperatorType, 0),
                    (NSUInteger)0, @"Case-sensitive BEGINSWITH operator in string comparison.");
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH[c] 'X'"].count,
+    XCTAssertEqual(count(NSBeginsWithPredicateOperatorType, NSCaseInsensitivePredicateOption),
                    (NSUInteger)1, @"Case-insensitive BEGINSWITH operator in string comparison.");
 
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ENDSWITH 'X'"].count,
-                   (NSUInteger)0, @"ENDSWITH operator in string comparison.");
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ENDSWITH[c] 'X'"].count,
+    XCTAssertEqual(count(NSEndsWithPredicateOperatorType, 0),
+                   (NSUInteger)0, @"Case-sensitive ENDSWITH operator in string comparison.");
+    XCTAssertEqual(count(NSEndsWithPredicateOperatorType, NSCaseInsensitivePredicateOption),
                    (NSUInteger)1, @"Case-insensitive ENDSWITH operator in string comparison.");
 
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol CONTAINS 'X'"].count,
-                   (NSUInteger)0, @"CONTAINS operator in string comparison.");
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol CONTAINS[c] 'X'"].count,
+    XCTAssertEqual(count(NSContainsPredicateOperatorType, 0),
+                   (NSUInteger)0, @"Case-sensitive CONTAINS operator in string comparison.");
+    XCTAssertEqual(count(NSContainsPredicateOperatorType, NSCaseInsensitivePredicateOption),
                    (NSUInteger)1, @"Case-insensitive CONTAINS operator in string comparison.");
 
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol == 'X'"].count,
-                   (NSUInteger)0, @"== operator in string comparison.");
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol ==[c] 'X'"].count,
-                   (NSUInteger)1, @"Case-insensitive == operator in string comparison.");
+    XCTAssertEqual(count(NSEqualToPredicateOperatorType, 0),
+                   (NSUInteger)0, @"Case-sensitive = or == operator in string comparison.");
+    XCTAssertEqual(count(NSEqualToPredicateOperatorType, NSCaseInsensitivePredicateOption),
+                   (NSUInteger)1, @"Case-insensitive = or == operator in string comparison.");
 
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol != 'X'"].count,
-                   (NSUInteger)1, @"!= operator in string comparison.");
-    XCTAssertEqual([StringObject objectsWithPredicateFormat:@"stringCol !=[c] 'X'"].count,
-                   (NSUInteger)0, @"Case-insenstive != operator in string comparison.");
+    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType, 0),
+                   (NSUInteger)1, @"Case-sensitive != or <> operator in string comparison.");
+    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType, NSCaseInsensitivePredicateOption),
+                   (NSUInteger)0, @"Case-insensitive != or <> operator in string comparison.");
 
     // Unsupported (but valid) modifiers.
     @try {
-        [StringObject objectsWithPredicateFormat:@"stringCol BEGINSWITH[d] 'X'"];
+        count(NSBeginsWithPredicateOperatorType, NSDiacriticInsensitivePredicateOption);
         XCTFail("Diachritic insensitivity is not supported.");
     }
     @catch (NSException *exception){
@@ -247,7 +261,7 @@
 
     // Unsupported (but valid) operators.
     @try {
-        [StringObject objectsWithPredicateFormat:@"stringCol LIKE 'X'"];
+        count(NSLikePredicateOperatorType, 0);
         XCTFail("LIKE not supported for string comparison.");
     }
     @catch (NSException *exception){
@@ -257,7 +271,7 @@
     }
 
     @try {
-        [StringObject objectsWithPredicateFormat:@"stringCol MATCHES 'X'"];
+        count(NSMatchesPredicateOperatorType, 0);
         XCTFail("MATCHES not supported in string comparison.");
     }
     @catch (NSException *exception){
@@ -268,7 +282,7 @@
 
     // Invalid operators.
     @try {
-        [StringObject objectsWithPredicateFormat:@"stringCol >= 'X'"];
+        count(NSLessThanPredicateOperatorType, 0);
         XCTFail("Invalid operator in string comparison.");
     }
     @catch (NSException *exception){
@@ -278,7 +292,75 @@
     }
 }
 
+- (void)testDateComparisonInPredicate
+{
+    NSExpression *now = [NSExpression expressionForConstantValue:[[NSDate alloc] init]];
 
+    NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
+        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"dateCol"
+                                                         expression: now
+                                                               type: type];
+        return [DateObject objectsWithPredicate: pred].count;
+    };
+
+    XCTAssertEqual(count(NSLessThanPredicateOperatorType), (NSUInteger)0,
+                   @"< operator in date comparison.");
+    XCTAssertEqual(count(NSLessThanOrEqualToPredicateOperatorType), (NSUInteger)0,
+                   @"<= operator in date comparison.");
+    XCTAssertEqual(count(NSGreaterThanPredicateOperatorType), (NSUInteger)0,
+                   @"> operator in date comparison.");
+    XCTAssertEqual(count(NSGreaterThanOrEqualToPredicateOperatorType), (NSUInteger)0,
+                   @">= operator in date comparison.");
+    XCTAssertEqual(count(NSEqualToPredicateOperatorType), (NSUInteger)0,
+                   @"= or == operator in date comparison.");
+    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType), (NSUInteger)0,
+                   @"!= or <> operator in date comparison.");
+
+    // Invalid operators.
+    @try {
+        count(NSBeginsWithPredicateOperatorType);
+        XCTFail("Invalid operator in date comparison.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"Invalid operator in date comparison.");
+    }
+}
+
+- (void)testBinaryComparisonInPredicate
+{
+    NSExpression *binary = [NSExpression expressionForConstantValue:[[NSData alloc] init]];
+
+    NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
+        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"binaryCol"
+                                                         expression: binary
+                                                               type: type];
+        return [BinaryObject objectsWithPredicate: pred].count;
+    };
+
+    XCTAssertEqual(count(NSBeginsWithPredicateOperatorType), (NSUInteger)0,
+                   @"BEGINSWITH operator in binary comparison.");
+    XCTAssertEqual(count(NSEndsWithPredicateOperatorType), (NSUInteger)0,
+                   @"ENDSWITH operator in binary comparison.");
+    XCTAssertEqual(count(NSContainsPredicateOperatorType), (NSUInteger)0,
+                   @"CONTAINS operator in binary comparison.");
+    XCTAssertEqual(count(NSEqualToPredicateOperatorType), (NSUInteger)0,
+                   @"= or == operator in binary comparison.");
+    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType), (NSUInteger)0,
+                   @"!= or <> operator in binary comparison.");
+
+    // Invalid operators.
+    @try {
+        count(NSLessThanPredicateOperatorType);
+        XCTFail("Invalid operator in binary comparison.");
+    }
+    @catch (NSException *exception){
+        XCTAssertEqualObjects(exception.name,
+                              @"filterWithPredicate:orderedBy: - Invalid operator type",
+                              @"Invalid operator in binary comparison.");
+    }
+}
 
 - (void)testDataTypes
 {

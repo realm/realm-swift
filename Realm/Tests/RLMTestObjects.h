@@ -42,6 +42,18 @@
 
 @end
 
+@interface DateObject : RLMObject
+
+@property NSDate *dateCol;
+
+@end
+
+@interface BinaryObject : RLMObject
+
+@property NSData *binaryCol;
+
+@end
+
 RLM_ARRAY_TYPE(StringObject)
 
 #pragma mark AllTypesObject

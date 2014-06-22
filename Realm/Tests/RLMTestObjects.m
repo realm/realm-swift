@@ -32,6 +32,12 @@
 @implementation BoolObject
 @end
 
+@implementation DateObject
+@end
+
+@implementation BinaryObject
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
