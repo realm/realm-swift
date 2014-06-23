@@ -18,14 +18,14 @@
 
 #import "RLMRealm_Private.hpp"
 #import "RLMObject.h"
-#import "RLMAccessor.h"
 #import "RLMObjectSchema.h"
 #import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor> {
+@interface RLMObject () {
   @public
     tightdb::Row _row;
+    RLMRealm *_realm;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm

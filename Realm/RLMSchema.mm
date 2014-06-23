@@ -121,9 +121,8 @@ static RLMSchema *s_sharedSchema;
             schema.tableNamesForClass[object.className] = tableName;
             [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
 
-            // generate dynamic class and set class mapping
-            Class dynamicClass = RLMDynamicClassForSchema(object, realm.schemaVersion);
-            schema.objectClassByName[object.className] = dynamicClass;
+            // use vanilla RLMObject in class mapping
+            schema.objectClassByName[object.className] = RLMObject.class;
         }
     }
     

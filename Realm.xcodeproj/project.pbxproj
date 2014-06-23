@@ -60,8 +60,6 @@
 		02E4D6B3192E3DC40082808D /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68F192E3DC40082808D /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6B4192E3DC40082808D /* RLMArrayTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D690192E3DC40082808D /* RLMArrayTableView.mm */; };
 		02E4D6B5192E3DC40082808D /* RLMArrayTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D690192E3DC40082808D /* RLMArrayTableView.mm */; };
-		02E4D6B8192E3DC40082808D /* RLMArrayAccessors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */; };
-		02E4D6B9192E3DC40082808D /* RLMArrayAccessors.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */; };
 		02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D693192E3DC40082808D /* RLMConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6BB192E3DC40082808D /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D693192E3DC40082808D /* RLMConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6BC192E3DC40082808D /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D694192E3DC40082808D /* RLMConstants.m */; };
@@ -187,7 +185,6 @@
 		02E4D68E192E3DC40082808D /* RLMArray_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMArray_Private.hpp; sourceTree = "<group>"; };
 		02E4D68F192E3DC40082808D /* RLMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArray.h; sourceTree = "<group>"; };
 		02E4D690192E3DC40082808D /* RLMArrayTableView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMArrayTableView.mm; sourceTree = "<group>"; };
-		02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMArrayAccessors.mm; sourceTree = "<group>"; };
 		02E4D693192E3DC40082808D /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMConstants.h; sourceTree = "<group>"; };
 		02E4D694192E3DC40082808D /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMConstants.m; sourceTree = "<group>"; };
 		02E4D695192E3DC40082808D /* RLMObject_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObject_Private.h; sourceTree = "<group>"; };
@@ -278,7 +275,6 @@
 				02026D15193E8F6400E4EEF8 /* RLMArray.mm */,
 				02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */,
 				02E4D690192E3DC40082808D /* RLMArrayTableView.mm */,
-				02E4D692192E3DC40082808D /* RLMArrayAccessors.mm */,
 				02E4D693192E3DC40082808D /* RLMConstants.h */,
 				02E4D694192E3DC40082808D /* RLMConstants.m */,
 				02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */,
@@ -677,7 +673,6 @@
 				02E4D6D6192E3DC40082808D /* RLMQueryUtil.mm in Sources */,
 				02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
-				02E4D6B8192E3DC40082808D /* RLMArrayAccessors.mm in Sources */,
 				02E4D6B4192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */,
 			);
@@ -721,7 +716,6 @@
 				02E4D6D7192E3DC40082808D /* RLMQueryUtil.mm in Sources */,
 				02E4D6CD192E3DC40082808D /* RLMObjectStore.mm in Sources */,
 				02E4D6E3192E3DC40082808D /* RLMSchema.mm in Sources */,
-				02E4D6B9192E3DC40082808D /* RLMArrayAccessors.mm in Sources */,
 				02E4D6B5192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6E7192E3DC40082808D /* RLMUtil.mm in Sources */,
 			);

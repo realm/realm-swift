@@ -23,7 +23,11 @@
 #import <tightdb/group.hpp>
 
 // RLMRealm private members
-@interface RLMRealm ()
+@interface RLMRealm () {
+    @public
+    // expose ivar to to avoid objc messages in accessors
+    BOOL _inWriteTransaction;
+}
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic) RLMSchema *schema;
@@ -34,8 +38,4 @@
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
                         error:(NSError **)outError;
-
-// call whenever creating an accessor to keep up to date accross transactions
-- (void)registerAccessor:(id<RLMAccessor>)accessor;
-
 @end

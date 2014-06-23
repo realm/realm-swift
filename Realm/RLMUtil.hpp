@@ -71,11 +71,6 @@ inline NSString *RLMTypeToString(RLMPropertyType type) {
     return @"Unknown";
 }
 
-// Getter and Setter for RLMPropertyTypeAny properties
-id RLMGetAnyProperty(tightdb::Row row, NSUInteger col_ndx);
-void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj);
-
-
 // String conversion utilities
 inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
     if (tightdb::util::int_cast_has_overflow<NSUInteger>(stringData.size())) {

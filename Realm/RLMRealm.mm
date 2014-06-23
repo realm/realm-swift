@@ -154,6 +154,8 @@ static NSArray *s_objectDescriptors = nil;
     Group *_group;
 }
 
+@synthesize inWriteTransaction = _inWriteTransaction;
+
 + (BOOL)isCoreDebug {
     return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
@@ -375,7 +377,6 @@ static NSArray *s_objectDescriptors = nil;
             
             // update state and make all objects in this realm writable
             _inWriteTransaction = YES;
-            [self updateAllObjects];
         }
         catch (std::exception& ex) {
             // File access errors are treated as exceptions here since they should not occur after the shared
@@ -395,8 +396,7 @@ static NSArray *s_objectDescriptors = nil;
             
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
-            [self updateAllObjects];
-            
+
             // notify other realm istances of changes
             for (RLMRealm *realm in realmsAtPath(_path)) {
                 if (![realm isEqual:self]) {
@@ -463,38 +463,9 @@ static NSArray *s_objectDescriptors = nil;
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
-            [self updateAllObjects];
             
             // send notification that someone else changed the realm
             [self sendNotifications];
-        }
-    }
-    catch (exception &ex) {
-        throw_objc_exception(ex);
-    }
-}
-
-- (void)registerAccessor:(id<RLMAccessor>)accessor {
-    [_objects setObject:accessor forKey:accessor];
-}
-
-- (void)updateAllObjects {
-    try {
-        // refresh all outstanding objects
-        for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            if ([obj isKindOfClass:RLMObject.class]) {
-                if (!((RLMObject *)obj)->_row.is_attached()) {
-                    obj.RLMAccessor_invalid = YES;
-                    continue; // don't change writeable one invalid
-                }
-            }
-            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                if (!((RLMArrayLinkView *)obj)->_backingLinkView->is_attached()) {
-                    obj.RLMAccessor_invalid = YES;
-                    continue; // don't change writeable one invalid
-                }
-            }
-            obj.RLMAccessor_writable = _inWriteTransaction;
         }
     }
     catch (exception &ex) {

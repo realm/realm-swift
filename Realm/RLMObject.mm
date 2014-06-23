@@ -27,8 +27,6 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize RLMAccessor_writable = _RLMAccessor_writable;
-@synthesize RLMAccessor_invalid = _RLMAccessor_invalid;
 @synthesize RLMObject_schema = _RLMObject_schema;
 
 // standalone init
@@ -139,44 +137,12 @@
 }
 #pragma GCC diagnostic pop
 
-- (void)setRLMAccessor_writable:(BOOL)writable {
-    if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
-    }
-    
-    // set accessor class based on write permission
-    // FIXME - we are assuming this is always an accessor subclass
-    if (writable) {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    else {
-        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    _RLMAccessor_writable = writable;
-}
-
-- (void)setRLMAccessor_invalid:(BOOL)invalid {
-    if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
-    }
-    
-    // set accessor class
-    // FIXME - we are assuming this is always an accessor subclass
-    if (invalid) {
-        object_setClass(self, RLMInvalidAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    else {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    _RLMAccessor_invalid = invalid;
-}
-
 -(id)objectForKeyedSubscript:(NSString *)key {
-    return [self valueForKey:key];
+    return RLMDynamicGet(self, key);
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    [self setValue:obj forKey:key];
+    RLMDynamicSet(self, key, obj);
 }
 
 + (RLMArray *)allObjects {

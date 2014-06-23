@@ -146,25 +146,25 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // get table and create new row
     NSString *objectClassName = object.RLMObject_schema.className;
     object.realm = realm;
-    object.RLMObject_schema = realm.schema[objectClassName];
-    
+
+    // set object schema
+    RLMObjectSchema *schema = realm.schema[objectClassName];
+    object.RLMObject_schema = schema;
+
+    // create row in table
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     size_t rowIndex = table->add_empty_row();
     object->_row = (*table)[rowIndex];
 
-    // change object class to insertion accessor
-    RLMObjectSchema *schema = realm.schema[objectClassName];
-    Class objectClass = NSClassFromString(objectClassName);
-    object_setClass(object, RLMInsertionAccessorClassForObjectClass(objectClass, schema));
-
-    // call our insertion setter to populate all properties in the table
+    // populate all properties
     for (RLMProperty *prop in schema.properties) {
-        // InsertionAccessr getter gets object from ivar
+        // get object from ivar using key value coding
         id value = [object valueForKey:prop.name];
         
         // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
         if (value) {
             // InsertionAccssor setter inserts into table
+            RLMDynamicSet(object, prop.name, value);
             [object setValue:value forKey:prop.name];
         }
         else {
@@ -175,10 +175,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // we are in a read transaction so change accessor class to readwrite accessor
+    Class objectClass = NSClassFromString(objectClassName);
     object_setClass(object, RLMAccessorClassForObjectClass(objectClass, schema));
-    
-    // register object with the realm
-    [realm registerAccessor:object];
 }
 
 void RLMDeleteObjectFromRealm(RLMObject *object) {
@@ -224,9 +222,6 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor->_row = (*table)[index];
-    accessor.RLMAccessor_writable = realm.inWriteTransaction;
-    
-    [accessor.realm registerAccessor:accessor];
     return accessor;
 }
 

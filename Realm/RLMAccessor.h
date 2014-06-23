@@ -20,24 +20,6 @@
 #import "RLMRealm.h"
 
 //
-// Accessor Protocol
-//
-
-// implemented by all persisted objects
-@protocol RLMAccessor <NSObject>
-
-// we don't namespace realm as it is public
-// this means users can't create properties names realm
-@property (nonatomic, readonly) RLMRealm *realm;
-
-// we need to namesapce these properties for RLMObject, so that users
-// don't try to create properties with the same names.
-@property (nonatomic, assign) BOOL RLMAccessor_writable;
-@property (nonatomic, assign) BOOL RLMAccessor_invalid;
-@end
-
-
-//
 // Accessors Class Creation/Caching
 //
 @class RLMObjectSchema;
@@ -47,12 +29,12 @@ void RLMAccessorCacheInitialize();
 
 // get accessor classes for an object class - generates classes if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
-Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 //
-// Dynamic accessor creation
+// Dynamic gettter/setter
 //
-Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version);
+void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate = YES);
+id RLMDynamicGet(RLMObject *obj, NSString *propName);
+
+
