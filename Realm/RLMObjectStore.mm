@@ -88,9 +88,6 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
     [realm commitWriteTransaction];
 }
 
-
-
-
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // if already in the right realm then no-op
     if (object.realm == realm) {
