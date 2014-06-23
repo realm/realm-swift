@@ -30,9 +30,6 @@ void RLMInitializeObjectStore();
 // throws if current state of realm is not compatible with current objects
 void RLMEnsureRealmTablesExist(RLMRealm *realm);
 
-// Populates the object with the provided values according the the schema
-void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id object);
-
 //
 // Adding, Removing, Getting Objects
 //
