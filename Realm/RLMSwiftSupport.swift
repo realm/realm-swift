@@ -58,14 +58,10 @@ import Foundation
             return "d"
         case is String.Type, is String?.Type:
             return "S"
-        case is NSData.Type, is NSData?.Type:
-            return "@\"NSData\""
-        case is NSDate.Type, is NSDate?.Type:
-            return "@\"NSDate\""
 
-        // Detect objects deriving from RLMObject (links)
-        case let c as RLMObject.Type:
-            return "@\"\(c.className())\"".bridgeToObjectiveC().UTF8String
+        // Detect Objective-C object types
+        case let c as NSObject.Type:
+            return "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
 
         default:
             println("Other type")
