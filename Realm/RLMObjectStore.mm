@@ -88,50 +88,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
     [realm commitWriteTransaction];
 }
 
-void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
-    NSArray *properties = schema.properties;
-    
-    // FIXME - this can be optimized by inserting directly into the table
-    //  after validation, rather than populating the object first
-    if ([values isKindOfClass:NSDictionary.class]) {
-        for (RLMProperty * property in properties) {
-            id value = values[property.name];
-            if (value) {
-                // Validate Value
-                if (RLMIsObjectValidForProperty(value, property)) {
-                    [obj setValue:value forKeyPath:property.name];
-                }
-                else {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-                }
-            }
-        }
-    }
-    else if ([values isKindOfClass:NSArray.class]) {
-        // for arrays use property names as keys
-        NSArray *array = values;
-        
-        if (array.count != properties.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-        }
-        
-        for (NSUInteger i = 0; i < array.count; i++) {
-            id value = values[i];
-            RLMProperty *property = properties[i];
-            
-            // Validate Value
-            if (RLMIsObjectValidForProperty(value, property)) {
-                [obj setValue:array[i] forKeyPath:property.name];
-            }
-            else {
-                @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-            }
-        }
-    } else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Values must be provided either as an array or dictionary" userInfo:nil];
-    }
 
-}
 
 
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
