@@ -18,26 +18,58 @@
 
 import Foundation
 
-@objc class RLMSwiftObjectSchema {
+@objc class RLMSwiftSupport {
     class func convertSwiftPropertiesToObjC(swiftClass: AnyClass) {
-        // get ivars (Swift properties behave like ObjC ivars)
-        var ivarCount: CUnsignedInt = 0
-        let ivars = class_copyIvarList(swiftClass, &ivarCount)
+        let swiftObject = (swiftClass as RLMObject.Type)()
+
+        let reflection = reflect(swiftObject)
+
+        let propertyCount = reflection.count
 
         let ignoredPropertiesForClass = swiftClass.ignoredProperties() as NSArray?
 
-        for i in 0..ivarCount {
-            let ivarName = "\(ivar_getName(ivars[Int(i)]))"
+        for i in 1..propertyCount {
+            // Skip the first property (super):
+            // super is an implicit property on Swift objects
+            let propertyName = reflection[i].0
 
             if ignoredPropertiesForClass != nil &&
-                ignoredPropertiesForClass!.containsObject(ivarName) {
+                ignoredPropertiesForClass!.containsObject(propertyName) {
                 continue
             }
 
-            var typeEncoding: CString = "c"
+            var typeEncoding = encodingForValueType(reflection[i].1.valueType)
 
             let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
-            class_addProperty(swiftClass, ivarName.bridgeToObjectiveC().UTF8String, [attr], 1)
+            class_addProperty(swiftClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
+        }
+    }
+
+    class func encodingForValueType(type: Any.Type) -> CString {
+        switch type {
+        // Detect basic types (including optional versions)
+        case is Bool.Type, is Bool?.Type:
+            return "c"
+        case is Int.Type, is Int?.Type:
+            return "i"
+        case is Float.Type, is Float?.Type:
+            return "f"
+        case is Double.Type, is Double?.Type:
+            return "d"
+        case is String.Type, is String?.Type:
+            return "S"
+        case is NSData.Type, is NSData?.Type:
+            return "@\"NSData\""
+        case is NSDate.Type, is NSDate?.Type:
+            return "@\"NSDate\""
+
+        // Detect objects deriving from RLMObject (links)
+        case let c as RLMObject.Type:
+            return "@\"\(c.className())\"".bridgeToObjectiveC().UTF8String
+
+        default:
+            println("Other type")
+            return ""
         }
     }
 }

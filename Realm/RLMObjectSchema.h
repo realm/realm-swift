@@ -45,3 +45,4 @@
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
 @end
+

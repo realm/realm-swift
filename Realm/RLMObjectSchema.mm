@@ -22,7 +22,10 @@
 #import "RLMSchema_Private.h"
 #import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+
+#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
 #import <Realm/Realm-Swift.h>
+#endif
 
 // private properties
 @interface RLMObjectSchema ()
@@ -51,10 +54,12 @@
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
     NSString *className = NSStringFromClass(objectClass);
-    
+
+#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
     if ([className rangeOfString:@"_T"].location == 0) {
-        [RLMSwiftObjectSchema convertSwiftPropertiesToObjC:objectClass];
+        [RLMSwiftSupport convertSwiftPropertiesToObjC:objectClass];
     }
+#endif
     
     // get object properties
     unsigned int count;

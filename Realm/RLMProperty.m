@@ -19,7 +19,6 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject.h"
-#import "RLMObjectSchema.h"
 
 // private properties
 @interface RLMProperty ()
