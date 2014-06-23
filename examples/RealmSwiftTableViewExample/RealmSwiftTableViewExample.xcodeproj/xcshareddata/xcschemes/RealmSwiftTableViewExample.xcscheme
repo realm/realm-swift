@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8D89B971955FC6D00CF2B9A"
-               BuildableName = "Realm.framework"
-               BlueprintName = "OSX"
-               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+               BlueprintIdentifier = "E8B359E51950229C00B4DB27"
+               BuildableName = "RealmSwiftTableViewExample.app"
+               BlueprintName = "RealmSwiftTableViewExample"
+               ReferencedContainer = "container:RealmSwiftTableViewExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,17 +28,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8D89BA21955FC6D00CF2B9A"
-               BuildableName = "OSX Tests.xctest"
-               BlueprintName = "OSX Tests"
-               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E8B359E51950229C00B4DB27"
+            BuildableName = "RealmSwiftTableViewExample.app"
+            BlueprintName = "RealmSwiftTableViewExample"
+            ReferencedContainer = "container:RealmSwiftTableViewExample.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -49,6 +48,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E8B359E51950229C00B4DB27"
+            BuildableName = "RealmSwiftTableViewExample.app"
+            BlueprintName = "RealmSwiftTableViewExample"
+            ReferencedContainer = "container:RealmSwiftTableViewExample.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -58,6 +66,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E8B359E51950229C00B4DB27"
+            BuildableName = "RealmSwiftTableViewExample.app"
+            BlueprintName = "RealmSwiftTableViewExample"
+            ReferencedContainer = "container:RealmSwiftTableViewExample.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

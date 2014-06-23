@@ -51,7 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		E8B359E61950229C00B4DB27 /* RealmSwiftExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmSwiftExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8B359E61950229C00B4DB27 /* RealmSwiftTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmSwiftTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8B359EA1950229C00B4DB27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8B359EB1950229C00B4DB27 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8B359ED1950229C00B4DB27 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		E8B359DD1950229C00B4DB27 = {
 			isa = PBXGroup;
 			children = (
-				E8B359E81950229C00B4DB27 /* RealmSwiftExample */,
+				E8B359E81950229C00B4DB27 /* RealmSwiftTableViewExample */,
 				E8B359E71950229C00B4DB27 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,12 +82,12 @@
 		E8B359E71950229C00B4DB27 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8B359E61950229C00B4DB27 /* RealmSwiftExample.app */,
+				E8B359E61950229C00B4DB27 /* RealmSwiftTableViewExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E8B359E81950229C00B4DB27 /* RealmSwiftExample */ = {
+		E8B359E81950229C00B4DB27 /* RealmSwiftTableViewExample */ = {
 			isa = PBXGroup;
 			children = (
 				E8C5DD58195025B50055C3B8 /* Realm-Xcode6.xcodeproj */,
@@ -96,7 +96,8 @@
 				E8B359ED1950229C00B4DB27 /* Images.xcassets */,
 				E8B359E91950229C00B4DB27 /* Supporting Files */,
 			);
-			path = RealmSwiftExample;
+			name = RealmSwiftTableViewExample;
+			path = RealmSwiftTableViewExample;
 			sourceTree = "<group>";
 		};
 		E8B359E91950229C00B4DB27 /* Supporting Files */ = {
@@ -110,9 +111,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E8B359E51950229C00B4DB27 /* RealmSwiftExample */ = {
+		E8B359E51950229C00B4DB27 /* RealmSwiftTableViewExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E8B359FD1950229C00B4DB27 /* Build configuration list for PBXNativeTarget "RealmSwiftExample" */;
+			buildConfigurationList = E8B359FD1950229C00B4DB27 /* Build configuration list for PBXNativeTarget "RealmSwiftTableViewExample" */;
 			buildPhases = (
 				E8B359E21950229C00B4DB27 /* Sources */,
 				E8B359E41950229C00B4DB27 /* Resources */,
@@ -122,9 +123,9 @@
 			dependencies = (
 				E8AFD02E19563B9500E2EE78 /* PBXTargetDependency */,
 			);
-			name = RealmSwiftExample;
-			productName = RealmSwiftExample;
-			productReference = E8B359E61950229C00B4DB27 /* RealmSwiftExample.app */;
+			name = RealmSwiftTableViewExample;
+			productName = RealmSwiftTableViewExample;
+			productReference = E8B359E61950229C00B4DB27 /* RealmSwiftTableViewExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -141,7 +142,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E8B359E11950229C00B4DB27 /* Build configuration list for PBXProject "RealmSwiftExample" */;
+			buildConfigurationList = E8B359E11950229C00B4DB27 /* Build configuration list for PBXProject "RealmSwiftTableViewExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -159,7 +160,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				E8B359E51950229C00B4DB27 /* RealmSwiftExample */,
+				E8B359E51950229C00B4DB27 /* RealmSwiftTableViewExample */,
 			);
 		};
 /* End PBXProject section */
@@ -312,9 +313,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				INFOPLIST_FILE = RealmSwiftExample/Info.plist;
+				INFOPLIST_FILE = RealmSwiftTableViewExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = RealmSwiftTableViewExample;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -326,9 +327,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				INFOPLIST_FILE = RealmSwiftExample/Info.plist;
+				INFOPLIST_FILE = RealmSwiftTableViewExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = RealmSwiftTableViewExample;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
@@ -336,7 +337,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E8B359E11950229C00B4DB27 /* Build configuration list for PBXProject "RealmSwiftExample" */ = {
+		E8B359E11950229C00B4DB27 /* Build configuration list for PBXProject "RealmSwiftTableViewExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E8B359FB1950229C00B4DB27 /* Debug */,
@@ -345,7 +346,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E8B359FD1950229C00B4DB27 /* Build configuration list for PBXNativeTarget "RealmSwiftExample" */ = {
+		E8B359FD1950229C00B4DB27 /* Build configuration list for PBXNativeTarget "RealmSwiftTableViewExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E8B359FE1950229C00B4DB27 /* Debug */,
