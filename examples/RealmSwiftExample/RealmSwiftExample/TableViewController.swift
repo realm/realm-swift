@@ -27,7 +27,7 @@ class DemoObject: RLMObject {
 class Cell: UITableViewCell {
     
     init(style: UITableViewCellStyle, reuseIdentifier: String!) {
-        super.init(style: UITableViewCellStyle.Subtitle, reuseIdentifier: reuseIdentifier)
+        super.init(style: .Subtitle, reuseIdentifier: reuseIdentifier)
     }
 }
 
@@ -55,8 +55,8 @@ class TableViewController: UITableViewController {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
         
         self.title = "SwiftExample"
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: UIBarButtonItemStyle.Plain, target: self, action: "backgroundAdd")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Add, target: self, action: "add")
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: "backgroundAdd")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
     }
 
     // Table view data source
@@ -76,7 +76,7 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath!) {
-        if editingStyle == UITableViewCellEditingStyle.Delete {
+        if editingStyle == .Delete {
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()
             realm.deleteObject(array[indexPath.row] as RLMObject)
