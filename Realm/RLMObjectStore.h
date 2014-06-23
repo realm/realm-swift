@@ -30,6 +30,7 @@ void RLMInitializeObjectStore();
 // throws if current state of realm is not compatible with current objects
 void RLMEnsureRealmTablesExist(RLMRealm *realm);
 
+
 //
 // Adding, Removing, Getting Objects
 //
