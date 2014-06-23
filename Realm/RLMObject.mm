@@ -21,7 +21,6 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
-#import "RLMSwiftSupport.h"
 
 #import <objc/runtime.h>
 
@@ -34,10 +33,13 @@
 
 // standalone init
 -(instancetype)init {
-    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+    RLMSchema *sharedSchema = RLMSchema.sharedSchema;
+    self = [self initWithRealm:nil schema:sharedSchema[self.class.className] defaultValues:YES];
     
     // set standalone accessor class
-    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+    if (sharedSchema) {
+        object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+    }
     
     return self;
 }
@@ -201,9 +203,8 @@
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-+ (NSString *)className
-{
-    return RLMParsedClassFromClass(self).name;
++ (NSString *)className {
+    return NSStringFromClass(self);
 }
 
 - (NSString *)description

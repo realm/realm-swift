@@ -16,16 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extension RLMArray: Sequence {
-    
-    func generate() -> GeneratorOf<RLMObject> {
-        var i  = 0
-        return GeneratorOf<RLMObject>({
-            if (i >= self.count) {
-                return .None
-            } else {
-                return self[i++] as? RLMObject
+import Foundation
+
+@objc class RLMSwiftObjectSchema {
+    class func convertSwiftPropertiesToObjC(swiftClass: AnyClass) {
+        // get ivars (Swift properties behave like ObjC ivars)
+        var ivarCount: CUnsignedInt = 0
+        let ivars = class_copyIvarList(swiftClass, &ivarCount)
+
+        let ignoredPropertiesForClass = swiftClass.ignoredProperties() as NSArray?
+
+        for i in 0..ivarCount {
+            let ivarName = "\(ivar_getName(ivars[Int(i)]))"
+
+            if ignoredPropertiesForClass != nil &&
+                ignoredPropertiesForClass!.containsObject(ivarName) {
+                continue
             }
-        })
+
+            var typeEncoding: CString = "c"
+
+            let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
+            class_addProperty(swiftClass, ivarName.bridgeToObjectiveC().UTF8String, [attr], 1)
+        }
     }
 }
