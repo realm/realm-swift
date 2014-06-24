@@ -207,6 +207,9 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
+        if [[ "$XCVERSION" == "6" ]]; then
+            xc "-project RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample clean build"
+        fi
         xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build"
         xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample clean build"
         xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build"
