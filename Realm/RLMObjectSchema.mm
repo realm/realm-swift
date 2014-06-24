@@ -23,10 +23,6 @@
 #import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#import <Realm/Realm-Swift.h>
-#endif
-
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
@@ -55,9 +51,12 @@
 +(instancetype)schemaForObjectClass:(Class)objectClass {
     NSString *className = NSStringFromClass(objectClass);
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-    if ([className rangeOfString:@"_T"].location == 0) {
+#ifdef REALM_SWIFT
+    ParsedClass *parsedClass = [RLMSwiftSupport parseClass:objectClass];
+    if (parsedClass.swift) {
         [RLMSwiftSupport convertSwiftPropertiesToObjC:objectClass];
+        className = parsedClass.name;
+        RLMSchema.mangledClassMap[parsedClass.name] = parsedClass.mangledName;
     }
 #endif
     

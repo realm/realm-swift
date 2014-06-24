@@ -99,4 +99,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding), "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
     }
+
+    func testSwiftClassNameIsDemangled() {
+        XCTAssertEqualObjects(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
+    }
 }

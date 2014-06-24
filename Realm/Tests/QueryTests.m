@@ -357,33 +357,33 @@
     
     [realm commitWriteTransaction];
     
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool2" expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 != bool2" expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"bool1 == bool1" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"bool1 == bool2" expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"bool1 != bool2" expectedCount:4];
     
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int2"  expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 != int2"  expectedCount:5];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 > int2"   expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 < int2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 >= int2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 <= int2"  expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 == int1"  expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 == int2"  expectedCount:2];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 != int2"  expectedCount:5];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 > int2"   expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 < int2"   expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 >= int2"  expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"int1 <= int2"  expectedCount:6];
     
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 == float1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 == float2"  expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 != float2"  expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 > float2"   expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 < float2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 >= float2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 <= float2"  expectedCount:5];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 == float1"  expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 == float2"  expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 != float2"  expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 > float2"   expectedCount:2];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 < float2"   expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 >= float2"  expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"float1 <= float2"  expectedCount:5];
     
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 == double1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 == double2" expectedCount:0];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 != double2" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 > double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 < double2" expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 >= double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 <= double2" expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 == double1" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 == double2" expectedCount:0];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 != double2" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 > double2" expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 < double2" expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 >= double2" expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject className] predicate:@"double1 <= double2" expectedCount:6];
     
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int1"  expectedCount:7];
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int2"  expectedCount:2];
@@ -409,38 +409,38 @@
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 >= double2" expectedCount:1];
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 <= double2" expectedCount:6];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"int1 == float1"
                                               expectedReason:@"Property type mismatch between int and float"];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"float2 >= double1"
                                               expectedReason:@"Property type mismatch between float and double"];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"double2 <= int2"
                                               expectedReason:@"Property type mismatch between double and int"];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"int2 != recordTag"
                                               expectedReason:@"Property type mismatch between int and string"];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"float1 > recordTag"
                                               expectedReason:@"Property type mismatch between float and string"];
     
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"double1 < recordTag"
                                               expectedReason:@"Property type mismatch between double and string"];
 }
 
-- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
+- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(NSString *)className
                                                    predicate:(NSString *)predicate
                                                expectedCount:(NSUInteger)expectedCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     
-    RLMArray *queryResult = [realm objects:NSStringFromClass(class)
+    RLMArray *queryResult = [realm objects:className
                        withPredicateFormat:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
@@ -456,14 +456,14 @@
                    predicate, expectedCount, actualCount);
 }
 
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
+- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(NSString *)className
                                                  predicate:(NSString *)predicate
                                             expectedReason:(NSString *)expectedReason
 {
     @try {
         RLMRealm *realm = [RLMRealm defaultRealm];
         
-        RLMArray *queryResult = [realm objects:NSStringFromClass(class)
+        RLMArray *queryResult = [realm objects:className
                            withPredicateFormat:predicate];
         NSUInteger actualCount = queryResult.count;
 #pragma unused(actualCount)

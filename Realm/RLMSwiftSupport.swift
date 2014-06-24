@@ -18,6 +18,32 @@
 
 import Foundation
 
+@objc class ParsedClass {
+    var swift = false
+    var name: String
+
+    var moduleName: String?
+    var mangledName: String?
+
+    init(swift: Bool, name: String, moduleName: String?, mangledName: String?) {
+        self.swift = swift
+        self.name = name
+        self.moduleName = moduleName
+        self.mangledName = mangledName
+    }
+}
+
+extension String {
+    subscript (r: Range<Int>) -> String {
+        get {
+            let startIndex = advance(self.startIndex, r.startIndex)
+            let endIndex = advance(startIndex, r.endIndex)
+
+            return self[Range(start: startIndex, end: endIndex)]
+        }
+    }
+}
+
 @objc class RLMSwiftSupport {
     class func convertSwiftPropertiesToObjC(swiftClass: AnyClass) {
         let swiftObject = (swiftClass as RLMObject.Type)()
@@ -67,5 +93,47 @@ import Foundation
             println("Other type")
             return ""
         }
+    }
+
+    class func isSwiftClassName(className: NSString) -> Bool {
+        return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
+    }
+
+    class func parseClass(aClass: AnyClass) -> ParsedClass {
+        // Swift mangling details found here: http://www.eswick.com/2014/06/inside-swift
+        // Swift class names look like _TFC9swifttest5Shape
+        // Format: _T{2 characters}{module length}{module}{class length}{class}
+
+        let originalName = NSStringFromClass(aClass)
+
+        if !isSwiftClassName(originalName) {
+            return ParsedClass(swift: false,
+                name: originalName,
+                moduleName: nil,
+                mangledName: nil)
+        }
+
+        let originalNameLength = originalName.utf16count
+        var cursor = 4
+        var substring = originalName[cursor..originalNameLength-cursor]
+
+        // Module
+        let moduleLength = substring.bridgeToObjectiveC().integerValue
+        let moduleLengthLength = "\(moduleLength)".utf16count
+        let moduleName = substring[moduleLengthLength..moduleLength]
+
+        // Update cursor and substring
+        cursor += moduleLengthLength + moduleName.utf16count
+        substring = originalName[cursor..originalNameLength-cursor]
+
+        // Class name
+        let classLength = substring.bridgeToObjectiveC().integerValue
+        let classLengthLength = "\(classLength)".utf16count
+        let className = substring[classLengthLength..classLength]
+
+        return ParsedClass(swift: true,
+            name: className,
+            moduleName: moduleName,
+            mangledName: originalName)
     }
 }
