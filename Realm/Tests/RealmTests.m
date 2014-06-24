@@ -86,7 +86,7 @@
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
-        [self notify:XCTAsyncTestCaseStatusSucceeded];
+        [self XCA_notify:XCTAsyncTestCaseStatusSucceeded];
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -97,7 +97,7 @@
         [realm commitWriteTransaction];
     });
     
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
+    [self XCA_waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
     [realm removeNotification:token];
 
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
@@ -110,7 +110,7 @@
      RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         notificationFired = YES;
-        [self notify:XCTAsyncTestCaseStatusSucceeded];
+        [self XCA_notify:XCTAsyncTestCaseStatusSucceeded];
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -124,7 +124,7 @@
     });
     
     // this should complete very fast before the timer
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
+    [self XCA_waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
     [realm removeNotification:token];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
