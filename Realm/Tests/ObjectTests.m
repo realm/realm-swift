@@ -123,6 +123,67 @@
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
 }
 
+-(void)testObjectInitWithObjectTypeArray
+{
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@[@"Peter", @30, @YES]];
+    
+    XCTAssertEqualObjects(obj1.name, @"Peter", @"Names should be equal");
+    XCTAssertEqual(obj1.age, 30, @"Age should be equal");
+    XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
+    
+    // Add to realm
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [EmployeeObject allObjects];
+    EmployeeObject *fromRealm = all.firstObject;
+    
+    XCTAssertEqualObjects(fromRealm.name, @"Peter", @"Names should be equal");
+    XCTAssertEqual(fromRealm.age, 30, @"Age should be equal");
+    XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
+    
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@"Peter", @30]]), @"To few arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@YES, @"Peter", @30]]), @"Wrong arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[]]), @"empty arguments");
+}
+
+-(void)testObjectInitWithObjectTypeDictionary
+{
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    
+    XCTAssertEqualObjects(obj1.name, @"Susi", @"Names should be equal");
+    XCTAssertEqual(obj1.age, 25, @"Age should be equal");
+    XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
+    
+    // Add to realm
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [EmployeeObject allObjects];
+    EmployeeObject *fromRealm = all.firstObject;
+    
+    XCTAssertEqualObjects(fromRealm.name, @"Susi", @"Names should be equal");
+    XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
+    XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
+    
+    
+    EmployeeObject *objDefault = [[EmployeeObject alloc] initWithObject:@{}];
+    XCTAssertNil(objDefault.name, @"nil string is default for String property");
+    XCTAssertEqual(objDefault.age, 0, @"0 is default for int property");
+    XCTAssertEqual(objDefault.hired, NO, @"No is default for Bool property");
+}
+
+-(void)testObjectInitWithObjectTypeOther
+{
+    XCTAssertThrows([[EmployeeObject alloc] initWithObject:@"StringObject"], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithObject:nil], @"Not an array or dictionary");
+}
+
+
 - (void)testObjectSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
