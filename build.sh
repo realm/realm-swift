@@ -16,7 +16,7 @@ PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
 
 if ! [ -z "${JENKINS_HOME}" ]; then
     XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
-    CODESIGN_PARAMS="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
+    CODESIGN_PARAMS="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
 fi
 
 usage() {
