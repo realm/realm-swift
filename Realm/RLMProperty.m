@@ -208,4 +208,17 @@
     return prop;
 }
 
+
+-(BOOL)isEqualToProperty:(RLMProperty *)prop {
+    return [_name isEqualTo:prop.name] && _type == prop.type &&
+           (_objectClassName == nil || [_objectClassName isEqualToString:prop.objectClassName]);
+}
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:RLMProperty.class]) {
+        return NO;
+    }
+    return [self isEqualToProperty:object];
+}
+
 @end

@@ -25,18 +25,6 @@
 @interface RLMProperty : NSObject
 
 /**
- Create an RLMProperty.
- 
- @param name            The property name.
- @param type            The property type.
- @param objectClassName The object class name of the type of object this property holds. This must be set for
-                        RLMPropertyTypeArray and RLMPropertyTypeObject properties.
- 
- @return A populated RLMProperty instance.
- */
-+ (instancetype)propertyWithName:(NSString *)name type:(RLMPropertyType)type objectClassName:(NSString *)objectClassName;
-
-/**
  Property name.
  */
 @property (nonatomic, readonly) NSString * name;
@@ -55,5 +43,10 @@
  Object class name - specify object types for RLMObject and RLMArray properties.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
+
+/**
+ Returns YES if property objects are equal
+ */
+-(BOOL)isEqualToProperty:(RLMProperty *)prop;
 
 @end

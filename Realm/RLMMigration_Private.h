@@ -25,4 +25,6 @@
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 
+- (void)migrateWithBlock:(RLMMigrationBlock)block;
+
 @end

@@ -20,8 +20,6 @@
 
 @class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigration, RLMNotificationToken;
 
-typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
-
 @interface RLMRealm : NSObject
 
 /**---------------------------------------------------------------------------------------
@@ -91,7 +89,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 
-#pragma mark -
+#pragma mark - Notifications
+
+typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**---------------------------------------------------------------------------------------
  *  @name Receiving Notification when a Realm Changes
@@ -127,7 +127,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
-#pragma mark -
+#pragma mark - Transactions
 
 /**---------------------------------------------------------------------------------------
  *  @name Writing to a Realm
@@ -169,7 +169,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
-#pragma mark -
+#pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------
  *  @name Adding and Removing Objects from a Realm
@@ -250,31 +250,28 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 
-#pragma mark -
+#pragma mark - Migrations
 
 /**
  Migration block used to migrate a Realm.
  
- In the migration block it is the implementer's responsibility to make the existing Schema
- in the Realm compatible with the current ObjectSchema defined in each object interface definition.
- 
- Any Schema which can be updated to match the current schema by adding new object classes and
- properties to existing classes can be considered compatible with the current Schema, and can
- be migrated automatically.
- 
- Schema changes involving the deletion of existing object classes or properties
- are not automatically compatible, and the missing objects and properties must be
- deleted manually in the migration block for the migration to succeed.
- 
+ You are required to supply a migration block when trying to open an RLMRealm which has an
+ on disk schema different from the schema defined in your object interfaces. When supplying a migration
+ block it is your responsibility to enumerate and update any objects which require alteration, and to
+ return the new schema version from the migration block.
+
+ @warning   Unsuccessful migrations will throw exceptions. This will happen in the following cases
+            - After applying a required migration, the schema version has not increased.
+            - A new property is added to an object and not initialized during the migration. You are 
+              required to either supply a default value or to manually populate added properties during
+              a migration.
+
  @param migration   RLMMigration object used to perform the migration. The migration object allows
- you to alter its Schema and to access objects in the Realm to populate added
- object classes and properties.
+ you to enumerate and alter any existing objects which require migration.
  
- @param oldSchemaVersion    The schema version of the Realm which requires migration.
+ @param oldSchemaVersion    The schema version of the RLMRealm being migrated.
  
- @return    Version number for the Realm after completing the migration. This version
- number is accessible in future migrations through the <code>schemaVersion</code>
- property on the RLMMigration object.
+ @return    Schema version number for the RLMRealm after completing the migration.
  */
 typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 

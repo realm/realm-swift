@@ -31,7 +31,6 @@
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic) RLMSchema *schema;
-@property (nonatomic) NSUInteger schemaVersion;
 
 // private constructor
 + (instancetype)realmWithPath:(NSString *)path

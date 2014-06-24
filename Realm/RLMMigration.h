@@ -20,6 +20,9 @@
 
 @class RLMSchema;
 @class RLMArray;
+@class RLMObject;
+
+typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObject);
 
 /**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
@@ -35,31 +38,33 @@
 @interface RLMMigration : NSObject
 
 /**
- Get the current RLMSchema for the migration. This object provides the ability to remove/rename object 
- classes. Each RLMObjectSchema object exposed by this object provide the ability to remove/rename/add
- properties to existing object types.
-
- @see       RLMObjectSchema
+ Get the new RLMSchema for the migration. This is the schema which describes the RLMRealm before the
+ migration is applied.
  */
-@property (nonatomic, readonly) RLMSchema *schema;
+@property (nonatomic, readonly) RLMSchema *oldSchema;
+
+/**
+ Get the new RLMSchema for the migration. This is the schema which describes the RLMRealm after applying
+ a migration.
+ */
+@property (nonatomic, readonly) RLMSchema *newSchema;
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Getting Objects during a Migration
+ *  @name Altering Objects during a Migration
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Get all objects of a given type in this Realm. 
+ Enumerates objects of a given type in this Realm, providing both the old and new versions of each object.
+ Objects properties can be accessed using keyed subscripting.
  
  @param className   The name of the RLMObject subclass to retrieve on eg. <code>MyClass.className</code>.
  
  @warning   All objects returned are of a type specific to the current migration and should not be casted
             to className. Instead you should access them as RLMObjects and use keyed subscripting to access
             properties.
- 
- @return    An RLMArray of all objects in this Realm of the given type.
  */
-- (RLMArray *)allObjects:(NSString *)className;
+- (void)enumerateObjectsWithClass:(NSString *)className block:(RLMObjectMigrationBlock)block;
 
 @end
 

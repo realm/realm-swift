@@ -516,17 +516,7 @@ static NSArray *s_objectDescriptors = nil;
     if (error) {
         return;
     }
-    
-    // start write transaction
-    [migration.realm beginWriteTransaction];
-    
-    // apply block and set new schema version
-    NSInteger oldVersion = RLMRealmSchemaVersion(migration.realm);
-    NSUInteger newVersion = block(migration, oldVersion);
-    RLMRealmSetSchemaVersion(migration.realm, newVersion);
-   
-    // end transaction
-    [migration.realm commitWriteTransaction];
+    [migration migrateWithBlock:block];
 }
 
 
