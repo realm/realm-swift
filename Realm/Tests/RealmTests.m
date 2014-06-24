@@ -46,6 +46,14 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
+- (void)testRealmPath
+{
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    XCTAssertEqualObjects(defaultRealm.path, RLMDefaultRealmPath(), @"Default path");
+    RLMRealm *testRealm = [self realmWithTestPath];
+    XCTAssertEqualObjects(testRealm.path, RLMTestRealmPath(), @"Test path");
+}
+
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
