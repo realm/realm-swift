@@ -72,6 +72,15 @@ static NSMutableDictionary *s_mangledClassMap;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
+#ifdef REALM_SWIFT
+                // Convert Swift properties to Objective-C properties
+                // to enable object schema generation and Realm custom accessors
+                ParsedClass *parsedClass = [RLMSwiftSupport parseClass:classes[i]];
+                if (parsedClass.swift) {
+                    [RLMSwiftSupport convertSwiftPropertiesToObjC:classes[i]];
+                    RLMSchema.mangledClassMap[parsedClass.name] = parsedClass.mangledName;
+                }
+#endif
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];

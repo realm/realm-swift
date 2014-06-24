@@ -49,17 +49,6 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
-    NSString *className = NSStringFromClass(objectClass);
-
-#ifdef REALM_SWIFT
-    ParsedClass *parsedClass = [RLMSwiftSupport parseClass:objectClass];
-    if (parsedClass.swift) {
-        [RLMSwiftSupport convertSwiftPropertiesToObjC:objectClass];
-        className = parsedClass.name;
-        RLMSchema.mangledClassMap[parsedClass.name] = parsedClass.mangledName;
-    }
-#endif
-    
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -90,7 +79,11 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = className;
+#ifdef REALM_SWIFT
+    schema.className = [RLMSwiftSupport parseClass:objectClass].name;
+#else
+    schema.className = NSStringFromClass(objectClass);
+#endif
     return schema;
 }
 

@@ -33,15 +33,25 @@
 
 // standalone init
 -(instancetype)init {
-    RLMSchema *sharedSchema = RLMSchema.sharedSchema;
-    self = [self initWithRealm:nil schema:sharedSchema[self.class.className] defaultValues:YES];
-    
-    // set standalone accessor class
-    if (sharedSchema) {
+    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+
+    // will only be nil when creating Swift objects for introspection at +initialize time
+    if (self.RLMObject_schema) {
+        // set standalone accessor class
         object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
     }
     
     return self;
+}
+
+
+-(instancetype)initWithObject:(id)values {
+    id obj = [self init];
+    RLMObjectSchema *schema = RLMSchema.sharedSchema[self.class.className];
+    
+    RLMPopulateObjectWithValues(schema, values, obj);
+    
+    return obj;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm
@@ -67,11 +77,19 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)values {
     id obj = [[self alloc] init];
     
-    RLMObjectSchema *desc = realm.schema[[self className]];
-    NSArray *properties = desc.properties;
+    RLMObjectSchema *schema = realm.schema[[self className]];
     
-    // FIXME - this can be optimized by inserting directly into the table
-    //  after validation, rather than populating the object first
+    RLMPopulateObjectWithValues(schema, values, obj);
+    
+    // insert populated object into store
+    RLMAddObjectToRealm(obj, realm);
+
+    return obj;
+}
+
+void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
+    NSArray *properties = schema.properties;
+    
     if ([values isKindOfClass:NSDictionary.class]) {
         for (RLMProperty * property in properties) {
             id value = values[property.name];
@@ -106,12 +124,10 @@
                 @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
             }
         }
+    } else {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Values must be provided either as an array or dictionary" userInfo:nil];
     }
     
-    // insert populated object into store
-    RLMAddObjectToRealm(obj, realm);
-
-    return obj;
 }
 
 // default attributes for property implementation

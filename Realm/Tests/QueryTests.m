@@ -83,6 +83,36 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
+
+-(void)testQueryBetween
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    NSDate *date3 = [date2 dateByAddingTimeInterval:1];
+    NSDate *date33 = [date3 dateByAddingTimeInterval:1];
+    
+    StringObject *stringObj = [StringObject new];
+    stringObj.stringCol = @"string";
+    
+    [realm beginWriteTransaction];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 52");
+    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)4, @"Should equal 4");
+    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+}
+
 - (void)testDefaultRealmQuery
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
