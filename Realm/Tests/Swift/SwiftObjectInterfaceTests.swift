@@ -18,6 +18,14 @@
 
 import XCTest
 
+class SwiftNoDefaultObject: RLMObject {
+    var stringCol: String
+    
+    init(stringCol: String) {
+        self.stringCol = stringCol
+    }
+}
+
 class SwiftObject: RLMObject {
     var boolCol = false
     var intCol = 123
@@ -102,5 +110,18 @@ class SwiftObjectInterfaceTests: RLMTestCase {
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqualObjects(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
+    }
+    
+    func testSwiftNoDefaultObject() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        let obj = SwiftNoDefaultObject(stringCol: "a")
+        realm.addObject(obj)
+        realm.commitWriteTransaction()
+        
+        let firstObj = realm.allObjects(SwiftNoDefaultObject.className()).firstObject() as SwiftNoDefaultObject
+        
+        XCTAssertNotNil(firstObj, "firstObj shouldn't be nil")
+        XCTAssertEqualObjects(firstObj.stringCol, "a", "firstObj.stringCol should be a")
     }
 }
