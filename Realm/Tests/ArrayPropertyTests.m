@@ -28,6 +28,14 @@
 @implementation ArrayPropertyObject
 @end
 
+
+@interface IntArrayPropertyObject : RLMObject
+@property RLMArray<StringObject> *array;
+@end
+
+@implementation IntArrayPropertyObject
+@end
+
 #pragma mark - Tests
 
 @interface ArrayPropertyTests : RLMTestCase
@@ -62,6 +70,9 @@
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
+    
+    // Test JSON output
+    XCTAssertThrows([array.array JSONString], @"Not yet implemented");
 }
 
 
@@ -122,6 +133,27 @@
     XCTAssertEqual(array.array.count, (NSUInteger)2, @"Should have two elements in array");
     XCTAssertEqualObjects([array.array[0] stringCol], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([array.array[1] stringCol], @"a", @"Second element should have property value 'a'");
+    
+    IntArrayPropertyObject *intArray = [[IntArrayPropertyObject alloc] init];
+    IntObject *intObj = [[IntObject alloc] init];
+    intObj.intCol = 1;
+    [intArray.array addObject:intObj];
+    
+    XCTAssertThrows([intArray.array sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    
+    XCTAssertThrows([intArray.array objectsWithPredicateFormat:@"intCol == 1"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows(([intArray.array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
+    
+    XCTAssertThrows([intArray.array indexOfObjectWithPredicateFormat:@"intCol == 1"], @"Not yet implemented");
+    XCTAssertThrows(([intArray.array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
+
+    XCTAssertEqual([intArray.array indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
+    
+    XCTAssertThrows([intArray.array JSONString], @"Not yet implemented");
 }
 
 @end

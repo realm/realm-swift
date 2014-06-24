@@ -14,24 +14,31 @@ set -o pipefail
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
 
+if ! [ -z "${JENKINS_HOME}" ]; then
+    XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
+    CODESIGN_PARAMS="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
+fi
+
 usage() {
 cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  download-core:         downloads core library (binary version)
-  clean [xcmode]:        clean up/remove all generated files
-  build [xcmode]:        builds iOS and OS X frameworks with release configuration
-  test-ios [xcmode]:     tests iOS framework with release configuration
-  test-osx [xcmode]:     tests OSX framework with release configuration
-  test [xcmode]:         tests iOS and OS X frameworks with release configuration
-  test-debug [xcmode]:   tests iOS and OS X frameworks with debug configuration
-  test-all [xcmode]:     tests iOS and OS X frameworks with debug and release configurations
-  examples [xcmode]:     builds all examples in examples/
-  verify [xcmode]:       cleans, removes docs/output/, then runs docs, test-all and examples
-  docs:                  builds docs in docs/output
-  get-version:           get the current version
-  set-version version:   set the version
+  download-core:           downloads core library (binary version)
+  clean [xcmode]:          clean up/remove all generated files
+  build [xcmode]:          builds iOS and OS X frameworks with release configuration
+  build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
+  test-ios [xcmode]:       tests iOS framework with release configuration
+  test-osx [xcmode]:       tests OSX framework with release configuration
+  test [xcmode]:           tests iOS and OS X frameworks with release configuration
+  test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
+  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations
+  examples [xcmode]:       builds all examples in examples/ in release configuration
+  examples-debug [xcmode]: builds all examples in examples/ in debug configuration
+  verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
+  docs:                    builds docs in docs/output
+  get-version:             get the current version
+  set-version version:     set the version
 
 argument:
   xcmode:  xcodebuild (default), xcpretty or xctool
@@ -47,7 +54,7 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | xcpretty -c
+        xcodebuild $1 | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
             exit 1
         fi
@@ -126,6 +133,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "build-debug")
+        sh build.sh ios-debug "$XCMODE" || exit 1
+        sh build.sh osx-debug "$XCMODE" || exit 1
+        exit 0
+        ;;
+
     "ios")
         xcrealm "-scheme iOS -configuration Release"
         exit 0
@@ -133,6 +146,16 @@ case "$COMMAND" in
 
     "osx")
         xcrealm "-scheme OSX -configuration Release"
+        exit 0
+        ;;
+
+    "ios-debug")
+        xcrealm "-scheme iOS -configuration Debug"
+        exit 0
+        ;;
+
+    "osx-debug")
+        xcrealm "-scheme OSX -configuration Debug"
         exit 0
         ;;
 
@@ -197,9 +220,17 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build"
-        xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample clean build"
-        xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build"
+        xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        exit 0
+        ;;
+
+    "examples-debug")
+        cd examples
+        xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
