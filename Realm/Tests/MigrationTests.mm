@@ -8,6 +8,20 @@
 
 #import "RLMTestCase.h"
 
+// private realm methods
+@interface RLMRealm ()
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
+                        error:(NSError **)outError;
+- (RLMSchema *)schema;
+@end
+
+@interface MigrationObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
+@end
 
 @interface MigrationTests : RLMTestCase
 

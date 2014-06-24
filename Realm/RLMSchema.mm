@@ -31,9 +31,7 @@ const size_t c_versionColumnIndex = 0;
 
 // RLMSchema private properties
 @interface RLMSchema ()
-@property (nonatomic, readwrite) NSArray *objectSchema;
 @property (nonatomic, readwrite) NSMutableDictionary *objectSchemaByName;
-@property (nonatomic, readwrite) NSMutableDictionary *objectClassByName;
 @end
 
 static RLMSchema *s_sharedSchema;
@@ -48,19 +46,25 @@ static RLMSchema *s_sharedSchema;
     return _objectSchemaByName[className];
 }
 
-- (Class)objectClassForClassName:(NSString *)className {
-    return _objectClassByName[className];
-}
-
 - (id)init {
     self = [super init];
     if (self) {
         // setup name mapping for object tables
         _tableNamesForClass = [NSMutableDictionary dictionary];
-        _objectClassByName = [NSMutableDictionary dictionary];
         _objectSchemaByName = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (void)setObjectSchema:(NSArray *)objectSchema {
+    _objectSchema = objectSchema;
+    
+    // update mappings
+    for (RLMObjectSchema *object in objectSchema) {
+        // set table name and mappings
+        _tableNamesForClass[object.className] = RLMTableNameForClassName(object.className);
+        [(NSMutableDictionary *)_objectSchemaByName setObject:object forKey:object.className];
+    }
 }
 
 + (void)initialize {
@@ -78,13 +82,8 @@ static RLMSchema *s_sharedSchema;
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
+                object.objectClass = classes[i];
                 [schemaArray addObject:object];
-                
-                // set table name and mappings
-                NSString *tableName = RLMTableNameForClassName(object.className);
-                schema.tableNamesForClass[object.className] = tableName;
-                schema.objectClassByName[object.className] = classes[i];
-                [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
             }
         }
         free(classes);
@@ -115,14 +114,8 @@ static RLMSchema *s_sharedSchema;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
+            object.objectClass = RLMObject.class;
             [schemaArray addObject:object];
-
-            // add object and set mappings
-            schema.tableNamesForClass[object.className] = tableName;
-            [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
-
-            // use vanilla RLMObject in class mapping
-            schema.objectClassByName[object.className] = RLMObject.class;
         }
     }
     

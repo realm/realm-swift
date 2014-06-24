@@ -58,6 +58,7 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
 //
 @class RLMRealm;
 @interface RLMSchema ()
+@property (nonatomic, readwrite) NSArray *objectSchema;
 
 // mapping of className to tableName
 @property (nonatomic, readonly) NSMutableDictionary *tableNamesForClass;
@@ -67,8 +68,5 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
 
 // schema based on tables in a Realm
 +(instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
-
-// get object class to use for a given class name
--(Class)objectClassForClassName:(NSString *)className;
 
 @end
