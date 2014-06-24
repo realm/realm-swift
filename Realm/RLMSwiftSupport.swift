@@ -28,7 +28,7 @@ extension RLMArray: Sequence {
             } else {
                 return self[i++] as? RLMObject
             }
-            })
+        })
     }
 }
 
@@ -81,5 +81,9 @@ extension RLMArray: Sequence {
             println("Other type")
             return ""
         }
+    }
+
+    class func isSwiftClassName(className: NSString) -> Bool {
+        return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
     }
 }

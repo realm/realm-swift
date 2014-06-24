@@ -24,6 +24,11 @@
 
 #import <objc/runtime.h>
 
+#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
+#define REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#endif
+
 // RLMSchema private properties
 @interface RLMSchema ()
 @property (nonatomic, readwrite) NSArray *objectSchema;
@@ -71,6 +76,13 @@ static RLMSchema *s_sharedSchema;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
+#ifdef REALM_SWIFT
+                // Convert Swift properties to Objective-C properties
+                // to enable object schema generation and Realm custom accessors
+                if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(classes[i])]) {
+                    [RLMSwiftSupport convertSwiftPropertiesToObjC:classes[i]];
+                }
+#endif
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];

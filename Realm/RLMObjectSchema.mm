@@ -23,10 +23,6 @@
 #import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#import <Realm/Realm-Swift.h>
-#endif
-
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
@@ -53,14 +49,6 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
-    NSString *className = NSStringFromClass(objectClass);
-
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-    if ([className rangeOfString:@"_T"].location == 0) {
-        [RLMSwiftSupport convertSwiftPropertiesToObjC:objectClass];
-    }
-#endif
-    
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -91,7 +79,7 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = className;
+    schema.className = NSStringFromClass(objectClass);
     return schema;
 }
 
