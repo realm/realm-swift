@@ -29,41 +29,6 @@
 			remoteGlobalIDString = 4DE0B126194747F70092154B;
 			remoteInfo = RealmSimpleExample;
 		};
-		4DE0B161194748060092154B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C4145E191DE49600F858D9;
-			remoteInfo = "OSX Framework";
-		};
-		4DE0B163194748060092154B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C4146E191DE49600F858D9;
-			remoteInfo = "OSX Tests";
-		};
-		4DE0B165194748060092154B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C415051921B0C300F858D9;
-			remoteInfo = "iOS Library";
-		};
-		4DE0B167194748060092154B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C415121921B0C400F858D9;
-			remoteInfo = "iOS Tests";
-		};
-		4DE0B1691947481D0092154B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -80,7 +45,6 @@
 		4DE0B13C194747F70092154B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DE0B142194747F70092154B /* RealmSimpleExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmSimpleExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE0B143194747F70092154B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4DE0B159194748060092154B /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		4DE0B16B194748560092154B /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		4DE0B18219486DD60092154B /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -114,7 +78,6 @@
 		4DE0B11E194747F70092154B = {
 			isa = PBXGroup;
 			children = (
-				4DE0B159194748060092154B /* Realm.xcodeproj */,
 				4DE0B130194747F70092154B /* RealmSimpleExample */,
 				4DE0B129194747F70092154B /* Frameworks */,
 				4DE0B128194747F70092154B /* Products */,
@@ -165,17 +128,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		4DE0B15A194748060092154B /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				4DE0B162194748060092154B /* Realm.framework */,
-				4DE0B164194748060092154B /* OSX Tests.xctest */,
-				4DE0B166194748060092154B /* libRealm.a */,
-				4DE0B168194748060092154B /* iOS Tests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -190,7 +142,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				4DE0B16A1947481D0092154B /* PBXTargetDependency */,
 			);
 			name = RealmSimpleExample;
 			productName = RealmSimpleExample;
@@ -239,12 +190,6 @@
 			mainGroup = 4DE0B11E194747F70092154B;
 			productRefGroup = 4DE0B128194747F70092154B /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 4DE0B15A194748060092154B /* Products */;
-					ProjectRef = 4DE0B159194748060092154B /* Realm.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				4DE0B126194747F70092154B /* RealmSimpleExample */,
@@ -252,37 +197,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		4DE0B162194748060092154B /* Realm.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Realm.framework;
-			remoteRef = 4DE0B161194748060092154B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		4DE0B164194748060092154B /* OSX Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "OSX Tests.xctest";
-			remoteRef = 4DE0B163194748060092154B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		4DE0B166194748060092154B /* libRealm.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRealm.a;
-			remoteRef = 4DE0B165194748060092154B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		4DE0B168194748060092154B /* iOS Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "iOS Tests.xctest";
-			remoteRef = 4DE0B167194748060092154B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4DE0B125194747F70092154B /* Resources */ = {
@@ -327,11 +241,6 @@
 			isa = PBXTargetDependency;
 			target = 4DE0B126194747F70092154B /* RealmSimpleExample */;
 			targetProxy = 4DE0B147194747F70092154B /* PBXContainerItemProxy */;
-		};
-		4DE0B16A1947481D0092154B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = 4DE0B1691947481D0092154B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -423,8 +332,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
 					"${SRCROOT}/../../build/${CONFIGURATION}",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";
@@ -441,8 +350,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
 					"${SRCROOT}/../../build/${CONFIGURATION}",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";
