@@ -28,6 +28,14 @@
 @implementation ArrayPropertyObject
 @end
 
+
+@interface IntArrayPropertyObject : RLMObject
+@property RLMArray<StringObject> *array;
+@end
+
+@implementation IntArrayPropertyObject
+@end
+
 #pragma mark - Tests
 
 @interface ArrayPropertyTests : RLMTestCase
@@ -122,6 +130,16 @@
     XCTAssertEqual(array.array.count, (NSUInteger)2, @"Should have two elements in array");
     XCTAssertEqualObjects([array.array[0] stringCol], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([array.array[1] stringCol], @"a", @"Second element should have property value 'a'");
+    
+    IntArrayPropertyObject *intArray = [[IntArrayPropertyObject alloc] init];
+    IntObject *intObj = [[IntObject alloc] init];
+    intObj.intCol = 1;
+    [intArray.array addObject:intObj];
+    
+    XCTAssertThrows([intArray.array sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.array maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
 }
 
 @end
