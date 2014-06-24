@@ -114,7 +114,7 @@
     XCTAssertEqualObjects([array.array[0] stringCol], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([array.array[1] stringCol], @"a", @"Second element should have property value 'a'");
     
-    IntArrayPropertyObject *intArray = [[IntArrayPropertyObject alloc] init];
+    ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
     [intArray.array addObject:intObj];
