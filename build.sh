@@ -14,6 +14,10 @@ set -o pipefail
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
 
+if ! [ -z "${JENKINS_HOME}" ]; then
+    XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
+fi
+
 usage() {
 cat <<EOF
 Usage: sh $0 command [argument]
@@ -44,7 +48,7 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | xcpretty -c
+        xcodebuild $1 | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
             exit 1
         fi
