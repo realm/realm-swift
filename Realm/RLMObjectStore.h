@@ -38,26 +38,8 @@ void RLMVerifyAndCreateTables(RLMRealm *realm);
 // verify that columns match - update objectSchema column indexes to match table
 void RLMVerifyAndAlignTableColumns(tightdb::Table *table, RLMObjectSchema *targetSchema);
 
-// create tables described in targetSchema missing from the given realm
-// returns if tables were added
 // NOTE: must be called from within write transaction
-bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyExisting);
-
-// FIXME - implement this and make use it to remove deleted object classes
-// removes tables in realm not described in targetSchema
-// returns if tables were removed
-// NOTE: must be called from within write transaction
-// bool RLMRemoveOldTables(RLMRealm *realm, RLMSchema *targetSchema);
-
-// add missing columns to objects described in targetSchema
-// returns if columns were added
-// NOTE: must be called from within write transaction
-bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyMatching);
-
-// remove old columns in the realm not in targetSchema
-// returns if columns were removed
-// NOTE: must be called from within write transaction
-bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema);
+bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema);
 
 
 //

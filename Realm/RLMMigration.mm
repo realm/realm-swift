@@ -29,7 +29,19 @@
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error {
     RLMMigration *migration = [RLMMigration new];
-    migration.realm = [RLMRealm realmWithPath:path readOnly:NO dynamic:YES error:error];
+    
+    // create rw realm to migrate with current on disk table
+    migration->_realm = [RLMRealm realmWithPath:path readOnly:NO dynamic:YES schema:nil error:error];
+    if (error && *error) {
+        return nil;
+    }
+    
+    // create read only realm used during migration with current on disk schema
+    migration->_oldRealm = [RLMRealm realmWithPath:path readOnly:YES dynamic:YES schema:nil error:error];
+    if (error && *error) {
+        return nil;
+    }
+    
     migration->_newSchema = [RLMSchema sharedSchema];
     return migration;
 }
@@ -48,12 +60,9 @@
 
 - (void)enumerateObjectsWithClass:(NSString *)className block:(RLMObjectMigrationBlock)block {
     // get all objects
-    RLMArray *objects = [_realm allObjects:className];
-    for (RLMObject *oldObj in objects) {
-        // create copy using output schema
-        RLMObject *newObj = [[RLMObject alloc] initWithRealm:_realm schema:[self newSchema][className] defaultValues:NO];
-        newObj->_row = oldObj->_row;
-        block(oldObj, newObj);
+    RLMArray *objects = [_realm allObjects:className], *oldObjects = [_oldRealm allObjects:className];
+    for (NSUInteger o = 0; o < objects.count; o++) {
+        block(oldObjects[o], objects[0]);
     }
 }
 
@@ -61,19 +70,13 @@
     // start write transaction
     [_realm beginWriteTransaction];
 
-    // add new tables
-    bool changed = RLMCreateMissingTables(_realm, self.newSchema, NO);
-
-    // add new columns before migration
-    changed |= RLMAddNewColumnsToSchema(_realm, self.newSchema, NO);
+    // add new tables/columns for the current shared schema
+    bool changed = RLMUpdateTables(_realm, [RLMSchema sharedSchema]);
 
     // apply block and set new schema version
     NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
     NSUInteger newVersion = block(self, oldVersion);
     RLMRealmSetSchemaVersion(_realm, newVersion);
-
-    // remove old columns
-    changed |= RLMRemoveOldColumnsFromSchema(_realm, self.newSchema);
 
     // make sure a new version was provided if changes were made
     if (changed && oldVersion >= newVersion) {

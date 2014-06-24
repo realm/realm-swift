@@ -21,6 +21,7 @@
 
 @interface RLMMigration ()
 
+@property (nonatomic, strong) RLMRealm *oldRealm;
 @property (nonatomic, strong) RLMRealm *realm;
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;

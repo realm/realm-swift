@@ -132,10 +132,6 @@ bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verif
     return changed;
 }
 
-// NOTE: must be called from within write transaction
-bool RLMRemoveOldTables(RLMRealm *realm, RLMSchema *targetSchema);
-
-
 // add missing columns to objects described in targetSchema
 // NOTE: must be called from within write transaction
 bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyMatching) {
@@ -180,6 +176,32 @@ bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema) {
         }
     }
     return removed;
+}
+
+bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
+    // first pass create missing tables and verify existing
+    bool changed = RLMCreateMissingTables(realm, targetSchema, NO);
+    
+    // second pass add columns to empty tables
+    changed |= RLMAddNewColumnsToSchema(realm, targetSchema, NO);
+    
+    // remove expired columns
+    changed |= RLMRemoveOldColumnsFromSchema(realm, targetSchema);
+    
+    // FIXME - remove deleted objects
+    
+    // verify
+    // FIXME - remove once we are sure the rest of the code actually works properly
+    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+        RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
+    }
+    
+    // set the new schema on the realm
+    realm.schema = targetSchema;
+    
+    return changed;
 }
 
 // verify and create new tables without migration - throws if any existing

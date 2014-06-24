@@ -26,6 +26,7 @@
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
 - (RLMSchema *)schema;
 @end
@@ -59,7 +60,11 @@
         [realm commitWriteTransaction];
     }
     
-    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES error:nil];
+    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath()
+                                       readOnly:YES
+                                        dynamic:YES
+                                         schema:nil
+                                          error:nil];
     XCTAssertNotNil(dyrealm, @"realm should not be nil");
     XCTAssertEqual([dyrealm class], [RLMRealm class], @"realm should be of class RLMDynamicRealm");
     
@@ -88,7 +93,7 @@
     }
     
     // verify properties
-    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES error:nil];
+    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES schema:nil error:nil];
     RLMArray *array = [dyrealm allObjects:@"DynamicObject"];
     
     RLMObject *o1 = array[0], *o2 = array[1];
@@ -114,7 +119,7 @@
     }
     
     // verify properties
-    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES error:nil];
+    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:nil error:nil];
     RLMArray *array = [dyrealm allObjects:AllTypesObject.className];
     XCTAssertEqual(array.count, (NSUInteger)2, @"Should have 2 objects");
     

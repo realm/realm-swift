@@ -36,5 +36,6 @@
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
 @end

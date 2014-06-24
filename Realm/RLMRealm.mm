@@ -155,6 +155,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 @synthesize inWriteTransaction = _inWriteTransaction;
+@synthesize group = _group;
 
 + (BOOL)isCoreDebug {
     return tightdb::Version::has_feature(tightdb::feature_Debug);
@@ -241,12 +242,13 @@ static NSArray *s_objectDescriptors = nil;
                      readOnly:(BOOL)readonly
                         error:(NSError **)outError
 {
-    return [self realmWithPath:path readOnly:readonly dynamic:NO error:outError];
+    return [self realmWithPath:path readOnly:readonly dynamic:NO schema:nil error:outError];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
 {
     NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
@@ -319,18 +321,22 @@ static NSArray *s_objectDescriptors = nil;
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
     realm->_group = &group;
     
-    if (dynamic) {
-        // for dynamic realms, get schema from stored tables
+    // set schema
+    if (customSchema) {
+        realm->_schema = customSchema;
+    }
+    else if (dynamic) {
         realm->_schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
-        // set the schema for this realm
-        realm.schema = [RLMSchema sharedSchema];
+        realm->_schema = [RLMSchema sharedSchema];
+    }
 
-        // initialize object store for this realm
-        RLMVerifyAndCreateTables(realm);
-        
-        // cache main thread realm at this path
+    // initialize object store for this realm
+    RLMVerifyAndCreateTables(realm);
+    
+    // cache realm at this path if using a vanilla realm
+    if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
     }
     
@@ -471,10 +477,6 @@ static NSArray *s_objectDescriptors = nil;
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
-}
-
-- (tightdb::Group *)group {
-    return _group;
 }
 
 - (void)addObject:(RLMObject *)object {
