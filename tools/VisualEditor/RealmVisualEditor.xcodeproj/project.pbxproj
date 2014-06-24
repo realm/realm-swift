@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		840F97C0192B7DCE006B591E /* RLMDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F97BF192B7DCE006B591E /* RLMDocument.m */; };
+		84446534195891AA00CEEA5B /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84446533195891AA00CEEA5B /* RLMViewController.m */; };
 		844C34DF19473D9D0027E902 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C34DE19473D9D0027E902 /* libc++.dylib */; };
 		844C34E3194859080027E902 /* TestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E2194859080027E902 /* TestClasses.m */; };
 		844C34E619487C210027E902 /* RLMArray+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E519487C210027E902 /* RLMArray+Extension.m */; };
@@ -102,6 +103,8 @@
 /* Begin PBXFileReference section */
 		840F97BE192B7DCE006B591E /* RLMDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDocument.h; path = Classes/RLMDocument.h; sourceTree = "<group>"; };
 		840F97BF192B7DCE006B591E /* RLMDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDocument.m; path = Classes/RLMDocument.m; sourceTree = "<group>"; };
+		84446532195891AA00CEEA5B /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewController.h; path = Classes/RLMViewController.h; sourceTree = "<group>"; };
+		84446533195891AA00CEEA5B /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMViewController.m; path = Classes/RLMViewController.m; sourceTree = "<group>"; };
 		844C34DE19473D9D0027E902 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		844C34E1194859080027E902 /* TestClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestClasses.h; path = Classes/TestClasses.h; sourceTree = "<group>"; };
 		844C34E2194859080027E902 /* TestClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestClasses.m; path = Classes/TestClasses.m; sourceTree = "<group>"; };
@@ -229,6 +232,8 @@
 				8474E2B319544D8000BCA755 /* RLMClassOutlineViewController.m */,
 				8474E2BB195452BE00BCA755 /* RLMInstanceTableViewController.h */,
 				8474E2BC195452BE00BCA755 /* RLMInstanceTableViewController.m */,
+				84446532195891AA00CEEA5B /* RLMViewController.h */,
+				84446533195891AA00CEEA5B /* RLMViewController.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -498,6 +503,7 @@
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				844C34E619487C210027E902 /* RLMArray+Extension.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
+				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClazzProperty.m in Sources */,
 				84D7990B19388E8900FC76A0 /* RLMClazzNode.m in Sources */,

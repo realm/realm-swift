@@ -181,12 +181,14 @@
             <connections>
                 <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="inH-pi-Hwr"/>
                 <outlet property="parentWindowController" destination="-2" id="UwQ-DI-ttX"/>
+                <outlet property="view" destination="IMi-6Y-gQF" id="XQa-PV-Ysa"/>
             </connections>
         </customObject>
         <customObject id="X01-Pz-1Ve" customClass="RLMInstanceTableViewController">
             <connections>
                 <outlet property="instancesTableView" destination="enp-HN-e6b" id="YrN-eD-dlY"/>
                 <outlet property="parentWindowController" destination="-2" id="zrl-bi-GWW"/>
+                <outlet property="view" destination="enp-HN-e6b" id="ve8-y2-M62"/>
             </connections>
         </customObject>
     </objects>

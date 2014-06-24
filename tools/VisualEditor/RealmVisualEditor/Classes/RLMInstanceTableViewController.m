@@ -26,7 +26,7 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.instancesTableView) {
-        return self.parentWindowController. modelDocument.selectedObjectNode.instanceCount;
+        return self.parentWindowController.selectedObjectNode.instanceCount;
     }
     
     return 0;
@@ -39,9 +39,9 @@
         NSUInteger columnIndex = [self.instancesTableView.tableColumns
                                   indexOfObject:tableColumn];
         
-        RLMClazzProperty *clazzProperty = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *clazzProperty = self.parentWindowController.selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = clazzProperty.name;
-        RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
+        RLMObject *selectedInstance = [self.parentWindowController.selectedObjectNode instanceAtIndex:rowIndex];
         NSObject *propertyValue = selectedInstance[propertyName];
         
         switch (clazzProperty.type) {
@@ -96,10 +96,10 @@
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedObjectNode.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
-        RLMObject *selectedObject = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:rowIndex];
+        RLMObject *selectedObject = [self.parentWindowController.selectedObjectNode instanceAtIndex:rowIndex];
         
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         
@@ -161,7 +161,7 @@
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedObjectNode.propertyColumns[columnIndex];
         
         switch (propertyNode.type) {
             case RLMPropertyTypeBool:
@@ -208,9 +208,9 @@
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedObjectNode.propertyColumns[columnIndex];
         
-        RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
+        RLMObject *selectedInstance = [self.parentWindowController.selectedObjectNode instanceAtIndex:row];
         NSObject *propertyValue = selectedInstance[propertyNode.name];
         
         switch (propertyNode.type) {
@@ -288,7 +288,7 @@
 {
     if (tableView == self.instancesTableView) {
         NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedObjectNode.propertyColumns[columnIndex];
         
         if (propertyNode.type == RLMPropertyTypeDate) {
             // Create a frame which covers the cell to be edited
@@ -307,7 +307,7 @@
             datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
             datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
             
-            RLMObject *selectedObject = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedObject = [self.parentWindowController.selectedObjectNode instanceAtIndex:row];
             NSString *propertyName = propertyNode.name;
             
             datepicker.dateValue = selectedObject[propertyName];
@@ -348,10 +348,10 @@
     NSInteger row = self.instancesTableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMClazzProperty *propertyNode = self.parentWindowController.modelDocument.selectedObjectNode.propertyColumns[column];
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedObjectNode.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
-            RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedInstance = [self.parentWindowController.selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
@@ -360,11 +360,7 @@
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        NSInteger index = [self.parentWindowController.outlineViewController.classesOutlineView rowForItem:clazzNode];
-                        
-                        [self.parentWindowController.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                                                   byExtendingSelection:NO];
-                        
+                        [self.parentWindowController classSelectionWasChangedTo:clazzNode];
                         [self updateTableView];
                         
                         // Right now we just fetches the object index from the proxy object.
@@ -390,27 +386,14 @@
             }
         }
         else if (propertyNode.type == RLMPropertyTypeArray) {
-            RLMObject *selectedInstance = [self.parentWindowController.modelDocument.selectedObjectNode instanceAtIndex:row];
+            RLMObject *selectedInstance = [self.parentWindowController.selectedObjectNode instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
-                
-                RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.parentWindowController.modelDocument.selectedObjectNode;
-                
-                RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:linkedArray
-                                                                  fromProperty:propertyNode.property
-                                                                        object:selectedInstance];
-/*
-                [self.outlineViewController.classesOutlineView reloadData];
-                
-                [self.outlineViewController.classesOutlineView expandItem:selectedClassNode];
-                NSInteger index = [self.outlineViewController.classesOutlineView rowForItem:arrayNode];
-                if (index != NSNotFound) {
-                    [self.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                                               byExtendingSelection:NO];
-                }
-*/                
+
+                [self.parentWindowController addArray:linkedArray
+                                         fromProperty:propertyNode.property object:selectedInstance];                
             }
         }
     }
@@ -428,7 +411,7 @@
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
 {
-    self.parentWindowController.modelDocument.selectedObjectNode = outlineNode;
+    self.parentWindowController.selectedObjectNode = outlineNode;
     
     // How many properties does the clazz contains?
     NSArray *columns = outlineNode.propertyColumns;

@@ -11,7 +11,33 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMRealmOutlineNode.h"
 
+@interface RLMClassOutlineViewController ()
+
+@property (nonatomic, strong) IBOutlet NSOutlineView *classesOutlineView;
+
+@end
+
 @implementation RLMClassOutlineViewController
+
+#pragma mark - RLMViewController overrides
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    // We want the class outline to be expandedas default
+    [self.classesOutlineView expandItem:nil
+                         expandChildren:YES];
+    
+    // ... and the first class to be selected so something is displayed in the property pane.
+    id firstItem = self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    if (firstItem != nil) {
+        NSInteger index = [self.classesOutlineView rowForItem:firstItem];
+        [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                             byExtendingSelection:NO];
+        [self selectOutlineItem:firstItem];
+    }
+}
 
 #pragma mark - NSOutlineViewDataSource implementation
 
@@ -105,19 +131,37 @@
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
-        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
-            RLMClazzNode *classNode = (RLMClazzNode *)selectedItem;
-            [self.parentWindowController updateSelectedObjectNode:classNode];
-            return;
-        }
-        else if ([selectedItem isKindOfClass:[RLMArrayNode class]]) {
-            RLMArrayNode *arrayNode = (RLMArrayNode *)selectedItem;
-            [self.parentWindowController updateSelectedObjectNode:arrayNode];
-            return;
-        }
+        [self selectOutlineItem:selectedItem];
     }
     
-    [self.parentWindowController updateSelectedObjectNode:nil];
+    // NOTE: Remember to move the clearing of the row selection in the instance view
+    //[self.parentWindowController updateSelectedObjectNode:nil];
+}
+
+#pragma mark - Public methods
+
+- (void)selectClassNode:(RLMClazzNode *)classNode
+{
+    NSInteger index = [self.classesOutlineView rowForItem:classNode];
+    
+    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                         byExtendingSelection:NO];
+}
+
+#pragma mark - Private methods
+
+- (void)selectOutlineItem:(id)item
+{
+    if ([item isKindOfClass:[RLMClazzNode class]]) {
+        RLMClazzNode *classNode = (RLMClazzNode *)item;
+        [self.parentWindowController updateSelectedObjectNode:classNode];
+        return;
+    }
+    else if ([item isKindOfClass:[RLMArrayNode class]]) {
+        RLMArrayNode *arrayNode = (RLMArrayNode *)item;
+        [self.parentWindowController updateSelectedObjectNode:arrayNode];
+        return;
+    }
 }
 
 @end

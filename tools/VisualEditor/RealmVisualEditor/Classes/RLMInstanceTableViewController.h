@@ -9,10 +9,11 @@
 #import <Cocoa/Cocoa.h>
 
 #import "RLMObjectNode.h"
+#import "RLMViewController.h"
 
 @class RLMRealmBrowserWindowController;
 
-@interface RLMInstanceTableViewController : NSViewController <NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 @property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;

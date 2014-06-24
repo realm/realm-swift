@@ -8,11 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "RLMViewController.h"
+#import "RLMClazzNode.h"
+
 @class RLMRealmBrowserWindowController;
 
-@interface RLMClassOutlineViewController : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface RLMClassOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
-@property (nonatomic, strong) IBOutlet NSOutlineView *classesOutlineView;
+
+- (void)selectClassNode:(RLMClazzNode *)classNode;
 
 @end

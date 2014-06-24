@@ -30,7 +30,12 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 @property (nonatomic, strong) IBOutlet RLMClassOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
+@property (nonatomic, strong) IBOutlet RLMObjectNode *selectedObjectNode;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
+
+- (void)classSelectionWasChangedTo:(RLMClazzNode *)classNode;
+
+- (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
 @end

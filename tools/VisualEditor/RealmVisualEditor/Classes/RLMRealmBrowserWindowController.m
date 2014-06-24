@@ -30,23 +30,37 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 - (void)windowDidLoad
 {
     [self.tableViewController viewDidLoad];
-    
-    // We want the class outline to be expandedas default
-    [self.outlineViewController.classesOutlineView expandItem:nil
-                         expandChildren:YES];
-    
-    // ... and the first class to be selected so something is displayed in the property pane.
-    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
-    if (firstItem != nil) {
-        NSInteger index = [self.outlineViewController.classesOutlineView rowForItem:firstItem];
-        [self.outlineViewController.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                                                   byExtendingSelection:NO];
-    }
+        
 }
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
 {
     [self.tableViewController updateSelectedObjectNode:outlineNode];
+}
+
+- (void)classSelectionWasChangedTo:(RLMClazzNode *)classNode
+{
+    [self.outlineViewController selectClassNode:classNode];
+}
+
+- (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
+{
+    RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedObjectNode;
+    
+    RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:array
+                                                      fromProperty:property
+                                                            object:object];
+    
+    NSOutlineView *outlineView = (NSOutlineView *)self.outlineViewController.view;
+    [outlineView reloadData];
+    
+    [outlineView expandItem:selectedClassNode];
+    
+    NSInteger index = [outlineView rowForItem:arrayNode];
+    if (index != NSNotFound) {
+        [outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                 byExtendingSelection:NO];
+    }    
 }
 
 @end
