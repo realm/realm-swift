@@ -52,21 +52,25 @@
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
+
+    NSArray *ignoredPropertiesForClass = [objectClass ignoredProperties];
     
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
-        BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
+        BOOL ignored = [ignoredPropertiesForClass containsObject:propertyName];
         
-        if (!ignored) { // Don't process ignored properties
-            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
-                                                            attributes:[objectClass attributesForProperty:propertyName]
-                                                                column:propArray.count];
-            
-            if (prop) {
-                [propArray addObject:prop];
-            }
+        if (ignored) { // Don't process ignored properties
+            continue;
+        }
+        
+        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
+                                                        attributes:[objectClass attributesForProperty:propertyName]
+                                                            column:propArray.count];
+        
+        if (prop) {
+            [propArray addObject:prop];
         }
     }
     

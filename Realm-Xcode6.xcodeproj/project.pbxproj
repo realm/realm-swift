@@ -53,21 +53,15 @@
 		E81A1FEB1955FE0100FDED82 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC31955FE0100FDED82 /* RealmTests.m */; };
 		E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E81A1FF11955FE0100FDED82 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
+		E81A1FF41955FE0100FDED82 /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCA1955FE0100FDED82 /* SwiftArrayPropertyTests.swift */; };
+		E81A1FF61955FE0100FDED82 /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCB1955FE0100FDED82 /* SwiftArrayTests.swift */; };
+		E81A1FF81955FE0100FDED82 /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCC1955FE0100FDED82 /* SwiftDynamicTests.swift */; };
+		E81A1FFA1955FE0100FDED82 /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCD1955FE0100FDED82 /* SwiftLinkTests.swift */; };
+		E81A1FFC1955FE0100FDED82 /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCE1955FE0100FDED82 /* SwiftMixedTests.swift */; };
+		E81A1FFE1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCF1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift */; };
 		E81A20001955FE0100FDED82 /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */; };
 		E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD11955FE0100FDED82 /* TransactionTests.m */; };
 		E81A20051955FE0100FDED82 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD31955FE0100FDED82 /* XCTestCase+AsyncTesting.m */; };
-		E82FA610195632F20043A3C3 /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
-		E82FA611195632F20043A3C3 /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
-		E82FA612195632F20043A3C3 /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
-		E82FA613195632F20043A3C3 /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
-		E82FA614195632F20043A3C3 /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60C195632F20043A3C3 /* SwiftDynamicTests.swift */; };
-		E82FA615195632F20043A3C3 /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60C195632F20043A3C3 /* SwiftDynamicTests.swift */; };
-		E82FA616195632F20043A3C3 /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */; };
-		E82FA617195632F20043A3C3 /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */; };
-		E82FA618195632F20043A3C3 /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60E195632F20043A3C3 /* SwiftMixedTests.swift */; };
-		E82FA619195632F20043A3C3 /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60E195632F20043A3C3 /* SwiftMixedTests.swift */; };
-		E82FA61A195632F20043A3C3 /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */; };
-		E82FA61B195632F20043A3C3 /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */; };
 		E856D1E0195614A400FB2FCF /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		E856D1EF1956153500FB2FCF /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB31955FCE000FDED82 /* CHANGELOG.md */; };
 		E856D1F01956153500FB2FCF /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB41955FCE000FDED82 /* LICENSE */; };
@@ -101,6 +95,7 @@
 		E856D20C1956154C00FB2FCF /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F7D1955FC9300FDED82 /* RLMSchema_Private.h */; };
 		E856D20D1956154C00FB2FCF /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F7E1955FC9300FDED82 /* RLMSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E856D20E1956154C00FB2FCF /* RLMSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F7F1955FC9300FDED82 /* RLMSchema.mm */; };
+		E856D2101956154C00FB2FCF /* RLMSwiftSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EE01BB1956034400B7AA13 /* RLMSwiftSupport.swift */; };
 		E856D2111956154C00FB2FCF /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F811955FC9300FDED82 /* RLMUtil.hpp */; };
 		E856D2121956154C00FB2FCF /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F821955FC9300FDED82 /* RLMUtil.mm */; };
 		E856D213195615A900FB2FCF /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD11955FE0100FDED82 /* TransactionTests.m */; };
@@ -118,9 +113,16 @@
 		E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E856D220195615B100FB2FCF /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
 		E856D221195615B100FB2FCF /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD31955FE0100FDED82 /* XCTestCase+AsyncTesting.m */; };
+		E856D222195615B800FB2FCF /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCA1955FE0100FDED82 /* SwiftArrayPropertyTests.swift */; };
+		E856D223195615B800FB2FCF /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCB1955FE0100FDED82 /* SwiftArrayTests.swift */; };
+		E856D224195615B800FB2FCF /* SwiftDynamicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCC1955FE0100FDED82 /* SwiftDynamicTests.swift */; };
+		E856D225195615B800FB2FCF /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCD1955FE0100FDED82 /* SwiftLinkTests.swift */; };
+		E856D226195615B800FB2FCF /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCE1955FE0100FDED82 /* SwiftMixedTests.swift */; };
+		E856D227195615B800FB2FCF /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCF1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift */; };
 		E856D228195615B800FB2FCF /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */; };
 		E8D89B9E1955FC6D00CF2B9A /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = E8D89B9D1955FC6D00CF2B9A /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8D89BA41955FC6D00CF2B9A /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8D89B981955FC6D00CF2B9A /* Realm.framework */; };
+		E8EE01BC1956034400B7AA13 /* RLMSwiftSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EE01BB1956034400B7AA13 /* RLMSwiftSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -227,21 +229,22 @@
 		E81A1FC61955FE0100FDED82 /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		E81A1FC91955FE0100FDED82 /* Realm-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Realm-Bridging-Header.h"; path = "Swift/Realm-Bridging-Header.h"; sourceTree = "<group>"; };
+		E81A1FCA1955FE0100FDED82 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; };
+		E81A1FCB1955FE0100FDED82 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayTests.swift; sourceTree = "<group>"; };
+		E81A1FCC1955FE0100FDED82 /* SwiftDynamicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDynamicTests.swift; sourceTree = "<group>"; };
+		E81A1FCD1955FE0100FDED82 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
+		E81A1FCE1955FE0100FDED82 /* SwiftMixedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMixedTests.swift; sourceTree = "<group>"; };
+		E81A1FCF1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
 		E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E81A1FD11955FE0100FDED82 /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		E81A1FD21955FE0100FDED82 /* XCTestCase+AsyncTesting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+AsyncTesting.h"; sourceTree = "<group>"; };
 		E81A1FD31955FE0100FDED82 /* XCTestCase+AsyncTesting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+AsyncTesting.m"; sourceTree = "<group>"; };
-		E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; };
-		E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayTests.swift; sourceTree = "<group>"; };
-		E82FA60C195632F20043A3C3 /* SwiftDynamicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDynamicTests.swift; sourceTree = "<group>"; };
-		E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
-		E82FA60E195632F20043A3C3 /* SwiftMixedTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMixedTests.swift; sourceTree = "<group>"; };
-		E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
 		E856D1D5195614A300FB2FCF /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E856D1DF195614A400FB2FCF /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D89B981955FC6D00CF2B9A /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
 		E8D89BA31955FC6D00CF2B9A /* OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8EE01BB1956034400B7AA13 /* RLMSwiftSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMSwiftSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +253,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E856D1E0195614A400FB2FCF /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8D89B941955FC6D00CF2B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,13 +277,13 @@
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
 			isa = PBXGroup;
 			children = (
+				E81A1FCA1955FE0100FDED82 /* SwiftArrayPropertyTests.swift */,
+				E81A1FCB1955FE0100FDED82 /* SwiftArrayTests.swift */,
+				E81A1FCC1955FE0100FDED82 /* SwiftDynamicTests.swift */,
+				E81A1FCD1955FE0100FDED82 /* SwiftLinkTests.swift */,
+				E81A1FCE1955FE0100FDED82 /* SwiftMixedTests.swift */,
+				E81A1FCF1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift */,
 				E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */,
-				E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */,
-				E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */,
-				E82FA60C195632F20043A3C3 /* SwiftDynamicTests.swift */,
-				E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */,
-				E82FA60E195632F20043A3C3 /* SwiftMixedTests.swift */,
-				E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */,
 			);
 			path = Swift;
 			sourceTree = "<group>";
@@ -365,6 +375,7 @@
 				E81A1F7D1955FC9300FDED82 /* RLMSchema_Private.h */,
 				E81A1F7E1955FC9300FDED82 /* RLMSchema.h */,
 				E81A1F7F1955FC9300FDED82 /* RLMSchema.mm */,
+				E8EE01BB1956034400B7AA13 /* RLMSwiftSupport.swift */,
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
 				E81A1F821955FC9300FDED82 /* RLMUtil.mm */,
 				E8D89B9B1955FC6D00CF2B9A /* Supporting Files */,
@@ -500,6 +511,7 @@
 			buildPhases = (
 				E81A1FB71955FCE700FDED82 /* Download Core */,
 				E8D89B931955FC6D00CF2B9A /* Sources */,
+				E8D89B941955FC6D00CF2B9A /* Frameworks */,
 				E8D89B951955FC6D00CF2B9A /* Headers */,
 				E8D89B961955FC6D00CF2B9A /* Resources */,
 			);
@@ -643,6 +655,7 @@
 				E856D1FE1956154C00FB2FCF /* RLMObject.mm in Sources */,
 				E856D1F81956154C00FB2FCF /* RLMArrayLinkView.mm in Sources */,
 				E856D1FB1956154C00FB2FCF /* RLMConstants.m in Sources */,
+				E856D2101956154C00FB2FCF /* RLMSwiftSupport.swift in Sources */,
 				E856D2011956154C00FB2FCF /* RLMObjectSchema.mm in Sources */,
 				E856D2061956154C00FB2FCF /* RLMProperty.m in Sources */,
 				E856D2031956154C00FB2FCF /* RLMObjectStore.mm in Sources */,
@@ -658,26 +671,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
-				E82FA613195632F20043A3C3 /* SwiftArrayTests.swift in Sources */,
+				E856D227195615B800FB2FCF /* SwiftObjectInterfaceTests.swift in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				E856D213195615A900FB2FCF /* TransactionTests.m in Sources */,
-				E82FA611195632F20043A3C3 /* SwiftArrayPropertyTests.swift in Sources */,
 				E856D228195615B800FB2FCF /* SwiftRealmTests.swift in Sources */,
-				E82FA619195632F20043A3C3 /* SwiftMixedTests.swift in Sources */,
 				E856D21D195615A900FB2FCF /* QueryTests.m in Sources */,
+				E856D225195615B800FB2FCF /* SwiftLinkTests.swift in Sources */,
 				E856D21C195615A900FB2FCF /* PropertyTypeTest.mm in Sources */,
-				E82FA617195632F20043A3C3 /* SwiftLinkTests.swift in Sources */,
+				E856D226195615B800FB2FCF /* SwiftMixedTests.swift in Sources */,
+				E856D223195615B800FB2FCF /* SwiftArrayTests.swift in Sources */,
 				E856D215195615A900FB2FCF /* ArrayTests.m in Sources */,
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
 				E856D219195615A900FB2FCF /* MixedTests.m in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
 				E856D221195615B100FB2FCF /* XCTestCase+AsyncTesting.m in Sources */,
 				E856D220195615B100FB2FCF /* RLMTestObjects.m in Sources */,
+				E856D224195615B800FB2FCF /* SwiftDynamicTests.swift in Sources */,
+				E856D222195615B800FB2FCF /* SwiftArrayPropertyTests.swift in Sources */,
 				E856D218195615A900FB2FCF /* LinkTests.m in Sources */,
-				E82FA615195632F20043A3C3 /* SwiftDynamicTests.swift in Sources */,
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
-				E82FA61B195632F20043A3C3 /* SwiftObjectInterfaceTests.swift in Sources */,
 				E856D21E195615A900FB2FCF /* RealmTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -695,6 +708,7 @@
 				E81A1F8E1955FC9300FDED82 /* RLMArrayLinkView.mm in Sources */,
 				E81A1F931955FC9300FDED82 /* RLMConstants.m in Sources */,
 				E81A1F9B1955FC9300FDED82 /* RLMObjectSchema.mm in Sources */,
+				E8EE01BC1956034400B7AA13 /* RLMSwiftSupport.swift in Sources */,
 				E81A1FA21955FC9300FDED82 /* RLMProperty.m in Sources */,
 				E81A1F9E1955FC9300FDED82 /* RLMObjectStore.mm in Sources */,
 				E81A1F901955FC9300FDED82 /* RLMArrayTableView.mm in Sources */,
@@ -708,26 +722,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				E81A1FE71955FE0100FDED82 /* QueryTests.m in Sources */,
-				E82FA612195632F20043A3C3 /* SwiftArrayTests.swift in Sources */,
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
+				E81A1FFA1955FE0100FDED82 /* SwiftLinkTests.swift in Sources */,
 				E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */,
+				E81A1FFC1955FE0100FDED82 /* SwiftMixedTests.swift in Sources */,
 				E81A1FDF1955FE0100FDED82 /* MixedTests.m in Sources */,
-				E82FA610195632F20043A3C3 /* SwiftArrayPropertyTests.swift in Sources */,
 				E81A1FEB1955FE0100FDED82 /* RealmTests.m in Sources */,
-				E82FA618195632F20043A3C3 /* SwiftMixedTests.swift in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,
+				E81A1FF61955FE0100FDED82 /* SwiftArrayTests.swift in Sources */,
 				E81A1FE51955FE0100FDED82 /* PropertyTypeTest.mm in Sources */,
-				E82FA616195632F20043A3C3 /* SwiftLinkTests.swift in Sources */,
 				E81A1FF11955FE0100FDED82 /* RLMTestObjects.m in Sources */,
+				E81A1FF41955FE0100FDED82 /* SwiftArrayPropertyTests.swift in Sources */,
 				E81A1FD71955FE0100FDED82 /* ArrayTests.m in Sources */,
+				E81A1FF81955FE0100FDED82 /* SwiftDynamicTests.swift in Sources */,
 				E81A20001955FE0100FDED82 /* SwiftRealmTests.swift in Sources */,
 				E81A1FD91955FE0100FDED82 /* DynamicTests.m in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,
 				E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */,
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
-				E82FA614195632F20043A3C3 /* SwiftDynamicTests.swift in Sources */,
 				E81A1FE31955FE0100FDED82 /* ObjectTests.m in Sources */,
-				E82FA61A195632F20043A3C3 /* SwiftObjectInterfaceTests.swift in Sources */,
+				E81A1FFE1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift in Sources */,
 				E81A20051955FE0100FDED82 /* XCTestCase+AsyncTesting.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

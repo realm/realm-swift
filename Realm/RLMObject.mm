@@ -34,9 +34,12 @@
 // standalone init
 -(instancetype)init {
     self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
-    
-    // set standalone accessor class
-    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+
+    // will only be nil when creating Swift objects for introspection at +initialize time
+    if (self.RLMObject_schema) {
+        // set standalone accessor class
+        object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+    }
     
     return self;
 }
