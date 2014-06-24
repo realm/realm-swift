@@ -47,9 +47,8 @@ class SwiftArrayTests: RLMTestCase {
         
         var totalSum: CInt = 0
         
-        // FIXME: Support Sequence-style enumeration
-        for idx in 0..result.count {
-            if let ao = result[idx] as? AggregateObject {
+        for ao in result {
+            if let ao = ao as? AggregateObject {
                 totalSum += ao.intCol
             }
         }

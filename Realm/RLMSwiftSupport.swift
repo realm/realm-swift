@@ -18,6 +18,24 @@
 
 import Foundation
 
+// Swift enumeration
+
+extension RLMArray: Sequence {
+
+    func generate() -> GeneratorOf<RLMObject> {
+        var i  = 0
+        return GeneratorOf<RLMObject>({
+            if (i >= self.count) {
+                return .None
+            } else {
+                return self[i++] as? RLMObject
+            }
+            })
+    }
+}
+
+// Swift & Objective-C class parsing
+
 @objc class ParsedClass {
     var swift = false
     var name: String
@@ -45,6 +63,8 @@ extension String {
 }
 
 @objc class RLMSwiftSupport {
+
+    // Swift property utilities
     class func convertSwiftPropertiesToObjC(swiftClass: AnyClass) {
         let swiftObject = (swiftClass as RLMObject.Type)()
 
@@ -95,6 +115,7 @@ extension String {
         }
     }
 
+    // Swift class parsing
     class func isSwiftClassName(className: NSString) -> Bool {
         return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
     }
