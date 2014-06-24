@@ -293,6 +293,13 @@
     XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
     //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
     
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([peopleInCompany removeLastObject], @"Should delete last link");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 remaining link");
+    XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)0, @"0 remaining links");
+    [realm commitWriteTransaction];
+    
     RLMArray *allPeople = [EmployeeObject allObjects];
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"Only links should have been deleted, not the employees");
     
