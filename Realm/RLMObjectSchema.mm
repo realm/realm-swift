@@ -22,16 +22,6 @@
 #import "RLMSchema_Private.h"
 #import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
-#import "RLMSwiftSupport.h"
-
-static NSMutableDictionary *s_mangledClassMap;
-
-Class RLMClassFromString(NSString *className) {
-    if ([s_mangledClassMap.allKeys containsObject:className]) {
-        className = s_mangledClassMap[className];
-    }
-    return NSClassFromString(className);
-}
 
 // private properties
 @interface RLMObjectSchema ()
@@ -59,38 +49,22 @@ Class RLMClassFromString(NSString *className) {
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
-    NSArray *ignoredPropertiesForClass = [objectClass ignoredProperties];
-    struct RLMParsedClass parsedClass = RLMParsedClassFromClass(objectClass);
-    
-    if (parsedClass.type == RLMClassTypeSwift) {
-        // Map class name to demangled class name
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            s_mangledClassMap = [NSMutableDictionary dictionary];
-        });
-        
-        s_mangledClassMap[parsedClass.name] = parsedClass.mangledName;
-        
-        // get ivars (Swift properties behave like ObjC ivars)
-        unsigned int ivarCount;
-        Ivar *ivars = class_copyIvarList(objectClass, &ivarCount);
-        for (unsigned int i = 0; i < ivarCount; i++) {
-            NSString *ivarName = [NSString stringWithUTF8String:ivar_getName(ivars[i])];
-            
-            BOOL ignored = [ignoredPropertiesForClass containsObject:ivarName];
-            
-            if (ignored) { // Don't process ignored properties
-                continue;
-            }
-            
-            objc_property_attribute_t attrs[] = { { "T", ivar_getRLMTypeEncodingSwift(ivars[i], objectClass) } };
-            class_addProperty(objectClass, ivarName.UTF8String, attrs, 1);
-        }
+    NSString *className = NSStringFromClass(objectClass);
+
+#ifdef REALM_SWIFT
+    ParsedClass *parsedClass = [RLMSwiftSupport parseClass:objectClass];
+    if (parsedClass.swift) {
+        [RLMSwiftSupport convertSwiftPropertiesToObjC:objectClass];
+        className = parsedClass.name;
+        RLMSchema.mangledClassMap[parsedClass.name] = parsedClass.mangledName;
     }
+#endif
     
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
+
+    NSArray *ignoredPropertiesForClass = [objectClass ignoredProperties];
     
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
@@ -116,7 +90,7 @@ Class RLMClassFromString(NSString *className) {
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = parsedClass.name;
+    schema.className = className;
     return schema;
 }
 

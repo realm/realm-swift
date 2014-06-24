@@ -32,6 +32,7 @@
 @end
 
 static RLMSchema *s_sharedSchema;
+static NSMutableDictionary *s_mangledClassMap;
 
 @implementation RLMSchema
 
@@ -125,6 +126,14 @@ static RLMSchema *s_sharedSchema;
     // set class array and mapping
     schema.objectSchema = schemaArray;
     return schema;
+}
+
++ (NSMutableDictionary *)mangledClassMap {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_mangledClassMap = [NSMutableDictionary dictionary];
+    });
+    return s_mangledClassMap;
 }
 
 @end

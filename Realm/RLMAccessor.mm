@@ -23,6 +23,7 @@
 #import "RLMUtil.hpp"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
+#import "RLMSchema_Private.h"
 
 #import <objc/runtime.h>
 
