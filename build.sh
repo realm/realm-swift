@@ -28,8 +28,11 @@ command:
   clean [xcmode]:          clean up/remove all generated files
   build [xcmode]:          builds iOS and OS X frameworks with release configuration
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
+  test-ios [xcmode]:       tests iOS framework with release configuration
+  test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
   test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
+  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
   verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
@@ -165,8 +168,8 @@ case "$COMMAND" in
     # Testing
     ######################################
     "test")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Release build test"
+        sh build.sh test-ios "$XCMODE"
+        sh build.sh test-osx "$XCMODE"
         exit 0
         ;;
 
@@ -177,18 +180,18 @@ case "$COMMAND" in
         ;;
 
     "test-all")
-        sh build.sh test || exit 1
-        sh build.sh test-debug || exit 1
+        sh build.sh test "$XCMODE" || exit 1
+        sh build.sh test-debug "$XCMODE" || exit 1
         exit 0
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
         exit 0
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX test"
+        xcrealm "-scheme OSX -configuration Release test"
         exit 0
         ;;
 
