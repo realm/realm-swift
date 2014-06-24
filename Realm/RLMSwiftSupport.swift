@@ -30,7 +30,7 @@ extension RLMArray: Sequence {
             } else {
                 return self[i++] as? RLMObject
             }
-            })
+        })
     }
 }
 
