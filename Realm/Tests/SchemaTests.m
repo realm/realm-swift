@@ -29,31 +29,34 @@
 {
     // Setting up some test data
     
-    NSArray *expectedTypes = @[@"Company",
-                               @"AgeObject",
-                               @"KeyedObject",
-                               @"AggregateObject",
-                               @"AllTypesObject",
-                               @"RLMTestObject",
-                               @"SimpleObject",
+    // Due to the automatic initialization of a new realm with all visible classes inheriting from
+    // RLMObject, it's difficuelt to define test cases that verifies the absolut correctness of a
+    // realm's current type catalogue unless it's expected configuration is known at compile time
+    // (requires that the set of expected types is contantly kept updated). Instead, only a partial
+    // verification  is performed, which only requires the availablity of a well-defined subset of
+    // types and ignores any other types that may be included in the realm's type catalogue.
+    // If a more fine-grained control with the realm's type inclusion mechanism is introduced later
+    // on, these test should be altered to perform a absolut correctness verification instead.
+    
+    NSArray *expectedTypes = @[@"QueryObject",
                                @"PersonObject",
-                               @"SimpleMisuseObject",
-                               @"OwnerObject",
-                               @"RLMDynamicObject",
-                               @"EnumPerson",
-                               @"CircleObject",
-                               @"MixedObject",
+                               @"DynamicObject",
                                @"DogObject",
-                               @"IndexedObject",
-                               @"TestQueryObject",
+                               @"AggregateObject",
                                @"ArrayPropertyObject",
-                               @"BaseClassTestObject",
-                               @"CustomAccessors",
-                               @"NoDefaultObject",
-                               @"PersonQueryObject",
-                               @"AllPropertyTypesObject",
+                               @"OwnerObject",
+                               @"CompanyObject",
+                               @"MixedObject",
+                               @"AllTypesObject",
+                               @"EmployeeObject",
+                               @"StringObject",
+                               @"IntObject",
                                @"IgnoredURLObject",
-                               @"DefaultObject"];
+                               @"BaseClassStringObject",
+                               @"IndexedObject",
+                               @"CustomAccessorsObject",
+                               @"DefaultObject",
+                               @"CircleObject"];
     
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
     
@@ -61,17 +64,18 @@
     RLMRealm *realm = [self realmWithTestPath];
     RLMSchema *schema = realm.schema;
     
-    // Test 1: Do objectSchema returns the right number of object schemas?
+    // Test 1: Does the objectSchema returns the right number of object schemas?
     NSArray *objectSchemas = schema.objectSchema;
     
-    XCTAssertEqual(objectSchemas.count, expectedTypes.count, @"Expecting %lu object schemas in database", (unsigned long)expectedTypes.count);
+    XCTAssertTrue(objectSchemas.count >= expectedTypes.count, @"Expecting %lu object schemas in database found %lu", (unsigned long)expectedTypes.count, (unsigned long)objectSchemas.count);
     
-    // Test 2: Does the object schema array contained the expected schemas?
+    // Test 2: Does the object schema array containe the expected schemas?
     NSUInteger identifiedTypesCount = 0;
     for (NSString *expectedType in expectedTypes) {
         NSUInteger occurrenceCount = 0;
         
         for (RLMObjectSchema *objectSchema in objectSchemas) {
+            NSLog(@"Scheme %@", objectSchema.className);
             if ([objectSchema.className isEqualToString:expectedType]) {
                 occurrenceCount++;
             }
@@ -84,8 +88,8 @@
         }
     }
 
-    // Test 3: Do the object schema array have unexpected schemas?
-    XCTAssertEqual(identifiedTypesCount, expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", identifiedTypesCount, expectedTypes.count);
+    // Test 3: Does the object schema array contains at least the expected classes
+    XCTAssertTrue(identifiedTypesCount >= expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", identifiedTypesCount, expectedTypes.count);
     
     // Test 4: Test querying object schemas using schemaForClassName: for expected types
     for (NSString *expectedType in expectedTypes) {
