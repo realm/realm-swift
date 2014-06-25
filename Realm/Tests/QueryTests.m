@@ -113,6 +113,37 @@
     XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
 }
 
+- (void)testQueryWithDates
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    NSDate *date3 = [date2 dateByAddingTimeInterval:1];
+    
+    StringObject *stringObj = [StringObject new];
+    stringObj.stringCol = @"string";
+    
+    [realm beginWriteTransaction];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
+    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
+    [realm commitWriteTransaction];
+    
+    RLMArray *dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)2, @"2 dates smaller");
+    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol =< %@", date3]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)3, @"3 dates smaller or equal");
+    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol > %@", date1]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)2, @"2 dates greater");
+    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol => %@", date1]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)3, @"3 dates greater or equal");
+    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol == %@", date1]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)1, @"1 date equal to");
+    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol != %@", date1]];
+    XCTAssertEqual(dateArray.count, (NSUInteger)2, @"2 dates not equal to");
+}
+
 - (void)testDefaultRealmQuery
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
