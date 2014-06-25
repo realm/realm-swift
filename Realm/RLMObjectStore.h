@@ -35,9 +35,6 @@ void RLMInitializeObjectStore();
 // throws if current state of realm is not compatible with current objects
 void RLMVerifyAndCreateTables(RLMRealm *realm);
 
-// verify that columns match - update objectSchema column indexes to match table
-void RLMVerifyAndAlignTableColumns(tightdb::Table *table, RLMObjectSchema *targetSchema);
-
 // NOTE: must be called from within write transaction
 bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema);
 

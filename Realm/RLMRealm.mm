@@ -515,7 +515,7 @@ static NSArray *s_objectDescriptors = nil;
 
 +(void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError *__autoreleasing *)error {
     RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:error];
-    if (error) {
+    if (error && *error) {
         return;
     }
     [migration migrateWithBlock:block];

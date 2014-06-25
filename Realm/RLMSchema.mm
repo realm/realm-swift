@@ -82,7 +82,6 @@ static RLMSchema *s_sharedSchema;
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
-                object.objectClass = classes[i];
                 [schemaArray addObject:object];
             }
         }
@@ -115,7 +114,6 @@ static RLMSchema *s_sharedSchema;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
-            object.objectClass = RLMObject.class;
             [schemaArray addObject:object];
         }
     }

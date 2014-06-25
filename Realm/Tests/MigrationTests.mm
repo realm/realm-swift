@@ -21,6 +21,7 @@ extern "C" {
     #import "RLMMigration.h"
     #import "RLMSchema_Private.h"
 }
+#import "RLMObjectStore.h"
 #import "RLMObjectSchema_Private.hpp"
 
 @interface MigrationObject : RLMObject
@@ -46,23 +47,23 @@ extern "C" {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
     objectSchema.properties = @[objectSchema.properties[0]];
+    objectSchema.objectClass = RLMObject.class;
     
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    
-    // FIXME - add objects
-    
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1]);
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2]);
     [realm commitWriteTransaction];
 
     // open realm with new schema before migration
     objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    XCTAssertThrows([self realmWithSingleObject:objectSchema], @"Migration should be required");
+    XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
     
     // apply migration
     [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
-        [migration enumerateObjectsWithClass:MigrationObject.class
+        [migration enumerateObjectsWithClass:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertThrows(oldObject[@"stringCol"], @"stringCol should not exist on old object");
             NSNumber *intObj;
@@ -72,6 +73,12 @@ extern "C" {
         }];
         return 1;
     } atPath:RLMTestRealmPath() error:nil];
+
+    // verify migration
+    realm = [self realmWithTestPath];
+    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
+    XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
 }
 
 @end

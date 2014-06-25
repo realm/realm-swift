@@ -77,6 +77,7 @@
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = NSStringFromClass(objectClass);
+    schema.objectClass = objectClass;
     return schema;
 }
 
@@ -106,7 +107,7 @@
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = className;
-    
+    schema.objectClass = RLMObject.class;
     return schema;
 }
 

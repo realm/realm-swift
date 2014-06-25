@@ -285,7 +285,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         RLMValidateArrayAgainstObjectSchema(array, schema);
 
         // create row
-        object->_row = (*table)[table->add_empty_row()];
+        size_t rowIndex = table->add_empty_row();
+        object->_row = (*table)[rowIndex];
 
         // populate
         NSArray *props = schema.properties;
@@ -297,8 +298,9 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
 
         // create row
-        object->_row = (*table)[table->add_empty_row()];
-
+        size_t rowIndex = table->add_empty_row();
+        object->_row = (*table)[rowIndex];
+        
         // populate
         NSArray *props = schema.properties;
         for (RLMProperty *prop in props) {
