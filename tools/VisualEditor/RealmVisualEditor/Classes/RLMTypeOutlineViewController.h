@@ -23,7 +23,7 @@
 
 @class RLMRealmBrowserWindowController;
 
-@interface RLMClassOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 

@@ -16,18 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMClassOutlineViewController.h"
+#import "RLMTypeOutlineViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMRealmOutlineNode.h"
 
-@interface RLMClassOutlineViewController ()
+@interface RLMTypeOutlineViewController ()
 
 @property (nonatomic, strong) IBOutlet NSOutlineView *classesOutlineView;
 
 @end
 
-@implementation RLMClassOutlineViewController
+@implementation RLMTypeOutlineViewController
 
 #pragma mark - RLMViewController overrides
 

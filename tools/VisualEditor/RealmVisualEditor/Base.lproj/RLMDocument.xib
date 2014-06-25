@@ -177,7 +177,7 @@
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
         </window>
-        <customObject id="hSp-0t-Gbg" customClass="RLMClassOutlineViewController">
+        <customObject id="hSp-0t-Gbg" customClass="RLMTypeOutlineViewController">
             <connections>
                 <outlet property="classesOutlineView" destination="IMi-6Y-gQF" id="inH-pi-Hwr"/>
                 <outlet property="parentWindowController" destination="-2" id="UwQ-DI-ttX"/>

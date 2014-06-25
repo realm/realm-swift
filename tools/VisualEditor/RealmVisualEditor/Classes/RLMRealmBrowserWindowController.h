@@ -19,7 +19,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "RLMDocument.h"
-#import "RLMClassOutlineViewController.h"
+#import "RLMTypeOutlineViewController.h"
 #import "RLMInstanceTableViewController.h"
 
 extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
@@ -28,7 +28,7 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 @property (nonatomic, weak) RLMDocument *modelDocument;
 
-@property (nonatomic, strong) IBOutlet RLMClassOutlineViewController *outlineViewController;
+@property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 @property (nonatomic, strong) IBOutlet RLMObjectNode *selectedTypeNode;
 
