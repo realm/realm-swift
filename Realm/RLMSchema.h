@@ -49,6 +49,8 @@
  */
 - (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;
 
++ (NSMutableDictionary *)mangledClassMap;
+
 @end
 
 

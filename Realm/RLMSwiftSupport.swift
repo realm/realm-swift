@@ -101,7 +101,17 @@ extension String {
 
         // Detect Objective-C object types
         case let c as NSObject.Type:
-            return "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
+            let parsedClass = parseClass(c.self)
+            if parsedClass.swift {
+                // Mangled class map must contain this property's class
+                // for Realm to create the proper table
+                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
+                if mapMissingName {
+                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
+                }
+            }
+            let className = parsedClass.swift ? parsedClass.mangledName : parsedClass.name
+            return "@\"\(className)\"".bridgeToObjectiveC().UTF8String
 
         default:
             println("Other type")

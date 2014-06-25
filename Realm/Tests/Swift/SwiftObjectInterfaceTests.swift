@@ -18,6 +18,10 @@
 
 import XCTest
 
+class SwiftBoolObject: RLMObject {
+    var boolCol = false
+}
+
 class SwiftObject: RLMObject {
     var boolCol = false
     var intCol = 123
@@ -26,6 +30,7 @@ class SwiftObject: RLMObject {
     var stringCol = "a"
     var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
     var dateCol = NSDate(timeIntervalSince1970: 1)
+    var objectCol = SwiftBoolObject()
 }
 
 class SwiftObjectInterfaceTests: RLMTestCase {
@@ -70,6 +75,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         obj.stringCol = "abcd"
         obj.binaryCol = "abcd".dataUsingEncoding(NSUTF8StringEncoding)
         obj.dateCol = NSDate(timeIntervalSince1970: 123)
+        obj.objectCol = SwiftBoolObject()
+        obj.objectCol.boolCol = true
 
         realm.addObject(obj)
         realm.commitWriteTransaction()
@@ -82,6 +89,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.stringCol, "abcd", "should be abcd")
         XCTAssertEqual(firstObj.binaryCol, "abcd".dataUsingEncoding(NSUTF8StringEncoding), "should be abcd data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
+        XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
     }
     
     func testDefaultValueSwiftObject() {
@@ -98,6 +106,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.stringCol, "a", "should be a")
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding), "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
+        XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
     }
 
     func testSwiftClassNameIsDemangled() {

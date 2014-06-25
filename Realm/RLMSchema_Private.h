@@ -59,8 +59,6 @@ inline NSString *RLMClassForTableName(NSString *tableName) {
 // get object class to use for a given class name
 -(Class)objectClassForClassName:(NSString *)className;
 
-+ (NSMutableDictionary *)mangledClassMap;
-
 @end
 
 static inline Class RLMClassFromString(NSString *className)
