@@ -19,17 +19,10 @@
 import UIKit
 import Realm
 
-class Dog: RLMObject {
-    var name = ""
-    var age = 0
-}
-
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
                             
     var window: UIWindow?
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
@@ -63,6 +56,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Queries are chainable!
         var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
         println("Number of dogs: \(results.count)")
+        
+        // Link objects
+        var person = Person()
+        person.name = "Tim";
+        person.dogs.addObject(mydog)
+        
+        realm.beginWriteTransaction()
+        realm.addObject(person)
+        realm.commitWriteTransaction()
 
         // Thread-safety
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	{
