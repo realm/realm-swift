@@ -50,6 +50,8 @@ EOF
 # Xcode Helpers
 ######################################
 
+XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
+
 xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
@@ -64,7 +66,11 @@ xc() {
 }
 
 xcrealm() {
-    xc "-project Realm.xcodeproj $1"
+    PROJECT=Realm.xcodeproj
+    if [[ "$XCVERSION" == "6" ]]; then
+        PROJECT=Realm-Xcode6.xcodeproj
+    fi
+    xc "-project $PROJECT $1"
 }
 
 ######################################
