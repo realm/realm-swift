@@ -11,7 +11,6 @@
 		84446534195891AA00CEEA5B /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84446533195891AA00CEEA5B /* RLMViewController.m */; };
 		844C34DF19473D9D0027E902 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C34DE19473D9D0027E902 /* libc++.dylib */; };
 		844C34E3194859080027E902 /* TestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E2194859080027E902 /* TestClasses.m */; };
-		844C34E619487C210027E902 /* RLMArray+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E519487C210027E902 /* RLMArray+Extension.m */; };
 		844C350E19499BC20027E902 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
 		844C350F19499CB90027E902 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
 		8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */; };
@@ -108,8 +107,6 @@
 		844C34DE19473D9D0027E902 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		844C34E1194859080027E902 /* TestClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestClasses.h; path = Classes/TestClasses.h; sourceTree = "<group>"; };
 		844C34E2194859080027E902 /* TestClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestClasses.m; path = Classes/TestClasses.m; sourceTree = "<group>"; };
-		844C34E419487C210027E902 /* RLMArray+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RLMArray+Extension.h"; path = "Classes/RLMArray+Extension.h"; sourceTree = "<group>"; };
-		844C34E519487C210027E902 /* RLMArray+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "RLMArray+Extension.m"; path = "Classes/RLMArray+Extension.m"; sourceTree = "<group>"; };
 		844C34FC19499A350027E902 /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
 		8474E2B219544D8000BCA755 /* RLMTypeOutlineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTypeOutlineViewController.h; path = Classes/RLMTypeOutlineViewController.h; sourceTree = "<group>"; };
 		8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTypeOutlineViewController.m; path = Classes/RLMTypeOutlineViewController.m; sourceTree = "<group>"; };
@@ -250,8 +247,6 @@
 		84945D5D1945CC380081C67B /* Aux */ = {
 			isa = PBXGroup;
 			children = (
-				844C34E419487C210027E902 /* RLMArray+Extension.h */,
-				844C34E519487C210027E902 /* RLMArray+Extension.m */,
 				84945D5F1945CCBB0081C67B /* RLMObject+ResolvedClass.h */,
 				84945D601945CCBB0081C67B /* RLMObject+ResolvedClass.m */,
 				844C34E1194859080027E902 /* TestClasses.h */,
@@ -501,7 +496,6 @@
 				84754ABE193CA4600093604E /* RLMRealmBrowserWindowController.m in Sources */,
 				84AA41C9194E108B00A50F03 /* NSTableColumn+Resize.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
-				844C34E619487C210027E902 /* RLMArray+Extension.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */,

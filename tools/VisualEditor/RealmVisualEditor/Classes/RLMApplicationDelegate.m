@@ -21,7 +21,6 @@
 #import <Realm/Realm.h>
 
 #import "TestClasses.h"
-#import "RLMArray+Extension.h"
 
 NSString *const kRealmFileExension = @"realm";
 
