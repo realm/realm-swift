@@ -20,6 +20,8 @@
 
 #import <Realm/Realm.h>
 
+#import "NSColor+ByteSizeFactory.h"
+
 @interface RLMRealm ()
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -95,9 +97,15 @@
 - (id)nodeElementForColumnWithIndex:(NSInteger)index
 {
     switch (index) {
-        case 0:
-            return @"CLASSES";
-            
+        case 0: {
+            NSColor *textColor = [NSColor colorWithByteRed:145
+                                                     green:152
+                                                      blue:153
+                                                     alpha:255];
+ 
+            NSDictionary *attributes = @{NSForegroundColorAttributeName: textColor};
+            return [[NSAttributedString alloc] initWithString:@"CLASSES" attributes:attributes];
+        }
         default:
             return nil;
     }
