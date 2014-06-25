@@ -143,6 +143,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
 
 
 void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj) {
+// FIXME: The Mixed column type does not yet support links
 //    if (obj == nil) {
 //        table.nullify_link(col_ndx, row_ndx);
 //        return;
