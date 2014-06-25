@@ -25,6 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
+        
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         // Override point for customization after application launch.
         self.window!.backgroundColor = UIColor.whiteColor()
@@ -38,8 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var mydog = Dog()
         
         // Set & read properties
-        mydog.name = "Rex";
-        mydog.age = 9;
+        mydog.name = "Rex"
+        mydog.age = 9
         println("Name of dog: \(mydog.name)")
         
         // Realms are used to group data together
@@ -59,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Link objects
         var person = Person()
-        person.name = "Tim";
+        person.name = "Tim"
         person.dogs.addObject(mydog)
         
         realm.beginWriteTransaction()
@@ -71,18 +72,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let otherRealm = RLMRealm.defaultRealm()
             var otherResults = otherRealm.objects(Dog.className(), withPredicate:NSPredicate(format:"name contains 'Rex'"))
             println("Number of dogs \(otherResults.count)")
-            });
+            })
         
         return true
     }
     
-    
     func deleteRealmFile() {
-
+        
         let documentsPaths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
-
         var path = documentsPaths.stringByAppendingPathComponent("default.realm")
         NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
     }
 }
-
