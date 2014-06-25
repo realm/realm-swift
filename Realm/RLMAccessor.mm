@@ -626,12 +626,12 @@ id RLMDynamicGet(RLMObject *obj, NSString *propName) {
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
-        case 'i': return @((int)obj->_row.get_int(col));
-        case 'l': return @(obj->_row.get_int(col));
-        case 'f': return @(obj->_row.get_float(col));
-        case 'd': return @(obj->_row.get_double(col));
-        case 'B': return @(obj->_row.get_bool(col));
-        case 'c': return @(obj->_row.get_bool(col));
+        case 'i': return @((int)RLMGetLong(obj, col));
+        case 'l': return @(RLMGetLong(obj, col));
+        case 'f': return @(RLMGetFloat(obj, col));
+        case 'd': return @(RLMGetDouble(obj, col));
+        case 'B': return @(RLMGetBool(obj, col));
+        case 'c': return @(RLMGetBool(obj, col));
         case 's': return RLMGetString(obj, col);
         case 'a': return RLMGetDate(obj, col);
         case 'e': return RLMGetData(obj, col);
