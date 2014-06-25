@@ -79,7 +79,11 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
+#ifdef REALM_SWIFT
+    schema.className = [RLMSwiftSupport parseClass:objectClass].name;
+#else
     schema.className = NSStringFromClass(objectClass);
+#endif
     return schema;
 }
 

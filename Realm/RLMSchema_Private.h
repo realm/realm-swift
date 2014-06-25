@@ -18,6 +18,11 @@
 
 #import "RLMSchema.h"
 
+#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
+#define REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#endif
+
 // NOTE: the object store uses a custom table namespace for storing data.
 // There current names used are:
 //  class_* - any table name beginning with class is used to store objects
@@ -54,4 +59,16 @@ inline NSString *RLMClassForTableName(NSString *tableName) {
 // get object class to use for a given class name
 -(Class)objectClassForClassName:(NSString *)className;
 
++ (NSMutableDictionary *)mangledClassMap;
+
 @end
+
+static inline Class RLMClassFromString(NSString *className)
+{
+#ifdef REALM_SWIFT
+    if ([RLMSchema.mangledClassMap.allKeys containsObject:className]) {
+        className = RLMSchema.mangledClassMap[className];
+    }
+#endif
+    return NSClassFromString(className);
+}

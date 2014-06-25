@@ -24,11 +24,6 @@
 
 #import <objc/runtime.h>
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define REALM_SWIFT
-#import <Realm/Realm-Swift.h>
-#endif
-
 // RLMSchema private properties
 @interface RLMSchema ()
 @property (nonatomic, readwrite) NSArray *objectSchema;
@@ -37,6 +32,7 @@
 @end
 
 static RLMSchema *s_sharedSchema;
+static NSMutableDictionary *s_mangledClassMap;
 
 @implementation RLMSchema
 
@@ -79,8 +75,10 @@ static RLMSchema *s_sharedSchema;
 #ifdef REALM_SWIFT
                 // Convert Swift properties to Objective-C properties
                 // to enable object schema generation and Realm custom accessors
-                if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(classes[i])]) {
+                ParsedClass *parsedClass = [RLMSwiftSupport parseClass:classes[i]];
+                if (parsedClass.swift) {
                     [RLMSwiftSupport convertSwiftPropertiesToObjC:classes[i]];
+                    RLMSchema.mangledClassMap[parsedClass.name] = parsedClass.mangledName;
                 }
 #endif
                 // add to class list
@@ -137,6 +135,14 @@ static RLMSchema *s_sharedSchema;
     // set class array and mapping
     schema.objectSchema = schemaArray;
     return schema;
+}
+
++ (NSMutableDictionary *)mangledClassMap {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_mangledClassMap = [NSMutableDictionary dictionary];
+    });
+    return s_mangledClassMap;
 }
 
 @end
