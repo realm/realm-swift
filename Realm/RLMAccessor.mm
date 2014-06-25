@@ -72,7 +72,7 @@ inline long long RLMGetLong(RLMObject *obj, NSUInteger col) {
     RLMVerifyAttached(obj);
     return obj->_row.get_int(col);
 }
-inline void RLMSetLong(RLMObject *obj, NSUInteger col, long val) {
+inline void RLMSetLong(RLMObject *obj, NSUInteger col, long long val) {
     RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_int(col, val);
