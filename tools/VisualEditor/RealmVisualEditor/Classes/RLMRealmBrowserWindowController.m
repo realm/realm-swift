@@ -45,7 +45,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
 {
-    RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedObjectNode;
+    RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedTypeNode;
     
     RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:array
                                                       fromProperty:property

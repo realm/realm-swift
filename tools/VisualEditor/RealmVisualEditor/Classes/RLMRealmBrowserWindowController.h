@@ -30,7 +30,7 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 @property (nonatomic, strong) IBOutlet RLMClassOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
-@property (nonatomic, strong) IBOutlet RLMObjectNode *selectedObjectNode;
+@property (nonatomic, strong) IBOutlet RLMObjectNode *selectedTypeNode;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
 
