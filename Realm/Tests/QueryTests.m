@@ -318,6 +318,8 @@
     XCTAssertNoThrow([realm objects:className withPredicateFormat:@"stringCol BEGINSWITH 'test'"], @"BEGINSWITH");
     XCTAssertNoThrow([realm objects:className withPredicateFormat:@"stringCol CONTAINS 'test'"], @"CONTAINS");
     XCTAssertNoThrow([realm objects:className withPredicateFormat:@"stringCol ENDSWITH 'test'"], @"ENDSWITH");
+    XCTAssertNoThrow([realm objects:className withPredicateFormat:@"stringCol == 'test'"], @"==");
+    XCTAssertNoThrow([realm objects:className withPredicateFormat:@"stringCol != 'test'"], @"!=");
     
     // ANY
     XCTAssertNoThrow([realm objects:className withPredicateFormat:@"ANY intCol > 5"], @"ANY int > constant");
