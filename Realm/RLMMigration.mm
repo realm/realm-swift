@@ -59,7 +59,7 @@
     // get all objects
     RLMArray *objects = [_realm allObjects:className], *oldObjects = [_oldRealm allObjects:className];
     for (NSUInteger o = 0; o < objects.count; o++) {
-        block(oldObjects[o], objects[0]);
+        block(oldObjects[o], objects[o]);
     }
 }
 
