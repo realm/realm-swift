@@ -251,9 +251,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         
         // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
         if (value) {
-            // InsertionAccssor setter inserts into table
-            RLMDynamicSet(object, prop.name, value);
-            [object setValue:value forKey:prop.name];
+            // set in table with out validation
+            RLMDynamicSet(object, prop.name, value, NO);
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
@@ -261,7 +260,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
                                          userInfo:nil];
         }
     }
-    
+
     // we are in a read transaction so change accessor class to readwrite accessor
     Class objectClass = NSClassFromString(objectClassName);
     object_setClass(object, RLMAccessorClassForObjectClass(objectClass, schema));

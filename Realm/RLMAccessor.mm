@@ -579,17 +579,17 @@ void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate) {
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case 'i':
         case 'l':
-            obj->_row.set_int(col, [val longLongValue]);
+            RLMSetLong(obj, col, [val longLongValue]);
             break;
         case 'f':
-            obj->_row.set_float(col, [val floatValue]);
+            RLMSetFloat(obj, col, [val floatValue]);
             break;
         case 'd':
-            obj->_row.set_double(col, [val doubleValue]);
+            RLMSetDouble(obj, col, [val doubleValue]);
             break;
         case 'B':
         case 'c':
-            obj->_row.set_bool(col, (bool)[val boolValue]);
+            RLMSetBool(obj, col, (bool)[val boolValue]);
             break;
         case 's':
             RLMSetString(obj, col, val);

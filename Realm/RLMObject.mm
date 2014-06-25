@@ -32,7 +32,7 @@
 // standalone init
 -(instancetype)init {
     self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
-    
+
     // set standalone accessor class
     object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
     
@@ -183,7 +183,8 @@ void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
 }
 
 + (NSString *)className {
-    return NSStringFromClass(self);
+    const char *className = class_getName(self);
+    return [[NSString alloc] initWithBytesNoCopy:(void *)className length:strlen(className) encoding:NSUTF8StringEncoding freeWhenDone:NO];
 }
 
 - (NSString *)description
