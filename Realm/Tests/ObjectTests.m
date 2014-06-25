@@ -82,6 +82,12 @@
 }
 @end
 
+#pragma mark - Private
+
+@interface RLMRealm ()
+@property (nonatomic) RLMSchema *schema;
+@end
+
 #pragma mark - Tests
 
 @interface ObjectTests : RLMTestCase
@@ -550,10 +556,10 @@
 
 - (void)testIndex
 {
-    RLMProperty *nameProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"name"];
+    RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
     XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
     
-    RLMProperty *ageProperty = [RLMRealm defaultRealm].schema[IndexedObject.className][@"age"];
+    RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
     XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 

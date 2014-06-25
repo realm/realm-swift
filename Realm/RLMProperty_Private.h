@@ -31,7 +31,7 @@
                                   column:(NSUInteger)column;
 
 // private properties
-@property (nonatomic, readonly) NSUInteger column;
+@property (nonatomic) NSUInteger column;
 @property (nonatomic, readonly) char objcType;
 
 // getter and setter names

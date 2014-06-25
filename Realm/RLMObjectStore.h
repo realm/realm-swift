@@ -26,9 +26,20 @@
 // call once before using other methods
 void RLMInitializeObjectStore();
 
+
+//
+// Table modifications
+//
+
 // verifies and/or creates tables needed in a realm to store all object types
 // throws if current state of realm is not compatible with current objects
-void RLMEnsureRealmTablesExist(RLMRealm *realm);
+void RLMVerifyAndCreateTables(RLMRealm *realm);
+
+// verify that columns match - update objectSchema column indexes to match table
+void RLMVerifyAndAlignTableColumns(tightdb::Table *table, RLMObjectSchema *targetSchema);
+
+// NOTE: must be called from within write transaction
+bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema);
 
 
 //

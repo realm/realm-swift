@@ -16,17 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import <Realm/Realm.h>
-#import "RLMTestObjects.h"
+#import "RLMMigration.h"
+#import "RLMRealm.h"
 
-NSString *RLMTestRealmPath();
-NSString *RLMDefaultRealmPath();
-NSString *RLMRealmPathForFile();
+@interface RLMMigration ()
 
-@interface RLMTestCase : XCTestCase
+@property (nonatomic, strong) RLMRealm *oldRealm;
+@property (nonatomic, strong) RLMRealm *realm;
 
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
++ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
+
+- (void)migrateWithBlock:(RLMMigrationBlock)block;
 
 @end

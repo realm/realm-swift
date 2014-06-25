@@ -17,17 +17,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectSchema.h"
-#import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+#import "RLMUtil.hpp"
+
+#import <tightdb/table.hpp>
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
+@property (nonatomic, readwrite, assign) Class objectClass;
 @end
 
 

@@ -18,10 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigrationRealm, RLMNotificationToken;
-
-typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
-typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
+@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigration, RLMNotificationToken;
 
 @interface RLMRealm : NSObject
 
@@ -92,7 +89,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 
-#pragma mark -
+#pragma mark - Notifications
+
+typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**---------------------------------------------------------------------------------------
  *  @name Receiving Notification when a Realm Changes
@@ -128,7 +127,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  */
 - (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
-#pragma mark -
+#pragma mark - Transactions
 
 /**---------------------------------------------------------------------------------------
  *  @name Writing to a Realm
@@ -170,7 +169,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
-#pragma mark -
+#pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------
  *  @name Adding and Removing Objects from a Realm
@@ -250,6 +249,60 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  */
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
+
+#pragma mark - Migrations
+
+/**
+ Migration block used to migrate a Realm.
+ 
+ You are required to supply a migration block when trying to open an RLMRealm which has an
+ on disk schema different from the schema defined in your object interfaces. When supplying a migration
+ block it is your responsibility to enumerate and update any objects which require alteration, and to
+ return the new schema version from the migration block.
+
+ @warning   Unsuccessful migrations will throw exceptions. This will happen in the following cases
+            - After applying a required migration, the schema version has not increased.
+            - A new property is added to an object and not initialized during the migration. You are 
+              required to either supply a default value or to manually populate added properties during
+              a migration.
+
+ @param migration   RLMMigration object used to perform the migration. The migration object allows
+ you to enumerate and alter any existing objects which require migration.
+ 
+ @param oldSchemaVersion    The schema version of the RLMRealm being migrated.
+ 
+ @return    Schema version number for the RLMRealm after completing the migration.
+ */
+typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+
+/**
+ Performs a migration on the default Realm.
+ 
+ Must be called before the default Realm is accessed (otherwise throws). If the
+ default Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param block       The block which migrates the Realm to the current version.
+ @param error       The error that occured while applying the migration if any.
+
+ @see               RLMMigration
+ */
++ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError **)error;
+
+/**
+ Performs a migration on a Realm at a path.
+ 
+ Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
+ If the Realm is at a version other than <code>version</code>, the migration is applied.
+ 
+ @param block       The block which migrates the Realm to the current version.
+ @param realmPath   The path of the Realm to migrate.
+ @param error       The error that occured while applying the migration if any.
+ 
+ @see               RLMMigration
+ */
++ (void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError **)error;
+
+
 #pragma mark -
 
 //---------------------------------------------------------------------------------------
@@ -278,22 +331,6 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 //
 //-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
-
-#pragma mark -
-
-//---------------------------------------------------------------------------------------
-// @name Realm and Object Schema
-//---------------------------------------------------------------------------------------
-//
-// Returns the schema used by this realm. This can be used to enumerate and introspect object
-// types during migrations for dynamic introspection.
-//
-@property (nonatomic, readonly) RLMSchema *schema;
-
-//
-// The schema version for this Realm.
-// 
-@property (nonatomic, readonly) NSUInteger schemaVersion;
 
 @end
 

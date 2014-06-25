@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject;
+@class RLMObject, RLMRealm;
 
 /**
  
@@ -58,6 +58,11 @@
  YES for RLMArray instances returned from predicate queries and object enumeration.
  */
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
+
+/**
+ The Realm in which this object is persisted. Returns nil for standalone objects.
+ */
+@property (nonatomic, readonly) RLMRealm *realm;
 
 #pragma mark -
 

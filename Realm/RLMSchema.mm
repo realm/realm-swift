@@ -24,11 +24,14 @@
 
 #import <objc/runtime.h>
 
+NSString *const c_objectTableNamePrefix = @"class_";
+const char *c_metadataTableName = "metadata";
+const char *c_versionColumnName = "version";
+const size_t c_versionColumnIndex = 0;
+
 // RLMSchema private properties
 @interface RLMSchema ()
-@property (nonatomic, readwrite) NSArray *objectSchema;
 @property (nonatomic, readwrite) NSMutableDictionary *objectSchemaByName;
-@property (nonatomic, readwrite) NSMutableDictionary *objectClassByName;
 @end
 
 static RLMSchema *s_sharedSchema;
@@ -43,19 +46,25 @@ static RLMSchema *s_sharedSchema;
     return _objectSchemaByName[className];
 }
 
-- (Class)objectClassForClassName:(NSString *)className {
-    return _objectClassByName[className];
-}
-
 - (id)init {
     self = [super init];
     if (self) {
         // setup name mapping for object tables
         _tableNamesForClass = [NSMutableDictionary dictionary];
-        _objectClassByName = [NSMutableDictionary dictionary];
         _objectSchemaByName = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (void)setObjectSchema:(NSArray *)objectSchema {
+    _objectSchema = objectSchema;
+    
+    // update mappings
+    for (RLMObjectSchema *object in objectSchema) {
+        // set table name and mappings
+        _tableNamesForClass[object.className] = RLMTableNameForClassName(object.className);
+        [(NSMutableDictionary *)_objectSchemaByName setObject:object forKey:object.className];
+    }
 }
 
 + (void)initialize {
@@ -73,13 +82,8 @@ static RLMSchema *s_sharedSchema;
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
+                object.objectClass = classes[i];
                 [schemaArray addObject:object];
-                
-                // set table name and mappings
-                NSString *tableName = RLMTableNameForClassName(object.className);
-                schema.tableNamesForClass[object.className] = tableName;
-                schema.objectClassByName[object.className] = classes[i];
-                [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
             }
         }
         free(classes);
@@ -87,6 +91,7 @@ static RLMSchema *s_sharedSchema;
         // set class array
         schema.objectSchema = schemaArray;
         
+        // set shared schema
         s_sharedSchema = schema;
     });
 }
@@ -110,21 +115,37 @@ static RLMSchema *s_sharedSchema;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
+            object.objectClass = RLMObject.class;
             [schemaArray addObject:object];
-
-            // add object and set mappings
-            schema.tableNamesForClass[object.className] = tableName;
-            [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
-
-            // generate dynamic class and set class mapping
-            Class dynamicClass = RLMDynamicClassForSchema(object, realm.schemaVersion);
-            schema.objectClassByName[object.className] = dynamicClass;
         }
     }
     
     // set class array and mapping
     schema.objectSchema = schemaArray;
     return schema;
+}
+
+
+inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
+    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    if (table->get_column_count() == 0) {
+        // create columns
+        table->add_column(tightdb::type_Int, c_versionColumnName);
+        
+        // set initial version
+        table->add_empty_row();
+        (*table)[0].set_int(c_versionColumnIndex, 0);
+    }
+    return table;
+}
+
+NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
+    return (NSUInteger)(*RLMVersionTable(realm))[0].get_int(c_versionColumnIndex);
+
+}
+
+void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
+    (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
 }
 
 @end

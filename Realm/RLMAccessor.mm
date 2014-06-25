@@ -49,66 +49,286 @@ void RLMAccessorCacheInitialize() {
     });
 }
 
+// verify attached
+inline void RLMVerifyAttached(RLMObject *obj) {
+    if (!obj->_row.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object has been deleted and is no longer valid."
+                                     userInfo:nil];
+    }
+}
+
+// verify writable
+inline void RLMVerifyInWriteTransaction(RLMObject *obj) {
+    if (!obj->_realm->_inWriteTransaction) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Attempting to modify object outside of a write transaction."
+                                     userInfo:nil];
+    }
+}
+
+// long getter/setter
+inline long long RLMGetLong(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    return obj->_row.get_int(col);
+}
+inline void RLMSetLong(RLMObject *obj, NSUInteger col, long long val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_int(col, val);
+}
+
+// float getter/setter
+inline float RLMGetFloat(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    return obj->_row.get_float(col);
+}
+inline void RLMSetFloat(RLMObject *obj, NSUInteger col, float val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_float(col, val);
+}
+
+// double getter/setter
+inline double RLMGetDouble(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    return obj->_row.get_double(col);
+}
+inline void RLMSetDouble(RLMObject *obj, NSUInteger col, double val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_double(col, val);
+}
+
+// bool getter/setter
+inline bool RLMGetBool(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    return obj->_row.get_bool(col);
+}
+inline void RLMSetBool(RLMObject *obj, NSUInteger col, bool val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_bool(col, val);
+}
+
+// string getter/setter
+inline NSString *RLMGetString(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    return RLMStringDataToNSString(obj->_row.get_string(col));
+}
+inline void RLMSetString(RLMObject *obj, NSUInteger col, NSString *val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_string(col, RLMStringDataWithNSString(val));
+}
+
+// date getter/setter
+inline NSDate *RLMGetDate(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    tightdb::DateTime dt = obj->_row.get_datetime(col);
+    return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+}
+inline void RLMSetDate(RLMObject *obj, NSUInteger col, NSDate *date) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    std::time_t time = date.timeIntervalSince1970;
+    obj->_row.set_datetime(col, tightdb::DateTime(time));
+}
+
+// data getter/setter
+inline NSData *RLMGetData(RLMObject *obj, NSUInteger col) {
+    RLMVerifyAttached(obj);
+    tightdb::BinaryData data = obj->_row.get_binary(col);
+    return [NSData dataWithBytes:data.data() length:data.size()];
+}
+inline void RLMSetData(RLMObject *obj, NSUInteger col, NSData *data) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+    obj->_row.set_binary(col, RLMBinaryDataForNSData(data));
+}
+
+// link getter/setter
+inline RLMObject *RLMGetLink(RLMObject *obj, NSUInteger col, NSString *objectClassName) {
+    RLMVerifyAttached(obj);
+
+    if (obj->_row.is_null_link(col)) {
+        return nil;
+    }
+    NSUInteger index = obj->_row.get_link(col);
+    return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+}
+inline void RLMSetLink(RLMObject *obj, NSUInteger col, RLMObject *link) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+
+    if (!link || link.class == NSNull.class) {
+        // if null
+        obj->_row.nullify_link(col);
+    }
+    else {
+        // add to Realm if not in it.
+        if (link.realm != obj.realm) {
+            [obj.realm addObject:link];
+        }
+        // set link
+        obj->_row.set_link(col, link->_row.get_index());
+    }
+}
+
+// array getter/setter
+inline RLMArray *RLMGetArray(RLMObject *obj, NSUInteger col, NSString *objectClassName) {
+    RLMVerifyAttached(obj);
+
+    tightdb::LinkViewRef linkView = obj->_row.get_linklist(col);
+    RLMArrayLinkView *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
+                                                                 view:linkView
+                                                                realm:obj.realm];
+    return ar;
+}
+inline void RLMSetArray(RLMObject *obj, NSUInteger col, id<NSFastEnumeration> val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+
+    tightdb::LinkViewRef linkView = obj->_row.get_linklist(col);
+    // remove all old
+    // FIXME: make sure delete rules don't purge objects
+    linkView->clear();
+    for (RLMObject *link in val) {
+        // add to realm if needed
+        if (link.realm != obj.realm) {
+            [obj.realm addObject:link];
+        }
+        // set in link view
+        linkView->add(link->_row.get_index());
+    }
+}
+
+// any getter/setter
+inline id RLMGetAnyProperty(RLMObject *obj, NSUInteger col_ndx) {
+    RLMVerifyAttached(obj);
+
+    tightdb::Mixed mixed = obj->_row.get_mixed(col_ndx);
+    switch (mixed.get_type()) {
+        case RLMPropertyTypeString:
+            return RLMStringDataToNSString(mixed.get_string());
+        case RLMPropertyTypeInt: {
+            return @(mixed.get_int());
+        case RLMPropertyTypeFloat:
+            return @(mixed.get_float());
+        case RLMPropertyTypeDouble:
+            return @(mixed.get_double());
+        case RLMPropertyTypeBool:
+            return @(mixed.get_bool());
+        case RLMPropertyTypeDate:
+            return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
+        case RLMPropertyTypeData: {
+            tightdb::BinaryData bd = mixed.get_binary();
+            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+            return d;
+        }
+        case RLMPropertyTypeArray:
+            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                           reason:@"RLMArray not yet supported" userInfo:nil];
+
+            // for links and other unsupported types throw
+        case RLMPropertyTypeObject:
+        default:
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
+        }
+    }
+}
+inline void RLMSetAnyProperty(RLMObject *obj, NSUInteger col_ndx, id val) {
+    RLMVerifyAttached(obj);
+    RLMVerifyInWriteTransaction(obj);
+
+    // FIXME - enable when Any supports links
+    //    if (obj == nil) {
+    //        table.nullify_link(col_ndx, row_ndx);
+    //        return;
+    //    }
+    if ([val isKindOfClass:[NSString class]]) {
+        obj->_row.set_mixed(col_ndx, RLMStringDataWithNSString(val));
+        return;
+    }
+    if ([val isKindOfClass:[NSDate class]]) {
+        obj->_row.set_mixed(col_ndx, tightdb::DateTime(time_t([(NSDate *)val timeIntervalSince1970])));
+        return;
+    }
+    if ([val isKindOfClass:[NSData class]]) {
+        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(val));
+        return;
+    }
+    if ([val isKindOfClass:[NSNumber class]]) {
+        const char *data_type = [(NSNumber *)val objCType];
+        const char dt = data_type[0];
+        switch (dt) {
+            case 'i':
+            case 's':
+            case 'l':
+                obj->_row.set_mixed(col_ndx, (int64_t)[(NSNumber *)val longValue]);
+                return;
+            case 'f':
+                obj->_row.set_mixed(col_ndx, [(NSNumber *)val floatValue]);
+                return;
+            case 'd':
+                obj->_row.set_mixed(col_ndx, [(NSNumber *)val doubleValue]);
+                return;
+            case 'B':
+            case 'c':
+                obj->_row.set_mixed(col_ndx, [(NSNumber *)val boolValue] == YES);
+                return;
+        }
+    }
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
+}
+
 // dynamic getter with column closure
 IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *objectClassName) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return (int)obj->_row.get_int(col);
+                return (int)RLMGetLong(obj, col);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return obj->_row.get_int(col);
+                return RLMGetLong(obj, col);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return obj->_row.get_float(col);
+                return RLMGetFloat(obj, col);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return obj->_row.get_double(col);
+                return RLMGetDouble(obj, col);
             });
         case 'B':
-            return imp_implementationWithBlock(^(RLMObject *obj) {
-                return obj->_row.get_bool(col);
-            });
         case 'c':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return obj->_row.get_bool(col);
+                return RLMGetBool(obj, col);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return RLMStringDataToNSString(obj->_row.get_string(col));
+                return RLMGetString(obj, col);
             });
         case 'a':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                tightdb::DateTime dt = obj->_row.get_datetime(col);
-                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+                return RLMGetDate(obj, col);
             });
         case 'e':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                tightdb::BinaryData data = obj->_row.get_binary(col);
-                return [NSData dataWithBytes:data.data() length:data.size()];
+                return RLMGetData(obj, col);
             });
         case 'k':
             return imp_implementationWithBlock(^id(RLMObject *obj) {
-                if (obj->_row.is_null_link(col)) {
-                    return nil;
-                }
-                NSUInteger index = obj->_row.get_link(col);
-                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
+                return RLMGetLink(obj, col, objectClassName);
             });
         case 't':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                tightdb::LinkViewRef linkView = obj->_row.get_linklist(col);
-                RLMArrayLinkView *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
-                                                                             view:linkView
-                                                                            realm:obj.realm];
-                return ar;
+                return RLMGetArray(obj, col, objectClassName);
             });
         case '@':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return RLMGetAnyProperty(obj->_row, col);
+                return RLMGetAnyProperty(obj, col);
             });
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
@@ -120,130 +340,57 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMObject *obj, int val) {
-                obj->_row.set_int(col, val);
+                RLMSetLong(obj, col, val);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMObject *obj, long val) {
-                obj->_row.set_int(col, val);
+                RLMSetLong(obj, col, val);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMObject *obj, float val) {
-                obj->_row.set_float(col, val);
+                RLMSetFloat(obj, col, val);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMObject *obj, double val) {
-                obj->_row.set_double(col, val);
+                RLMSetDouble(obj, col, val);
             });
         case 'B':
             return imp_implementationWithBlock(^(RLMObject *obj, bool val) {
-                obj->_row.set_bool(col, val);
+                RLMSetBool(obj, col, val);
             });
         case 'c':
             return imp_implementationWithBlock(^(RLMObject *obj, BOOL val) {
-                obj->_row.set_bool(col, val);
+                RLMSetBool(obj, col, val);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMObject *obj, NSString *val) {
-                obj->_row.set_string(col, RLMStringDataWithNSString(val));
+                RLMSetString(obj, col, val);
             });
         case 'a':
             return imp_implementationWithBlock(^(RLMObject *obj, NSDate *date) {
-                std::time_t time = date.timeIntervalSince1970;
-                obj->_row.set_datetime(col, tightdb::DateTime(time));
+                RLMSetDate(obj, col, date);
             });
         case 'e':
             return imp_implementationWithBlock(^(RLMObject *obj, NSData *data) {
-                obj->_row.set_binary(col, RLMBinaryDataForNSData(data));
+                RLMSetData(obj, col, data);
             });
         case 'k':
             return imp_implementationWithBlock(^(RLMObject *obj, RLMObject *link) {
-                if (!link || link.class == NSNull.class) {
-                    // if null
-                    obj->_row.nullify_link(col);
-                }
-                else {
-                    // add to Realm if not in it.
-                    if (link.realm != obj.realm) {
-                        [obj.realm addObject:link];
-                    }
-                    // set link
-                    obj->_row.set_link(col, link->_row.get_index());
-                }
+                RLMSetLink(obj, col, link);
             });
         case 't':
             return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> val) {
-                tightdb::LinkViewRef linkView = obj->_row.get_linklist(col);
-                // remove all old
-                // FIXME: make sure delete rules don't purge objects
-                linkView->clear();
-                for (RLMObject *link in val) {
-                    // add to realm if needed
-                    if (link.realm != obj.realm) {
-                        [obj.realm addObject:link];
-                    }
-                    // set in link view
-                    linkView->add(link->_row.get_index());
-                }
+                RLMSetArray(obj, col, val);
             });
         case '@':
             return imp_implementationWithBlock(^(RLMObject *obj, id val) {
-                RLMSetAnyProperty(obj->_row, col, val);
+                RLMSetAnyProperty(obj, col, val);
             });
         default:
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Invalid accessor code"
                                          userInfo:nil];
     }
-}
-
-
-// setter which throws exception
-IMP RLMAccessorExceptionSetter(NSUInteger, char accessorCode, NSString *message) {
-    switch (accessorCode) {
-        case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, int) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, long) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, float) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, double) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, bool) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, BOOL) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        case 's':
-        case 'a':
-        case 'k':
-        case 'e':
-        case '@':
-        case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor>, id) {
-                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
-        default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
-    }
-}
-
-// getter for invalid objects
-NSString *const c_invalidObjectMessage = @"Object is no longer valid.";
-IMP RLMAccessorInvalidGetter(NSUInteger, char, NSString *) {
-    return imp_implementationWithBlock(^(id<RLMAccessor>) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:c_invalidObjectMessage userInfo:nil];
-    });
-}
-
-// setter for invalid objects
-IMP RLMAccessorInvalidSetter(NSUInteger col, char accessorCode) {
-    return RLMAccessorExceptionSetter(col, accessorCode, c_invalidObjectMessage);
 }
 
 // getter for standalone
@@ -268,12 +415,6 @@ IMP RLMAccessorStandaloneGetter(NSUInteger col, char accessorCode, NSString *obj
     }
     return nil;
 }
-
-// setter for readonly objects
-IMP RLMAccessorReadOnlySetter(NSUInteger col, char accessorCode) {
-    return RLMAccessorExceptionSetter(col, accessorCode, @"Trying to set a property on a read-only object.");
-}
-
 
 // macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"
@@ -354,6 +495,12 @@ Class RLMCreateAccessorClass(Class objectClass,
     if (Class cls = [cache objectForKey:objectClass]) {
         return cls;
     }
+
+    // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
+    if (objectClass == RLMObject.class) {
+        [cache setObject:objectClass forKey:objectClass];
+        return objectClass;
+    }
     
     // throw if no schema, prefix, or object class
     if (!objectClass || !schema || !accessorClassPrefix) {
@@ -404,21 +551,6 @@ Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema)
                                   RLMAccessorGetter, RLMAccessorSetter, s_accessorCaches[RLMAccessorTypeNormal]);
 }
 
-Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, @"RLMReadOnly_",
-                                  RLMAccessorGetter, RLMAccessorReadOnlySetter, s_accessorCaches[RLMAccessorTypeReadOnly]);
-}
-
-Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, @"RLMInvalid_",
-                                  RLMAccessorInvalidGetter, RLMAccessorInvalidSetter, s_accessorCaches[RLMAccessorTypeInvalid]);
-}
-
-Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
-                                  NULL, RLMAccessorSetter, s_accessorCaches[RLMAccessorTypeInsertion]);
-}
-
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
                                   RLMAccessorStandaloneGetter, NULL, s_accessorCaches[RLMAccessorTypeStandalone]);
@@ -429,20 +561,88 @@ inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
     return [NSString stringWithFormat:@"RLMDynamic_%@_Version_%lu", className, (unsigned long)version];
 }
 
-// Get or generate a dynamic class from a table and classname
-Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version) {
-    // generate our new classname, and check if it exists
-    NSString *dynamicName = RLMDynamicClassName(schema.className, version);
-    Class dynamicClass = NSClassFromString(dynamicName);
-    if (!dynamicClass) {
-        // if we don't have this class, create a subclass or RLMObject
-        dynamicClass = objc_allocateClassPair(RLMObject.class, dynamicName.UTF8String, 0);
-        objc_registerClassPair(dynamicClass);
-        
-        // implement className for accessor to return base className
-        RLMImplementClassNameMethod(dynamicClass, schema.className);
+void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate) {
+    RLMProperty *prop = obj.RLMObject_schema[propName];
+    if (!prop) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Invalid property name"
+                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                                @"Class name": [obj.class className]}];
     }
-    return dynamicClass;
+    if (validate && !RLMIsObjectValidForProperty(val, prop)) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Invalid value for property"
+                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                                @"Value": val ? [val description] : @"nil"}];
+    }
+    NSUInteger col = prop.column;
+    switch (accessorCodeForType(prop.objcType, prop.type)) {
+        case 'i':
+        case 'l':
+            RLMSetLong(obj, col, [val longLongValue]);
+            break;
+        case 'f':
+            RLMSetFloat(obj, col, [val floatValue]);
+            break;
+        case 'd':
+            RLMSetDouble(obj, col, [val doubleValue]);
+            break;
+        case 'B':
+        case 'c':
+            RLMSetBool(obj, col, (bool)[val boolValue]);
+            break;
+        case 's':
+            RLMSetString(obj, col, val);
+            break;
+        case 'a':
+            RLMSetDate(obj, col, val);
+            break;
+        case 'e':
+            RLMSetData(obj, col, val);
+            break;
+        case 'k':
+            RLMSetLink(obj, col, val);
+            break;
+        case 't':
+            RLMSetArray(obj, col, val);
+            break;
+        case '@':
+            RLMSetAnyProperty(obj, col, val);
+            break;
+        default:
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid accessor code"
+                                         userInfo:nil];
+    }
+}
+
+id RLMDynamicGet(RLMObject *obj, NSString *propName) {
+    RLMProperty *prop = obj.RLMObject_schema[propName];
+    if (!prop) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Invalid property name"
+                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                                @"Class name": [obj.class className]}];
+    }
+    NSUInteger col = prop.column;
+    switch (accessorCodeForType(prop.objcType, prop.type)) {
+        case 'i': return @((int)RLMGetLong(obj, col));
+        case 'l': return @(RLMGetLong(obj, col));
+        case 'f': return @(RLMGetFloat(obj, col));
+        case 'd': return @(RLMGetDouble(obj, col));
+        case 'B': return @(RLMGetBool(obj, col));
+        case 'c': return @(RLMGetBool(obj, col));
+        case 's': return RLMGetString(obj, col);
+        case 'a': return RLMGetDate(obj, col);
+        case 'e': return RLMGetData(obj, col);
+        case 'k': return RLMGetLink(obj, col, prop.objectClassName);
+        case 't': return RLMGetArray(obj, col, prop.objectClassName);
+        case '@': return RLMGetAnyProperty(obj, col);
+        default:
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid accessor code"
+                                         userInfo:nil];
+    }
 }
 
 
