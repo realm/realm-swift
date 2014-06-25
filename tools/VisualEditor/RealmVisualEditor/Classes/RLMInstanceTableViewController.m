@@ -172,13 +172,14 @@
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
+        NSCell *displayingCell = (NSCell *)cell;
         
         switch (propertyNode.type) {
             case RLMPropertyTypeBool:
             case RLMPropertyTypeInt: {
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
                 formatter.allowsFloats = NO;
-                ((NSCell *)cell).formatter = formatter;
+                displayingCell.formatter = formatter;
                 break;
             }
                 
@@ -187,7 +188,7 @@
                 NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
                 formatter.allowsFloats = YES;
                 formatter.numberStyle = NSNumberFormatterDecimalStyle;
-                ((NSCell *)cell).formatter = formatter;
+                displayingCell.formatter = formatter;
                 break;
             }
                 
@@ -195,7 +196,7 @@
                 NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
                 formatter.dateStyle = NSDateFormatterMediumStyle;
                 formatter.timeStyle = NSDateFormatterShortStyle;
-                ((NSCell *)cell).formatter = formatter;
+                displayingCell.formatter = formatter;
                 break;
             }
                 
@@ -204,10 +205,17 @@
             }
                 
             case RLMPropertyTypeString:
-            case RLMPropertyTypeObject:
-            case RLMPropertyTypeArray:
                 break;
                 
+            case RLMPropertyTypeObject:
+            case RLMPropertyTypeArray: {
+                NSString *rawText = displayingCell.stringValue;
+                NSDictionary *attributes = @{NSForegroundColorAttributeName: [NSColor redColor], NSUnderlineStyleAttributeName: @1};
+                NSAttributedString *formattedText = [[NSAttributedString alloc] initWithString:rawText
+                                                                                attributes:attributes];
+                displayingCell.attributedStringValue = formattedText;
+                break;
+            }
             default:
                 break;
         }
