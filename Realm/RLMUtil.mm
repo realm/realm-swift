@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMObject.h"
 #import "RLMArray.h"
@@ -141,4 +142,42 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
 }
 
+
+NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *schema) {
+    NSArray *properties = schema.properties;
+    NSDictionary *defaults = [schema.objectClass defaultPropertyValues];
+    NSMutableDictionary *outDict = [dict mutableCopy];
+    for (RLMProperty * prop in properties) {
+        // set defualt value if missing
+        if (!outDict[prop.name]) {
+            outDict[prop.name] = defaults[prop.name];
+        }
+
+        // validate
+        if (!RLMIsObjectValidForProperty(outDict[prop.name], prop)) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", prop.name]
+                                         userInfo:nil];
+        }
+    }
+    return outDict;
+}
+
+void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema) {
+    NSArray *props = schema.properties;
+    if (array.count != props.count) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Invalid array input. Number of array elements does not match number of properties."
+                                     userInfo:nil];
+    }
+
+    // validate all values
+    for (NSUInteger i = 0; i < array.count; i++) {
+        if (!RLMIsObjectValidForProperty(array[i], props[i])) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", [props[i] name]]
+                                         userInfo:nil];
+        }
+    }
+};
 

@@ -575,6 +575,10 @@ void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate) {
                                      userInfo:@{@"Property name:" : propName ? propName : @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
+    RLMDynamicSet(obj, prop, val);
+}
+
+void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case 'i':

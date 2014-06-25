@@ -218,26 +218,29 @@ void RLMVerifyAndCreateTables(RLMRealm *realm) {
     [realm commitWriteTransaction];
 }
 
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
-    // if already in the right realm then no-op
-    if (object.realm == realm) {
-        return;
-    }
-    
+inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Can only add an object to a Realm during a write transaction"
                                      userInfo:nil];
     }
-    
-    // get table and create new row
-    NSString *objectClassName = object.RLMObject_schema.className;
-    object.realm = realm;
+}
 
-    // set object schema
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
+    // if already in the right realm then no-op
+    if (object.realm == realm) {
+        return;
+    }
+
+    // verify writable
+    RLMVerifyInWriteTransaction(realm);
+    
+    // set the realm and schema
+    NSString *objectClassName = [object.class className];
     RLMObjectSchema *schema = realm.schema[objectClassName];
     object.RLMObject_schema = schema;
+    object.realm = realm;
 
     // create row in table
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
@@ -249,28 +252,74 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         // get object from ivar using key value coding
         id value = [object valueForKey:prop.name];
         
-        // FIXME: Add condition to check for Mixed or Object types because they can support a nil value.
-        if (value) {
-            // set in table with out validation
-            RLMDynamicSet(object, prop.name, value, NO);
-        }
-        else {
+        // FIXME: Add condition to check for Mixed once it can support a nil value.
+        if (!value && prop.type != RLMPropertyTypeObject) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:[NSString stringWithFormat:@"No value or default value specified for %@ property", prop.name]
                                          userInfo:nil];
         }
+
+        // set in table with out validation
+        RLMDynamicSet(object, prop.name, value, NO);
     }
 
-    // we are in a read transaction so change accessor class to readwrite accessor
-    Class objectClass = NSClassFromString(objectClassName);
-    object_setClass(object, RLMAccessorClassForObjectClass(objectClass, schema));
+    // switch class to use table backed accessor
+    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+}
+
+
+RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value) {
+    // verify writable
+    RLMVerifyInWriteTransaction(realm);
+
+    // create the object
+    RLMObjectSchema *schema = realm.schema[className];
+    RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
+
+    // get table
+    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
+
+    // validate values, create row, and populate
+    if ([value isKindOfClass:NSArray.class]) {
+        NSArray *array = value;
+        RLMValidateArrayAgainstObjectSchema(array, schema);
+
+        // create row
+        object->_row = (*table)[table->add_empty_row()];
+
+        // populate
+        NSArray *props = schema.properties;
+        for (NSUInteger i = 0; i < array.count; i++) {
+            RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
+        }
+    }
+    else if ([value isKindOfClass:NSDictionary.class]) {
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
+
+        // create row
+        object->_row = (*table)[table->add_empty_row()];
+
+        // populate
+        NSArray *props = schema.properties;
+        for (RLMProperty *prop in props) {
+            RLMDynamicSet(object, prop, dict[prop.name]);
+        }
+    }
+    else {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Values must be provided either as an array or dictionary"
+                                     userInfo:nil];
+    }
+
+    // switch class to use table backed accessor
+    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+
+    return object;
 }
 
 void RLMDeleteObjectFromRealm(RLMObject *object) {
-    // if realm is not writable throw
-    if (!object.realm.inWriteTransaction) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only delete objects from a Realm during a write transaction" userInfo:nil];
-    }
+    RLMVerifyInWriteTransaction(object.realm);
+
     // move last row to row we are deleting
     object->_row.get_table()->move_last_over(object->_row.get_index());
     // FIXME - fix all accessors

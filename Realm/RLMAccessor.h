@@ -32,9 +32,11 @@ Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema)
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 //
-// Dynamic gettter/setter
+// Dynamic gettters/setters
 //
 void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate = YES);
 id RLMDynamicGet(RLMObject *obj, NSString *propName);
 
+// by column
+void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val);
 
