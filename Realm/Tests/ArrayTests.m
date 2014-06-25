@@ -33,6 +33,25 @@
 
 #pragma mark - Tests
 
+@interface ToJsonObject : RLMObject
+@property NSString *name;
+@property NSInteger age;
+@end
+
+RLM_ARRAY_TYPE(ToJsonObject) //Defines an RLMArray<ToJsonObject> type
+
+
+@implementation ToJsonObject
+@end
+
+@interface ToJsonObjectWithLinks : RLMObject
+@property RLMArray<ToJsonObject> *links;
+@end
+
+@implementation ToJsonObjectWithLinks
+@end
+
+
 @interface ArrayTests : RLMTestCase
 @end
 
@@ -214,6 +233,35 @@
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
 }
 
+
+- (void)testArrayToJSONString
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [ToJsonObject createInRealm:realm withObject:@[@"Mary", @1]];
+    [ToJsonObject createInRealm:realm withObject:@[@"John", @2]];
+    
+    ToJsonObjectWithLinks *withLinks = [[ToJsonObjectWithLinks alloc] init];
+    withLinks.links = (RLMArray<ToJsonObject> *)[ToJsonObject allObjects];
+
+    [realm addObject:withLinks];
+    
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [ToJsonObject allObjects];
+    
+    NSString *json = [all JSONString];
+    XCTAssertNotNil(json, @"Should contain json string");
+    
+    XCTAssertTrue([json rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"JSONString\" on RLMArray");
+    XCTAssertTrue([json rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"JSONString\" on RLMArray");
+    
+    XCTAssertTrue([json rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"JSONString\" on RLMArray");
+    XCTAssertTrue([json rangeOfString:@"1"].location != NSNotFound, @"property values should be displayed when calling \"JSONString\" on RLMArray");
+
+    XCTAssertThrows([withLinks.links JSONString], @"Array with links not supported");
+}
+
 - (void)testArrayDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -237,6 +285,7 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+
 }
 
 - (void)testDeleteLinksAndObjectsInArray

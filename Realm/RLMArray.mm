@@ -196,11 +196,12 @@
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];
 }
+
 #pragma GCC diagnostic pop
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+- (NSString *)JSONString
+{
+    return [self JSONString];
 }
 
 
