@@ -40,6 +40,7 @@
 @end
 
 RLM_ARRAY_TYPE(StringObject)
+RLM_ARRAY_TYPE(IntObject)
 
 #pragma mark AllTypesObject
 

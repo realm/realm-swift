@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4DF358B11959A55300A56343 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF358B01959A55300A56343 /* AppDelegate.swift */; };
 		4DF358B31959A55300A56343 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF358B21959A55300A56343 /* Images.xcassets */; };
-		4DF358BF1959A55300A56343 /* RealmSwiftSimpleExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF358BE1959A55300A56343 /* RealmSwiftSimpleExampleTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,8 +62,6 @@
 		4DF358B01959A55300A56343 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4DF358B21959A55300A56343 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4DF358B81959A55300A56343 /* RealmSwiftSimpleExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmSwiftSimpleExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4DF358BD1959A55300A56343 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4DF358BE1959A55300A56343 /* RealmSwiftSimpleExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmSwiftSimpleExampleTests.swift; sourceTree = "<group>"; };
 		4DF358C81959A56000A56343 /* Realm-Xcode6.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Realm-Xcode6.xcodeproj"; path = "../../../Realm-Xcode6.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,7 +87,6 @@
 			isa = PBXGroup;
 			children = (
 				4DF358AD1959A55300A56343 /* RealmSwiftSimpleExample */,
-				4DF358BB1959A55300A56343 /* RealmSwiftSimpleExampleTests */,
 				4DF358AC1959A55300A56343 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -119,23 +115,6 @@
 			isa = PBXGroup;
 			children = (
 				4DF358AF1959A55300A56343 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		4DF358BB1959A55300A56343 /* RealmSwiftSimpleExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				4DF358BE1959A55300A56343 /* RealmSwiftSimpleExampleTests.swift */,
-				4DF358BC1959A55300A56343 /* Supporting Files */,
-			);
-			path = RealmSwiftSimpleExampleTests;
-			sourceTree = "<group>";
-		};
-		4DF358BC1959A55300A56343 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4DF358BD1959A55300A56343 /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -294,7 +273,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DF358BF1959A55300A56343 /* RealmSwiftSimpleExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
