@@ -111,8 +111,15 @@
                                             withReferringProperty:property
                                                          onObject:object
                                                             realm:self.realm];
-    [displayedArrays addObject:arrayNode];
     
+    if (displayedArrays.count == 0) {
+        [displayedArrays addObject:arrayNode];
+    }
+    else {
+        [displayedArrays replaceObjectAtIndex:0
+                                   withObject:arrayNode];
+    }
+
     return arrayNode;
 }
 
