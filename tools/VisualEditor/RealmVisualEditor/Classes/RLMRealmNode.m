@@ -102,8 +102,8 @@
                                                      green:152
                                                       blue:153
                                                      alpha:255];
- 
-            NSDictionary *attributes = @{NSForegroundColorAttributeName: textColor};
+            NSFont *font = [NSFont boldSystemFontOfSize:12.0];
+            NSDictionary *attributes = @{NSForegroundColorAttributeName: textColor, NSFontAttributeName: font};
             return [[NSAttributedString alloc] initWithString:@"CLASSES" attributes:attributes];
         }
         default:
