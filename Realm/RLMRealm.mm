@@ -515,7 +515,7 @@ static NSArray *s_objectDescriptors = nil;
                 ((RLMObject *)obj).backingTable = tableRef;
                 obj.writable = writable;
             }
-            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
+            else if ([obj isKindOfClass:RLMArrayLinkView.class]) {
                 [arrays addObject:obj];
             }
         }

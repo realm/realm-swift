@@ -412,7 +412,7 @@
 - (void)updateTableView
 {
     [self.instancesTableView reloadData];
-    for(NSTableColumn *column in self.instancesTableView.tableColumns) {
+    for (NSTableColumn *column in self.instancesTableView.tableColumns) {
         [column resizeToFitContents];
     }
 }

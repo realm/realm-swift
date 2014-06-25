@@ -77,7 +77,7 @@ const NSUInteger kTopTipDelay = 250;
         // If the user has selected a file url for storing the demo database, we first check if the
         // file already exists (and is actually a file) we delete the old file before creating the
         // new demo file.
-        if(userSelectesFile) {
+        if (userSelectesFile) {
             NSString *path = selectedFile.path;
             BOOL isDirectory = NO;
             

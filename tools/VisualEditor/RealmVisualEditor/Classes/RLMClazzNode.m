@@ -89,8 +89,8 @@
     
     RLMArray *allObjects = [self.realm allObjects:self.schema.className];
     NSUInteger index = 0;
-    for(RLMObject *classInstance in allObjects) {
-        if(classInstance == instance) {
+    for (RLMObject *classInstance in allObjects) {
+        if (classInstance == instance) {
             return index;
         }
         index++;
