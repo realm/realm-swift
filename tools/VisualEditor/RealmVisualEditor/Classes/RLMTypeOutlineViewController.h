@@ -28,6 +28,6 @@
 @property (nonatomic, readonly) NSOutlineView *outlineView;
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (void)selectClassNode:(RLMObjectNode *)objectNode;
+- (void)selectTypeNode:(RLMObjectNode *)objectNode;
 
 @end

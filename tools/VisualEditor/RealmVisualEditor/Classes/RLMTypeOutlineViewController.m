@@ -161,7 +161,7 @@
 
 #pragma mark - Public methods
 
-- (void)selectClassNode:(RLMObjectNode *)objectNode
+- (void)selectTypeNode:(RLMObjectNode *)objectNode
 {
     NSInteger index = [self.classesOutlineView rowForItem:objectNode];
     

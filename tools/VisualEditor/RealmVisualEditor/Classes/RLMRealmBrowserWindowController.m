@@ -35,7 +35,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode
 {
-    [self.outlineViewController selectClassNode:typeNode];
+    [self.outlineViewController selectTypeNode:typeNode];
     [self.tableViewController updateSelectedObjectNode:typeNode];
 }
 
@@ -46,7 +46,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)classSelectionWasChangedTo:(RLMClazzNode *)classNode
 {
-    [self.outlineViewController selectClassNode:classNode];
+    [self.outlineViewController selectTypeNode:classNode];
 }
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
