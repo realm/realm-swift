@@ -127,7 +127,7 @@
                 Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"Property '%@' must descend from RLMObject", _objectClassName]
+                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
@@ -140,7 +140,7 @@
                 Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"Property '%@' must descend from RLMObject", _objectClassName]
+                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
