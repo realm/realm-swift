@@ -27,8 +27,6 @@
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (void)viewDidLoad;
-
 - (IBAction)userDoubleClicked:(id)sender;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;

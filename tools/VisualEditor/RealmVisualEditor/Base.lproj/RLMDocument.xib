@@ -107,7 +107,6 @@
                                                     <tableViewGridLines key="gridStyleMask" vertical="YES" horizontal="YES"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <connections>
-                                                        <action selector="userDoubleClicked:" target="X01-Pz-1Ve" id="cK2-R8-gRT"/>
                                                         <outlet property="dataSource" destination="X01-Pz-1Ve" id="GhO-Zd-xr8"/>
                                                         <outlet property="delegate" destination="X01-Pz-1Ve" id="FW0-Gv-Asq"/>
                                                     </connections>

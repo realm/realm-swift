@@ -27,8 +27,8 @@
 - (void)viewDidLoad
 {
     // Perform some extra inititialization on the tableview
-    
-    // [self.instancesTableView setDoubleAction:@selector(userDoubleClicked:)];
+    [self.tableView setTarget:self];
+    [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
 }
 
 #pragma mark - NSTableViewDataSource implementation
