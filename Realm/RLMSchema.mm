@@ -91,6 +91,7 @@ static RLMSchema *s_sharedSchema;
         // set class array
         schema.objectSchema = schemaArray;
         
+        // set shared schema
         s_sharedSchema = schema;
     });
 }

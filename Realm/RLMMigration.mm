@@ -23,9 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMArray.h"
 
-@implementation RLMMigration {
-    RLMSchema *_newSchema;
-}
+@implementation RLMMigration
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error {
     RLMMigration *migration = [RLMMigration new];
@@ -42,16 +40,15 @@
         return nil;
     }
     
-    migration->_newSchema = [RLMSchema sharedSchema];
     return migration;
 }
 
 - (RLMSchema *)oldSchema {
-    return self.realm.schema;
+    return self.oldRealm.schema;
 }
 
 - (RLMSchema *)newSchema {
-    return _newSchema;
+    return [RLMSchema sharedSchema];
 }
 
 - (RLMArray *)allObjects:(NSString *)className {
@@ -71,7 +68,8 @@
     [_realm beginWriteTransaction];
 
     // add new tables/columns for the current shared schema
-    bool changed = RLMUpdateTables(_realm, [RLMSchema sharedSchema]);
+    _realm.schema = [RLMSchema sharedSchema];
+    bool changed = RLMUpdateTables(_realm, _realm.schema);
 
     // apply block and set new schema version
     NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);

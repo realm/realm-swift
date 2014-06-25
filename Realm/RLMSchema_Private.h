@@ -58,7 +58,7 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
 //
 @class RLMRealm;
 @interface RLMSchema ()
-@property (nonatomic, readwrite) NSArray *objectSchema;
+@property (nonatomic, readwrite, copy) NSArray *objectSchema;
 
 // mapping of className to tableName
 @property (nonatomic, readonly) NSMutableDictionary *tableNamesForClass;
