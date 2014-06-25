@@ -17,9 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 extern "C" {
-    #import "RLMTestCase.h"
-    #import "RLMMigration.h"
-    #import "RLMSchema_Private.h"
+#import "RLMTestCase.h"
+#import "RLMMigration.h"
+#import "RLMProperty_Private.h"
+#import "RLMSchema_Private.h"
 }
 #import "RLMObjectStore.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -38,6 +39,9 @@ extern "C" {
 @implementation MigrationTests
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
+    // modify object schema to use RLMObject class (or else bad accessors will get created)
+    objectSchema.objectClass = RLMObject.class;
+
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
     return [self dynamicRealmWithTestPathAndSchema:schema];
@@ -47,8 +51,7 @@ extern "C" {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
     objectSchema.properties = @[objectSchema.properties[0]];
-    objectSchema.objectClass = RLMObject.class;
-    
+
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
@@ -56,7 +59,7 @@ extern "C" {
     RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2]);
     [realm commitWriteTransaction];
 
-    // open realm with new schema before migration
+    // open realm with new schema before migration to test migration is necessary
     objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
     XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
     
@@ -79,6 +82,82 @@ extern "C" {
     MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
     XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
     XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
+}
+
+
+- (void)testRemoveProperty {
+    // create schema to migrate from with single string column
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool column:2];
+    objectSchema.properties = [objectSchema.properties arrayByAddingObject:thirdProperty];
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"1", @YES]);
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2, @"2", @NO]);
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+        [migration enumerateObjectsWithClass:MigrationObject.className
+                                       block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertNoThrow(oldObject[@"deletedCol"], @"Deleted column should be accessible on old object.");
+            XCTAssertThrows(newObject[@"deletedCol"], @"Deleted column should not be accessible on new object.");
+        }];
+        return 1;
+    } atPath:RLMTestRealmPath() error:nil];
+
+    // verify migration
+    realm = [self realmWithTestPath];
+    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
+}
+
+- (void)testChangePropertyType {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    RLMProperty *stringCol = objectSchema.properties[1];
+    stringCol.type = RLMPropertyTypeInt;
+    stringCol.objcType = 'i';
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @1]);
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2, @2]);
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+        [migration enumerateObjectsWithClass:MigrationObject.className
+                                       block:^(RLMObject *oldObject, RLMObject *newObject) {
+            NSNumber *intObj = oldObject[@"stringCol"];
+            XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");
+            newObject[@"stringCol"] = [NSString stringWithFormat:@"%@", intObj];
+        }];
+        return 1;
+    } atPath:RLMTestRealmPath() error:nil];
+
+    // verify migration
+    realm = [self realmWithTestPath];
+    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"strintCol should be string after migration.");
+}
+
+- (void)testNoMigrationApplied {
+    // create realm an tables
+    RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:[RLMSchema sharedSchema]];
+    realm = nil;
+    
+    // apply migration
+    XCTAssertNoThrow(
+        [RLMRealm applyMigrationBlock:^NSUInteger(__unused RLMMigration *migration, NSUInteger oldSchemaVersion) {
+            return oldSchemaVersion;
+        } atPath:RLMTestRealmPath() error:nil],
+        @"Returning the same version should work when no migration is required");
 }
 
 @end
