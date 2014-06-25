@@ -20,6 +20,8 @@
 
 @interface RLMViewController : NSViewController
 
+@property (nonatomic, readonly) NSTableView *tableView;
+
 - (void)viewWillLoad;
 
 - (void)viewDidLoad;

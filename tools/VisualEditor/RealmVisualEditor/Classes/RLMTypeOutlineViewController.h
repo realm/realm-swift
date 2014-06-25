@@ -25,8 +25,9 @@
 
 @interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
+@property (nonatomic, readonly) NSOutlineView *outlineView;
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (void)selectClassNode:(RLMClazzNode *)classNode;
+- (void)selectClassNode:(RLMObjectNode *)objectNode;
 
 @end

@@ -20,15 +20,7 @@
 
 @implementation RLMViewController
 
-- (void)viewWillLoad
-{
-    
-}
-
-- (void)viewDidLoad
-{
-    
-}
+#pragma mark - NSViewController overrides
 
 - (void)setView:(NSView *)newValue
 {
@@ -42,6 +34,29 @@
     [self viewWillLoad];
     [super loadView];
     [self viewDidLoad];
+}
+
+#pragma mark - Public methods - Accessors
+
+- (NSTableView *)tableView
+{
+    if([self.view isKindOfClass:[NSTableView class]]) {
+        return (NSTableView *)self.view;
+    }
+        
+    return nil;
+}
+
+#pragma mark - Public methods
+
+- (void)viewWillLoad
+{
+    // Empty default implementation - can be overridden by subclasses.
+}
+
+- (void)viewDidLoad
+{
+    // Empty default implementation - can be overridden by subclasses.    
 }
 
 @end

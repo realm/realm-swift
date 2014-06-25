@@ -33,6 +33,12 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         
 }
 
+- (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode
+{
+    [self.outlineViewController selectClassNode:typeNode];
+    [self.tableViewController updateSelectedObjectNode:typeNode];
+}
+
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
 {
     [self.tableViewController updateSelectedObjectNode:outlineNode];

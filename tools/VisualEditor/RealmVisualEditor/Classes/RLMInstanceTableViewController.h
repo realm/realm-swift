@@ -26,13 +26,10 @@
 @interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
-@property (nonatomic, strong) IBOutlet NSTableView *instancesTableView;
 
 - (void)viewDidLoad;
 
 - (IBAction)userDoubleClicked:(id)sender;
-
-- (void)updateTableView;
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
 

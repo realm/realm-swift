@@ -35,7 +35,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView == self.instancesTableView) {
+    if (tableView == self.tableView) {
         return self.parentWindowController.selectedTypeNode.instanceCount;
     }
     
@@ -44,9 +44,9 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    if (tableView == self.instancesTableView) {
+    if (tableView == self.tableView) {
         
-        NSUInteger columnIndex = [self.instancesTableView.tableColumns
+        NSUInteger columnIndex = [self.tableView.tableColumns
                                   indexOfObject:tableColumn];
         
         RLMClazzProperty *clazzProperty = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
@@ -104,8 +104,8 @@
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    if (tableView == self.instancesTableView) {
-        NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
+    if (tableView == self.tableView) {
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
@@ -169,8 +169,8 @@
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    if (tableView == self.instancesTableView) {
-        NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
+    if (tableView == self.tableView) {
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
         
         switch (propertyNode.type) {
@@ -216,8 +216,8 @@
 
 - (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
-    if (tableView == self.instancesTableView) {
-        NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
+    if (tableView == self.tableView) {
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
         
         RLMObject *selectedInstance = [self.parentWindowController.selectedTypeNode instanceAtIndex:row];
@@ -296,8 +296,8 @@
 
 - (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    if (tableView == self.instancesTableView) {
-        NSUInteger columnIndex = [self.instancesTableView.tableColumns indexOfObject:tableColumn];
+    if (tableView == self.tableView) {
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[columnIndex];
         
         if (propertyNode.type == RLMPropertyTypeDate) {
@@ -354,8 +354,8 @@
 
 - (IBAction)userDoubleClicked:(id)sender
 {
-    NSInteger column = self.instancesTableView.clickedColumn;
-    NSInteger row = self.instancesTableView.clickedRow;
+    NSInteger column = self.tableView.clickedColumn;
+    NSInteger row = self.tableView.clickedRow;
     
     if (column != -1 && row != -1) {
         RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[column];
@@ -370,7 +370,7 @@
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        [self.parentWindowController classSelectionWasChangedTo:clazzNode];
+                        [self.parentWindowController updateSelectedTypeNode:clazzNode];
                         [self updateTableView];
                         
                         // Right now we just fetches the object index from the proxy object.
@@ -382,11 +382,11 @@
                         NSUInteger instanceIndex = indexNumber.integerValue;
                         
                         if (instanceIndex != NSNotFound) {
-                            [self.instancesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:instanceIndex]
+                            [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:instanceIndex]
                                                  byExtendingSelection:NO];
                         }
                         else {
-                            [self.instancesTableView selectRowIndexes:nil
+                            [self.tableView selectRowIndexes:nil
                                                  byExtendingSelection:NO];
                         }
                         
@@ -411,8 +411,8 @@
 
 - (void)updateTableView
 {
-    [self.instancesTableView reloadData];
-    for (NSTableColumn *column in self.instancesTableView.tableColumns) {
+    [self.tableView reloadData];
+    for (NSTableColumn *column in self.tableView.tableColumns) {
         [column resizeToFitContents];
     }
 }
@@ -428,22 +428,22 @@
     NSUInteger columnCount = columns.count;
     
     // We clear the table view from all old columns
-    NSUInteger existingColumnsCount = self.instancesTableView.numberOfColumns;
+    NSUInteger existingColumnsCount = self.tableView.numberOfColumns;
     for (NSUInteger index = 0; index < existingColumnsCount; index++) {
-        NSTableColumn *column = [self.instancesTableView.tableColumns lastObject];
-        [self.instancesTableView removeTableColumn:column];
+        NSTableColumn *column = [self.tableView.tableColumns lastObject];
+        [self.tableView removeTableColumn:column];
     }
     
     // ... and add new columns matching the structure of the new realm table.
     for (NSUInteger index = 0; index < columnCount; index++) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
         
-        [self.instancesTableView addTableColumn:tableColumn];
+        [self.tableView addTableColumn:tableColumn];
     }
     
     // Set the column names and cell type / formatting
     for (NSUInteger index = 0; index < columns.count; index++) {
-        NSTableColumn *tableColumn = self.instancesTableView.tableColumns[index];
+        NSTableColumn *tableColumn = self.tableView.tableColumns[index];
         
         RLMClazzProperty *property = columns[index];
         NSString *columnName = property.name;

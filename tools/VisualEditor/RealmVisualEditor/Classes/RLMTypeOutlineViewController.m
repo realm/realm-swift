@@ -148,11 +148,22 @@
     //[self.parentWindowController updateSelectedObjectNode:nil];
 }
 
+#pragma mark - Public methods - Accessors
+
+- (NSOutlineView *)outlineView
+{
+    if([self.view isKindOfClass:[NSOutlineView class]]) {
+        return (NSOutlineView *)self.view;
+    }
+    
+    return nil;
+}
+
 #pragma mark - Public methods
 
-- (void)selectClassNode:(RLMClazzNode *)classNode
+- (void)selectClassNode:(RLMObjectNode *)objectNode
 {
-    NSInteger index = [self.classesOutlineView rowForItem:classNode];
+    NSInteger index = [self.classesOutlineView rowForItem:objectNode];
     
     [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
                          byExtendingSelection:NO];
@@ -164,12 +175,12 @@
 {
     if ([item isKindOfClass:[RLMClazzNode class]]) {
         RLMClazzNode *classNode = (RLMClazzNode *)item;
-        [self.parentWindowController updateSelectedObjectNode:classNode];
+        [self.parentWindowController updateSelectedTypeNode:classNode];
         return;
     }
     else if ([item isKindOfClass:[RLMArrayNode class]]) {
         RLMArrayNode *arrayNode = (RLMArrayNode *)item;
-        [self.parentWindowController updateSelectedObjectNode:arrayNode];
+        [self.parentWindowController updateSelectedTypeNode:arrayNode];
         return;
     }
 }

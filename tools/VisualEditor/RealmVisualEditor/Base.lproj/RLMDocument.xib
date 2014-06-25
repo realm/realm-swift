@@ -186,7 +186,6 @@
         </customObject>
         <customObject id="X01-Pz-1Ve" customClass="RLMInstanceTableViewController">
             <connections>
-                <outlet property="instancesTableView" destination="enp-HN-e6b" id="YrN-eD-dlY"/>
                 <outlet property="parentWindowController" destination="-2" id="zrl-bi-GWW"/>
                 <outlet property="view" destination="enp-HN-e6b" id="ve8-y2-M62"/>
             </connections>
