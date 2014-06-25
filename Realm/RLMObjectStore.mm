@@ -121,9 +121,9 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         id value = [object valueForKey:prop.name];
         
         // FIXME: Mixed/Any does not support links so nil is not a proper value
-       if (([prop type] == RLMPropertyTypeObject) || value) {
-            // InsertionAccssor setter inserts into table
+        if (([prop type] == RLMPropertyTypeObject) || value) {
             [object setValue:value forKey:prop.name];
+            // InsertionAccssor setter inserts into table
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
