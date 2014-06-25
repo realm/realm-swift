@@ -531,20 +531,22 @@
             }
                 
             case RLMPropertyTypeArray: {
+                NSString *targetTypeName = property.property.objectClassName;
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
                                    editable:NO
-                                    toolTip:@"Array"];
+                                    toolTip:[NSString stringWithFormat:@"%@[..]", targetTypeName]];
                 break;
             }
                 
             case RLMPropertyTypeObject: {
+                NSString *targetTypeName = property.property.objectClassName;
                 [self initializeTableColumn:tableColumn
                                    withName:columnName
                                   alignment:NSLeftTextAlignment
                                    editable:NO
-                                    toolTip:@"Link to object"];
+                                    toolTip:[NSString stringWithFormat:@"%@", targetTypeName]];
                 break;
             }
         }
