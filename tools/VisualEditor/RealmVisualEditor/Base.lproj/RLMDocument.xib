@@ -35,11 +35,11 @@
                                         <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <clipView key="contentView" focusRingType="none" id="udQ-xx-2L4">
-                                            <rect key="frame" x="0.0" y="17" width="322" height="385"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" headerView="UX2-qY-7xj" indentationPerLevel="16" outlineTableColumn="ye8-fR-LJ8" id="IMi-6Y-gQF">
-                                                    <rect key="frame" x="0.0" y="0.0" width="322" height="385"/>
+                                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" indentationPerLevel="16" outlineTableColumn="ye8-fR-LJ8" id="IMi-6Y-gQF">
+                                                    <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" red="0.86274516582489014" green="0.88235300779342651" blue="0.90588241815567017" alpha="1" colorSpace="deviceRGB"/>
@@ -71,14 +71,10 @@
                                             <rect key="frame" x="0.0" y="397" width="255" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
-                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2YT-v9-0yd">
+                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="2YT-v9-0yd">
                                             <rect key="frame" x="-15" y="17" width="16" height="0.0"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
-                                        <tableHeaderView key="headerView" id="UX2-qY-7xj">
-                                            <rect key="frame" x="0.0" y="0.0" width="322" height="17"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableHeaderView>
                                     </scrollView>
                                 </subviews>
                                 <constraints>
