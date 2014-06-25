@@ -136,7 +136,9 @@
                 // verify type
                 Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+                                                 userInfo:nil];
                 }
             }
             else {
@@ -147,7 +149,9 @@
                 // verify type
                 Class cls = NSClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+                                                 userInfo:nil];
                 }
             }
             return YES;

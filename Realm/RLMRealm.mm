@@ -275,7 +275,7 @@ static NSArray *s_objectDescriptors = nil;
     if (!realm) {
         return nil;
     }
-    
+
     NSError *error = nil;
     try {
         if (s_useInMemoryDefaultRealm && [path isEqualToString:RLMRealm.defaultPath]) { // Only for default realm
@@ -307,14 +307,13 @@ static NSArray *s_objectDescriptors = nil;
     if (error) {
         if (outError) {
             *outError = error;
+            return nil;
         }
         else {
-            // if no error provided, throw
             @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Error while opening the Realm"
-                                         userInfo:error.userInfo];
+                                           reason:[error localizedDescription]
+                                         userInfo:nil];
         }
-        return nil;
     }
     
     // begin read

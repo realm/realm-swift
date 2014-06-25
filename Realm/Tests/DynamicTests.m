@@ -19,30 +19,6 @@
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
 
-#pragma mark - Class Extensions
-
-// private realm methods
-@interface RLMRealm ()
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-- (RLMSchema *)schema;
-@end
-
-#pragma mark - Test Objects
-
-@interface DynamicObject : RLMObject
-@property NSString *stringCol;
-@property NSInteger intCol;
-@end
-
-@implementation DynamicObject
-@end
-
-#pragma mark - Tests
-
 @interface DynamicTests : RLMTestCase
 @end
 
@@ -82,7 +58,7 @@
                       @"Array class should by a dynamic object class");
 }
 
-- (void)testDynaimcProperties {
+- (void)testDynamicProperties {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose
         RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
@@ -102,7 +78,7 @@
     XCTAssertThrows(o1[@"invalid"], @"Invalid column name should throw");
 }
 
-- (void)testDynaimcTypes {
+- (void)testDynamicTypes {
     NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
     id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @0, NSNull.null];
     
