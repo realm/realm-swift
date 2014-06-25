@@ -23,6 +23,7 @@
 #import "RLMUtil.hpp"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
+#import "RLMSchema_Private.h"
 
 #import <objc/runtime.h>
 
@@ -433,7 +434,7 @@ inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
 Class RLMDynamicClassForSchema(RLMObjectSchema *schema, NSUInteger version) {
     // generate our new classname, and check if it exists
     NSString *dynamicName = RLMDynamicClassName(schema.className, version);
-    Class dynamicClass = NSClassFromString(dynamicName);
+    Class dynamicClass = RLMClassFromString(dynamicName);
     if (!dynamicClass) {
         // if we don't have this class, create a subclass or RLMObject
         dynamicClass = objc_allocateClassPair(RLMObject.class, dynamicName.UTF8String, 0);

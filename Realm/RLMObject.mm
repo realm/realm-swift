@@ -219,8 +219,13 @@ void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-+ (NSString *)className {
++ (NSString *)className
+{
+#ifdef REALM_SWIFT
+    return [RLMSwiftSupport parseClass:self].name;
+#else
     return NSStringFromClass(self);
+#endif
 }
 
 - (NSString *)description

@@ -19,6 +19,7 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject.h"
+#import "RLMSchema_Private.h"
 
 // private properties
 @interface RLMProperty ()
@@ -124,7 +125,7 @@
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
-                Class cls = NSClassFromString(self.objectClassName);
+                Class cls = RLMClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
@@ -137,7 +138,7 @@
                 _type = RLMPropertyTypeObject;
                 
                 // verify type
-                Class cls = NSClassFromString(self.objectClassName);
+                Class cls = RLMClassFromString(self.objectClassName);
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
