@@ -279,10 +279,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					"${SRCROOT}/../../build/${CONFIGURATION}",
-					../../,
+					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
-					"$(PROJECT_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -306,10 +304,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
-					"${SRCROOT}/../../build/${CONFIGURATION}",
+					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
-					../../,
-					"$(PROJECT_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

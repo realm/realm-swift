@@ -24,7 +24,8 @@
 
 @implementation LinkTests
 
-- (void)testBasicLink {
+- (void)testBasicLink
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     OwnerObject *owner = [[OwnerObject alloc] init];
@@ -36,8 +37,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
-    RLMArray *owners = [realm objects:OwnerObject.className withPredicate:nil];
-    RLMArray *dogs = [realm objects:DogObject.className withPredicate:nil];
+    RLMArray *owners = [realm objects:[OwnerObject className] withPredicate:nil];
+    RLMArray *dogs = [realm objects:[DogObject className] withPredicate:nil];
     XCTAssertEqual(owners.count, (NSUInteger)1, @"Expecting 1 owner");
     XCTAssertEqual(dogs.count, (NSUInteger)1, @"Expecting 1 dog");
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -47,7 +48,30 @@
     XCTAssertEqualObjects(tim.dog.dogName, @"Harvie", @"Tim's dog should be Harvie");
 }
 
-- (void)testMultipleOwnerLink {
+-(void)testBasicLinkWithNil
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    OwnerObject *owner = [[OwnerObject alloc] init];
+    owner.name = @"Tim";
+    owner.dog = nil;
+
+    [realm beginWriteTransaction];
+    [realm addObject:owner];
+    [realm commitWriteTransaction];
+
+    RLMArray *owners = [realm objects:[OwnerObject className] withPredicate:nil];
+    RLMArray *dogs = [realm objects:[DogObject className] withPredicate:nil];
+    XCTAssertEqual(owners.count, (NSUInteger)1, @"Expecting 1 owner");
+    XCTAssertEqual(dogs.count, (NSUInteger)0, @"Expecting 0 dogs");
+    XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
+
+    OwnerObject *tim = owners[0];
+    XCTAssertEqualObjects(tim.dog, nil, @"Tim does not have a dog");
+}
+
+- (void)testMultipleOwnerLink
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     OwnerObject *owner = [[OwnerObject alloc] init];
@@ -71,7 +95,8 @@
     XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 dog");
 }
 
-- (void)testLinkRemoval {
+- (void)testLinkRemoval
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     OwnerObject *owner = [[OwnerObject alloc] init];
@@ -101,7 +126,8 @@
     XCTAssertEqual([realm objects:[DogObject className] withPredicate:nil].count, (NSUInteger)0, @"Expecting 0 dogs");
 }
 
-- (void)testInvalidLinks {
+- (void)testInvalidLinks
+{
     RLMRealm *realm = [self realmWithTestPath];
     
     OwnerObject *owner = [[OwnerObject alloc] init];
@@ -119,7 +145,8 @@
 
 // FIXME - disable until we fix commit log issue which break transacions when leaking realm objects
 /*
-- (void)testCircularLinks {
+- (void)testCircularLinks 
+ {
     RLMRealm *realm = [self realmWithTestPath];
     
     CircleObject *obj = [[CircleObject alloc] init];
