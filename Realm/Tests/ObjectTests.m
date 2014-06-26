@@ -266,15 +266,7 @@
     NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
     XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
 
-    @try {
-        [IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"];
-        XCTFail(@"Invalid operator in numeric predicate.");
-    }
-    @catch (NSException *exception) {
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"Invalid operator in numeric predicate.");
-    }
+    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in numeric predicate.");
 }
 
 - (void)testDataTypes
