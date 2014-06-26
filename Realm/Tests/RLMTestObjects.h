@@ -23,7 +23,7 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark OneTypeObjects
+#pragma mark SingleTypeObjects
 
 @interface StringObject : RLMObject
 
