@@ -65,3 +65,41 @@
 
 @implementation OwnerObject
 @end
+
+#pragma mark - Specific Use Objects
+#pragma mark -
+
+#pragma mark MixedObject
+
+@implementation MixedObject
+@end
+
+#pragma mark CustomAccessorsObject
+
+@implementation CustomAccessorsObject
+@end
+
+#pragma mark BaseClassStringObject
+
+@implementation BaseClassStringObject
+@end
+
+#pragma mark CircleObject
+
+@implementation CircleObject
+@end
+
+#pragma mark ArrayPropertyObject
+
+@implementation ArrayPropertyObject
+@end
+
+#pragma mark DynamicObject
+
+@implementation DynamicObject
+@end
+
+#pragma mark AggregateObject
+
+@implementation AggregateObject
+@end

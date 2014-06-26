@@ -127,6 +127,67 @@
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
 }
 
+-(void)testObjectInitWithObjectTypeArray
+{
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@[@"Peter", @30, @YES]];
+    
+    XCTAssertEqualObjects(obj1.name, @"Peter", @"Names should be equal");
+    XCTAssertEqual(obj1.age, 30, @"Age should be equal");
+    XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
+    
+    // Add to realm
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [EmployeeObject allObjects];
+    EmployeeObject *fromRealm = all.firstObject;
+    
+    XCTAssertEqualObjects(fromRealm.name, @"Peter", @"Names should be equal");
+    XCTAssertEqual(fromRealm.age, 30, @"Age should be equal");
+    XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
+    
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@"Peter", @30]]), @"To few arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[@YES, @"Peter", @30]]), @"Wrong arguments");
+    XCTAssertThrows(([[EmployeeObject alloc] initWithObject:@[]]), @"empty arguments");
+}
+
+-(void)testObjectInitWithObjectTypeDictionary
+{
+    EmployeeObject *obj1 = [[EmployeeObject alloc] initWithObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    
+    XCTAssertEqualObjects(obj1.name, @"Susi", @"Names should be equal");
+    XCTAssertEqual(obj1.age, 25, @"Age should be equal");
+    XCTAssertEqual(obj1.hired, YES, @"Hired should be equal");
+    
+    // Add to realm
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+    
+    RLMArray *all = [EmployeeObject allObjects];
+    EmployeeObject *fromRealm = all.firstObject;
+    
+    XCTAssertEqualObjects(fromRealm.name, @"Susi", @"Names should be equal");
+    XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
+    XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
+    
+    
+    EmployeeObject *objDefault = [[EmployeeObject alloc] initWithObject:@{}];
+    XCTAssertNil(objDefault.name, @"nil string is default for String property");
+    XCTAssertEqual(objDefault.age, 0, @"0 is default for int property");
+    XCTAssertEqual(objDefault.hired, NO, @"No is default for Bool property");
+}
+
+-(void)testObjectInitWithObjectTypeOther
+{
+    XCTAssertThrows([[EmployeeObject alloc] initWithObject:@"StringObject"], @"Not an array or dictionary");
+    XCTAssertThrows([[EmployeeObject alloc] initWithObject:nil], @"Not an array or dictionary");
+}
+
+
 - (void)testObjectSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -166,23 +227,50 @@
 
 - (void)testObjectCount
 {
+    XCTAssertEqual([[IntObject allObjects] count], (NSUInteger)0,
+                   @"No RLMObjects in empty Realm.");
+    // count is frequently used in connection with other tests.
+    // Eventually, we can remove the above as well.
+}
+
+- (void)testNumericPredicate
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    [IntObject createInRealm:realm withObject:(@[@23])];
-    [IntObject createInRealm:realm withObject:(@[@23])];
-    [IntObject createInRealm:realm withObject:(@[@22])];
-    [IntObject createInRealm:realm withObject:(@[@29])];
+    [IntObject createInRealm:realm withObject:(@[@1])];
+
     [IntObject createInRealm:realm withObject:(@[@2])];
-    [IntObject createInRealm:realm withObject:(@[@24])];
-    [IntObject createInRealm:realm withObject:(@[@21])];
+    [IntObject createInRealm:realm withObject:(@[@2])];
+
+    [IntObject createInRealm:realm withObject:(@[@3])];
+    [IntObject createInRealm:realm withObject:(@[@3])];
+    [IntObject createInRealm:realm withObject:(@[@3])];
+
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
     [realm commitWriteTransaction];
-  
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
+
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 3"].count, (NSUInteger)3,
+                   @"== operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 3"].count, (NSUInteger)7,
+                   @">= operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <= 3"].count, (NSUInteger)6,
+                   @"<= operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >  3"].count, (NSUInteger)4,
+                   @">  operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <  3"].count, (NSUInteger)3,
+                   @"<  operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol != 3"].count, (NSUInteger)7,
+                   @"!= operator in numeric predicate.");
+
+    // varargs don't play nice with macros
+    NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
+    XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
+
+    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in numeric predicate.");
 }
 
 - (void)testBooleanPredicate
