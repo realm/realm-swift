@@ -50,7 +50,7 @@
  
  ### Attributes for Properties
 
- You can set which of these properties should be indexed, stored in-line, unique, required
+ You can set which of these properties should be indexed, stored inline, unique, required
  as well as delete rules for the links by implementing the attributesForProperty: method.
  
  You can set properties to ignore (i.e. transient properties you do not want
