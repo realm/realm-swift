@@ -203,4 +203,9 @@
     return prop;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"name: %@\ntype: %d\nattributes: %lu\nobjcType: %c\nobjectClassName: %@", self.name, self.type, self.attributes, self.objcType, self.objectClassName];
+}
+
 @end

@@ -25,9 +25,7 @@
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
-@property (nonatomic, readwrite, assign) NSString *className;
 @end
 
 

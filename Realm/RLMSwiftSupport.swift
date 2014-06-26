@@ -59,65 +59,6 @@ extension String {
 }
 
 @objc class RLMSwiftSupport {
-    class func convertSwiftPropertiesToObjC(swiftClass: AnyClass) {
-        let swiftObject = (swiftClass as RLMObject.Type)()
-
-        let reflection = reflect(swiftObject)
-
-        let propertyCount = reflection.count
-
-        let ignoredPropertiesForClass = swiftClass.ignoredProperties() as NSArray?
-
-        for i in 1..propertyCount {
-            // Skip the first property (super):
-            // super is an implicit property on Swift objects
-            let propertyName = reflection[i].0
-
-            if ignoredPropertiesForClass != nil &&
-                ignoredPropertiesForClass!.containsObject(propertyName) {
-                continue
-            }
-
-            var typeEncoding = encodingForValueType(reflection[i].1.valueType)
-
-            let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
-            class_addProperty(swiftClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
-        }
-    }
-
-    class func encodingForValueType(type: Any.Type) -> CString {
-        switch type {
-        // Detect basic types (including optional versions)
-        case is Bool.Type, is Bool?.Type:
-            return "c"
-        case is Int.Type, is Int?.Type:
-            return "i"
-        case is Float.Type, is Float?.Type:
-            return "f"
-        case is Double.Type, is Double?.Type:
-            return "d"
-        case is String.Type, is String?.Type:
-            return "S"
-
-        // Detect Objective-C object types
-        case let c as NSObject.Type:
-            let parsedClass = parseClass(c.self)
-            if parsedClass.swift {
-                // Mangled class map must contain this property's class
-                // for Realm to create the proper table
-                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
-                if mapMissingName {
-                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
-                }
-            }
-            let className = parsedClass.swift ? parsedClass.mangledName : parsedClass.name
-            return "@\"\(className)\"".bridgeToObjectiveC().UTF8String
-
-        default:
-            println("Other type")
-            return ""
-        }
-    }
 
     class func isSwiftClassName(className: NSString) -> Bool {
         return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
@@ -160,4 +101,112 @@ extension String {
             moduleName: moduleName,
             mangledName: originalName)
     }
+
+    class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
+        let parsedClass = parseClass(aClass)
+
+        if !parsedClass.swift {
+            return RLMObjectSchema(forObjectClass: aClass)
+        }
+
+        RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
+
+        let swiftObject = (aClass as RLMObject.Type)()
+
+        let reflection = reflect(swiftObject)
+
+        let ignoredPropertiesForClass = aClass.ignoredProperties() as NSArray?
+
+        var propArray = RLMProperty[]()
+
+        for i in 1..reflection.count {
+            // Skip the first property (super):
+            // super is an implicit property on Swift objects
+            let propertyName = reflection[i].0
+
+            if ignoredPropertiesForClass != nil &&
+                ignoredPropertiesForClass!.containsObject(propertyName) {
+                    continue
+            }
+
+            let realmAttributes = aClass.attributesForProperty(propertyName)
+
+            let (property, typeEncoding) = propertyForMirror(reflection[i].1,
+                name: propertyName,
+                attributes: realmAttributes, column: propArray.count)
+
+            propArray += property
+
+            let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
+            class_addProperty(aClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
+        }
+
+        let schema = RLMObjectSchema()
+        schema.properties = propArray
+        schema.className = parsedClass.name
+        return schema
+    }
+
+    class func propertyForMirror(mirror: Mirror, name: String, attributes: RLMPropertyAttributes, column: Int) -> (RLMProperty, CString) {
+        var propertyType: RLMPropertyType?
+        var encoding: CString?
+        var objectClassName: String?
+
+        switch mirror.valueType {
+            // Detect basic types (including optional versions)
+        case is Bool.Type, is Bool?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Bool, "c")
+        case is Int.Type, is Int?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Int, "i")
+        case is Float.Type, is Float?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Float, "f")
+        case is Double.Type, is Double?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Double, "d")
+        case is String.Type, is String?.Type:
+            (propertyType, encoding) = (RLMPropertyType.String, "S")
+        case is NSData.Type, is NSData?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Data, "@\"NSData\"")
+        case is NSDate.Type, is NSDate?.Type:
+            (propertyType, encoding) = (RLMPropertyType.Date, "@\"NSDate\"")
+
+            // Detect Objective-C object types
+        case let c as RLMObject.Type:
+            let parsedClass = RLMSwiftSupport.parseClass(c.self)
+            if parsedClass.swift {
+                // Mangled class map must contain this property's class
+                // for Realm to create the proper table
+                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
+                if mapMissingName {
+                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
+                }
+            }
+            objectClassName = parsedClass.name
+            let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
+            (propertyType, encoding) = (RLMPropertyType.Object, typeEncoding)
+            
+        default:
+            println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
+            assert(false)
+        }
+
+        let prop = RLMProperty(name: name, type: propertyType!, column: column)
+        prop.attributes = attributes
+        prop.objectClassName = objectClassName
+        return (prop, encoding!)
+    }
+
+//            else if ([type hasPrefix:arrayPrefix]) {
+//                // get object class from type string - @"RLMArray<objectClassName>"
+//                _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
+//                _type = RLMPropertyTypeArray;
+//                
+//                // verify type
+//                Class cls = RLMClassFromString(self.objectClassName);
+//                if (class_getSuperclass(cls) != RLMObject.class) {
+//                    @throw [NSException exceptionWithName:@"RLMException"
+//                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+//                                                 userInfo:nil];
+//                }
+//            }
+
 }

@@ -28,12 +28,12 @@
 /**
  Array of persisted properties for an object.
  */
-@property (nonatomic, readonly, copy) NSArray *properties;
+@property (nonatomic, copy) NSArray *properties;
 
 /**
  The name of the class this schema describes.
  */
-@property (nonatomic, readonly) NSString *className;
+@property (nonatomic, copy) NSString *className;
 
 /**
  Lookup a property object by name.
@@ -43,6 +43,9 @@
  @return    RLMProperty object or nil if there is no property with the given name.
  */
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
+
+// returns a cached or new schema for a given object class
++(instancetype)schemaForObjectClass:(Class)objectClass;
 
 @end
 
