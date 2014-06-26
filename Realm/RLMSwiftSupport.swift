@@ -105,10 +105,6 @@ extension String {
     class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
         let parsedClass = parseClass(aClass)
 
-        if !parsedClass.swift {
-            return RLMObjectSchema(forObjectClass: aClass)
-        }
-
         RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
 
         let swiftObject = (aClass as RLMObject.Type)()
@@ -144,10 +140,7 @@ extension String {
             class_addProperty(aClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
         }
 
-        let schema = RLMObjectSchema()
-        schema.properties = properties
-        schema.className = parsedClass.name
-        return schema
+        return RLMObjectSchema(className: parsedClass.name, properties: properties)
     }
 
     class func propertyForValueType(valueType: Any.Type,

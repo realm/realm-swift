@@ -26,6 +26,7 @@
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
+@property (nonatomic, readwrite, copy) NSString *className;
 @end
 
 
@@ -47,6 +48,14 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
+    NSString *className = NSStringFromClass(objectClass);
+
+#ifdef REALM_SWIFT
+    if ([RLMSwiftSupport isSwiftClassName:className]) {
+        return [RLMSwiftSupport schemaForObjectClass:objectClass];
+    }
+#endif
+
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -73,16 +82,8 @@
     }
     
     free(props);
-    
-    // create schema object and set properties
-    RLMObjectSchema * schema = [RLMObjectSchema new];
-    schema.properties = propArray;
-#ifdef REALM_SWIFT
-    schema.className = [RLMSwiftSupport parseClass:objectClass].name;
-#else
-    schema.className = NSStringFromClass(objectClass);
-#endif
-    return schema;
+
+    return [[RLMObjectSchema alloc] initWithClassName:className properties:propArray];
 }
 
 
@@ -106,13 +107,18 @@
 
         [propArray addObject:prop];
     }
-    
-    // create schema object and set properties
-    RLMObjectSchema * schema = [RLMObjectSchema new];
-    schema.properties = propArray;
-    schema.className = className;
-    
-    return schema;
+
+    return [[RLMObjectSchema alloc] initWithClassName:className properties:propArray];
+}
+
+- (instancetype)initWithClassName:(NSString *)className properties:(NSArray *)properties
+{
+    self = [super init];
+    if (self) {
+        self.className = className;
+        self.properties = properties;
+    }
+    return self;
 }
 
 @end

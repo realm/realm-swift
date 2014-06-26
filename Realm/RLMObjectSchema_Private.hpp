@@ -23,6 +23,9 @@
 // RLMObjectSchema private
 @interface RLMObjectSchema ()
 
+// returns a cached or new schema for a given object class
++(instancetype)schemaForObjectClass:(Class)objectClass;
+
 // generate a schema from a table
 +(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className;
 

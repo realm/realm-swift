@@ -27,12 +27,12 @@
 /**
  Property name.
  */
-@property (nonatomic, copy) NSString * name;
+@property (nonatomic, readonly) NSString * name;
 
 /**
  Property type.
  */
-@property (nonatomic, assign) RLMPropertyType type;
+@property (nonatomic, readonly) RLMPropertyType type;
 
 /**
  Property attributes.
@@ -43,8 +43,6 @@
  Object class name - specify object types for RLMObject and RLMArray properties.
  */
 @property (nonatomic, copy) NSString *objectClassName;
-@property (nonatomic, assign) char objcType;
-@property (nonatomic, assign) NSUInteger column;
 
 // initializer
 -(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;

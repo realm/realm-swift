@@ -72,12 +72,7 @@ static NSMutableDictionary *s_mangledClassMap;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
-                RLMObjectSchema *object = nil;
-#ifdef REALM_SWIFT
-                object = [RLMSwiftSupport schemaForObjectClass:classes[i]];
-#else
-                object = [RLMObjectSchema schemaForObjectClass:classes[i]];
-#endif
+                RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];
 
                 // set table name and mappings
