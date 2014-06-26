@@ -62,7 +62,7 @@
  
  You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search in Realms other than the default Realm use the interface on an RLMRealm instance.
+ default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
  ### Relationships
  
