@@ -285,7 +285,7 @@
 -(NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
- Returns the average of a givne property for objects in an RLMArray.
+ Returns the average of a given property for objects in an RLMArray.
  
  NSNumber *average = [table averageOfProperty:@"age"];
  
