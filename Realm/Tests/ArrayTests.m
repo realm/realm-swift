@@ -63,12 +63,15 @@
     RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
-    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"name"]];
+    StringObject *obj1 = [StringObject createInRealm:realm withObject:@[@"name1"]];
+    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"name2"]];
     [realm commitWriteTransaction];
     
-    RLMArray *array = [realm allObjects:StringObject.className];
+    RLMArray *array = [StringObject allObjects];
     XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
-    XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array addObject:obj1], NSException, @"RLMException", @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array replaceObjectAtIndex:0 withObject:obj2], NSException, @"RLMException", @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array insertObject:obj1 atIndex:0], NSException, @"RLMException", @"Mutating readOnly array should throw");
 }
 
 - (void)testObjectAggregate
@@ -289,7 +292,7 @@
     XCTAssertNoThrow([peopleInCompany removeLastObject], @"Should delete last link");
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 remaining link");
     [peopleInCompany replaceObjectAtIndex:0 withObject:po2];
-    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 lin replaced");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 link replaced");
     [peopleInCompany insertObject:po1 atIndex:0];
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"2 links");
     XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links");
@@ -305,7 +308,7 @@
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"No employees should have been deleted");
 
     [realm beginWriteTransaction];
-    XCTAssertThrows([allPeople removeObjectAtIndex:3], @"Out of bounds");
+    XCTAssertThrows([allPeople removeObjectAtIndex:0], @"Not implemented");
     allPeople = [EmployeeObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
 
     //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported
