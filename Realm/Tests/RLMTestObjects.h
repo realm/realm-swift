@@ -23,7 +23,7 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark StringObject
+#pragma mark SingleTypeObjects
 
 @interface StringObject : RLMObject
 
@@ -31,11 +31,27 @@
 
 @end
 
-#pragma mark IntObject
-
 @interface IntObject : RLMObject
 
 @property int intCol;
+
+@end
+
+@interface BoolObject : RLMObject
+
+@property BOOL boolCol;
+
+@end
+
+@interface DateObject : RLMObject
+
+@property NSDate *dateCol;
+
+@end
+
+@interface BinaryObject : RLMObject
+
+@property NSData *binaryCol;
 
 @end
 
