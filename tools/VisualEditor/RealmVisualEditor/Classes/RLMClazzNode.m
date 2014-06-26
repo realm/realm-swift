@@ -18,6 +18,8 @@
 
 #import "RLMClazzNode.h"
 
+#import "SidebarTableCellView.h"
+
 @implementation RLMClazzNode {
 
     NSMutableArray *displayedArrays;
@@ -63,17 +65,6 @@
     return displayedArrays[index];
 }
 
-- (id)nodeElementForColumnWithIndex:(NSInteger)index
-{
-    switch (index) {
-        case 0:
-            return self.schema.className;
-        
-        default:
-            return nil;
-    }
-}
-
 #pragma mark - RLMObjectNode overrides
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
@@ -101,6 +92,20 @@
 /*
     return [allObjects indexOfObject:instance];
 */
+}
+
+- (NSView *)cellViewForTableView:(NSTableView *)tableView
+{
+    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                      owner:self];
+
+    result.textField.stringValue = self.name;
+    result.button.title = [NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
+    [[result.button cell] setHighlightsBy:0];
+    result.button.hidden = NO;
+    result.imageView.image = [NSImage imageNamed:NSImageNameFolder];
+    
+    return result;
 }
 
 #pragma mark - Public methods

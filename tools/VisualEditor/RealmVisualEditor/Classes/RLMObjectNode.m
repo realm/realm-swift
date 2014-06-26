@@ -62,6 +62,12 @@
     return nil; // Default implementation - should be overridden by subclasses.
 }
 
+- (NSView *)cellViewForTableView:(NSTableView *)tableView
+{
+    return nil; // Default implementation - should be overridden by subclasses.    
+}
+
+
 #pragma mark - Public methods - Accessors
 
 - (NSString *)name

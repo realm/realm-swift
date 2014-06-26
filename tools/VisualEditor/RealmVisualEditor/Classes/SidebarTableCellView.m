@@ -8,12 +8,6 @@
 
 #import "SidebarTableCellView.h"
 
-@interface SidebarTableCellView ()
-
-@property(strong) IBOutlet NSButton *button;
-
-@end
-
 @implementation SidebarTableCellView
 
 @synthesize button = _button;
@@ -32,7 +26,7 @@
         
         NSRect textFrame = self.textField.frame;
         NSRect buttonFrame = self.button.frame;
-        buttonFrame.origin.x = NSWidth(self.frame) - NSWidth(buttonFrame);
+        buttonFrame.origin.x = NSWidth(self.frame) - NSWidth(buttonFrame) - 10.0f;
         self.button.frame = buttonFrame;
         textFrame.size.width = NSMinX(buttonFrame) - NSMinX(textFrame);
         self.textField.frame = textFrame;

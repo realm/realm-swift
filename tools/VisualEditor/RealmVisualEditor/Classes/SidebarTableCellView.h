@@ -10,5 +10,7 @@
 
 @interface SidebarTableCellView : NSTableCellView
 
+@property(strong) IBOutlet NSButton *button;
+
 @end
 

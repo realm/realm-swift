@@ -20,6 +20,7 @@
 
 #import <Realm/Realm.h>
 
+#import "SidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
 
 @interface RLMRealm ()
@@ -94,23 +95,6 @@
     return [self topLevelClazzes][index];
 }
 
-- (id)nodeElementForColumnWithIndex:(NSInteger)index
-{
-    switch (index) {
-        case 0: {
-            NSColor *textColor = [NSColor colorWithByteRed:145
-                                                     green:152
-                                                      blue:153
-                                                     alpha:255];
-            NSFont *font = [NSFont boldSystemFontOfSize:12.0];
-            NSDictionary *attributes = @{NSForegroundColorAttributeName: textColor, NSFontAttributeName: font};
-            return [[NSAttributedString alloc] initWithString:@"CLASSES" attributes:attributes];
-        }
-        default:
-            return nil;
-    }
-}
-
 - (BOOL)hasToolTip
 {
     return YES;
@@ -119,6 +103,23 @@
 - (NSString *)toolTipString
 {
     return _url;
+}
+
+- (NSView *)cellViewForTableView:(NSTableView *)tableView
+{
+    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"HeaderLabel"
+                                                      owner:self];
+    
+    result.textField.stringValue = @"classes".uppercaseString;
+    result.textField.textColor = [NSColor colorWithByteRed:145
+                                                     green:152
+                                                      blue:153
+                                                     alpha:255];
+    
+    [[result.button cell] setHighlightsBy:0];
+    
+    return result;
+
 }
 
 #pragma mark - Private methods

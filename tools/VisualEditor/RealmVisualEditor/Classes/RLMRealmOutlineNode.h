@@ -30,7 +30,7 @@
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index;
 
-- (id)nodeElementForColumnWithIndex:(NSInteger)index;
+- (NSView *)cellViewForTableView:(NSTableView *)tableView;
 
 @optional
 

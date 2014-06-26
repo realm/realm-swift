@@ -95,22 +95,6 @@
     return 0;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
-{
-    NSUInteger columnIndex = [self.classesOutlineView.tableColumns indexOfObject:tableColumn];
-    if (columnIndex != NSNotFound) {
-        if (item == nil && columnIndex == 0) {
-            return @"Realms";
-        }
-        else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
-            id<RLMRealmOutlineNode> outlineItem = item;
-            return [outlineItem nodeElementForColumnWithIndex:columnIndex];
-        }
-    }
-    
-    return nil;
-}
-
 #pragma mark - NSOutlineViewDelegate implementation
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
@@ -146,6 +130,33 @@
     
     // NOTE: Remember to move the clearing of the row selection in the instance view
     //[self.parentWindowController updateSelectedObjectNode:nil];
+}
+
+- (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row
+{
+    // No Action
+}
+
+- (void)outlineView:(NSOutlineView *)outlineView didRemoveRowView:(NSTableRowView *)rowView forRow:(NSInteger)row
+{
+    // No Action
+}
+
+- (NSTableRowView *)outlineView:(NSOutlineView *)outlineView rowViewForItem:(id)item
+{
+    return nil;
+}
+
+- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    if (outlineView == self.classesOutlineView) {
+        if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
+            id<RLMRealmOutlineNode> outlineNode = item;
+            return [outlineNode cellViewForTableView:self.tableView];
+        }
+    }
+    
+    return nil;
 }
 
 #pragma mark - Public methods - Accessors
