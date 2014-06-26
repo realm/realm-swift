@@ -154,12 +154,12 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
- Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
+ Update an RLMRealm and outstanding objects to point to the most recent data for this RLMRealm.
  */
 - (void)refresh;
 
 /**
- Set to YES to automacially update this Realm when changes happen in other threads.
+ Set to YES to automatically update this Realm when changes happen in other threads.
 
  If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
  Notifications are sent immediately when a change is available whether or not the Realm is automatically
@@ -176,7 +176,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  * ---------------------------------------------------------------------------------------
  */
 /**
- Adds an object to be persistsed it in this Realm.
+ Adds an object to be persisted it in this Realm.
  
  Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
@@ -188,7 +188,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds objects in the given array to be persistsed it in this Realm.
+ Adds objects in the given array to be persisted it in this Realm.
  
  This is the equivalent of addObject: except for an array of objects.
  
@@ -213,7 +213,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Get all objects of a given type in this Realm.
  
- @param className   The name of the RLMObject subclass to retrieve on eg. `MyClass.className`.
+ @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
  
  @return    An RLMArray of all objects in this realm of the given type.
  
@@ -327,7 +327,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 // 
 // @usage RLMRealm.defaultRealm[@"name"] = object;
 // @param obj     The object to be stored.
-// @param key     The key that itentifies the object to be used for future lookups.
+// @param key     The key that identifies the object to be used for future lookups.
 //
 //-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 

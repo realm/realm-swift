@@ -251,6 +251,12 @@ static NSArray *s_objectDescriptors = nil;
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
 {
+    if (!path || path.length == 0) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Path is not valid"
+                                     userInfo:@{@"path":(path ?: @"nil")}];
+    }
+    
     NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
