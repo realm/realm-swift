@@ -246,10 +246,10 @@ static NSArray *s_objectDescriptors = nil;
                       dynamic:(BOOL)dynamic
                         error:(NSError **)outError
 {
-    if (!path || [path isEqualToString:@""]) {
+    if (!path || path.length == 0) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Path is not valid"
-                                     userInfo:@{@"path":path}];
+                                     userInfo:@{@"path":(path ?: @"nil")}];
     }
     
     NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
