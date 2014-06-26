@@ -20,6 +20,10 @@ import Foundation
 
 extension RLMArray: Sequence {
 
+    convenience init<T: RLMObject>(object: T) {
+        self.init(objectClassName: NSStringFromClass(object.dynamicType))
+    }
+
     func generate() -> GeneratorOf<RLMObject> {
         var i  = 0
         return GeneratorOf<RLMObject>({
@@ -183,7 +187,21 @@ extension String {
             objectClassName = parsedClass.name
             let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
             (propertyType, encoding) = (RLMPropertyType.Object, typeEncoding)
-            
+
+        case let c as RLMArray.Type:
+            let parsedClass = RLMSwiftSupport.parseClass(c.self)
+            if parsedClass.swift {
+                // Mangled class map must contain this property's class
+                // for Realm to create the proper table
+                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
+                if mapMissingName {
+                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
+                }
+            }
+            objectClassName = parsedClass.name
+            let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
+            (propertyType, encoding) = (RLMPropertyType.Array, typeEncoding)
+
         default:
             println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
             assert(false)
