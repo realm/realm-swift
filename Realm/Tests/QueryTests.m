@@ -371,6 +371,7 @@
     
 }
 
+// FIXME Reenable when issue has been resolved: https://app.asana.com/0/861870036984/13392049000660
 //- (void)testTwoColumnComparisonQuery
 //{
 //    RLMRealm *realm = [RLMRealm defaultRealm];
