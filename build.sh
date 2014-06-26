@@ -56,8 +56,9 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | xcpretty -c ${XCPRETTY_PARAMS}
+        xcodebuild $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
+            echo "The raw xcodebuild output is available in build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
@@ -180,19 +181,23 @@ case "$COMMAND" in
         ;;
 
     "test-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Debug build test"
+        sh build.sh test-osx-debug
+        sh build.sh test-ios-debug
         exit 0
         ;;
 
     "test-all")
-        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
         sh build.sh test "$XCMODE" || exit 1
         sh build.sh test-debug "$XCMODE" || exit 1
-        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer
-        sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-debug "$XCMODE" || exit 1
-        exit 0
+        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer || exit 1
+        fail=0
+        (
+            sh build.sh test "$XCMODE" || exit 1
+            sh build.sh test-debug "$XCMODE" || exit 1
+        ) || fail=1
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
+        exit $fail
         ;;
 
     "test-ios")
@@ -202,6 +207,16 @@ case "$COMMAND" in
 
     "test-osx")
         xcrealm "-scheme OSX -configuration Release test"
+        exit 0
+        ;;
+
+    "test-ios-debug")
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        exit 0
+        ;;
+
+    "test-osx-debug")
+        xcrealm "-scheme OSX -configuration Debug test"
         exit 0
         ;;
 

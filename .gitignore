@@ -46,3 +46,6 @@ DerivedData
 *.iml
 # backup and crash files
 *.swp
+
+# xcpretty
+build.log
