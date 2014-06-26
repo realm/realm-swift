@@ -331,11 +331,11 @@
 				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 				02E4D6EE192E583A0082808D /* RLMTestObjects.h */,
 				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
+				5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */,
+				5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */,
 				02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */,
 				02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
-				5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */,
-				5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */,
 			);
 			name = RealmTests;
 			path = Realm/Tests;
