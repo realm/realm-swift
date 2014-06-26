@@ -131,7 +131,7 @@ extension String {
 
             let realmAttributes = aClass.attributesForProperty(propertyName)
 
-            let (property, typeEncoding) = propertyForMirror(reflection[i].1,
+            let (property, typeEncoding) = propertyForValueType(reflection[i].1.valueType,
                 name: propertyName,
                 attributes: realmAttributes, column: propArray.count)
 
@@ -147,12 +147,12 @@ extension String {
         return schema
     }
 
-    class func propertyForMirror(mirror: Mirror, name: String, attributes: RLMPropertyAttributes, column: Int) -> (RLMProperty, CString) {
+    class func propertyForValueType(valueType: Any.Type, name: String, attributes: RLMPropertyAttributes, column: Int) -> (RLMProperty, CString) {
         var propertyType: RLMPropertyType?
         var encoding: CString?
         var objectClassName: String?
 
-        switch mirror.valueType {
+        switch valueType {
             // Detect basic types (including optional versions)
         case is Bool.Type, is Bool?.Type:
             (propertyType, encoding) = (RLMPropertyType.Bool, "c")
