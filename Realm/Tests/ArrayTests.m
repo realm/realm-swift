@@ -222,6 +222,8 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+    
+    XCTAssertThrowsSpecificNamed(([[EmployeeObject allObjects] JSONString]), NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 - (void)testDeleteLinksAndObjectsInArray
