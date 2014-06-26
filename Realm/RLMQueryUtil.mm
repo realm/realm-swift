@@ -346,27 +346,26 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
 }
 
 template<typename T>
-Expression *column_expression(NSComparisonPredicateOptions operatorType,
+Query column_expression(NSComparisonPredicateOptions operatorType,
                                             NSUInteger leftColumn,
-                                            NSUInteger rightColumn) {
-    Columns<T> *col1 = new Columns<T>(leftColumn);
-    Columns<T> *col2 = new Columns<T>(rightColumn);
+                                            NSUInteger rightColumn,
+                                            Table *table) {
 
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
-            return new Compare<Equal, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) == table->column<T>(rightColumn);
         case NSNotEqualToPredicateOperatorType:
-            return new Compare<NotEqual, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) != table->column<T>(rightColumn);
         case NSLessThanPredicateOperatorType:
-            return new Compare<Less, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) < table->column<T>(rightColumn);
         case NSGreaterThanPredicateOperatorType:
-            return new Compare<Greater, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) > table->column<T>(rightColumn);
         case NSLessThanOrEqualToPredicateOperatorType:
-            return new Compare<LessEqual, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) <= table->column<T>(rightColumn);
         case NSGreaterThanOrEqualToPredicateOperatorType:
-            return new Compare<GreaterEqual, T>(*col1, *col2, true);
+            return table->column<T>(leftColumn) >= table->column<T>(rightColumn);
         default:
-            @throw RLMPredicateException(@"Wrong operator", @"Wrong operator");
+            @throw RLMPredicateException(@"Unsupported operator", @"Only ==, !=, <, <=, >, and >= are support comparison operators");
     }
 }
     
@@ -384,16 +383,16 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     if (leftType == rightType) {
         switch (leftType) {
             case type_Bool:
-                query.and_query(*column_expression<Bool>(predicateOptions, leftIndex, rightIndex));
+                query.and_query(column_expression<Bool>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             case type_Int:
-                query.and_query(*column_expression<Int>(predicateOptions, leftIndex, rightIndex));
+                query.and_query(column_expression<Int>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             case type_Float:
-                query.and_query(*column_expression<Float>(predicateOptions, leftIndex, rightIndex));
+                query.and_query(column_expression<Float>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             case type_Double:
-                query.and_query(*column_expression<Double>(predicateOptions, leftIndex, rightIndex));
+                query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
