@@ -31,11 +31,11 @@
                                   column:(NSUInteger)column;
 
 // private setters
-@property (nonatomic) NSUInteger column;
-@property (nonatomic, readwrite) RLMPropertyType type;
+@property (nonatomic, assign) NSUInteger column;
+@property (nonatomic, readwrite, assign) RLMPropertyType type;
 
 // private properties
-@property (nonatomic) char objcType;
+@property (nonatomic, assign) char objcType;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
