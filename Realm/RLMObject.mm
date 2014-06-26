@@ -19,24 +19,36 @@
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
-#import "RLMQueryUtil.h"
-#import "RLMUtil.h"
+#import "RLMQueryUtil.hpp"
+#import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
 
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize writable = _writable;
+@synthesize RLMAccessor_writable = _RLMAccessor_writable;
+@synthesize RLMAccessor_invalid = _RLMAccessor_invalid;
+@synthesize RLMObject_schema = _RLMObject_schema;
 
 // standalone init
 -(instancetype)init {
     self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
     
     // set standalone accessor class
-    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.schema));
+    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
     
     return self;
+}
+
+
+-(instancetype)initWithObject:(id)values {
+    id obj = [self init];
+    RLMObjectSchema *schema = RLMSchema.sharedSchema[self.class.className];
+    
+    RLMPopulateObjectWithValues(schema, values, obj);
+    
+    return obj;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm
@@ -46,7 +58,7 @@
     
     if (self) {
         self.realm = realm;
-        self.schema = schema;
+        self.RLMObject_schema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -62,11 +74,19 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)values {
     id obj = [[self alloc] init];
     
-    RLMObjectSchema *desc = realm.schema[[self className]];
-    NSArray *properties = desc.properties;
+    RLMObjectSchema *schema = realm.schema[[self className]];
     
-    // FIXME - this can be optimized by inserting directly into the table
-    //  after validation, rather than populating the object first
+    RLMPopulateObjectWithValues(schema, values, obj);
+    
+    // insert populated object into store
+    RLMAddObjectToRealm(obj, realm);
+
+    return obj;
+}
+
+void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
+    NSArray *properties = schema.properties;
+    
     if ([values isKindOfClass:NSDictionary.class]) {
         for (RLMProperty * property in properties) {
             id value = values[property.name];
@@ -101,17 +121,10 @@
                 @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
             }
         }
+    } else {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Values must be provided either as an array or dictionary" userInfo:nil];
     }
     
-    // insert populated object into store
-    RLMAddObjectToRealm(obj, realm);
-
-    return obj;
-}
-
--(void)setBackingTable:(tightdb::TableRef)backingTable {
-    _backingTable = backingTable;
-    _backingTableIndex = backingTable->get_index_in_parent();
 }
 
 // default attributes for property implementation
@@ -142,7 +155,7 @@
 }
 #pragma GCC diagnostic pop
 
-- (void)setWritable:(BOOL)writable {
+- (void)setRLMAccessor_writable:(BOOL)writable {
     if (!_realm) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
     }
@@ -150,12 +163,28 @@
     // set accessor class based on write permission
     // FIXME - we are assuming this is always an accessor subclass
     if (writable) {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _schema));
+        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
     }
     else {
-        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, _schema));
+        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
     }
-    _writable = writable;
+    _RLMAccessor_writable = writable;
+}
+
+- (void)setRLMAccessor_invalid:(BOOL)invalid {
+    if (!_realm) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
+    }
+    
+    // set accessor class
+    // FIXME - we are assuming this is always an accessor subclass
+    if (invalid) {
+        object_setClass(self, RLMInvalidAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
+    }
+    else {
+        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
+    }
+    _RLMAccessor_invalid = invalid;
 }
 
 -(id)objectForKeyedSubscript:(NSString *)key {
@@ -170,20 +199,16 @@
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWhere:(id)predicate, ... {
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+{
     NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, nil);
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objectsWithPredicate:outPredicate];
 }
 
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    NSPredicate *outPredicate = nil;
-    if (predicate) {
-        RLM_PREDICATE(predicate, outPredicate);
-    }
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, outPredicate, order);
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+{
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
 }
 
 - (NSString *)JSONString {

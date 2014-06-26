@@ -18,8 +18,81 @@
 
 #import "RLMTestObjects.h"
 
+#pragma mark - Abstract Objects
+#pragma mark -
+
+#pragma mark StringObject
+
+@implementation StringObject
+@end
+
+#pragma mark IntObject
+
+@implementation IntObject
+@end
+
+#pragma mark AllTypesObject
+
 @implementation AllTypesObject
 @end
 
-@implementation RLMTestObject
+#pragma mark - Real Life Objects
+#pragma mark -
+
+#pragma mark EmployeeObject
+
+@implementation EmployeeObject
+@end
+
+#pragma mark CompanyObject
+
+@implementation CompanyObject
+@end
+
+#pragma mark DogObject
+
+@implementation DogObject
+@end
+
+#pragma mark OwnerObject
+
+@implementation OwnerObject
+@end
+
+#pragma mark - Specific Use Objects
+#pragma mark -
+
+#pragma mark MixedObject
+
+@implementation MixedObject
+@end
+
+#pragma mark CustomAccessorsObject
+
+@implementation CustomAccessorsObject
+@end
+
+#pragma mark BaseClassStringObject
+
+@implementation BaseClassStringObject
+@end
+
+#pragma mark CircleObject
+
+@implementation CircleObject
+@end
+
+#pragma mark ArrayPropertyObject
+
+@implementation ArrayPropertyObject
+@end
+
+#pragma mark DynamicObject
+
+@implementation DynamicObject
+@end
+
+#pragma mark AggregateObject
+
+@implementation AggregateObject
 @end

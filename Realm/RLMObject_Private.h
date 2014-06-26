@@ -19,19 +19,21 @@
 #import "RLMObject.h"
 #import "RLMAccessor.h"
 #import "RLMObjectSchema.h"
+#import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
-@interface RLMObject () <RLMAccessor>
+@interface RLMObject () <RLMAccessor> {
+  @public
+    tightdb::Row _row;
+}
 
 - (instancetype)initWithRealm:(RLMRealm *)realm
                        schema:(RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
 
+// namespace properties to prevent collision with user properties
 @property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::TableRef backingTable;
-@property (nonatomic) RLMObjectSchema *schema;
+@property (nonatomic) RLMObjectSchema *RLMObject_schema;
 
 @end
 

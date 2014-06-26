@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
 @interface RLMRealm ()
@@ -47,29 +46,43 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
+-(void)testRealmFailure
+{
+    XCTAssertThrows([RLMRealm realmWithPath:@"/dev/null"], @"Shouldn't exist");
+
+}
+
+- (void)testRealmPath
+{
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    XCTAssertEqualObjects(defaultRealm.path, RLMDefaultRealmPath(), @"Default path");
+    RLMRealm *testRealm = [self realmWithTestPath];
+    XCTAssertEqualObjects(testRealm.path, RLMTestRealmPath(), @"Test path");
+}
+
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    [RLMTestObject createInRealm:realm withObject:@[@"a"]];
-    [RLMTestObject createInRealm:realm withObject:@[@"b"]];
-    [RLMTestObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    [StringObject createInRealm:realm withObject:@[@"a"]];
+    [StringObject createInRealm:realm withObject:@[@"b"]];
+    [StringObject createInRealm:realm withObject:@[@"c"]];
+    XCTAssertEqual([realm objects:[StringObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
-    RLMArray *objects = [realm allObjects:RLMTestObject.className];
+    RLMArray *objects = [realm allObjects:StringObject.className];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
-    XCTAssertEqualObjects([objects.firstObject column], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:[RLMTestObject className] where:nil].count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual([realm objects:[StringObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
-    objects = [realm allObjects:[RLMTestObject className]];
+    objects = [realm allObjects:[StringObject className]];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
-    XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
 
@@ -86,7 +99,7 @@
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [RLMTestObject createInRealm:realm withObject:@[@"string"]];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
     });
     
@@ -109,8 +122,8 @@
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
-        RLMTestObject *obj = [[RLMTestObject alloc] init];
-        obj.column = @"string";
+        StringObject *obj = [[StringObject alloc] init];
+        obj.stringCol = @"string";
         [realm beginWriteTransaction];
         [realm addObject:obj];
         [realm commitWriteTransaction];
@@ -123,9 +136,9 @@
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
     // get object
-    RLMArray *objects = [realm objects:RLMTestObject.className where:nil];
-    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type RLMTestObject");
-    XCTAssertEqualObjects([objects[0] column], @"string", @"Value of first column should be 'string'");
+    RLMArray *objects = [realm objects:StringObject.className withPredicate:nil];
+    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+    XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
 /* FIXME: disabled until we have per file compile options
@@ -171,7 +184,7 @@
 {
     RLMRealm *realmWithFile = [RLMRealm defaultRealm];
     [realmWithFile beginWriteTransaction];
-    [RLMTestObject createInRealm:realmWithFile withObject:@[@"a"]];
+    [StringObject createInRealm:realmWithFile withObject:@[@"a"]];
     [realmWithFile commitWriteTransaction];
     XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
 }
@@ -182,11 +195,26 @@
     
     RLMRealm *realmInMemory = [RLMRealm defaultRealm];
     [realmInMemory beginWriteTransaction];
-    [RLMTestObject createInRealm:realmInMemory withObject:@[@"a"]];
-    [RLMTestObject createInRealm:realmInMemory withObject:@[@"b"]];
-    [RLMTestObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([realmInMemory objects:[RLMTestObject className] where:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
+    [StringObject createInRealm:realmInMemory withObject:@[@"b"]];
+    [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
+    XCTAssertEqual([realmInMemory objects:[StringObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realmInMemory commitWriteTransaction];
+}
+
+- (void)testRealmFileAccess
+{
+    XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
+    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");    
+    
+    NSString *content = @"Some content";
+    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *filePath = RLMRealmPathForFile(@"filename.realm");
+    [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
+    
+    NSError *error;
+    XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
+    XCTAssertNotNil(error, @"Should populate error object");
 }
 
 @end

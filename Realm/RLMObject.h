@@ -60,9 +60,9 @@
  
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search in a Realms other than the defaut Realm  use the interface on an RLMRealm instance.
+ default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
  ### Relationships
  
@@ -88,6 +88,18 @@
  */
 -(instancetype)init;
 
+
+/**
+ Initialize a standalone RLMObject with values from an NSArray or NSDictionary
+ 
+ Initialize an unpersisted instance of this object.
+ Call addObject: on an RLMRealm to add standalone object to a realm.
+ 
+ @see [RLMRealm addObject:]:
+ */
+- (instancetype)initWithObject:(id)object;
+
+
 /**
  Helper to return the class name for an RLMObject subclass.
  
@@ -105,7 +117,7 @@
  @param object  The object used to populate the object. This can be any key/value compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
-                thrown if all equired properties are not present or no default is provided.
+                thrown if all required properties are not present or no default is provided.
                 When passing in an NSArray, all properties must be present and valid.
  
  @see   defaultPropertyValues
@@ -176,26 +188,20 @@
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWhere:(id)predicate, ...;
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered RLMArray of objects matching the given predicate for this type from the default Realm.
+ Get objects matching the given predicate for this type from the default Realm.
  
- @param predicate   The argument can be an NSPredicate, a predicate string, or predicate format string
- which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
- the property name, or an NSSortDescriptor with the property name and order.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the predicate
- ordered by the given order.
+ @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
-
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -241,6 +247,3 @@
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
-
-
-

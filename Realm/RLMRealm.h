@@ -23,7 +23,6 @@
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 
-
 @interface RLMRealm : NSObject
 
 /**---------------------------------------------------------------------------------------
@@ -156,19 +155,12 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
- Abandon all write operations in the current write transaction terminating the transaction.
- 
- After this is called the RLMRealm reverts back to being read-only.
- */
-- (void)rollbackWriteTransaction;
-
-/**
- Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
+ Update an RLMRealm and outstanding objects to point to the most recent data for this RLMRealm.
  */
 - (void)refresh;
 
 /**
- Set to YES to automacially update this Realm when changes happen in other threads.
+ Set to YES to automatically update this Realm when changes happen in other threads.
 
  If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
  Notifications are sent immediately when a change is available whether or not the Realm is automatically
@@ -185,9 +177,9 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  * ---------------------------------------------------------------------------------------
  */
 /**
- Adds an object to be persistsed it in this Realm.
+ Adds an object to be persisted it in this Realm.
  
- Once added, this object can be retrieved using the objectsWhere: selectors on RLMRealm and on
+ Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
  also be added to the Realm if they are not already in it. If linked objects already belong to a
  different Realm an exception will be thrown.
@@ -197,7 +189,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds objects in the given array to be persistsed it in this Realm.
+ Adds objects in the given array to be persisted it in this Realm.
  
  This is the equivalent of addObject: except for an array of objects.
  
@@ -222,7 +214,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Get all objects of a given type in this Realm.
  
- @param className   The name of the RLMObject subclass to retrieve on eg. `MyClass.className`.
+ @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
  
  @return    An RLMArray of all objects in this realm of the given type.
  
@@ -235,32 +227,28 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
- @param className   The type of objects you are looking for (name of the class).
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
-                    which can accept variable arguments.
+ @param className       The type of objects you are looking for (name of the class).
+ @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsWhere:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
 
 /**
- Get an ordered array of objects matching the given predicate from the this Realm.
+ Get objects matching the given predicate from the this Realm.
  
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
  
  @param className   The type of objects you are looking for (name of the class).
- @param order       This argument determines how the results are sorted. It can be an NSString containing
-                    the property name, or an NSSortDescriptor with the property name and order.
- @param predicate   This argument can be an NSPredicate, a predicte string, or predicate format string
- which can accept variable arguments.
+ @param predicate   The predicate to filter the objects.
  
- @return    An RLMArray of results matching the predicate ordered by the given order.
+ @return    An RLMArray of results matching the given predicate.
  
- @see       RLMObject objectsOrderedBy:where:
+ @see       RLMObject objectsWithPredicateFormat:
  */
-- (RLMArray *)objects:(NSString *)className orderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 #pragma mark -
 
@@ -286,7 +274,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // 
 // @usage RLMRealm.defaultRealm[@"name"] = object;
 // @param obj     The object to be stored.
-// @param key     The key that itentifies the object to be used for future lookups.
+// @param key     The key that identifies the object to be used for future lookups.
 //
 //-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
@@ -307,4 +295,10 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 // 
 @property (nonatomic, readonly) NSUInteger schemaVersion;
 
+@end
+
+//
+// Notification token - holds onto the realm and the notification block
+//
+@interface RLMNotificationToken : NSObject
 @end
