@@ -55,14 +55,15 @@ void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema
     // FIXME - this method should calculate all mismatched columns, and missing/extra columns, and include
     //         all of this information in a single exception
     // FIXME - verify property attributes
-    
-    // for now loop through all columns and ensure they are aligned
+
+    // check count
     if (tableSchema.properties.count != objectSchema.properties.count) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Column count does not match interface - migration required"
                                      userInfo:nil];
     }
 
+    // check to see if properties are the same
     for (RLMProperty *schemaProp in objectSchema.properties) {
         RLMProperty *tableProp = tableSchema[schemaProp.name];
         if (![tableProp.name isEqualToString:schemaProp.name]) {
