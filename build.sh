@@ -181,8 +181,8 @@ case "$COMMAND" in
         ;;
 
     "test-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Debug build test"
+        sh build.sh test-osx-debug
+        sh build.sh test-ios-debug
         exit 0
         ;;
 
@@ -207,6 +207,16 @@ case "$COMMAND" in
 
     "test-osx")
         xcrealm "-scheme OSX -configuration Release test"
+        exit 0
+        ;;
+
+    "test-ios-debug")
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        exit 0
+        ;;
+
+    "test-osx-debug")
+        xcrealm "-scheme OSX -configuration Debug test"
         exit 0
         ;;
 
