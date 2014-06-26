@@ -365,7 +365,7 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
         case NSGreaterThanOrEqualToPredicateOperatorType:
             return table->column<T>(leftColumn) >= table->column<T>(rightColumn);
         default:
-            @throw RLMPredicateException(@"Unsupported operator", @"Only ==, !=, <, <=, >, and >= are support comparison operators");
+            @throw RLMPredicateException(@"Unsupported operator", @"Only ==, !=, <, <=, >, and >= are supported comparison operators");
     }
 }
     
