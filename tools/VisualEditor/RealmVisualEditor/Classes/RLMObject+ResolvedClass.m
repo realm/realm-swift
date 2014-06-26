@@ -23,6 +23,6 @@ static NSString *const RLMLinkedObjectPrefix = @"RLMReadOnly_";
 @implementation RLMObject (Schema)
 
 // This property is defined in the private files of the Realm ObjC binding.
-@dynamic schema;
+@dynamic RLMObject_schema;
 
 @end

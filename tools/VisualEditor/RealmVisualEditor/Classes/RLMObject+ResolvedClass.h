@@ -18,9 +18,8 @@
 
 #import <Realm/Realm.h>
 
-
 @interface RLMObject (Schema)
 
-@property (nonatomic) RLMObjectSchema *schema;
+@property (nonatomic) RLMObjectSchema *RLMObject_schema;
 
 @end

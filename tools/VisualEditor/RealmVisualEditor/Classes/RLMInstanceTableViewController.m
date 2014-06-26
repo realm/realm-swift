@@ -90,7 +90,7 @@
                 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *objectSchema = referredObject.schema;
+                RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
                 return [NSString stringWithFormat:@"-> %@", objectSchema.className];
             }
                 
@@ -248,7 +248,7 @@
             case RLMPropertyTypeObject: {
                 if ([propertyValue isKindOfClass:[RLMObject class]]) {
                     RLMObject *referredObject = (RLMObject *)propertyValue;
-                    RLMObjectSchema *objectSchema = referredObject.schema;
+                    RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
                     NSArray *properties = objectSchema.properties;
                     
                     NSString *toolTipString = @"";
@@ -374,7 +374,7 @@
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
                 RLMObject *linkedObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *linkedObjectSchema = linkedObject.schema;
+                RLMObjectSchema *linkedObjectSchema = linkedObject.RLMObject_schema;
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
