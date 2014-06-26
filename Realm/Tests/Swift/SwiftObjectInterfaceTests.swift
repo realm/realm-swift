@@ -30,7 +30,6 @@ class SwiftObject: RLMObject {
     var stringCol = "a"
     var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
     var dateCol = NSDate(timeIntervalSince1970: 1)
-    var swiftDateCol = NSDate(timeIntervalSince1970: 1)
     var objectCol = SwiftBoolObject()
     var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }

@@ -79,7 +79,6 @@ static NSMutableDictionary *s_mangledClassMap;
                 object = [RLMObjectSchema schemaForObjectClass:classes[i]];
 #endif
                 [schemaArray addObject:object];
-                NSLog(@"object schema: %@", object.properties);
 
                 // set table name and mappings
                 NSString *tableName = RLMTableNameForClassName(object.className);
