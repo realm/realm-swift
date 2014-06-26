@@ -21,6 +21,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
+#import "NSColor+ByteSizeFactory.h"
 
 @implementation RLMInstanceTableViewController
 
@@ -85,13 +86,13 @@
                 
             case RLMPropertyTypeArray: {
                 RLMArray *referredObject = (RLMArray *)propertyValue;
-                return [NSString stringWithFormat:@"-> %@[%lu]", referredObject.objectClassName, (unsigned long)referredObject.count];
+                return [NSString stringWithFormat:@"List of links to %@", referredObject.objectClassName];
             }
                 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
                 RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
-                return [NSString stringWithFormat:@"-> %@", objectSchema.className];
+                return [NSString stringWithFormat:@"Link to %@", objectSchema.className];
             }
                 
             default:
@@ -210,7 +211,7 @@
             case RLMPropertyTypeObject:
             case RLMPropertyTypeArray: {
                 NSString *rawText = displayingCell.stringValue;
-                NSDictionary *attributes = @{NSForegroundColorAttributeName: [NSColor redColor], NSUnderlineStyleAttributeName: @1};
+                NSDictionary *attributes = @{NSForegroundColorAttributeName: [NSColor colorWithByteRed:26 green:66 blue:251 alpha:255], NSUnderlineStyleAttributeName: @1};
                 NSAttributedString *formattedText = [[NSAttributedString alloc] initWithString:rawText
                                                                                 attributes:attributes];
                 displayingCell.attributedStringValue = formattedText;
