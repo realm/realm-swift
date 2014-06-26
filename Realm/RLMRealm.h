@@ -177,7 +177,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
  * ---------------------------------------------------------------------------------------
  */
 /**
- Adds an object to be persistsed it in this Realm.
+ Adds an object to be persisted it in this Realm.
  
  Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
@@ -189,7 +189,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 - (void)addObject:(RLMObject *)object;
 
 /**
- Adds objects in the given array to be persistsed it in this Realm.
+ Adds objects in the given array to be persisted it in this Realm.
  
  This is the equivalent of addObject: except for an array of objects.
  
@@ -214,7 +214,7 @@ typedef void (^RLMMigrationBlock)(RLMMigrationRealm *realm);
 /**
  Get all objects of a given type in this Realm.
  
- @param className   The name of the RLMObject subclass to retrieve on eg. `MyClass.className`.
+ @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
  
  @return    An RLMArray of all objects in this realm of the given type.
  
