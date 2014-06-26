@@ -50,7 +50,7 @@
  
  ### Attributes for Properties
 
- You can set which of these properties should be indexed, stored inline, unique, required
+ You can set which of these properties should be indexed, stored in-line, unique, required
  as well as delete rules for the links by implementing the attributesForProperty: method.
  
  You can set properties to ignore (i.e. transient properties you do not want
@@ -62,7 +62,7 @@
  
  You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search in a Realms other than the defaut Realm  use the interface on an RLMRealm instance.
+ default Realm. To search in a Realms other than the default Realm  use the interface on an RLMRealm instance.
  
  ### Relationships
  
@@ -117,7 +117,7 @@
  @param object  The object used to populate the object. This can be any key/value compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
-                thrown if all equired properties are not present or no default is provided.
+                thrown if all required properties are not present or no default is provided.
                 When passing in an NSArray, all properties must be present and valid.
  
  @see   defaultPropertyValues
