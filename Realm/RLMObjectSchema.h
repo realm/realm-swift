@@ -44,8 +44,5 @@
  */
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
-// Designated initializer
-- (instancetype)initWithClassName:(NSString *)objectClassName properties:(NSArray *)properties;
-
 @end
 

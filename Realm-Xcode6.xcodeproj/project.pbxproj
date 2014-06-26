@@ -120,6 +120,8 @@
 		E856D226195615B800FB2FCF /* SwiftMixedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCE1955FE0100FDED82 /* SwiftMixedTests.swift */; };
 		E856D227195615B800FB2FCF /* SwiftObjectInterfaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FCF1955FE0100FDED82 /* SwiftObjectInterfaceTests.swift */; };
 		E856D228195615B800FB2FCF /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */; };
+		E87EB774195CD1CC00492C0B /* RLMSwiftSupport_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E87EB773195CD1CC00492C0B /* RLMSwiftSupport_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E87EB775195CD1CC00492C0B /* RLMSwiftSupport_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E87EB773195CD1CC00492C0B /* RLMSwiftSupport_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8A543AF195C9C9E00990A20 /* RLMPredicateUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */; };
 		E8A543B0195C9C9E00990A20 /* RLMPredicateUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */; };
 		E8A543B1195C9C9E00990A20 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */; };
@@ -245,6 +247,7 @@
 		E81A1FD31955FE0100FDED82 /* XCTestCase+AsyncTesting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+AsyncTesting.m"; sourceTree = "<group>"; };
 		E856D1D5195614A300FB2FCF /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E856D1DF195614A400FB2FCF /* iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E87EB773195CD1CC00492C0B /* RLMSwiftSupport_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport_Private.h; sourceTree = "<group>"; };
 		E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
 		E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
 		E8D89B981955FC6D00CF2B9A /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -383,6 +386,7 @@
 				E81A1F7D1955FC9300FDED82 /* RLMSchema_Private.h */,
 				E81A1F7E1955FC9300FDED82 /* RLMSchema.h */,
 				E81A1F7F1955FC9300FDED82 /* RLMSchema.mm */,
+				E87EB773195CD1CC00492C0B /* RLMSwiftSupport_Private.h */,
 				E8EE01BB1956034400B7AA13 /* RLMSwiftSupport.swift */,
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
 				E81A1F821955FC9300FDED82 /* RLMUtil.mm */,
@@ -435,6 +439,7 @@
 				E856D20A1956154C00FB2FCF /* RLMRealm.h in Headers */,
 				E856D1F51956154C00FB2FCF /* RLMArray.h in Headers */,
 				E856D2051956154C00FB2FCF /* RLMProperty.h in Headers */,
+				E87EB775195CD1CC00492C0B /* RLMSwiftSupport_Private.h in Headers */,
 				E8A543B0195C9C9E00990A20 /* RLMPredicateUtil.h in Headers */,
 				E856D2021956154C00FB2FCF /* RLMObjectStore.h in Headers */,
 				E856D2071956154C00FB2FCF /* RLMQueryUtil.hpp in Headers */,
@@ -461,6 +466,7 @@
 				E81A1FA81955FC9300FDED82 /* RLMRealm.h in Headers */,
 				E81A1FA11955FC9300FDED82 /* RLMProperty.h in Headers */,
 				E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */,
+				E87EB774195CD1CC00492C0B /* RLMSwiftSupport_Private.h in Headers */,
 				E8A543AF195C9C9E00990A20 /* RLMPredicateUtil.h in Headers */,
 				E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */,
 				E81A1F9D1955FC9300FDED82 /* RLMObjectStore.h in Headers */,

@@ -22,3 +22,7 @@
 #import <Realm/RLMObject.h>
 #import <Realm/RLMArray.h>
 #import <Realm/RLMSchema.h>
+
+// Private: for Swift support only
+// Do not use
+#import <Realm/RLMSwiftSupport_Private.h>
