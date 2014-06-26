@@ -16,23 +16,44 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMPredicateUtil.h"
 
-@interface RLMPredicateGen : NSObject
-
-+ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
-                             expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type;
+@implementation RLMPredicateUtil
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                                    type: (NSPredicateOperatorType) type
-                                options: (NSComparisonPredicateOptions) options;
+{
+    return [RLMPredicateUtil comparisonWithKeyPath: keyPath
+                                       expression: expression
+                                             type: type
+                                          options: 0];
+}
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                                    type: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
-                               modifier: (NSComparisonPredicateModifier) modifier;
+{
+    return [RLMPredicateUtil comparisonWithKeyPath: keyPath
+                                       expression: expression
+                                             type: type
+                                          options: options
+                                         modifier: NSDirectPredicateModifier];
+}
+
++ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
+                             expression: (NSExpression *)expression
+                                   type: (NSPredicateOperatorType) type
+                                options: (NSComparisonPredicateOptions) options
+                               modifier: (NSComparisonPredicateModifier) modifier
+{
+    return
+    [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForKeyPath:keyPath]
+                                       rightExpression: expression
+                                              modifier: modifier
+                                                  type: type
+                                               options: options];
+}
 
 @end

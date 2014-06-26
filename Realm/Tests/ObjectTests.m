@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMPredicateGen.h"
+#import "RLMPredicateUtil.h"
 
 #define OP_TYPE NSPredicateOperatorType
 #define OP_OPTIONS NSComparisonPredicateOptions
@@ -280,15 +280,7 @@
     XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol != TRUE"].count,
                    (NSUInteger)0, @"== operator in bool predicate.");
 
-    @try {
-        [BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"];
-        XCTFail("Invalid operator in bool predicate.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"Invalid operator in bool predicate.");
-    }
+    XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in bool predicate.");
 }
 
 - (void)testStringComparisonInPredicate
@@ -304,7 +296,7 @@
     NSExpression *alpha = [NSExpression expressionForConstantValue:@"A"];
 
     NSUInteger (^count)(OP_TYPE, OP_OPTIONS) = ^(OP_TYPE type, OP_OPTIONS options) {
-        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"stringCol"
+        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
                                                          expression: alpha
                                                                type: type
                                                             options: options];
@@ -337,47 +329,14 @@
                    (NSUInteger)0, @"Case-insensitive != or <> operator in string comparison.");
 
     // Unsupported (but valid) modifiers.
-    @try {
-        count(NSBeginsWithPredicateOperatorType, NSDiacriticInsensitivePredicateOption);
-        XCTFail("Diachritic insensitivity is not supported.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid predicate option",
-                              @"Diachritic insensitivity is not supported.");
-    }
+    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType, NSDiacriticInsensitivePredicateOption), NSException, @"filterWithPredicate:orderedBy: - Invalid predicate option", @"Diachritic insensitivity is not supported.");
 
     // Unsupported (but valid) operators.
-    @try {
-        count(NSLikePredicateOperatorType, 0);
-        XCTFail("LIKE not supported for string comparison.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"LIKE not supported for string comparison.");
-    }
-
-    @try {
-        count(NSMatchesPredicateOperatorType, 0);
-        XCTFail("MATCHES not supported in string comparison.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"MATCHES not supported in string comparison.");
-    }
+    XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"LIKE not supported for string comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"MATCHES not supported in string comparison.");
 
     // Invalid operators.
-    @try {
-        count(NSLessThanPredicateOperatorType, 0);
-        XCTFail("Invalid operator in string comparison.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"Invalid operator in string comparison.");
-    }
+    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in string comparison.");
 }
 
 - (void)testDateComparisonInPredicate
@@ -385,7 +344,7 @@
     NSExpression *now = [NSExpression expressionForConstantValue:[[NSDate alloc] init]];
 
     NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
-        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"dateCol"
+        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                          expression: now
                                                                type: type];
         return [DateObject objectsWithPredicate: pred].count;
@@ -405,15 +364,7 @@
                    @"!= or <> operator in date comparison.");
 
     // Invalid operators.
-    @try {
-        count(NSBeginsWithPredicateOperatorType);
-        XCTFail("Invalid operator in date comparison.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"Invalid operator in date comparison.");
-    }
+    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in date comparison.");
 }
 
 - (void)testBinaryComparisonInPredicate
@@ -421,7 +372,7 @@
     NSExpression *binary = [NSExpression expressionForConstantValue:[[NSData alloc] init]];
 
     NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
-        NSPredicate * pred = [RLMPredicateGen comparisonWithKeyPath: @"binaryCol"
+        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"binaryCol"
                                                          expression: binary
                                                                type: type];
         return [BinaryObject objectsWithPredicate: pred].count;
@@ -439,15 +390,7 @@
                    @"!= or <> operator in binary comparison.");
 
     // Invalid operators.
-    @try {
-        count(NSLessThanPredicateOperatorType);
-        XCTFail("Invalid operator in binary comparison.");
-    }
-    @catch (NSException *exception){
-        XCTAssertEqualObjects(exception.name,
-                              @"filterWithPredicate:orderedBy: - Invalid operator type",
-                              @"Invalid operator in binary comparison.");
-    }
+    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in binary comparison.");
 }
 
 - (void)testDataTypes
