@@ -43,15 +43,15 @@
     XCTAssertEqual((int)RLMPropertyTypeObject,  (int)tightdb::type_Link,        @"Link");
     XCTAssertEqual((int)RLMPropertyTypeArray,   (int)tightdb::type_LinkList,    @"Link list");
     
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeString), @"string", @"stringType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeInt), @"int", @"intType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDate), @"date", @"dateType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeData), @"data", @"dataType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDouble), @"double", @"doubleType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeFloat), @"float", @"floatType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeAny), @"any", @"anyType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeObject), @"object", @"objectType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray), @"array", @"arrayType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeString),   @"string",  @"stringType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeInt),      @"int",     @"intType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDate),     @"date",    @"dateType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeData),     @"data",    @"dataType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDouble),   @"double",  @"doubleType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeFloat),    @"float",   @"floatType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeAny),      @"any",     @"anyType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeObject),   @"object",  @"objectType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray),    @"array",   @"arrayType");
 }
 
 @end
