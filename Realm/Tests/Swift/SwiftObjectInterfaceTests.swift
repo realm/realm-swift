@@ -32,7 +32,7 @@ class SwiftObject: RLMObject {
     var dateCol = NSDate(timeIntervalSince1970: 1)
     var swiftDateCol = NSDate(timeIntervalSince1970: 1)
     var objectCol = SwiftBoolObject()
-    var arrayCol = RLMArray(object: SwiftBoolObject())
+    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftObjectInterfaceTests: RLMTestCase {
@@ -69,6 +69,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         realm.beginWriteTransaction()
         
         let obj = SwiftObject()
+        realm.addObject(obj)
 
         obj.boolCol = true
         obj.intCol = 1234
@@ -79,8 +80,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         obj.dateCol = NSDate(timeIntervalSince1970: 123)
         obj.objectCol = SwiftBoolObject()
         obj.objectCol.boolCol = true
+        obj.arrayCol.addObject(obj.objectCol)
 
-        realm.addObject(obj)
         realm.commitWriteTransaction()
         
         let firstObj = realm.allObjects(SwiftObject.className()).firstObject() as SwiftObject
@@ -92,6 +93,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.binaryCol, "abcd".dataUsingEncoding(NSUTF8StringEncoding), "should be abcd data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
+        XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
+        XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftObject() {
@@ -109,6 +112,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding), "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
+        XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
     }
 
     func testSwiftClassNameIsDemangled() {

@@ -20,10 +20,6 @@ import Foundation
 
 extension RLMArray: Sequence {
 
-    convenience init<T: RLMObject>(object: T) {
-        self.init(objectClassName: NSStringFromClass(object.dynamicType))
-    }
-
     func generate() -> GeneratorOf<RLMObject> {
         var i  = 0
         return GeneratorOf<RLMObject>({
@@ -121,7 +117,7 @@ extension String {
 
         let ignoredPropertiesForClass = aClass.ignoredProperties() as NSArray?
 
-        var propArray = RLMProperty[]()
+        var properties = RLMProperty[]()
 
         for i in 1..reflection.count {
             // Skip the first property (super):
@@ -133,25 +129,31 @@ extension String {
                     continue
             }
 
-            let realmAttributes = aClass.attributesForProperty(propertyName)
-
             let (property, typeEncoding) = propertyForValueType(reflection[i].1.valueType,
                 name: propertyName,
-                attributes: realmAttributes, column: propArray.count)
+                attributes: aClass.attributesForProperty(propertyName),
+                column: properties.count)
 
-            propArray += property
+            if property.type == .Array {
+                property.objectClassName = (swiftObject.valueForKey(propertyName) as RLMArray).objectClassName
+            }
+
+            properties += property
 
             let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
             class_addProperty(aClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
         }
 
         let schema = RLMObjectSchema()
-        schema.properties = propArray
+        schema.properties = properties
         schema.className = parsedClass.name
         return schema
     }
 
-    class func propertyForValueType(valueType: Any.Type, name: String, attributes: RLMPropertyAttributes, column: Int) -> (RLMProperty, CString) {
+    class func propertyForValueType(valueType: Any.Type,
+        name: String,
+        attributes: RLMPropertyAttributes,
+        column: Int) -> (RLMProperty, CString) {
         var propertyType: RLMPropertyType?
         var encoding: CString?
         var objectClassName: String?
@@ -189,16 +191,6 @@ extension String {
             (propertyType, encoding) = (RLMPropertyType.Object, typeEncoding)
 
         case let c as RLMArray.Type:
-            let parsedClass = RLMSwiftSupport.parseClass(c.self)
-            if parsedClass.swift {
-                // Mangled class map must contain this property's class
-                // for Realm to create the proper table
-                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
-                if mapMissingName {
-                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
-                }
-            }
-            objectClassName = parsedClass.name
             let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
             (propertyType, encoding) = (RLMPropertyType.Array, typeEncoding)
 
@@ -212,19 +204,4 @@ extension String {
         prop.objectClassName = objectClassName
         return (prop, encoding!)
     }
-
-//            else if ([type hasPrefix:arrayPrefix]) {
-//                // get object class from type string - @"RLMArray<objectClassName>"
-//                _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
-//                _type = RLMPropertyTypeArray;
-//                
-//                // verify type
-//                Class cls = RLMClassFromString(self.objectClassName);
-//                if (class_getSuperclass(cls) != RLMObject.class) {
-//                    @throw [NSException exceptionWithName:@"RLMException"
-//                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
-//                                                 userInfo:nil];
-//                }
-//            }
-
 }
