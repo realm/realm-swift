@@ -187,13 +187,17 @@ case "$COMMAND" in
         ;;
 
     "test-all")
-        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
         sh build.sh test "$XCMODE" || exit 1
         sh build.sh test-debug "$XCMODE" || exit 1
-        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer
-        sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-debug "$XCMODE" || exit 1
-        exit 0
+        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer || exit 1
+        fail=0
+        (
+            sh build.sh test "$XCMODE" || exit 1
+            sh build.sh test-debug "$XCMODE" || exit 1
+        ) || fail=1
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
+        exit $fail
         ;;
 
     "test-ios")
