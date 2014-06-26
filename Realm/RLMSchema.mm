@@ -72,6 +72,7 @@ static NSMutableDictionary *s_mangledClassMap;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
+                // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];
 
