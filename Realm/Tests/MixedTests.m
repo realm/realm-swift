@@ -19,19 +19,6 @@
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
 
-#pragma mark - Test Objects
-
-@interface MixedObject : RLMObject
-@property BOOL hired;
-@property id other;
-@property NSInteger age;
-@end
-
-@implementation MixedObject
-@end
-
-#pragma mark - Tests
-
 @interface MixedTests : RLMTestCase
 @end
 

@@ -18,26 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#pragma mark - Test Objects
-
-@interface ArrayPropertyObject : RLMObject
-@property NSString *name;
-@property RLMArray<StringObject> *array;
-@end
-
-@implementation ArrayPropertyObject
-@end
-
-
-@interface IntArrayPropertyObject : RLMObject
-@property RLMArray<StringObject> *array;
-@end
-
-@implementation IntArrayPropertyObject
-@end
-
-#pragma mark - Tests
-
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -158,7 +138,7 @@
     XCTAssertEqual(array.array.count, (NSUInteger)0, @"All objects removed");
     [realm commitWriteTransaction];
     
-    IntArrayPropertyObject *intArray = [[IntArrayPropertyObject alloc] init];
+    ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
     [intArray.array addObject:intObj];
