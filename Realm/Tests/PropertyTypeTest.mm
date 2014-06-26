@@ -54,5 +54,4 @@
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray), @"array", @"arrayType");
 }
 
-
 @end
