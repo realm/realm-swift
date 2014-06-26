@@ -223,23 +223,50 @@
 
 - (void)testObjectCount
 {
+    XCTAssertEqual([[IntObject allObjects] count], (NSUInteger)0,
+                   @"No RLMObjects in empty Realm.");
+    // count is frequently used in connection with other tests.
+    // Eventually, we can remove the above as well.
+}
+
+- (void)testNumericPredicate
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    [IntObject createInRealm:realm withObject:(@[@23])];
-    [IntObject createInRealm:realm withObject:(@[@23])];
-    [IntObject createInRealm:realm withObject:(@[@22])];
-    [IntObject createInRealm:realm withObject:(@[@29])];
+    [IntObject createInRealm:realm withObject:(@[@1])];
+
     [IntObject createInRealm:realm withObject:(@[@2])];
-    [IntObject createInRealm:realm withObject:(@[@24])];
-    [IntObject createInRealm:realm withObject:(@[@21])];
+    [IntObject createInRealm:realm withObject:(@[@2])];
+
+    [IntObject createInRealm:realm withObject:(@[@3])];
+    [IntObject createInRealm:realm withObject:(@[@3])];
+    [IntObject createInRealm:realm withObject:(@[@3])];
+
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
+    [IntObject createInRealm:realm withObject:(@[@4])];
     [realm commitWriteTransaction];
-  
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 23"].count, (NSUInteger)2, @"count should return 2");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 10"].count, (NSUInteger)6, @"count should return 6");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 1"].count, (NSUInteger)0, @"count should return 0");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 2"].count, (NSUInteger)1, @"count should return 1");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol < 30"].count, (NSUInteger)7, @"count should return 7");
+
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 3"].count, (NSUInteger)3,
+                   @"== operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 3"].count, (NSUInteger)7,
+                   @">= operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <= 3"].count, (NSUInteger)6,
+                   @"<= operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >  3"].count, (NSUInteger)4,
+                   @">  operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <  3"].count, (NSUInteger)3,
+                   @"<  operator in numeric predicate.");
+    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol != 3"].count, (NSUInteger)7,
+                   @"!= operator in numeric predicate.");
+
+    // varargs don't play nice with macros
+    NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
+    XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
+
+    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in numeric predicate.");
 }
 
 - (void)testDataTypes
