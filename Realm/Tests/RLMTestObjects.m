@@ -21,14 +21,21 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark StringObject
+#pragma mark OneTypeObjects
 
 @implementation StringObject
 @end
 
-#pragma mark IntObject
-
 @implementation IntObject
+@end
+
+@implementation BoolObject
+@end
+
+@implementation DateObject
+@end
+
+@implementation BinaryObject
 @end
 
 #pragma mark AllTypesObject
@@ -57,4 +64,42 @@
 #pragma mark OwnerObject
 
 @implementation OwnerObject
+@end
+
+#pragma mark - Specific Use Objects
+#pragma mark -
+
+#pragma mark MixedObject
+
+@implementation MixedObject
+@end
+
+#pragma mark CustomAccessorsObject
+
+@implementation CustomAccessorsObject
+@end
+
+#pragma mark BaseClassStringObject
+
+@implementation BaseClassStringObject
+@end
+
+#pragma mark CircleObject
+
+@implementation CircleObject
+@end
+
+#pragma mark ArrayPropertyObject
+
+@implementation ArrayPropertyObject
+@end
+
+#pragma mark DynamicObject
+
+@implementation DynamicObject
+@end
+
+#pragma mark AggregateObject
+
+@implementation AggregateObject
 @end

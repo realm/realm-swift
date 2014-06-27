@@ -18,21 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#pragma mark - Test Objects
-
-@interface AggregateObject : RLMObject
-@property int     intCol;
-@property float   floatCol;
-@property double  doubleCol;
-@property BOOL    boolCol;
-@property NSDate *dateCol;
-@end
-
-@implementation AggregateObject
-@end
-
-#pragma mark - Tests
-
 @interface ArrayTests : RLMTestCase
 @end
 
@@ -78,12 +63,15 @@
     RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
-    StringObject *obj = [StringObject createInRealm:realm withObject:@[@"name"]];
+    StringObject *obj1 = [StringObject createInRealm:realm withObject:@[@"name1"]];
+    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"name2"]];
     [realm commitWriteTransaction];
     
-    RLMArray *array = [realm allObjects:StringObject.className];
+    RLMArray *array = [StringObject allObjects];
     XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
-    XCTAssertThrows([array addObject:obj], @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array addObject:obj1], NSException, @"RLMException", @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array replaceObjectAtIndex:0 withObject:obj2], NSException, @"RLMException", @"Mutating readOnly array should throw");
+    XCTAssertThrowsSpecificNamed([array insertObject:obj1 atIndex:0], NSException, @"RLMException", @"Mutating readOnly array should throw");
 }
 
 - (void)testObjectAggregate
@@ -237,6 +225,8 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"12 objects skipped"].location != NSNotFound, @"'12 rows more' should be displayed when calling \"description\" on RLMArray");
+    
+    XCTAssertThrowsSpecificNamed(([[EmployeeObject allObjects] JSONString]), NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 - (void)testDeleteLinksAndObjectsInArray
@@ -272,11 +262,11 @@
     RLMArray *peopleInCompany = company.employees;
     
     // Delete link to employee
-    XCTAssertThrows([peopleInCompany removeObjectAtIndex:1], @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeObjectAtIndex:1], NSException, @"RLMException", @"Not allowed in read transaction");
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)3, @"No links should have been deleted");
     
     [realm beginWriteTransaction];
-    XCTAssertThrows([peopleInCompany removeObjectAtIndex:3], @"Out of bounds");
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeObjectAtIndex:3], NSException, @"RLMException", @"Out of bounds");
     XCTAssertNoThrow([peopleInCompany removeObjectAtIndex:1], @"Should delete link to employee");
     [realm commitWriteTransaction];
     
@@ -293,16 +283,16 @@
     XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
     //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
     
-    XCTAssertThrows([peopleInCompany removeLastObject], @"Not allowed in read transaction");
-    XCTAssertThrows([peopleInCompany removeAllObjects], @"Not allowed in read transaction");
-    XCTAssertThrows([peopleInCompany replaceObjectAtIndex:0 withObject:po2], @"Not allowed in read transaction");
-    XCTAssertThrows([peopleInCompany insertObject:po2 atIndex:0], @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeLastObject], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeAllObjects], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany replaceObjectAtIndex:0 withObject:po2], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany insertObject:po2 atIndex:0], NSException, @"RLMException", @"Not allowed in read transaction");
 
     [realm beginWriteTransaction];
     XCTAssertNoThrow([peopleInCompany removeLastObject], @"Should delete last link");
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 remaining link");
     [peopleInCompany replaceObjectAtIndex:0 withObject:po2];
-    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 lin replaced");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 link replaced");
     [peopleInCompany insertObject:po1 atIndex:0];
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"2 links");
     XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links");
@@ -314,11 +304,11 @@
     
     
     // Delete the actual employees
-    XCTAssertThrows([allPeople removeObjectAtIndex:1], @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([allPeople removeObjectAtIndex:1], NSException, @"RLMException", @"Not allowed in read transaction");
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"No employees should have been deleted");
 
     [realm beginWriteTransaction];
-    XCTAssertThrows([allPeople removeObjectAtIndex:3], @"Out of bounds");
+    XCTAssertThrows([allPeople removeObjectAtIndex:0], @"Not implemented");
     allPeople = [EmployeeObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
 
     //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported

@@ -28,8 +28,11 @@ command:
   clean [xcmode]:          clean up/remove all generated files
   build [xcmode]:          builds iOS and OS X frameworks with release configuration
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
+  test-ios [xcmode]:       tests iOS framework with release configuration
+  test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
   test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
+  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
   verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
@@ -47,12 +50,15 @@ EOF
 # Xcode Helpers
 ######################################
 
+XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
+
 xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | xcpretty -c ${XCPRETTY_PARAMS}
+        xcodebuild $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
+            echo "The raw xcodebuild output is available in build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
@@ -61,7 +67,11 @@ xc() {
 }
 
 xcrealm() {
-    xc "-project Realm.xcodeproj $1"
+    PROJECT=Realm.xcodeproj
+    if [[ "$XCVERSION" == "6" ]]; then
+        PROJECT=Realm-Xcode6.xcodeproj
+    fi
+    xc "-project $PROJECT $1"
 }
 
 ######################################
@@ -165,30 +175,48 @@ case "$COMMAND" in
     # Testing
     ######################################
     "test")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Release build test"
+        sh build.sh test-ios "$XCMODE"
+        sh build.sh test-osx "$XCMODE"
         exit 0
         ;;
 
     "test-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator build test"
-        xcrealm "-scheme OSX -configuration Debug build test"
+        sh build.sh test-osx-debug
+        sh build.sh test-ios-debug
         exit 0
         ;;
 
     "test-all")
-        sh build.sh test || exit 1
-        sh build.sh test-debug || exit 1
-        exit 0
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
+        sh build.sh test "$XCMODE" || exit 1
+        sh build.sh test-debug "$XCMODE" || exit 1
+        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer || exit 1
+        fail=0
+        (
+            sh build.sh test "$XCMODE" || exit 1
+            sh build.sh test-debug "$XCMODE" || exit 1
+        ) || fail=1
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
+        exit $fail
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
         exit 0
         ;;
 
     "test-osx")
-        xcrealm "-scheme OSX test"
+        xcrealm "-scheme OSX -configuration Release test"
+        exit 0
+        ;;
+
+    "test-ios-debug")
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        exit 0
+        ;;
+
+    "test-osx-debug")
+        xcrealm "-scheme OSX -configuration Debug test"
         exit 0
         ;;
 
@@ -217,17 +245,24 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        if [[ "$XCVERSION" == "6" ]]; then
+        	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        	xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        fi
+        xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-debug")
         cd examples
-        xc "-project RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        if [[ "$XCVERSION" == "6" ]]; then
+        	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        fi
+        xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 

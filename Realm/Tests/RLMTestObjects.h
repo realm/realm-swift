@@ -18,11 +18,12 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMObject.h"
+#import "RLMRealm.h"
 
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark StringObject
+#pragma mark SingleTypeObjects
 
 @interface StringObject : RLMObject
 
@@ -30,11 +31,27 @@
 
 @end
 
-#pragma mark IntObject
-
 @interface IntObject : RLMObject
 
 @property int intCol;
+
+@end
+
+@interface BoolObject : RLMObject
+
+@property BOOL boolCol;
+
+@end
+
+@interface DateObject : RLMObject
+
+@property NSDate *dateCol;
+
+@end
+
+@interface BinaryObject : RLMObject
+
+@property NSData *binaryCol;
 
 @end
 
@@ -96,5 +113,91 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @property NSString *name;
 @property DogObject *dog;
+
+@end
+
+#pragma mark - Specific Use Objects
+#pragma mark -
+
+#pragma mark MixedObject
+
+@interface MixedObject : RLMObject
+
+@property BOOL hired;
+@property id other;
+@property NSInteger age;
+
+@end
+
+#pragma mark CustomAccessorsObject
+
+@interface CustomAccessorsObject : RLMObject
+
+@property (getter = getThatName) NSString *name;
+@property (setter = setTheInt:)  int age;
+
+@end
+
+#pragma mark BaseClassStringObject
+
+@interface BaseClassStringObject : RLMObject
+
+@property NSInteger intCol;
+
+@end
+
+@interface BaseClassStringObject ()
+
+@property NSString *stringCol;
+
+@end
+
+#pragma mark CircleObject
+
+@interface CircleObject : RLMObject
+
+@property NSString *data;
+@property CircleObject *next;
+
+@end
+
+#pragma mark ArrayPropertyObject
+
+@interface ArrayPropertyObject : RLMObject
+
+@property NSString *name;
+@property RLMArray<StringObject> *array;
+
+@end
+
+#pragma mark - Class Extension
+
+@interface RLMRealm ()
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
+
+@end
+
+#pragma mark DynamicObject
+
+@interface DynamicObject : RLMObject
+
+@property NSString *stringCol;
+@property NSInteger intCol;
+
+@end
+
+#pragma mark AggregateObject
+
+@interface AggregateObject : RLMObject
+
+@property int     intCol;
+@property float   floatCol;
+@property double  doubleCol;
+@property BOOL    boolCol;
+@property NSDate *dateCol;
 
 @end

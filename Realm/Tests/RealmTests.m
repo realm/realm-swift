@@ -46,6 +46,12 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
+-(void)testRealmFailure
+{
+    XCTAssertThrows([RLMRealm realmWithPath:@"/dev/null"], @"Shouldn't exist");
+
+}
+
 - (void)testRealmPath
 {
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
@@ -194,6 +200,21 @@
     [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
     XCTAssertEqual([realmInMemory objects:[StringObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realmInMemory commitWriteTransaction];
+}
+
+- (void)testRealmFileAccess
+{
+    XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
+    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");    
+    
+    NSString *content = @"Some content";
+    NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *filePath = RLMRealmPathForFile(@"filename.realm");
+    [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
+    
+    NSError *error;
+    XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
+    XCTAssertNotNil(error, @"Should populate error object");
 }
 
 @end
