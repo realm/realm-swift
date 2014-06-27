@@ -18,10 +18,10 @@
 
 extern "C" {
 #import "RLMTestCase.h"
+}
 #import "RLMMigration.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-}
 #import "RLMObjectStore.h"
 #import "RLMObjectSchema_Private.hpp"
 
@@ -66,7 +66,7 @@ extern "C" {
     // apply migration
     [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
-        [migration enumerateObjectsWithClass:MigrationObject.className
+        [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertThrows(oldObject[@"stringCol"], @"stringCol should not exist on old object");
             NSNumber *intObj;
@@ -101,7 +101,7 @@ extern "C" {
     // apply migration
     [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
-        [migration enumerateObjectsWithClass:MigrationObject.className
+        [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNoThrow(oldObject[@"deletedCol"], @"Deleted column should be accessible on old object.");
             XCTAssertThrows(newObject[@"deletedCol"], @"Deleted column should not be accessible on new object.");
@@ -132,7 +132,7 @@ extern "C" {
     // apply migration
     [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
-        [migration enumerateObjectsWithClass:MigrationObject.className
+        [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             NSNumber *intObj = oldObject[@"stringCol"];
             XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");

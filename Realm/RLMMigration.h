@@ -64,7 +64,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
             to className. Instead you should access them as RLMObjects and use keyed subscripting to access
             properties.
  */
-- (void)enumerateObjectsWithClass:(NSString *)className block:(RLMObjectMigrationBlock)block;
+- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block;
 
 @end
 

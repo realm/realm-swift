@@ -51,11 +51,7 @@
     return [RLMSchema sharedSchema];
 }
 
-- (RLMArray *)allObjects:(NSString *)className {
-    return [self.realm allObjects:className];
-}
-
-- (void)enumerateObjectsWithClass:(NSString *)className block:(RLMObjectMigrationBlock)block {
+- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
     // get all objects
     RLMArray *objects = [_realm allObjects:className], *oldObjects = [_oldRealm allObjects:className];
     for (NSUInteger o = 0; o < oldObjects.count; o++) {

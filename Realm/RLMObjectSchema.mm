@@ -107,6 +107,8 @@
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = className;
+
+    // for dynamic interface use vanilla RLMObject
     schema.objectClass = RLMObject.class;
     return schema;
 }
