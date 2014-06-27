@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMAppDelegate.m
-//  RealmMigrationExample
+// Copyright 2014 Realm Inc.
 //
-//  Created by Ari Lazier on 6/26/14.
-//  Copyright (c) 2014 Realm. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMAppDelegate.h"
 #import <Realm/Realm.h>
@@ -23,7 +33,7 @@
     // you can define this inline, but we will reuse this to migrate realm files from multiple versions
     // to the most current version of our data model
     RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
-        [migration enumerateObjectsWithClass:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+        [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             if (oldSchemaVersion < 1) {
                 // combine name fields into a single field
                 newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];
@@ -36,7 +46,7 @@
                 }
             }
         }];
-        [migration enumerateObjectsWithClass:Pet.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+        [migration enumerateObjects:Pet.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             if (oldSchemaVersion < 3) {
                 // convert type string to type enum
                 newObject[@"type"] = @([Pet animalTypeForString:oldObject[@"type"]]);
