@@ -5,6 +5,7 @@
 
 ### API breaking changes
 
+* Rename schemaForObject: to schemaForClassName: on RLMSchema
 * Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
 * Removed -indexOfObjectWhere:, -objectsWhere: and -objectsOrderedBy:where: from RLMArray
 * Removed +objectsWhere: and +objectsOrderedBy:where: from RLMObject
