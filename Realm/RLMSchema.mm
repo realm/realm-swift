@@ -38,7 +38,7 @@ static RLMSchema *s_sharedSchema;
 
 @implementation RLMSchema
 
-- (RLMObjectSchema *)schemaForObject:(NSString *)className {
+- (RLMObjectSchema *)schemaForClassName:(NSString *)className {
     return _objectSchemaByName[className];
 }
 

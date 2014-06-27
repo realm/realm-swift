@@ -131,6 +131,8 @@
     XCTAssertEqualObjects(soUsingDictionary.name, @"Susi", @"Name should be Susi");
     XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
+    
+    XCTAssertThrowsSpecificNamed([soInit JSONString], NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 -(void)testObjectInitWithObjectTypeArray
