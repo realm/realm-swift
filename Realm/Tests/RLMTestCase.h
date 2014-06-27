@@ -27,6 +27,7 @@ NSString *RLMRealmPathForFile();
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmWithTestPath;
+- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
 
 @end

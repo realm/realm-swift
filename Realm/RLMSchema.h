@@ -34,10 +34,10 @@
 @property (nonatomic, readonly, copy) NSArray *objectSchema;
 
 /**
- Returns an RLMObjectSchema for the given class in this Realm.
+ Returns an RLMObjectSchema for the given class in this RLMSchema.
  
  @param className   The object class name.
- @return            RLMObjectSchema for the given class in this Realm.
+ @return            RLMObjectSchema for the given class in this RLMSchema.
  
  @see               RLMObjectSchema
  */

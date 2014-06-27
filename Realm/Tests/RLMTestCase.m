@@ -101,6 +101,10 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
 }
 
+- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
+    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:NO schema:schema error:nil];
+}
+
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:schema error:nil];
 }
