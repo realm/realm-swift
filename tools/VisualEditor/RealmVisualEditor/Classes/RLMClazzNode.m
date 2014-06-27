@@ -23,6 +23,7 @@
 @implementation RLMClazzNode {
 
     NSMutableArray *displayedArrays;
+    RLMArray *allObjects;
 }
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm
@@ -44,8 +45,8 @@
 
 - (NSUInteger)instanceCount
 {
-    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
-    return allObjects.count;
+    RLMArray *objects = [self allObjects];
+    return objects.count;
 }
 
 #pragma mark - RLMRealmOutlineNode implementation
@@ -69,8 +70,8 @@
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
-    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
-    return allObjects[index];
+    RLMArray *objects = [self allObjects];
+    return objects[index];
 }
 
 - (NSUInteger)indexOfInstance:(RLMObject *)instance
@@ -78,9 +79,9 @@
 // Note: The indexOfObject method of RLMArray is not yet implemented so we have to perform the
 //       lookup as a simple linear search;
     
-    RLMArray *allObjects = [self.realm allObjects:self.schema.className];
+    RLMArray *objects = [self allObjects];
     NSUInteger index = 0;
-    for (RLMObject *classInstance in allObjects) {
+    for (RLMObject *classInstance in objects) {
         if (classInstance == instance) {
             return index;
         }
@@ -88,10 +89,6 @@
     }
     
     return NSNotFound;
-    
-/*
-    return [allObjects indexOfObject:instance];
-*/
 }
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
@@ -138,6 +135,15 @@
 
 }
 
+#pragma mark - Private methods
+
+- (RLMArray *)allObjects
+{
+    if(allObjects == nil) {
+        allObjects = [self.realm allObjects:self.schema.className];
+    }
+    return allObjects;
+}
 
 @end
 
