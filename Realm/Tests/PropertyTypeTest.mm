@@ -53,6 +53,8 @@
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeAny),      @"any",     @"anyType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeObject),   @"object",  @"objectType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray),    @"array",   @"arrayType");
+
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyType(-1)),    @"Unknown",   @"Unknown type");
 }
 
 @end
