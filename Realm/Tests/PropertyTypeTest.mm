@@ -45,7 +45,7 @@
     
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeString),   @"string",  @"stringType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeInt),      @"int",     @"intType");
-    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeBool),      @"bool",     @"boolType");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeBool),     @"bool",    @"boolType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDate),     @"date",    @"dateType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeData),     @"data",    @"dataType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDouble),   @"double",  @"doubleType");
