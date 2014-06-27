@@ -110,7 +110,6 @@ void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) 
             if (prop.attributes & RLMPropertyAttributeIndexed) {
                 table->set_index(prop.column);
             }
-            break;
         }
     }
 }
