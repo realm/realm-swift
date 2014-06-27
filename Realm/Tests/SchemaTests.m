@@ -30,13 +30,13 @@
     // Setting up some test data
     
     // Due to the automatic initialization of a new realm with all visible classes inheriting from
-    // RLMObject, it's difficuelt to define test cases that verifies the absolut correctness of a
-    // realm's current type catalogue unless it's expected configuration is known at compile time
-    // (requires that the set of expected types is contantly kept updated). Instead, only a partial
-    // verification  is performed, which only requires the availablity of a well-defined subset of
+    // RLMObject, it's difficult to define test cases that verify the absolute correctness of a
+    // realm's current type catalogue unless its expected configuration is known at compile time
+    // (requires that the set of expected types is always up-to-date). Instead, only a partial
+    // verification is performed, which only requires the availability of a well-defined subset of
     // types and ignores any other types that may be included in the realm's type catalogue.
     // If a more fine-grained control with the realm's type inclusion mechanism is introduced later
-    // on, these test should be altered to perform a absolut correctness verification instead.
+    // on, these tests should be altered to verify all types.
     
     NSArray *expectedTypes = @[@"QueryObject",
                                @"PersonObject",
@@ -64,12 +64,12 @@
     RLMRealm *realm = [self realmWithTestPath];
     RLMSchema *schema = realm.schema;
     
-    // Test 1: Does the objectSchema returns the right number of object schemas?
+    // Test 1: Does the objectSchema return the right number of object schemas?
     NSArray *objectSchemas = schema.objectSchema;
     
     XCTAssertTrue(objectSchemas.count >= expectedTypes.count, @"Expecting %lu object schemas in database found %lu", (unsigned long)expectedTypes.count, (unsigned long)objectSchemas.count);
     
-    // Test 2: Does the object schema array containe the expected schemas?
+    // Test 2: Does the object schema array contain the expected schemas?
     NSUInteger identifiedTypesCount = 0;
     for (NSString *expectedType in expectedTypes) {
         NSUInteger occurrenceCount = 0;
