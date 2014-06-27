@@ -37,7 +37,7 @@
  
  @see               RLMObjectSchema
  */
-- (RLMObjectSchema *)schemaForObject:(NSString *)className;
+- (RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
  Lookup an RLMObjectSchema for the given class in this Realm.
