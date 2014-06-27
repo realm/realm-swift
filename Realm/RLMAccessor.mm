@@ -157,16 +157,17 @@ inline RLMObject *RLMGetLink(RLMObject *obj, NSUInteger colIndex, NSString *obje
     NSUInteger index = obj->_row.get_link(colIndex);
     return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
 }
-inline void RLMSetLink(RLMObject *obj, NSUInteger colIndex, RLMObject *link) {
+inline void RLMSetLink(RLMObject *obj, NSUInteger colIndex, id val) {
     RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
 
-    if (!link || link.class == NSNull.class) {
+    if (!val || val == NSNull.null) {
         // if null
         obj->_row.nullify_link(colIndex);
     }
     else {
         // add to Realm if not in it.
+        RLMObject *link = val;
         if (link.realm != obj.realm) {
             [obj.realm addObject:link];
         }
