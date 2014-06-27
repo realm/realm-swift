@@ -23,6 +23,8 @@
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
 
+#import "objc/objc-class.h"
+
 @implementation RLMInstanceTableViewController
 
 - (void)viewDidLoad
@@ -382,14 +384,28 @@
                         [self.parentWindowController updateSelectedTypeNode:clazzNode];
                         [self updateTableView];
                         
-                        // Right now we just fetches the object index from the proxy object.
-                        // However, this must be changed later when the proxy object is made public
-                        // and provides some mean to retrieve the underlying RLMObject object.
-                        // Note: This selection of the linked object does not take any future row
-                        // sorting into account!!!
-                        NSNumber *indexNumber = [linkedObject valueForKeyPath:@"objectIndex"];
-                        NSUInteger instanceIndex = indexNumber.integerValue;
-                        
+                        RLMRealm *realm = linkedObject.realm;
+                        RLMObjectSchema *objectSchema = linkedObject.RLMObject_schema;
+                        NSString *className = objectSchema.className;
+                        RLMArray *allInstances = [realm allObjects:className];
+                                                
+                        // Note: indexOfObject on RLMArray is not yet implemented, which means that
+                        // we need to do a linear search over the array to localize the linked
+                        // object.
+                        // Note 2: However, this approach not even works as the object retrieved
+                        // from an array is actual an proxy object referring to the underlying db
+                        // row- The proxy objects are not reused cross-array which means that
+                        // comparison between two underlying objects using their proxy objects is
+                        // not possible as there is no pointer equality.
+                        NSUInteger instanceIndex = NSNotFound;
+                        for (NSUInteger index = 0; index < allInstances.count; index++) {
+                            RLMObject *typeInstance = [allInstances objectAtIndex:index];
+                            if (typeInstance == linkedObject) {
+                                instanceIndex = index;
+                                break;
+                            }
+                        }
+                            
                         if (instanceIndex != NSNotFound) {
                             [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:instanceIndex]
                                                  byExtendingSelection:NO];
