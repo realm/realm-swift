@@ -51,6 +51,9 @@ inline void RLMLinkViewArrayValidateAttached(RLMArrayLinkView *ar) {
     }
 }
 inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *ar) {
+    // first verify attached
+    RLMLinkViewArrayValidateAttached(ar);
+
     if (!ar->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Can't mutate a persisted array outside of a write transaction."
@@ -105,7 +108,6 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (void)addObject:(RLMObject *)object {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);
@@ -116,7 +118,6 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);
@@ -127,7 +128,6 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     if (index >= _backingLinkView->size()) {
@@ -138,7 +138,6 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (void)removeLastObject {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     size_t size = _backingLinkView->size();
@@ -148,14 +147,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (void)removeAllObjects {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     _backingLinkView->clear();
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
-    RLMLinkViewArrayValidateAttached(self);
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);

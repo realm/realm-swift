@@ -35,7 +35,7 @@ void RLMInitializeObjectStore();
 // throws if current state of realm is not compatible with current objects
 void RLMVerifyAndCreateTables(RLMRealm *realm);
 
-// update tables in real to the targetSchema
+// update tables in realm to the targetSchema
 // returns true if modifications were made
 // NOTE: must be called from within write transaction
 bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema);

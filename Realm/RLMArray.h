@@ -60,7 +60,7 @@
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 /**
- The Realm in which this object is persisted. Returns nil for standalone objects.
+ The Realm in which this array is persisted. Returns nil for standalone arrays.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 

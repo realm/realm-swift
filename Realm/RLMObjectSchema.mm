@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
@@ -28,7 +28,6 @@
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
-@property (nonatomic, readwrite, assign) Class objectClass;
 @end
 
 

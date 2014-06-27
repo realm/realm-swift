@@ -112,6 +112,8 @@
 		02E4D6EA192E58250082808D /* MixedTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6E8192E58250082808D /* MixedTests.m */; };
 		02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
 		02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
+		02F4EAF6195DF0A6008743D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		02F4EAF7195DF0B0008743D9 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
 		428D6F421947066E00ACEB74 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E395319409432001DC9C1 /* libc++.dylib */; };
 		428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		429E39571940B3DC001DC9C1 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E39551940B204001DC9C1 /* libc++.dylib */; };
@@ -428,7 +430,9 @@
 				02E4D6DA192E3DC40082808D /* RLMRealm.h in Headers */,
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */,
+				02F4EAF6195DF0A6008743D9 /* RLMMigration.h in Headers */,
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
+				02F4EAF7195DF0B0008743D9 /* RLMMigration_Private.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6E4192E3DC40082808D /* RLMUtil.hpp in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,

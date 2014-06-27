@@ -30,7 +30,7 @@
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
-// throws if the values in array nare not valid for the given schema
+// throws if the values in array are not valid for the given schema
 void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema);
 
 // throws if the values in dict are not valid for the given schema

@@ -60,6 +60,9 @@ inline void RLMVerifyAttached(RLMObject *obj) {
 
 // verify writable
 inline void RLMVerifyInWriteTransaction(RLMObject *obj) {
+    // first verify is attached
+    RLMVerifyAttached(obj);
+
     if (!obj->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Attempting to modify object outside of a write transaction."
@@ -73,7 +76,6 @@ inline long long RLMGetLong(RLMObject *obj, NSUInteger colIndex) {
     return obj->_row.get_int(colIndex);
 }
 inline void RLMSetLong(RLMObject *obj, NSUInteger colIndex, long long val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_int(colIndex, val);
 }
@@ -84,7 +86,6 @@ inline float RLMGetFloat(RLMObject *obj, NSUInteger colIndex) {
     return obj->_row.get_float(colIndex);
 }
 inline void RLMSetFloat(RLMObject *obj, NSUInteger colIndex, float val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_float(colIndex, val);
 }
@@ -95,7 +96,6 @@ inline double RLMGetDouble(RLMObject *obj, NSUInteger colIndex) {
     return obj->_row.get_double(colIndex);
 }
 inline void RLMSetDouble(RLMObject *obj, NSUInteger colIndex, double val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_double(colIndex, val);
 }
@@ -106,7 +106,6 @@ inline bool RLMGetBool(RLMObject *obj, NSUInteger colIndex) {
     return obj->_row.get_bool(colIndex);
 }
 inline void RLMSetBool(RLMObject *obj, NSUInteger colIndex, bool val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_bool(colIndex, val);
 }
@@ -117,7 +116,6 @@ inline NSString *RLMGetString(RLMObject *obj, NSUInteger colIndex) {
     return RLMStringDataToNSString(obj->_row.get_string(colIndex));
 }
 inline void RLMSetString(RLMObject *obj, NSUInteger colIndex, NSString *val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
 }
@@ -129,7 +127,6 @@ inline NSDate *RLMGetDate(RLMObject *obj, NSUInteger colIndex) {
     return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
 }
 inline void RLMSetDate(RLMObject *obj, NSUInteger colIndex, NSDate *date) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     std::time_t time = date.timeIntervalSince1970;
     obj->_row.set_datetime(colIndex, tightdb::DateTime(time));
@@ -142,7 +139,6 @@ inline NSData *RLMGetData(RLMObject *obj, NSUInteger colIndex) {
     return [NSData dataWithBytes:data.data() length:data.size()];
 }
 inline void RLMSetData(RLMObject *obj, NSUInteger colIndex, NSData *data) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
 }
@@ -158,7 +154,6 @@ inline RLMObject *RLMGetLink(RLMObject *obj, NSUInteger colIndex, NSString *obje
     return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
 }
 inline void RLMSetLink(RLMObject *obj, NSUInteger colIndex, id val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
 
     if (!val || val == NSNull.null) {
@@ -187,7 +182,6 @@ inline RLMArray *RLMGetArray(RLMObject *obj, NSUInteger colIndex, NSString *obje
     return ar;
 }
 inline void RLMSetArray(RLMObject *obj, NSUInteger colIndex, id<NSFastEnumeration> val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
 
     tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
@@ -239,7 +233,6 @@ inline id RLMGetAnyProperty(RLMObject *obj, NSUInteger col_ndx) {
     }
 }
 inline void RLMSetAnyProperty(RLMObject *obj, NSUInteger col_ndx, id val) {
-    RLMVerifyAttached(obj);
     RLMVerifyInWriteTransaction(obj);
 
     // FIXME - enable when Any supports links
@@ -567,13 +560,13 @@ void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate) {
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Class name": [obj.class className]}];
     }
     if (validate && !RLMIsObjectValidForProperty(val, prop)) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid value for property"
-                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
     RLMDynamicSet(obj, prop, val);
