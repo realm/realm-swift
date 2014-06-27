@@ -80,7 +80,7 @@
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;
-    result.imageView.image = [NSImage imageNamed:NSImageNameAdvanced];
+    result.imageView.image = nil;
     
     return result;
 }
