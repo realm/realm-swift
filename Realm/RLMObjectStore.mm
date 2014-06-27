@@ -184,10 +184,10 @@ bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
     bool changed = RLMCreateMissingTables(realm, targetSchema, NO);
     
     // second pass add columns to empty tables
-    changed = RLMAddNewColumnsToSchema(realm, targetSchema, NO) | changed;
+    changed = RLMAddNewColumnsToSchema(realm, targetSchema, NO) || changed;
     
     // remove expired columns
-    changed = RLMRemoveOldColumnsFromSchema(realm, targetSchema) | changed;
+    changed = RLMRemoveOldColumnsFromSchema(realm, targetSchema) || changed;
     
     // FIXME - remove deleted objects
     
