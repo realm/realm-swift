@@ -52,6 +52,8 @@
                 newObject[@"type"] = @([Pet animalTypeForString:oldObject[@"type"]]);
             }
         }];
+
+        // return the new schema version
         return 3;
     };
     
@@ -59,7 +61,7 @@
     // Migrate the default realm over multiple data model versions
     //
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    NSString *docsDir = paths[0];
     NSString *defaultRealmPath = [docsDir stringByAppendingPathComponent:@"default.realm"];
     
     // copy over old data file for v0 data model
@@ -93,42 +95,17 @@
     [[NSFileManager defaultManager] removeItemAtPath:realmv2Path error:nil];;
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
     
-    // migrate the realm at v2DocsPath
+    // migrate realms at custom paths
     [RLMRealm applyMigrationBlock:migrationBlock atPath:realmv1Path error:nil];
     [RLMRealm applyMigrationBlock:migrationBlock atPath:realmv2Path error:nil];
 
-    // print out all migrated objects in one of the migrated realm - all migrated realms now have the same data
-    RLMRealm *realm = [RLMRealm realmWithPath:realmv1Path];
-    NSLog(@"Migrated objects in the migrated Realm: %@", [[realm allObjects:Person.className] description]);
+    // print out all migrated objects in the migrated realms
+    RLMRealm *realmv1 = [RLMRealm realmWithPath:realmv1Path];
+    NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[realmv1 allObjects:Person.className] description]);
+    RLMRealm *realmv2 = [RLMRealm realmWithPath:realmv2Path];
+    NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[realmv2 allObjects:Person.className] description]);
     
     return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
 @end
