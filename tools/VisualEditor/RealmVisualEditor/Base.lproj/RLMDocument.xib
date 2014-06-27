@@ -14,7 +14,7 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application"/>
         <window title="Realm" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" appearanceType="lightContent" animationBehavior="default" id="xOd-HO-29H" userLabel="Window">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES" unifiedTitleAndToolbar="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="921" y="485" width="860" height="402"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
@@ -204,9 +204,9 @@
                     <constraint firstAttribute="bottom" secondItem="IXc-8a-g01" secondAttribute="bottom" id="oqa-Wj-uil"/>
                 </constraints>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="rfo-lS-fnD">
+            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" allowsUserCustomization="NO" prefersToBeShown="NO" displayMode="iconOnly" sizeMode="regular" id="rfo-lS-fnD">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="F282DCEE-9213-4F0B-81F0-B60051FC777A" label="" paletteLabel="Navigation" id="dAe-mG-eMX">
+                    <toolbarItem implicitItemIdentifier="6A2680B3-CB3F-4B46-943B-6DB55B89691A" label="" paletteLabel="Navigation" id="dAe-mG-eMX">
                         <nil key="toolTip"/>
                         <size key="minSize" width="67" height="28"/>
                         <size key="maxSize" width="104" height="28"/>
