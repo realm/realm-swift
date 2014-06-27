@@ -16,37 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "DataModels.h"
 
-#import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
-#import <Realm/RLMObject.h>
+@implementation Pet
 
-// object property definition
-@interface RLMProperty : NSObject
-
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
-
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
-
-/**
- Property attributes.
- */
-@property (nonatomic, readonly) RLMPropertyAttributes attributes;
-
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly, copy) NSString *objectClassName;
-
-/**
- Returns YES if property objects are equal
- */
--(BOOL)isEqualToProperty:(RLMProperty *)prop;
++ (AnimalType)animalTypeForString:(NSString *)typeString {
+    if ([typeString isEqualToString:@"dog"]) {
+        return AnimalTypeDog;
+    }
+    if ([typeString isEqualToString:@"cat"]) {
+        return AnimalTypeCat;
+    }
+    if ([typeString isEqualToString:@"hamster"]) {
+        return AnimalTypeHamster;
+    }
+    @throw [NSException exceptionWithName:@"InvalidAnimalException" reason:@"typeString is not a valid animal type" userInfo:nil];
+}
 
 @end
+
+@implementation Person
+@end
+

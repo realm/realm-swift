@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMObject.h"
 #import "RLMArray.h"
@@ -142,76 +143,41 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
 }
 
 
-void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj) {
-// FIXME: The Mixed column type does not yet support links
-//    if (obj == nil) {
-//        table.nullify_link(col_ndx, row_ndx);
-//        return;
-//    }
-    if ([obj isKindOfClass:[NSString class]]) {
-        row.set_mixed(col_ndx, RLMStringDataWithNSString(obj));
-        return;
-    }
-    if ([obj isKindOfClass:[NSDate class]]) {
-        row.set_mixed(col_ndx, tightdb::DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
-        return;
-    }
-    if ([obj isKindOfClass:[NSData class]]) {
-        row.set_mixed(col_ndx, RLMBinaryDataForNSData(obj));
-        return;
-    }
-    if ([obj isKindOfClass:[NSNumber class]]) {
-        const char *data_type = [(NSNumber *)obj objCType];
-        const char dt = data_type[0];
-        switch (dt) {
-            case 'i':
-            case 's':
-            case 'l':
-                row.set_mixed(col_ndx, (int64_t)[(NSNumber *)obj longValue]);
-                return;
-            case 'f':
-                row.set_mixed(col_ndx, [(NSNumber *)obj floatValue]);
-                return;
-            case 'd':
-                row.set_mixed(col_ndx, [(NSNumber *)obj doubleValue]);
-                return;
-            case 'B':
-            case 'c':
-                row.set_mixed(col_ndx, [(NSNumber *)obj boolValue] == YES);
-                return;
+NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *schema) {
+    NSArray *properties = schema.properties;
+    NSDictionary *defaults = [schema.objectClass defaultPropertyValues];
+    NSMutableDictionary *outDict = [dict mutableCopy];
+    for (RLMProperty * prop in properties) {
+        // set defualt value if missing
+        if (!outDict[prop.name]) {
+            outDict[prop.name] = defaults[prop.name];
+        }
+
+        // validate
+        if (!RLMIsObjectValidForProperty(outDict[prop.name], prop)) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", prop.name]
+                                         userInfo:nil];
         }
     }
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
+    return outDict;
 }
 
-id RLMGetAnyProperty(tightdb::Row row, NSUInteger col_ndx) {
-    tightdb::Mixed mixed = row.get_mixed(col_ndx);
-    switch (mixed.get_type()) {
-        case RLMPropertyTypeString:
-            return RLMStringDataToNSString(mixed.get_string());
-        case RLMPropertyTypeInt: {
-            return @(mixed.get_int());
-        case RLMPropertyTypeFloat:
-            return @(mixed.get_float());
-        case RLMPropertyTypeDouble:
-            return @(mixed.get_double());
-        case RLMPropertyTypeBool:
-            return @(mixed.get_bool());
-        case RLMPropertyTypeDate:
-            return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
-        case RLMPropertyTypeData: {
-            tightdb::BinaryData bd = mixed.get_binary();
-            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
-            return d;
-        }
-        case RLMPropertyTypeArray:
-            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"RLMArray not yet supported" userInfo:nil];
-        
-        // for links and other unsupported types throw
-        case RLMPropertyTypeObject:
-        default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
+void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema) {
+    NSArray *props = schema.properties;
+    if (array.count != props.count) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Invalid array input. Number of array elements does not match number of properties."
+                                     userInfo:nil];
+    }
+
+    // validate all values
+    for (NSUInteger i = 0; i < array.count; i++) {
+        if (!RLMIsObjectValidForProperty(array[i], props[i])) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", [props[i] name]]
+                                         userInfo:nil];
         }
     }
-}
+};
+

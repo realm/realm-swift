@@ -16,37 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMMigration.h"
+#import "RLMRealm.h"
 
-#import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
-#import <Realm/RLMObject.h>
+@interface RLMMigration ()
 
-// object property definition
-@interface RLMProperty : NSObject
+@property (nonatomic, strong) RLMRealm *oldRealm;
+@property (nonatomic, strong) RLMRealm *realm;
 
-/**
- Property name.
- */
-@property (nonatomic, readonly) NSString * name;
++ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 
-/**
- Property type.
- */
-@property (nonatomic, readonly) RLMPropertyType type;
-
-/**
- Property attributes.
- */
-@property (nonatomic, readonly) RLMPropertyAttributes attributes;
-
-/**
- Object class name - specify object types for RLMObject and RLMArray properties.
- */
-@property (nonatomic, readonly, copy) NSString *objectClassName;
-
-/**
- Returns YES if property objects are equal
- */
--(BOOL)isEqualToProperty:(RLMProperty *)prop;
+- (void)migrateWithBlock:(RLMMigrationBlock)block;
 
 @end
