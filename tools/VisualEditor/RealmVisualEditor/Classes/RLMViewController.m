@@ -40,7 +40,7 @@
 
 - (NSTableView *)tableView
 {
-    if([self.view isKindOfClass:[NSTableView class]]) {
+    if ([self.view isKindOfClass:[NSTableView class]]) {
         return (NSTableView *)self.view;
     }
         

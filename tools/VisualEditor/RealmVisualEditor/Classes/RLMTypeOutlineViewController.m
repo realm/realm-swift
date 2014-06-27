@@ -163,7 +163,7 @@
 
 - (NSOutlineView *)outlineView
 {
-    if([self.view isKindOfClass:[NSOutlineView class]]) {
+    if ([self.view isKindOfClass:[NSOutlineView class]]) {
         return (NSOutlineView *)self.view;
     }
     

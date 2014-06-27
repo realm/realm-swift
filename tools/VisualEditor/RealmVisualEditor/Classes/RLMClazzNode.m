@@ -139,7 +139,7 @@
 
 - (RLMArray *)allObjects
 {
-    if(allObjects == nil) {
+    if (allObjects == nil) {
         allObjects = [self.realm allObjects:self.schema.className];
     }
     return allObjects;
