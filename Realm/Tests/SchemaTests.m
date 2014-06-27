@@ -81,7 +81,7 @@
             }
         }
         
-        XCTAssertEqual(occurrenceCount, (NSUInteger)1, @"Expecting single occurrence of object schema for type %@ found %lu", expectedType, occurrenceCount);
+        XCTAssertEqual(occurrenceCount, (NSUInteger)1, @"Expecting single occurrence of object schema for type %@ found %lu", expectedType, (unsigned long)occurrenceCount);
         
         if (occurrenceCount > 0) {
             identifiedTypesCount++;
@@ -89,7 +89,7 @@
     }
 
     // Test 3: Does the object schema array contains at least the expected classes
-    XCTAssertTrue(identifiedTypesCount >= expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", identifiedTypesCount, expectedTypes.count);
+    XCTAssertTrue(identifiedTypesCount >= expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", (unsigned long)identifiedTypesCount, (unsigned long)expectedTypes.count);
     
     // Test 4: Test querying object schemas using schemaForClassName: for expected types
     for (NSString *expectedType in expectedTypes) {
