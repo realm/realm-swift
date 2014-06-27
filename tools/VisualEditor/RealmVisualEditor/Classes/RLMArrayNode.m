@@ -31,7 +31,7 @@
 {
     NSString *elementTypeName = property.objectClassName;
     RLMSchema *realmSchema = realm.schema;
-    RLMObjectSchema *elementSchema = [realmSchema schemaForObject:elementTypeName];
+    RLMObjectSchema *elementSchema = [realmSchema schemaForClassName:elementTypeName];
     
     if (self = [super initWithSchema:elementSchema
                              inRealm:realm]) {
