@@ -88,6 +88,11 @@
  */
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
+/**
+ The RLMSchema used by this RLMRealm.
+ */
+@property (nonatomic, readonly) RLMSchema *schema;
+
 
 #pragma mark - Notifications
 

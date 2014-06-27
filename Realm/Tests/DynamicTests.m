@@ -19,10 +19,6 @@
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
 
-@interface RLMRealm ()
-@property (nonatomic) RLMSchema *schema;
-@end
-
 @interface DynamicTests : RLMTestCase
 @end
 

@@ -64,8 +64,7 @@
     [_realm beginWriteTransaction];
 
     // add new tables/columns for the current shared schema
-    _realm.schema = [RLMSchema sharedSchema];
-    bool changed = RLMUpdateTables(_realm, _realm.schema);
+    bool changed = RLMUpdateTables(_realm, [RLMSchema sharedSchema]);
 
     // apply block and set new schema version
     NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);

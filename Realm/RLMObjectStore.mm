@@ -46,9 +46,8 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
 }
 inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                 NSString *className) {
-    bool created;
     NSString *tableName = realm.schema.tableNamesForClass[className];
-    return realm.group->get_table(tableName.UTF8String, created);
+    return realm.group->get_table(tableName.UTF8String);
 }
 
 void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
@@ -120,7 +119,7 @@ void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) 
 bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyExisting) {
     bool changed = false;
     for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-        bool created;
+        bool created = false;
         tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className, created);
         changed |= created;
 
@@ -180,6 +179,9 @@ bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema) {
 }
 
 bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
+    // set new schema
+    realm.schema = targetSchema;
+
     // first pass create missing tables and verify existing
     bool changed = RLMCreateMissingTables(realm, targetSchema, NO);
     
