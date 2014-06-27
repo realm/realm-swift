@@ -22,7 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; };
+		02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02026CA519354DDF00E4EEF8 /* RLMMigration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.mm */; };
 		02026CA619354DDF00E4EEF8 /* RLMMigration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02026CA219354DDF00E4EEF8 /* RLMMigration.mm */; };
 		02026CA9193562B400E4EEF8 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
@@ -449,13 +449,13 @@
 				02E4D6E1192E3DC40082808D /* RLMSchema.h in Headers */,
 				02E4D6C7192E3DC40082808D /* RLMObjectSchema.h in Headers */,
 				02E4D6D1192E3DC40082808D /* RLMProperty.h in Headers */,
+				02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */,
 				02E4D6BB192E3DC40082808D /* RLMConstants.h in Headers */,
 				02E4D6CF192E3DC40082808D /* RLMProperty_Private.h in Headers */,
 				02E4D6DF192E3DC40082808D /* RLMSchema_Private.h in Headers */,
 				02E4D6BF192E3DC40082808D /* RLMObject_Private.h in Headers */,
 				02E4D6C5192E3DC40082808D /* RLMObjectSchema_Private.hpp in Headers */,
 				02E4D6D9192E3DC40082808D /* RLMRealm_Private.hpp in Headers */,
-				02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */,
 				02E4D6AD192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6D5192E3DC40082808D /* RLMQueryUtil.hpp in Headers */,
 				02E4D6E5192E3DC40082808D /* RLMUtil.hpp in Headers */,

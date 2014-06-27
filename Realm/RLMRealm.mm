@@ -194,6 +194,10 @@ static NSArray *s_objectDescriptors = nil;
 
 +(NSString *)defaultPath
 {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+    });
     return s_defaultRealmPath;
 }
 
@@ -206,9 +210,6 @@ static NSArray *s_objectDescriptors = nil;
 
 + (instancetype)defaultRealm
 {
-    if (!s_defaultRealmPath) {
-        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
-    }
     return [RLMRealm realmWithPath:RLMRealm.defaultPath readOnly:NO error:nil];
 }
 
