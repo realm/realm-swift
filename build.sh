@@ -181,8 +181,8 @@ case "$COMMAND" in
         ;;
 
     "test-debug")
-        sh build.sh test-osx-debug
-        sh build.sh test-ios-debug
+        sh build.sh test-osx-debug "$XCMODE"
+        sh build.sh test-ios-debug "$XCMODE"
         exit 0
         ;;
 
