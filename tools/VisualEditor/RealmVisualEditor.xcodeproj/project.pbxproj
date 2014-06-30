@@ -693,7 +693,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/build",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
@@ -718,7 +717,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/build",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
