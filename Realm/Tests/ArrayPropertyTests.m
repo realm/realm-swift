@@ -45,12 +45,12 @@
 
     RLMArray *arrayProp = array.array;
     XCTAssertThrows([arrayProp addObject:obj], @"Adding array object outside a transaction should throw");
-    
+
     // make sure we can fast enumerate
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
-    
+
     // Test JSON output
     XCTAssertThrows([array.array JSONString], @"Not yet implemented");
 }

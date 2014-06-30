@@ -41,13 +41,11 @@
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		02C4147B191DE49600F858D9 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.m */; };
 		02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
-		02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */; };
 		02C414D81921939D00F858D9 /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C414D71921939D00F858D9 /* QueryTests.m */; };
 		02C415131921B0C400F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		02C4153E1921B25000F858D9 /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C414D71921939D00F858D9 /* QueryTests.m */; };
 		02C4153F1921B25000F858D9 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.m */; };
 		02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
-		02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */; };
 		02DCBE8D195A22C000F1CBE6 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02DCBE8C195A22C000F1CBE6 /* MigrationTests.mm */; };
 		02DCBE8E195A22C000F1CBE6 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02DCBE8C195A22C000F1CBE6 /* MigrationTests.mm */; };
 		02E4D6AA192E3DC40082808D /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D68B192E3DC40082808D /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -180,8 +178,6 @@
 		02C4147A191DE49600F858D9 /* RealmTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RealmTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		02C4148E191DE68900F858D9 /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestCase.h; sourceTree = "<group>"; };
 		02C4148F191DE68900F858D9 /* RLMTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestCase.m; sourceTree = "<group>"; };
-		02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+AsyncTesting.h"; sourceTree = "<group>"; };
-		02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+AsyncTesting.m"; sourceTree = "<group>"; };
 		02C414D71921939D00F858D9 /* QueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueryTests.m; sourceTree = "<group>"; };
 		02C414DE1921B07200F858D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		02C415051921B0C300F858D9 /* libRealm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRealm.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -349,8 +345,6 @@
 				02E4D6EB192E58320082808D /* RLMTestObjects.m */,
 				5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */,
 				5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */,
-				02C41490191DE68900F858D9 /* XCTestCase+AsyncTesting.h */,
-				02C41491191DE68900F858D9 /* XCTestCase+AsyncTesting.m */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
 			);
 			name = RealmTests;
@@ -715,7 +709,6 @@
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				4DE0B176194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				84449B3119508AD2000F077D /* SchemaTests.mm in Sources */,
-				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
 			);
@@ -757,7 +750,6 @@
 				02026CAC19363B5300E4EEF8 /* ArrayTests.m in Sources */,
 				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
 				02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */,
-				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
 				4DE0B177194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				84449B3219508AD2000F077D /* SchemaTests.mm in Sources */,

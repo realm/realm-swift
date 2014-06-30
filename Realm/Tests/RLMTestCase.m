@@ -19,13 +19,26 @@
 #import "RLMTestCase.h"
 
 @interface RLMRealm ()
-+ (void)clearRealmCache;
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
++ (void)clearRealmCache;
 @end
+
+#if !defined(SWIFT)
+@implementation XCTestExpectation{
+@public
+    BOOL _fulfilled;
+}
+
+- (void)fulfill {
+    _fulfilled = YES;
+    CFRunLoopStop(CFRunLoopGetMain());
+}
+@end
+#endif
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
@@ -65,6 +78,11 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 
 @implementation RLMTestCase
+#if !defined(SWIFT)
+{
+    XCTestExpectation *_expectation;
+}
+#endif
 
 + (void)setUp
 {
@@ -78,8 +96,8 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
 + (void)tearDown
 {
     [super tearDown];
-    
-    // Reset realm cache
+
+    // Clear cache
     [RLMRealm clearRealmCache];
     
     // Delete Realm files
@@ -109,4 +127,25 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:schema error:nil];
 }
 
+#if !defined(SWIFT)
+- (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(__unused id)noop {
+    NSDate *endDate = [NSDate dateWithTimeIntervalSinceNow:interval];
+    NSLog(@"start");
+    while (!_expectation->_fulfilled && [endDate timeIntervalSinceNow] > 0) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:endDate];
+    }
+    NSLog(@"end");
+
+    if (!_expectation->_fulfilled) {
+        XCTFail(@"Wait for expectation timed out after %f seconds", interval);
+    }
+}
+
+- (XCTestExpectation *)expectationWithDescription:(__unused NSString *)desc {
+    _expectation = [[XCTestExpectation alloc] init];
+    return _expectation;
+}
+#endif
+
 @end
+
