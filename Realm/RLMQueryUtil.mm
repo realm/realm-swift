@@ -349,8 +349,7 @@ template<typename T>
 Query column_expression(NSComparisonPredicateOptions operatorType,
                                             NSUInteger leftColumn,
                                             NSUInteger rightColumn,
-                                            Table *table)
-{
+                                            Table *table) {
 
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
@@ -394,9 +393,6 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
                 break;
             case type_Double:
                 query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            case type_DateTime:
-                query.and_query(column_expression<DateTime>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,

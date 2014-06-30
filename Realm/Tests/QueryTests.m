@@ -52,8 +52,6 @@
 @property (nonatomic, assign) float     float2;
 @property (nonatomic, assign) double    double1;
 @property (nonatomic, assign) double    double2;
-@property (nonatomic, assign) NSDate    *date1;
-@property (nonatomic, assign) NSDate    *date2;
 @property (nonatomic, copy) NSString   *recordTag;
 @end
 
@@ -410,33 +408,21 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    NSDate *now = [NSDate dateWithTimeIntervalSinceNow:0];
-    NSDate *past = [NSDate dateWithTimeIntervalSinceNow:-100];
-    NSDate *future = [NSDate dateWithTimeIntervalSinceNow:100];
-
     [realm beginWriteTransaction];
 
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, now, now, @"Instance 0"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, now, past, @"Instance 1"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, past, future, @"Instance 2"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, future, past, @"Instance 3"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, past, past, @"Instance 4"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, future, now, @"Instance 5"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, future, future, @"Instance 6"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"Instance 2"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"Instance 3"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"Instance 4"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 5"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
 
     [realm commitWriteTransaction];
 
     [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool1" expectedCount:7];
     [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool2" expectedCount:3];
     [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 != bool2" expectedCount:4];
-
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 == date1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 == date2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 != date2"  expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 > date2"   expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 < date2"   expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 >= date2"  expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"date1 <= date2"  expectedCount:4];
 
     [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int1"  expectedCount:7];
     [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int2"  expectedCount:2];
