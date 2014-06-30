@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "XCTestCase+AsyncTesting.h"
 
 #pragma mark - Test Objects
 
@@ -157,11 +156,14 @@
     // query on class
     RLMArray *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
-    XCTAssertEqual([PersonObject objectsWithPredicateFormat:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 results");
+
+    RLMArray *results = [PersonObject objectsWithPredicateFormat:@"age == 27"];
+    XCTAssertEqual(results.count, (NSUInteger)1, @"Expecting 1 results");
     
     // with order
-    RLMArray *results = [[PersonObject objectsWithPredicateFormat:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
-    XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
+    results = [[PersonObject objectsWithPredicateFormat:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    PersonObject *tim = results[0];
+    XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
 
 - (void)testArrayQuery
@@ -523,9 +525,8 @@
                                                  predicate:(NSString *)predicate
                                             expectedReason:(NSString *)expectedReason
 {
+    RLMRealm *realm = [RLMRealm defaultRealm];
     @try {
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        
         RLMArray *queryResult = [realm objects:NSStringFromClass(class)
                            withPredicateFormat:predicate];
         NSUInteger actualCount = queryResult.count;
@@ -537,6 +538,7 @@
         if (![expectedReason isEqualToString:exception.reason]) {
             XCTFail(@"Exception reason: expected \"%@\" received @\"%@\"", expectedReason, exception.reason);
         }
+        realm = nil;
     }
 }
 

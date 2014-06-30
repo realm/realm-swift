@@ -21,4 +21,3 @@
 
 #import "RLMTestCase.h"
 #import "RLMTestObjects.h"
-#import "XCTestCase+AsyncTesting.h"
