@@ -18,8 +18,6 @@
 
 #import "RLMObject+ResolvedClass.h"
 
-static NSString *const RLMLinkedObjectPrefix = @"RLMReadOnly_";
-
 @implementation RLMObject (Schema)
 
 // This property is defined in the private files of the Realm ObjC binding.
