@@ -22,29 +22,29 @@
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
 {
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
-                                       expression: expression
-                                             type: type
-                                          options: 0];
+                                        expression: expression
+                                      operatorType: type
+                                           options: 0];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
 {
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
-                                       expression: expression
-                                             type: type
-                                          options: options
-                                         modifier: NSDirectPredicateModifier];
+                                        expression: expression
+                                      operatorType: type
+                                           options: options
+                                          modifier: NSDirectPredicateModifier];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier
 {

@@ -238,47 +238,67 @@
     // Eventually, we can remove the above as well.
 }
 
-- (void)testNumericPredicate
+- (void)testValidOperatorsInIntegerComparison
 {
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    NSExpression *alpha = [NSExpression expressionForConstantValue:@42];
+    BOOL (^isEmpty)(NSPredicateOperatorType) = ^BOOL(NSPredicateOperatorType type) {
+        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                          expression: alpha
+                                                        operatorType: type];
+        return [IntObject objectsWithPredicate: pred].count == 0 ? YES : NO;
+    };
 
-    [realm beginWriteTransaction];
-    [IntObject createInRealm:realm withObject:(@[@1])];
+    XCTAssert(isEmpty(NSLessThanPredicateOperatorType),
+              @"< operator in integer comparison.");
+    XCTAssert(isEmpty(NSLessThanOrEqualToPredicateOperatorType),
+              @"<= or =< operator in integer comparison.");
+    XCTAssert(isEmpty(NSGreaterThanPredicateOperatorType),
+              @"> operator in integer comparison.");
+    XCTAssert(isEmpty(NSGreaterThanOrEqualToPredicateOperatorType),
+              @">= or => operator in integer comparison.");
+    XCTAssert(isEmpty(NSEqualToPredicateOperatorType),
+              @"= or == operator in integer comparison.");
+    XCTAssert(isEmpty(NSNotEqualToPredicateOperatorType),
+              @"<> or != operator in integer comparison.");
+}
 
-    [IntObject createInRealm:realm withObject:(@[@2])];
-    [IntObject createInRealm:realm withObject:(@[@2])];
+- (void)testInvalidOperatorsInIntegerComparison
+{
+    NSExpression *alpha = [NSExpression expressionForConstantValue:@42];
+    BOOL (^isEmpty)(NSPredicateOperatorType) = ^BOOL(NSPredicateOperatorType type) {
+        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                          expression: alpha
+                                                        operatorType: type];
+        return [IntObject objectsWithPredicate: pred].count == 0 ? YES : NO;
+    };
 
-    [IntObject createInRealm:realm withObject:(@[@3])];
-    [IntObject createInRealm:realm withObject:(@[@3])];
-    [IntObject createInRealm:realm withObject:(@[@3])];
+    NSString *name = @"filterWithPredicate:orderedBy: - Invalid operator type";
 
-    [IntObject createInRealm:realm withObject:(@[@4])];
-    [IntObject createInRealm:realm withObject:(@[@4])];
-    [IntObject createInRealm:realm withObject:(@[@4])];
-    [IntObject createInRealm:realm withObject:(@[@4])];
-    [realm commitWriteTransaction];
+    XCTAssertThrowsSpecificNamed(isEmpty(NSMatchesPredicateOperatorType),
+                                 NSException, name,
+                                 @"MATCHES operator invalid in integer comparison.");
+    XCTAssertThrowsSpecificNamed(isEmpty(NSLikePredicateOperatorType),
+                                 NSException, name,
+                                 @"LIKE operator invalid in integer comparison.");
+    XCTAssertThrowsSpecificNamed(isEmpty(NSBeginsWithPredicateOperatorType),
+                                 NSException, name,
+                                 @"BEGINSWITH operator invalid in integer comparison.");
+    XCTAssertThrowsSpecificNamed(isEmpty(NSEndsWithPredicateOperatorType),
+                                 NSException, name,
+                                 @"ENDSWITH operator invalid in integer comparison.");
+    XCTAssertThrowsSpecificNamed(isEmpty(NSInPredicateOperatorType),
+                                 NSException, name,
+                                 @"IN operator invalid in integer comparison.");
 
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol == 3"].count, (NSUInteger)3,
-                   @"== operator in numeric predicate.");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >= 3"].count, (NSUInteger)7,
-                   @">= operator in numeric predicate.");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <= 3"].count, (NSUInteger)6,
-                   @"<= operator in numeric predicate.");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol >  3"].count, (NSUInteger)4,
-                   @">  operator in numeric predicate.");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol <  3"].count, (NSUInteger)3,
-                   @"<  operator in numeric predicate.");
-    XCTAssertEqual([IntObject objectsWithPredicateFormat:@"intCol != 3"].count, (NSUInteger)7,
-                   @"!= operator in numeric predicate.");
+    // Not sure what this operator is, but getting an
+    // NSInternalInconsistencyException: Unknown predicate type 11.
+    //
+    // XCTAssertThrowsSpecificNamed(isEmpty(NSCustomSelectorPredicateOperatorType),
+    //                             NSException, name,
+    //                             @"Invalid operator in integer comparison.");
 
-    // varargs don't play nice with macros
-    NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
-    XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
-
-    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"],
-                                 NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
-                                 @"Invalid operator in numeric predicate.");
+    XCTAssertThrowsSpecificNamed(isEmpty(NSContainsPredicateOperatorType), NSException, name,
+                                 @"CONTAINS operator invalid in integer comparison.");
 }
 
 - (void)testBooleanPredicate
@@ -309,9 +329,9 @@
     NSUInteger (^count)(NSPredicateOperatorType, NSComparisonPredicateOptions) =
     ^(NSPredicateOperatorType type, NSComparisonPredicateOptions options) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
-                                                         expression: alpha
-                                                               type: type
-                                                            options: options];
+                                                          expression: alpha
+                                                        operatorType: type
+                                                             options: options];
         return [StringObject objectsWithPredicate: pred].count;
     };
 
@@ -366,8 +386,8 @@
 
     NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
-                                                         expression: now
-                                                               type: type];
+                                                          expression: now
+                                                        operatorType: type];
         return [DateObject objectsWithPredicate: pred].count;
     };
 
@@ -396,8 +416,8 @@
 
     NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"binaryCol"
-                                                         expression: binary
-                                                               type: type];
+                                                          expression: binary
+                                                        operatorType: type];
         return [BinaryObject objectsWithPredicate: pred].count;
     };
 

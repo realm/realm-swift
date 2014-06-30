@@ -17,21 +17,22 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <XCTest/XCTest.h>
 
 @interface RLMPredicateUtil : NSObject
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type;
+                           operatorType: (NSPredicateOperatorType) type;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier;
 
