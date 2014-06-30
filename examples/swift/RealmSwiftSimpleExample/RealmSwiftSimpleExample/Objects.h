@@ -24,7 +24,10 @@
 @property NSInteger age;
 @end
 
-RLM_ARRAY_TYPE(Dog)
+// This protocol enables typed collections. i.e.:
+// RLMArray<Dog>
+@protocol Dog <NSObject>
+@end
 
 @interface Person : RLMObject
 @property NSString        *name;

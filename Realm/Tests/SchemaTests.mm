@@ -18,6 +18,9 @@
 
 #import <XCTest/XCTest.h>
 #import "RLMTestCase.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMRealm_Private.hpp"
 
 @interface SchemaTests : RLMTestCase
 
@@ -38,32 +41,28 @@
     // If a more fine-grained control with the realm's type inclusion mechanism is introduced later
     // on, these tests should be altered to verify all types.
     
-    NSArray *expectedTypes = @[@"QueryObject",
-                               @"PersonObject",
-                               @"DynamicObject",
-                               @"DogObject",
-                               @"AggregateObject",
-                               @"ArrayPropertyObject",
-                               @"OwnerObject",
-                               @"CompanyObject",
-                               @"MixedObject",
-                               @"AllTypesObject",
-                               @"EmployeeObject",
+    NSArray *expectedTypes = @[@"AllTypesObject",
                                @"StringObject",
-                               @"IntObject",
-                               @"IgnoredURLObject",
-                               @"BaseClassStringObject",
-                               @"IndexedObject",
-                               @"CustomAccessorsObject",
-                               @"DefaultObject",
-                               @"CircleObject"];
+                               @"IntObject"];
     
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
     
     // Getting the test realm
-    RLMRealm *realm = [self realmWithTestPath];
-    RLMSchema *schema = realm.schema;
-    
+    NSMutableArray *objectSchema = [NSMutableArray array];
+    for (NSString *className in expectedTypes) {
+        [objectSchema addObject:[RLMObjectSchema schemaForObjectClass:NSClassFromString(className)]];
+    }
+
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    schema.objectSchema = objectSchema;
+
+    // create realm with schema
+    [self realmWithTestPathAndSchema:schema];
+
+    // get dynamic realm and extract schema
+    RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:nil];
+    schema = realm.schema;
+
     // Test 1: Does the objectSchema return the right number of object schemas?
     NSArray *objectSchemas = schema.objectSchema;
     
