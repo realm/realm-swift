@@ -123,8 +123,9 @@
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
+        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [realm addObject:obj];
         [realm commitWriteTransaction];
 
         RLMArray *objects = [realm objects:StringObject.className withPredicate:nil];
