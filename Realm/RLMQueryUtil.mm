@@ -396,7 +396,9 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
                 query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             case type_DateTime:
-                query.and_query(column_expression<DateTime>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+                // FIXME: int64_t should be DateTime but that doesn't work on 32 bit
+                // FIXME: as time_t(32bit) != time_t(64bit)
+                query.and_query(column_expression<int64_t>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
