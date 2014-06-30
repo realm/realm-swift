@@ -692,8 +692,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"/Users/zuschlag/Projects/Realm/realm-objc/build",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug",
+					"$(PROJECT_DIR)/build",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
@@ -717,8 +716,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"/Users/zuschlag/Projects/Realm/realm-objc/build",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug",
+					"$(PROJECT_DIR)/build",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
