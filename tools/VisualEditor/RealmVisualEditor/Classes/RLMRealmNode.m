@@ -25,9 +25,11 @@
 
 @interface RLMRealm ()
 
+// private constructor
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
 
 @end
@@ -55,6 +57,7 @@
     _realm = [RLMRealm realmWithPath:_url
                             readOnly:NO
                              dynamic:YES
+                              schema:nil
                                error:error];
     
     if (*error != nil) {
