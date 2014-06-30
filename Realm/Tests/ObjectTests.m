@@ -19,9 +19,6 @@
 #import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
-#define OP_TYPE NSPredicateOperatorType
-#define OP_OPTIONS NSComparisonPredicateOptions
-
 #pragma mark - Test Objects
 
 #pragma mark DefaultObject
@@ -303,7 +300,8 @@
 
     NSExpression *alpha = [NSExpression expressionForConstantValue:@"A"];
 
-    NSUInteger (^count)(OP_TYPE, OP_OPTIONS) = ^(OP_TYPE type, OP_OPTIONS options) {
+    NSUInteger (^count)(NSPredicateOperatorType, NSComparisonPredicateOptions) =
+    ^(NSPredicateOperatorType type, NSComparisonPredicateOptions options) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
                                                          expression: alpha
                                                                type: type
@@ -351,7 +349,7 @@
 {
     NSExpression *now = [NSExpression expressionForConstantValue:[[NSDate alloc] init]];
 
-    NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
+    NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                          expression: now
                                                                type: type];
@@ -379,7 +377,7 @@
 {
     NSExpression *binary = [NSExpression expressionForConstantValue:[[NSData alloc] init]];
 
-    NSUInteger (^count)(OP_TYPE) = ^(OP_TYPE type) {
+    NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
         NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"binaryCol"
                                                          expression: binary
                                                                type: type];
