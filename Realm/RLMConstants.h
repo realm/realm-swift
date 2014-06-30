@@ -110,16 +110,21 @@ typedef NS_ENUM(NSInteger, RLMSortOrder) {
 extern NSString *const RLMRealmDidChangeNotification;
 
 typedef NS_ENUM(NSInteger, RLMError) {
-    RLMErrorOk                    = 0,
+    /** Retuned by RLMRealm if no other specific error is returned when a realm is opened. */
     RLMErrorFail                  = 1,
-    RLMErrorFailRdOnly            = 2,
-    RLMErrorFileAccessError       = 3,
-    RLMErrorFilePermissionDenied  = 4,
-    RLMErrorFileExists            = 5,
-    RLMErrorFileNotFound          = 6,
-    RLMErrorRollback              = 7,
-    RLMErrorInvalidDatabase       = 8,
-    RLMErrorTableNotFound         = 9,
-    RLMErrorStaleLockFile         = 10,
-    RLMErrorLockFileButNoData     = 11
+    /** Returned by RLMRealm for any I/O related exception scenarios when a realm is opened. */
+    RLMErrorFileAccessError       = 2,
+    /** Returned by RLMRealm if the user does not have permission to open or create
+        the specified file in the specified access mode when the realm is opened. */
+    RLMErrorFilePermissionDenied  = 3,
+    /** Returned by RLMRealm if no_create was specified and the file did already exist when the realm is opened. */
+    RLMErrorFileExists            = 4,
+    /** Returned by RLMRealm if no_create was specified and the file was not found when the realm is opened. */
+    RLMErrorFileNotFound          = 5,
+    /** Returned by RLMRealm if a stale .lock file is present when the realm is opened. */
+    RLMErrorStaleLockFile         = 6,
+    /** Returned by RLMRealm if the database file is deleted while there are open realms,
+        and subsequent attempts to open realms will try to join an already
+        active shared scheme, but fail due to the missing database file. */
+    RLMErrorLockFileButNoData     = 7
 };
