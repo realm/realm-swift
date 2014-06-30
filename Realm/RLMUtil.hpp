@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConstants.h"
+#import "RLMObjectSchema.h"
 #import <objc/runtime.h>
 
 #import <tightdb/table.hpp>
@@ -28,6 +29,13 @@
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
+
+// throws if the values in array are not valid for the given schema
+void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema);
+
+// throws if the values in dict are not valid for the given schema
+// returns dictionary with default values when applicable
+NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *schema);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
@@ -70,11 +78,6 @@ inline NSString *RLMTypeToString(RLMPropertyType type) {
     }
     return @"Unknown";
 }
-
-// Getter and Setter for RLMPropertyTypeAny properties
-id RLMGetAnyProperty(tightdb::Row row, NSUInteger col_ndx);
-void RLMSetAnyProperty(tightdb::Row row, NSUInteger col_ndx, id obj);
-
 
 // String conversion utilities
 inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {

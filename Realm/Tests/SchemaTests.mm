@@ -18,6 +18,9 @@
 
 #import <XCTest/XCTest.h>
 #import "RLMTestCase.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMRealm_Private.hpp"
 
 @interface SchemaTests : RLMTestCase
 
@@ -38,32 +41,28 @@
     // If a more fine-grained control with the realm's type inclusion mechanism is introduced later
     // on, these tests should be altered to verify all types.
     
-    NSArray *expectedTypes = @[@"QueryObject",
-                               @"PersonObject",
-                               @"DynamicObject",
-                               @"DogObject",
-                               @"AggregateObject",
-                               @"ArrayPropertyObject",
-                               @"OwnerObject",
-                               @"CompanyObject",
-                               @"MixedObject",
-                               @"AllTypesObject",
-                               @"EmployeeObject",
+    NSArray *expectedTypes = @[@"AllTypesObject",
                                @"StringObject",
-                               @"IntObject",
-                               @"IgnoredURLObject",
-                               @"BaseClassStringObject",
-                               @"IndexedObject",
-                               @"CustomAccessorsObject",
-                               @"DefaultObject",
-                               @"CircleObject"];
+                               @"IntObject"];
     
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
     
     // Getting the test realm
-    RLMRealm *realm = [self realmWithTestPath];
-    RLMSchema *schema = realm.schema;
-    
+    NSMutableArray *objectSchema = [NSMutableArray array];
+    for (NSString *className in expectedTypes) {
+        [objectSchema addObject:[RLMObjectSchema schemaForObjectClass:NSClassFromString(className)]];
+    }
+
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    schema.objectSchema = objectSchema;
+
+    // create realm with schema
+    [self realmWithTestPathAndSchema:schema];
+
+    // get dynamic realm and extract schema
+    RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:nil];
+    schema = realm.schema;
+
     // Test 1: Does the objectSchema return the right number of object schemas?
     NSArray *objectSchemas = schema.objectSchema;
     
@@ -81,7 +80,7 @@
             }
         }
         
-        XCTAssertEqual(occurrenceCount, (NSUInteger)1, @"Expecting single occurrence of object schema for type %@ found %lu", expectedType, occurrenceCount);
+        XCTAssertEqual(occurrenceCount, (NSUInteger)1, @"Expecting single occurrence of object schema for type %@ found %lu", expectedType, (unsigned long)occurrenceCount);
         
         if (occurrenceCount > 0) {
             identifiedTypesCount++;
@@ -89,7 +88,7 @@
     }
 
     // Test 3: Does the object schema array contains at least the expected classes
-    XCTAssertTrue(identifiedTypesCount >= expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", identifiedTypesCount, expectedTypes.count);
+    XCTAssertTrue(identifiedTypesCount >= expectedTypes.count, @"Unexpected object schemas in database. Found %lu out of %lu expected", (unsigned long)identifiedTypesCount, (unsigned long)expectedTypes.count);
     
     // Test 4: Test querying object schemas using schemaForClassName: for expected types
     for (NSString *expectedType in expectedTypes) {

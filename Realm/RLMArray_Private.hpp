@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
-#import "RLMAccessor.h"
 
 #import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
@@ -30,15 +29,14 @@
 // NOTE: We put all sublass properties in the same class to keep
 //       the ivar layout the same - this allows us to switch implementations
 //       after creation
-@interface RLMArray () <RLMAccessor> {
+@interface RLMArray () {
   @private
     // array for standalone
     NSMutableArray *_backingArray;
   @protected
     // accessor ivars
     RLMRealm *_realm;
-    BOOL _RLMAccessor_writable;     // YES when in write transaction
-    BOOL _RLMAccessor_invalid;      // YES for invalidated objects
+    NSString *_objectClassName;
     BOOL _readOnly;     // YES for RLMArrays which are never mutable
 }
 
@@ -92,31 +90,6 @@
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 
 @end
-
-
-//
-// Invalid and readonly RLMArray variants
-//
-
-// IMPORTANT NOTE: Do not add any ivars or properties to these sub-classes
-//                 we switch the class of RLMArray instances after creation
-
-// RLMArrayLinkView variant used when read only
-@interface RLMArrayLinkViewReadOnly : RLMArrayLinkView
-@end
-
-// RLMArrayLinkView variant used when invalidated
-@interface RLMArrayLinkViewInvalid : RLMArrayLinkView
-@end
-
-// RLMArrayTableView variant used when read only
-@interface RLMArrayTableViewReadOnly : RLMArrayTableView
-@end
-
-// RLMArrayTableView variant used when invalidated
-@interface RLMArrayTableViewInvalid : RLMArrayTableView
-@end
-
 
 
 

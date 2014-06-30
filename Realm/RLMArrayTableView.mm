@@ -42,47 +42,35 @@
     ar->_backingView = view;
     ar->_realm = realm;
     ar->_readOnly = YES;
-    [realm registerAccessor:ar];
-    
-    // make readonly if not in write transaction
-    if (!realm.inWriteTransaction) {
-        object_setClass(ar, RLMArrayTableViewReadOnly.class);
-    }
-    
     return ar;
 }
 
-- (void)setRLMAccessor_writable:(BOOL)writable {
-    if (writable) {
-        object_setClass(self, RLMArrayTableView.class);
+//
+// validation helper
+//
+inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
+    if (!ar->_backingView.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
-    else {
-        object_setClass(self, RLMArrayTableViewReadOnly.class);
-    }
-    _RLMAccessor_writable = writable;
 }
 
-- (void)setRLMAccessor_Invalid:(BOOL)invalid {
-    if (invalid) {
-        object_setClass(self, RLMArrayTableViewInvalid.class);
-    }
-    else {
-        object_setClass(self, RLMArrayTableView.class);
-    }
-    _RLMAccessor_invalid = invalid;
-}
-
+//
+// public method implementations
+//
 - (NSUInteger)count {
+    RLMArrayTableViewValidateAttached(self);
     return _backingView.size();
 }
 
 inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger index) {
     return RLMCreateObjectAccessor(array->_realm,
-                                   array.objectClassName,
+                                   array->_objectClassName,
                                    array->_backingView.get_source_ndx(index));
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
+    RLMArrayTableViewValidateAttached(self);
+
     NSUInteger batchCount = 0, index = state->state, count = self.count;
     
     __autoreleasing id *autoreleasingBuffer = (__autoreleasing id *)(void *)buffer;
@@ -97,6 +85,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
+    RLMArrayTableViewValidateAttached(self);
+
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
@@ -150,6 +140,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (RLMArray *)copy {
+    RLMArrayTableViewValidateAttached(self);
+
     tightdb::TableView viewCopy = _backingView.get_parent().where(&_backingView).find_all();
     return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                  query:new tightdb::Query(*_backingQuery)
@@ -188,8 +180,9 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 -(id)minOfProperty:(NSString *)property {
+    RLMArrayTableViewValidateAttached(self);
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
-    
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
@@ -211,8 +204,9 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 -(id)maxOfProperty:(NSString *)property {
+    RLMArrayTableViewValidateAttached(self);
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
-    
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
@@ -234,8 +228,9 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
+    RLMArrayTableViewValidateAttached(self);
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
-    
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
@@ -253,8 +248,9 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
+    RLMArrayTableViewValidateAttached(self);
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
-    
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
     switch (colType) {
