@@ -18,7 +18,7 @@
 
 #import "RLMClazzNode.h"
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 
 @implementation RLMClazzNode {
 
@@ -93,8 +93,8 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                      owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                                  owner:self];
 
     result.textField.stringValue = self.name;
     result.button.title = [NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];

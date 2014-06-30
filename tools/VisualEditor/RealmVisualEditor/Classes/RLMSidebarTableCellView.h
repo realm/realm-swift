@@ -18,10 +18,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSColor (ByteSizeFactory)
+@interface RLMSidebarTableCellView : NSTableCellView
 
-+ (NSColor *)colorWithByteRed:(NSUInteger)red green:(NSUInteger)green blue:(NSUInteger)blue alpha:(NSUInteger)alpha;
-
-+ (NSColor *)colorWithByteWhite:(NSUInteger)white alpha:(NSUInteger)alpha;
+@property(strong) IBOutlet NSButton *button;
 
 @end
+

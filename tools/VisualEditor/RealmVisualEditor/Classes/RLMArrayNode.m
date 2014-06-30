@@ -18,7 +18,7 @@
 
 #import "RLMArrayNode.h"
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 
 @implementation RLMArrayNode {
 
@@ -73,8 +73,8 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                               owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                                  owner:self];
     
     result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];

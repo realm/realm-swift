@@ -20,7 +20,7 @@
 
 #import <Realm/Realm.h>
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
 
 @interface RLMRealm ()
@@ -107,8 +107,8 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"HeaderLabel"
-                                                      owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"HeaderLabel"
+                                                                  owner:self];
     
     result.textField.stringValue = @"classes".uppercaseString;
     result.textField.textColor = [NSColor colorWithByteRed:145
