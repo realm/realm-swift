@@ -349,8 +349,7 @@ template<typename T>
 Query column_expression(NSComparisonPredicateOptions operatorType,
                                             NSUInteger leftColumn,
                                             NSUInteger rightColumn,
-                                            Table *table)
-{
+                                            Table *table) {
 
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
