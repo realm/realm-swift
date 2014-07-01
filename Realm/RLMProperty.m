@@ -51,6 +51,16 @@
     return self;
 }
 
++ (instancetype)propertyWithName:(NSString *)name type:(RLMPropertyType)type objectClassName:(NSString *)objectClassName {
+    RLMProperty *prop = [[RLMProperty alloc] init];
+    prop->_name = name;
+    prop->_type = type;
+    prop->_objectClassName = objectClassName;
+    [prop updateAccessorNames];
+    [prop setObjcCodeFromType];
+    return prop;
+}
+
 -(void)updateAccessorNames {
     // populate getter/setter names if generic
     if (!_getterName) {
