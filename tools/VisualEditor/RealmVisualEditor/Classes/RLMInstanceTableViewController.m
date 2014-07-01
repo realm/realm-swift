@@ -27,7 +27,7 @@
 
 @implementation RLMInstanceTableViewController {
 
-    NSCursor *previousCursor;
+    BOOL linkCursorDisplaying;
 }
 
 #pragma mark - NSObject overrides
@@ -38,7 +38,9 @@
     
     // Perform some extra inititialization on the tableview
     [self.tableView setTarget:self];
-    [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
+    [self.tableView setAction:@selector(userClicked:)];
+    
+    linkCursorDisplaying = NO;
 }
 
 #pragma mark - NSTableViewDataSource implementation
@@ -370,42 +372,24 @@
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    // NSLog(@"Entering %lu, %lu", location.row, location.column);
-    if(RLMTableLocationRowIsUndefined(location) || RLMTableLocationColumnIsUndefined(location)) {
-        return;
-    }
-    
-    RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
-    
-    if(propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
-        if(previousCursor == nil) {
-            previousCursor = [NSCursor currentCursor];
-            NSCursor *newCursor = [NSCursor pointingHandCursor];
-            [newCursor set];
+    if (!RLMTableLocationColumnIsUndefined(location)) {        
+        RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
+        
+        if (propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
+            if (!linkCursorDisplaying) {
+                [self enableLinkCursor];
+            }
+            
+            return;
         }
     }
-}
-
-- (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
-{
-    // NSLog(@"Exiting %lu, %lu", location.row, location.column);
-    if(RLMTableLocationRowIsUndefined(location) || RLMTableLocationColumnIsUndefined(location)) {
-        return;
-    }
     
-    RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];    
-    
-    if(propertyNode.type != RLMPropertyTypeObject && propertyNode.type != RLMPropertyTypeArray) {
-        if(previousCursor != nil) {
-            [previousCursor set];
-            previousCursor = nil;
-        }
-    }
+    [self disableLinkCursor];
 }
 
 #pragma mark - Public methods - NSTableView eventHandling
 
-- (IBAction)userDoubleClicked:(id)sender
+- (IBAction)userClicked:(id)sender
 {
     NSInteger column = self.tableView.clickedColumn;
     NSInteger row = self.tableView.clickedRow;
@@ -663,5 +647,26 @@
     headerCell.stringValue = name;
 }
 
+- (void)enableLinkCursor
+{
+    NSCursor *currentCursor = [NSCursor currentCursor];
+    [currentCursor push];
+    
+    NSCursor *newCursor = [NSCursor pointingHandCursor];
+    [newCursor set];
+    
+    [self.parentWindowController.window disableCursorRects];
+    linkCursorDisplaying = YES;
+}
+
+- (void)disableLinkCursor
+{
+    [self.parentWindowController.window enableCursorRects];
+    [self.parentWindowController.window resetCursorRects];
+    
+    [NSCursor pop];
+    
+    linkCursorDisplaying = NO;
+}
 
 @end
