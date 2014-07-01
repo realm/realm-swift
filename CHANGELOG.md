@@ -12,7 +12,8 @@
 
 ### Enhancements
 
-* Added a project to build in XCode6 for experimental swift support.
+* new XCode6 project for experimental swift support.
+* new Realm Editor app for reading and editing Realm db files.
 * Added support for migrations.
 * Added support for RLMArray properties on objects.
 * Added support for creating in-memory default Realm.
