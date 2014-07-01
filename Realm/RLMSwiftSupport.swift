@@ -113,8 +113,8 @@ extension String {
                                       name: String,
                                       column: Int,
                                       attr: RLMPropertyAttributes) -> RLMProperty {
-        var p:RLMProperty?
-        var t:String?
+        var p: RLMProperty?
+        var t: String?
         switch valueType {
             // Detect basic types (including optional versions)
             case is Bool.Type, is Bool?.Type:

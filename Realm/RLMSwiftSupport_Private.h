@@ -32,7 +32,6 @@
 
 @interface RLMObject ()
 // create instance for introspection
-+ (instancetype)createInstance;
 - (instancetype)initEmptyInRealm:(RLMRealm *)realm;
 @end
 

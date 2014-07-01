@@ -18,8 +18,7 @@
 
 #import "RLMSchema.h"
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define REALM_SWIFT
+#ifdef REALM_SWIFT
 #import <Realm/Realm-Swift.h>
 #endif
 
