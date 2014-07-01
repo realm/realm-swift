@@ -28,8 +28,6 @@
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (IBAction)userDoubleClicked:(id)sender;
-
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
 
 @end
