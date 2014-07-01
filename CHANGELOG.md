@@ -12,11 +12,15 @@
 
 ### Enhancements
 
-* Added support for RLMArrayProperties.
-* Added support for creating in-memory default realm.
+* New Xcode 6 project for experimental swift support.
+* New Realm Editor app for reading and editing Realm db files.
+* Added support for migrations.
+* Added support for RLMArray properties on objects.
+* Added support for creating in-memory default Realm.
 * Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
 * Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
 * Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
+* Now allows predicates comparing two object properties of the same type.
 
 ### Bugfixes
 
