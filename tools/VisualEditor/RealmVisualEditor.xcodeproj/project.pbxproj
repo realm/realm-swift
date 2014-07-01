@@ -13,6 +13,7 @@
 		844C34E3194859080027E902 /* TestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E2194859080027E902 /* TestClasses.m */; };
 		844C350E19499BC20027E902 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
 		844C350F19499CB90027E902 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
+		8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457294C1962E3860076D4F1 /* RLMTableView.m */; };
 		8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */; };
 		8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2BC195452BE00BCA755 /* RLMInstanceTableViewController.m */; };
 		84754ABE193CA4600093604E /* RLMRealmBrowserWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84754ABD193CA4600093604E /* RLMRealmBrowserWindowController.m */; };
@@ -110,6 +111,8 @@
 		844C34E1194859080027E902 /* TestClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestClasses.h; path = Classes/TestClasses.h; sourceTree = "<group>"; };
 		844C34E2194859080027E902 /* TestClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestClasses.m; path = Classes/TestClasses.m; sourceTree = "<group>"; };
 		844C34FC19499A350027E902 /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../Realm.xcodeproj; sourceTree = "<group>"; };
+		8457294B1962E3860076D4F1 /* RLMTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTableView.h; path = Classes/RLMTableView.h; sourceTree = "<group>"; };
+		8457294C1962E3860076D4F1 /* RLMTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTableView.m; path = Classes/RLMTableView.m; sourceTree = "<group>"; };
 		8474E2B219544D8000BCA755 /* RLMTypeOutlineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTypeOutlineViewController.h; path = Classes/RLMTypeOutlineViewController.h; sourceTree = "<group>"; };
 		8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTypeOutlineViewController.m; path = Classes/RLMTypeOutlineViewController.m; sourceTree = "<group>"; };
 		8474E2BB195452BE00BCA755 /* RLMInstanceTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMInstanceTableViewController.h; path = Classes/RLMInstanceTableViewController.h; sourceTree = "<group>"; };
@@ -233,6 +236,8 @@
 			children = (
 				84754ABC193CA4600093604E /* RLMRealmBrowserWindowController.h */,
 				84754ABD193CA4600093604E /* RLMRealmBrowserWindowController.m */,
+				8457294B1962E3860076D4F1 /* RLMTableView.h */,
+				8457294C1962E3860076D4F1 /* RLMTableView.m */,
 				8474E2B219544D8000BCA755 /* RLMTypeOutlineViewController.h */,
 				8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */,
 				8474E2BB195452BE00BCA755 /* RLMInstanceTableViewController.h */,
@@ -539,6 +544,7 @@
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClazzProperty.m in Sources */,
+				8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */,
 				84925C67195AE9AD00EE27B1 /* RLMSidebarTableCellView.m in Sources */,
 				84D7990B19388E8900FC76A0 /* RLMClazzNode.m in Sources */,
 				84AA41A91949C99800A50F03 /* RLMObjectNode.m in Sources */,

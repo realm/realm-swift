@@ -25,7 +25,10 @@
 
 #import "objc/objc-class.h"
 
-@implementation RLMInstanceTableViewController
+@implementation RLMInstanceTableViewController {
+
+    NSCursor *previousCursor;
+}
 
 #pragma mark - NSObject overrides
 
@@ -167,7 +170,7 @@
     }
 }
 
-#pragma mark - NSTableViewDelegate implementation
+#pragma mark - RLMTableViewDelegate implementation
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
@@ -363,6 +366,41 @@
     }
     
     return NO;
+}
+
+- (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
+{
+    // NSLog(@"Entering %lu, %lu", location.row, location.column);
+    if(RLMTableLocationRowIsUndefined(location) || RLMTableLocationColumnIsUndefined(location)) {
+        return;
+    }
+    
+    RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
+    
+    if(propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
+        if(previousCursor == nil) {
+            previousCursor = [NSCursor currentCursor];
+            NSCursor *newCursor = [NSCursor pointingHandCursor];
+            [newCursor set];
+        }
+    }
+}
+
+- (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
+{
+    // NSLog(@"Exiting %lu, %lu", location.row, location.column);
+    if(RLMTableLocationRowIsUndefined(location) || RLMTableLocationColumnIsUndefined(location)) {
+        return;
+    }
+    
+    RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];    
+    
+    if(propertyNode.type != RLMPropertyTypeObject && propertyNode.type != RLMPropertyTypeArray) {
+        if(previousCursor != nil) {
+            [previousCursor set];
+            previousCursor = nil;
+        }
+    }
 }
 
 #pragma mark - Public methods - NSTableView eventHandling
