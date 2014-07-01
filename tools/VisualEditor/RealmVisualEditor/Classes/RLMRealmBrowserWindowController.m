@@ -25,14 +25,6 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 @implementation RLMRealmBrowserWindowController
 
-#pragma mark - NSWindowsController overrides
-
-- (void)windowDidLoad
-{
-    [self.tableViewController viewDidLoad];
-        
-}
-
 - (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode
 {
     [self.outlineViewController selectTypeNode:typeNode];

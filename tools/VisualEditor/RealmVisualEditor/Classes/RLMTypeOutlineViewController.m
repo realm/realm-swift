@@ -31,9 +31,9 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)viewDidLoad
+- (void)awakeFromNib
 {
-    [super viewDidLoad];
+    [super awakeFromNib];
     
     // We want the class outline to be expandedas default
     [self.classesOutlineView expandItem:nil

@@ -27,8 +27,12 @@
 
 @implementation RLMInstanceTableViewController
 
-- (void)viewDidLoad
+#pragma mark - NSObject overrides
+
+- (void)awakeFromNib
 {
+    [super awakeFromNib];
+    
     // Perform some extra inititialization on the tableview
     [self.tableView setTarget:self];
     [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
