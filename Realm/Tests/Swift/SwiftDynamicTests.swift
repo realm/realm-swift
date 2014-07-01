@@ -29,7 +29,7 @@ class SwiftDynamicTests: RLMTestCase {
             DynamicObject.createInRealm(realm, withObject: ["column2", 2])
             realm.commitWriteTransaction()
         }
-        let dyrealm = RLMRealm.realmWithPath(RLMTestRealmPath(), readOnly: true, dynamic: true, error: nil)
+        let dyrealm = self.dynamicRealmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
         XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm.self), "realm should be of class RLMDynamicRealm")
         
@@ -57,7 +57,7 @@ class SwiftDynamicTests: RLMTestCase {
         }
         
         // verify properties
-        let dyrealm = RLMRealm.realmWithPath(RLMTestRealmPath(), readOnly: true, dynamic: true, error: nil)
+        let dyrealm = self.dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects(DynamicObject.className())
         
         // FIXME: These should work

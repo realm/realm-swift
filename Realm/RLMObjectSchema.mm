@@ -16,16 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema.h"
-#import "RLMUtil.hpp"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+#import "RLMUtil.hpp"
+
+#import <tightdb/table.hpp>
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
 @end
@@ -76,6 +76,7 @@
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = NSStringFromClass(objectClass);
+    schema.objectClass = objectClass;
     return schema;
 }
 
@@ -105,7 +106,9 @@
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = className;
-    
+
+    // for dynamic interface use vanilla RLMObject
+    schema.objectClass = RLMObject.class;
     return schema;
 }
 

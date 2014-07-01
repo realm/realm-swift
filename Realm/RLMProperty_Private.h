@@ -30,9 +30,12 @@
                               attributes:(RLMPropertyAttributes)attributes
                                   column:(NSUInteger)column;
 
+// private setters
+@property (nonatomic, assign) NSUInteger column;
+@property (nonatomic, readwrite, assign) RLMPropertyType type;
+
 // private properties
-@property (nonatomic, readonly) NSUInteger column;
-@property (nonatomic, readonly) char objcType;
+@property (nonatomic, assign) char objcType;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
