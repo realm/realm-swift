@@ -59,9 +59,10 @@ class SwiftRealmTests: RLMTestCase {
     
     func testRealmIsUpdatedAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
+        let notification = expectationWithDescription("realm notification")
         let token = realm.addNotificationBlock() { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
-            self.notify(XCTAsyncTestCaseStatusSucceeded)
+            notification.fulfill();
         }
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
@@ -70,16 +71,17 @@ class SwiftRealmTests: RLMTestCase {
             StringObject.createInRealm(realm, withObject: ["string"])
             realm.commitWriteTransaction()
         }
-        
-        waitForStatus(XCTAsyncTestCaseStatusSucceeded, timeout: 2)
+
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
     }
     
     func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
+        let notification = expectationWithDescription("realm notification")
         let token = realm.addNotificationBlock() { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
-            self.notify(XCTAsyncTestCaseStatusSucceeded)
+            notification.fulfill();
         }
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
@@ -92,7 +94,7 @@ class SwiftRealmTests: RLMTestCase {
         }
         
         // this should complete very fast before the timer
-        waitForStatus(XCTAsyncTestCaseStatusSucceeded, timeout: 2)
+        waitForExpectationsWithTimeout(2.0, handler: nil)
         realm.removeNotification(token)
         
         // get object

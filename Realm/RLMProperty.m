@@ -31,12 +31,19 @@
 
 @implementation RLMProperty
 
--(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column {
+
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+                      column:(NSUInteger)column
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _column = column;
+        _objectClassName = objectClassName;
+        _attributes = attributes;
         [self updateAccessorNames];
         [self setObjcCodeFromType];
     }
@@ -125,7 +132,7 @@
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
-                Class cls = RLMClassFromString(self.objectClassName);
+                Class cls = [RLMSchema classForString:self.objectClassName];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
@@ -138,7 +145,7 @@
                 _type = RLMPropertyTypeObject;
                 
                 // verify type
-                Class cls = RLMClassFromString(self.objectClassName);
+                Class cls = [RLMSchema classForString:self.objectClassName];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
@@ -201,6 +208,19 @@
     [prop updateAccessorNames];
     
     return prop;
+}
+
+
+-(BOOL)isEqualToProperty:(RLMProperty *)prop {
+    return [_name isEqualToString:prop.name] && _type == prop.type &&
+           (_objectClassName == nil || [_objectClassName isEqualToString:prop.objectClassName]);
+}
+
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:RLMProperty.class]) {
+        return NO;
+    }
+    return [self isEqualToProperty:object];
 }
 
 @end

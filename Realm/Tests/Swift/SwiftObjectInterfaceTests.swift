@@ -31,8 +31,18 @@ class SwiftObject: RLMObject {
     var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
     var dateCol = NSDate(timeIntervalSince1970: 1)
     var objectCol = SwiftBoolObject()
-    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    //var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
+/*
+class SwiftObjectCustomInitializer : RLMObject {
+    var intCol: Int
+    var stringCol: String
+    init(intCol: Int, stringCol: String) {
+        self.intCol = intCol
+        self.stringCol = stringCol
+        super.init()
+    }
+}*/
 
 class SwiftObjectInterfaceTests: RLMTestCase {
     
@@ -79,7 +89,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         obj.dateCol = NSDate(timeIntervalSince1970: 123)
         obj.objectCol = SwiftBoolObject()
         obj.objectCol.boolCol = true
-        obj.arrayCol.addObject(obj.objectCol)
+        //obj.arrayCol.addObject(obj.objectCol)
 
         realm.commitWriteTransaction()
         
@@ -92,8 +102,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.binaryCol, "abcd".dataUsingEncoding(NSUTF8StringEncoding), "should be abcd data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
-        XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
-        XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
+        //XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
+        //XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftObject() {
@@ -111,10 +121,23 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding), "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
-        XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
+        //XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
     }
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqualObjects(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
     }
+/*
+    func testCustomInitializer() {
+        let realm = realmWithTestPath()
+
+        realm.beginWriteTransaction()
+        let object = SwiftObjectCustomInitializer(intCol: 1, stringCol: "stringVal")
+        realm.addObject(object)
+        realm.commitWriteTransaction()
+
+        let objectFromRealm = realm.allObjects(BaseClassStringObject.className())[0] as SwiftObjectCustomInitializer
+        XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
+        XCTAssertEqualObjects(objectFromRealm.stringCol, "stringVal", "Should be stringVal")
+    }*/
 }

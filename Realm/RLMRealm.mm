@@ -20,6 +20,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
+#import "RLMMigration_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMConstants.h"
 #import "RLMQueryUtil.hpp"
@@ -68,6 +69,7 @@ void throw_objc_exception(exception &ex) {
 inline NSError* make_realm_error(RLMError code, exception &ex) {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
+    [details setValue:@(code) forKey:@"Error Code"];
     return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
 }
 
@@ -86,7 +88,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex) {
     return wt;
 }
 - (void)checkForUpdate {
-    [_realm performSelector:@selector(refresh)];
+    [_realm refresh];
 }
 @end
 
@@ -125,13 +127,15 @@ inline NSArray *realmsAtPath(NSString *path) {
 
 inline void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
+        for (NSMapTable *map in s_realmsPerPath.allValues) {
+            [map removeAllObjects];
+        }
         s_realmsPerPath = [NSMutableDictionary dictionary];
     }
 }
 
 @interface RLMRealm ()
 @property (nonatomic) NSString *path;
-@property (nonatomic, readwrite) RLMSchema *schema;
 @end
 
 
@@ -141,7 +145,6 @@ static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
@@ -152,6 +155,9 @@ static NSArray *s_objectDescriptors = nil;
     
     Group *_group;
 }
+
+@synthesize inWriteTransaction = _inWriteTransaction;
+@synthesize group = _group;
 
 + (BOOL)isCoreDebug {
     return tightdb::Version::has_feature(tightdb::feature_Debug);
@@ -174,9 +180,6 @@ static NSArray *s_objectDescriptors = nil;
     if (self) {
         _path = path;
         _runLoop = [NSRunLoop currentRunLoop];
-        _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                             valueOptions:NSPointerFunctionsWeakMemory
-                                                 capacity:128];
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -190,6 +193,10 @@ static NSArray *s_objectDescriptors = nil;
 
 +(NSString *)defaultPath
 {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+    });
     return s_defaultRealmPath;
 }
 
@@ -202,9 +209,6 @@ static NSArray *s_objectDescriptors = nil;
 
 + (instancetype)defaultRealm
 {
-    if (!s_defaultRealmPath) {
-        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
-    }
     return [RLMRealm realmWithPath:RLMRealm.defaultPath readOnly:NO error:nil];
 }
 
@@ -238,12 +242,13 @@ static NSArray *s_objectDescriptors = nil;
                      readOnly:(BOOL)readonly
                         error:(NSError **)outError
 {
-    return [self realmWithPath:path readOnly:readonly dynamic:NO error:outError];
+    return [self realmWithPath:path readOnly:readonly dynamic:NO schema:nil error:outError];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                       dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
 {
     if (!path || path.length == 0) {
@@ -321,18 +326,22 @@ static NSArray *s_objectDescriptors = nil;
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
     realm->_group = &group;
     
-    if (dynamic) {
-        // for dynamic realms, get schema from stored tables
-        realm.schema = [RLMSchema dynamicSchemaFromRealm:realm];
+    // set schema
+    if (customSchema) {
+        realm->_schema = customSchema;
+    }
+    else if (dynamic) {
+        realm->_schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
-        // set the schema for this realm
-        realm.schema = [RLMSchema sharedSchema];
+        realm->_schema = [RLMSchema sharedSchema];
+    }
 
-        // initialize object store for this realm
-        RLMEnsureRealmTablesExist(realm);
-        
-        // cache main thread realm at this path
+    // initialize object store for this realm
+    RLMVerifyAndCreateTables(realm);
+    
+    // cache realm at this path if using a vanilla realm
+    if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
     }
     
@@ -379,7 +388,6 @@ static NSArray *s_objectDescriptors = nil;
             
             // update state and make all objects in this realm writable
             _inWriteTransaction = YES;
-            [self updateAllObjects];
         }
         catch (std::exception& ex) {
             // File access errors are treated as exceptions here since they should not occur after the shared
@@ -399,12 +407,12 @@ static NSArray *s_objectDescriptors = nil;
             
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
-            [self updateAllObjects];
-            
+
             // notify other realm istances of changes
-            for (RLMRealm *realm in realmsAtPath(_path)) {
+            NSArray *realms = realmsAtPath(_path);
+            for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
-                    [realm->_runLoop performSelector:@selector(refresh) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+                    [realm->_runLoop performSelector:@selector(refresh) withObject:realm afterDelay:0.0 inModes:@[NSRunLoopCommonModes]];
                 }
             }
             
@@ -467,7 +475,6 @@ static NSArray *s_objectDescriptors = nil;
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
-            [self updateAllObjects];
             
             // send notification that someone else changed the realm
             [self sendNotifications];
@@ -476,38 +483,6 @@ static NSArray *s_objectDescriptors = nil;
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
-}
-
-- (void)registerAccessor:(id<RLMAccessor>)accessor {
-    [_objects setObject:accessor forKey:accessor];
-}
-
-- (void)updateAllObjects {
-    try {
-        // refresh all outstanding objects
-        for (id<RLMAccessor> obj in _objects.objectEnumerator.allObjects) {
-            if ([obj isKindOfClass:RLMObject.class]) {
-                if (!((RLMObject *)obj)->_row.is_attached()) {
-                    obj.RLMAccessor_invalid = YES;
-                    continue; // don't change writeable one invalid
-                }
-            }
-            else if([obj isKindOfClass:RLMArrayLinkView.class]) {
-                if (!((RLMArrayLinkView *)obj)->_backingLinkView->is_attached()) {
-                    obj.RLMAccessor_invalid = YES;
-                    continue; // don't change writeable one invalid
-                }
-            }
-            obj.RLMAccessor_writable = _inWriteTransaction;
-        }
-    }
-    catch (exception &ex) {
-        throw_objc_exception(ex);
-    }
-}
-
-- (tightdb::Group *)group {
-    return _group;
 }
 
 - (void)addObject:(RLMObject *)object {
@@ -540,22 +515,17 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, predicate, nil);
 }
 
--(NSUInteger)schemaVersion {
-    // FIXME - store version in metadata table - will come with migration support
-    return 0;
++ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError *__autoreleasing *)error {
+    [self applyMigrationBlock:block atPath:[RLMRealm defaultPath] error:error];
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
--(id)objectForKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
++(void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError *__autoreleasing *)error {
+    RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:error];
+    if (error && *error) {
+        return;
+    }
+    [migration migrateWithBlock:block];
 }
 
--(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
 
 @end

@@ -28,7 +28,7 @@
 /**
  Array of persisted properties for an object.
  */
-@property (nonatomic, readonly) NSArray *properties;
+@property (nonatomic, readonly, copy) NSArray *properties;
 
 /**
  The name of the class this schema describes.
@@ -45,4 +45,5 @@
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
 @end
+
 

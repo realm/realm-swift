@@ -27,30 +27,38 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize RLMAccessor_writable = _RLMAccessor_writable;
-@synthesize RLMAccessor_invalid = _RLMAccessor_invalid;
 @synthesize RLMObject_schema = _RLMObject_schema;
 
 // standalone init
 -(instancetype)init {
     self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
 
-    // will only be nil when creating Swift objects for introspection at +initialize time
-    if (self.RLMObject_schema) {
-        // set standalone accessor class
-        object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
-    }
+    // set standalone accessor class
+    //object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
     
     return self;
 }
 
+-(instancetype)initEmptyInRealm:(RLMRealm *)realm {
+    self = [super init];
+    self.realm = realm;
+    return self;
+}
 
--(instancetype)initWithObject:(id)values {
+-(instancetype)initWithObject:(id)value {
     id obj = [self init];
-    RLMObjectSchema *schema = RLMSchema.sharedSchema[self.class.className];
-    
-    RLMPopulateObjectWithValues(schema, values, obj);
-    
+    if ([value isKindOfClass:NSArray.class]) {
+        RLMPopulateObjectWithArray(obj, value);
+    }
+    else if ([value isKindOfClass:NSDictionary.class]) {
+        RLMPopulateObjectWithDictionary(obj, value);
+    }
+    else {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Values must be provided either as an array or dictionary"
+                                     userInfo:nil];
+    }
+
     return obj;
 }
 
@@ -74,60 +82,45 @@
     return self;
 }
 
-+(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)values {
-    id obj = [[self alloc] init];
-    
-    RLMObjectSchema *schema = realm.schema[[self className]];
-    
-    RLMPopulateObjectWithValues(schema, values, obj);
-    
-    // insert populated object into store
-    RLMAddObjectToRealm(obj, realm);
-
-    return obj;
++(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
+    return RLMCreateObjectInRealmWithValue(realm, [self className], value);
 }
 
-void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
-    NSArray *properties = schema.properties;
-    
-    if ([values isKindOfClass:NSDictionary.class]) {
-        for (RLMProperty * property in properties) {
-            id value = values[property.name];
-            if (value) {
-                // Validate Value
-                if (RLMIsObjectValidForProperty(value, property)) {
-                    [obj setValue:value forKeyPath:property.name];
-                }
-                else {
-                    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-                }
+void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
+    RLMObjectSchema *schema = obj.RLMObject_schema;
+    for (NSString *name in values) {
+        // Validate Value
+        RLMProperty *prop = schema[name];
+        if (prop) {
+            id value = values[name];
+            if (!RLMIsObjectValidForProperty(value, prop)) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:[NSString stringWithFormat:@"Invalid value type for %@", name]
+                                             userInfo:nil];
             }
+            [obj setValue:value forKeyPath:name];
         }
     }
-    else if ([values isKindOfClass:NSArray.class]) {
-        // for arrays use property names as keys
-        NSArray *array = values;
-        
-        if (array.count != properties.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-        }
-        
-        for (NSUInteger i = 0; i < array.count; i++) {
-            id value = values[i];
-            RLMProperty *property = properties[i];
-            
-            // Validate Value
-            if (RLMIsObjectValidForProperty(value, property)) {
-                [obj setValue:array[i] forKeyPath:property.name];
-            }
-            else {
-                @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-            }
-        }
-    } else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Values must be provided either as an array or dictionary" userInfo:nil];
+}
+
+void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
+    NSArray *properties = obj.RLMObject_schema.properties;
+
+    if (array.count != properties.count) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
     }
     
+    for (NSUInteger i = 0; i < array.count; i++) {
+        id value = array[i];
+        RLMProperty *property = properties[i];
+        
+        // Validate Value
+        if (!RLMIsObjectValidForProperty(value, property)) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
+        }
+        [obj setValue:array[i] forKeyPath:property.name];
+
+    }
 }
 
 // default attributes for property implementation
@@ -158,44 +151,12 @@ void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
 }
 #pragma GCC diagnostic pop
 
-- (void)setRLMAccessor_writable:(BOOL)writable {
-    if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
-    }
-    
-    // set accessor class based on write permission
-    // FIXME - we are assuming this is always an accessor subclass
-    if (writable) {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    else {
-        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    _RLMAccessor_writable = writable;
-}
-
-- (void)setRLMAccessor_invalid:(BOOL)invalid {
-    if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to set writable on object not in a Realm" userInfo:nil];
-    }
-    
-    // set accessor class
-    // FIXME - we are assuming this is always an accessor subclass
-    if (invalid) {
-        object_setClass(self, RLMInvalidAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    else {
-        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass, _RLMObject_schema));
-    }
-    _RLMAccessor_invalid = invalid;
-}
-
 -(id)objectForKeyedSubscript:(NSString *)key {
-    return [self valueForKey:key];
+    return RLMDynamicGet(self, key);
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    [self setValue:obj forKey:key];
+    RLMDynamicSet(self, key, obj);
 }
 
 + (RLMArray *)allObjects {
@@ -219,17 +180,18 @@ void RLMPopulateObjectWithValues(RLMObjectSchema *schema, id values, id obj) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-+ (NSString *)className
-{
++ (NSString *)className {
+    const char *cName = class_getName(self);
+    NSString *className = [[NSString alloc] initWithBytesNoCopy:(void *)cName length:strlen(cName) encoding:NSUTF8StringEncoding freeWhenDone:NO];
 #ifdef REALM_SWIFT
-    return [RLMSwiftSupport parseClass:self].name;
-#else
-    return NSStringFromClass(self);
+    if ([RLMSwiftSupport isSwiftClassName:className]) {
+        className = [RLMSwiftSupport demangleClassName:className];
+    }
 #endif
+    return className;
 }
 
-- (NSString *)description
-{
+- (NSString *)description {
     NSString *baseClassName = self.class.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];

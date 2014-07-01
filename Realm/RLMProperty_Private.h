@@ -27,9 +27,19 @@
                               attributes:(RLMPropertyAttributes)attributes
                                   column:(NSUInteger)column;
 
+-(instancetype)initWithName:(NSString *)name
+                       type:(RLMPropertyType)type
+                     column:(NSUInteger)column
+            objectClassName:(NSString *)objectClassName
+                 attributes:(RLMPropertyAttributes)attributes;
+
+// private setters
+@property (nonatomic, assign) NSUInteger column;
+@property (nonatomic, readwrite, assign) RLMPropertyType type;
+@property (nonatomic, readwrite, copy) NSString *objectClassName;
+
 // private properties
-@property (nonatomic, readonly) NSUInteger column;
-@property (nonatomic, readonly) char objcType;
+@property (nonatomic, assign) char objcType;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;

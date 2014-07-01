@@ -19,6 +19,10 @@
 #import <Foundation/Foundation.h>
 #import <Realm/RLMObjectSchema.h>
 
+/**---------------------------------------------------------------------------------------
+ *  @name Realm Schema
+ * ---------------------------------------------------------------------------------------
+ */
 @interface RLMSchema : NSObject
 
 /**
@@ -27,17 +31,17 @@
  
  @see       RLMObjectSchema
  */
-@property (nonatomic, readonly) NSArray *objectSchema;
+@property (nonatomic, readonly, copy) NSArray *objectSchema;
 
 /**
- Returns an RLMObjectSchema for the given class in this Realm.
+ Returns an RLMObjectSchema for the given class in this RLMSchema.
  
  @param className   The object class name.
- @return            RLMObjectSchema for the given class in this Realm.
+ @return            RLMObjectSchema for the given class in this RLMSchema.
  
  @see               RLMObjectSchema
  */
-- (RLMObjectSchema *)schemaForObject:(NSString *)className;
+- (RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
  Lookup an RLMObjectSchema for the given class in this Realm.
@@ -49,8 +53,5 @@
  */
 - (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;
 
-+ (NSMutableDictionary *)mangledClassMap;
-
 @end
-
 

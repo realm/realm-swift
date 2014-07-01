@@ -21,34 +21,33 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
-
-@interface RLMArray ()
-
-// Also defined in RLMArray_Private.hpp
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-
-@end
-
 #import "RLMObjectSchema.h"
-
-@interface RLMObjectSchema ()
-
-@property (nonatomic, readwrite) NSArray *properties;
-
-// Designated initializer
-- (instancetype)initWithClassName:(NSString *)objectClassName properties:(NSArray *)properties;
-
-@end
-
+#import "RLMObject.h"
 #import "RLMProperty.h"
 
-@interface RLMProperty ()
+@interface RLMArray ()
+// Also defined in RLMArray_Private.hpp
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
 
-@property (nonatomic, readwrite, assign) RLMPropertyAttributes attributes;
+@interface RLMObject ()
+// create instance for introspection
++ (instancetype)createInstance;
+- (instancetype)initEmptyInRealm:(RLMRealm *)realm;
+@end
 
-@property (nonatomic, readwrite, copy) NSString *objectClassName;
-
+@interface RLMObjectSchema ()
 // Designated initializer
-- (instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
+@end
+
+@interface RLMProperty ()
+// Designated initializer
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+                      column:(NSUInteger)column
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes;
 
 @end
+

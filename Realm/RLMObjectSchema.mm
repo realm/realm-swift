@@ -16,21 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema.h"
-#import "RLMUtil.hpp"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import <tightdb/table.hpp>
 #import "RLMObject_Private.h"
+#import "RLMUtil.hpp"
+
+#import <tightdb/table.hpp>
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite) NSDictionary * propertiesByName;
+@property (nonatomic, readwrite) NSDictionary *propertiesByName;
 @property (nonatomic, readwrite, copy) NSString *className;
 @end
 
 
 @implementation RLMObjectSchema
+
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
+    self = [super init];
+    self.className = objectClassName;
+    self.properties = properties;
+    self.objectClass = objectClass;
+    return self;
+}
 
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
@@ -48,14 +57,6 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
-    NSString *className = NSStringFromClass(objectClass);
-
-#ifdef REALM_SWIFT
-    if ([RLMSwiftSupport isSwiftClassName:className]) {
-        return [RLMSwiftSupport schemaForObjectClass:objectClass];
-    }
-#endif
-
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -75,15 +76,18 @@
         RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]
                                                         attributes:[objectClass attributesForProperty:propertyName]
                                                             column:propArray.count];
-        
         if (prop) {
             [propArray addObject:prop];
         }
     }
     
     free(props);
-
-    return [[RLMObjectSchema alloc] initWithClassName:className properties:propArray];
+    
+    // create schema object and set properties
+    RLMObjectSchema * schema = [[RLMObjectSchema alloc] initWithClassName:NSStringFromClass(objectClass)
+                                                               objectClass:objectClass
+                                                                properties:propArray];
+    return schema;
 }
 
 
@@ -98,7 +102,9 @@
         NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
-                                                       column:col];
+                                                       column:col
+                                              objectClassName:nil
+                                                   attributes:(RLMPropertyAttributes)0];
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
             tightdb::TableRef linkTable = table->get_link_target(col);
@@ -107,18 +113,11 @@
 
         [propArray addObject:prop];
     }
-
-    return [[RLMObjectSchema alloc] initWithClassName:className properties:propArray];
-}
-
-- (instancetype)initWithClassName:(NSString *)className properties:(NSArray *)properties
-{
-    self = [super init];
-    if (self) {
-        self.className = className;
-        self.properties = properties;
-    }
-    return self;
+    
+    // create schema object and set properties
+    // for dynamic interface use vanilla RLMObject
+    RLMObjectSchema * schema = [[RLMObjectSchema alloc] initWithClassName:className objectClass:RLMObject.class properties:propArray];
+    return schema;
 }
 
 @end

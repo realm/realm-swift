@@ -24,19 +24,23 @@
 
 #import <objc/runtime.h>
 
+NSString *const c_objectTableNamePrefix = @"class_";
+const char *c_metadataTableName = "metadata";
+const char *c_versionColumnName = "version";
+const size_t c_versionColumnIndex = 0;
+
 // RLMSchema private properties
 @interface RLMSchema ()
-@property (nonatomic, readwrite) NSArray *objectSchema;
 @property (nonatomic, readwrite) NSMutableDictionary *objectSchemaByName;
-@property (nonatomic, readwrite) NSMutableDictionary *objectClassByName;
 @end
 
 static RLMSchema *s_sharedSchema;
-static NSMutableDictionary *s_mangledClassMap;
+static NSMutableDictionary *s_classNameToMangledName;
+
 
 @implementation RLMSchema
 
-- (RLMObjectSchema *)schemaForObject:(NSString *)className {
+- (RLMObjectSchema *)schemaForClassName:(NSString *)className {
     return _objectSchemaByName[className];
 }
 
@@ -44,24 +48,33 @@ static NSMutableDictionary *s_mangledClassMap;
     return _objectSchemaByName[className];
 }
 
-- (Class)objectClassForClassName:(NSString *)className {
-    return _objectClassByName[className];
-}
-
 - (id)init {
     self = [super init];
     if (self) {
         // setup name mapping for object tables
         _tableNamesForClass = [NSMutableDictionary dictionary];
-        _objectClassByName = [NSMutableDictionary dictionary];
         _objectSchemaByName = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
+- (void)setObjectSchema:(NSArray *)objectSchema {
+    _objectSchema = objectSchema;
+    
+    // update mappings
+    for (RLMObjectSchema *object in objectSchema) {
+        // set table name and mappings
+        _tableNamesForClass[object.className] = RLMTableNameForClassName(object.className);
+        [(NSMutableDictionary *)_objectSchemaByName setObject:object forKey:object.className];
+    }
+}
+
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // initialize mangled name mapping
+        s_classNameToMangledName = [NSMutableDictionary dictionary];
+
         // load object schemas for all RLMObject subclasses
         unsigned int numClasses;
         Class *classes = objc_copyClassList(&numClasses);
@@ -72,15 +85,23 @@ static NSMutableDictionary *s_mangledClassMap;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
-                // add to class list
-                RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
-                [schemaArray addObject:object];
+                RLMObjectSchema *objectSchema = nil;
+#ifdef REALM_SWIFT
+                // if swift
+                NSString *className = NSStringFromClass(classes[i]);
+                if ([RLMSwiftSupport isSwiftClassName:className]) {
+                    objectSchema = [RLMSwiftSupport schemaForObjectClass:classes[i]];
+                    s_classNameToMangledName[objectSchema.className] = objectSchema.objectClass;
+                }
+                else {
+                    objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
+                }
+#else
+                objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
+#endif
+                // add to list
+                [schemaArray addObject:objectSchema];
 
-                // set table name and mappings
-                NSString *tableName = RLMTableNameForClassName(object.className);
-                schema.tableNamesForClass[object.className] = tableName;
-                schema.objectClassByName[object.className] = classes[i];
-                [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
             }
         }
         free(classes);
@@ -88,6 +109,7 @@ static NSMutableDictionary *s_mangledClassMap;
         // set class array
         schema.objectSchema = schemaArray;
         
+        // set shared schema
         s_sharedSchema = schema;
     });
 }
@@ -112,14 +134,6 @@ static NSMutableDictionary *s_mangledClassMap;
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
             [schemaArray addObject:object];
-
-            // add object and set mappings
-            schema.tableNamesForClass[object.className] = tableName;
-            [(NSMutableDictionary *)schema.objectSchemaByName setObject:object forKey:object.className];
-
-            // generate dynamic class and set class mapping
-            Class dynamicClass = RLMDynamicClassForSchema(object, realm.schemaVersion);
-            schema.objectClassByName[object.className] = dynamicClass;
         }
     }
     
@@ -128,12 +142,36 @@ static NSMutableDictionary *s_mangledClassMap;
     return schema;
 }
 
-+ (NSMutableDictionary *)mangledClassMap {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_mangledClassMap = [NSMutableDictionary dictionary];
-    });
-    return s_mangledClassMap;
+
+inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
+    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    if (table->get_column_count() == 0) {
+        // create columns
+        table->add_column(tightdb::type_Int, c_versionColumnName);
+        
+        // set initial version
+        table->add_empty_row();
+        (*table)[0].set_int(c_versionColumnIndex, 0);
+    }
+    return table;
+}
+
+NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
+    return (NSUInteger)(*RLMVersionTable(realm))[0].get_int(c_versionColumnIndex);
+
+}
+
+void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
+    (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
+}
+
++ (Class)classForString:(NSString *)className {
+#ifdef REALM_SWIFT
+    if (s_classNameToMangledName[className]) {
+        className = s_classNameToMangledName[className];
+    }
+#endif
+    return NSClassFromString(className);
 }
 
 @end

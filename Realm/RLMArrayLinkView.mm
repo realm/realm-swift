@@ -39,46 +39,52 @@
     RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName];
     ar->_backingLinkView = view;
     ar->_realm = realm;
-    [realm registerAccessor:ar];
-    
-    // make readonly if not in write transaction
-    if (!realm.inWriteTransaction) {
-        object_setClass(ar, RLMArrayLinkViewReadOnly.class);
-    }
     return ar;
 }
 
-- (void)setRLMAccessor_writable:(BOOL)writable {
-    if (writable) {
-        object_setClass(self, RLMArrayLinkView.class);
+//
+// validation helpers
+//
+inline void RLMLinkViewArrayValidateAttached(RLMArrayLinkView *ar) {
+    if (!ar->_backingLinkView->is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
-    else {
-        object_setClass(self, RLMArrayLinkViewReadOnly.class);
+}
+inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *ar) {
+    // first verify attached
+    RLMLinkViewArrayValidateAttached(ar);
+
+    if (!ar->_realm->_inWriteTransaction) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can't mutate a persisted array outside of a write transaction."
+                                     userInfo:nil];
     }
-    _RLMAccessor_writable = writable;
+}
+inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
+    NSString *objectClassName = [obj.class className];
+    if (![objectClassName isEqualToString:expected]) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
+                                     userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
+    }
 }
 
-- (void)setRLMAccessor_Invalid:(BOOL)invalid {
-    if (invalid) {
-        object_setClass(self, RLMArrayLinkViewInvalid.class);
-    }
-    else {
-        object_setClass(self, RLMArrayLinkView.class);
-    }
-    _RLMAccessor_invalid = invalid;
-}
-
+//
+// public method implementations
+//
 - (NSUInteger)count {
+    RLMLinkViewArrayValidateAttached(self);
     return _backingLinkView->size();
 }
 
 inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger index) {
-    return RLMCreateObjectAccessor(array.realm,
-                                   array.objectClassName,
+    return RLMCreateObjectAccessor(array->_realm,
+                                   array->_objectClassName,
                                    array->_backingLinkView->get_target_row(index));
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
+    RLMLinkViewArrayValidateAttached(self);
+
     NSUInteger batchCount = 0, index = state->state, count = self.count;
     
     __autoreleasing id *autoreleasingBuffer = (__autoreleasing id *)(void *)buffer;
@@ -93,21 +99,17 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
+    RLMLinkViewArrayValidateAttached(self);
+
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
     return RLMCreateAccessorForArrayIndex(self, index);;
 }
 
-inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
-    NSString *objectClassName = [obj.class className];
-    if (![objectClassName isEqualToString:expected]) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
-                                     userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
-    }
-}
-
 - (void)addObject:(RLMObject *)object {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     RLMValidateObjectClass(object, self.objectClassName);
     if (object.realm != self.realm) {
         [self.realm addObject:object];
@@ -116,6 +118,8 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     RLMValidateObjectClass(object, self.objectClassName);
     if (object.realm != self.realm) {
         [self.realm addObject:object];
@@ -124,6 +128,8 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 - (void)removeObjectAtIndex:(NSUInteger)index {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Trying to remove object at invalid index" userInfo:nil];
@@ -132,6 +138,8 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 - (void)removeLastObject {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     size_t size = _backingLinkView->size();
     if (size > 0){
         _backingLinkView->remove(size-1);
@@ -139,10 +147,14 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 - (void)removeAllObjects {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     _backingLinkView->clear();
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
     RLMValidateObjectClass(object, self.objectClassName);
     if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException"
@@ -155,6 +167,8 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 }
 
 - (NSString *)JSONString {
+    RLMLinkViewArrayValidateAttached(self);
+
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }

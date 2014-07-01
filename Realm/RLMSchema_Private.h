@@ -23,29 +23,47 @@
 #import <Realm/Realm-Swift.h>
 #endif
 
+//
+// Realm table namespace costants/methods
+//
+
 // NOTE: the object store uses a custom table namespace for storing data.
 // There current names used are:
 //  class_* - any table name beginning with class is used to store objects
 //            of the typename (the rest of the name after class)
 //  metadata - table used for realm metadata storage
-NSString *const c_objectTableNamePrefix = @"class_";
-NSString *const c_metadataTableName = @"metadata";
+extern NSString *const c_objectTableNamePrefix;
+extern const char *c_metadataTableName;
+extern const char *c_versionColumnName;
+extern const size_t c_versionColumnIndex;
 
 inline NSString *RLMTableNameForClassName(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];
 }
 
 inline NSString *RLMClassForTableName(NSString *tableName) {
-    if ([tableName hasPrefix:@"class_"]) {
+    if ([tableName hasPrefix:c_objectTableNamePrefix]) {
         return [tableName substringFromIndex:6];
     }
     return nil;
 }
 
-@class RLMRealm;
 
+//
+// Realm schema version
+//
+NSUInteger RLMRealmSchemaVersion(RLMRealm *realm);
+
+// must be in write transaction to set
+void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
+
+
+//
 // RLMSchema private interface
+//
+@class RLMRealm;
 @interface RLMSchema ()
+@property (nonatomic, readwrite, copy) NSArray *objectSchema;
 
 // mapping of className to tableName
 @property (nonatomic, readonly) NSMutableDictionary *tableNamesForClass;
@@ -56,17 +74,9 @@ inline NSString *RLMClassForTableName(NSString *tableName) {
 // schema based on tables in a Realm
 +(instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
 
-// get object class to use for a given class name
--(Class)objectClassForClassName:(NSString *)className;
+// class for string
++ (Class)classForString:(NSString *)className;
 
 @end
 
-static inline Class RLMClassFromString(NSString *className)
-{
-#ifdef REALM_SWIFT
-    if ([RLMSchema.mangledClassMap.allKeys containsObject:className]) {
-        className = RLMSchema.mangledClassMap[className];
-    }
-#endif
-    return NSClassFromString(className);
-}
+

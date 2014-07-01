@@ -18,6 +18,9 @@
 
 import Foundation
 
+//
+// Support Swift enumeration
+//
 extension RLMArray: Sequence {
 
     func generate() -> GeneratorOf<RLMObject> {
@@ -32,21 +35,8 @@ extension RLMArray: Sequence {
     }
 }
 
-@objc class ParsedClass {
-    var swift = false
-    var name: String
-
-    var moduleName: String?
-    var mangledName: String?
-
-    init(swift: Bool, name: String, moduleName: String?, mangledName: String?) {
-        self.swift = swift
-        self.name = name
-        self.moduleName = moduleName
-        self.mangledName = mangledName
-    }
-}
-
+// index subscripting for ranges on string
+// FIXME - put in an extension file
 extension String {
     subscript (r: Range<Int>) -> String {
         get {
@@ -64,20 +54,12 @@ extension String {
         return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
     }
 
-    class func parseClass(aClass: AnyClass) -> ParsedClass {
+    class func demangleClassName(className: NSString) -> NSString {
         // Swift mangling details found here: http://www.eswick.com/2014/06/inside-swift
         // Swift class names look like _TFC9swifttest5Shape
         // Format: _T{2 characters}{module length}{module}{class length}{class}
 
-        let originalName = NSStringFromClass(aClass)
-
-        if !isSwiftClassName(originalName) {
-            return ParsedClass(swift: false,
-                name: originalName,
-                moduleName: nil,
-                mangledName: nil)
-        }
-
+        let originalName:String = className
         let originalNameLength = originalName.utf16count
         var cursor = 4
         var substring = originalName[cursor..originalNameLength-cursor]
@@ -96,105 +78,75 @@ extension String {
         let classLengthLength = "\(classLength)".utf16count
         let className = substring[classLengthLength..classLength]
 
-        return ParsedClass(swift: true,
-            name: className,
-            moduleName: moduleName,
-            mangledName: originalName)
+        return className
     }
 
     class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
-        let parsedClass = parseClass(aClass)
+        let className = demangleClassName(NSStringFromClass(aClass))
 
-        RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
-
-        let swiftObject = (aClass as RLMObject.Type)()
-
+        let swiftObject = (aClass as RLMObject.Type)(emptyInRealm: nil)
         let reflection = reflect(swiftObject)
-
         let ignoredPropertiesForClass = aClass.ignoredProperties() as NSArray?
 
         var properties = RLMProperty[]()
 
+        // Skip the first property (super):
+        // super is an implicit property on Swift objects
         for i in 1..reflection.count {
-            // Skip the first property (super):
-            // super is an implicit property on Swift objects
             let propertyName = reflection[i].0
-
-            if ignoredPropertiesForClass != nil &&
-                ignoredPropertiesForClass!.containsObject(propertyName) {
-                    continue
+            if ignoredPropertiesForClass?.containsObject(propertyName) {
+                continue
             }
 
-            let (property, typeEncoding) = propertyForValueType(reflection[i].1.valueType,
+            properties += createPropertyForClass(aClass,
+                valueType: reflection[i].1.valueType,
                 name: propertyName,
-                attributes: aClass.attributesForProperty(propertyName),
-                column: properties.count)
-
-            if property.type == .Array {
-                property.objectClassName = (swiftObject.valueForKey(propertyName) as RLMArray).objectClassName
-            }
-
-            properties += property
-
-            let attr = objc_property_attribute_t(name: "T", value: typeEncoding)
-            class_addProperty(aClass, propertyName.bridgeToObjectiveC().UTF8String, [attr], 1)
+                column: properties.count,
+                attr: aClass.attributesForProperty(propertyName))
         }
 
-        return RLMObjectSchema(className: parsedClass.name, properties: properties)
+        return RLMObjectSchema(className: className as NSString?, objectClass: aClass, properties: properties)
     }
 
-    class func propertyForValueType(valueType: Any.Type,
-        name: String,
-        attributes: RLMPropertyAttributes,
-        column: Int) -> (RLMProperty, CString) {
-        var propertyType: RLMPropertyType?
-        var encoding: CString?
-        var objectClassName: String?
-
+    class func createPropertyForClass(aClass: AnyClass,
+                                      valueType: Any.Type,
+                                      name: String,
+                                      column: Int,
+                                      attr: RLMPropertyAttributes) -> RLMProperty {
+        var p:RLMProperty?
+        var t:String?
         switch valueType {
             // Detect basic types (including optional versions)
-        case is Bool.Type, is Bool?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Bool, "c")
-        case is Int.Type, is Int?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Int, "i")
-        case is Float.Type, is Float?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Float, "f")
-        case is Double.Type, is Double?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Double, "d")
-        case is String.Type, is String?.Type:
-            (propertyType, encoding) = (RLMPropertyType.String, "S")
-        case is NSData.Type, is NSData?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Data, "@\"NSData\"")
-        case is NSDate.Type, is NSDate?.Type:
-            (propertyType, encoding) = (RLMPropertyType.Date, "@\"NSDate\"")
-
-            // Detect Objective-C object types
-        case let c as RLMObject.Type:
-            let parsedClass = RLMSwiftSupport.parseClass(c.self)
-            if parsedClass.swift {
-                // Mangled class map must contain this property's class
-                // for Realm to create the proper table
-                let mapMissingName = !RLMSchema.mangledClassMap().allKeys.bridgeToObjectiveC().containsObject(parsedClass.name)
-                if mapMissingName {
-                    RLMSchema.mangledClassMap()[parsedClass.name] = parsedClass.mangledName
-                }
-            }
-            objectClassName = parsedClass.name
-            let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
-            (propertyType, encoding) = (RLMPropertyType.Object, typeEncoding)
-
-        case let c as RLMArray.Type:
-            let typeEncoding = "@\"\(NSStringFromClass(c.self))\"".bridgeToObjectiveC().UTF8String
-            (propertyType, encoding) = (RLMPropertyType.Array, typeEncoding)
-
-        default:
-            println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
-            assert(false)
+            case is Bool.Type, is Bool?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Bool, column: column, objectClassName: nil, attributes: attr), "c")
+            case is Int.Type, is Int?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Int, column: column, objectClassName: nil, attributes: attr), "i")
+            case is Float.Type, is Float?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Float, column: column, objectClassName: nil, attributes: attr), "f")
+            case is Double.Type, is Double?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Double, column: column, objectClassName: nil, attributes: attr), "d")
+            case is String.Type, is String?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.String, column: column, objectClassName: nil, attributes: attr), "S")
+            case is NSData.Type, is NSData?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Data, column: column, objectClassName: nil, attributes: attr), "@\"NSData\"")
+            case is NSDate.Type, is NSDate?.Type:
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Date, column: column, objectClassName: nil, attributes: attr), "@\"NSDate\"")
+            case let objectType as RLMObject.Type:
+                assert(objectType.isKindOfClass(RLMObject))
+                let mangledClassName = NSStringFromClass(objectType.self)
+                let objectClassName = demangleClassName(mangledClassName)
+                let typeEncoding = "@\"\(mangledClassName))\""
+                (p, t) = (RLMProperty(name: name, type: RLMPropertyType.Object, column: column, objectClassName: objectClassName, attributes: attr), typeEncoding)
+            case let c as RLMArray.Type:
+                assert(false, "Not implemented")
+            default:
+                println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
+                assert(false)
         }
 
-        let prop = RLMProperty(name: name, type: propertyType!, column: column)
-        prop.attributes = attributes
-        prop.objectClassName = objectClassName
-        return (prop, encoding!)
+        // create objc property
+        let attr = objc_property_attribute_t(name: "T", value: t!.bridgeToObjectiveC().UTF8String)
+        class_addProperty(aClass, p!.name.bridgeToObjectiveC().UTF8String, [attr], 1)
+        return p!
     }
 }
