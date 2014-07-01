@@ -31,17 +31,17 @@
 
 // standalone init
 -(instancetype)init {
-    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+    if (RLMSchema.sharedSchema) {
+        // if system is initialzed create with schema
+        self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+        // set standalone accessor class
+        object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+    }
+    else {
+        // if not initialized this is only used for introspection
+        self = [super init];
+    }
 
-    // set standalone accessor class
-    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
-    
-    return self;
-}
-
--(instancetype)initEmptyInRealm:(RLMRealm *)realm {
-    self = [super init];
-    self.realm = realm;
     return self;
 }
 

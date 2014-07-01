@@ -30,11 +30,6 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 
-@interface RLMObject ()
-// create instance for introspection
-- (instancetype)initEmptyInRealm:(RLMRealm *)realm;
-@end
-
 @interface RLMObjectSchema ()
 // Designated initializer
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;

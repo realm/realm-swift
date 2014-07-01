@@ -84,7 +84,7 @@ extension String {
     class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
         let className = demangleClassName(NSStringFromClass(aClass))
 
-        let swiftObject = (aClass as RLMObject.Type)(emptyInRealm: nil)
+        let swiftObject = (aClass as RLMObject.Type)()
         let reflection = reflect(swiftObject)
         let ignoredPropertiesForClass = aClass.ignoredProperties() as NSArray?
 
