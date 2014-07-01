@@ -26,4 +26,6 @@
 
 // Private: for Swift support only
 // Do not use
+#if defined(REALM_SWIFT)
 #import <Realm/RLMSwiftSupport_Private.h>
+#endif 
