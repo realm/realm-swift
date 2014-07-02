@@ -278,7 +278,7 @@
     NSUInteger cnt = [IntObject objectsWithPredicateFormat:@"intCol BETWEEN %@", @[@2,@3]].count;
     XCTAssertEqual(cnt, (NSUInteger)5, "BETWEEN operator in numeric predicate.");
 
-    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in numeric predicate.");
+    XCTAssertThrowsSpecificNamed([IntObject objectsWithPredicateFormat:@"intCol BEGINSWITH 3"], NSException, @"Invalid operator type", @"Invalid operator in numeric predicate.");
 }
 
 - (void)testBooleanPredicate
@@ -288,7 +288,7 @@
     XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol != TRUE"].count,
                    (NSUInteger)0, @"== operator in bool predicate.");
 
-    XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"], NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in bool predicate.");
+    XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"], NSException, @"Invalid operator type", @"Invalid operator in bool predicate.");
 }
 
 - (void)testStringComparisonInPredicate
@@ -337,14 +337,14 @@
                    (NSUInteger)0, @"Case-insensitive != or <> operator in string comparison.");
 
     // Unsupported (but valid) modifiers.
-    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType, NSDiacriticInsensitivePredicateOption), NSException, @"filterWithPredicate:orderedBy: - Invalid predicate option", @"Diachritic insensitivity is not supported.");
+    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType, NSDiacriticInsensitivePredicateOption), NSException, @"Invalid predicate option", @"Diachritic insensitivity is not supported.");
 
     // Unsupported (but valid) operators.
-    XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"LIKE not supported for string comparison.");
-    XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"MATCHES not supported in string comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException, @"Invalid operator type", @"LIKE not supported for string comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException, @"Invalid operator type", @"MATCHES not supported in string comparison.");
 
     // Invalid operators.
-    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in string comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException, @"Invalid operator type", @"Invalid operator in string comparison.");
 }
 
 - (void)testDateComparisonInPredicate
@@ -372,7 +372,7 @@
                    @"!= or <> operator in date comparison.");
 
     // Invalid operators.
-    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in date comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType), NSException, @"Invalid operator type", @"Invalid operator in date comparison.");
 }
 
 - (void)testBinaryComparisonInPredicate
@@ -398,7 +398,7 @@
                    @"!= or <> operator in binary comparison.");
 
     // Invalid operators.
-    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType), NSException, @"filterWithPredicate:orderedBy: - Invalid operator type", @"Invalid operator in binary comparison.");
+    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType), NSException, @"Invalid operator type", @"Invalid operator in binary comparison.");
 }
 
 - (void)testDataTypes
