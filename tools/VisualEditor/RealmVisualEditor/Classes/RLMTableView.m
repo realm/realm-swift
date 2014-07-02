@@ -29,7 +29,7 @@
 {
     [super awakeFromNib];
     
-    int opts = (NSTrackingActiveAlways | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
+    int opts = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate);
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
                                                 options:opts
                                                   owner:self
@@ -39,6 +39,11 @@
 	mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
+}
+
+- (void)cursorUpdate:(NSEvent *)event
+{
+
 }
 
 - (void)dealloc
@@ -62,8 +67,9 @@
 	if (!myDelegate) {
 		return; // No delegate, no need to track the mouse.
     }
-    
+
 	if (mouseOverView) {
+
 		currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 		
 		if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
@@ -74,16 +80,15 @@
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
             }
             
-            // NSLog(@"Mouse over row:%lu column:%lu", currentMouseLocation.row, currentMouseLocation.column);
-
             CGRect cellRect = [self rectOfLocation:previousMouseLocation];
 			[self setNeedsDisplayInRect:cellRect];
             
 			previousMouseLocation = currentMouseLocation;
-            
+
             if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
             }
+
 		}
 
         CGRect cellRect = [self rectOfLocation:currentMouseLocation];
@@ -107,12 +112,12 @@
 
 }
 
-- (void)viewDidEndLiveResize
+- (void)updateTrackingAreas
 {
-    [super viewDidEndLiveResize];
+    [super updateTrackingAreas];
     
     [self removeTrackingArea:trackingArea];
-    int opts = (NSTrackingActiveAlways | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
+    int opts = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
                                                 options:opts
                                                   owner:self

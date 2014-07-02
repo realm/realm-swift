@@ -664,16 +664,12 @@
     NSCursor *newCursor = [NSCursor pointingHandCursor];
     [newCursor set];
     
-    [self.parentWindowController.window disableCursorRects];
     linkCursorDisplaying = YES;
 }
 
 - (void)disableLinkCursor
 {
     if (linkCursorDisplaying) {
-        [self.parentWindowController.window enableCursorRects];
-        [self.parentWindowController.window resetCursorRects];
-        
         [NSCursor pop];
         
         linkCursorDisplaying = NO;
