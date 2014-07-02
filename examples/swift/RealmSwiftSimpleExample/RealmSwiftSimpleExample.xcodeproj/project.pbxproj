@@ -48,13 +48,6 @@
 			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
 			remoteInfo = iOS;
 		};
-		4DF358B91959A55300A56343 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DF358A31959A55300A56343 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4DF358AA1959A55300A56343;
-			remoteInfo = RealmSwiftSimpleExample;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -66,25 +59,7 @@
 		4DF358AF1959A55300A56343 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4DF358B01959A55300A56343 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4DF358B21959A55300A56343 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		4DF358B81959A55300A56343 /* RealmSwiftSimpleExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmSwiftSimpleExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		4DF358A81959A55300A56343 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4DF358B51959A55300A56343 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		4D1E47A2195C1BB40005280D /* Products */ = {
@@ -110,7 +85,6 @@
 			isa = PBXGroup;
 			children = (
 				4DF358AB1959A55300A56343 /* RealmSwiftSimpleExample.app */,
-				4DF358B81959A55300A56343 /* RealmSwiftSimpleExampleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -145,7 +119,6 @@
 			buildConfigurationList = 4DF358C21959A55300A56343 /* Build configuration list for PBXNativeTarget "RealmSwiftSimpleExample" */;
 			buildPhases = (
 				4DF358A71959A55300A56343 /* Sources */,
-				4DF358A81959A55300A56343 /* Frameworks */,
 				4DF358A91959A55300A56343 /* Resources */,
 			);
 			buildRules = (
@@ -158,24 +131,6 @@
 			productReference = 4DF358AB1959A55300A56343 /* RealmSwiftSimpleExample.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4DF358B71959A55300A56343 /* RealmSwiftSimpleExampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4DF358C51959A55300A56343 /* Build configuration list for PBXNativeTarget "RealmSwiftSimpleExampleTests" */;
-			buildPhases = (
-				4DF358B41959A55300A56343 /* Sources */,
-				4DF358B51959A55300A56343 /* Frameworks */,
-				4DF358B61959A55300A56343 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4DF358BA1959A55300A56343 /* PBXTargetDependency */,
-			);
-			name = RealmSwiftSimpleExampleTests;
-			productName = RealmSwiftSimpleExampleTests;
-			productReference = 4DF358B81959A55300A56343 /* RealmSwiftSimpleExampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -187,10 +142,6 @@
 				TargetAttributes = {
 					4DF358AA1959A55300A56343 = {
 						CreatedOnToolsVersion = 6.0;
-					};
-					4DF358B71959A55300A56343 = {
-						CreatedOnToolsVersion = 6.0;
-						TestTargetID = 4DF358AA1959A55300A56343;
 					};
 				};
 			};
@@ -213,7 +164,6 @@
 			projectRoot = "";
 			targets = (
 				4DF358AA1959A55300A56343 /* RealmSwiftSimpleExample */,
-				4DF358B71959A55300A56343 /* RealmSwiftSimpleExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,13 +208,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4DF358B61959A55300A56343 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -277,13 +220,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4DF358B41959A55300A56343 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -291,11 +227,6 @@
 			isa = PBXTargetDependency;
 			name = iOS;
 			targetProxy = 4D1E47B0195C1BC00005280D /* PBXContainerItemProxy */;
-		};
-		4DF358BA1959A55300A56343 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4DF358AA1959A55300A56343 /* RealmSwiftSimpleExample */;
-			targetProxy = 4DF358B91959A55300A56343 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -335,6 +266,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "";
 				METAL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -371,6 +303,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -383,8 +316,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = ../../;
 				INFOPLIST_FILE = RealmSwiftSimpleExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwiftSimpleExample/RealmSwiftSimpleExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -397,46 +331,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = ../../;
 				INFOPLIST_FILE = RealmSwiftSimpleExample/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwiftSimpleExample/RealmSwiftSimpleExample-Bridging-Header.h";
-			};
-			name = Release;
-		};
-		4DF358C61959A55300A56343 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RealmSwiftSimpleExample.app/RealmSwiftSimpleExample";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = RealmSwiftSimpleExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-			};
-			name = Debug;
-		};
-		4DF358C71959A55300A56343 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RealmSwiftSimpleExample.app/RealmSwiftSimpleExample";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = RealmSwiftSimpleExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				METAL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Release;
 		};
@@ -457,15 +356,6 @@
 			buildConfigurations = (
 				4DF358C31959A55300A56343 /* Debug */,
 				4DF358C41959A55300A56343 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4DF358C51959A55300A56343 /* Build configuration list for PBXNativeTarget "RealmSwiftSimpleExampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4DF358C61959A55300A56343 /* Debug */,
-				4DF358C71959A55300A56343 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

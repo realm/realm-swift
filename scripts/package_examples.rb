@@ -28,6 +28,24 @@ def example_projects
     "E870C94B195B328E00163667"
   ]
 
+  # RealmSwiftTableViewExample
+  realmSwiftTableViewExample = ExampleProject.new
+  realmSwiftTableViewExample.path = "examples/swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj"
+  realmSwiftTableViewExample.uuids_to_remove = [
+    "E8C5DD58195025B50055C3B8",
+    "E870C959195B32A300163667",
+    "E870C95A195B32A300163667",
+    "E870C951195B328E00163667",
+    "E870C952195B328E00163667",
+    "E870C953195B328E00163667",
+    "E870C954195B328E00163667",
+    "E870C955195B328E00163667",
+    "E870C956195B328E00163667",
+    "E870C957195B328E00163667",
+    "E870C958195B328E00163667",
+    "E870C94B195B328E00163667"
+  ]
+
   # Return all example projects
   [
     realmSwiftTableViewExample
