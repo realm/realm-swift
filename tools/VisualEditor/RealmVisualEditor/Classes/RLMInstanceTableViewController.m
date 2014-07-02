@@ -372,8 +372,6 @@
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    NSLog(@"Mouse entered location = %li, %li", location.row, location.column);
-    
     if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
         if (location.column < self.parentWindowController.selectedTypeNode.propertyColumns.count) {
             RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
@@ -431,7 +429,7 @@
                         // object.
                         // Note 2: However, this approach not even works as the object retrieved
                         // from an array is actual an proxy object referring to the underlying db
-                        // row- The proxy objects are not reused cross-array which means that
+                        // row. The proxy objects are not reused cross-array which means that
                         // comparison between two underlying objects using their proxy objects is
                         // not possible as there is no pointer equality.
                         NSUInteger instanceIndex = NSNotFound;
