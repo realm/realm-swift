@@ -87,12 +87,32 @@ def example_projects
     "E82ED90D1964C87A0058B909"
   ]
 
+  # RealmPerformanceExample
+  realmPerformanceExample = ExampleProject.new
+  realmPerformanceExample.swift = false
+  realmPerformanceExample.path = "examples/objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj"
+  realmPerformanceExample.uuids_to_remove = [
+    "E882E01E1964C9EF00D863C4",
+    "E882E0201964C9EF00D863C4",
+    "E882E0221964C9EF00D863C4",
+    "E882E0241964C9EF00D863C4",
+    "E882E0261964C9F400D863C4",
+    "E882E0161964C9EF00D863C4",
+    "E882E0171964C9EF00D863C4",
+    "E882E01F1964C9EF00D863C4",
+    "E882E0211964C9EF00D863C4",
+    "E882E0231964C9EF00D863C4",
+    "E882E0251964C9EF00D863C4",
+    "E882E0271964C9F400D863C4"
+  ]
+
   # Return all example projects
   [
     realmSwiftTableViewExample,
     realmSwiftSimpleExample,
     realmTableViewExample,
-    realmSimpleExample
+    realmSimpleExample,
+    realmPerformanceExample
   ]
 end
 
@@ -155,7 +175,7 @@ example_projects.each do |example|
     filepath = example.path + "/project.pbxproj"
     contents = File.read(filepath)
     File.open(filepath, "w") do |file|
-      file.puts contents.gsub("../../../build/$(CONFIGURATION)", "../../")
+      file.puts contents.gsub("../../../build/${CONFIGURATION}", "../../")
     end
   end
 end

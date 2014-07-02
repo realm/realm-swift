@@ -364,7 +364,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../build/$(CONFIGURATION)",
+					"../../../build/${CONFIGURATION}",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
@@ -386,7 +386,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../build/$(CONFIGURATION)",
+					"../../../build/${CONFIGURATION}",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
