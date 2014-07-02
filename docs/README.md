@@ -3,7 +3,7 @@ Realm Documentation
 
 ## Docs
 
-You probably want to go and [read the docs on the Realm project website](http://realm.io/docs/ios/latest/). The file `index.md` is the source for the iOS guide you will see rendered there.
+You probably want to go and [read the docs on the Realm project website](http://realm.io/docs/ios/latest/). The file `docs/src/docs.md` is the source for the docs you will see rendered there.
 
 ## API Reference
 
