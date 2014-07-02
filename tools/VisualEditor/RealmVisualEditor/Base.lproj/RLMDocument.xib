@@ -31,18 +31,18 @@
                                 <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <scrollView appearanceType="aqua" borderType="none" autohidesScrollers="YES" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MSf-82-x0U">
+                                    <scrollView appearanceType="aqua" borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MSf-82-x0U">
                                         <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <clipView key="contentView" focusRingType="none" id="udQ-xx-2L4">
+                                        <clipView key="contentView" focusRingType="none" drawsBackground="NO" id="udQ-xx-2L4">
                                             <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" outlineTableColumn="ye8-fR-LJ8" id="IMi-6Y-gQF">
+                                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" multipleSelection="NO" autosaveColumns="NO" rowHeight="22" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="14" outlineTableColumn="ye8-fR-LJ8" id="IMi-6Y-gQF">
                                                     <rect key="frame" x="0.0" y="0.0" width="322" height="402"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <size key="intercellSpacing" width="3" height="2"/>
-                                                    <color key="backgroundColor" red="0.86274516582489014" green="0.88235300779342651" blue="0.90588241815567017" alpha="1" colorSpace="deviceRGB"/>
+                                                    <size key="intercellSpacing" width="3" height="0.0"/>
+                                                    <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
                                                         <tableColumn editable="NO" width="319" minWidth="16" maxWidth="1000" id="ye8-fR-LJ8">
@@ -59,7 +59,7 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <customView identifier="HeaderLabel" id="P2Q-h7-7w1" userLabel="HeaderLabel" customClass="RLMSidebarTableCellView">
-                                                                    <rect key="frame" x="1" y="1" width="319" height="22"/>
+                                                                    <rect key="frame" x="1" y="0.0" width="319" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xqj-Z0-TH4">
@@ -83,7 +83,7 @@
                                                                     </connections>
                                                                 </customView>
                                                                 <customView identifier="MainCell" id="O58-xq-8no" userLabel="MainCell" customClass="RLMSidebarTableCellView">
-                                                                    <rect key="frame" x="1" y="25" width="319" height="22"/>
+                                                                    <rect key="frame" x="1" y="22" width="319" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lUk-zd-1z6">
@@ -124,7 +124,7 @@
                                                     </connections>
                                                 </outlineView>
                                             </subviews>
-                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <nil key="backgroundColor"/>
                                         </clipView>
                                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="exH-b9-o3D">
                                             <rect key="frame" x="0.0" y="397" width="255" height="16"/>
@@ -154,7 +154,7 @@
                                             <rect key="frame" x="0.0" y="17" width="537" height="385"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="cDp-e2-1cA" id="enp-HN-e6b" customClass="RLMTableView">
+                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="cDp-e2-1cA" id="enp-HN-e6b" customClass="RLMTableView">
                                                     <rect key="frame" x="0.0" y="0.0" width="537" height="385"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
