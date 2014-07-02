@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMTestObjects.h"
+#import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
 @implementation RLMPredicateUtil
@@ -54,6 +56,93 @@
                                               modifier: modifier
                                                   type: type
                                                options: options];
+}
+
++ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
+                             expression: (NSExpression *)expression
+                               selector: (SEL)selector
+{
+    return
+    [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForKeyPath: keyPath]
+                                       rightExpression: expression
+                                        customSelector: selector];
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [IntObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [FloatObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [DoubleObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL)alwaysFalse: (id) value
+{
+    return value == nil ? NO : NO;
+};
+
++ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [IntObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [FloatObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [DoubleObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+    };
 }
 
 @end

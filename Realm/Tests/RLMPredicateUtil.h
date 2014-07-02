@@ -36,4 +36,20 @@
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier;
 
++ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
+                             expression: (NSExpression *)expression
+                               selector: (SEL)selector;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate;
+
++ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate;
+
 @end

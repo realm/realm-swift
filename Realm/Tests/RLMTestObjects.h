@@ -37,6 +37,18 @@
 
 @end
 
+@interface FloatObject : RLMObject
+
+@property float floatCol;
+
+@end
+
+@interface DoubleObject : RLMObject
+
+@property double doubleCol;
+
+@end
+
 @interface BoolObject : RLMObject
 
 @property BOOL boolCol;
