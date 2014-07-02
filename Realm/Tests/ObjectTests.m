@@ -331,25 +331,25 @@
 - (void)testCustomSelectorsInIntegerComparison
 {
     BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyIntColSelectorPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"integer" withProposition:isEmpty];
+    [self testCustomSelectorsInNumericComparison:@"integer" withProposition:isEmpty];
 }
 
 - (void)testCustomSelectorsInFloatComparison
 {
     BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyFloatColSelectorPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"float" withProposition:isEmpty];
+    [self testCustomSelectorsInNumericComparison:@"float" withProposition:isEmpty];
 }
 
 - (void)testCustomSelectorsInDoubleComparison
 {
     BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
+    [self testCustomSelectorsInNumericComparison:@"double" withProposition:isEmpty];
 }
 
 - (void)testCustomSelectorsInDateComparison
 {
     BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+    [self testCustomSelectorsInNumericComparison:@"date" withProposition:isEmpty];
 }
 
 - (void)testBooleanPredicate
