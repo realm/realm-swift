@@ -44,7 +44,7 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 
 ## Models
 
-Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass [RLMObject](api/Classes/RLMObject.html) to create your Realm data model objects.
+Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects.
 
 
 <div class="highlight-wrapper">
@@ -68,7 +68,7 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 </div><!--/highlight-wrapper -->
 
 
-See [RLMObject](api/Classes/RLMObject.html) for more details.
+See RLMObject for more details.
 
 
 ## Writes
@@ -97,15 +97,15 @@ author.birthdate  = [NSDate date];
 </div><!--/highlight-wrapper -->
 
 
-See [RLMRealm](api/Classes/RLMRealm.html) and [RLMObject](api/Classes/RLMObject.html) for more details.
+See RLMRealm and RLMObject for more details.
 
 ## Queries
 
-**A note about using Realm Arrays ([RLMArray](api/Classes/RLMArray.html))**: All successful calls to retrieval and querying methods return the resulting collection of [RLMObjects](api/Classes/RLMObject.html) in an [RLMArray](api/Classes/RLMArray.html). [RLMArrays](api/Classes/RLMArray.html) can be manipulated similarly to a standard NSArray; however, [RLMArrays](api/Classes/RLMArray.html) are typed, meaning they only hold [RLMObjects](api/Classes/RLMObject.html) of the same [RLMObject](api/Classes/RLMObject.html) subclass type. For more details see [RLMArray](api/Classes/RLMArray.html#).
+**A note about using Realm Arrays (RLMArray)**: All successful calls to retrieval and querying methods return the resulting collection of RLMObjects in an RLMArray. RLMArrays can be manipulated similarly to a standard NSArray; however, RLMArrays are typed, meaning they only hold RLMObjects of the same RLMObject subclass type. For more details see [RLMArray](api/Classes/RLMArray.html#).
 
 ### Retrieving Objects by Type
 
-The most basic method for retrieving objects from a Realm is the [-allObjects](api/Classes/RLMObject.html#//api/name/allObjects) instance method of [RLMObjects](api/Classes/RLMObject.html), which returns all [RLMObject](api/Classes/RLMObject.html) instances of the same subclass type from the default Realm.
+The most basic method for retrieving objects from a Realm is the [-allObjects](api/Classes/RLMObject.html#//api/name/allObjects) instance method of RLMObjects, which returns all RLMObject instances of the same subclass type from the default Realm.
 
 <div class="highlight-wrapper">
 
@@ -127,7 +127,7 @@ RLMArray *dogs = [petsRealm allObjects: @"dog"]; // retrieve all Dogs from that 
 
 ### Querying with Predicates
 
-If you're familiar with [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), then you already know how to query in Realm. [RLMObjects](api/Classes/RLMObject.html), [RLMRealm](api/Classes/RLMRealm.html) and [RLMArray](api/Classes/RLMArray.html) all provide methods that allow you to query for specific [RLMObjects](api/Classes/RLMObbject.html) instances by simply passing in an NSPredicate instance, predicate string, or predicate format string just as you would with an NSObject instance.
+If you're familiar with [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), then you already know how to query in Realm. RLMObjects, RLMRealm and RLMArray all provide methods that allow you to query for specific RLMObjects instances by simply passing in an NSPredicate instance, predicate string, or predicate format string just as you would with an NSObject instance.
 
 For example, the following would extend our earlier example by calling [[RLMObject objectsWhere:]](api/Classes/RLMObject.html#//api/name/objectsWhere:) to retrieve all dogs with the color tan and names beginning with 'B' from the default Realm:
 
@@ -153,7 +153,7 @@ For more, see [-objectsWhere:](api/Classes/RLMObject.html#//api/name/objectsWher
 
 ### Ordering Results
 
-In many cases it is desirable to be able to have a retrieval or query operation return an ordered result set. To enable this, [RLMRealm](api/Classes/RLMRealm.html) and [RLMObject](api/Classes/RLMObbject.html) support methods that allow you to specify a property name or [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) to order the result set by.
+In many cases it is desirable to be able to have a retrieval or query operation return an ordered result set. To enable this, RLMRealm and RLMObject support methods that allow you to specify a property name or [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) to order the result set by.
 
 For example, the following calls [[RLMObject objectsOrderedBy:where:]](api/Classes/RLMObject.html#//api/name/objectsOrderedBy:where:) to sort the returned dogs from the example above alphabetically by name:
 
@@ -204,7 +204,7 @@ RLMArray * tanDogsWithBNames = [tanDogs objectsWhere: @"name BEGINSWITH 'B'"];
 
 ### The Default Realm
 
-You may have noticed so far that we have always initialized access to our `realm` variable by calling `[RLMRealm defaultRealm]`. That method returns an [RLMRealm](api/Classes/RLMRealm.html) object that maps to a file called “default.realm” under the Documents folder of your app. Write transactions will be automatically written to disk at that location for you, and likewise for reads.
+You may have noticed so far that we have always initialized access to our `realm` variable by calling `[RLMRealm defaultRealm]`. That method returns an RLMRealm object that maps to a file called “default.realm” under the Documents folder of your app. Write transactions will be automatically written to disk at that location for you, and likewise for reads.
 
 ### In-Memory Default Realm
 
@@ -226,7 +226,7 @@ RLMRealm *realm = [RLMRealm defaultRealm]; // Only call this line after!
 
 This option is only available on the default Realm.
 
-If you use your default Realm in memory, it will not persist your [RLMObjects](api/Classes/RLMObject.html), meaning data will not be saved across app launches. However, all other features of Realm will work as expected, including querying, relationships & thread-safety. This is a useful option if you need flexible data access without the overhead of disk persistence.
+If you use your default Realm in memory, it will not persist your RLMObjects, meaning data will not be saved across app launches. However, all other features of Realm will work as expected, including querying, relationships & thread-safety. This is a useful option if you need flexible data access without the overhead of disk persistence.
 
 ### Other Realms
 
@@ -235,11 +235,11 @@ It’s sometimes useful to have multiple realms, persisted at different location
 ### Using a Realm Across Threads
 
 If you are trying to access the same realm file from different threads, you should call `[RLMRealm defaultRealm]`, `[RLMRealm realmWithPath:]` or `[RLMRealm realmWithPath:readOnly:error:]` to get a different Realm object for every thread of your app. As long as you specify the same path, all RLMRealm objects will map to the same file on disk.  
-**Do _not_ pass an [RLMRealm](api/Classes/RLMRealm.html) object from thread to thread**. It’s totally fine to have many RLMRealm objects, all mapping to the same file. You can even have multiple [RLMRealm](api/Classes/RLMRealm.html) objects pointing to the same file living on the same thread.
+**Do _not_ pass an RLMRealm object from thread to thread**. It’s totally fine to have many RLMRealm objects, all mapping to the same file. You can even have multiple RLMRealm objects pointing to the same file living on the same thread.
 
 ## Relationships
 
-Any two [RLMObjects](api/Classes/RLMObbject.html) can be linked together. Assuming your Person model has already been defined ([see above](#defining-a-data-model)) let’s create another model called Dog:
+Any two RLMObjects can be linked together. Assuming your Person model has already been defined ([see above](#defining-a-data-model)) let’s create another model called Dog:
 
 <div class="highlight-wrapper">
 
@@ -263,7 +263,7 @@ Any two [RLMObjects](api/Classes/RLMObbject.html) can be linked together. Assumi
  
 ### Many-to-One
  
-Simply declare a property with the type of one of your [RLMObject](api/Classes/RLMObject.html) subclasses:
+Simply declare a property with the type of one of your RLMObject subclasses:
 
 <div class="highlight-wrapper">
 
@@ -303,7 +303,7 @@ When you do queries, children will not be fetched into memory at query time, but
  
 ### Many-to-Many
 
-You can establish a relationship to several objects from a single object via an RLMArray\<_Object_\> property declaration. [RLMArrays](api/Classes/RLMArray.html) are basically containers of [RLMObjects](api/Classes/RLMObject.html), that behave very much like an NSArray, with the notable exception that they are typed.
+You can establish a relationship to several objects from a single object via an RLMArray\<_Object_\> property declaration. RLMArrays are basically containers of RLMObjects, that behave very much like an NSArray, with the notable exception that they are typed.
 
 To add a “dogs” property on our Person model, that links to multiple dogs, we must first define an `RLMArray<Dog>` type. This is done via a macro at the bottom of the corresponding model interface:
  
@@ -361,7 +361,7 @@ jim.dogs = some_dogs;
 </div><!--/highlight-wrapper -->
 
 
-**Note:** [RLMArray](api/Classes/RLMArray.html) properties on models are “copy on write”. Any direct assignment of that property will copy the references to the objects from the assignee into the assigned property.
+**Note:** RLMArray properties on models are “copy on write”. Any direct assignment of that property will copy the references to the objects from the assignee into the assigned property.
 In the example above, that means that any dogs added to `some_dogs` after `jim.dogs = some_dogs;` would _not_ also be added to `jim.dogs`.
 
 
@@ -388,11 +388,11 @@ self.token = [realm addNotification:^(NSString *note, RLMRealm * realm) {
 You can use the token to unsubscribe from the notification later on. We recommend you store this
 token on your Main class, as losing reference to it will automatically unsubscribe you from the notification.
 
-See [addNotificationBlock:](api/Classes/RLMRealm.html#//api/name/addNotificationBlock:) and [removeNotificationBlock:](api/Classes/RLMRealm.html#//api/name/removeNotificationBlock:) methods on [RLMRealm](api/Classes/RLMRealm.html).
+See [addNotificationBlock:](api/Classes/RLMRealm.html#//api/name/addNotificationBlock:) and [removeNotificationBlock:](api/Classes/RLMRealm.html#//api/name/removeNotificationBlock:) methods on RLMRealm.
 
 ## Background Operations
 
-Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread. [RLMRealm](api/Classes/RLMRealm.html) objects are not thread safe and cannot be shared across threads, so you must get an [RLMRealm](api/Classes/RLMRealm.html) instance in each thread/dispatch_queue in which you want to read or write. Here's an example of inserting a million objects in a background queue:
+Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread. RLMRealm objects are not thread safe and cannot be shared across threads, so you must get an RLMRealm instance in each thread/dispatch_queue in which you want to read or write. Here's an example of inserting a million objects in a background queue:
 
 <div class="highlight-wrapper">
 
@@ -427,7 +427,7 @@ dispatch_async(queue, ^{
 
 </div><!--/highlight-wrapper -->
 
-See [RLMRealm](api/Classes/RLMRealm.html) for more details.
+See RLMRealm for more details.
 
 
 ## REST APIs
