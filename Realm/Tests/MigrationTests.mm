@@ -131,8 +131,10 @@ extern "C" {
     // object migration object
     void (^migrateObjectBlock)(RLMObject *, RLMObject *) = ^(RLMObject *oldObject, RLMObject *newObject) {
         XCTAssertNoThrow(oldObject[@"oldIntCol"], @"Deleted column should be accessible on old object.");
+        XCTAssertThrows(oldObject[@"intCol"], @"New column should not be accessible on old object.");
         XCTAssertEqual([oldObject[@"oldIntCol"] intValue], 1, @"Deleted column value is correct.");
         XCTAssertNoThrow(newObject[@"intCol"], @"New column is accessible on new object.");
+        XCTAssertThrows(newObject[@"oldIntCol"], @"Old column should not be accessible on old object.");
         XCTAssertEqual([newObject[@"intCol"] intValue], 0, @"New column value is uninitialized.");
     };
 
