@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "XCTestCase+AsyncTesting.h"
 
 @interface LinkTests : RLMTestCase
 @end

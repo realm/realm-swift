@@ -90,9 +90,6 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             }
             return NO;
         case RLMPropertyTypeDate:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_integer(obj);
-            }
             return [obj isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
             if ([obj isKindOfClass:[NSNumber class]]) {

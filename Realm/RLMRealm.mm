@@ -88,7 +88,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex) {
     return wt;
 }
 - (void)checkForUpdate {
-    [_realm performSelector:@selector(refresh)];
+    [_realm refresh];
 }
 @end
 
@@ -127,6 +127,9 @@ inline NSArray *realmsAtPath(NSString *path) {
 
 inline void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
+        for (NSMapTable *map in s_realmsPerPath.allValues) {
+            [map removeAllObjects];
+        }
         s_realmsPerPath = [NSMutableDictionary dictionary];
     }
 }
@@ -142,7 +145,6 @@ static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
@@ -178,9 +180,6 @@ static NSArray *s_objectDescriptors = nil;
     if (self) {
         _path = path;
         _runLoop = [NSRunLoop currentRunLoop];
-        _objects = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                             valueOptions:NSPointerFunctionsWeakMemory
-                                                 capacity:128];
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -410,9 +409,10 @@ static NSArray *s_objectDescriptors = nil;
             _inWriteTransaction = NO;
 
             // notify other realm istances of changes
-            for (RLMRealm *realm in realmsAtPath(_path)) {
+            NSArray *realms = realmsAtPath(_path);
+            for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
-                    [realm->_runLoop performSelector:@selector(refresh) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+                    [realm->_runLoop performSelector:@selector(refresh) withObject:realm afterDelay:0.0 inModes:@[NSRunLoopCommonModes]];
                 }
             }
             
