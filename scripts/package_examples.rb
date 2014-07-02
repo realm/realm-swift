@@ -68,11 +68,20 @@ def example_projects
     "E8F190381964C24700B0F161"
   ]
 
+  # RealmSimpleExample
+  realmSimpleExample = ExampleProject.new
+  realmSimpleExample.swift = false
+  realmSimpleExample.path = "examples/objc/RealmSimpleExample/RealmSimpleExample.xcodeproj"
+  realmSimpleExample.uuids_to_remove = [
+    
+  ]
+
   # Return all example projects
   [
     realmSwiftTableViewExample,
     realmSwiftSimpleExample,
-    realmTableViewExample
+    realmTableViewExample,
+    realmSimpleExample
   ]
 end
 
