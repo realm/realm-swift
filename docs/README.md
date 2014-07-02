@@ -1,14 +1,14 @@
 Realm Documentation
 ===================
 
-You probably want to go and [read the docs on the Realm project website](http://realm.io/docs/ios/latest/)
+## Docs
 
-You can generate the docs locally by using the build.sh script at the root of this repository. This requires installation of [appledoc](https://github.com/tomaz/appledoc/releases/tag/v2.2-963).
+You probably want to go and [read the docs on the Realm project website](http://realm.io/docs/ios/latest/). The file `docs/src/docs.md` is the source for the docs you will see rendered there.
 
-```
-sh build.sh docs
-```
+## API Reference
 
-This will generate docs under `docs/output/` and install the documentation in your Xcode.
+You probably to go and [read the API reference on the Realm project website](http://realm.io/docs/ios/latest/api). The API reference is generate from comments in the source code of this repository.
 
-You will also find an Apple docset package at the root of that that folder. You can view the docset locally with tools like [Dash](http://kapeli.com/dash) or in Xcode directly with e.g. [Docs for XCode](http://georiot.co/docsforxcode) using the packages generated in `docs/output/` or via the links in the upper right corner of our [online docs](http://realm.io/docs/ios/latest/).
+You can generate the API docs locally by running `sh build.sh docs` from the root of this repository. This requires installation of [appledoc](https://github.com/tomaz/appledoc/releases/tag/v2.2-963). You will find the output `docs/output/`
+
+You can view the docset locally with tools like [Dash](http://kapeli.com/dash) or in Xcode directly with e.g. [Docs for XCode](http://georiot.co/docsforxcode) using the packages generated in `docs/output/` or via the links in the upper right corner of our [online docs](http://realm.io/docs/ios/latest/).
