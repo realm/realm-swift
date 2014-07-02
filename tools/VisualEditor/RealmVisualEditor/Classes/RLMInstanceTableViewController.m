@@ -372,18 +372,29 @@
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    if (!RLMTableLocationColumnIsUndefined(location)) {        
-        RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
-        
-        if (propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
-            if (!linkCursorDisplaying) {
-                [self enableLinkCursor];
-            }
+    NSLog(@"Mouse entered location = %li, %li", location.row, location.column);
+    
+    if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
+        if (location.column < self.parentWindowController.selectedTypeNode.propertyColumns.count) {
+            RLMClazzProperty *propertyNode = self.parentWindowController.selectedTypeNode.propertyColumns[location.column];
             
-            return;
+            if (propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
+                if (location.row < self.parentWindowController.selectedTypeNode.instanceCount) {
+                    if (!linkCursorDisplaying) {
+                        [self enableLinkCursor];
+                    }
+                    
+                    return;
+                }
+            }
         }
     }
     
+    [self disableLinkCursor];
+}
+
+- (void)mouseDidExitView:(RLMTableView *)view
+{
     [self disableLinkCursor];
 }
 
@@ -661,12 +672,14 @@
 
 - (void)disableLinkCursor
 {
-    [self.parentWindowController.window enableCursorRects];
-    [self.parentWindowController.window resetCursorRects];
-    
-    [NSCursor pop];
-    
-    linkCursorDisplaying = NO;
+    if (linkCursorDisplaying) {
+        [self.parentWindowController.window enableCursorRects];
+        [self.parentWindowController.window resetCursorRects];
+        
+        [NSCursor pop];
+        
+        linkCursorDisplaying = NO;
+    }
 }
 
 @end
