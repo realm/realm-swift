@@ -106,13 +106,33 @@ def example_projects
     "E882E0271964C9F400D863C4"
   ]
 
+  # RealmMigrationExample
+  realmMigrationExample = ExampleProject.new
+  realmMigrationExample.swift = false
+  realmMigrationExample.path = "examples/objc/RealmMigrationExample/RealmMigrationExample.xcodeproj"
+  realmMigrationExample.uuids_to_remove = [
+    "E87D55C51964CD3200B808D5",
+    "E87D55C71964CD3200B808D5",
+    "E87D55C91964CD3200B808D5",
+    "E87D55CB1964CD3200B808D5",
+    "E87D55CD1964CD6300B808D5",
+    "E87D55BD1964CD3200B808D5",
+    "E87D55BE1964CD3200B808D5",
+    "E87D55C61964CD3200B808D5",
+    "E87D55C81964CD3200B808D5",
+    "E87D55CA1964CD3200B808D5",
+    "E87D55CC1964CD3200B808D5",
+    "E87D55CE1964CD6300B808D5"
+  ]
+
   # Return all example projects
   [
     realmSwiftTableViewExample,
     realmSwiftSimpleExample,
     realmTableViewExample,
     realmSimpleExample,
-    realmPerformanceExample
+    realmPerformanceExample,
+    realmMigrationExample
   ]
 end
 
@@ -148,7 +168,7 @@ def add_framework(example)
   
   # Add file reference
   obj = project.new(Xcodeproj::Project::PBXFileReference)
-  obj.path = "../../Realm.framework"
+  obj.path = "../Realm.framework"
   obj.name = "Realm.framework"
   project.main_group << obj
 
@@ -175,7 +195,7 @@ example_projects.each do |example|
     filepath = example.path + "/project.pbxproj"
     contents = File.read(filepath)
     File.open(filepath, "w") do |file|
-      file.puts contents.gsub("../../../build/${CONFIGURATION}", "../../")
+      file.puts contents.gsub("../../../build/${CONFIGURATION}", "../")
     end
   end
 end
