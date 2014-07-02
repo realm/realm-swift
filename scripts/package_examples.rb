@@ -6,13 +6,14 @@ require 'xcodeproj'
 ##########################
 
 class ExampleProject
-  attr_accessor :path, :uuids_to_remove
+  attr_accessor :path, :uuids_to_remove, :swift
 end
 
 def example_projects
 
   # RealmSwiftTableViewExample
   realmSwiftTableViewExample = ExampleProject.new
+  realmSwiftTableViewExample.swift = true
   realmSwiftTableViewExample.path = "examples/swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj"
   realmSwiftTableViewExample.uuids_to_remove = [
     "E8C5DD58195025B50055C3B8",
@@ -29,8 +30,9 @@ def example_projects
     "E870C94B195B328E00163667"
   ]
 
-  # RealmSwiftTableViewExample
+  # RealmSwiftSimpleViewExample
   realmSwiftSimpleExample = ExampleProject.new
+  realmSwiftSimpleExample.swift = true
   realmSwiftSimpleExample.path = "examples/swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj"
   realmSwiftSimpleExample.uuids_to_remove = [
     "4D1E47A8195C1BB40005280D",
@@ -47,10 +49,30 @@ def example_projects
     "4D1E47B1195C1BC00005280D"
   ]
 
+  # RealmTableViewExample
+  realmTableViewExample = ExampleProject.new
+  realmTableViewExample.swift = false
+  realmTableViewExample.path = "examples/objc/RealmTableViewExample/RealmTableViewExample.xcodeproj"
+  realmTableViewExample.uuids_to_remove = [
+    "E8F1902F1964C24100B0F161",
+    "E8F190311964C24100B0F161",
+    "E8F190331964C24100B0F161",
+    "E8F190351964C24100B0F161",
+    "E8F190371964C24700B0F161",
+    "E8F190271964C24100B0F161",
+    "E8F190281964C24100B0F161",
+    "E8F190301964C24100B0F161",
+    "E8F190321964C24100B0F161",
+    "E8F190341964C24100B0F161",
+    "E8F190361964C24100B0F161",
+    "E8F190381964C24700B0F161"
+  ]
+
   # Return all example projects
   [
     realmSwiftTableViewExample,
-    realmSwiftSimpleExample
+    realmSwiftSimpleExample,
+    realmTableViewExample
   ]
 end
 
@@ -107,5 +129,13 @@ end
 
 example_projects.each do |example|
   remove_uuids_from_example(example)
-  add_framework(example)
+  if example.swift
+    add_framework(example)
+  else
+    filepath = example.path + "/project.pbxproj"
+    contents = File.read(filepath)
+    File.open(filepath, "w") do |file|
+      file.puts contents.gsub("../../../build/$(CONFIGURATION)", "../../")
+    end
+  end
 end
