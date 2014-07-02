@@ -503,18 +503,22 @@
 - (void)testValidOperatorsInNumericComparison:(NSString *) comparisonType
                               withProposition:(BOOL(^)(NSPredicateOperatorType)) proposition
 {
-    XCTAssert(proposition(NSLessThanPredicateOperatorType),
-              @"< operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSLessThanOrEqualToPredicateOperatorType),
-              @"<= or =< operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSGreaterThanPredicateOperatorType),
-              @"> operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSGreaterThanOrEqualToPredicateOperatorType),
-              @">= or => operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSEqualToPredicateOperatorType),
-              @"= or == operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSNotEqualToPredicateOperatorType),
-              @"<> or != operator in %@ comparison.", comparisonType);
+    NSPredicateOperatorType validOps[] = {
+        NSLessThanPredicateOperatorType,
+        NSLessThanOrEqualToPredicateOperatorType,
+        NSGreaterThanPredicateOperatorType,
+        NSGreaterThanOrEqualToPredicateOperatorType,
+        NSEqualToPredicateOperatorType,
+        NSNotEqualToPredicateOperatorType
+    };
+
+    for (NSUInteger i = 0; i < sizeof(validOps) / sizeof(NSPredicateOperatorType); ++i)
+    {
+        XCTAssert(proposition(validOps[i]),
+                  @"%@ operator in %@ comparison.",
+                  [RLMPredicateUtil predicateOperatorTypeString:validOps[i]],
+                  comparisonType);
+    }
 }
 
 - (void)testValidOperatorsInIntegerComparison
@@ -544,26 +548,23 @@
 - (void)testInvalidOperatorsInNumericComparison:(NSString *) comparisonType
                                 withProposition:(BOOL(^)(NSPredicateOperatorType)) proposition
 {
-    NSString *name = @"filterWithPredicate:orderedBy: - Invalid operator type";
+    NSPredicateOperatorType invalidOps[] = {
+        NSMatchesPredicateOperatorType,
+        NSLikePredicateOperatorType,
+        NSBeginsWithPredicateOperatorType,
+        NSEndsWithPredicateOperatorType,
+        NSInPredicateOperatorType,
+        NSContainsPredicateOperatorType
+    };
 
-    XCTAssertThrowsSpecificNamed(proposition(NSMatchesPredicateOperatorType),
-                                 NSException, name,
-                                 @"MATCHES operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSLikePredicateOperatorType),
-                                 NSException, name,
-                                 @"LIKE operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSBeginsWithPredicateOperatorType),
-                                 NSException, name,
-                                 @"BEGINSWITH operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSEndsWithPredicateOperatorType),
-                                 NSException, name,
-                                 @"ENDSWITH operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSInPredicateOperatorType),
-                                 NSException, name,
-                                 @"IN operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSContainsPredicateOperatorType),
-                                 NSException, name,
-                                 @"CONTAINS operator invalid in %@ comparison.", comparisonType);
+    for (NSUInteger i = 0; i < sizeof(invalidOps) / sizeof(NSPredicateOperatorType); ++i)
+    {
+        XCTAssertThrowsSpecificNamed(proposition(invalidOps[i]), NSException,
+                                     @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                     @"%@ operator invalid in %@ comparison.",
+                                     [RLMPredicateUtil predicateOperatorTypeString:invalidOps[i]],
+                                     comparisonType);
+    }
 }
 
 - (void)testInvalidOperatorsInIntegerComparison

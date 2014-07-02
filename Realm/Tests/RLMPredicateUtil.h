@@ -56,4 +56,6 @@
 
 + (BOOL(^)()) alwaysEmptyDateColSelectorPredicate;
 
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType;
+
 @end

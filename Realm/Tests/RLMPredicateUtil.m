@@ -171,4 +171,38 @@
     };
 }
 
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return @"<";
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return @"<= or =<";
+        case NSGreaterThanPredicateOperatorType:
+            return @">";
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return @">= or =>";
+        case NSEqualToPredicateOperatorType:
+            return @"= or ==";
+        case NSNotEqualToPredicateOperatorType:
+            return @"<> or !=";
+        case NSMatchesPredicateOperatorType:
+            return @"MATCHES";
+        case NSLikePredicateOperatorType:
+            return @"LIKE";
+        case NSBeginsWithPredicateOperatorType:
+            return @"BEGINSWITH";
+        case NSEndsWithPredicateOperatorType:
+            return @"ENDSWITH";
+        case NSInPredicateOperatorType:
+            return @"IN";
+        case NSCustomSelectorPredicateOperatorType:
+            return @"@selector()";
+        case NSContainsPredicateOperatorType:
+            return @"CONTAINS";
+        case NSBetweenPredicateOperatorType:
+            return @"BETWEEN";
+    }
+}
+
 @end
