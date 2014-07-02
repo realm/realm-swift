@@ -68,7 +68,7 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 </div><!--/highlight-wrapper -->
 
 
-See RLMObject for more details.
+See [RLMObject](api/Classes/RLMObject.html#) for more details.
 
 
 ## Writes
@@ -97,7 +97,7 @@ author.birthdate  = [NSDate date];
 </div><!--/highlight-wrapper -->
 
 
-See RLMRealm and RLMObject for more details.
+See [RLMRealm](api/Classes/RLMRealm.html#) and [RLMObject](api/Classes/RLMObject.html#) for more details.
 
 ## Queries
 
@@ -427,7 +427,7 @@ dispatch_async(queue, ^{
 
 </div><!--/highlight-wrapper -->
 
-See RLMRealm for more details.
+See [RLMRealm](api/Classes/RLMRealm.html#) for more details.
 
 
 ## REST APIs
