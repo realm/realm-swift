@@ -115,6 +115,40 @@ extern "C" {
     XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
 }
 
+- (void)testRemoveAndAddProperty {
+    // create schema to migrate from with single string column
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
+    RLMProperty *oldInt = [[RLMProperty alloc] initWithName:@"oldIntCol" type:RLMPropertyTypeInt column:0];
+    objectSchema.properties = @[oldInt, objectSchema.properties[1]];
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"1"]);
+    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"2"]);
+    [realm commitWriteTransaction];
+
+    // object migration object
+    void (^migrateObjectBlock)(RLMObject *, RLMObject *) = ^(RLMObject *oldObject, RLMObject *newObject) {
+        XCTAssertNoThrow(oldObject[@"oldIntCol"], @"Deleted column should be accessible on old object.");
+        XCTAssertEqual([oldObject[@"oldIntCol"] intValue], 1, @"Deleted column value is correct.");
+        XCTAssertNoThrow(newObject[@"intCol"], @"New column is accessible on new object.");
+        XCTAssertEqual([newObject[@"intCol"] intValue], 0, @"New column value is uninitialized.");
+    };
+
+    // apply migration
+    [RLMRealm applyMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+        [migration enumerateObjects:MigrationObject.className block:migrateObjectBlock];
+        return 1;
+    } atPath:RLMTestRealmPath() error:nil];
+
+    // verify migration
+    realm = [self realmWithTestPath];
+    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
+}
+
 - (void)testChangePropertyType {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
