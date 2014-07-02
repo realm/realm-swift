@@ -144,53 +144,69 @@ static BOOL KEY_FIRST = YES;
     return value == nil ? NO : NO;
 };
 
-+ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate
++ (BOOL(^)()) isEmptyIntColWithPredicate:(NSPredicate *)predicate
 {
-    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
-
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
-                                                           expression: expression
-                                                             selector: @selector(alwaysFalse:)];
     return ^BOOL() {
         return [IntObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
     };
 }
 
-+ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate
++ (BOOL(^)()) isEmptyFloatColWithPredicate:(NSPredicate *)predicate
 {
-    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
-
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
-                                                           expression: expression
-                                                             selector: @selector(alwaysFalse:)];
     return ^BOOL() {
         return [FloatObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
     };
 }
 
-+ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
++ (BOOL(^)()) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate
 {
-    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
-
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
-                                                           expression: expression
-                                                             selector: @selector(alwaysFalse:)];
     return ^BOOL() {
         return [DoubleObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
     };
+}
+
++ (BOOL(^)()) isEmptyDateColWithPredicate:(NSPredicate *)predicate
+{
+    return ^BOOL() {
+        return [DateObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+}
+
++ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
+}
+
++ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
 }
 
 + (BOOL(^)()) alwaysEmptyDateColSelectorPredicate
 {
     NSExpression *expression = [NSExpression expressionForConstantValue:
                                 [NSDate dateWithTimeIntervalSinceNow:0]];
-
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
-    return ^BOOL() {
-        return [DateObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
-    };
+    return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
 }
 
 @end

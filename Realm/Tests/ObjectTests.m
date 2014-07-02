@@ -459,6 +459,81 @@
                                  @"Invalid operator in binary comparison.");
 }
 
+- (void)testAndCompound
+{
+    NSExpression *exp = [NSExpression expressionForConstantValue:@0];
+    NSPredicate *subpred = [RLMPredicateUtil comparisonWithKeyPath:@"intCol"
+                                                        expression:exp
+                                                      operatorType:NSEqualToPredicateOperatorType];
+
+    NSString *exc_name = @"filterWithPredicate:orderedBy: - Invalid query";
+
+    NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[]];
+    BOOL(^proposition)() = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssertThrowsSpecificNamed(proposition(), NSException, exc_name,
+                                 @"Compound OR predicate with no subpredicates is invalid.");
+
+    predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[subpred]];
+    proposition = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssert(proposition(), @"Compound OR predicate with one subpredicate.");
+
+    predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[subpred,subpred]];
+    proposition = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssert(proposition(), @"Compound OR predicate with two subpredicates.");
+}
+
+- (void)testOrCompound
+{
+    NSExpression *exp = [NSExpression expressionForConstantValue:@0];
+    NSPredicate *subpred = [RLMPredicateUtil comparisonWithKeyPath:@"intCol"
+                                                        expression:exp
+                                                      operatorType:NSEqualToPredicateOperatorType];
+
+    NSString *exc_name = @"filterWithPredicate:orderedBy: - Invalid query";
+
+    NSPredicate *predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[]];
+    BOOL(^proposition)() = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssertThrowsSpecificNamed(proposition(), NSException, exc_name,
+                                 @"Compound OR predicate with no subpredicates is invalid.");
+
+    predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[subpred]];
+    proposition = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssert(proposition(), @"Compound OR predicate with one subpredicate.");
+
+    predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[subpred,subpred]];
+    proposition = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssert(proposition(), @"Compound OR predicate with two subpredicates.");
+}
+
+- (void)testNotCompound
+{
+    NSExpression *exp = [NSExpression expressionForConstantValue:@0];
+    NSPredicate *subpred = [RLMPredicateUtil comparisonWithKeyPath:@"intCol"
+                                                        expression:exp
+                                                      operatorType:NSEqualToPredicateOperatorType];
+
+    NSPredicate *predicate = [NSCompoundPredicate notPredicateWithSubpredicate:subpred];
+    BOOL(^proposition)() = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssert(proposition(), @"Compound OR predicate with two subpredicates.");
+}
+
+- (void)testInvalidArgument
+{
+    NSPredicate *predicate = (NSPredicate *)@42;
+    BOOL(^proposition)() = [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
+
+    XCTAssertThrowsSpecificNamed(proposition(), NSException,
+                                 @"filterWithPredicate:orderedBy: - Invalid argument",
+                                 @"Non compound or comparison predicate is invalid.");
+}
+
 - (void)testDataTypes
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

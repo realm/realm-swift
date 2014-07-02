@@ -41,19 +41,18 @@
                                selector: (SEL)selector;
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate;
-
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate;
-
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate;
-
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate;
 
++ (BOOL(^)()) isEmptyIntColWithPredicate:(NSPredicate *)predicate;
++ (BOOL(^)()) isEmptyFloatColWithPredicate:(NSPredicate *)predicate;
++ (BOOL(^)()) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate;
++ (BOOL(^)()) isEmptyDateColWithPredicate:(NSPredicate *)predicate;
+
 + (BOOL(^)()) alwaysEmptyIntColSelectorPredicate;
-
 + (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate;
-
 + (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate;
-
 + (BOOL(^)()) alwaysEmptyDateColSelectorPredicate;
 
 @end
