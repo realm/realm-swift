@@ -10,6 +10,7 @@ class ExampleProject
 end
 
 def example_projects
+
   # RealmSwiftTableViewExample
   realmSwiftTableViewExample = ExampleProject.new
   realmSwiftTableViewExample.path = "examples/swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj"
