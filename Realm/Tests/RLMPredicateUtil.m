@@ -135,7 +135,7 @@
 
 + (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
 {
-    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
 
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                            expression: expression
