@@ -73,7 +73,18 @@ def example_projects
   realmSimpleExample.swift = false
   realmSimpleExample.path = "examples/objc/RealmSimpleExample/RealmSimpleExample.xcodeproj"
   realmSimpleExample.uuids_to_remove = [
-    
+    "E82ED9041964C8730058B909",
+    "E82ED9061964C8730058B909",
+    "E82ED9081964C8730058B909",
+    "E82ED90A1964C8730058B909",
+    "E82ED90C1964C87A0058B909",
+    "E82ED8FC1964C8730058B909",
+    "E82ED8FD1964C8730058B909",
+    "E82ED9051964C8730058B909",
+    "E82ED9071964C8730058B909",
+    "E82ED9091964C8730058B909",
+    "E82ED90B1964C8730058B909",
+    "E82ED90D1964C87A0058B909"
   ]
 
   # Return all example projects
