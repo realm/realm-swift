@@ -265,6 +265,12 @@
     [self testValidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
 }
 
+- (void)testValidOperatorsInDateComparison
+{
+    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
+    [self testValidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+}
+
 - (void)testInvalidOperatorsInNumericComparison:(NSString *) comparisonType
                                 withProposition:(BOOL(^)(NSPredicateOperatorType)) proposition
 {
@@ -308,6 +314,12 @@
     [self testInvalidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
 }
 
+- (void)testInvalidOperatorsInDateComparison
+{
+    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
+    [self testInvalidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+}
+
 - (void)testCustomSelectorsInNumericComparison:(NSString *) comparisonType
                                withProposition:(BOOL(^)()) proposition
 {
@@ -332,6 +344,12 @@
 {
     BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
     [self testInvalidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
+}
+
+- (void)testCustomSelectorsInDateComparison
+{
+    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
+    [self testInvalidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
 }
 
 - (void)testBooleanPredicate
@@ -411,36 +429,6 @@
     XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException,
                                  @"filterWithPredicate:orderedBy: - Invalid operator type",
                                  @"Invalid operator in string comparison.");
-}
-
-- (void)testDateComparisonInPredicate
-{
-    NSExpression *now = [NSExpression expressionForConstantValue:[[NSDate alloc] init]];
-
-    NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
-        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
-                                                          expression: now
-                                                        operatorType: type];
-        return [DateObject objectsWithPredicate: pred].count;
-    };
-
-    XCTAssertEqual(count(NSLessThanPredicateOperatorType), (NSUInteger)0,
-                   @"< operator in date comparison.");
-    XCTAssertEqual(count(NSLessThanOrEqualToPredicateOperatorType), (NSUInteger)0,
-                   @"<= operator in date comparison.");
-    XCTAssertEqual(count(NSGreaterThanPredicateOperatorType), (NSUInteger)0,
-                   @"> operator in date comparison.");
-    XCTAssertEqual(count(NSGreaterThanOrEqualToPredicateOperatorType), (NSUInteger)0,
-                   @">= operator in date comparison.");
-    XCTAssertEqual(count(NSEqualToPredicateOperatorType), (NSUInteger)0,
-                   @"= or == operator in date comparison.");
-    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType), (NSUInteger)0,
-                   @"!= or <> operator in date comparison.");
-
-    // Invalid operators.
-    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
-                                 @"Invalid operator in date comparison.");
 }
 
 - (void)testBinaryComparisonInPredicate

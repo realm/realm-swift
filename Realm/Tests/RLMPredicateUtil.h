@@ -46,10 +46,14 @@
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate;
 
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate;
+
 + (BOOL(^)()) alwaysEmptyIntColSelectorPredicate;
 
 + (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate;
 
 + (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyDateColSelectorPredicate;
 
 @end

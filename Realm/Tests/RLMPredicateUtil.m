@@ -104,6 +104,19 @@
     };
 }
 
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue:
+                                [NSDate dateWithTimeIntervalSinceNow:0]];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [DateObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+    };
+}
+
 + (BOOL)alwaysFalse: (id) value
 {
     return value == nil ? NO : NO;
@@ -142,6 +155,19 @@
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
         return [DoubleObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyDateColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue:
+                                [NSDate dateWithTimeIntervalSinceNow:0]];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [DateObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
     };
 }
 
