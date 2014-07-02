@@ -125,6 +125,11 @@
     return arrayNode;
 }
 
+- (void)removeAllChildNodes
+{
+    [displayedArrays removeAllObjects];
+}
+
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index
 {
 

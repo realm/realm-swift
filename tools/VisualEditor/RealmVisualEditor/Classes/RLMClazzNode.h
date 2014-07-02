@@ -25,6 +25,8 @@
 
 - (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
+- (void)removeAllChildNodes;
+
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
 
 - (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;

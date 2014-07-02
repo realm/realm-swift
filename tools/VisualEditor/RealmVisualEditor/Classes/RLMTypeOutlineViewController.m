@@ -125,6 +125,13 @@
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
+
+        // The arrays we get from linkviews are ephemeral, so we
+        // remove them when any class node is selected
+        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+            [self removeAllChildArrays];
+        }
+
         [self selectOutlineItem:selectedItem];
     }
     
@@ -193,6 +200,14 @@
         RLMArrayNode *arrayNode = (RLMArrayNode *)item;
         [self.parentWindowController updateSelectedTypeNode:arrayNode];
         return;
+    }
+}
+
+- (void)removeAllChildArrays
+{
+    for (RLMClazzNode *node in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
+        [node removeAllChildNodes];
+        [self.classesOutlineView reloadItem:node];
     }
 }
 
