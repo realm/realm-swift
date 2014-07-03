@@ -23,7 +23,7 @@
  *  @name Realm Schema
  * ---------------------------------------------------------------------------------------
  */
-@interface RLMSchema : NSObject
+@interface RLMSchema : NSObject<NSCopying>
 
 /**
  An NSArray containing RLMObjectSchema for all object types in this Realm. Meant
