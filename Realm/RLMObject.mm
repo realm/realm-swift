@@ -151,7 +151,7 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    RLMDynamicSet(self, key, obj);
+    RLMDynamicValidatedSet(self, key, obj);
 }
 
 + (RLMArray *)allObjects {

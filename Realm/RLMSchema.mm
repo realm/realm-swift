@@ -42,8 +42,13 @@ static RLMSchema *s_sharedSchema;
     return _objectSchemaByName[className];
 }
 
-- (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)className {
-    return _objectSchemaByName[className];
+- (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className {
+    RLMObjectSchema *schema = _objectSchemaByName[className];
+    if (!schema) {
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+    }
+    return schema;
 }
 
 - (id)init {
@@ -114,6 +119,7 @@ static RLMSchema *s_sharedSchema;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
+            object->_table = table;
             [schemaArray addObject:object];
         }
     }
@@ -144,6 +150,19 @@ NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
+}
+
+- (id)copy {
+    RLMSchema *schema = [[RLMSchema alloc] init];
+
+    // copy object schema
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.objectSchema.count];
+    for (RLMObjectSchema *objSchema in self.objectSchema) {
+        [array addObject:[objSchema copy]];
+    }
+    schema.objectSchema = array;
+    
+    return schema;
 }
 
 @end

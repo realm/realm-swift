@@ -112,5 +112,13 @@
     return schema;
 }
 
+- (id)copy {
+    RLMObjectSchema *schema = [[RLMObjectSchema alloc] init];
+    schema.properties = self.properties;
+    schema.objectClass = self.objectClass;
+    schema.className = self.className;
+    return schema;
+}
+
 @end
 

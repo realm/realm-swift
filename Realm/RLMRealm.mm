@@ -328,13 +328,13 @@ static NSArray *s_objectDescriptors = nil;
     
     // set schema
     if (customSchema) {
-        realm->_schema = customSchema;
+        realm->_schema = [customSchema copy];
     }
     else if (dynamic) {
         realm->_schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
-        realm->_schema = [RLMSchema sharedSchema];
+        realm->_schema = [[RLMSchema sharedSchema] copy];
     }
 
     // initialize object store for this realm
@@ -526,6 +526,5 @@ static NSArray *s_objectDescriptors = nil;
     }
     [migration migrateWithBlock:block];
 }
-
 
 @end
