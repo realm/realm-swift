@@ -24,9 +24,6 @@
 //
 @class RLMObjectSchema;
 
-// initialize accessor cache
-void RLMAccessorCacheInitialize();
-
 // get accessor classes for an object class - generates classes if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
@@ -34,9 +31,18 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
 //
 // Dynamic getters/setters
 //
-void RLMDynamicSet(RLMObject *obj, NSString *propName, id val, BOOL validate = YES);
+void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val);
 id RLMDynamicGet(RLMObject *obj, NSString *propName);
 
 // by property/column
 void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val);
 
+//
+// Class modification
+//
+
+// Replace className method for the given class
+void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
+
+// Replace sharedSchema method for the given class
+void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema);

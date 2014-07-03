@@ -23,7 +23,7 @@
  *  @name Realm Schema
  * ---------------------------------------------------------------------------------------
  */
-@interface RLMSchema : NSObject
+@interface RLMSchema : NSObject<NSCopying>
 
 /**
  An NSArray containing RLMObjectSchema for all object types in this Realm. Meant
@@ -44,7 +44,8 @@
 - (RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
- Lookup an RLMObjectSchema for the given class in this Realm.
+ Lookup an RLMObjectSchema for the given class in this Realm. Throws if there
+ is no object of type className in this RLMSchema instance.
  
  @param className   The object class name.
  @return            RLMObjectSchema for the given class in this Realm.

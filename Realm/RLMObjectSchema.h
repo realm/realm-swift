@@ -23,7 +23,7 @@
  *  @name Object Schema
  * ---------------------------------------------------------------------------------------
  */
-@interface RLMObjectSchema : NSObject
+@interface RLMObjectSchema : NSObject<NSCopying>
 
 /**
  Array of persisted properties for an object.

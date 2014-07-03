@@ -104,7 +104,7 @@
     }
     
     // Test 7: Test querying object schemas using subscription for unexpected types
-    XCTAssertNil(schema[unexpectedType], @"Expecting not to find object schema for type %@ in realm using subscription, did find", unexpectedType);
+    XCTAssertThrows(schema[unexpectedType], @"Expecting asking schema for type %@ in realm using subscription to throw", unexpectedType);
 }
 
 @end

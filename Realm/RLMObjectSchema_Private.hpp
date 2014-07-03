@@ -21,12 +21,19 @@
 #import <tightdb/table.hpp>
 
 // RLMObjectSchema private
-@interface RLMObjectSchema ()
+@interface RLMObjectSchema () {
+    @public
+    // table accessor optimization
+    tightdb::TableRef _table;
+}
+
 // writable redecleration
 @property (nonatomic, readwrite, copy) NSArray * properties;
 
 // class used for this object schema
 @property (nonatomic, readwrite, assign) Class objectClass;
+@property (nonatomic, readwrite, assign) Class accessorClass;
+@property (nonatomic, readwrite, assign) Class standaloneClass;
 
 // returns a cached or new schema for a given object class
 +(instancetype)schemaForObjectClass:(Class)objectClass;

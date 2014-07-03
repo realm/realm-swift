@@ -36,5 +36,8 @@
 @property (nonatomic, readwrite) RLMRealm *realm;
 @property (nonatomic) RLMObjectSchema *RLMObject_schema;
 
+// shared schema for this class
++ (RLMObjectSchema *)sharedSchema;
+
 @end
 
