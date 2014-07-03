@@ -97,6 +97,17 @@
 
 #pragma mark - NSOutlineViewDelegate implementation
 
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+    return [item isKindOfClass:[RLMRealmNode class]];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+    // Group headers should not be selectable
+    return ![item isKindOfClass:[RLMRealmNode class]];
+}
+
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
 {
     // The top level node should not be collapsed.
@@ -125,6 +136,13 @@
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
+
+        // The arrays we get from linkviews are ephemeral, so we
+        // remove them when any class node is selected
+        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+            [self removeAllChildArrays];
+        }
+
         [self selectOutlineItem:selectedItem];
     }
     
@@ -193,6 +211,14 @@
         RLMArrayNode *arrayNode = (RLMArrayNode *)item;
         [self.parentWindowController updateSelectedTypeNode:arrayNode];
         return;
+    }
+}
+
+- (void)removeAllChildArrays
+{
+    for (RLMClazzNode *node in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
+        [node removeAllChildNodes];
+        [self.classesOutlineView reloadItem:node];
     }
 }
 

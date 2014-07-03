@@ -110,16 +110,9 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"HeaderLabel"
-                                                                  owner:self];
-    
-    result.textField.stringValue = @"classes".uppercaseString;
-    result.textField.textColor = [NSColor colorWithByteRed:145
-                                                     green:152
-                                                      blue:153
-                                                     alpha:255];
-    
-    [[result.button cell] setHighlightsBy:0];
+    NSTextField *result =  [tableView makeViewWithIdentifier:@"HeaderLabel"
+                                                       owner:self];
+    [result setStringValue:@"CLASSES"];
     
     return result;
 
