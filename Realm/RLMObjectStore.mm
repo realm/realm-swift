@@ -269,6 +269,17 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
 }
 
+RLMObject *RLMCreateObjectInRealm(RLMRealm *realm, NSString *className) {
+    // verify writable
+    RLMVerifyInWriteTransaction(realm);
+
+    // create the object
+    RLMObjectSchema *schema = realm.schema[className];
+    RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:YES];
+
+    return object;
+}
+
 
 RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value) {
     // verify writable

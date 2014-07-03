@@ -572,6 +572,17 @@
     XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
 }
 
+- (void)testCreateInRealm
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    AllTypesObject *obj = [AllTypesObject createInRealm:realm];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(realm, obj.realm);
+}
+
 - (void)testCreateInRealmValidationForDictionary
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

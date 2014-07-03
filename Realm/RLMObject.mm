@@ -77,6 +77,10 @@
     return self;
 }
 
++(instancetype)createInRealm:(RLMRealm *)realm {
+    return RLMCreateObjectInRealm(realm, [self className]);;
+}
+
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
     return RLMCreateObjectInRealmWithValue(realm, [self className], value);
 }
