@@ -26,29 +26,6 @@
 
 #import <objc/runtime.h>
 
-enum RLMAccessorTypes {
-    RLMAccessorTypeNormal = 0,
-    RLMAccessorTypeInvalid,
-    RLMAccessorTypeReadOnly,
-    RLMAccessorTypeInsertion,
-    RLMAccessorTypeStandalone,
-    RLMNumAccessorTypes
-};
-
-// accessor caches by type
-static NSMapTable *s_accessorCaches[RLMNumAccessorTypes];
-
-// initialize statics
-void RLMAccessorCacheInitialize() {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        for (NSUInteger i = 0; i < RLMNumAccessorTypes; i++) {
-            s_accessorCaches[i] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                                        valueOptions:NSPointerFunctionsOpaquePersonality];
-        }
-    });
-}
-
 // verify attached
 inline void RLMVerifyAttached(__unsafe_unretained RLMObject *obj) {
     if (!obj->_row.is_attached()) {
@@ -115,7 +92,7 @@ inline NSString *RLMGetString(__unsafe_unretained RLMObject *obj, NSUInteger col
     RLMVerifyAttached(obj);
     return RLMStringDataToNSString(obj->_row.get_string(colIndex));
 }
-inline void RLMSetString(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *val) {
+inline void RLMSetString(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSString *val) {
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
 }
@@ -126,7 +103,7 @@ inline NSDate *RLMGetDate(__unsafe_unretained RLMObject *obj, NSUInteger colInde
     tightdb::DateTime dt = obj->_row.get_datetime(colIndex);
     return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
 }
-inline void RLMSetDate(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSDate *date) {
+inline void RLMSetDate(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSDate *date) {
     RLMVerifyInWriteTransaction(obj);
     std::time_t time = date.timeIntervalSince1970;
     obj->_row.set_datetime(colIndex, tightdb::DateTime(time));
@@ -138,13 +115,13 @@ inline NSData *RLMGetData(__unsafe_unretained RLMObject *obj, NSUInteger colInde
     tightdb::BinaryData data = obj->_row.get_binary(colIndex);
     return [NSData dataWithBytes:data.data() length:data.size()];
 }
-inline void RLMSetData(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSData *data) {
+inline void RLMSetData(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSData *data) {
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
 }
 
 // link getter/setter
-inline RLMObject *RLMGetLink(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *objectClassName) {
+inline RLMObject *RLMGetLink(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSString *objectClassName) {
     RLMVerifyAttached(obj);
 
     if (obj->_row.is_null_link(colIndex)) {
@@ -473,22 +450,27 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
 
 // implement the class method className on accessors to return the className of the
 // base object
-inline void RLMImplementClassNameMethod(Class accessorClass, NSString *className) {
+void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
     Class metaClass = objc_getMetaClass(class_getName(accessorClass));
     IMP imp = imp_implementationWithBlock(^{ return className; });
     class_replaceMethod(metaClass, @selector(className), imp, "@:");
+}
+
+// implement the shared schema method
+void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) {
+    Class metaClass = objc_getMetaClass(class_getName(accessorClass));
+    IMP imp = imp_implementationWithBlock(^{ return schema; });
+    class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@:");
 }
 
 Class RLMCreateAccessorClass(Class objectClass,
                              RLMObjectSchema *schema,
                              NSString *accessorClassPrefix,
                              IMP (*getterGetter)(NSUInteger, char, NSString *),
-                             IMP (*setterGetter)(NSUInteger, char),
-                             NSMapTable *cache) {
+                             IMP (*setterGetter)(NSUInteger, char)) {
 
     // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
     if (objectClass == RLMObject.class) {
-        [cache setObject:objectClass forKey:objectClass];
         return objectClass;
     }
     
@@ -532,21 +514,19 @@ Class RLMCreateAccessorClass(Class objectClass,
     }
     
     // implement className for accessor to return base className
-    RLMImplementClassNameMethod(accClass, schema.className);
-    
-    // cache and return
-    [cache setObject:accClass forKey:objectClass];
+    RLMReplaceClassNameMethod(accClass, schema.className);
+
     return accClass;
 }
 
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
-                                  RLMAccessorGetter, RLMAccessorSetter, s_accessorCaches[RLMAccessorTypeNormal]);
+                                  RLMAccessorGetter, RLMAccessorSetter);
 }
 
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
-                                  RLMAccessorStandaloneGetter, NULL, s_accessorCaches[RLMAccessorTypeStandalone]);
+                                  RLMAccessorStandaloneGetter, NULL);
 }
 
 // Dynamic accessor name for a classname

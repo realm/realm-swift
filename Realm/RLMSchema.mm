@@ -88,6 +88,9 @@ static RLMSchema *s_sharedSchema;
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];
+                // implement sharedSchema and className for this class
+                RLMReplaceSharedSchemaMethod(classes[i], object);
+                RLMReplaceClassNameMethod(classes[i], object.className);
             }
         }
         free(classes);

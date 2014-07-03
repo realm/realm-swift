@@ -28,15 +28,6 @@
 
 #import <objc/runtime.h>
 
-// initializer
-void RLMInitializeObjectStore() {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // register accessor cache
-        RLMAccessorCacheInitialize();
-    });
-}
-
 // get the table used to store object of objectClass
 inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                 NSString *className,
@@ -105,6 +96,12 @@ void RLMVerifyAndAlignSchema(RLMSchema *schema) {
 
         // verify and align
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+
+        // create accessors
+        // FIXME - we need to generate different accessors keyed by the hash of the objectSchema (to preserve column ordering)
+        //         it's possible to have multiple realms with different on-disk layouts, which requires
+        //         us to have multiple accessors for each type/instance combination
+        objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
     }
 }
 
@@ -258,7 +255,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
 
     // switch class to use table backed accessor
-    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+    object_setClass(object, schema.accessorClass);
 }
 
 
@@ -305,7 +302,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     }
 
     // switch class to use table backed accessor
-    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+    object_setClass(object, schema.accessorClass);
 
     return object;
 }
@@ -341,10 +338,9 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     
     // get acessor fot the object class
-    Class accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
-    RLMObject *accessor = [[accessorClass alloc] initWithRealm:realm
-                                                        schema:realm.schema[objectClassName]
-                                                 defaultValues:NO];
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm
+                                                                     schema:realm.schema[objectClassName]
+                                                              defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor->_row = (*objectSchema->_table)[index];

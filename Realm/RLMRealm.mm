@@ -169,9 +169,6 @@ static NSArray *s_objectDescriptors = nil;
     dispatch_once(&onceToken, ^{
         // initilize realm cache
         clearRealmCache();
-        
-        // initialize object store
-        RLMInitializeObjectStore();
     });
 }
 

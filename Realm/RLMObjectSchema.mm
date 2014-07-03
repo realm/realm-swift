@@ -77,6 +77,8 @@
     schema.properties = propArray;
     schema.className = NSStringFromClass(objectClass);
     schema.objectClass = objectClass;
+    schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
+
     return schema;
 }
 
@@ -109,6 +111,8 @@
 
     // for dynamic interface use vanilla RLMObject
     schema.objectClass = RLMObject.class;
+    schema.standaloneClass = RLMObject.class;
+
     return schema;
 }
 

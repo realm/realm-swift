@@ -19,15 +19,6 @@
 #import "RLMRealm.h"
 
 //
-// Object Store Initialization
-//
-
-// initialize global object store
-// call once before using other methods
-void RLMInitializeObjectStore();
-
-
-//
 // Table modifications
 //
 

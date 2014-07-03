@@ -18,6 +18,7 @@
 
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
@@ -29,18 +30,19 @@
 @synthesize realm = _realm;
 @synthesize RLMObject_schema = _RLMObject_schema;
 
+
 // standalone init
--(instancetype)init {
-    self = [self initWithRealm:nil schema:RLMSchema.sharedSchema[self.class.className] defaultValues:YES];
+- (instancetype)init {
+    self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
 
     // set standalone accessor class
-    object_setClass(self, RLMStandaloneAccessorClassForObjectClass(self.class, self.RLMObject_schema));
+    object_setClass(self, self.RLMObject_schema.standaloneClass);
     
     return self;
 }
 
 
--(instancetype)initWithObject:(id)value {
+- (instancetype)initWithObject:(id)value {
     id obj = [self init];
     if ([value isKindOfClass:NSArray.class]) {
         RLMPopulateObjectWithArray(obj, value);
@@ -61,10 +63,9 @@
                        schema:(RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults {
     self = [super init];
-    
     if (self) {
-        self.realm = realm;
-        self.RLMObject_schema = schema;
+        _realm = realm;
+        _RLMObject_schema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -176,8 +177,11 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
 }
 
 + (NSString *)className {
-    const char *className = class_getName(self);
-    return [[NSString alloc] initWithBytesNoCopy:(void *)className length:strlen(className) encoding:NSUTF8StringEncoding freeWhenDone:NO];
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
+}
+
++ (RLMObjectSchema *)sharedSchema {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
 }
 
 - (NSString *)description

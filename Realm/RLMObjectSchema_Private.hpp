@@ -32,6 +32,8 @@
 
 // class used for this object schema
 @property (nonatomic, readwrite, assign) Class objectClass;
+@property (nonatomic, readwrite, assign) Class accessorClass;
+@property (nonatomic, readwrite, assign) Class standaloneClass;
 
 // returns a cached or new schema for a given object class
 +(instancetype)schemaForObjectClass:(Class)objectClass;
