@@ -190,8 +190,10 @@ end
 example_projects.each do |example|
   remove_uuids_from_example(example)
   if example.swift
+    # Add true framework to Swift projects
     add_framework(example)
   else
+    # Link pseudo-framework to Objective-C projects
     filepath = File.join(example.path, "project.pbxproj")
     contents = File.read(filepath)
     File.open(filepath, "w") do |file|
