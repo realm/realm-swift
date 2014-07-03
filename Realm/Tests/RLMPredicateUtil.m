@@ -16,35 +16,37 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMTestObjects.h"
+#import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
 @implementation RLMPredicateUtil
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
 {
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
-                                       expression: expression
-                                             type: type
-                                          options: 0];
+                                        expression: expression
+                                      operatorType: type
+                                           options: 0];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
 {
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
-                                       expression: expression
-                                             type: type
-                                          options: options
-                                         modifier: NSDirectPredicateModifier];
+                                        expression: expression
+                                      operatorType: type
+                                           options: options
+                                          modifier: NSDirectPredicateModifier];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier
 {
@@ -54,6 +56,153 @@
                                               modifier: modifier
                                                   type: type
                                                options: options];
+}
+
++ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
+                             expression: (NSExpression *)expression
+                               selector: (SEL)selector
+{
+    return
+    [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForKeyPath: keyPath]
+                                       rightExpression: expression
+                                        customSelector: selector];
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [IntObject objectsWithPredicate:predicate].count == 0;
+    };
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [FloatObject objectsWithPredicate:predicate].count == 0;
+    };
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [DoubleObject objectsWithPredicate:predicate].count == 0;
+    };
+}
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue:
+                                [NSDate dateWithTimeIntervalSinceNow:0]];
+
+    return ^BOOL(NSPredicateOperatorType operatorType) {
+        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+                                                               expression: expression
+                                                             operatorType: operatorType];
+        return [DateObject objectsWithPredicate:predicate].count == 0;
+    };
+}
+
++ (BOOL)alwaysFalse: (id) value
+{
+    return value == nil ? NO : NO;
+};
+
++ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [IntObject objectsWithPredicate: predicate].count == 0;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [FloatObject objectsWithPredicate: predicate].count == 0;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [DoubleObject objectsWithPredicate: predicate].count == 0;
+    };
+}
+
++ (BOOL(^)()) alwaysEmptyDateColSelectorPredicate
+{
+    NSExpression *expression = [NSExpression expressionForConstantValue:
+                                [NSDate dateWithTimeIntervalSinceNow:0]];
+
+    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+                                                           expression: expression
+                                                             selector: @selector(alwaysFalse:)];
+    return ^BOOL() {
+        return [DateObject objectsWithPredicate: predicate].count == 0;
+    };
+}
+
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return @"<";
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return @"<= or =<";
+        case NSGreaterThanPredicateOperatorType:
+            return @">";
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return @">= or =>";
+        case NSEqualToPredicateOperatorType:
+            return @"= or ==";
+        case NSNotEqualToPredicateOperatorType:
+            return @"<> or !=";
+        case NSMatchesPredicateOperatorType:
+            return @"MATCHES";
+        case NSLikePredicateOperatorType:
+            return @"LIKE";
+        case NSBeginsWithPredicateOperatorType:
+            return @"BEGINSWITH";
+        case NSEndsWithPredicateOperatorType:
+            return @"ENDSWITH";
+        case NSInPredicateOperatorType:
+            return @"IN";
+        case NSCustomSelectorPredicateOperatorType:
+            return @"@selector()";
+        case NSContainsPredicateOperatorType:
+            return @"CONTAINS";
+        case NSBetweenPredicateOperatorType:
+            return @"BETWEEN";
+    }
 }
 
 @end
