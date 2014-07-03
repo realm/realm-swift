@@ -192,7 +192,7 @@ example_projects.each do |example|
   if example.swift
     add_framework(example)
   else
-    filepath = example.path + "/project.pbxproj"
+    filepath = File.join(example.path, "project.pbxproj")
     contents = File.read(filepath)
     File.open(filepath, "w") do |file|
       file.puts contents.gsub("../../../build/${CONFIGURATION}", "../")
