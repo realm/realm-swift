@@ -190,10 +190,12 @@ end
 example_projects.each do |example|
   remove_uuids_from_example(example)
   if example.swift
-    # Add true framework to Swift projects
+    # Swift examples use the Xcode6-generated dynamic framework
+    # So we can add it to the project
     add_framework(example)
   else
-    # Link pseudo-framework to Objective-C projects
+    # Objective-C examples use the Xcode5-generated static pseudo-framework
+    # So must link it directly with the project
     filepath = File.join(example.path, "project.pbxproj")
     contents = File.read(filepath)
     File.open(filepath, "w") do |file|
