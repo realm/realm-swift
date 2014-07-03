@@ -44,28 +44,50 @@
                                           modifier: NSDirectPredicateModifier];
 }
 
+static BOOL KEY_FIRST = YES;
+
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                            operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier
 {
-    return
-    [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForKeyPath:keyPath]
-                                       rightExpression: expression
-                                              modifier: modifier
-                                                  type: type
-                                               options: options];
+    NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
+    NSExpression * right = expression;
+
+    if (KEY_FIRST == NO) {
+        right = left;
+        left = expression;
+        KEY_FIRST = YES;
+    } else {
+        KEY_FIRST = NO;
+    }
+
+    return [NSComparisonPredicate predicateWithLeftExpression: left
+                                              rightExpression: right
+                                                     modifier: modifier
+                                                         type: type
+                                                      options: options];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                                selector: (SEL)selector
 {
-    return
-    [NSComparisonPredicate predicateWithLeftExpression: [NSExpression expressionForKeyPath: keyPath]
-                                       rightExpression: expression
-                                        customSelector: selector];
+    NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
+    NSExpression * right = expression;
+
+    if (KEY_FIRST == NO) {
+        right = left;
+        left = expression;
+        KEY_FIRST = YES;
+    } else {
+        KEY_FIRST = NO;
+    }
+
+    return [NSComparisonPredicate predicateWithLeftExpression: left
+                                              rightExpression: right
+                                               customSelector: selector];
 }
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate
