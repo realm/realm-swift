@@ -521,28 +521,16 @@
     }
 }
 
-- (void)testValidOperatorsInIntegerComparison
+- (void)testValidOperatorsInNumericComparison
 {
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyIntColPredicate];
-    [self testValidOperatorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInFloatComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyFloatColPredicate];
-    [self testValidOperatorsInNumericComparison:@"float" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInDoubleComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDoubleColPredicate];
-    [self testValidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInDateComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
-    [self testValidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+    [self testValidOperatorsInNumericComparison:@"integer"
+                                withProposition:[RLMPredicateUtil isEmptyIntColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"float"
+                                withProposition:[RLMPredicateUtil isEmptyFloatColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"double"
+                                withProposition:[RLMPredicateUtil isEmptyDoubleColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"date"
+                                withProposition:[RLMPredicateUtil isEmptyDateColPredicate]];
 }
 
 - (void)testInvalidOperatorsInNumericComparison:(NSString *) comparisonType
@@ -567,28 +555,16 @@
     }
 }
 
-- (void)testInvalidOperatorsInIntegerComparison
+- (void)testInvalidOperatorsInNumericComparison
 {
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyIntColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInFloatComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyFloatColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"float" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInDoubleComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDoubleColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInDateComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+    [self testInvalidOperatorsInNumericComparison:@"integer"
+                                  withProposition:[RLMPredicateUtil isEmptyIntColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"float"
+                                  withProposition:[RLMPredicateUtil isEmptyFloatColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"double"
+                                  withProposition:[RLMPredicateUtil isEmptyDoubleColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"date"
+                                  withProposition:[RLMPredicateUtil isEmptyDateColPredicate]];
 }
 
 - (void)testCustomSelectorsInNumericComparison:(NSString *) comparisonType
@@ -599,27 +575,20 @@
                                  @"Custom selector invalid in %@ comparison.", comparisonType);
 }
 
-- (void)testCustomSelectorsInIntegerComparison
+- (void)testCustomSelectorsInNumericComparison
 {
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyIntColSelectorPredicate];
+    BOOL (^isEmpty)();
+
+    isEmpty = [RLMPredicateUtil alwaysEmptyIntColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInFloatComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyFloatColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyFloatColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"float" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInDoubleComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"double" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInDateComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"date" withProposition:isEmpty];
 }
 
