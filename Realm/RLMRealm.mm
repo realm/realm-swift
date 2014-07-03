@@ -325,20 +325,23 @@ static NSArray *s_objectDescriptors = nil;
     // begin read
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
     realm->_group = &group;
-    
-    // set schema
+
+    // determine schema
+    RLMSchema *schema;
     if (customSchema) {
-        realm->_schema = [customSchema copy];
+        schema = customSchema;
     }
     else if (dynamic) {
-        realm->_schema = [RLMSchema dynamicSchemaFromRealm:realm];
+        schema = [RLMSchema dynamicSchemaFromRealm:realm];
     }
     else {
-        realm->_schema = [[RLMSchema sharedSchema] copy];
+        schema = [RLMSchema sharedSchema];
     }
 
-    // initialize object store for this realm
-    RLMVerifyAndCreateTables(realm);
+    // apply schema
+    [realm beginWriteTransaction];
+    RLMRealmSetSchema(realm, schema);
+    [realm commitWriteTransaction];
     
     // cache realm at this path if using a vanilla realm
     if (!dynamic && !customSchema) {

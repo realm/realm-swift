@@ -153,7 +153,7 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-    RLMSchema *schema = [[RLMSchema alloc] init];
+    RLMSchema *schema = [[RLMSchema allocWithZone:zone] init];
     schema.objectSchema = [[NSArray allocWithZone:zone] initWithArray:self.objectSchema copyItems:YES];
     return schema;
 }

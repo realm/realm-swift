@@ -31,14 +31,10 @@ void RLMInitializeObjectStore();
 // Table modifications
 //
 
-// verifies and/or creates tables needed in a realm to store all object types
-// throws if current state of realm is not compatible with current objects
-void RLMVerifyAndCreateTables(RLMRealm *realm);
-
-// update tables in realm to the targetSchema
+// update tables in realm to the targetSchema and set schema on realm
 // returns true if modifications were made
 // NOTE: must be called from within write transaction
-bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema);
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration = false);
 
 
 //

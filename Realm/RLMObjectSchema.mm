@@ -112,8 +112,8 @@
     return schema;
 }
 
-- (id)copyWithZone:(__unused NSZone *)zone {
-    RLMObjectSchema *schema = [[RLMObjectSchema alloc] init];
+- (id)copyWithZone:(NSZone *)zone {
+    RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
     schema.properties = self.properties;
     schema.objectClass = self.objectClass;
     schema.className = self.className;

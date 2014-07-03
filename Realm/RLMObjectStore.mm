@@ -50,7 +50,8 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
     return realm.group->get_table(tableName.UTF8String);
 }
 
-void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
+
+void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
     // FIXME - this method should calculate all mismatched columns, and missing/extra columns, and include
     //         all of this information in a single exception
     // FIXME - verify property attributes
@@ -89,10 +90,24 @@ void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema
             }
         }
 
-        // update column on schemaProp
+        // align
         schemaProp.column = tableProp.column;
     }
 }
+
+
+// verify and align all tables in schema
+void RLMVerifyAndAlignSchema(RLMSchema *schema) {
+    for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+        // get table schema
+        tightdb::TableRef table = objectSchema->_table;
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+
+        // verify and align
+        RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+    }
+}
+
 
 // create a column for a property in a table
 // NOTE: must be called from within write transaction
@@ -115,7 +130,7 @@ void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) 
 }
 
 // NOTE: must be called from within write transaction
-bool RLMCreateMissingTables(RLMRealm *realm, BOOL verifyExisting) {
+bool RLMCreateMissingTables(RLMRealm *realm) {
     bool changed = false;
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         bool created = false;
@@ -124,37 +139,23 @@ bool RLMCreateMissingTables(RLMRealm *realm, BOOL verifyExisting) {
 
         // store the table in this object schema
         objectSchema->_table = table;
-
-        // if columns have already been created, then verify
-        if (verifyExisting && table->get_column_count()) {
-            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-            RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
-        }
     }
     return changed;
 }
 
 // add missing columns to objects described in targetSchema
 // NOTE: must be called from within write transaction
-bool RLMAddMissingColumns(RLMRealm *realm, BOOL verifyMatching) {
+bool RLMAddMissingColumns(RLMRealm *realm) {
     bool added = false;
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-
         // add columns
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get() className:objectSchema.className];
         for (RLMProperty *prop in objectSchema.properties) {
             // add any new properties (new name or different type)
             if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
-                RLMCreateColumn(realm, table.get(), prop);
+                RLMCreateColumn(realm, objectSchema->_table.get(), prop);
                 added = true;
             }
-        }
-
-        // re-verify and align
-        if (verifyMatching) {
-            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-            RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
         }
     }
     return added;
@@ -165,14 +166,13 @@ bool RLMAddMissingColumns(RLMRealm *realm, BOOL verifyMatching) {
 bool RLMRemoveExtraColumns(RLMRealm *realm) {
     bool removed = false;
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get() className:objectSchema.className];
 
         // remove any columns from tableSchema not in final schema
         for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
             RLMProperty *prop = tableSchema.properties[i];
             if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
-                table->remove_column(prop.column);
+                objectSchema->_table->remove_column(prop.column);
                 removed = true;
             }
         }
@@ -180,44 +180,36 @@ bool RLMRemoveExtraColumns(RLMRealm *realm) {
     return removed;
 }
 
-bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration) {
     // set new schema
     realm.schema = [targetSchema copy];
 
     // first pass create missing tables and verify existing
-    bool changed = RLMCreateMissingTables(realm, NO);
-    
+    bool changed = RLMCreateMissingTables(realm);
+
+    // if not migrating then verify all non-empty tables
+    if (!migration) {
+        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+            if (objectSchema->_table->get_column_count()) {
+                RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
+                                                                     className:objectSchema.className];
+                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+            }
+        }
+    }
+
     // second pass add columns to empty tables
-    changed = RLMAddMissingColumns(realm, NO) || changed;
+    changed = RLMAddMissingColumns(realm) || changed;
     
     // remove expired columns
     changed = RLMRemoveExtraColumns(realm) || changed;
     
     // FIXME - remove deleted objects
     
-    // verify
-    // FIXME - remove once we are sure the rest of the code actually works properly
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-        RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
-    }
+    // align all tables
+    RLMVerifyAndAlignSchema(realm.schema);
     
     return changed;
-}
-
-// verify and create new tables without migration - throws if any existing
-// tables are not compatible with on disk schema
-void RLMVerifyAndCreateTables(RLMRealm *realm) {
-    [realm beginWriteTransaction];
-    
-    // first pass create missing tables and verify existing
-    RLMCreateMissingTables(realm, YES);
-    
-    // second pass add columns to empty tables
-    RLMAddMissingColumns(realm, YES);
-
-    [realm commitWriteTransaction];
 }
 
 inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {

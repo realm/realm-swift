@@ -485,10 +485,6 @@ Class RLMCreateAccessorClass(Class objectClass,
                              IMP (*getterGetter)(NSUInteger, char, NSString *),
                              IMP (*setterGetter)(NSUInteger, char),
                              NSMapTable *cache) {
-    // return cached
-    if (Class cls = [cache objectForKey:objectClass]) {
-        return cls;
-    }
 
     // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
     if (objectClass == RLMObject.class) {
@@ -509,8 +505,11 @@ Class RLMCreateAccessorClass(Class objectClass,
     // create and register proxy class which derives from object class
     NSString *objectClassName = NSStringFromClass(objectClass);
     NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:objectClassName];
-    Class accClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
-    objc_registerClassPair(accClass);
+    Class accClass = objc_getClass(accessorClassName.UTF8String);
+    if (!accClass) {
+        accClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
+        objc_registerClassPair(accClass);
+    }
     
     // override getters/setters for each propery
     for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
