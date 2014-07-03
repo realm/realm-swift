@@ -124,7 +124,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             if ([obj isKindOfClass:NSArray.class]) {
                 // check each element for compliance
                 for (id el in obj) {
-                    if (![el isKindOfClass:property.objectClassName]) {
+                    if (![[[el class] className] isEqualToString:property.objectClassName]) {
                         return NO;
                     }
                 }
