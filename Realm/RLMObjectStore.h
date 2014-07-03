@@ -54,9 +54,6 @@ void RLMDeleteObjectFromRealm(RLMObject *object);
 // get objects of a given class
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order);
 
-// create object with default values
-RLMObject *RLMCreateObjectInRealm(RLMRealm *realm, NSString *className);
-
 // create object from array or dictionary
 RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value);
 
