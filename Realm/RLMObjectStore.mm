@@ -269,7 +269,6 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
 }
 
-
 RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value) {
     // verify writable
     RLMVerifyInWriteTransaction(realm);
@@ -278,41 +277,43 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     RLMObjectSchema *schema = realm.schema[className];
     RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
 
-    // get table
-    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
+    if (value) {
+        // get table
+        tightdb::TableRef table = RLMTableForObjectClass(realm, className);
 
-    // validate values, create row, and populate
-    if ([value isKindOfClass:NSArray.class]) {
-        NSArray *array = value;
-        RLMValidateArrayAgainstObjectSchema(array, schema);
+        // validate values, create row, and populate
+        if ([value isKindOfClass:NSArray.class]) {
+            NSArray *array = value;
+            RLMValidateArrayAgainstObjectSchema(array, schema);
 
-        // create row
-        size_t rowIndex = table->add_empty_row();
-        object->_row = (*table)[rowIndex];
+            // create row
+            size_t rowIndex = table->add_empty_row();
+            object->_row = (*table)[rowIndex];
 
-        // populate
-        NSArray *props = schema.properties;
-        for (NSUInteger i = 0; i < array.count; i++) {
-            RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
+            // populate
+            NSArray *props = schema.properties;
+            for (NSUInteger i = 0; i < array.count; i++) {
+                RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
+            }
         }
-    }
-    else if ([value isKindOfClass:NSDictionary.class]) {
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
+        else if ([value isKindOfClass:NSDictionary.class]) {
+            NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
 
-        // create row
-        size_t rowIndex = table->add_empty_row();
-        object->_row = (*table)[rowIndex];
-        
-        // populate
-        NSArray *props = schema.properties;
-        for (RLMProperty *prop in props) {
-            RLMDynamicSet(object, prop, dict[prop.name]);
+            // create row
+            size_t rowIndex = table->add_empty_row();
+            object->_row = (*table)[rowIndex];
+
+            // populate
+            NSArray *props = schema.properties;
+            for (RLMProperty *prop in props) {
+                RLMDynamicSet(object, prop, dict[prop.name]);
+            }
         }
-    }
-    else {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Values must be provided either as an array or dictionary"
-                                     userInfo:nil];
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Values must be provided either as an array or dictionary"
+                                         userInfo:nil];
+        }
     }
 
     // switch class to use table backed accessor

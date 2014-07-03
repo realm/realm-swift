@@ -108,6 +108,17 @@
 + (NSString *)className;
 
 /**
+ Create an RLMObject within a Realm with default values.
+
+ Creates an instance of this object and adds it to the given Realm.
+
+ @param realm   The Realm in which this object is persisted.
+
+ @see   defaultPropertyValues
+ */
++(instancetype)createInRealm:(RLMRealm *)realm;
+
+/**
  Create an RLMObject within a Realm with a given object.
  
  Creates an instance of this object and adds it to the given Realm populating
