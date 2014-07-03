@@ -440,16 +440,7 @@
                                 break;
                             }
                         }
-                            
-                        if (instanceIndex != NSNotFound) {
-                            [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:instanceIndex]
-                                                 byExtendingSelection:NO];
-                        }
-                        else {
-                            [self.tableView selectRowIndexes:nil
-                                                 byExtendingSelection:NO];
-                        }
-                        
+
                         break;
                     }
                 }
@@ -464,6 +455,16 @@
 
                 [self.parentWindowController addArray:linkedArray
                                          fromProperty:propertyNode.property object:selectedInstance];                
+            }
+        }
+        else {
+            if (row != -1) {
+                [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
+                            byExtendingSelection:NO];
+            }
+            else {
+                [self.tableView selectRowIndexes:nil
+                            byExtendingSelection:NO];
             }
         }
     }
@@ -664,16 +665,12 @@
     NSCursor *newCursor = [NSCursor pointingHandCursor];
     [newCursor set];
     
-    [self.parentWindowController.window disableCursorRects];
     linkCursorDisplaying = YES;
 }
 
 - (void)disableLinkCursor
 {
     if (linkCursorDisplaying) {
-        [self.parentWindowController.window enableCursorRects];
-        [self.parentWindowController.window resetCursorRects];
-        
         [NSCursor pop];
         
         linkCursorDisplaying = NO;
