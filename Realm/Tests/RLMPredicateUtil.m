@@ -98,7 +98,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [IntObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [IntObject objectsWithPredicate:predicate].count == 0;
     };
 }
 
@@ -110,7 +110,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [FloatObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [FloatObject objectsWithPredicate:predicate].count == 0;
     };
 }
 
@@ -122,7 +122,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DoubleObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [DoubleObject objectsWithPredicate:predicate].count == 0;
     };
 }
 
@@ -135,7 +135,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DateObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [DateObject objectsWithPredicate:predicate].count == 0;
     };
 }
 
@@ -152,7 +152,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [IntObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [IntObject objectsWithPredicate: predicate].count == 0;
     };
 }
 
@@ -164,7 +164,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [FloatObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [FloatObject objectsWithPredicate: predicate].count == 0;
     };
 }
 
@@ -176,7 +176,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DoubleObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [DoubleObject objectsWithPredicate: predicate].count == 0;
     };
 }
 
@@ -189,8 +189,42 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DateObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [DateObject objectsWithPredicate: predicate].count == 0;
     };
+}
+
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return @"<";
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return @"<= or =<";
+        case NSGreaterThanPredicateOperatorType:
+            return @">";
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return @">= or =>";
+        case NSEqualToPredicateOperatorType:
+            return @"= or ==";
+        case NSNotEqualToPredicateOperatorType:
+            return @"<> or !=";
+        case NSMatchesPredicateOperatorType:
+            return @"MATCHES";
+        case NSLikePredicateOperatorType:
+            return @"LIKE";
+        case NSBeginsWithPredicateOperatorType:
+            return @"BEGINSWITH";
+        case NSEndsWithPredicateOperatorType:
+            return @"ENDSWITH";
+        case NSInPredicateOperatorType:
+            return @"IN";
+        case NSCustomSelectorPredicateOperatorType:
+            return @"@selector()";
+        case NSContainsPredicateOperatorType:
+            return @"CONTAINS";
+        case NSBetweenPredicateOperatorType:
+            return @"BETWEEN";
+    }
 }
 
 @end
