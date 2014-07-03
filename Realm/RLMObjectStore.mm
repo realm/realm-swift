@@ -275,7 +275,10 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
 
     // create the object
     RLMObjectSchema *schema = realm.schema[className];
-    RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
+    BOOL useDefaultValues = value ? NO : YES;
+    RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm
+                                                           schema:schema
+                                                    defaultValues:useDefaultValues];
 
     if (value) {
         // get table
