@@ -548,7 +548,7 @@
     for (NSUInteger i = 0; i < sizeof(invalidOps) / sizeof(NSPredicateOperatorType); ++i)
     {
         XCTAssertThrowsSpecificNamed(proposition(invalidOps[i]), NSException,
-                                     @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                     @"Invalid operator type",
                                      @"%@ operator invalid in %@ comparison.",
                                      [RLMPredicateUtil predicateOperatorTypeString:invalidOps[i]],
                                      comparisonType);
@@ -571,7 +571,7 @@
                                withProposition:(BOOL(^)()) proposition
 {
     XCTAssertThrowsSpecificNamed(proposition(), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Custom selector invalid in %@ comparison.", comparisonType);
 }
 
@@ -601,7 +601,7 @@
 
     XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"],
                                  NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in bool predicate.");
 }
 
@@ -654,20 +654,20 @@
     // Unsupported (but valid) modifiers.
     XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType,
                                        NSDiacriticInsensitivePredicateOption), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid predicate option",
+                                 @"Invalid predicate option",
                                  @"Diachritic insensitivity is not supported.");
 
     // Unsupported (but valid) operators.
     XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"LIKE not supported for string comparison.");
     XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"MATCHES not supported in string comparison.");
 
     // Invalid operators.
     XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in string comparison.");
 }
 
@@ -695,7 +695,7 @@
 
     // Invalid operators.
     XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in binary comparison.");
 }
 
