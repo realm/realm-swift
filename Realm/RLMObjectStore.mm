@@ -277,10 +277,10 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     RLMObjectSchema *schema = realm.schema[className];
     RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
 
-    // get table
-    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
-
     if (value) {
+        // get table
+        tightdb::TableRef table = RLMTableForObjectClass(realm, className);
+
         // validate values, create row, and populate
         if ([value isKindOfClass:NSArray.class]) {
             NSArray *array = value;
