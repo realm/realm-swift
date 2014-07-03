@@ -316,4 +316,21 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testIndexOfObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [EmployeeObject objectsWithPredicateFormat:@"hired = YES"];
+    XCTAssertEqual((NSUInteger)0, [results indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)1, [results indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
+}
+
+
 @end
