@@ -152,16 +152,9 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
 }
 
-- (id)copy {
+- (id)copyWithZone:(NSZone *)zone {
     RLMSchema *schema = [[RLMSchema alloc] init];
-
-    // copy object schema
-    NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.objectSchema.count];
-    for (RLMObjectSchema *objSchema in self.objectSchema) {
-        [array addObject:[objSchema copy]];
-    }
-    schema.objectSchema = array;
-    
+    schema.objectSchema = [[NSArray allocWithZone:zone] initWithArray:self.objectSchema copyItems:YES];
     return schema;
 }
 

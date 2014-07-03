@@ -561,13 +561,13 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : prop.name ?: @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Class name": [obj.class className]}];
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid value for property"
-                                     userInfo:@{@"Property name:" : prop.name ?: @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
     RLMDynamicSet(obj, (RLMProperty *)prop, val);

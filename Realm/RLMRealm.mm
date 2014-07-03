@@ -525,6 +525,9 @@ static NSArray *s_objectDescriptors = nil;
         return;
     }
     [migration migrateWithBlock:block];
+
+    // clear cache for future callers
+    clearRealmCache();
 }
 
 @end

@@ -115,9 +115,9 @@ void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) 
 }
 
 // NOTE: must be called from within write transaction
-bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyExisting) {
+bool RLMCreateMissingTables(RLMRealm *realm, BOOL verifyExisting) {
     bool changed = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         bool created = false;
         tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className, created);
         changed |= created;
@@ -136,9 +136,9 @@ bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verif
 
 // add missing columns to objects described in targetSchema
 // NOTE: must be called from within write transaction
-bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyMatching) {
+bool RLMAddMissingColumns(RLMRealm *realm, BOOL verifyMatching) {
     bool added = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
 
         // add columns
@@ -162,9 +162,9 @@ bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL ver
 
 // remove old columns in the realm not in targetSchema
 // NOTE: must be called from within write transaction
-bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema) {
+bool RLMRemoveExtraColumns(RLMRealm *realm) {
     bool removed = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
 
@@ -185,13 +185,13 @@ bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
     realm.schema = [targetSchema copy];
 
     // first pass create missing tables and verify existing
-    bool changed = RLMCreateMissingTables(realm, realm.schema, NO);
+    bool changed = RLMCreateMissingTables(realm, NO);
     
     // second pass add columns to empty tables
-    changed = RLMAddNewColumnsToSchema(realm, realm.schema, NO) || changed;
+    changed = RLMAddMissingColumns(realm, NO) || changed;
     
     // remove expired columns
-    changed = RLMRemoveOldColumnsFromSchema(realm, realm.schema) || changed;
+    changed = RLMRemoveExtraColumns(realm) || changed;
     
     // FIXME - remove deleted objects
     
@@ -212,10 +212,10 @@ void RLMVerifyAndCreateTables(RLMRealm *realm) {
     [realm beginWriteTransaction];
     
     // first pass create missing tables and verify existing
-    RLMCreateMissingTables(realm, realm.schema, YES);
+    RLMCreateMissingTables(realm, YES);
     
     // second pass add columns to empty tables
-    RLMAddNewColumnsToSchema(realm, realm.schema, YES);
+    RLMAddMissingColumns(realm, YES);
 
     [realm commitWriteTransaction];
 }
