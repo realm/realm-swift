@@ -160,4 +160,22 @@
     XCTAssertThrows([intArray.array JSONString], @"Not yet implemented");
 }
 
+- (void)testIndexOfObject
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+
+    CompanyObject *co = [CompanyObject createInRealm:realm withObject:@{@"employees": @[po1, po3]}];
+    [realm commitWriteTransaction];
+
+    RLMArray *employees = co.employees;
+    XCTAssertEqual((NSUInteger)0, [employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)1, [employees indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po2]);
+}
+
 @end
