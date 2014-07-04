@@ -22,6 +22,29 @@
 
 @implementation RLMPredicateUtil
 
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_OPERATOR_TYPE = NSLessThanPredicateOperatorType;
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_OPTIONS = 0;
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifier;
+
++ (NSPredicate *(^)(NSExpression *, NSExpression *)) defaultPredicateGenerator
+{
+    return ^(NSExpression *leftExpression, NSExpression * rightExpression) {
+        return [NSComparisonPredicate
+                predicateWithLeftExpression: leftExpression
+                rightExpression: rightExpression
+                modifier: DEFAULT_COMPARISON_PREDICATE_MODIFIER
+                type: DEFAULT_COMPARISON_PREDICATE_OPERATOR_TYPE
+                options: DEFAULT_COMPARISON_PREDICATE_OPTIONS];
+    };
+}
+
++ (NSPredicate *) defaultIntColPredicate
+{
+    NSExpression *keyPath = [NSExpression expressionForKeyPath:@"intCol"];
+    NSExpression *expr = [NSExpression expressionForConstantValue:@0];
+    return [RLMPredicateUtil defaultPredicateGenerator](keyPath, expr);
+}
+
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                            operatorType: (NSPredicateOperatorType) type
@@ -29,7 +52,7 @@
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
                                         expression: expression
                                       operatorType: type
-                                           options: 0];
+                                           options: DEFAULT_COMPARISON_PREDICATE_OPTIONS];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
@@ -41,10 +64,8 @@
                                         expression: expression
                                       operatorType: type
                                            options: options
-                                          modifier: NSDirectPredicateModifier];
+                                          modifier: DEFAULT_COMPARISON_PREDICATE_MODIFIER];
 }
-
-static BOOL KEY_FIRST = YES;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
@@ -54,14 +75,6 @@ static BOOL KEY_FIRST = YES;
 {
     NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
     NSExpression * right = expression;
-
-    if (KEY_FIRST == NO) {
-        right = left;
-        left = expression;
-        KEY_FIRST = YES;
-    } else {
-        KEY_FIRST = NO;
-    }
 
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
@@ -77,17 +90,29 @@ static BOOL KEY_FIRST = YES;
     NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
     NSExpression * right = expression;
 
-    if (KEY_FIRST == NO) {
-        right = left;
-        left = expression;
-        KEY_FIRST = YES;
-    } else {
-        KEY_FIRST = NO;
-    }
-
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
                                                customSelector: selector];
+}
+
++ (BOOL) isEmptyIntColWithPredicate:(NSPredicate *)predicate
+{
+    return [IntObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyFloatColWithPredicate:(NSPredicate *)predicate
+{
+    return [FloatObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate
+{
+    return [DoubleObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyDateColWithPredicate:(NSPredicate *)predicate
+{
+    return [DateObject objectsWithPredicate:predicate].count == 0;
 }
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate
@@ -98,7 +123,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [IntObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
     };
 }
 
@@ -110,7 +135,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [FloatObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
     };
 }
 
@@ -122,7 +147,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DoubleObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
     };
 }
 
@@ -135,7 +160,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DateObject objectsWithPredicate:predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
     };
 }
 
@@ -147,36 +172,33 @@ static BOOL KEY_FIRST = YES;
 + (BOOL(^)()) alwaysEmptyIntColSelectorPredicate
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0];
-
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [IntObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
     };
 }
 
 + (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
-
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [FloatObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
     };
 }
 
 + (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
-
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DoubleObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
     };
 }
 
@@ -184,13 +206,46 @@ static BOOL KEY_FIRST = YES;
 {
     NSExpression *expression = [NSExpression expressionForConstantValue:
                                 [NSDate dateWithTimeIntervalSinceNow:0]];
-
     NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DateObject objectsWithPredicate: predicate].count == 0 ? YES : NO;
+        return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
     };
+}
+
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return @"<";
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return @"<= or =<";
+        case NSGreaterThanPredicateOperatorType:
+            return @">";
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return @">= or =>";
+        case NSEqualToPredicateOperatorType:
+            return @"= or ==";
+        case NSNotEqualToPredicateOperatorType:
+            return @"<> or !=";
+        case NSMatchesPredicateOperatorType:
+            return @"MATCHES";
+        case NSLikePredicateOperatorType:
+            return @"LIKE";
+        case NSBeginsWithPredicateOperatorType:
+            return @"BEGINSWITH";
+        case NSEndsWithPredicateOperatorType:
+            return @"ENDSWITH";
+        case NSInPredicateOperatorType:
+            return @"IN";
+        case NSCustomSelectorPredicateOperatorType:
+            return @"@selector()";
+        case NSContainsPredicateOperatorType:
+            return @"CONTAINS";
+        case NSBetweenPredicateOperatorType:
+            return @"BETWEEN";
+    }
 }
 
 @end

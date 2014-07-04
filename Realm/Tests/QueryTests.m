@@ -503,122 +503,92 @@
 - (void)testValidOperatorsInNumericComparison:(NSString *) comparisonType
                               withProposition:(BOOL(^)(NSPredicateOperatorType)) proposition
 {
-    XCTAssert(proposition(NSLessThanPredicateOperatorType),
-              @"< operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSLessThanOrEqualToPredicateOperatorType),
-              @"<= or =< operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSGreaterThanPredicateOperatorType),
-              @"> operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSGreaterThanOrEqualToPredicateOperatorType),
-              @">= or => operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSEqualToPredicateOperatorType),
-              @"= or == operator in %@ comparison.", comparisonType);
-    XCTAssert(proposition(NSNotEqualToPredicateOperatorType),
-              @"<> or != operator in %@ comparison.", comparisonType);
+    NSPredicateOperatorType validOps[] = {
+        NSLessThanPredicateOperatorType,
+        NSLessThanOrEqualToPredicateOperatorType,
+        NSGreaterThanPredicateOperatorType,
+        NSGreaterThanOrEqualToPredicateOperatorType,
+        NSEqualToPredicateOperatorType,
+        NSNotEqualToPredicateOperatorType
+    };
+
+    for (NSUInteger i = 0; i < sizeof(validOps) / sizeof(NSPredicateOperatorType); ++i)
+    {
+        XCTAssert(proposition(validOps[i]),
+                  @"%@ operator in %@ comparison.",
+                  [RLMPredicateUtil predicateOperatorTypeString:validOps[i]],
+                  comparisonType);
+    }
 }
 
-- (void)testValidOperatorsInIntegerComparison
+- (void)testValidOperatorsInNumericComparison
 {
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyIntColPredicate];
-    [self testValidOperatorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInFloatComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyFloatColPredicate];
-    [self testValidOperatorsInNumericComparison:@"float" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInDoubleComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDoubleColPredicate];
-    [self testValidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
-}
-
-- (void)testValidOperatorsInDateComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
-    [self testValidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+    [self testValidOperatorsInNumericComparison:@"integer"
+                                withProposition:[RLMPredicateUtil isEmptyIntColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"float"
+                                withProposition:[RLMPredicateUtil isEmptyFloatColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"double"
+                                withProposition:[RLMPredicateUtil isEmptyDoubleColPredicate]];
+    [self testValidOperatorsInNumericComparison:@"date"
+                                withProposition:[RLMPredicateUtil isEmptyDateColPredicate]];
 }
 
 - (void)testInvalidOperatorsInNumericComparison:(NSString *) comparisonType
                                 withProposition:(BOOL(^)(NSPredicateOperatorType)) proposition
 {
-    NSString *name = @"filterWithPredicate:orderedBy: - Invalid operator type";
+    NSPredicateOperatorType invalidOps[] = {
+        NSMatchesPredicateOperatorType,
+        NSLikePredicateOperatorType,
+        NSBeginsWithPredicateOperatorType,
+        NSEndsWithPredicateOperatorType,
+        NSInPredicateOperatorType,
+        NSContainsPredicateOperatorType
+    };
 
-    XCTAssertThrowsSpecificNamed(proposition(NSMatchesPredicateOperatorType),
-                                 NSException, name,
-                                 @"MATCHES operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSLikePredicateOperatorType),
-                                 NSException, name,
-                                 @"LIKE operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSBeginsWithPredicateOperatorType),
-                                 NSException, name,
-                                 @"BEGINSWITH operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSEndsWithPredicateOperatorType),
-                                 NSException, name,
-                                 @"ENDSWITH operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSInPredicateOperatorType),
-                                 NSException, name,
-                                 @"IN operator invalid in %@ comparison.", comparisonType);
-    XCTAssertThrowsSpecificNamed(proposition(NSContainsPredicateOperatorType),
-                                 NSException, name,
-                                 @"CONTAINS operator invalid in %@ comparison.", comparisonType);
+    for (NSUInteger i = 0; i < sizeof(invalidOps) / sizeof(NSPredicateOperatorType); ++i)
+    {
+        XCTAssertThrowsSpecificNamed(proposition(invalidOps[i]), NSException,
+                                     @"Invalid operator type",
+                                     @"%@ operator invalid in %@ comparison.",
+                                     [RLMPredicateUtil predicateOperatorTypeString:invalidOps[i]],
+                                     comparisonType);
+    }
 }
 
-- (void)testInvalidOperatorsInIntegerComparison
+- (void)testInvalidOperatorsInNumericComparison
 {
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyIntColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInFloatComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyFloatColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"float" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInDoubleComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDoubleColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"double" withProposition:isEmpty];
-}
-
-- (void)testInvalidOperatorsInDateComparison
-{
-    BOOL (^isEmpty)(NSPredicateOperatorType) = [RLMPredicateUtil isEmptyDateColPredicate];
-    [self testInvalidOperatorsInNumericComparison:@"date" withProposition:isEmpty];
+    [self testInvalidOperatorsInNumericComparison:@"integer"
+                                  withProposition:[RLMPredicateUtil isEmptyIntColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"float"
+                                  withProposition:[RLMPredicateUtil isEmptyFloatColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"double"
+                                  withProposition:[RLMPredicateUtil isEmptyDoubleColPredicate]];
+    [self testInvalidOperatorsInNumericComparison:@"date"
+                                  withProposition:[RLMPredicateUtil isEmptyDateColPredicate]];
 }
 
 - (void)testCustomSelectorsInNumericComparison:(NSString *) comparisonType
                                withProposition:(BOOL(^)()) proposition
 {
     XCTAssertThrowsSpecificNamed(proposition(), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Custom selector invalid in %@ comparison.", comparisonType);
 }
 
-- (void)testCustomSelectorsInIntegerComparison
+- (void)testCustomSelectorsInNumericComparison
 {
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyIntColSelectorPredicate];
+    BOOL (^isEmpty)();
+
+    isEmpty = [RLMPredicateUtil alwaysEmptyIntColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"integer" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInFloatComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyFloatColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyFloatColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"float" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInDoubleComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyDoubleColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"double" withProposition:isEmpty];
-}
 
-- (void)testCustomSelectorsInDateComparison
-{
-    BOOL (^isEmpty)() = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
+    isEmpty = [RLMPredicateUtil alwaysEmptyDateColSelectorPredicate];
     [self testCustomSelectorsInNumericComparison:@"date" withProposition:isEmpty];
 }
 
@@ -631,7 +601,7 @@
 
     XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"],
                                  NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in bool predicate.");
 }
 
@@ -684,20 +654,20 @@
     // Unsupported (but valid) modifiers.
     XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType,
                                        NSDiacriticInsensitivePredicateOption), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid predicate option",
+                                 @"Invalid predicate option",
                                  @"Diachritic insensitivity is not supported.");
 
     // Unsupported (but valid) operators.
     XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"LIKE not supported for string comparison.");
     XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"MATCHES not supported in string comparison.");
 
     // Invalid operators.
     XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in string comparison.");
 }
 
@@ -725,8 +695,86 @@
 
     // Invalid operators.
     XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType), NSException,
-                                 @"filterWithPredicate:orderedBy: - Invalid operator type",
+                                 @"Invalid operator type",
                                  @"Invalid operator in binary comparison.");
+}
+
+- (void)testAndCompound
+{
+    NSPredicate *subpred = [RLMPredicateUtil defaultIntColPredicate];
+    NSPredicate *predicate;
+
+    predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[]];
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid query",
+                                 @"Compound AND predicate with no subpredicates is invalid.");
+
+    predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[subpred]];
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Compound AND predicate with one subpredicate.");
+
+    predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[subpred,subpred]];
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Compound AND predicate with two subpredicates.");
+}
+
+- (void)testOrCompound
+{
+    NSPredicate *subpred = [RLMPredicateUtil defaultIntColPredicate];
+    NSPredicate *predicate;
+
+    predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[]];
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid query",
+                                 @"Compound OR predicate with no subpredicates is invalid.");
+
+    predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[subpred]];
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Compound OR predicate with one subpredicate.");
+
+    predicate = [NSCompoundPredicate orPredicateWithSubpredicates:@[subpred,subpred]];
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Compound OR predicate with two subpredicates.");
+}
+
+- (void)testNotCompound
+{
+    NSPredicate *subpred = [RLMPredicateUtil defaultIntColPredicate];
+    NSPredicate *predicate = [NSCompoundPredicate notPredicateWithSubpredicate:subpred];
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate], @"Compound NOT predicate.");
+}
+
+- (void)testInvalidArgument
+{
+    NSPredicate *predicate = (NSPredicate *)@42;
+
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid argument",
+                                 @"Non compound or comparison predicate is invalid.");
+}
+
+- (void)testKeyPathLocationInComparison
+{
+    NSExpression *keyPath = [NSExpression expressionForKeyPath:@"intCol"];
+    NSExpression *expr = [NSExpression expressionForConstantValue:@0];
+    NSPredicate *predicate;
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](keyPath, expr);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path to the left in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](expr, keyPath);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path to the right in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](keyPath, keyPath);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path in both locations in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](expr, expr);
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid predicate expressions",
+                                 @"Key path in absent in an integer comparison.");
 }
 
 - (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
