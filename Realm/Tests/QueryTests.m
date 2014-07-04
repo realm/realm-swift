@@ -388,6 +388,20 @@
     // abuse of BETWEEN
     XCTAssertThrows([realm objects:className withPredicateFormat:@"age BETWEEN 25"], @"between with a scalar");
     XCTAssertThrows([realm objects:className withPredicateFormat:@"age BETWEEN Foo"], @"between with a string");
+
+    NSPredicate *predicate;
+
+    predicate = [NSPredicate predicateWithFormat:@"name BETWEEN %@", @[@"", @""]];
+    XCTAssertThrowsSpecificNamed([realm objects:className withPredicate:predicate],
+                                 NSException,
+                                 @"Unsupported predicate value type",
+                                 @"BETWEEN comparison for strings is not supported");
+
+    predicate = [NSPredicate predicateWithFormat:@"name BETWEEN {'',''}"];
+    XCTAssertThrowsSpecificNamed([realm objects:className withPredicate:predicate],
+                                 NSException,
+                                 @"Invalid expression type",
+                                 @"NSAggregateExpressionType is not supported");
     
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 1 item");
@@ -403,8 +417,7 @@
     
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"invalid property/column");
-    
-    
+
 }
 
 - (void)testTwoColumnComparison
@@ -747,10 +760,21 @@
 - (void)testInvalidArgument
 {
     NSPredicate *predicate = (NSPredicate *)@42;
-
     XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
                                  NSException, @"Invalid argument",
-                                 @"Non compound or comparison predicate is invalid.");
+                                 @"Non compound nor comparison predicate is invalid.");
+}
+
+- (void)testInvalidExpressionType
+{
+    NSExpression *expr = [NSExpression expressionForAnyKey];
+    NSPredicate *predicate = [RLMPredicateUtil
+                              comparisonWithKeyPath:@"intCol"
+                              expression:expr
+                              operatorType:NSLessThanPredicateOperatorType];
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid expression type",
+                                 @"Non constant nor key path expression is invalid.");
 }
 
 - (void)testKeyPathLocationInComparison
