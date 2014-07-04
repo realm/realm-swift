@@ -32,7 +32,7 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 @property (nonatomic, strong) IBOutlet RLMObjectNode *selectedTypeNode;
 
-- (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode;
+- (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
 

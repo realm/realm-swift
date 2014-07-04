@@ -204,12 +204,14 @@
 {
     if ([item isKindOfClass:[RLMClazzNode class]]) {
         RLMClazzNode *classNode = (RLMClazzNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:classNode];
+        [self.parentWindowController updateSelectedTypeNode:classNode
+                                         withSelectionAtRow:0];
         return;
     }
     else if ([item isKindOfClass:[RLMArrayNode class]]) {
         RLMArrayNode *arrayNode = (RLMArrayNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:arrayNode];
+        [self.parentWindowController updateSelectedTypeNode:arrayNode
+                                         withSelectionAtRow:0];
         return;
     }
 }

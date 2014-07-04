@@ -28,6 +28,6 @@
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 @end

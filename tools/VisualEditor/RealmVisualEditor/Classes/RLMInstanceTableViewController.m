@@ -416,30 +416,14 @@
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        [self.parentWindowController updateSelectedTypeNode:clazzNode];
-                        
                         RLMRealm *realm = linkedObject.realm;
                         RLMObjectSchema *objectSchema = linkedObject.RLMObject_schema;
                         NSString *className = objectSchema.className;
                         RLMArray *allInstances = [realm allObjects:className];
-                                                
-                        // Note: indexOfObject on RLMArray is not yet implemented, which means that
-                        // we need to do a linear search over the array to localize the linked
-                        // object.
-                        // Note 2: However, this approach not even works as the object retrieved
-                        // from an array is actual an proxy object referring to the underlying db
-                        // row. The proxy objects are not reused cross-array which means that
-                        // comparison between two underlying objects using their proxy objects is
-                        // not possible as there is no pointer equality.
-                        NSUInteger instanceIndex = NSNotFound;
-                        for (NSUInteger index = 0; index < allInstances.count; index++) {
-                            RLMObject *typeInstance = [allInstances objectAtIndex:index];
-                            if (typeInstance == linkedObject) {
-                                instanceIndex = index;
-                                break;
-                            }
-                        }
-
+                        NSUInteger objctIndex = [allInstances indexOfObject:linkedObject];
+                        
+                        [self.parentWindowController updateSelectedTypeNode:clazzNode
+                                                         withSelectionAtRow:objctIndex];                        
                         break;
                     }
                 }
@@ -469,17 +453,20 @@
     }
 }
 
-- (void)updateTableView
+- (void)updateTableViewWithSelectionAtRow:(NSUInteger)index
 {
     [self.tableView reloadData];
     for (NSTableColumn *column in self.tableView.tableColumns) {
         [column resizeToFitContents];
     }
+    
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                byExtendingSelection:NO];
 }
 
-#pragma mark - Private methods - Table view construction
+#pragma mark - Public methods - Table view construction
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     self.parentWindowController.selectedTypeNode = outlineNode;
     
@@ -606,8 +593,10 @@
         
     }
     
-    [self updateTableView];
+    [self updateTableViewWithSelectionAtRow:selectionIndex];
 }
+
+#pragma mark - Private methods - Table view construction
 
 - (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
