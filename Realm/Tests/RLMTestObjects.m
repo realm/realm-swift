@@ -29,6 +29,12 @@
 @implementation IntObject
 @end
 
+@implementation FloatObject
+@end
+
+@implementation DoubleObject
+@end
+
 @implementation BoolObject
 @end
 

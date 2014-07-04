@@ -21,6 +21,7 @@
 * Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
 * Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
 * Now allows predicates comparing two object properties of the same type.
+* Implemented -indexOfObject: for RLMArray
 
 ### Bugfixes
 

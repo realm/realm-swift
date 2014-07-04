@@ -28,15 +28,6 @@
 
 #import <objc/runtime.h>
 
-// initializer
-void RLMInitializeObjectStore() {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // register accessor cache
-        RLMAccessorCacheInitialize();
-    });
-}
-
 // get the table used to store object of objectClass
 inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                 NSString *className,
@@ -50,7 +41,8 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
     return realm.group->get_table(tableName.UTF8String);
 }
 
-void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
+
+void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
     // FIXME - this method should calculate all mismatched columns, and missing/extra columns, and include
     //         all of this information in a single exception
     // FIXME - verify property attributes
@@ -89,10 +81,30 @@ void RLMVerifyAndAlignTableColumns(RLMObjectSchema *tableSchema, RLMObjectSchema
             }
         }
 
-        // update column on schemaProp
+        // align
         schemaProp.column = tableProp.column;
     }
 }
+
+
+// verify and align all tables in schema
+void RLMVerifyAndAlignSchema(RLMSchema *schema) {
+    for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+        // get table schema
+        tightdb::TableRef table = objectSchema->_table;
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+
+        // verify and align
+        RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+
+        // create accessors
+        // FIXME - we need to generate different accessors keyed by the hash of the objectSchema (to preserve column ordering)
+        //         it's possible to have multiple realms with different on-disk layouts, which requires
+        //         us to have multiple accessors for each type/instance combination
+        objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+    }
+}
+
 
 // create a column for a property in a table
 // NOTE: must be called from within write transaction
@@ -115,43 +127,32 @@ void RLMCreateColumn(RLMRealm *realm, tightdb::Table *table, RLMProperty *prop) 
 }
 
 // NOTE: must be called from within write transaction
-bool RLMCreateMissingTables(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyExisting) {
+bool RLMCreateMissingTables(RLMRealm *realm) {
     bool changed = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         bool created = false;
         tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className, created);
         changed |= created;
 
-        // if columns have already been created, then verify
-        if (verifyExisting && table->get_column_count()) {
-            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-            RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
-        }
+        // store the table in this object schema
+        objectSchema->_table = table;
     }
     return changed;
 }
 
 // add missing columns to objects described in targetSchema
 // NOTE: must be called from within write transaction
-bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL verifyMatching) {
+bool RLMAddMissingColumns(RLMRealm *realm) {
     bool added = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         // add columns
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get() className:objectSchema.className];
         for (RLMProperty *prop in objectSchema.properties) {
             // add any new properties (new name or different type)
             if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
-                RLMCreateColumn(realm, table.get(), prop);
+                RLMCreateColumn(realm, objectSchema->_table.get(), prop);
                 added = true;
             }
-        }
-
-        // re-verify and align
-        if (verifyMatching) {
-            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-            RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
         }
     }
     return added;
@@ -159,17 +160,16 @@ bool RLMAddNewColumnsToSchema(RLMRealm *realm, RLMSchema *targetSchema, BOOL ver
 
 // remove old columns in the realm not in targetSchema
 // NOTE: must be called from within write transaction
-bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema) {
+bool RLMRemoveExtraColumns(RLMRealm *realm) {
     bool removed = false;
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get() className:objectSchema.className];
 
         // remove any columns from tableSchema not in final schema
         for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
             RLMProperty *prop = tableSchema.properties[i];
             if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
-                table->remove_column(prop.column);
+                objectSchema->_table->remove_column(prop.column);
                 removed = true;
             }
         }
@@ -177,47 +177,36 @@ bool RLMRemoveOldColumnsFromSchema(RLMRealm *realm, RLMSchema *targetSchema) {
     return removed;
 }
 
-bool RLMUpdateTables(RLMRealm *realm, RLMSchema *targetSchema) {
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration) {
     // set new schema
-    realm.schema = targetSchema;
+    realm.schema = [targetSchema copy];
 
     // first pass create missing tables and verify existing
-    bool changed = RLMCreateMissingTables(realm, targetSchema, NO);
-    
+    bool changed = RLMCreateMissingTables(realm);
+
+    // if not migrating then verify all non-empty tables
+    if (!migration) {
+        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+            if (objectSchema->_table->get_column_count()) {
+                RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
+                                                                     className:objectSchema.className];
+                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+            }
+        }
+    }
+
     // second pass add columns to empty tables
-    changed = RLMAddNewColumnsToSchema(realm, targetSchema, NO) || changed;
+    changed = RLMAddMissingColumns(realm) || changed;
     
     // remove expired columns
-    changed = RLMRemoveOldColumnsFromSchema(realm, targetSchema) || changed;
+    changed = RLMRemoveExtraColumns(realm) || changed;
     
     // FIXME - remove deleted objects
     
-    // verify
-    // FIXME - remove once we are sure the rest of the code actually works properly
-    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
-        tightdb::TableRef table = RLMTableForObjectClass(realm, objectSchema.className);
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:table.get() className:objectSchema.className];
-        RLMVerifyAndAlignTableColumns(tableSchema, objectSchema);
-    }
-    
-    // set the new schema on the realm
-    realm.schema = targetSchema;
+    // align all tables
+    RLMVerifyAndAlignSchema(realm.schema);
     
     return changed;
-}
-
-// verify and create new tables without migration - throws if any existing
-// tables are not compatible with on disk schema
-void RLMVerifyAndCreateTables(RLMRealm *realm) {
-    [realm beginWriteTransaction];
-    
-    // first pass create missing tables and verify existing
-    RLMCreateMissingTables(realm, realm.schema, YES);
-    
-    // second pass add columns to empty tables
-    RLMAddNewColumnsToSchema(realm, realm.schema, YES);
-
-    [realm commitWriteTransaction];
 }
 
 inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
@@ -245,7 +234,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     object.realm = realm;
 
     // create row in table
-    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
+    tightdb::TableRef &table = schema->_table;
     size_t rowIndex = table->add_empty_row();
     object->_row = (*table)[rowIndex];
 
@@ -262,11 +251,11 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         }
 
         // set in table with out validation
-        RLMDynamicSet(object, prop.name, value, NO);
+        RLMDynamicSet(object, prop, value);
     }
 
     // switch class to use table backed accessor
-    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+    object_setClass(object, schema.accessorClass);
 }
 
 
@@ -278,17 +267,14 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     RLMObjectSchema *schema = realm.schema[className];
     RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
 
-    // get table
-    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
-
     // validate values, create row, and populate
     if ([value isKindOfClass:NSArray.class]) {
         NSArray *array = value;
         RLMValidateArrayAgainstObjectSchema(array, schema);
 
         // create row
-        size_t rowIndex = table->add_empty_row();
-        object->_row = (*table)[rowIndex];
+        size_t rowIndex = schema->_table->add_empty_row();
+        object->_row = (*schema->_table)[rowIndex];
 
         // populate
         NSArray *props = schema.properties;
@@ -300,8 +286,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
 
         // create row
-        size_t rowIndex = table->add_empty_row();
-        object->_row = (*table)[rowIndex];
+        size_t rowIndex = schema->_table->add_empty_row();
+        object->_row = (*schema->_table)[rowIndex];
         
         // populate
         NSArray *props = schema.properties;
@@ -316,7 +302,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     }
 
     // switch class to use table backed accessor
-    object_setClass(object, RLMAccessorClassForObjectClass(schema.objectClass, schema));
+    object_setClass(object, schema.accessorClass);
 
     return object;
 }
@@ -330,12 +316,9 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
-    // get table for this calss
-    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    
     // create view from table and predicate
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    tightdb::Query *query = new tightdb::Query(table->where());
+    tightdb::Query *query = new tightdb::Query(schema->_table->where());
     RLMUpdateQueryWithPredicate(query, predicate, schema);
     
     // create view and sort
@@ -355,13 +338,12 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     
     // get acessor fot the object class
-    Class accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
-    RLMObject *accessor = [[accessorClass alloc] initWithRealm:realm
-                                                        schema:realm.schema[objectClassName]
-                                                 defaultValues:NO];
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm
+                                                                     schema:realm.schema[objectClassName]
+                                                              defaultValues:NO];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
-    accessor->_row = (*table)[index];
+    accessor->_row = (*objectSchema->_table)[index];
     return accessor;
 }
 

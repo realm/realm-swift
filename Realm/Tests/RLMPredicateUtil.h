@@ -17,22 +17,45 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <XCTest/XCTest.h>
 
 @interface RLMPredicateUtil : NSObject
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type;
+                           operatorType: (NSPredicateOperatorType) type;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
-                                   type: (NSPredicateOperatorType) type
+                           operatorType: (NSPredicateOperatorType) type
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier;
+
++ (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
+                             expression: (NSExpression *)expression
+                               selector: (SEL)selector;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate;
+
++ (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate;
+
++ (BOOL(^)()) alwaysEmptyIntColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate;
+
++ (BOOL(^)()) alwaysEmptyDateColSelectorPredicate;
+
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType;
 
 @end

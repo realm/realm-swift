@@ -42,8 +42,13 @@ static RLMSchema *s_sharedSchema;
     return _objectSchemaByName[className];
 }
 
-- (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)className {
-    return _objectSchemaByName[className];
+- (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className {
+    RLMObjectSchema *schema = _objectSchemaByName[className];
+    if (!schema) {
+        NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+    }
+    return schema;
 }
 
 - (id)init {
@@ -83,6 +88,9 @@ static RLMSchema *s_sharedSchema;
                 // add to class list
                 RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
                 [schemaArray addObject:object];
+                // implement sharedSchema and className for this class
+                RLMReplaceSharedSchemaMethod(classes[i], object);
+                RLMReplaceClassNameMethod(classes[i], object.className);
             }
         }
         free(classes);
@@ -114,6 +122,7 @@ static RLMSchema *s_sharedSchema;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
+            object->_table = table;
             [schemaArray addObject:object];
         }
     }
@@ -144,6 +153,12 @@ NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+    RLMSchema *schema = [[RLMSchema allocWithZone:zone] init];
+    schema.objectSchema = [[NSArray allocWithZone:zone] initWithArray:self.objectSchema copyItems:YES];
+    return schema;
 }
 
 @end

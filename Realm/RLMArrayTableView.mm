@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema.h"
@@ -116,8 +117,20 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    RLMArrayTableViewValidateAttached(self);
+
+    if (object->_row.get_table() != &_backingView.get_parent()) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object type does not match RLMArray" userInfo:nil];
+    }
+
+    size_t object_ndx = object->_row.get_index();
+    size_t result = _backingView.find_by_source_ndx(object_ndx);
+    if (result == tightdb::not_found) {
+        return NSNotFound;
+    }
+
+    return result;
 }
 
 - (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ... {

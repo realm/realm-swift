@@ -32,7 +32,7 @@ NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Compariso
 
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
-    return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
+    return [NSException exceptionWithName:name reason:reason userInfo:nil];
 }
 
 // return the column index for a validated column name
