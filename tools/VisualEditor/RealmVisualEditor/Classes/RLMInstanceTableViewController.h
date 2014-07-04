@@ -18,7 +18,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "RLMObjectNode.h"
+#import "RLMTypeNode.h"
 #import "RLMViewController.h"
 #import "RLMTableView.h"
 
@@ -28,6 +28,6 @@
 
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 @end

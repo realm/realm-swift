@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectNode.h"
+#import "RLMTypeNode.h"
 
-@interface RLMArrayNode : RLMObjectNode
+@interface RLMArrayNode : RLMTypeNode
 
 - (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
 

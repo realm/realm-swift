@@ -140,7 +140,7 @@
 
 #pragma mark - Public methods
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     // How many properties does the clazz contains?
     NSArray *columns = outlineNode.propertyColumns;

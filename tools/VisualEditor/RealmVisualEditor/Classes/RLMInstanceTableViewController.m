@@ -423,7 +423,7 @@
                         NSUInteger objctIndex = [allInstances indexOfObject:linkedObject];
                         
                         [self.parentWindowController updateSelectedTypeNode:clazzNode
-                                                         withSelectionAtRow:objctIndex];                        
+                                                       withSelectionAtIndex:objctIndex];
                         break;
                     }
                 }
@@ -455,7 +455,7 @@
 
 #pragma mark - Public methods - Table view construction
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     self.parentWindowController.selectedTypeNode = outlineNode;
     RLMTableView *tableView = (RLMTableView *)self.tableView;

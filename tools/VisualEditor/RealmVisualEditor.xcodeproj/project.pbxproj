@@ -21,7 +21,7 @@
 		84925C67195AE9AD00EE27B1 /* RLMSidebarTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84925C66195AE9AD00EE27B1 /* RLMSidebarTableCellView.m */; };
 		84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 84945D601945CCBB0081C67B /* RLMObject+ResolvedClass.m */; };
 		84A34A4F192E19C5005D6CC4 /* RLMApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */; };
-		84AA41A91949C99800A50F03 /* RLMObjectNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA41A81949C99800A50F03 /* RLMObjectNode.m */; };
+		84AA41A91949C99800A50F03 /* RLMTypeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA41A81949C99800A50F03 /* RLMTypeNode.m */; };
 		84AA41B01949CD7700A50F03 /* RLMArrayNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA41AF1949CD7700A50F03 /* RLMArrayNode.m */; };
 		84AA41C5194B67D200A50F03 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AA41C4194B67D200A50F03 /* Realm.framework */; };
 		84AA41C6194B67D200A50F03 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AA41C4194B67D200A50F03 /* Realm.framework */; };
@@ -127,8 +127,8 @@
 		84945D601945CCBB0081C67B /* RLMObject+ResolvedClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "RLMObject+ResolvedClass.m"; path = "Classes/RLMObject+ResolvedClass.m"; sourceTree = "<group>"; };
 		84A34A4D192E19C5005D6CC4 /* RLMApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMApplicationDelegate.h; path = Classes/RLMApplicationDelegate.h; sourceTree = "<group>"; };
 		84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMApplicationDelegate.m; path = Classes/RLMApplicationDelegate.m; sourceTree = "<group>"; };
-		84AA41A71949C99800A50F03 /* RLMObjectNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObjectNode.h; path = Classes/RLMObjectNode.h; sourceTree = "<group>"; };
-		84AA41A81949C99800A50F03 /* RLMObjectNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMObjectNode.m; path = Classes/RLMObjectNode.m; sourceTree = "<group>"; };
+		84AA41A71949C99800A50F03 /* RLMTypeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTypeNode.h; path = Classes/RLMTypeNode.h; sourceTree = "<group>"; };
+		84AA41A81949C99800A50F03 /* RLMTypeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTypeNode.m; path = Classes/RLMTypeNode.m; sourceTree = "<group>"; };
 		84AA41AE1949CD7700A50F03 /* RLMArrayNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArrayNode.h; path = Classes/RLMArrayNode.h; sourceTree = "<group>"; };
 		84AA41AF1949CD7700A50F03 /* RLMArrayNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMArrayNode.m; path = Classes/RLMArrayNode.m; sourceTree = "<group>"; };
 		84AA41C4194B67D200A50F03 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/RealmVisualEditor-foflgyixjksjabguajskfbufmqsj/Build/Products/Debug/Realm.framework"; sourceTree = "<group>"; };
@@ -212,8 +212,8 @@
 				84D7990819388E8900FC76A0 /* RLMRealmNode.h */,
 				84D7990919388E8900FC76A0 /* RLMRealmNode.m */,
 				84D7990A19388E8900FC76A0 /* RLMRealmOutlineNode.h */,
-				84AA41A71949C99800A50F03 /* RLMObjectNode.h */,
-				84AA41A81949C99800A50F03 /* RLMObjectNode.m */,
+				84AA41A71949C99800A50F03 /* RLMTypeNode.h */,
+				84AA41A81949C99800A50F03 /* RLMTypeNode.m */,
 			);
 			name = "Display model";
 			sourceTree = "<group>";
@@ -543,7 +543,7 @@
 				8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */,
 				84925C67195AE9AD00EE27B1 /* RLMSidebarTableCellView.m in Sources */,
 				84D7990B19388E8900FC76A0 /* RLMClazzNode.m in Sources */,
-				84AA41A91949C99800A50F03 /* RLMObjectNode.m in Sources */,
+				84AA41A91949C99800A50F03 /* RLMTypeNode.m in Sources */,
 				84A34A4F192E19C5005D6CC4 /* RLMApplicationDelegate.m in Sources */,
 				8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */,
 				84D7990D19388E8900FC76A0 /* RLMRealmNode.m in Sources */,

@@ -25,22 +25,23 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 @implementation RLMRealmBrowserWindowController
 
-- (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
 {
     [self.outlineViewController selectTypeNode:typeNode];
     [self.tableViewController updateSelectedObjectNode:typeNode
                                     withSelectionAtRow:selectionIndex];
 }
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode
+{
+    [self updateSelectedObjectNode:typeNode
+                withSelectionAtRow:0];
+}
+
+- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     [self.tableViewController updateSelectedObjectNode:outlineNode
                                     withSelectionAtRow:selectionIndex];
-}
-
-- (void)classSelectionWasChangedTo:(RLMClazzNode *)classNode
-{
-    [self.outlineViewController selectTypeNode:classNode];
 }
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object

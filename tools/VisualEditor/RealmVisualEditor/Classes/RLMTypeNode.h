@@ -22,7 +22,7 @@
 #import "RLMRealmOutlineNode.h"
 #import "RLMClazzProperty.h"
 
-@interface RLMObjectNode : NSObject <RLMRealmOutlineNode>
+@interface RLMTypeNode : NSObject <RLMRealmOutlineNode>
 
 @property (nonatomic, readonly) RLMRealm *realm;
 @property (nonatomic, readonly) RLMObjectSchema *schema;

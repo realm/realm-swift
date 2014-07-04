@@ -190,7 +190,7 @@
 
 #pragma mark - Public methods
 
-- (void)selectTypeNode:(RLMObjectNode *)objectNode
+- (void)selectTypeNode:(RLMTypeNode *)objectNode
 {
     NSInteger index = [self.classesOutlineView rowForItem:objectNode];
     
@@ -204,14 +204,12 @@
 {
     if ([item isKindOfClass:[RLMClazzNode class]]) {
         RLMClazzNode *classNode = (RLMClazzNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:classNode
-                                         withSelectionAtRow:0];
+        [self.parentWindowController updateSelectedTypeNode:classNode ];
         return;
     }
     else if ([item isKindOfClass:[RLMArrayNode class]]) {
         RLMArrayNode *arrayNode = (RLMArrayNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:arrayNode
-                                         withSelectionAtRow:0];
+        [self.parentWindowController updateSelectedTypeNode:arrayNode];
         return;
     }
 }
