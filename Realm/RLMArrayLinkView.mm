@@ -178,11 +178,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 
     if (object->_row.get_table() != &_backingLinkView->get_parent()) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMArray" userInfo:nil];
+                                       reason:@"Object type does not match RLMArray"
+                                     userInfo:nil];
     }
 
     size_t object_ndx = object->_row.get_index();
-    size_t result = _backingLinkView->find_by_source_ndx(object_ndx);
+    size_t result = _backingLinkView->find(object_ndx);
     if (result == tightdb::not_found) {
         return NSNotFound;
     }
