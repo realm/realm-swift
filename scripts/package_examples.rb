@@ -1,0 +1,205 @@
+#!/usr/bin/env ruby
+require 'xcodeproj'
+
+##########################
+# Example Projects
+##########################
+
+class ExampleProject
+  attr_accessor :path, :uuids_to_remove, :swift
+end
+
+def example_projects
+
+  # RealmSwiftTableViewExample
+  realmSwiftTableViewExample = ExampleProject.new
+  realmSwiftTableViewExample.swift = true
+  realmSwiftTableViewExample.path = "examples/swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj"
+  realmSwiftTableViewExample.uuids_to_remove = [
+    "E8C5DD58195025B50055C3B8",
+    "E870C959195B32A300163667",
+    "E870C95A195B32A300163667",
+    "E870C951195B328E00163667",
+    "E870C952195B328E00163667",
+    "E870C953195B328E00163667",
+    "E870C954195B328E00163667",
+    "E870C955195B328E00163667",
+    "E870C956195B328E00163667",
+    "E870C957195B328E00163667",
+    "E870C958195B328E00163667",
+    "E870C94B195B328E00163667"
+  ]
+
+  # RealmSwiftSimpleViewExample
+  realmSwiftSimpleExample = ExampleProject.new
+  realmSwiftSimpleExample.swift = true
+  realmSwiftSimpleExample.path = "examples/swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj"
+  realmSwiftSimpleExample.uuids_to_remove = [
+    "4D1E47A8195C1BB40005280D",
+    "4D1E47AA195C1BB40005280D",
+    "4D1E47AC195C1BB40005280D",
+    "4D1E47AE195C1BB40005280D",
+    "4D1E47B0195C1BC00005280D",
+    "4D1E47A1195C1BB40005280D",
+    "4D1E47A2195C1BB40005280D",
+    "4D1E47A9195C1BB40005280D",
+    "4D1E47AB195C1BB40005280D",
+    "4D1E47AD195C1BB40005280D",
+    "4D1E47AF195C1BB40005280D",
+    "4D1E47B1195C1BC00005280D"
+  ]
+
+  # RealmTableViewExample
+  realmTableViewExample = ExampleProject.new
+  realmTableViewExample.swift = false
+  realmTableViewExample.path = "examples/objc/RealmTableViewExample/RealmTableViewExample.xcodeproj"
+  realmTableViewExample.uuids_to_remove = [
+    "E8F1902F1964C24100B0F161",
+    "E8F190311964C24100B0F161",
+    "E8F190331964C24100B0F161",
+    "E8F190351964C24100B0F161",
+    "E8F190371964C24700B0F161",
+    "E8F190271964C24100B0F161",
+    "E8F190281964C24100B0F161",
+    "E8F190301964C24100B0F161",
+    "E8F190321964C24100B0F161",
+    "E8F190341964C24100B0F161",
+    "E8F190361964C24100B0F161",
+    "E8F190381964C24700B0F161"
+  ]
+
+  # RealmSimpleExample
+  realmSimpleExample = ExampleProject.new
+  realmSimpleExample.swift = false
+  realmSimpleExample.path = "examples/objc/RealmSimpleExample/RealmSimpleExample.xcodeproj"
+  realmSimpleExample.uuids_to_remove = [
+    "E82ED9041964C8730058B909",
+    "E82ED9061964C8730058B909",
+    "E82ED9081964C8730058B909",
+    "E82ED90A1964C8730058B909",
+    "E82ED90C1964C87A0058B909",
+    "E82ED8FC1964C8730058B909",
+    "E82ED8FD1964C8730058B909",
+    "E82ED9051964C8730058B909",
+    "E82ED9071964C8730058B909",
+    "E82ED9091964C8730058B909",
+    "E82ED90B1964C8730058B909",
+    "E82ED90D1964C87A0058B909"
+  ]
+
+  # RealmPerformanceExample
+  realmPerformanceExample = ExampleProject.new
+  realmPerformanceExample.swift = false
+  realmPerformanceExample.path = "examples/objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj"
+  realmPerformanceExample.uuids_to_remove = [
+    "E882E01E1964C9EF00D863C4",
+    "E882E0201964C9EF00D863C4",
+    "E882E0221964C9EF00D863C4",
+    "E882E0241964C9EF00D863C4",
+    "E882E0261964C9F400D863C4",
+    "E882E0161964C9EF00D863C4",
+    "E882E0171964C9EF00D863C4",
+    "E882E01F1964C9EF00D863C4",
+    "E882E0211964C9EF00D863C4",
+    "E882E0231964C9EF00D863C4",
+    "E882E0251964C9EF00D863C4",
+    "E882E0271964C9F400D863C4"
+  ]
+
+  # RealmMigrationExample
+  realmMigrationExample = ExampleProject.new
+  realmMigrationExample.swift = false
+  realmMigrationExample.path = "examples/objc/RealmMigrationExample/RealmMigrationExample.xcodeproj"
+  realmMigrationExample.uuids_to_remove = [
+    "E87D55C51964CD3200B808D5",
+    "E87D55C71964CD3200B808D5",
+    "E87D55C91964CD3200B808D5",
+    "E87D55CB1964CD3200B808D5",
+    "E87D55CD1964CD6300B808D5",
+    "E87D55BD1964CD3200B808D5",
+    "E87D55BE1964CD3200B808D5",
+    "E87D55C61964CD3200B808D5",
+    "E87D55C81964CD3200B808D5",
+    "E87D55CA1964CD3200B808D5",
+    "E87D55CC1964CD3200B808D5",
+    "E87D55CE1964CD6300B808D5"
+  ]
+
+  # Return all example projects
+  [
+    realmSwiftTableViewExample,
+    realmSwiftSimpleExample,
+    realmTableViewExample,
+    realmSimpleExample,
+    realmPerformanceExample,
+    realmMigrationExample
+  ]
+end
+
+##########################
+# Functions
+##########################
+
+def remove_uuids_from_example(example)
+  project = Xcodeproj::Project.open(example.path)
+
+  objects_to_remove = project.objects.select { |o| example.uuids_to_remove.include?(o.uuid) }
+
+  objects_to_remove.each do |object|
+    object.remove_from_project
+  end
+
+  project.save
+end
+
+def add_framework_file_reference(example)
+  project = Xcodeproj::Project.open(example.path)
+  
+  obj = project.new(Xcodeproj::Project::PBXFileReference)
+  obj.path = "../../Realm.framework"
+  obj.name = "Realm.framework"
+  project.main_group << obj
+
+  project.save
+end
+
+def add_framework(example)
+  project = Xcodeproj::Project.open(example.path)
+  
+  # Add file reference
+  obj = project.new(Xcodeproj::Project::PBXFileReference)
+  obj.path = "../Realm.framework"
+  obj.name = "Realm.framework"
+  project.main_group << obj
+
+  target = project.targets.first
+
+  # Add to copy build phase
+  target.resources_build_phase.add_file_reference(obj)
+
+  # Add to frameworks build phase
+  target.frameworks_build_phase.add_file_reference(obj)
+
+  project.save
+end
+
+##########################
+# Script
+##########################
+
+example_projects.each do |example|
+  remove_uuids_from_example(example)
+  if example.swift
+    # Swift examples use the Xcode6-generated dynamic framework
+    # So we can add it to the project
+    add_framework(example)
+  else
+    # Objective-C examples use the Xcode5-generated static pseudo-framework
+    # So must link it directly with the project
+    filepath = File.join(example.path, "project.pbxproj")
+    contents = File.read(filepath)
+    File.open(filepath, "w") do |file|
+      file.puts contents.gsub("../../../build/${CONFIGURATION}", "../")
+    end
+  end
+end
