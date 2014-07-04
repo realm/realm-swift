@@ -699,6 +699,30 @@
                                  @"Invalid operator in binary comparison.");
 }
 
+- (void)testKeyPathLocationInComparison
+{
+    NSExpression *keyPath = [NSExpression expressionForKeyPath:@"intCol"];
+    NSExpression *expr = [NSExpression expressionForConstantValue:@0];
+    NSPredicate *predicate;
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](keyPath, expr);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path to the left in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](expr, keyPath);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path to the right in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](keyPath, keyPath);
+    XCTAssert([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+              @"Key path in both locations in an integer comparison.");
+
+    predicate = [RLMPredicateUtil defaultPredicateGenerator](expr, expr);
+    XCTAssertThrowsSpecificNamed([RLMPredicateUtil isEmptyIntColWithPredicate:predicate],
+                                 NSException, @"Invalid predicate expressions",
+                                 @"Key path in absent in an integer comparison.");
+}
+
 - (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
                                                    predicate:(NSString *)predicate
                                                expectedCount:(NSUInteger)expectedCount
