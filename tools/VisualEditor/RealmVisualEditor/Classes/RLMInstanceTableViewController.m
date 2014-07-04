@@ -417,7 +417,6 @@
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
                         [self.parentWindowController updateSelectedTypeNode:clazzNode];
-                        [self updateTableView];
                         
                         RLMRealm *realm = linkedObject.realm;
                         RLMObjectSchema *objectSchema = linkedObject.RLMObject_schema;
