@@ -22,6 +22,22 @@
 
 @implementation RLMPredicateUtil
 
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_OPERATOR_TYPE = NSLessThanPredicateOperatorType;
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_OPTIONS = 0;
+const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifier;
+
++ (NSPredicate *(^)(NSExpression *, NSExpression *)) defaultPredicateGenerator
+{
+    return ^(NSExpression *leftExpression, NSExpression * rightExpression) {
+        return [NSComparisonPredicate
+                predicateWithLeftExpression: leftExpression
+                rightExpression: rightExpression
+                modifier: DEFAULT_COMPARISON_PREDICATE_MODIFIER
+                type: DEFAULT_COMPARISON_PREDICATE_OPERATOR_TYPE
+                options: DEFAULT_COMPARISON_PREDICATE_OPTIONS];
+    };
+}
+
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                            operatorType: (NSPredicateOperatorType) type
@@ -29,7 +45,7 @@
     return [RLMPredicateUtil comparisonWithKeyPath: keyPath
                                         expression: expression
                                       operatorType: type
-                                           options: 0];
+                                           options: DEFAULT_COMPARISON_PREDICATE_OPTIONS];
 }
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
@@ -41,10 +57,8 @@
                                         expression: expression
                                       operatorType: type
                                            options: options
-                                          modifier: NSDirectPredicateModifier];
+                                          modifier: DEFAULT_COMPARISON_PREDICATE_MODIFIER];
 }
-
-static BOOL KEY_FIRST = YES;
 
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
@@ -54,14 +68,6 @@ static BOOL KEY_FIRST = YES;
 {
     NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
     NSExpression * right = expression;
-
-    if (KEY_FIRST == NO) {
-        right = left;
-        left = expression;
-        KEY_FIRST = YES;
-    } else {
-        KEY_FIRST = NO;
-    }
 
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
@@ -77,17 +83,29 @@ static BOOL KEY_FIRST = YES;
     NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
     NSExpression * right = expression;
 
-    if (KEY_FIRST == NO) {
-        right = left;
-        left = expression;
-        KEY_FIRST = YES;
-    } else {
-        KEY_FIRST = NO;
-    }
-
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
                                                customSelector: selector];
+}
+
++ (BOOL) isEmptyIntColWithPredicate:(NSPredicate *)predicate
+{
+    return [IntObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyFloatColWithPredicate:(NSPredicate *)predicate
+{
+    return [FloatObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate
+{
+    return [DoubleObject objectsWithPredicate:predicate].count == 0;
+}
+
++ (BOOL) isEmptyDateColWithPredicate:(NSPredicate *)predicate
+{
+    return [DateObject objectsWithPredicate:predicate].count == 0;
 }
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate
@@ -98,7 +116,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [IntObject objectsWithPredicate:predicate].count == 0;
+        return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
     };
 }
 
@@ -110,7 +128,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [FloatObject objectsWithPredicate:predicate].count == 0;
+        return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
     };
 }
 
@@ -122,7 +140,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DoubleObject objectsWithPredicate:predicate].count == 0;
+        return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
     };
 }
 
@@ -135,7 +153,7 @@ static BOOL KEY_FIRST = YES;
         NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                                expression: expression
                                                              operatorType: operatorType];
-        return [DateObject objectsWithPredicate:predicate].count == 0;
+        return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
     };
 }
 
@@ -152,7 +170,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [IntObject objectsWithPredicate: predicate].count == 0;
+        return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
     };
 }
 
@@ -164,7 +182,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [FloatObject objectsWithPredicate: predicate].count == 0;
+        return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
     };
 }
 
@@ -176,7 +194,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DoubleObject objectsWithPredicate: predicate].count == 0;
+        return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
     };
 }
 
@@ -189,7 +207,7 @@ static BOOL KEY_FIRST = YES;
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
-        return [DateObject objectsWithPredicate: predicate].count == 0;
+        return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
     };
 }
 
