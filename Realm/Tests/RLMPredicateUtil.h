@@ -21,6 +21,9 @@
 
 @interface RLMPredicateUtil : NSObject
 
++ (NSPredicate *(^)(NSExpression *, NSExpression *)) defaultPredicateGenerator;
++ (NSPredicate *) defaultIntColPredicate;
+
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                            operatorType: (NSPredicateOperatorType) type;
@@ -40,19 +43,21 @@
                              expression: (NSExpression *)expression
                                selector: (SEL)selector;
 
++ (BOOL) isEmptyIntColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyFloatColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyDateColWithPredicate:(NSPredicate *)predicate;
+
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate;
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyFloatColPredicate;
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyDoubleColPredicate;
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyDateColPredicate;
 
-+ (BOOL(^)()) isEmptyIntColWithPredicate:(NSPredicate *)predicate;
-+ (BOOL(^)()) isEmptyFloatColWithPredicate:(NSPredicate *)predicate;
-+ (BOOL(^)()) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate;
-+ (BOOL(^)()) isEmptyDateColWithPredicate:(NSPredicate *)predicate;
-
 + (BOOL(^)()) alwaysEmptyIntColSelectorPredicate;
 + (BOOL(^)()) alwaysEmptyFloatColSelectorPredicate;
 + (BOOL(^)()) alwaysEmptyDoubleColSelectorPredicate;
 + (BOOL(^)()) alwaysEmptyDateColSelectorPredicate;
+
++ (NSString *) predicateOperatorTypeString: (NSPredicateOperatorType) operatorType;
 
 @end
