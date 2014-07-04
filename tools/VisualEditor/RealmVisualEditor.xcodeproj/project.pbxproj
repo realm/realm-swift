@@ -135,8 +135,6 @@
 		84AA41C7194E108B00A50F03 /* NSTableColumn+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSTableColumn+Resize.h"; path = "Classes/NSTableColumn+Resize.h"; sourceTree = "<group>"; };
 		84AA41C8194E108B00A50F03 /* NSTableColumn+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSTableColumn+Resize.m"; path = "Classes/NSTableColumn+Resize.m"; sourceTree = "<group>"; };
 		84BCA6031951BD07008FC850 /* realm.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = realm.icns; sourceTree = "<group>"; };
-		84C4247719615FA600240857 /* RLMCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMCell.h; path = Classes/RLMCell.h; sourceTree = "<group>"; };
-		84C4247819615FA600240857 /* RLMCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMCell.m; path = Classes/RLMCell.m; sourceTree = "<group>"; };
 		84D7990419388E8900FC76A0 /* RLMClazzNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMClazzNode.h; path = Classes/RLMClazzNode.h; sourceTree = "<group>"; };
 		84D7990519388E8900FC76A0 /* RLMClazzNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMClazzNode.m; path = Classes/RLMClazzNode.m; sourceTree = "<group>"; };
 		84D7990619388E8900FC76A0 /* RLMClazzProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMClazzProperty.h; path = Classes/RLMClazzProperty.h; sourceTree = "<group>"; };
@@ -282,8 +280,6 @@
 		84925C64195AE8E800EE27B1 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				84C4247719615FA600240857 /* RLMCell.h */,
-				84C4247819615FA600240857 /* RLMCell.m */,
 				84925C65195AE9AD00EE27B1 /* RLMSidebarTableCellView.h */,
 				84925C66195AE9AD00EE27B1 /* RLMSidebarTableCellView.m */,
 			);
