@@ -45,14 +45,21 @@
     previousMouseLocation = RLMTableLocationUndefined;
 }
 
-- (void)cursorUpdate:(NSEvent *)event
-{
-
-}
-
 - (void)dealloc
 {
 	[self removeTrackingArea:trackingArea];
+}
+
+#pragma mark - NSResponder overrides
+
+- (void)cursorUpdate:(NSEvent *)event
+{
+    // Note: This method is left empty intentionally. It avoids cursor events to be passed on up
+    //       the responder chain where it potentially could reach a displayed tool-tip view, which
+    //       will undo any modification to the cursor image dome by the application. This "fix" is
+    //       in order to cercumvent a bug in OS X version prior to 10.10 Yosemite not honouring
+    //       the NSTrackingActiveAlways option even when the cursorRect has been disabled.
+    //       IMPORTANT: Must NOT be deleted!!!
 }
 
 - (void)mouseEntered:(NSEvent*)event
@@ -116,6 +123,8 @@
 
 }
 
+#pragma mark - NSView overrdes
+
 - (void)updateTrackingAreas
 {
     [super updateTrackingAreas];
@@ -129,24 +138,7 @@
     [self addTrackingArea:trackingArea];
 }
 
-- (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
-{
-    NSPoint localPoint = [self convertPoint:point
-                                   fromView:nil];
-    
-    NSInteger row = [self rowAtPoint:localPoint];
-    NSInteger column = [self columnAtPoint:localPoint];
-    
-    return RLMTableLocationMake(row, column);
-}
-
-- (CGRect)rectOfLocation:(RLMTableLocation)location
-{
-    CGRect rowRect = [self rectOfRow:location.row];
-    CGRect columnRect = [self rectOfColumn:location.column];
-    
-    return CGRectIntersection(rowRect, columnRect);
-}
+#pragma mark - Public methods
 
 - (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
@@ -276,7 +268,28 @@
     [self updateTableViewWithSelectionAtRow:selectionIndex];
 }
 
-#pragma mark - Private methods - Table view construction
+#pragma mark - Private methods - Cell geometry 
+
+- (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
+{
+    NSPoint localPoint = [self convertPoint:point
+                                   fromView:nil];
+    
+    NSInteger row = [self rowAtPoint:localPoint];
+    NSInteger column = [self columnAtPoint:localPoint];
+    
+    return RLMTableLocationMake(row, column);
+}
+
+- (CGRect)rectOfLocation:(RLMTableLocation)location
+{
+    CGRect rowRect = [self rectOfRow:location.row];
+    CGRect columnRect = [self rectOfColumn:location.column];
+    
+    return CGRectIntersection(rowRect, columnRect);
+}
+
+#pragma mark - Private methods - Table view configuration
 
 - (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
 {
