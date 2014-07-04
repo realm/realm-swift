@@ -18,12 +18,16 @@
 
 #import "RLMTableView.h"
 
+#import "NSTableColumn+Resize.h"
+
 @implementation RLMTableView {
 	NSTrackingArea *trackingArea;
 	BOOL mouseOverView;
 	RLMTableLocation currentMouseLocation;
 	RLMTableLocation previousMouseLocation;
 }
+
+#pragma mark - NSObject overrides
 
 - (void)awakeFromNib
 {
@@ -142,6 +146,194 @@
     CGRect columnRect = [self rectOfColumn:location.column];
     
     return CGRectIntersection(rowRect, columnRect);
+}
+
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+{
+    // How many properties does the clazz contains?
+    NSArray *columns = outlineNode.propertyColumns;
+    NSUInteger columnCount = columns.count;
+    
+    // We clear the table view from all old columns
+    NSUInteger existingColumnsCount = self.numberOfColumns;
+    for (NSUInteger index = 0; index < existingColumnsCount; index++) {
+        NSTableColumn *column = [self.tableColumns lastObject];
+        [self removeTableColumn:column];
+    }
+    
+    // ... and add new columns matching the structure of the new realm table.
+    for (NSUInteger index = 0; index < columnCount; index++) {
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
+        
+        [self addTableColumn:tableColumn];
+    }
+    
+    // Set the column names and cell type / formatting
+    for (NSUInteger index = 0; index < columns.count; index++) {
+        NSTableColumn *tableColumn = self.tableColumns[index];
+        
+        RLMClazzProperty *property = columns[index];
+        NSString *columnName = property.name;
+        
+        switch (property.type) {
+            case RLMPropertyTypeBool: {
+                [self initializeSwitchButtonTableColumn:tableColumn
+                                               withName:columnName
+                                              alignment:NSRightTextAlignment
+                                               editable:YES
+                                                toolTip:@"Boolean"];
+                break;
+            }
+                
+            case RLMPropertyTypeInt: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                   editable:YES
+                                    toolTip:@"Integer"];
+                break;
+                
+            }
+                
+            case RLMPropertyTypeFloat: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                   editable:YES
+                                    toolTip:@"Float"];
+                break;
+            }
+                
+            case RLMPropertyTypeDouble: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSRightTextAlignment
+                                   editable:YES
+                                    toolTip:@"Double"];
+                break;
+            }
+                
+            case RLMPropertyTypeString: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:YES
+                                    toolTip:@"String"];
+                break;
+            }
+                
+            case RLMPropertyTypeData: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:NO
+                                    toolTip:@"Data"];
+                break;
+            }
+                
+            case RLMPropertyTypeAny: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:NO
+                                    toolTip:@"Any"];
+                break;
+            }
+                
+            case RLMPropertyTypeDate: {
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:YES
+                                    toolTip:@"Date"];
+                break;
+            }
+                
+            case RLMPropertyTypeArray: {
+                NSString *targetTypeName = property.property.objectClassName;
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:NO
+                                    toolTip:[NSString stringWithFormat:@"%@[..]", targetTypeName]];
+                break;
+            }
+                
+            case RLMPropertyTypeObject: {
+                NSString *targetTypeName = property.property.objectClassName;
+                [self initializeTableColumn:tableColumn
+                                   withName:columnName
+                                  alignment:NSLeftTextAlignment
+                                   editable:NO
+                                    toolTip:[NSString stringWithFormat:@"%@", targetTypeName]];
+                break;
+            }
+        }
+        
+        
+    }
+    
+    [self updateTableViewWithSelectionAtRow:selectionIndex];
+}
+
+#pragma mark - Private methods - Table view construction
+
+- (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
+{
+    NSCell *cell = [[NSCell alloc] initTextCell:@""];
+    
+    [self initializeTabelColumn:column
+                       withCell:cell
+                           name:name
+                      alignment:alignment
+                       editable:editable
+                        toolTip:toolTip];
+    
+    return cell;
+}
+
+- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
+{
+    NSButtonCell *cell = [[NSButtonCell alloc] init];
+    
+    cell.title = nil;
+    cell.allowsMixedState = YES;
+    cell.buttonType =NSSwitchButton;
+    cell.alignment = NSCenterTextAlignment;
+    cell.imagePosition = NSImageOnly;
+    cell.controlSize = NSSmallControlSize;
+    
+    [self initializeTabelColumn:column
+                       withCell:cell
+                           name:name
+                      alignment:alignment
+                       editable:editable
+                        toolTip:toolTip];
+    
+    return cell;
+}
+
+- (void)initializeTabelColumn:(NSTableColumn *)column withCell:(NSCell *)cell name:(NSString *) name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
+{
+    cell.alignment = alignment;
+    cell.editable = editable;
+    
+    column.dataCell = cell;
+    column.headerToolTip = toolTip;
+    
+    NSTableHeaderCell *headerCell = column.headerCell;
+    headerCell.stringValue = name;
+}
+
+- (void)updateTableViewWithSelectionAtRow:(NSUInteger)index
+{
+    [self reloadData];
+    for (NSTableColumn *column in self.tableColumns) {
+        [column resizeToFitContents];
+    }
+    
+    [self selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+      byExtendingSelection:NO];
 }
 
 @end

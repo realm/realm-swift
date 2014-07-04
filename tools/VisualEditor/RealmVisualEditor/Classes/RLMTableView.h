@@ -16,6 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Cocoa/Cocoa.h>
+
+#import "RLMObjectNode.h"
+
 typedef struct {
     NSInteger row;
     NSInteger column;
@@ -44,8 +48,8 @@ typedef struct {
 
 @end
 
-#import <Cocoa/Cocoa.h>
-
 @interface RLMTableView : NSTableView
+
+- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 @end
