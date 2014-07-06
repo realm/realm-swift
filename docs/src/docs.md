@@ -524,8 +524,8 @@ There are several ways we may want to import this JSON into our Realm. You could
 
 // Location.h
 @interface Venue : RLMObject
-@property double   *lat;
-@property double   *lng;
+@property double   lat;
+@property double   lng;
 @property NSString *postalCode;
 @property NSString *cc;
 @property NSString *state;
@@ -555,6 +555,157 @@ NSArray *venues = json[@"venues"];
 
 </div><!--/highlight-wrapper -->
 
+## Schema migration
+
+When working with any database, it is likely your data model will change over time. Since data models in Realm are defined as standard Objects, changing them is as easy as changing the interface of the corresponding RLMObject subclass. For example, suppose we have the following interface in 'Person.h':
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+@interface
+@property NSString *firstName
+@property NSString *lastName
+@property int age
+@end
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+Next, we want to update the data model to require a 'fullName' property, rather than separate first and last names. To do this, we simply change the subclass interface to the following:
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+@interface
+@property NSString *fullName
+@property int age
+@end
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+When dealing with persisted data, however, it is essential that a consistent data schema be enforced for records of the same type. In Realm, this means that each persisted RLMObject instance must conform to the current data model for its respective type before it can be accessed. If a Realm that contains non-conforming Objects is accessed, e.g. by calling [`[RLMRealm defaultRealm]`](api/Classes/RLMRealm.html#//api/name/defaultRealm), the call will throw an `NSException`.
+
+### Migrating a Realm
+
+Realms that contain non-conforming Objects must be migrated to the current schema before they can be accessed. To make this process easy, Realm provides specialized classes and methods for handling schema migration.
+
+Migrating a Realm to a new schema takes just two steps:
+
+1. Define an `RLMMigrationBlock` that provides the logic for converting data models from previous schemas to the new schema. Within the block, call [`[RLMMigration enumerateObjects:block:]`](api/Classes/RLMMigration.html#//api/name/enumerateObjects:block:) to enumerate each Realm Object type that needs to be migrated, and apply any necessary migration logic.
+
+For example, suppose we want to migrate the 'Person' subclass from above. To do this, our migration block would look like the following. Notice how for each enumeration the existing RLMObject instance is accessed via an `oldObject` variable, and the updated instance is accessed via `newObject`:
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+  //Call [RLMMigration enumerateObjects:block:] to enumerate each 'Person' in the Realm
+  [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {    
+    //Provide the logic for updating the data model on each 'Person'
+    newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];          
+  }
+  //Return the new version number. Must be higher version than the previous version or an RLMException is thrown
+  return 1;
+}
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+2. Call [`[RLMRealm applyMigrationBlock:atPath:error]`](api/Classes/RLMRealm.html#//api/name/applyMigrationBlock:atPath:error:) to apply the migration logic to a Realm. In this method, the `atPath` parameter specifies the path to where the Realm is persisted on disk. You can retrieve the path for a Realm by calling [`[RLMRealm path]`](api/Classes/RLMRealm.html#//api/name/path) on an RLMRealm instance.
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+//In this case, we apply the migration block to the default Realm
+[RLMRealm applyMigrationBlock:migrationBlock atPath:[[RLMRealm defaultRealm] path] error:nil];
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+Once the migration is successfully completed, the Realm and all of its Objects can be accessed as usual. For a more complete look at the implementation of a data schema migration, check out our [migration sample app](https://github.com/realm/realm-cocoa/tree/master/examples/objc/RealmMigrationExample).
+
+### Schema versions
+
+In some cases, it may make sense to create multiple Realms with the same data schema, such as in the case of a social media app, where you might choose to persist the data for each user in its own Realm. This type of approach, however, can cause issues with schema consistency. For example, consider the following scenario, again using the 'Person' subclass from above.
+
+Suppose we change the data model for the 'Person' subclass yet again, for a total of three different schemas:
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+//v0
+@property NSString *firstName
+@property NSString *lastName
+@property int age
+
+//v1
+@property NSString *fullName //new property
+@property int age
+
+//v2
+@property NSString *fullName
+@property NSString *email //new property
+@property int age
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+Next, suppose we have two users for our app: JP and Tim. JP logs in often, but Tim hardly ever logs in. In this scenario, for Tim's data we cannot rely on providing logic for only migrating the most recent version of the schema, i.e. v1 to v2. 
+
+Because the Realm with JP's data is accessed often, it is likely the data schema of his Realm will be migrated with each change. In the case of Tim, however, if our app reaches v2 of the schema before he logs in again, an exception will be thrown, since the migration to convert the 'firstName' and 'lastName' properties of v0 into the 'fullName' property of v1 was never applied to his Realm.
+
+To avoid this type of scenario, Realm uses schema versions to track which migrations have been applied to each Realm. This allows us to apply separate migration logic in our `RLMMigrationBlock`, depending on which schema version a Realm conforms to.
+
+So, in the case described above, the logic in our migration block might look like the following. Note how we get the schema version number of the Realm being migrated by referencing the `oldSchemaVersion` variable:
+
+<div class="highlight-wrapper">
+
+{% highlight swift %}
+
+{% endhighlight%}
+
+{% highlight objective-c %}
+//Enumerate each 'Person' in the Realm
+[migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {    
+  //Add the 'fullName' property only to Realms with a schema version of 0
+  if (oldSchemaVersion < 1) {    
+    newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];    
+  } 
+  //Add the 'email' property to Realms with a schema version of 0 or 1
+  if (oldSchemaVersion < 2) {    
+    newObject[@"email"] = [[NSString alloc] init];
+  }
+}
+{% endhighlight %}
+</div><!--/highlight-wrapper -->
+
+Once a migration is successful, Realm will automatically set the Realm's schema version to the current version number. In this way, by taking advantage of schema versions we ensure that all previous versions of our data schema can be migrated correctly, regardless of when a Realm is accessed. In the case of Tim, both the v0 to v1 and the v1 to v2 migrations will be applied to the Realm where his data is persisted.
+
+### Best Practices
+
+The following are some suggested best practices for handling Realm migrations:
+
+1. If you persist an RLMObject subclass type across multiple Realms, define one method for migrating the Object schema, then call that from the `RLMMigrationBlock` for each Realm. This ensures you won't need to duplicate the same logic across multiple migration blocks.
+
+2. When introducing new properties into an RLMObject, set the default value to `nil`. This avoids a potential edge case in Realm related to a scenario where a user skips versions, e.g. migrates from version 1 to 3, rather than 1 to 2 to 3.
+
+3. Update the `RLMMigrationBlock` as soon as the schema of an RLMObject subclass changes. Since all Objects in a Realm must conform to the data model of their respective subclasses before the Realm can be accessed, this will help avoid unexpected exceptions from being thrown in your app.
 
 ## Next Steps
 
