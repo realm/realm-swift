@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMRealm_Dynamic.h"
 
 @interface LinkTests : RLMTestCase
 @end

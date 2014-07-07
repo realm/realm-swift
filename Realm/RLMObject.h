@@ -194,14 +194,52 @@
  */
 + (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
 
+
 /**
  Get objects matching the given predicate for this type from the default Realm.
- 
+
  @param predicate   The predicate to filter the objects.
- 
+ @param realm   The Realm instance to query.
+
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
 + (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
+
+
+/**---------------------------------------------------------------------------------------
+ *  @name Querying Specific Realms
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ Get all objects of this type from the specified Realm.
+
+ @param realm   The Realm instance to query.
+
+ @return        An RLMArray of all objects of this type in the specified Realm.
+ */
++ (RLMArray *)allObjectsInRealm:(RLMRealm *)realm;
+
+/**
+ Get objects matching the given predicate for this type from the specified Realm.
+
+ @param predicateFormat The predicate format string which can accept variable arguments.
+ @param realm           The Realm instance to query.
+
+ @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
+ */
++ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ...;
+
+/**
+ Get objects matching the given predicate for this type from the specified Realm.
+
+ @param predicate   The predicate to filter the objects.
+ @param realm       The Realm instance to query.
+
+ @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
+ */
++ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
+
 
 #pragma mark -
 

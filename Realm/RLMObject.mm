@@ -159,16 +159,28 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
-{
++ (RLMArray *)allObjectsInRealm:(RLMRealm *)realm {
+    return RLMGetObjects(realm, self.className, nil, nil);
+}
+
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ... {
     NSPredicate *outPredicate = nil;
     RLM_PREDICATE(predicateFormat, outPredicate);
     return [self objectsWithPredicate:outPredicate];
 }
 
-+ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
-{
++(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ... {
+    NSPredicate *outPredicate = nil;
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objectsInRealm:realm withPredicate:outPredicate];
+}
+
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
+}
+
++(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate {
+    return RLMGetObjects(realm, self.className, predicate, nil);
 }
 
 - (NSString *)JSONString {

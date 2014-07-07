@@ -79,7 +79,7 @@ extern "C" {
 
     // verify migration
     realm = [self realmWithTestPath];
-    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
     XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
 }
@@ -111,7 +111,7 @@ extern "C" {
 
     // verify migration
     realm = [self realmWithTestPath];
-    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
 }
 
@@ -147,7 +147,7 @@ extern "C" {
 
     // verify migration
     realm = [self realmWithTestPath];
-    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
 }
 
@@ -179,7 +179,7 @@ extern "C" {
 
     // verify migration
     realm = [self realmWithTestPath];
-    MigrationObject *mig1 = [realm allObjects:MigrationObject.className][1];
+    MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"strintCol should be string after migration.");
 }
 

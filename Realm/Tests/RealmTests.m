@@ -65,21 +65,21 @@
     [StringObject createInRealm:realm withObject:@[@"a"]];
     [StringObject createInRealm:realm withObject:@[@"b"]];
     [StringObject createInRealm:realm withObject:@[@"c"]];
-    XCTAssertEqual([realm objects:[StringObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
     
     // test again after write transaction
-    RLMArray *objects = [realm allObjects:StringObject.className];
+    RLMArray *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
     [realm beginWriteTransaction];
     [realm deleteObject:objects[2]];
     [realm deleteObject:objects[0]];
-    XCTAssertEqual([realm objects:[StringObject className] withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
-    objects = [realm allObjects:[StringObject className]];
+    objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
@@ -106,7 +106,7 @@
     [realm removeNotification:token];
 
     // get object
-    RLMArray *objects = [realm objects:StringObject.className withPredicate:nil];
+    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
     XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
@@ -128,7 +128,7 @@
         [realm addObject:obj];
         [realm commitWriteTransaction];
 
-        RLMArray *objects = [realm objects:StringObject.className withPredicate:nil];
+        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
         XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
         XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
     });
@@ -138,7 +138,7 @@
     [realm removeNotification:token];
         
     // get object
-    RLMArray *objects = [realm objects:StringObject.className withPredicate:nil];
+    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
     XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
     StringObject *obj = objects.firstObject;
     XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
@@ -201,7 +201,7 @@
     [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
     [StringObject createInRealm:realmInMemory withObject:@[@"b"]];
     [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([realmInMemory objects:[StringObject className] withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
+    XCTAssertEqual([StringObject objectsInRealm:realmInMemory withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realmInMemory commitWriteTransaction];
 }
 

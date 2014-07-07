@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
+#import "RLMRealm_Dynamic.h"
 
 #pragma mark - Test Objects
 

@@ -89,7 +89,7 @@
     [obj.array addObjectsFromArray:@[child2, child1]];
     [realm commitWriteTransaction];
     
-    RLMArray *children = [realm allObjects:StringObject.className];
+    RLMArray *children = [StringObject allObjectsInRealm:realm];
     XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }

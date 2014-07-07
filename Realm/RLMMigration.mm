@@ -53,7 +53,7 @@
 
 - (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
     // get all objects
-    RLMArray *objects = [_realm allObjects:className], *oldObjects = [_oldRealm allObjects:className];
+    RLMArray *objects = RLMGetObjects(_realm, className, nil, nil), *oldObjects = RLMGetObjects(_oldRealm, className, nil, nil);
     for (NSUInteger i = 0; i < oldObjects.count; i++) {
         block(oldObjects[i], objects[i]);
     }
