@@ -159,3 +159,5 @@ The documentation is generated with the following command:
     sh build.sh docs
 
 Please note that this will also install the documentation to your machine.
+
+![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-cocoa/README?pixel)
