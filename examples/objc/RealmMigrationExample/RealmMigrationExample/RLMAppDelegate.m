@@ -33,25 +33,31 @@
     // you can define this inline, but we will reuse this to migrate realm files from multiple versions
     // to the most current version of our data model
     RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
-        [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            if (oldSchemaVersion < 1) {
-                // combine name fields into a single field
-                newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];
-            }
-            if (oldSchemaVersion < 2) {
+        if (oldSchemaVersion < 1) {
+            [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                if (oldSchemaVersion < 1) {
+                    // combine name fields into a single field
+                    newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];
+                }
+            }];
+        }
+        if (oldSchemaVersion < 2) {
+            [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 // give JP a dog
                 if ([newObject[@"fullName"] isEqualToString:@"JP McDonald"]) {
                     Pet *jpsDog = [[Pet alloc] initWithObject:@[@"Jimbo", @(AnimalTypeDog)]];
                     [newObject[@"pets"] addObject:jpsDog];
                 }
-            }
-        }];
-        [migration enumerateObjects:Pet.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            if (oldSchemaVersion < 3) {
-                // convert type string to type enum
-                newObject[@"type"] = @([Pet animalTypeForString:oldObject[@"type"]]);
-            }
-        }];
+            }];
+        }
+        if (oldSchemaVersion < 3) {
+            [migration enumerateObjects:Pet.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                // convert type string to type enum if we have outdated Pet object
+                if (oldObject && oldObject.objectSchema[@"type"].type == RLMPropertyTypeString) {
+                    newObject[@"type"] = @([Pet animalTypeForString:oldObject[@"type"]]);
+                }
+            }];
+        }
 
         // return the new schema version
         return 3;

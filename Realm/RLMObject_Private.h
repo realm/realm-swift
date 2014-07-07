@@ -34,7 +34,7 @@
 
 // namespace properties to prevent collision with user properties
 @property (nonatomic, readwrite) RLMRealm *realm;
-@property (nonatomic) RLMObjectSchema *RLMObject_schema;
+@property (nonatomic, readwrite) RLMObjectSchema *objectSchema;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
