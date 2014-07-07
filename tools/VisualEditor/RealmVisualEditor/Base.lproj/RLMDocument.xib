@@ -6,6 +6,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
             <connections>
+                <outlet property="navigationButtons" destination="2Ep-Z1-kHF" id="R6Y-2D-J2o"/>
                 <outlet property="outlineViewController" destination="hSp-0t-Gbg" id="wTv-NH-RZX"/>
                 <outlet property="tableViewController" destination="X01-Pz-1Ve" id="3ep-TB-FsM"/>
                 <outlet property="window" destination="xOd-HO-29H" id="JIz-fz-R2o"/>

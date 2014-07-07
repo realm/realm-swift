@@ -33,6 +33,7 @@ extern NSString *const RLMNotificationInfoIndex;
 @property (nonatomic, readonly) RLMTypeNode *selectedTypeNode;
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
+@property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
 
 - (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode;
 

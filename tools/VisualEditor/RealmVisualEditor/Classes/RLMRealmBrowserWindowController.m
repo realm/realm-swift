@@ -39,6 +39,7 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 {
     navigationStack = [[NSMutableArray alloc] initWithCapacity:200];
     navigationIndex = -1;
+    [self updateNavigationButtons];
     
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
@@ -70,6 +71,8 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 
         [navigationStack addObject:state];
         navigationIndex++;
+        
+        [self updateNavigationButtons];
         
         [self performUpdateOfSelectedTypeNode:typeNode
                          withSelectionAtIndex:selectionIndex];
@@ -120,9 +123,23 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
         default:
             break;
     }
+    
+    [self updateNavigationButtons];    
 }
 
 #pragma mark - Private methods
+
+- (void)updateNavigationButtons
+{
+    if (navigationStack.count <= 1) {
+        [self.navigationButtons setEnabled:NO forSegment:0];
+        [self.navigationButtons setEnabled:NO forSegment:1];
+    }
+    else {
+        [self.navigationButtons setEnabled:(navigationIndex > 0) forSegment:0];
+        [self.navigationButtons setEnabled:(navigationIndex < navigationStack.count - 1) forSegment:1];
+    }
+}
 
 - (void)performUpdateOfSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
 {
