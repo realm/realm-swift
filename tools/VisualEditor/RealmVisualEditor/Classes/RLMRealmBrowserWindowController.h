@@ -24,8 +24,7 @@
 
 extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 extern NSString *const RLMNewTypeNodeHasBeenSelectedNotification;
-extern NSString *const RLMNotificationInfoTypeNode;
-extern NSString *const RLMNotificationInfoIndex;
+extern NSString *const RLMNotificationInfoNavigationState;
 
 @interface RLMRealmBrowserWindowController : NSWindowController
 

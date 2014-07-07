@@ -19,10 +19,13 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMNavigationState.h"
+#import "RLMArrayNavigationState.h"
 
 @interface RLMNavigationStack : NSObject
 
-- (void)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
+- (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
+
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode arrayNode:(RLMArrayNode *)arrayNode index:(NSInteger)selectionIndex;
 
 - (void)pushState:(RLMNavigationState *)state;
 

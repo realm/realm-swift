@@ -44,6 +44,7 @@
 		84E0F97D1921F3B900D6CA14 /* RealmVisualEditorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F97C1921F3B900D6CA14 /* RealmVisualEditorTests.m */; };
 		84E35A42196A9F3B007F0344 /* RLMNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A41196A9F3B007F0344 /* RLMNavigationState.m */; };
 		84E35A49196AD991007F0344 /* RLMNavigationStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A48196AD991007F0344 /* RLMNavigationStack.m */; };
+		84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +167,8 @@
 		84E35A41196A9F3B007F0344 /* RLMNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationState.m; path = Classes/RLMNavigationState.m; sourceTree = "<group>"; };
 		84E35A47196AD991007F0344 /* RLMNavigationStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNavigationStack.h; path = Classes/RLMNavigationStack.h; sourceTree = "<group>"; };
 		84E35A48196AD991007F0344 /* RLMNavigationStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationStack.m; path = Classes/RLMNavigationStack.m; sourceTree = "<group>"; };
+		84E35A4B196B021B007F0344 /* RLMArrayNavigationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArrayNavigationState.h; path = Classes/RLMArrayNavigationState.h; sourceTree = "<group>"; };
+		84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMArrayNavigationState.m; path = Classes/RLMArrayNavigationState.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -238,10 +241,7 @@
 		8474E2B919544D8700BCA755 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				84E35A47196AD991007F0344 /* RLMNavigationStack.h */,
-				84E35A48196AD991007F0344 /* RLMNavigationStack.m */,
-				84E35A40196A9F3B007F0344 /* RLMNavigationState.h */,
-				84E35A41196A9F3B007F0344 /* RLMNavigationState.m */,
+				84E35A4A196B01D0007F0344 /* Navigation */,
 				84754ABC193CA4600093604E /* RLMRealmBrowserWindowController.h */,
 				84754ABD193CA4600093604E /* RLMRealmBrowserWindowController.m */,
 				8457294B1962E3860076D4F1 /* RLMTableView.h */,
@@ -399,6 +399,19 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		84E35A4A196B01D0007F0344 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				84E35A47196AD991007F0344 /* RLMNavigationStack.h */,
+				84E35A48196AD991007F0344 /* RLMNavigationStack.m */,
+				84E35A40196A9F3B007F0344 /* RLMNavigationState.h */,
+				84E35A41196A9F3B007F0344 /* RLMNavigationState.m */,
+				84E35A4B196B021B007F0344 /* RLMArrayNavigationState.h */,
+				84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */,
+			);
+			name = Navigation;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -547,6 +560,7 @@
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				84925C61195AD5B000EE27B1 /* NSColor+ByteSizeFactory.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
+				84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */,
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClazzProperty.m in Sources */,

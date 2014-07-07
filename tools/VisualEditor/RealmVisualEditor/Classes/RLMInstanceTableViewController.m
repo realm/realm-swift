@@ -45,12 +45,12 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+- (void)updateViewWithState:(RLMNavigationState *)state
 {
-    [(RLMTableView *)self.tableView formatColumnsToFitType:type
-                                        withSelectionAtRow:index];
+    [(RLMTableView *)self.tableView formatColumnsToFitType:state.selectedType
+                                        withSelectionAtRow:state.selectionIndex];
     [self.tableView reloadData];
-    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:state.selectionIndex]
                 byExtendingSelection:NO];
 }
 

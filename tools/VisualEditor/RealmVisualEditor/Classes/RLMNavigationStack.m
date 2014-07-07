@@ -29,17 +29,29 @@
     if (self = [super init]) {
         stack = [[NSMutableArray alloc] initWithCapacity:200];
         index = -1;
-    
     }
     return  self;
 }
 
-- (void)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex
+- (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex
 {
-    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode
-                                                                           index:selectionIndex];
+    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectionType:typeNode
+                                                                            index:selectionIndex];
     [self pushState:state];
+    
+    return state;
 }
+
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode arrayNode:(RLMArrayNode *)arrayNode index:(NSInteger)selectionIndex;
+{
+    RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectionType:typeNode
+                                                                                      array:arrayNode
+                                                                                      index:selectionIndex];
+    [self pushState:state];
+    
+    return state;
+}
+
 
 - (void)pushState:(RLMNavigationState *)state
 {

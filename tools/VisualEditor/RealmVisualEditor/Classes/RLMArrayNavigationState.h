@@ -16,15 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMNavigationState.h"
 
-#import "RLMTypeNode.h"
+#import "RLMArrayNode.h"
 
-@interface RLMNavigationState : NSObject
+@interface RLMArrayNavigationState : RLMNavigationState
 
-@property (nonatomic, readonly) RLMTypeNode *selectedType;
-@property (nonatomic, readonly) NSInteger selectionIndex;
+@property (nonatomic, readonly) RLMArrayNode *selectionArray;
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index;
+- (instancetype)initWithSelectionType:(RLMTypeNode *)type array:(RLMArrayNode *)array index:(NSInteger)index;
 
 @end

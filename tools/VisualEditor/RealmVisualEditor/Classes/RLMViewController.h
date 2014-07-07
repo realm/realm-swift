@@ -18,12 +18,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "RLMTypeNode.h"
+#import "RLMNavigationState.h"
 
 @interface RLMViewController : NSViewController
 
 @property (nonatomic, readonly) NSTableView *tableView;
 
-- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index;
+- (void)updateViewWithState:(RLMNavigationState *)state;
 
 @end

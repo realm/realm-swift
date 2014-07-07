@@ -46,11 +46,11 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+- (void)updateViewWithState:(RLMNavigationState *)state
 {
     [self.classesOutlineView reloadData];
     
-    NSInteger typeIndex = [self.classesOutlineView rowForItem:type];
+    NSInteger typeIndex = [self.classesOutlineView rowForItem:state.selectedType];
     [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:typeIndex]
                          byExtendingSelection:NO];
 }

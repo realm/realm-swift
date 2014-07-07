@@ -51,7 +51,7 @@
 
 #pragma mark - Public methods
 
-- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+- (void)updateViewWithState:(RLMNavigationState *)state
 {
     // No action - should be overridden by subclasses.
 }
@@ -60,10 +60,8 @@
 
 - (void)newTypeNodeHasBeenSelectedNotificationListener:(NSNotification *)notification
 {
-    RLMTypeNode *typeNode = notification.userInfo[RLMNotificationInfoTypeNode];
-    NSNumber *index = notification.userInfo[RLMNotificationInfoIndex];
-    [self updateViewWithType:typeNode
-                       index:index.integerValue];
+    RLMNavigationState *navigationState = notification.userInfo[RLMNotificationInfoNavigationState];
+    [self updateViewWithState:navigationState];
 }
 
 @end
