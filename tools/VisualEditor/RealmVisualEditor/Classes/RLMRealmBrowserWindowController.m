@@ -20,7 +20,7 @@
 
 #import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
-#import "RLMNavigationState.h"
+#import "RLMNavigationStack.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 NSString *const RLMNewTypeNodeHasBeenSelectedNotification = @"RLMNewTypeNodeHasBeenSelectedNotification";
@@ -29,18 +29,15 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 
 @implementation RLMRealmBrowserWindowController {
 
-    NSMutableArray *navigationStack;
-    NSInteger navigationIndex;
+    RLMNavigationStack *navigationStack;
 }
 
 #pragma mark - NSViewController overrides
 
 - (void)windowDidLoad
 {
-    navigationStack = [[NSMutableArray alloc] initWithCapacity:200];
-    navigationIndex = -1;
+    navigationStack = [[RLMNavigationStack alloc] init];
     [self updateNavigationButtons];
-    
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
@@ -62,16 +59,8 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
     // Only update and notify if we really have changed the selection!!!
     if (_selectedTypeNode != typeNode) {
         
-        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode
-                                                                               index:selectionIndex];
-        NSInteger lastIndex = (NSInteger)navigationStack.count - 1;
-        if(navigationIndex < lastIndex) {
-            [navigationStack removeObjectsInRange:NSMakeRange(navigationIndex, navigationStack.count - navigationIndex - 1)];
-        }
-
-        [navigationStack addObject:state];
-        navigationIndex++;
-        
+        [navigationStack pushStateWithTypeNode:typeNode
+                                         index:selectionIndex];
         [self updateNavigationButtons];
         
         [self performUpdateOfSelectedTypeNode:typeNode
@@ -103,18 +92,16 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 {
     switch (buttons.selectedSegment) {
         case 0: { // Navigate backwards
-            if (navigationIndex > 0) {
-                navigationIndex--;
-                RLMNavigationState *state = navigationStack[navigationIndex];
+            RLMNavigationState *state = [navigationStack navigateBackward];
+            if (state != nil) {
                 [self performUpdateOfSelectedTypeNode:state.selectedType
                                  withSelectionAtIndex:state.selectionIndex];
             }
             break;
         }
         case 1: { // Navigate backwards
-            if (navigationIndex < navigationStack.count - 1) {
-                navigationIndex++;
-                RLMNavigationState *state = navigationStack[navigationIndex];
+            RLMNavigationState *state = [navigationStack navigateForward];
+            if (state != nil) {
                 [self performUpdateOfSelectedTypeNode:state.selectedType
                                  withSelectionAtIndex:state.selectionIndex];
             }
@@ -131,14 +118,10 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 
 - (void)updateNavigationButtons
 {
-    if (navigationStack.count <= 1) {
-        [self.navigationButtons setEnabled:NO forSegment:0];
-        [self.navigationButtons setEnabled:NO forSegment:1];
-    }
-    else {
-        [self.navigationButtons setEnabled:(navigationIndex > 0) forSegment:0];
-        [self.navigationButtons setEnabled:(navigationIndex < navigationStack.count - 1) forSegment:1];
-    }
+    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward]
+                            forSegment:0];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
+                            forSegment:1];
 }
 
 - (void)performUpdateOfSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;

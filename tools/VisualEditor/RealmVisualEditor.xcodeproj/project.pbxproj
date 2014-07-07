@@ -43,6 +43,7 @@
 		84E0F97B1921F3B900D6CA14 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9791921F3B900D6CA14 /* InfoPlist.strings */; };
 		84E0F97D1921F3B900D6CA14 /* RealmVisualEditorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F97C1921F3B900D6CA14 /* RealmVisualEditorTests.m */; };
 		84E35A42196A9F3B007F0344 /* RLMNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A41196A9F3B007F0344 /* RLMNavigationState.m */; };
+		84E35A49196AD991007F0344 /* RLMNavigationStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A48196AD991007F0344 /* RLMNavigationStack.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -163,6 +164,8 @@
 		84E0F97C1921F3B900D6CA14 /* RealmVisualEditorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmVisualEditorTests.m; sourceTree = "<group>"; };
 		84E35A40196A9F3B007F0344 /* RLMNavigationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNavigationState.h; path = Classes/RLMNavigationState.h; sourceTree = "<group>"; };
 		84E35A41196A9F3B007F0344 /* RLMNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationState.m; path = Classes/RLMNavigationState.m; sourceTree = "<group>"; };
+		84E35A47196AD991007F0344 /* RLMNavigationStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNavigationStack.h; path = Classes/RLMNavigationStack.h; sourceTree = "<group>"; };
+		84E35A48196AD991007F0344 /* RLMNavigationStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationStack.m; path = Classes/RLMNavigationStack.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,6 +238,8 @@
 		8474E2B919544D8700BCA755 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				84E35A47196AD991007F0344 /* RLMNavigationStack.h */,
+				84E35A48196AD991007F0344 /* RLMNavigationStack.m */,
 				84E35A40196A9F3B007F0344 /* RLMNavigationState.h */,
 				84E35A41196A9F3B007F0344 /* RLMNavigationState.m */,
 				84754ABC193CA4600093604E /* RLMRealmBrowserWindowController.h */,
@@ -546,6 +551,7 @@
 				84945D611945CCBB0081C67B /* RLMObject+ResolvedClass.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClazzProperty.m in Sources */,
 				8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */,
+				84E35A49196AD991007F0344 /* RLMNavigationStack.m in Sources */,
 				84925C67195AE9AD00EE27B1 /* RLMSidebarTableCellView.m in Sources */,
 				84D7990B19388E8900FC76A0 /* RLMClazzNode.m in Sources */,
 				84AA41A91949C99800A50F03 /* RLMTypeNode.m in Sources */,
