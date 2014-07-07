@@ -23,7 +23,6 @@
 #import "RLMClazzProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
-#import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
 
 @implementation RLMDocument

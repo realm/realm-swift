@@ -119,7 +119,7 @@ RLMArray *dogs = [Dog.className allObjects]; // retrieves all Dogs from the defa
 
 // On a specific Realm:
 RLMRealm *petsRealm = [RLMRealm initWithPath:"pets.realm"]; // get a specific Realm
-RLMArray *dogs = [petsRealm allObjects: @"dog"]; // retrieve all Dogs from that Realm
+RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->

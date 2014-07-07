@@ -17,8 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmBrowserWindowController.h"
-
-#import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;

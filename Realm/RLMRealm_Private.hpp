@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
+#import "RLMRealm_Dynamic.h"
 #import "RLMSchema.h"
 #import "RLMAccessor.h"
 
@@ -32,10 +32,4 @@
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
-// private constructor
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
 @end

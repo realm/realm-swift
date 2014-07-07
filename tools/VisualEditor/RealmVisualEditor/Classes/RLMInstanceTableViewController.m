@@ -19,11 +19,16 @@
 #import "RLMInstanceTableViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
-#import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
 
 #import "objc/objc-class.h"
+
+// private redeclaration
+@interface RLMRealm ()
+- (RLMArray *)allObjects:(NSString *)className;
+@end
+
 
 @implementation RLMInstanceTableViewController
 
@@ -93,8 +98,7 @@
                 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
-                return [NSString stringWithFormat:@"Link to %@", objectSchema.className];
+                return [NSString stringWithFormat:@"Link to %@", referredObject.objectSchema.className];
             }
                 
             default:
@@ -251,7 +255,7 @@
             case RLMPropertyTypeObject: {
                 if ([propertyValue isKindOfClass:[RLMObject class]]) {
                     RLMObject *referredObject = (RLMObject *)propertyValue;
-                    RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
+                    RLMObjectSchema *objectSchema = referredObject.objectSchema;
                     NSArray *properties = objectSchema.properties;
                     
                     NSString *toolTipString = @"";
@@ -377,7 +381,7 @@
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
                 RLMObject *linkedObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *linkedObjectSchema = linkedObject.RLMObject_schema;
+                RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
@@ -385,7 +389,7 @@
                         [self updateTableView];
                         
                         RLMRealm *realm = linkedObject.realm;
-                        RLMObjectSchema *objectSchema = linkedObject.RLMObject_schema;
+                        RLMObjectSchema *objectSchema = linkedObject.objectSchema;
                         NSString *className = objectSchema.className;
                         RLMArray *allInstances = [realm allObjects:className];
                                                 
