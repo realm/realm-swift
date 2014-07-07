@@ -21,6 +21,8 @@
 
 @interface RLMPredicateUtil : NSObject
 
++ (NSPredicate *(^)(NSExpression *, NSExpression *)) defaultPredicateGenerator;
+
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                            operatorType: (NSPredicateOperatorType) type;
@@ -39,6 +41,11 @@
 + (NSPredicate *) comparisonWithKeyPath: (NSString *)keyPath
                              expression: (NSExpression *)expression
                                selector: (SEL)selector;
+
++ (BOOL) isEmptyIntColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyFloatColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyDoubleColWithPredicate:(NSPredicate *)predicate;
++ (BOOL) isEmptyDateColWithPredicate:(NSPredicate *)predicate;
 
 + (BOOL(^)(NSPredicateOperatorType)) isEmptyIntColPredicate;
 
