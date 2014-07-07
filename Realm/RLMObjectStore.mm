@@ -230,7 +230,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // set the realm and schema
     NSString *objectClassName = [object.class className];
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    object.RLMObject_schema = schema;
+    object.objectSchema = schema;
     object.realm = realm;
 
     // create row in table

@@ -28,7 +28,7 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize RLMObject_schema = _RLMObject_schema;
+@synthesize objectSchema = _objectSchema;
 
 
 // standalone init
@@ -36,7 +36,7 @@
     self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
 
     // set standalone accessor class
-    object_setClass(self, self.RLMObject_schema.standaloneClass);
+    object_setClass(self, self.objectSchema.standaloneClass);
     
     return self;
 }
@@ -65,7 +65,7 @@
     self = [super init];
     if (self) {
         _realm = realm;
-        _RLMObject_schema = schema;
+        _objectSchema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -83,7 +83,7 @@
 }
 
 void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
-    RLMObjectSchema *schema = obj.RLMObject_schema;
+    RLMObjectSchema *schema = obj.objectSchema;
     for (NSString *name in values) {
         // Validate Value
         RLMProperty *prop = schema[name];
@@ -100,7 +100,7 @@ void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
 }
 
 void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
-    NSArray *properties = obj.RLMObject_schema.properties;
+    NSArray *properties = obj.objectSchema.properties;
 
     if (array.count != properties.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
@@ -186,7 +186,7 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
 
 - (NSString *)description
 {
-    NSString *baseClassName = self.RLMObject_schema.className;
+    NSString *baseClassName = self.objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
     

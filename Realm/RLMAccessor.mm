@@ -370,7 +370,7 @@ IMP RLMAccessorStandaloneGetter(NSUInteger colIndex, char accessorCode, NSString
     if (accessorCode == 't') {
         return imp_implementationWithBlock(^(RLMObject *obj) {
             typedef id (*getter_type)(RLMObject *, SEL);
-            RLMProperty *prop = obj.RLMObject_schema.properties[colIndex];
+            RLMProperty *prop = obj.objectSchema.properties[colIndex];
             Class superClass = class_getSuperclass(obj.class);
             getter_type superGetter = (getter_type)class_getMethodImplementation(superClass, NSSelectorFromString(prop.getterName));
             id val = superGetter(obj, NSSelectorFromString(prop.getterName));
@@ -536,7 +536,7 @@ inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
 
 
 void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
-    RLMProperty *prop = obj.RLMObject_schema[propName];
+    RLMProperty *prop = obj.objectSchema[propName];
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
@@ -595,7 +595,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *propName) {
-    RLMProperty *prop = obj.RLMObject_schema[propName];
+    RLMProperty *prop = obj.objectSchema[propName];
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"

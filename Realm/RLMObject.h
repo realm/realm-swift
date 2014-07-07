@@ -21,7 +21,7 @@
 
 @class RLMRealm;
 @class RLMArray;
-
+@class RLMObjectSchema;
 
 /**
  
@@ -142,6 +142,11 @@
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
+
+/**
+ The ObjectSchema which lists the persisted properties for this object.
+ */
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
 
 
 /**---------------------------------------------------------------------------------------
