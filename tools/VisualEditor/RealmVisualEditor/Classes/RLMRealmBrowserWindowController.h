@@ -30,9 +30,7 @@ extern NSString *const RLMNotificationInfoIndex;
 @interface RLMRealmBrowserWindowController : NSWindowController
 
 @property (nonatomic, weak) RLMDocument *modelDocument;
-
 @property (nonatomic, readonly) RLMTypeNode *selectedTypeNode;
-
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 
@@ -41,5 +39,7 @@ extern NSString *const RLMNotificationInfoIndex;
 - (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
+
+- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
 
 @end
