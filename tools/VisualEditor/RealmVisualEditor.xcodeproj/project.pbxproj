@@ -42,6 +42,7 @@
 		84E0F9731921F3B900D6CA14 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84E0F94F1921F3B900D6CA14 /* Cocoa.framework */; };
 		84E0F97B1921F3B900D6CA14 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84E0F9791921F3B900D6CA14 /* InfoPlist.strings */; };
 		84E0F97D1921F3B900D6CA14 /* RealmVisualEditorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0F97C1921F3B900D6CA14 /* RealmVisualEditorTests.m */; };
+		84E35A42196A9F3B007F0344 /* RLMNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A41196A9F3B007F0344 /* RLMNavigationState.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,6 +161,8 @@
 		84E0F9781921F3B900D6CA14 /* RealmVisualEditorTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmVisualEditorTests-Info.plist"; sourceTree = "<group>"; };
 		84E0F97A1921F3B900D6CA14 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		84E0F97C1921F3B900D6CA14 /* RealmVisualEditorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmVisualEditorTests.m; sourceTree = "<group>"; };
+		84E35A40196A9F3B007F0344 /* RLMNavigationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNavigationState.h; path = Classes/RLMNavigationState.h; sourceTree = "<group>"; };
+		84E35A41196A9F3B007F0344 /* RLMNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationState.m; path = Classes/RLMNavigationState.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,6 +235,8 @@
 		8474E2B919544D8700BCA755 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				84E35A40196A9F3B007F0344 /* RLMNavigationState.h */,
+				84E35A41196A9F3B007F0344 /* RLMNavigationState.m */,
 				84754ABC193CA4600093604E /* RLMRealmBrowserWindowController.h */,
 				84754ABD193CA4600093604E /* RLMRealmBrowserWindowController.m */,
 				8457294B1962E3860076D4F1 /* RLMTableView.h */,
@@ -546,6 +551,7 @@
 				84AA41A91949C99800A50F03 /* RLMTypeNode.m in Sources */,
 				84A34A4F192E19C5005D6CC4 /* RLMApplicationDelegate.m in Sources */,
 				8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */,
+				84E35A42196A9F3B007F0344 /* RLMNavigationState.m in Sources */,
 				84D7990D19388E8900FC76A0 /* RLMRealmNode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

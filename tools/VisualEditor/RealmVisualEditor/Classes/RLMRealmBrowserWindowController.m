@@ -20,19 +20,24 @@
 
 #import "RLMObject+ResolvedClass.h"
 #import "NSTableColumn+Resize.h"
+#import "RLMNavigationState.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 NSString *const RLMNewTypeNodeHasBeenSelectedNotification = @"RLMNewTypeNodeHasBeenSelectedNotification";
 NSString *const RLMNotificationInfoTypeNode = @"RLMNotificationInfoTypeNode";
 NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 
-@implementation RLMRealmBrowserWindowController
+@implementation RLMRealmBrowserWindowController {
+
+    NSMutableArray *navigationStack;
+}
 
 #pragma mark - NSViewController overrides
 
 - (void)windowDidLoad
 {
-    // ... and the first class to be selected so something is displayed in the property pane.
+    navigationStack = [[NSMutableArray alloc] initWithCapacity:200];
+    
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
         [self updateSelectedTypeNode:firstItem];
@@ -52,6 +57,11 @@ NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 {
     // Only update and notify if we really have changed the selection!!!
     if (_selectedTypeNode != typeNode) {
+        
+        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode
+                                                                               index:selectionIndex];
+        [navigationStack addObject:state];
+        
         _selectedTypeNode = typeNode;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:RLMNewTypeNodeHasBeenSelectedNotification
