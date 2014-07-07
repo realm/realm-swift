@@ -140,10 +140,10 @@
 
 #pragma mark - Public methods
 
-- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     // How many properties does the clazz contains?
-    NSArray *columns = outlineNode.propertyColumns;
+    NSArray *columns = typeNode.propertyColumns;
     NSUInteger columnCount = columns.count;
     
     // We clear the table view from all old columns

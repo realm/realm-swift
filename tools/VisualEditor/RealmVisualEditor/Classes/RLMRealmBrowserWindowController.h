@@ -23,12 +23,15 @@
 #import "RLMInstanceTableViewController.h"
 
 extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
+extern NSString *const RLMNewTypeNodeHasBeenSelectedNotification;
+extern NSString *const RLMNotificationInfoTypeNode;
+extern NSString *const RLMNotificationInfoIndex;
 
 @interface RLMRealmBrowserWindowController : NSWindowController
 
 @property (nonatomic, weak) RLMDocument *modelDocument;
 
-@property (nonatomic, strong) RLMTypeNode *selectedTypeNode;
+@property (nonatomic, readonly) RLMTypeNode *selectedTypeNode;
 
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;

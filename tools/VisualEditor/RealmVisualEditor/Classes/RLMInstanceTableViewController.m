@@ -43,6 +43,17 @@
     linkCursorDisplaying = NO;
 }
 
+#pragma mark - RLMViewController overrides
+
+- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+{
+    [(RLMTableView *)self.tableView formatColumnsToFitType:type
+                                        withSelectionAtRow:index];
+    [self.tableView reloadData];
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
+                byExtendingSelection:NO];
+}
+
 #pragma mark - NSTableViewDataSource implementation
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -437,7 +448,8 @@
                 RLMArray *linkedArray = (RLMArray *)propertyValue;
 
                 [self.parentWindowController addArray:linkedArray
-                                         fromProperty:propertyNode.property object:selectedInstance];                
+                                         fromProperty:propertyNode.property
+                                               object:selectedInstance];
             }
         }
         else {
@@ -454,14 +466,6 @@
 }
 
 #pragma mark - Public methods - Table view construction
-
-- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
-{
-    self.parentWindowController.selectedTypeNode = outlineNode;
-    RLMTableView *tableView = (RLMTableView *)self.tableView;
-    [tableView updateSelectedObjectNode:outlineNode
-                     withSelectionAtRow:selectionIndex];
-}
 
 - (void)enableLinkCursor
 {

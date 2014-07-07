@@ -18,7 +18,25 @@
 
 #import "RLMViewController.h"
 
+#import "RLMRealmBrowserWindowController.h"
+
 @implementation RLMViewController
+
+#pragma mark - NSObject overrides
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newTypeNodeHasBeenSelectedNotificationListener:)
+                                                 name:RLMNewTypeNodeHasBeenSelectedNotification
+                                               object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 #pragma mark - Public methods - Accessors
 
@@ -29,6 +47,23 @@
     }
         
     return nil;
+}
+
+#pragma mark - Public methods
+
+- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+{
+    // No action - should be overridden by subclasses.
+}
+
+#pragma mark - Private methods
+
+- (void)newTypeNodeHasBeenSelectedNotificationListener:(NSNotification *)notification
+{
+    RLMTypeNode *typeNode = notification.userInfo[RLMNotificationInfoTypeNode];
+    NSNumber *index = notification.userInfo[RLMNotificationInfoIndex];
+    [self updateViewWithType:typeNode
+                       index:index.integerValue];
 }
 
 @end

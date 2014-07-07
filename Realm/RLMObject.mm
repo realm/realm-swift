@@ -186,7 +186,7 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
 
 - (NSString *)description
 {
-    NSString *baseClassName = self.class.className;
+    NSString *baseClassName = self.RLMObject_schema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
     

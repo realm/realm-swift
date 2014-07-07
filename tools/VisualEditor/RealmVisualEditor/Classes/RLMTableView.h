@@ -50,6 +50,6 @@ typedef struct {
 
 @interface RLMTableView : NSTableView
 
-- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 @end

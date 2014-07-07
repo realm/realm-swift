@@ -34,19 +34,25 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
-    // We want the class outline to be expandedas default
-    [self.classesOutlineView expandItem:nil
-                         expandChildren:YES];
-    
-    // ... and the first class to be selected so something is displayed in the property pane.
-    id firstItem = self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+
+    // Expand the root item representing the selected realm.
+    RLMRealmNode *firstItem = self.parentWindowController.modelDocument.presentedRealm;
     if (firstItem != nil) {
-        NSInteger index = [self.classesOutlineView rowForItem:firstItem];
-        [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                             byExtendingSelection:NO];
-        [self selectOutlineItem:firstItem];
+        // We want the class outline to be expanded as default
+        [self.classesOutlineView expandItem:firstItem
+                             expandChildren:YES];
     }
+}
+
+#pragma mark - RLMViewController overrides
+
+- (void)updateViewWithType:(RLMTypeNode *)type index:(NSUInteger)index
+{
+    [self.classesOutlineView reloadData];
+    
+    NSInteger typeIndex = [self.classesOutlineView rowForItem:type];
+    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:typeIndex]
+                         byExtendingSelection:NO];
 }
 
 #pragma mark - NSOutlineViewDataSource implementation
@@ -82,7 +88,7 @@
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    // There is always only one root node
+    // There is never more than one root node
     if (item == nil) {
         return 1;
     }
@@ -142,8 +148,8 @@
         if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
             [self removeAllChildArrays];
         }
-
-        [self selectOutlineItem:selectedItem];
+        
+        [self.parentWindowController updateSelectedTypeNode:selectedItem];
     }
     
     // NOTE: Remember to move the clearing of the row selection in the instance view
@@ -199,20 +205,6 @@
 }
 
 #pragma mark - Private methods
-
-- (void)selectOutlineItem:(id)item
-{
-    if ([item isKindOfClass:[RLMClazzNode class]]) {
-        RLMClazzNode *classNode = (RLMClazzNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:classNode ];
-        return;
-    }
-    else if ([item isKindOfClass:[RLMArrayNode class]]) {
-        RLMArrayNode *arrayNode = (RLMArrayNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:arrayNode];
-        return;
-    }
-}
 
 - (void)removeAllChildArrays
 {

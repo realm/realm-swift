@@ -22,26 +22,43 @@
 #import "NSTableColumn+Resize.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+NSString *const RLMNewTypeNodeHasBeenSelectedNotification = @"RLMNewTypeNodeHasBeenSelectedNotification";
+NSString *const RLMNotificationInfoTypeNode = @"RLMNotificationInfoTypeNode";
+NSString *const RLMNotificationInfoIndex = @"RLMNotificationInfoIndex";
 
 @implementation RLMRealmBrowserWindowController
 
-- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
+#pragma mark - NSViewController overrides
+
+- (void)windowDidLoad
 {
-    [self.outlineViewController selectTypeNode:typeNode];
-    [self.tableViewController updateSelectedObjectNode:typeNode
-                                    withSelectionAtRow:selectionIndex];
+    // ... and the first class to be selected so something is displayed in the property pane.
+    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    if (firstItem != nil) {
+        [self updateSelectedTypeNode:firstItem];
+    }
+    
 }
+
+#pragma mark - Public methods
 
 - (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode
 {
-    [self updateSelectedObjectNode:typeNode
-                withSelectionAtRow:0];
+    [self updateSelectedTypeNode:typeNode
+            withSelectionAtIndex:0];
 }
 
-- (void)updateSelectedObjectNode:(RLMTypeNode *)outlineNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
 {
-    [self.tableViewController updateSelectedObjectNode:outlineNode
-                                    withSelectionAtRow:selectionIndex];
+    // Only update and notify if we really have changed the selection!!!
+    if (_selectedTypeNode != typeNode) {
+        _selectedTypeNode = typeNode;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:RLMNewTypeNodeHasBeenSelectedNotification
+                                                            object:self
+                                                          userInfo:@{RLMNotificationInfoTypeNode:typeNode,
+                                                                     RLMNotificationInfoIndex:@(selectionIndex)}];
+    }
 }
 
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
