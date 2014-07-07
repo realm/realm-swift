@@ -121,7 +121,7 @@ case "$COMMAND" in
     ######################################
     "download-core")
         if ! [ -d core ]; then
-            curl -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+            curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
             unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
             rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
         else
