@@ -88,10 +88,14 @@
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
+    // we have two notifications, one for opening the realm, and a second when performing our transaction
+    __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        [notificationFired fulfill];
+        if (++noteCount == 2) {
+            [notificationFired fulfill];
+        }
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -114,10 +118,14 @@
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
+    // we have two notifications, one for opening the realm, and a second when performing our transaction
+    __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        [notificationFired fulfill];
+        if (++noteCount == 2) {
+            [notificationFired fulfill];
+        }
      }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -134,7 +142,7 @@
     });
     
     // this should complete very fast before the timer
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.01 handler:nil];
     [realm removeNotification:token];
         
     // get object
