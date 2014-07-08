@@ -145,7 +145,7 @@ static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
-    NSRunLoop *_runLoop;
+    NSThread *_thread;
     NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
     
@@ -176,7 +176,7 @@ static NSArray *s_objectDescriptors = nil;
     self = [super init];
     if (self) {
         _path = path;
-        _runLoop = [NSRunLoop currentRunLoop];
+        _thread = [NSThread currentThread];
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -412,7 +412,7 @@ static NSArray *s_objectDescriptors = nil;
             NSArray *realms = realmsAtPath(_path);
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
-                    [realm->_runLoop performSelector:@selector(refresh) withObject:realm afterDelay:0.0 inModes:@[NSRunLoopCommonModes]];
+                    [realm performSelector:@selector(refresh) onThread:realm->_thread withObject:nil waitUntilDone:NO];
                 }
             }
             
