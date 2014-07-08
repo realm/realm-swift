@@ -188,12 +188,14 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
+// overriddent at runtime per-class for performance
 + (NSString *)className {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
+    return NSStringFromClass(self);
 }
 
+// overriddent at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
+    return RLMSchema.sharedSchema[self.className];
 }
 
 - (NSString *)description
