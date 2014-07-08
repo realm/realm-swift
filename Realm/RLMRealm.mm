@@ -179,11 +179,6 @@ static NSArray *s_objectDescriptors = nil;
         _thread = [NSThread currentThread];
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
-        _updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
-                                                        target:[RLMWeakTarget createWithRealm:self]
-                                                      selector:@selector(checkForUpdate)
-                                                      userInfo:nil
-                                                       repeats:YES];
     }
     return self;
 }
@@ -344,6 +339,13 @@ static NSArray *s_objectDescriptors = nil;
     if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
     }
+    
+    // start update timer
+    realm->_updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
+                                                           target:[RLMWeakTarget createWithRealm:realm]
+                                                         selector:@selector(checkForUpdate)
+                                                         userInfo:nil
+                                                          repeats:YES];
     
     return realm;
 }
