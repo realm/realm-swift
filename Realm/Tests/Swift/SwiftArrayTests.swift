@@ -40,9 +40,8 @@ class SwiftArrayTests: RLMTestCase {
         AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
         
         realm.commitWriteTransaction()
-        
-        let result: RLMArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "intCol < \(100)"))
-        
+
+        let result = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
         XCTAssertEqual(result.count, 10, "10 objects added")
         
         var totalSum: CInt = 0
@@ -64,10 +63,10 @@ class SwiftArrayTests: RLMTestCase {
         let obj = StringObject.createInRealm(realm, withObject: ["name"])
         realm.commitWriteTransaction()
         
-        let array = realm.allObjects(StringObject.className())
+        let array = StringObject.allObjectsInRealm(realm)
         XCTAssertTrue(array.readOnly, "Array returned from query should be readonly")
     }
-    
+
     func testObjectAggregate() {
         let realm = realmWithTestPath()
         
@@ -88,10 +87,10 @@ class SwiftArrayTests: RLMTestCase {
         AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         
         realm.commitWriteTransaction()
-        
-        let noArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "boolCol == NO"))
-        let yesArray = realm.objects(AggregateObject.className(), withPredicate: NSPredicate(format: "boolCol == YES"))
-        
+
+        let noArray = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == NO"))
+        let yesArray = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == YES"))
+
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
         XCTAssertEqual(noArray.sumOfProperty("intCol").integerValue, 4, "Sum should be 4")
@@ -184,7 +183,7 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let description = realm.allObjects(EmployeeObject.className()).description
+        let description = EmployeeObject.allObjectsInRealm(realm).description
         
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -194,7 +193,7 @@ class SwiftArrayTests: RLMTestCase {
         
         XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
-    
+
     func testDeleteLinksAndObjectsInArray() {
         let realm = realmWithTestPath()
         
@@ -220,7 +219,7 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(po3)
         
         let company = CompanyObject()
-        company.employees = realm.allObjects(EmployeeObject.className())
+        company.employees = EmployeeObject.allObjectsInRealm(realm)
         realm.addObject(company)
         
         realm.commitWriteTransaction()
@@ -246,7 +245,7 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        let allPeople = realm.allObjects(EmployeeObject.className())
+        let allPeople = EmployeeObject.allObjectsInRealm(realm)
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
     }
 }

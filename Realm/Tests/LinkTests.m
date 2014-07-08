@@ -143,7 +143,7 @@
     [realm commitWriteTransaction];
 }
 
-// FIXME - disable until we fix commit log issue which break transacions when leaking realm objects
+// FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
 /*
 - (void)testCircularLinks 
  {

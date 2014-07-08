@@ -36,7 +36,7 @@ class SwiftMixedTests: RLMTestCase {
         MixedObject.createInRealm(realm, withObject: [true, data, 50])
         realm.commitWriteTransaction()
         
-        let objects = realm.allObjects(MixedObject.className())
+        let objects = MixedObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 5, "5 rows expected")
         XCTAssertTrue(objects[0].isKindOfClass(MixedObject.self), "MixedObject expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isKindOfClass(NSString.self), "NSString expected")

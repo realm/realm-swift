@@ -370,7 +370,8 @@ id RLMSuperGet(RLMObject *obj, NSUInteger colIndex) {
     RLMProperty *prop = obj.objectSchema.properties[colIndex];
     Class superClass = class_getSuperclass(obj.class);
     SEL selector = NSSelectorFromString(prop.getterName);
-    return [superClass instanceMethodForSelector:selector](obj, selector);
+    getter_type superGetter = (getter_type)[superClass instanceMethodForSelector:selector];
+    return superGetter(obj, selector);
 }
 
 // call setter for superclass for property at colIndex
@@ -379,7 +380,8 @@ void RLMSuperSet(RLMObject *obj, NSUInteger colIndex, id val) {
     RLMProperty *prop = obj.objectSchema.properties[colIndex];
     Class superClass = class_getSuperclass(obj.class);
     SEL selector = NSSelectorFromString(prop.setterName);
-    [superClass instanceMethodForSelector:selector](obj, selector, val);
+    setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:selector];
+    superSetter(obj, selector, val);
 }
 
 // getter/setter for standalone
