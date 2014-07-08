@@ -107,9 +107,9 @@
 
     // print out all migrated objects in the migrated realms
     RLMRealm *realmv1 = [RLMRealm realmWithPath:realmv1Path];
-    NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[realmv1 allObjects:Person.className] description]);
+    NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[Person allObjectsInRealm:realmv1] description]);
     RLMRealm *realmv2 = [RLMRealm realmWithPath:realmv2Path];
-    NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[realmv2 allObjects:Person.className] description]);
+    NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[Person allObjectsInRealm:realmv2] description]);
     
     return YES;
 }
