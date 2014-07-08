@@ -33,7 +33,6 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  of an RLMRealm instance.
  
  This object provides access to the RLMSchema current to this migration.
- @see RLMMigrationBlock
  */
 @interface RLMMigration : NSObject
 

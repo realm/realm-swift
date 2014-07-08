@@ -204,7 +204,6 @@
  Get objects matching the given predicate for this type from the default Realm.
 
  @param predicate   The predicate to filter the objects.
- @param realm   The Realm instance to query.
 
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
