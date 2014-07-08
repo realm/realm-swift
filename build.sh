@@ -53,6 +53,7 @@ EOF
 XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
 
 xc() {
+    echo "Building target \"$1\" with: $(xcodebuild -version)"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
