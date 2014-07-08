@@ -174,14 +174,25 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
+    // check attached for table and object
     RLMLinkViewArrayValidateAttached(self);
+    if (object->_realm && !object->_row.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
+    }
 
-    if (object->_row.get_table() != &_backingLinkView->get_parent()) {
+    // check that object types align
+    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object type does not match RLMArray"
                                      userInfo:nil];
     }
 
+    // if different tables then no match
+    if (object->_row.get_table() != &_backingLinkView->get_parent()) {
+        return NSNotFound;
+    }
+
+    // call find on backing array
     size_t object_ndx = object->_row.get_index();
     size_t result = _backingLinkView->find(object_ndx);
     if (result == tightdb::not_found) {

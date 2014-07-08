@@ -117,11 +117,21 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
+    // check attached for table and object
     RLMArrayTableViewValidateAttached(self);
+    if (object->_realm && !object->_row.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
+    }
 
-    if (object->_row.get_table() != &_backingView.get_parent()) {
+    // check that object types align
+    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object type does not match RLMArray" userInfo:nil];
+    }
+
+    // if different tables then no match
+    if (object->_row.get_table() != &_backingView.get_parent()) {
+        return NSNotFound;
     }
 
     size_t object_ndx = object->_row.get_index();

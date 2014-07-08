@@ -27,7 +27,7 @@
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
     XCTAssertNotNil(array.array, @"Should be able to get an empty array");
     XCTAssertEqual(array.array.count, (NSUInteger)0, @"Should start with no array elements");
 
@@ -60,7 +60,7 @@
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
-    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
     XCTAssertNotNil(arObj.array, @"Should be able to get an empty array");
     XCTAssertEqual(arObj.array.count, (NSUInteger)0, @"Should start with no array elements");
     
@@ -82,7 +82,7 @@
     RLMRealm *realm = [self realmWithTestPath];
     
     [realm beginWriteTransaction];
-    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[]]];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
     StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
@@ -128,9 +128,9 @@
 
     [realm beginWriteTransaction];
     [array.array replaceObjectAtIndex:0 withObject:obj3];
-    // XCTAssertEqualObjects([array.array objectAtIndex:0], obj3, @"Objects should be replaced"); FIXME ASANA: https://app.asana.com/0/861870036984/13123030433568
+    XCTAssertEqualObjects([array.array objectAtIndex:0], obj3, @"Objects should be replaced");
     array.array[0] = obj1;
-    // XCTAssertEqualObjects([array.array objectAtIndex:0], obj1, @"Objects should be replaced"); FIXME ASANA: https://app.asana.com/0/861870036984/13123030433568
+    XCTAssertEqualObjects([array.array objectAtIndex:0], obj1, @"Objects should be replaced");
     [array.array removeLastObject];
     XCTAssertEqual(array.array.count, (NSUInteger)2, @"2 objects left");
     [array.array addObject:obj1];
@@ -141,23 +141,24 @@
     ArrayPropertyObject *intArray = [[ArrayPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    [intArray.array addObject:intObj];
+    XCTAssertThrows([intArray.array addObject:intObj], @"Addint to string array should throw");
+    [intArray.intArray addObject:intObj];
 
-    XCTAssertThrows([intArray.array sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.array averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.array minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.array maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
 
-    XCTAssertThrows([intArray.array objectsWithPredicateFormat:@"intCol == 1"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows(([intArray.array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.array arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray objectsWithPredicateFormat:@"intCol == 1"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
     
-    XCTAssertThrows([intArray.array indexOfObjectWithPredicateFormat:@"intCol == 1"], @"Not yet implemented");
-    XCTAssertThrows(([intArray.array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
+    XCTAssertThrows([intArray.intArray indexOfObjectWithPredicateFormat:@"intCol == 1"], @"Not yet implemented");
+    XCTAssertThrows(([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
 
-    XCTAssertEqual([intArray.array indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
+    XCTAssertEqual([intArray.intArray indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
 
-    XCTAssertThrows([intArray.array JSONString], @"Not yet implemented");
+    XCTAssertThrows([intArray.intArray JSONString], @"Not yet implemented");
 }
 
 - (void)testIndexOfObject
@@ -169,13 +170,28 @@
     EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
 
-    CompanyObject *co = [CompanyObject createInRealm:realm withObject:@{@"employees": @[po1, po3]}];
+    // create company
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
+    [company.employees removeObjectAtIndex:1];
+
+    // test standalone
+    XCTAssertEqual((NSUInteger)0, [company.employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)1, [company.employees indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:po2]);
+
+    // add to realm
+    [realm addObject:company];
     [realm commitWriteTransaction];
 
-    RLMArray *employees = co.employees;
-    XCTAssertEqual((NSUInteger)0, [employees indexOfObject:po1]);
-    XCTAssertEqual((NSUInteger)1, [employees indexOfObject:po3]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po2]);
+    // test LinkView RLMArray
+    XCTAssertEqual((NSUInteger)0, [company.employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)1, [company.employees indexOfObject:po3]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:po2]);
+
+    // non realm employee
+    EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithObject:@[@"NoName", @1, @NO]];
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 }
 
 @end

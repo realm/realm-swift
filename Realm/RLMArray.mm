@@ -18,6 +18,7 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
+#import "RLMObjectSchema.h"
 
 @implementation RLMArray
 
@@ -93,6 +94,14 @@
 // Stanalone RLMArray implementation
 //
 
+void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
+    if (![array->_objectClassName isEqualToString:object.objectSchema.className]) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object type does not match RLMArray"
+                                     userInfo:nil];
+    }
+}
+
 + (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
     RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
     ar->_backingArray = [NSMutableArray array];
@@ -112,6 +121,7 @@
 }
 
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
+    RLMValidateMatchingObjectType(self, anObject);
     [_backingArray insertObject:anObject atIndex:index];
 }
 
@@ -120,10 +130,12 @@
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
+    RLMValidateMatchingObjectType(self, anObject);
     [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
+    RLMValidateMatchingObjectType(self, object);
     return [_backingArray indexOfObject:object];
 }
 

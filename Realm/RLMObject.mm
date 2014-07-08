@@ -212,4 +212,25 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     return [NSString stringWithString:mString];
 }
 
+- (BOOL)isEqualToObject:(RLMObject *)object {
+    // if identical object
+    if (self == object) {
+        return YES;
+    }
+    // if not in realm or differing realms
+    if (_realm == nil || _realm != object.realm) {
+        return NO;
+    }
+    // if either are detached
+    if (!_row.is_attached() || !object->_row.is_attached()) {
+        return NO;
+    }
+    // if table and index are the same
+    return _row.get_table() == object->_row.get_table() && _row.get_index() == object->_row.get_index();
+}
+
+- (BOOL)isEqual:(id)object {
+    return [self isEqualToObject:object];
+}
+
 @end
