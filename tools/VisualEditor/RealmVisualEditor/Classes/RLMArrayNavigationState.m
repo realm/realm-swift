@@ -29,4 +29,17 @@
     return self;
 }
 
+- (BOOL)isEqualTo:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        BOOL result = [super isEqualTo:object];
+        
+        RLMArrayNavigationState *comparedState = (RLMArrayNavigationState *)object;
+        return result && self.property == comparedState.property;
+    }
+    
+    return NO;
+}
+
+
 @end

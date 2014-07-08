@@ -30,4 +30,17 @@
     return self;
 }
 
+- (BOOL)isEqualTo:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        RLMNavigationState *comparedState = (RLMNavigationState *)object;
+        BOOL result = self.selectedType == comparedState.selectedType &&
+                      self.selectionIndex == comparedState.selectionIndex;
+        
+        return result;
+    }
+    
+    return NO;
+}
+
 @end

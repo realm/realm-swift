@@ -83,8 +83,11 @@
 - (void)newTypeNodeHasBeenSelectedNotificationListener:(NSNotification *)notification
 {
     RLMNavigationState *navigationState = notification.userInfo[RLMNotificationInfoNavigationState];
-    _currentState = navigationState;
-    [self updateViewWithState:navigationState];
+    
+    if (![_currentState isEqualTo:navigationState]) {
+        _currentState = navigationState;
+        [self updateViewWithState:navigationState];
+    }
 }
 
 @end

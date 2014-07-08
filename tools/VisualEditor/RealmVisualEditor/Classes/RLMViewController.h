@@ -20,10 +20,13 @@
 
 #import "RLMNavigationState.h"
 
+@class RLMRealmBrowserWindowController;
+
 @interface RLMViewController : NSViewController
 
 @property (nonatomic, readonly) NSTableView *tableView;
 @property (nonatomic, readonly) RLMNavigationState *currentState;
+@property (nonatomic, weak) IBOutlet RLMRealmBrowserWindowController *parentWindowController;
 
 - (void)updateViewWithState:(RLMNavigationState *)state;
 

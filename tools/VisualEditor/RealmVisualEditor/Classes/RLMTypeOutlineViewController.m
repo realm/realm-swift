@@ -213,14 +213,6 @@
     return nil;
 }
 
-#pragma mark - Public methods
-
-- (void)selectTypeNode:(RLMTypeNode *)objectNode
-{
-    NSInteger index = [self.classesOutlineView rowForItem:objectNode];    
-    [self setSelectionIndex:index];
-}
-
 #pragma mark - Private methods
 
 - (void)removeAllChildArrays
