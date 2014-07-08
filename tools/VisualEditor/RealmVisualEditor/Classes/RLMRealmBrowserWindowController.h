@@ -38,6 +38,8 @@ extern NSString *const RLMNotificationInfoNavigationState;
 
 - (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
 
+- (void)updateSelectionAtIndex:(NSUInteger)selectionIndex;
+
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;

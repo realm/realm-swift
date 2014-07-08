@@ -26,6 +26,7 @@
 
 @interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, RLMTableViewDelegate>
 
+@property (nonatomic, readonly) RLMTableView *realmTableView;
 @property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
 
 @end

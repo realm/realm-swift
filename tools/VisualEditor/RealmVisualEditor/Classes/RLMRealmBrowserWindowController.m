@@ -67,6 +67,17 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
     }
 }
 
+- (void)updateSelectionAtIndex:(NSUInteger)selectionIndex
+{
+    // When making changes to the instance selection we only register the navigation changes in the
+    // navigation stack but avoid notifying others as there is no changes to the selected type and
+    // consequently no need for further updates.
+    [navigationStack pushStateWithTypeNode:self.selectedTypeNode
+                                     index:selectionIndex];
+    [self updateNavigationButtons];
+
+}
+
 - (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
 {
     RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedTypeNode;

@@ -123,7 +123,7 @@
 
 }
 
-#pragma mark - NSView overrdes
+#pragma mark - NSView overrides
 
 - (void)updateTrackingAreas
 {
@@ -268,6 +268,28 @@
     [self updateTableViewWithSelectionAtRow:selectionIndex];
 }
 
+- (void)clearSelection
+{
+    id<NSTableViewDelegate> tempDelegate = self.delegate;
+    self.delegate = nil;
+    
+    [self selectRowIndexes:nil
+      byExtendingSelection:NO];
+    
+    self.delegate = tempDelegate;
+}
+
+- (void)setSelectionIndex:(NSUInteger)newIndex
+{
+    id<NSTableViewDelegate> tempDelegate = self.delegate;
+    self.delegate = nil;
+    
+    [self selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+      byExtendingSelection:NO];
+    
+    self.delegate = tempDelegate;
+}
+
 #pragma mark - Private methods - Cell geometry 
 
 - (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
@@ -345,8 +367,7 @@
         [column resizeToFitContents];
     }
     
-    [self selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-      byExtendingSelection:NO];
+    [self setSelectionIndex:index];
 }
 
 @end

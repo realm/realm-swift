@@ -50,8 +50,7 @@
     [(RLMTableView *)self.tableView formatColumnsToFitType:state.selectedType
                                         withSelectionAtRow:state.selectionIndex];
     [self.tableView reloadData];
-    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:state.selectionIndex]
-                byExtendingSelection:NO];
+    [self.realmTableView setSelectionIndex:state.selectionIndex];
 }
 
 #pragma mark - NSTableViewDataSource implementation
@@ -187,7 +186,7 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    
+    [self.parentWindowController updateSelectionAtIndex:self.tableView.selectedRow];
 }
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -407,6 +406,13 @@
     [self disableLinkCursor];
 }
 
+#pragma mark - Public methods - Accessors
+
+- (RLMTableView *)realmTableView
+{
+    return (RLMTableView *)self.tableView;
+}
+
 #pragma mark - Public methods - NSTableView eventHandling
 
 - (IBAction)userClicked:(id)sender
@@ -454,12 +460,10 @@
         }
         else {
             if (row != -1) {
-                [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-                            byExtendingSelection:NO];
+                [self.realmTableView setSelectionIndex:row];
             }
             else {
-                [self.tableView selectRowIndexes:nil
-                            byExtendingSelection:NO];
+                [self.realmTableView clearSelection];
             }
         }
     }
