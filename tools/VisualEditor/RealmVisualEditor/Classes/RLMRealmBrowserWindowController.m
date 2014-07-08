@@ -123,6 +123,7 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
 
 - (void)performUpdateBasedOnNavigationState:(RLMNavigationState *)state
 {
+    _selectedTypeNode = state.selectedType;
     [[NSNotificationCenter defaultCenter] postNotificationName:RLMNewTypeNodeHasBeenSelectedNotification
                                                         object:self
                                                       userInfo:@{RLMNotificationInfoNavigationState:state}];
