@@ -20,6 +20,7 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMRealmOutlineNode.h"
+#import "RLMArrayNavigationState.h"
 
 @interface RLMTypeOutlineViewController ()
 
@@ -48,11 +49,29 @@
 
 - (void)updateViewWithState:(RLMNavigationState *)state
 {
-    [self.classesOutlineView reloadData];
-    
-    NSInteger typeIndex = [self.classesOutlineView rowForItem:state.selectedType];
-    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:typeIndex]
-                         byExtendingSelection:NO];
+    if ([state isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)state;
+        
+        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+        NSInteger selectionIndex = arrayState.selectionIndex;
+        RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
+        
+        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
+        
+        [self.classesOutlineView reloadData];
+        [self.classesOutlineView expandItem:parentClassNode];
+        
+        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
+        if (index != NSNotFound) {
+            [self setSelectionIndex:index];
+        }
+    }
+    else {
+        [self.classesOutlineView reloadData];
+        
+        NSInteger typeIndex = [self.classesOutlineView rowForItem:state.selectedType];
+        [self setSelectionIndex:typeIndex];
+    }
 }
 
 #pragma mark - NSOutlineViewDataSource implementation
@@ -149,7 +168,7 @@
             [self removeAllChildArrays];
         }
         
-        [self.parentWindowController updateSelectedTypeNode:selectedItem];
+        [self.parentWindowController updateSelectedType:selectedItem];
     }
     
     // NOTE: Remember to move the clearing of the row selection in the instance view
@@ -198,10 +217,8 @@
 
 - (void)selectTypeNode:(RLMTypeNode *)objectNode
 {
-    NSInteger index = [self.classesOutlineView rowForItem:objectNode];
-    
-    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                         byExtendingSelection:NO];
+    NSInteger index = [self.classesOutlineView rowForItem:objectNode];    
+    [self setSelectionIndex:index];
 }
 
 #pragma mark - Private methods

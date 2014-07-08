@@ -42,11 +42,11 @@
     return state;
 }
 
-- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode arrayNode:(RLMArrayNode *)arrayNode index:(NSInteger)selectionIndex;
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property
 {
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectionType:typeNode
-                                                                                      array:arrayNode
-                                                                                      index:selectionIndex];
+                                                                                      index:index
+                                                                                   property:property];
     [self pushState:state];
     
     return state;

@@ -20,6 +20,6 @@
 
 @interface RLMArrayNode : RLMTypeNode
 
-- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
 
 @end

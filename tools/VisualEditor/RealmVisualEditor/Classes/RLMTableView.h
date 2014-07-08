@@ -52,8 +52,4 @@ typedef struct {
 
 - (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
-- (void)clearSelection;
-
-- (void)setSelectionIndex:(NSUInteger)newIndex;
-
 @end

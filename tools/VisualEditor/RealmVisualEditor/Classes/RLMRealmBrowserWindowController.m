@@ -40,62 +40,35 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
-        [self updateSelectedTypeNode:firstItem];
+        [self updateSelectedType:firstItem];
     }
     
 }
 
 #pragma mark - Public methods
 
-- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode
+- (void)updateSelectedType:(RLMTypeNode *)type
 {
-    [self updateSelectedTypeNode:typeNode
-            withSelectionAtIndex:0];
+    [self updateSelectedType:type
+                     atIndex:0];
 }
 
-- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
+- (void)updateSelectedType:(RLMTypeNode *)type atIndex:(NSUInteger)index
 {
-    // Only update and notify if we really have changed the selection!!!
-    if (_selectedTypeNode != typeNode) {
-        _selectedTypeNode = typeNode;
-        
-        RLMNavigationState *state = [navigationStack pushStateWithTypeNode:typeNode
-                                         index:selectionIndex];
-        [self updateNavigationButtons];
-
-        [self performUpdateBasedOnNavigationState:state];
-    }
-}
-
-- (void)updateSelectionAtIndex:(NSUInteger)selectionIndex
-{
-    // When making changes to the instance selection we only register the navigation changes in the
-    // navigation stack but avoid notifying others as there is no changes to the selected type and
-    // consequently no need for further updates.
-    [navigationStack pushStateWithTypeNode:self.selectedTypeNode
-                                     index:selectionIndex];
+    RLMNavigationState *state = [navigationStack pushStateWithTypeNode:type
+                                                                 index:index];
     [self updateNavigationButtons];
-
+    
+    [self performUpdateBasedOnNavigationState:state];
 }
 
-- (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
+- (void)updateSelectedType:(RLMTypeNode *)type withArrayProperty:(RLMProperty *)array atIndex:(NSUInteger)index
 {
-    RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedTypeNode;
+    RLMArrayNavigationState *state = [navigationStack pushStateWithTypeNode:type
+                                                                      index:index
+                                                                   property:array];
     
-    RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:array
-                                                      fromProperty:property
-                                                            object:object];
-    
-    NSOutlineView *outlineView = (NSOutlineView *)self.outlineViewController.view;
-    [outlineView reloadData];
-    
-    [outlineView expandItem:selectedClassNode];
-    
-    NSInteger index = [outlineView rowForItem:arrayNode];
-    if (index != NSNotFound) {
-        [outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                 byExtendingSelection:NO];
-    }    
+    [self performUpdateBasedOnNavigationState:state];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
@@ -134,7 +107,6 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
 
 - (void)performUpdateBasedOnNavigationState:(RLMNavigationState *)state
 {
-    _selectedTypeNode = state.selectedType;
     [[NSNotificationCenter defaultCenter] postNotificationName:RLMNewTypeNodeHasBeenSelectedNotification
                                                         object:self
                                                       userInfo:@{RLMNotificationInfoNavigationState:state}];

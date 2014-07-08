@@ -23,7 +23,12 @@
 @interface RLMViewController : NSViewController
 
 @property (nonatomic, readonly) NSTableView *tableView;
+@property (nonatomic, readonly) RLMNavigationState *currentState;
 
 - (void)updateViewWithState:(RLMNavigationState *)state;
+
+- (void)clearSelection;
+
+- (void)setSelectionIndex:(NSUInteger)newIndex;
 
 @end

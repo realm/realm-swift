@@ -56,11 +56,34 @@
     // No action - should be overridden by subclasses.
 }
 
+- (void)clearSelection
+{
+    id<NSTableViewDelegate> tempDelegate = self.tableView.delegate;
+    self.tableView.delegate = nil;
+    
+    [self.tableView selectRowIndexes:nil
+                byExtendingSelection:NO];
+    
+    self.tableView.delegate = tempDelegate;
+}
+
+- (void)setSelectionIndex:(NSUInteger)newIndex
+{
+    id<NSTableViewDelegate> tempDelegate = self.tableView.delegate;
+    self.tableView.delegate = nil;
+    
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+                byExtendingSelection:NO];
+    
+    self.tableView.delegate = tempDelegate;
+}
+
 #pragma mark - Private methods
 
 - (void)newTypeNodeHasBeenSelectedNotificationListener:(NSNotification *)notification
 {
     RLMNavigationState *navigationState = notification.userInfo[RLMNotificationInfoNavigationState];
+    _currentState = navigationState;
     [self updateViewWithState:navigationState];
 }
 

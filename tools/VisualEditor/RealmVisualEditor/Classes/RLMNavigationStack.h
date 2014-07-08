@@ -25,7 +25,7 @@
 
 - (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
 
-- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode arrayNode:(RLMArrayNode *)arrayNode index:(NSInteger)selectionIndex;
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property;
 
 - (void)pushState:(RLMNavigationState *)state;
 

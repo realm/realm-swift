@@ -265,29 +265,10 @@
         
     }
     
-    [self updateTableViewWithSelectionAtRow:selectionIndex];
-}
-
-- (void)clearSelection
-{
-    id<NSTableViewDelegate> tempDelegate = self.delegate;
-    self.delegate = nil;
-    
-    [self selectRowIndexes:nil
-      byExtendingSelection:NO];
-    
-    self.delegate = tempDelegate;
-}
-
-- (void)setSelectionIndex:(NSUInteger)newIndex
-{
-    id<NSTableViewDelegate> tempDelegate = self.delegate;
-    self.delegate = nil;
-    
-    [self selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
-      byExtendingSelection:NO];
-    
-    self.delegate = tempDelegate;
+    [self reloadData];
+    for (NSTableColumn *column in self.tableColumns) {
+        [column resizeToFitContents];
+    }
 }
 
 #pragma mark - Private methods - Cell geometry 
@@ -358,16 +339,6 @@
     
     NSTableHeaderCell *headerCell = column.headerCell;
     headerCell.stringValue = name;
-}
-
-- (void)updateTableViewWithSelectionAtRow:(NSUInteger)index
-{
-    [self reloadData];
-    for (NSTableColumn *column in self.tableColumns) {
-        [column resizeToFitContents];
-    }
-    
-    [self setSelectionIndex:index];
 }
 
 @end

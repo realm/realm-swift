@@ -22,8 +22,8 @@
 
 @interface RLMArrayNavigationState : RLMNavigationState
 
-@property (nonatomic, readonly) RLMArrayNode *selectionArray;
+@property (nonatomic, readonly) RLMProperty *property;
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type array:(RLMArrayNode *)array index:(NSInteger)index;
+- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property;
 
 @end

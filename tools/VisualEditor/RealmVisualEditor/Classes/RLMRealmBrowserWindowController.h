@@ -29,18 +29,16 @@ extern NSString *const RLMNotificationInfoNavigationState;
 @interface RLMRealmBrowserWindowController : NSWindowController
 
 @property (nonatomic, weak) RLMDocument *modelDocument;
-@property (nonatomic, readonly) RLMTypeNode *selectedTypeNode;
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
 
-- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode;
+- (void)updateSelectedType:(RLMTypeNode *)type;
 
-- (void)updateSelectedTypeNode:(RLMTypeNode *)typeNode withSelectionAtIndex:(NSUInteger)selectionIndex;
+- (void)updateSelectedType:(RLMTypeNode *)type atIndex:(NSUInteger)index;
 
-- (void)updateSelectionAtIndex:(NSUInteger)selectionIndex;
-
-- (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
+- (void)updateSelectedType:(RLMTypeNode *)type withArrayProperty:(RLMProperty *)array atIndex:(NSUInteger)index
+;
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
 

@@ -107,12 +107,11 @@
 
 #pragma mark - Public methods
 
-- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
+- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object
 {
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithArray:array
-                                            withReferringProperty:property
-                                                         onObject:object
-                                                            realm:self.realm];
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:property
+                                                                     onObject:object
+                                                                        realm:self.realm];
     
     if (displayedArrays.count == 0) {
         [displayedArrays addObject:arrayNode];

@@ -27,7 +27,7 @@
     RLMArray *displayedArray;
 }
 
-- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
+- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
     NSString *elementTypeName = property.objectClassName;
     RLMSchema *realmSchema = realm.schema;
@@ -37,7 +37,7 @@
                              inRealm:realm]) {
         referringProperty = property;
         referringObject = object;
-        displayedArray = array;
+        displayedArray = object[property.name];
     }
 
     return self;
