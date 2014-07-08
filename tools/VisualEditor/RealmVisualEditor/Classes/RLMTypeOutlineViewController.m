@@ -143,7 +143,7 @@
     if (outlineView == self.classesOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
 
-        // The arrays we get from linkviews are ephemeral, so we
+        // The arrays we get from link views are ephemeral, so we
         // remove them when any class node is selected
         if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
             [self removeAllChildArrays];

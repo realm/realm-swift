@@ -62,7 +62,6 @@
     
     [stack addObject:state];
     index++;
-
 }
 
 - (RLMNavigationState *)navigateBackward
