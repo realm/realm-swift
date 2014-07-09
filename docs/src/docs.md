@@ -44,7 +44,9 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 
 ## Models
 
-Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects.
+Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects. Apart from the fact that they can be added to a Realm for persistence and sharing between threads, these are just regular objects. So you can add your own methods and protocols to them and use them like any other object.
+
+If you have installed our plugin there will be a nice template to create the interface and implementation files in the "New File..." dialog.
 
 
 <div class="highlight-wrapper">
@@ -56,9 +58,11 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 {% highlight objective-c %}
 // Person.h
 @interface Person : RLMObject
-@property (nonatomic, copy)   NSString *name;
-@property (nonatomic, strong) NSDate   *birthdate;
+@property NSString *name;
+@property NSDate   *birthdate;
 @end
+
+RLM_ARRAY_TYPE(Person) // Defines an RLMArray<Person> type
 
 // Person.m
 @implementation Person
@@ -71,9 +75,11 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 See [RLMObject](api/Classes/RLMObject.html#) for more details.
 
 
-## Writes
+## Persisting Objects
 
-All writes must be done via a write transaction:
+Realm objects can be created and used standalone, just like regular objects. If you want them to persist and be sharable between threads, you just add them to a Realm. As all changes to objects in a Realm has to be done through write transactions, this is also the case for adding objects.
+
+After you have added the object to the Realm you can continue using it, and all changes you make to it from now on will be persisted and available from other threads that uses the same realm.
 
 <div class="highlight-wrapper">
 
@@ -85,10 +91,12 @@ All writes must be done via a write transaction:
 // Get the default Realm
 RLMRealm *realm = [RLMRealm defaultRealm];
 
+// Create object
 Person *author = [[Person alloc] init];
 author.name       = @"David Foster Wallace";
 author.birthdate  = [NSDate date];
 
+// Add object to Realm
 [realm beginWriteTransaction];  // Begin a transaction
 [realm addObject:author]        // Add the object
 [realm commitWriteTransaction]; // Commit the transaction
