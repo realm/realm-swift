@@ -18,8 +18,11 @@
 
 import XCTest
 import Realm
+import TestFramework
 
 class SwiftObjectInterfaceTests: SwiftTestCase {
+
+    // Swift models
 
     func testSwiftObject() {
         let realm = realmWithTestPath()
@@ -104,5 +107,34 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqualObjects(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
+    }
+
+    // Objective-C models
+
+    // Note: Swift doesn't support custom accessor names
+    // so we test to make sure models with custom accessors can still be accessed
+    func testCustomAccessors() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        let ca = CustomAccessorsObject.createInRealm(realm, withObject: ["name", 2])
+        XCTAssertEqualObjects(ca.name, "name", "name property should be name.")
+        ca.age = 99
+        XCTAssertEqual(ca.age, 99, "age property should be 99")
+        realm.commitWriteTransaction()
+    }
+
+    func testClassExtension() {
+        let realm = realmWithTestPath()
+
+        realm.beginWriteTransaction()
+        let bObject = BaseClassStringObject()
+        bObject.intCol = 1
+        bObject.stringCol = "stringVal"
+        realm.addObject(bObject)
+        realm.commitWriteTransaction()
+
+        let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as BaseClassStringObject
+        XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
+        XCTAssertEqualObjects(objectFromRealm.stringCol, "stringVal", "Should be stringVal")
     }
 }
