@@ -42,7 +42,7 @@ inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObject *obj) {
 
     if (!obj->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Attempting to modify object outside of a write transaction."
+                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on a RLMRealm instance first."
                                      userInfo:nil];
     }
 }
@@ -624,7 +624,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Class name": [obj.class className]}];
     }
     NSUInteger col = prop.column;
