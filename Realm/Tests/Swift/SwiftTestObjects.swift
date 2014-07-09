@@ -87,3 +87,8 @@ class SwiftArrayPropertyObject: RLMObject {
     var array = RLMArray(objectClassName: SwiftStringObject.className())
     var intArray = RLMArray(objectClassName: SwiftIntObject.className())
 }
+
+class SwiftDynamicObject: RLMObject {
+    var stringCol = "a"
+    var intCol = 0
+}

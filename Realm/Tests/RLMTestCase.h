@@ -18,7 +18,7 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
-#import <TestFramework/RLMTestObjects.h>
+#import <TestFramework/TestFramework.h>
 
 NSString *RLMTestRealmPath();
 NSString *RLMDefaultRealmPath();
@@ -46,6 +46,3 @@ NSString *RLMRealmPathForFile();
 #endif
 
 @end
-
-
-
