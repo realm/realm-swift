@@ -18,8 +18,6 @@
 		DBB7F31E1968B03000CEE7F3 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBB7F31D1968B03000CEE7F3 /* XCTest.framework */; };
 		DBB7F31F1968B03000CEE7F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBB7F3041968B03000CEE7F3 /* Foundation.framework */; };
 		DBB7F3201968B03000CEE7F3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBB7F3081968B03000CEE7F3 /* UIKit.framework */; };
-		DBB7F3281968B03000CEE7F3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DBB7F3261968B03000CEE7F3 /* InfoPlist.strings */; };
-		DBB7F32A1968B03000CEE7F3 /* RealmRestExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7F3291968B03000CEE7F3 /* RealmRestExampleTests.m */; };
 		DBB7F3341968B09200CEE7F3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DBB7F3331968B09200CEE7F3 /* libc++.dylib */; };
 		DBB7F3361968B0A700CEE7F3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBB7F3351968B0A700CEE7F3 /* Realm.framework */; };
 /* End PBXBuildFile section */
@@ -50,9 +48,6 @@
 		DBB7F3161968B03000CEE7F3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		DBB7F31C1968B03000CEE7F3 /* RealmRestExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmRestExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBB7F31D1968B03000CEE7F3 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		DBB7F3251968B03000CEE7F3 /* RealmRestExampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmRestExampleTests-Info.plist"; sourceTree = "<group>"; };
-		DBB7F3271968B03000CEE7F3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		DBB7F3291968B03000CEE7F3 /* RealmRestExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmRestExampleTests.m; sourceTree = "<group>"; };
 		DBB7F3331968B09200CEE7F3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		DBB7F3351968B0A700CEE7F3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../../Downloads/Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -87,7 +82,6 @@
 			isa = PBXGroup;
 			children = (
 				DBB7F30A1968B03000CEE7F3 /* RealmRestExample */,
-				DBB7F3231968B03000CEE7F3 /* RealmRestExampleTests */,
 				DBB7F3031968B03000CEE7F3 /* Frameworks */,
 				DBB7F3021968B03000CEE7F3 /* Products */,
 			);
@@ -135,24 +129,6 @@
 				DBB7F30D1968B03000CEE7F3 /* InfoPlist.strings */,
 				DBB7F3101968B03000CEE7F3 /* main.m */,
 				DBB7F3121968B03000CEE7F3 /* RealmRestExample-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		DBB7F3231968B03000CEE7F3 /* RealmRestExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				DBB7F3291968B03000CEE7F3 /* RealmRestExampleTests.m */,
-				DBB7F3241968B03000CEE7F3 /* Supporting Files */,
-			);
-			path = RealmRestExampleTests;
-			sourceTree = "<group>";
-		};
-		DBB7F3241968B03000CEE7F3 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				DBB7F3251968B03000CEE7F3 /* RealmRestExampleTests-Info.plist */,
-				DBB7F3261968B03000CEE7F3 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -241,7 +217,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBB7F3281968B03000CEE7F3 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,7 +237,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBB7F32A1968B03000CEE7F3 /* RealmRestExampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,14 +255,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				DBB7F30E1968B03000CEE7F3 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		DBB7F3261968B03000CEE7F3 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DBB7F3271968B03000CEE7F3 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
