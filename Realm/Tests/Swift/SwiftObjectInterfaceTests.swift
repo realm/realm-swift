@@ -71,6 +71,37 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
     }
 
+    func testOptionalSwiftProperties() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+
+        let obj = SwiftOptionalObject()
+//        obj.optBoolCol = true
+//        obj.optIntCol = 1234
+//        obj.optFloatCol = 1.1
+//        obj.optDoubleCol = 2.2
+        obj.optStringCol = "abcd"
+        obj.optBinaryCol = "abcd".dataUsingEncoding(NSUTF8StringEncoding)
+        obj.optDateCol = NSDate(timeIntervalSince1970: 123)
+//        obj.optObjectCol = SwiftBoolObject()
+//        obj.optObjectCol!.boolCol = true
+        realm.addObject(obj)
+
+        realm.commitWriteTransaction()
+
+        let firstObj = SwiftOptionalObject.allObjectsInRealm(realm).firstObject() as SwiftOptionalObject
+//        XCTAssertEqual(firstObj.optBoolCol!, true, "should be true")
+//        XCTAssertEqual(firstObj.optIntCol!, 1234, "should be 1234")
+//        XCTAssertEqual(firstObj.optFloatCol!, 1.1, "should be 1.1")
+//        XCTAssertEqual(firstObj.optDoubleCol!, 2.2, "should be 2.2")
+        XCTAssertEqual(firstObj.optStringCol!, "abcd", "should be abcd")
+        XCTAssertEqual(firstObj.optBinaryCol!, "abcd".dataUsingEncoding(NSUTF8StringEncoding)!, "should be abcd data")
+        XCTAssertEqual(firstObj.optDateCol!, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
+//        XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
+//        XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
+//        XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
+    }
+
     func testSwiftClassNameIsDemangled() {
         XCTAssertEqualObjects(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
     }

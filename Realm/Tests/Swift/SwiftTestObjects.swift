@@ -42,6 +42,19 @@ class SwiftObject: RLMObject {
     var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
+class SwiftOptionalObject: RLMObject {
+    // FIXME: Support all optional property types
+//    var optBoolCol: Bool?
+//    var optIntCol: Int?
+//    var optFloatCol: Float?
+//    var optDoubleCol: Double?
+    var optStringCol: String?
+    var optBinaryCol: NSData?
+    var optDateCol: NSDate?
+//    var optObjectCol: SwiftBoolObject?
+//    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+}
+
 class SwiftDogObject: RLMObject {
     var dogName = ""
 }
