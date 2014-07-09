@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import TestFramework
 
 class SwiftMixedTests: RLMTestCase {
     
@@ -33,7 +34,7 @@ class SwiftMixedTests: RLMTestCase {
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53])
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54])
         MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55])
-        MixedObject.createInRealm(realm, withObject: [true, data, 50])
+        MixedObject.createInRealm(realm, withObject: [true, data as NSData, 50])
         realm.commitWriteTransaction()
         
         let objects = MixedObject.allObjectsInRealm(realm)

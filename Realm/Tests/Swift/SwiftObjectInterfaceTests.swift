@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import TestFramework
 
 class SwiftObjectInterfaceTests: RLMTestCase {
     
