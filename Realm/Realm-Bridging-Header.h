@@ -15,9 +15,19 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-//
-//  Use this file to import your target's public headers that you would like to expose to Swift.
-//
 
-#import "RLMTestCase.h"
-#import "RLMTestObjects.h"
+#import "RLMArray.h"
+#import "RLMObjectSchema.h"
+#import "RLMProperty_Private.h"
+
+@interface RLMObjectSchema ()
+
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
+
+@end
+
+@interface RLMArray ()
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+
+@end

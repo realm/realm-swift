@@ -191,7 +191,7 @@ case "$COMMAND" in
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
         sh build.sh test "$XCMODE" || exit 1
         sh build.sh test-debug "$XCMODE" || exit 1
-        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer || exit 1
+        sudo xcode-select -s /Applications/Xcode6-Beta3.app/Contents/Developer || exit 1
         fail=0
         (
             sh build.sh test "$XCMODE" || exit 1

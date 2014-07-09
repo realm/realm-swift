@@ -17,8 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 
-class SwiftArrayTests: RLMTestCase {
+class SwiftArrayTests: SwiftTestCase {
     
     func testFastEnumeration() {
         let realm = realmWithTestPath()
@@ -28,27 +29,26 @@ class SwiftArrayTests: RLMTestCase {
         let dateMinInput = NSDate()
         let dateMaxInput = dateMinInput.dateByAddingTimeInterval(1000)
         
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
         
         realm.commitWriteTransaction()
 
-        let result = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let result = SwiftAggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
         XCTAssertEqual(result.count, 10, "10 objects added")
         
-        var totalSum: CInt = 0
-        
-        // FIXME: Support Sequence-style enumeration
-        for idx in 0..result.count {
-            if let ao = result[idx] as? AggregateObject {
+        var totalSum = 0
+
+        for idx in 0..<result.count {
+            if let ao = result[idx] as? SwiftAggregateObject {
                 totalSum += ao.intCol
             }
         }
@@ -60,10 +60,10 @@ class SwiftArrayTests: RLMTestCase {
         let realm = realmWithTestPath()
         
         realm.beginWriteTransaction()
-        let obj = StringObject.createInRealm(realm, withObject: ["name"])
+        let obj = SwiftStringObject.createInRealm(realm, withObject: ["name"])
         realm.commitWriteTransaction()
         
-        let array = StringObject.allObjectsInRealm(realm)
+        let array = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertTrue(array.readOnly, "Array returned from query should be readonly")
     }
 
@@ -75,21 +75,21 @@ class SwiftArrayTests: RLMTestCase {
         let dateMinInput = NSDate()
         let dateMaxInput = dateMinInput.dateByAddingTimeInterval(1000)
         
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        AggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         
         realm.commitWriteTransaction()
 
-        let noArray = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == NO"))
-        let yesArray = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == YES"))
+        let noArray = SwiftAggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == NO"))
+        let yesArray = SwiftAggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "boolCol == YES"))
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -173,8 +173,8 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.beginWriteTransaction()
         
-        for i in 0..1012 {
-            let person = EmployeeObject()
+        for i in 0..<1012 {
+            let person = SwiftEmployeeObject()
             person.name = "Mary"
             person.age = 24
             person.hired = true
@@ -183,7 +183,7 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.commitWriteTransaction()
         
-        let description = EmployeeObject.allObjectsInRealm(realm).description
+        let description = SwiftEmployeeObject.allObjectsInRealm(realm).description
         
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -199,17 +199,17 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.beginWriteTransaction()
         
-        let po1 = EmployeeObject()
+        let po1 = SwiftEmployeeObject()
         po1.age = 40
         po1.name = "Joe"
         po1.hired = true
         
-        let po2 = EmployeeObject()
+        let po2 = SwiftEmployeeObject()
         po2.age = 30
         po2.name = "John"
         po2.hired = false
         
-        let po3 = EmployeeObject()
+        let po3 = SwiftEmployeeObject()
         po3.age = 25
         po3.name = "Jill"
         po3.hired = true
@@ -218,9 +218,9 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(po2)
         realm.addObject(po3)
         
-        let company = CompanyObject()
-        company.employees = EmployeeObject.allObjectsInRealm(realm)
+        let company = SwiftCompanyObject()
         realm.addObject(company)
+        company.employees = SwiftEmployeeObject.allObjectsInRealm(realm)
         
         realm.commitWriteTransaction()
         
@@ -233,19 +233,19 @@ class SwiftArrayTests: RLMTestCase {
         
         XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
         
-        var test = peopleInCompany[0] as EmployeeObject
+        var test = peopleInCompany[0] as SwiftEmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        test = peopleInCompany[1] as EmployeeObject
+        test = peopleInCompany[1] as SwiftEmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        let allPeople = EmployeeObject.allObjectsInRealm(realm)
+        let allPeople = SwiftEmployeeObject.allObjectsInRealm(realm)
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
     }
 }

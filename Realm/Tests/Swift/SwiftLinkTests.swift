@@ -17,70 +17,71 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 
-class SwiftLinkTests: RLMTestCase {
+class SwiftLinkTests: SwiftTestCase {
     
     func testBasicLink() {
         let realm = realmWithTestPath()
         
-        let owner = OwnerObject()
+        let owner = SwiftOwnerObject()
         owner.name = "Tim"
-        owner.dog = DogObject()
+        owner.dog = SwiftDogObject()
         owner.dog.dogName = "Harvie"
         
         realm.beginWriteTransaction()
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        let owners = OwnerObject.allObjectsInRealm(realm)
-        let dogs = DogObject.allObjectsInRealm(realm)
+        let owners = SwiftOwnerObject.allObjectsInRealm(realm)
+        let dogs = SwiftDogObject.allObjectsInRealm(realm)
         XCTAssertEqual(owners.count, 1, "Expecting 1 owner")
         XCTAssertEqual(dogs.count, 1, "Expecting 1 dog")
-        XCTAssertEqualObjects((owners[0] as OwnerObject).name, "Tim", "Tim is named Tim")
-        XCTAssertEqualObjects((dogs[0] as DogObject).dogName, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqualObjects((owners[0] as SwiftOwnerObject).name, "Tim", "Tim is named Tim")
+        XCTAssertEqualObjects((dogs[0] as SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
         
-        let tim = owners[0] as OwnerObject
+        let tim = owners[0] as SwiftOwnerObject
         XCTAssertEqualObjects(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
     }
     
     func testMultipleOwnerLink() {
         let realm = realmWithTestPath()
         
-        let owner = OwnerObject()
+        let owner = SwiftOwnerObject()
         owner.name = "Tim"
-        owner.dog = DogObject()
+        owner.dog = SwiftDogObject()
         owner.dog.dogName = "Harvie"
         
         realm.beginWriteTransaction()
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, 1, "Expecting 1 owner")
-        XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, 1, "Expecting 1 owner")
+        XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
         
         realm.beginWriteTransaction()
-        let fiel = OwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
+        let fiel = SwiftOwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
         fiel.dog = owner.dog
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, 2, "Expecting 2 owners")
-        XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, 2, "Expecting 2 owners")
+        XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
     }
     
     func testLinkRemoval() {
         let realm = realmWithTestPath()
         
-        let owner = OwnerObject()
+        let owner = SwiftOwnerObject()
         owner.name = "Tim"
-        owner.dog = DogObject()
+        owner.dog = SwiftDogObject()
         owner.dog.dogName = "Harvie"
         
         realm.beginWriteTransaction()
         realm.addObject(owner)
         realm.commitWriteTransaction()
         
-        XCTAssertEqual(OwnerObject.allObjectsInRealm(realm).count, 1, "Expecting 1 owner")
-        XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
+        XCTAssertEqual(SwiftOwnerObject.allObjectsInRealm(realm).count, 1, "Expecting 1 owner")
+        XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, 1, "Expecting 1 dog")
         
         realm.beginWriteTransaction()
         realm.deleteObject(owner.dog)
@@ -89,10 +90,10 @@ class SwiftLinkTests: RLMTestCase {
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
         
         // refresh owner and check
-        let owner2 = OwnerObject.allObjectsInRealm(realm).firstObject
+        let owner2 = SwiftOwnerObject.allObjectsInRealm(realm).firstObject
         XCTAssertNotNil(owner, "Should have 1 owner")
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
-        XCTAssertEqual(DogObject.allObjectsInRealm(realm).count, 0, "Expecting 0 dogs")
+        XCTAssertEqual(SwiftDogObject.allObjectsInRealm(realm).count, 0, "Expecting 0 dogs")
     }
 
 //    FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
