@@ -47,13 +47,13 @@
                            [NSURL URLWithString:[NSString stringWithFormat:@"https://api.foursquare.com/v2/venues/search?near=San%@Francisco&client_id=%@&client_secret=%@&v=20140101&limit=50", @"%20", clientID, clientSecret]]];
     
     // Serialize the NSData object from the response into an NSDictionary
-    NSDictionary *responseJson = [[NSJSONSerialization
+    NSDictionary *serializedResponse = [[NSJSONSerialization
                                    JSONObjectWithData:apiResponse
                                               options:kNilOptions
                                                 error:nil] objectForKey:@"response"];
 
     // Extract the array of venues from the response
-    NSArray *returnedVenues = responseJson[@"venues"];
+    NSArray *returnedVenues = serializedResponse[@"venues"];
     
     // Begin a write transaction to save to the default Realm
     [defaultRealm beginWriteTransaction];
