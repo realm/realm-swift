@@ -32,28 +32,28 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     UIViewController *rootVC = [[UIViewController alloc] init];
-    [self.window setRootViewController:rootVC];    
-    [self deleteRealmFile];
+    [self.window setRootViewController:rootVC];
     
     #warning Provide your foursquare client ID and client secret
     NSString *clientID = @"YOUR CLIENT ID";
     NSString *clientSecret = @"YOUR CLIENT SECRET";
     
-    // Get an instance of the default Realm
-    RLMRealm * defaultRealm = [RLMRealm defaultRealm];
-    
-    // Call the API
-    NSData *apiResponse = [[NSData alloc] initWithContentsOfURL:
-                           [NSURL URLWithString:[NSString stringWithFormat:@"https://api.foursquare.com/v2/venues/search?near=San%@Francisco&client_id=%@&client_secret=%@&v=20140101&limit=50", @"%20", clientID, clientSecret]]];
+    // Get the San Fransisco venues from Foursquare
+    NSData *SFVenuesRequest = [[NSData alloc] initWithContentsOfURL:
+                               [NSURL URLWithString:[NSString stringWithFormat:@"https://api.foursquare.com/v2/venues/search?near=San%@Francisco&client_id=%@&client_secret=%@&v=20140101&limit=50", @"%20", clientID, clientSecret]]];
     
     // Serialize the NSData object from the response into an NSDictionary
-    NSDictionary *responseJson = [[NSJSONSerialization
-                                   JSONObjectWithData:apiResponse
-                                              options:kNilOptions
-                                                error:nil] objectForKey:@"response"];
+    NSDictionary *responseJson = [[NSJSONSerialization JSONObjectWithData:SFVenuesRequest
+                                                                  options:kNilOptions
+                                                                    error:nil] objectForKey:@"response"];
 
     // Extract the array of venues from the response
     NSArray *returnedVenues = responseJson[@"venues"];
+
+    
+    // Get an instance of the default Realm. Start with an empty Realm
+    [self deleteRealmFile];
+    RLMRealm * defaultRealm = [RLMRealm defaultRealm];
     
     // Begin a write transaction to save to the default Realm
     [defaultRealm beginWriteTransaction];
@@ -62,7 +62,7 @@
         Venue *newVenue = [[Venue alloc] init];
         newVenue.foursquareID = venue[@"id"];
         newVenue.name = venue[@"name"];
-        // Add the array to the default Realm
+        // Add the object to the default Realm
         [defaultRealm addObject:newVenue];
     }
 
