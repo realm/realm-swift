@@ -47,13 +47,31 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)updateViewWithState:(RLMNavigationState *)state
+- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    if ([state isMemberOfClass:[RLMArrayNavigationState class]]) {
-        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)state;
+    [super performUpdateUsingState:newState
+                          oldState:oldState];
+ 
+    if ([oldState.selectedType isKindOfClass:[RLMArrayNode class]]) {
+        RLMArrayNode *arrayNode = (RLMArrayNode *)oldState.selectedType;
+        RLMClazzNode *parentNode = [self.classesOutlineView parentForItem:arrayNode];
+        [parentNode removeAllChildNodes];
+    }
+    
+    if ([newState isMemberOfClass:[RLMNavigationState class]]) {
+        if (newState.selectedType != oldState.selectedType) {
+            NSInteger typeIndex = [self.classesOutlineView rowForItem:newState.selectedType];
+            
+            if(self.tableView.selectedRow != typeIndex) {
+                [self setSelectionIndex:typeIndex];
+            }
+        }
+    }
+    else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
         RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
-        NSInteger selectionIndex = arrayState.selectionIndex;
+        NSInteger selectionIndex = arrayState.selectedInstanceIndex;
         RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
         
         RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
@@ -65,12 +83,6 @@
         if (index != NSNotFound) {
             [self setSelectionIndex:index];
         }
-    }
-    else {
-        [self.classesOutlineView reloadData];
-        
-        NSInteger typeIndex = [self.classesOutlineView rowForItem:state.selectedType];
-        [self setSelectionIndex:typeIndex];
     }
 }
 
@@ -158,21 +170,24 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
-    NSOutlineView *outlineView = notification.object;
-    if (outlineView == self.classesOutlineView) {
-        id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
-
-        // The arrays we get from link views are ephemeral, so we
-        // remove them when any class node is selected
-        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
-            [self removeAllChildArrays];
+        NSOutlineView *outlineView = notification.object;
+        if (outlineView == self.classesOutlineView) {
+            id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
+            
+            // The arrays we get from link views are ephemeral, so we
+            // remove them when any class node is selected
+            if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+                [self removeAllChildArrays];
+            }
+            
+            RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
+            
+            [self.parentWindowController addNavigationState:state
+                                         fromViewController:self];
         }
         
-        [self.parentWindowController updateSelectedType:selectedItem];
-    }
-    
-    // NOTE: Remember to move the clearing of the row selection in the instance view
-    //[self.parentWindowController updateSelectedObjectNode:nil];
+        // NOTE: Remember to move the clearing of the row selection in the instance view
+        //[self.parentWindowController updateSelectedObjectNode:nil];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row

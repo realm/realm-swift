@@ -23,8 +23,8 @@
 @interface RLMNavigationState : NSObject
 
 @property (nonatomic, readonly) RLMTypeNode *selectedType;
-@property (nonatomic, readonly) NSInteger selectionIndex;
+@property (nonatomic, readonly) NSInteger selectedInstanceIndex;
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index;
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index;
 
 @end

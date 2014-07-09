@@ -23,8 +23,6 @@
 #import "RLMNavigationStack.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
-NSString *const RLMNewTypeNodeHasBeenSelectedNotification = @"RLMNewTypeNodeHasBeenSelectedNotification";
-NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNavigationState";
 
 @implementation RLMRealmBrowserWindowController {
 
@@ -40,51 +38,67 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
-        [self updateSelectedType:firstItem];
+        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem
+                                                                                   index:0];
+
+        [self addNavigationState:initState
+              fromViewController:nil];
     }
-    
+}
+
+#pragma mark - Public methods - Accessors
+
+- (RLMNavigationState *)currentState
+{
+    return navigationStack.currentState;
 }
 
 #pragma mark - Public methods
 
-- (void)updateSelectedType:(RLMTypeNode *)type
+- (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
-    [self updateSelectedType:type
-                     atIndex:0];
-}
-
-- (void)updateSelectedType:(RLMTypeNode *)type atIndex:(NSUInteger)index
-{
-    RLMNavigationState *state = [navigationStack pushStateWithTypeNode:type
-                                                                 index:index];
+    [navigationStack pushState:state];
     [self updateNavigationButtons];
     
-    [self performUpdateBasedOnNavigationState:state];
-}
-
-- (void)updateSelectedType:(RLMTypeNode *)type withArrayProperty:(RLMProperty *)array atIndex:(NSUInteger)index
-{
-    RLMArrayNavigationState *state = [navigationStack pushStateWithTypeNode:type
-                                                                      index:index
-                                                                   property:array];
+    if (controller != self.outlineViewController) {
+        [self.outlineViewController updateUsingState:state
+                                            oldState:navigationStack.currentState
+                                      enableDelegate:NO];
+    }
     
-    [self performUpdateBasedOnNavigationState:state];
+    if (controller != self.tableViewController) {
+        [self.tableViewController updateUsingState:state
+                                          oldState:navigationStack.currentState
+                                    enableDelegate:NO];
+    }
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
 {
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
     switch (buttons.selectedSegment) {
         case 0: { // Navigate backwards
             RLMNavigationState *state = [navigationStack navigateBackward];
             if (state != nil) {
-                [self performUpdateBasedOnNavigationState:state];
+                [self.outlineViewController updateUsingState:state
+                                                       oldState:oldState
+                                              enableDelegate:NO];
+                [self.tableViewController updateUsingState:state
+                                                     oldState:oldState
+                                            enableDelegate:NO];
             }
             break;
         }
         case 1: { // Navigate backwards
             RLMNavigationState *state = [navigationStack navigateForward];
             if (state != nil) {
-                [self performUpdateBasedOnNavigationState:state];
+                [self.outlineViewController updateUsingState:state
+                                                       oldState:oldState
+                                              enableDelegate:NO];
+                [self.tableViewController updateUsingState:state
+                                                     oldState:oldState
+                                            enableDelegate:NO];
             }
             break;
         }
@@ -103,13 +117,6 @@ NSString *const RLMNotificationInfoNavigationState = @"RLMNotificationInfoNaviga
                             forSegment:0];
     [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
                             forSegment:1];
-}
-
-- (void)performUpdateBasedOnNavigationState:(RLMNavigationState *)state
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:RLMNewTypeNodeHasBeenSelectedNotification
-                                                        object:self
-                                                      userInfo:@{RLMNotificationInfoNavigationState:state}];
 }
 
 @end

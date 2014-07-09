@@ -20,22 +20,16 @@
 
 #import "RLMRealmBrowserWindowController.h"
 
-@implementation RLMViewController
+@implementation RLMViewController {
+
+    id delegate;
+}
 
 #pragma mark - NSObject overrides
 
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newTypeNodeHasBeenSelectedNotificationListener:)
-                                                 name:RLMNewTypeNodeHasBeenSelectedNotification
-                                               object:nil];
-}
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Public methods - Accessors
@@ -51,43 +45,49 @@
 
 #pragma mark - Public methods
 
-- (void)updateViewWithState:(RLMNavigationState *)state
+- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState enableDelegate:(BOOL)enableDelegate;
 {
-    // No action - should be overridden by subclasses.
+    if (!enableDelegate) {
+        [self disableViewDelegate];
+    }
+    
+    [self performUpdateUsingState:newState
+                         oldState:oldState];
+    
+    if (!enableDelegate) {
+        [self enableViewDelegate];
+    }
+}
+
+- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
+{
+    // No action - should be implemented by subclasses.
 }
 
 - (void)clearSelection
 {
-    id<NSTableViewDelegate> tempDelegate = self.tableView.delegate;
-    self.tableView.delegate = nil;
-    
     [self.tableView selectRowIndexes:nil
                 byExtendingSelection:NO];
-    
-    self.tableView.delegate = tempDelegate;
 }
 
 - (void)setSelectionIndex:(NSUInteger)newIndex
 {
-    id<NSTableViewDelegate> tempDelegate = self.tableView.delegate;
-    self.tableView.delegate = nil;
-    
-    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
-                byExtendingSelection:NO];
-    
-    self.tableView.delegate = tempDelegate;
+    NSUInteger oldIndex = self.tableView.selectedRow;
+    if (oldIndex != newIndex) {
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+                    byExtendingSelection:NO];
+    }
 }
 
-#pragma mark - Private methods
-
-- (void)newTypeNodeHasBeenSelectedNotificationListener:(NSNotification *)notification
+- (void)enableViewDelegate
 {
-    RLMNavigationState *navigationState = notification.userInfo[RLMNotificationInfoNavigationState];
-    
-    if (![_currentState isEqualTo:navigationState]) {
-        _currentState = navigationState;
-        [self updateViewWithState:navigationState];
-    }
+    self.tableView.delegate = delegate;
+}
+
+- (void)disableViewDelegate
+{
+    delegate = self.tableView.delegate;
+    self.tableView.delegate = nil;
 }
 
 @end

@@ -23,8 +23,6 @@
 #import "RLMInstanceTableViewController.h"
 
 extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
-extern NSString *const RLMNewTypeNodeHasBeenSelectedNotification;
-extern NSString *const RLMNotificationInfoNavigationState;
 
 @interface RLMRealmBrowserWindowController : NSWindowController
 
@@ -32,13 +30,9 @@ extern NSString *const RLMNotificationInfoNavigationState;
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
+@property (nonatomic, readonly) RLMNavigationState *currentState;
 
-- (void)updateSelectedType:(RLMTypeNode *)type;
-
-- (void)updateSelectedType:(RLMTypeNode *)type atIndex:(NSUInteger)index;
-
-- (void)updateSelectedType:(RLMTypeNode *)type withArrayProperty:(RLMProperty *)array atIndex:(NSUInteger)index
-;
+- (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller;
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
 

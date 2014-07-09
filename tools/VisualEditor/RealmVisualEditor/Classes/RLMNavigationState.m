@@ -20,11 +20,11 @@
 
 @implementation RLMNavigationState
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index
 {
     if (self = [super init]) {
         _selectedType = type;
-        _selectionIndex = index;
+        _selectedInstanceIndex = index;
     }
     
     return self;
@@ -35,7 +35,7 @@
     if ([object isKindOfClass:[self class]]) {
         RLMNavigationState *comparedState = (RLMNavigationState *)object;
         BOOL result = self.selectedType == comparedState.selectedType &&
-                      self.selectionIndex == comparedState.selectionIndex;
+                      self.selectedInstanceIndex == comparedState.selectedInstanceIndex;
         
         return result;
     }

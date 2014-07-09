@@ -24,6 +24,6 @@
 
 @property (nonatomic, readonly) RLMProperty *property;
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property;
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property;
 
 @end

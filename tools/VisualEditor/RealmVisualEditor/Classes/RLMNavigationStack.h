@@ -23,6 +23,8 @@
 
 @interface RLMNavigationStack : NSObject
 
+@property (nonatomic, readonly) RLMNavigationState *currentState;
+
 - (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
 
 - (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property;

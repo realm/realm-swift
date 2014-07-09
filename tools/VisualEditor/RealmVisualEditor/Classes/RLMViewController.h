@@ -25,13 +25,18 @@
 @interface RLMViewController : NSViewController
 
 @property (nonatomic, readonly) NSTableView *tableView;
-@property (nonatomic, readonly) RLMNavigationState *currentState;
 @property (nonatomic, weak) IBOutlet RLMRealmBrowserWindowController *parentWindowController;
 
-- (void)updateViewWithState:(RLMNavigationState *)state;
+- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState enableDelegate:(BOOL)enableDelegate;
+
+- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState;
 
 - (void)clearSelection;
 
 - (void)setSelectionIndex:(NSUInteger)newIndex;
+
+- (void)enableViewDelegate;
+
+- (void)disableViewDelegate;
 
 @end

@@ -33,9 +33,18 @@
     return  self;
 }
 
+- (RLMNavigationState *)currentState
+{
+    if (0 <= index && index < stack.count ) {
+        return stack[index];
+    }
+    
+    return nil;
+}
+
 - (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex
 {
-    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectionType:typeNode
+    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode
                                                                             index:selectionIndex];
     [self pushState:state];
     
@@ -44,14 +53,13 @@
 
 - (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property
 {
-    RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectionType:typeNode
-                                                                                      index:index
+    RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:typeNode
+                                                                                      index:selectionIndex
                                                                                    property:property];
     [self pushState:state];
     
     return state;
 }
-
 
 - (void)pushState:(RLMNavigationState *)state
 {

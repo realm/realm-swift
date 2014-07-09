@@ -20,9 +20,9 @@
 
 @implementation RLMArrayNavigationState
 
-- (instancetype)initWithSelectionType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property
 {
-    if (self = [super initWithSelectionType:type
+    if (self = [super initWithSelectedType:type
                                       index:index]) {
         _property = property;
     }
