@@ -88,7 +88,7 @@
     if (changed && oldVersion >= newVersion) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Migration block should return a higher version after a schema update"
-                                     userInfo:nil];
+                                     userInfo:@{@"path" : _realm.path}];
     }
 
     // end transaction

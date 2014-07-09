@@ -144,7 +144,7 @@
                 Class cls = [RLMSchema classForString:self.objectClassName];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
