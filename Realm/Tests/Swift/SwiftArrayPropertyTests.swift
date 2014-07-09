@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import TestFramework
 
 class SwiftArrayPropertyTests: RLMTestCase {
     
@@ -40,7 +41,7 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqualObjects((array.array[1] as StringObject).stringCol, "b", "Second element should have property value 'b'")
         XCTAssertEqualObjects((array.array[2] as StringObject).stringCol, "a", "Third element should have property value 'a'")
 
-        for idx in 0..array.array.count {
+        for idx in 0..<array.array.count {
             if let obj = array.array[idx] as? StringObject {
                 XCTAssertFalse(obj.description.isEmpty, "Object should have description")
             }

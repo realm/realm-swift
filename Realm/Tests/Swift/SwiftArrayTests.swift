@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import TestFramework
 
 class SwiftArrayTests: RLMTestCase {
     
@@ -47,7 +48,7 @@ class SwiftArrayTests: RLMTestCase {
         var totalSum: CInt = 0
         
         // FIXME: Support Sequence-style enumeration
-        for idx in 0..result.count {
+        for idx in 0..<result.count {
             if let ao = result[idx] as? AggregateObject {
                 totalSum += ao.intCol
             }
@@ -173,7 +174,7 @@ class SwiftArrayTests: RLMTestCase {
         
         realm.beginWriteTransaction()
         
-        for i in 0..1012 {
+        for i in 0..<1012 {
             let person = EmployeeObject()
             person.name = "Mary"
             person.age = 24
