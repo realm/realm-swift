@@ -179,6 +179,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @property NSString *name;
 @property RLMArray<StringObject> *array;
+@property RLMArray<IntObject> *intArray;
 
 @end
 

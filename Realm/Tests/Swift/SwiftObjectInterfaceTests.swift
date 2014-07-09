@@ -42,7 +42,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         realm.addObject(bObject)
         realm.commitWriteTransaction()
         
-        let objectFromRealm = realm.allObjects(BaseClassStringObject.className())[0] as BaseClassStringObject
+        let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as BaseClassStringObject
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqualObjects(objectFromRealm.stringCol, "stringVal", "Should be stringVal")
     }

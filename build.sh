@@ -53,6 +53,7 @@ EOF
 XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
 
 xc() {
+    echo "Building target \"$1\" with: $(xcodebuild -version)"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcodebuild $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
@@ -121,7 +122,7 @@ case "$COMMAND" in
     ######################################
     "download-core")
         if ! [ -d core ]; then
-            curl -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+            curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
             unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
             rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
         else

@@ -41,7 +41,7 @@ class SwiftDynamicTests: RLMTestCase {
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
         
         // verify object type
-        let array = dyrealm.allObjects(DynamicObject.className())
+        let array = DynamicObject.allObjectsInRealm(dyrealm)
         XCTAssertEqual(array.count, 2, "Array should have 2 elements")
         XCTAssertEqualObjects(array.objectClassName, DynamicObject.className(), "Array class should by a dynamic object class")
     }
@@ -58,7 +58,7 @@ class SwiftDynamicTests: RLMTestCase {
         
         // verify properties
         let dyrealm = self.dynamicRealmWithTestPathAndSchema(nil)
-        let array = dyrealm.allObjects(DynamicObject.className())
+        let array = DynamicObject.allObjectsInRealm(dyrealm)
         
         // FIXME: These should work
         // XCTAssertEqualObjects((array[0] as DynamicObject)["integer"] as NSNumber, 1, "First object should have column value 1")

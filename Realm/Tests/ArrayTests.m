@@ -45,7 +45,7 @@
     
     [realm commitWriteTransaction];
        
-    RLMArray *result = [realm objects:[AggregateObject className] withPredicate:[NSPredicate predicateWithFormat:@"intCol < %i", 100]];
+    RLMArray *result = [AggregateObject objectsInRealm:realm withPredicateFormat:@"intCol < %i", 100];
     
     XCTAssertEqual(result.count, (NSUInteger)10, @"10 objects added");
     
@@ -326,6 +326,7 @@
     EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
     [realm commitWriteTransaction];
 
+    // test TableView RLMArray
     RLMArray *results = [EmployeeObject objectsWithPredicateFormat:@"hired = YES"];
     XCTAssertEqual((NSUInteger)0, [results indexOfObject:po1]);
     XCTAssertEqual((NSUInteger)1, [results indexOfObject:po3]);
