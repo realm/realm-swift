@@ -183,9 +183,6 @@
             [self.parentWindowController addNavigationState:state
                                          fromViewController:self];
         }
-        
-        // NOTE: Remember to move the clearing of the row selection in the instance view
-        //[self.parentWindowController updateSelectedObjectNode:nil];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row
