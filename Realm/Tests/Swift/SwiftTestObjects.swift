@@ -18,19 +18,19 @@
 
 import Realm
 
-class SwiftStringObject: RLMObject {
+class SwiftStringObject: RealmObject {
     var stringCol = ""
 }
 
-class SwiftBoolObject: RLMObject {
+class SwiftBoolObject: RealmObject {
     var boolCol = false
 }
 
-class SwiftIntObject: RLMObject {
+class SwiftIntObject: RealmObject {
     var intCol = 0
 }
 
-class SwiftObject: RLMObject {
+class SwiftObject: RealmObject {
     var boolCol = false
     var intCol = 123
     var floatCol = 1.23 as Float
@@ -42,7 +42,7 @@ class SwiftObject: RLMObject {
     var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
-class SwiftOptionalObject: RLMObject {
+class SwiftOptionalObject: RealmObject {
     // FIXME: Support all optional property types
 //    var optBoolCol: Bool?
 //    var optIntCol: Int?
@@ -55,16 +55,16 @@ class SwiftOptionalObject: RLMObject {
 //    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
-class SwiftDogObject: RLMObject {
+class SwiftDogObject: RealmObject {
     var dogName = ""
 }
 
-class SwiftOwnerObject: RLMObject {
+class SwiftOwnerObject: RealmObject {
     var name = ""
     var dog = SwiftDogObject()
 }
 
-class SwiftAggregateObject: RLMObject {
+class SwiftAggregateObject: RealmObject {
     var intCol = 0
     var floatCol = 0 as Float
     var doubleCol = 0.0
@@ -72,23 +72,23 @@ class SwiftAggregateObject: RLMObject {
     var dateCol = NSDate()
 }
 
-class SwiftEmployeeObject: RLMObject {
+class SwiftEmployeeObject: RealmObject {
     var name = ""
     var age = 0
     var hired = false
 }
 
-class SwiftCompanyObject: RLMObject {
+class SwiftCompanyObject: RealmObject {
     var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
 }
 
-class SwiftArrayPropertyObject: RLMObject {
+class SwiftArrayPropertyObject: RealmObject {
     var name = ""
     var array = RLMArray(objectClassName: SwiftStringObject.className())
     var intArray = RLMArray(objectClassName: SwiftIntObject.className())
 }
 
-class SwiftDynamicObject: RLMObject {
+class SwiftDynamicObject: RealmObject {
     var stringCol = "a"
     var intCol = 0
 }

@@ -19,6 +19,17 @@
 import XCTest
 import Realm
 
+// Framework Extensions
+
+extension RealmObject {
+
+    class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
+        return createInRealm(realm.rlmRealm, withObject: object)
+    }
+}
+
+// SwiftTestCase
+
 func testRealmPath() -> String {
     return realmPathForFile("test.realm")
 }
@@ -60,8 +71,8 @@ func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
 
 class SwiftTestCase: XCTestCase {
 
-    func realmWithTestPath() -> RLMRealm {
-        return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+    func realmWithTestPath() -> Realm {
+        return Realm(path: testRealmPath(), readOnly: false, error: nil)
     }
 
     override func setUp() {

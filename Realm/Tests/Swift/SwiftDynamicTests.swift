@@ -34,7 +34,7 @@ class SwiftDynamicTests: SwiftTestCase {
         }
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm.self), "realm should be of class RLMDynamicRealm")
+        XCTAssertTrue((dyrealm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
 
         // verify schema
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]

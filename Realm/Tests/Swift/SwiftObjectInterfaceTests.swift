@@ -43,7 +43,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         obj.arrayCol.addObject(obj.objectCol)
         realm.commitWriteTransaction()
 
-        let firstObj = SwiftObject.allObjectsInRealm(realm).firstObject() as SwiftObject
+        let firstObj = realm.objects(SwiftObject()).firstObject()!
         XCTAssertEqual(firstObj.boolCol, true, "should be true")
         XCTAssertEqual(firstObj.intCol, 1234, "should be 1234")
         XCTAssertEqual(firstObj.floatCol, 1.1, "should be 1.1")
@@ -62,7 +62,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.addObject(SwiftObject())
         realm.commitWriteTransaction()
 
-        let firstObj = SwiftObject.allObjectsInRealm(realm).firstObject() as SwiftObject
+        let firstObj = realm.objects(SwiftObject()).firstObject()!
         XCTAssertEqual(firstObj.boolCol, false, "should be false")
         XCTAssertEqual(firstObj.intCol, 123, "should be 123")
         XCTAssertEqual(firstObj.floatCol, 1.23, "should be 1.23")
@@ -92,7 +92,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let firstObj = SwiftOptionalObject.allObjectsInRealm(realm).firstObject() as SwiftOptionalObject
+        let firstObj = realm.objects(SwiftOptionalObject()).firstObject()!
 //        XCTAssertEqual(firstObj.optBoolCol!, true, "should be true")
 //        XCTAssertEqual(firstObj.optIntCol!, 1234, "should be 1234")
 //        XCTAssertEqual(firstObj.optFloatCol!, 1.1, "should be 1.1")
@@ -133,7 +133,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.addObject(bObject)
         realm.commitWriteTransaction()
 
-        let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as BaseClassStringObject
+        let objectFromRealm = realm.objects(BaseClassStringObject()).firstObject()!
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqualObjects(objectFromRealm.stringCol, "stringVal", "Should be stringVal")
     }
