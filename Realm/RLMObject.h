@@ -224,6 +224,8 @@
  */
 + (RLMArray *)allObjectsInRealm:(RLMRealm *)realm;
 
+- (RLMArray *)allInstancesInRealm:(RLMRealm *)realm;
+
 /**
  Get objects matching the given predicate for this type from the specified Realm.
 

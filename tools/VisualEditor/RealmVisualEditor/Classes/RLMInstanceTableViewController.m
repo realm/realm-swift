@@ -474,7 +474,7 @@
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        RLMArray *allInstances = [linkedObject.class allObjectsInRealm:linkedObject.realm];
+                        RLMArray *allInstances = [linkedObject allInstancesInRealm:linkedObject.realm];
                         
                         NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
                         
