@@ -79,7 +79,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger index) {
     return RLMCreateObjectAccessor(array->_realm,
                                    array->_objectClassName,
-                                   array->_backingLinkView->get_target_row(index));
+                                   array->_backingLinkView->get(index).get_index());
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
@@ -188,7 +188,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     }
 
     // if different tables then no match
-    if (object->_row.get_table() != &_backingLinkView->get_parent()) {
+    if (object->_row.get_table() != &_backingLinkView->get_target_table()) {
         return NSNotFound;
     }
 
