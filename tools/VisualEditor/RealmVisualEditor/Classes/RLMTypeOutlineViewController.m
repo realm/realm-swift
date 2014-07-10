@@ -52,19 +52,17 @@
     [super performUpdateUsingState:newState
                           oldState:oldState];
  
-    if ([oldState.selectedType isKindOfClass:[RLMArrayNode class]]) {
-        RLMArrayNode *arrayNode = (RLMArrayNode *)oldState.selectedType;
-        RLMClazzNode *parentNode = [self.classesOutlineView parentForItem:arrayNode];
+    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMClazzNode *parentNode = (RLMClazzNode *)oldState.selectedType;
         [parentNode removeAllChildNodes];
+        [self.tableView reloadData];
     }
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         if (newState.selectedType != oldState.selectedType) {
             NSInteger typeIndex = [self.classesOutlineView rowForItem:newState.selectedType];
             
-            if(self.tableView.selectedRow != typeIndex) {
-                [self setSelectionIndex:typeIndex];
-            }
+            [self setSelectionIndex:typeIndex];
         }
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {

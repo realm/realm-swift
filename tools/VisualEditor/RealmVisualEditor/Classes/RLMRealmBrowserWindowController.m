@@ -57,20 +57,20 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
     [navigationStack pushState:state];
     [self updateNavigationButtons];
-    
-    if (controller != self.outlineViewController) {
+
+    if (controller == self.tableViewController) {
         [self.outlineViewController updateUsingState:state
-                                            oldState:navigationStack.currentState
+                                            oldState:oldState
                                       enableDelegate:NO];
     }
     
-    if (controller != self.tableViewController) {
-        [self.tableViewController updateUsingState:state
-                                          oldState:navigationStack.currentState
-                                    enableDelegate:NO];
-    }
+    [self.tableViewController updateUsingState:state
+                                      oldState:oldState
+                                enableDelegate:NO];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons

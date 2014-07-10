@@ -21,6 +21,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMObject+ResolvedClass.h"
 #import "RLMArrayNavigationState.h"
+#import "RLMArrayNode.h"
 
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
@@ -60,6 +61,17 @@
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
+        
+        RLMClazzNode *referringType = (RLMClazzNode *)arrayState.selectedType;
+        RLMObject *referingInstance = [referringType instanceAtIndex:arrayState.selectedInstanceIndex];
+        RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
+                                                                         onObject:referingInstance
+                                                                            realm:self.parentWindowController.modelDocument.presentedRealm.realm];
+        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
+                                            withSelectionAtRow:0];
+        [self.tableView reloadData];
+        [self setSelectionIndex:0];
     }
 }
 
@@ -68,7 +80,8 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.tableView) {
-        NSUInteger count = self.parentWindowController.currentState.selectedType.instanceCount;
+        RLMTypeNode *displayedType = [self displayedType];
+        NSUInteger count = displayedType.instanceCount;
         return count;
     }
     
@@ -82,9 +95,11 @@
         NSUInteger columnIndex = [self.tableView.tableColumns
                                   indexOfObject:tableColumn];
         
-        RLMClazzProperty *clazzProperty = self.parentWindowController.currentState.selectedType.propertyColumns[columnIndex];
+        RLMTypeNode *displayedType = [self displayedType];
+        
+        RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
         NSString *propertyName = clazzProperty.name;
-        RLMObject *selectedInstance = [self.parentWindowController.currentState.selectedType instanceAtIndex:rowIndex];
+        RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
         NSObject *propertyValue = selectedInstance[propertyName];
         
         switch (clazzProperty.type) {
@@ -137,12 +152,14 @@
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    RLMTypeNode *displayedType = [self displayedType];
+    
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
         NSString *propertyName = propertyNode.name;
         
-        RLMObject *selectedObject = [self.parentWindowController.currentState.selectedType instanceAtIndex:rowIndex];
+        RLMObject *selectedObject = [displayedType instanceAtIndex:rowIndex];
         
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         
@@ -197,7 +214,8 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:self.parentWindowController.currentState.selectedType
+    RLMTypeNode *displayedType = [self displayedType];
+    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:displayedType
                                                                            index:self.tableView.selectedRow];
     [self.parentWindowController addNavigationState:state
                                  fromViewController:self];
@@ -206,8 +224,10 @@
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.tableView) {
+        RLMTypeNode *displayedType = [self displayedType];
+        
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
         NSCell *displayingCell = (NSCell *)cell;
         
         switch (propertyNode.type) {
@@ -261,10 +281,12 @@
 - (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
     if (tableView == self.tableView) {
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[columnIndex];
+        RLMTypeNode *displayedType = [self displayedType];
         
-        RLMObject *selectedInstance = [self.parentWindowController.currentState.selectedType instanceAtIndex:row];
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
+        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
+        
+        RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
         NSObject *propertyValue = selectedInstance[propertyNode.name];
         
         switch (propertyNode.type) {
@@ -341,8 +363,10 @@
 - (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if (tableView == self.tableView) {
+        RLMTypeNode *displayedType = [self displayedType];
+        
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[columnIndex];
+        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
         
         if (propertyNode.type == RLMPropertyTypeDate) {
             // Create a frame which covers the cell to be edited
@@ -361,7 +385,7 @@
             datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
             datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
             
-            RLMObject *selectedObject = [self.parentWindowController.currentState.selectedType instanceAtIndex:row];
+            RLMObject *selectedObject = [displayedType instanceAtIndex:row];
             NSString *propertyName = propertyNode.name;
             
             datepicker.dateValue = selectedObject[propertyName];
@@ -397,11 +421,13 @@
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
     if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        if (location.column < self.parentWindowController.currentState.selectedType.propertyColumns.count) {
-            RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[location.column];
+        RLMTypeNode *displayedType = [self displayedType];
+        
+        if (location.column < displayedType.propertyColumns.count) {
+            RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
             
             if (propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
-                if (location.row < self.parentWindowController.currentState.selectedType.instanceCount) {
+                if (location.row < displayedType.instanceCount) {
                     if (!linkCursorDisplaying) {
                         [self enableLinkCursor];
                     }
@@ -435,10 +461,12 @@
     NSInteger row = self.tableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMClazzProperty *propertyNode = self.parentWindowController.currentState.selectedType.propertyColumns[column];
+        RLMTypeNode *displayedType = [self displayedType];
+        
+        RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
-            RLMObject *selectedInstance = [self.parentWindowController.currentState.selectedType instanceAtIndex:row];
+            RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
@@ -464,11 +492,11 @@
             }
         }
         else if (propertyNode.type == RLMPropertyTypeArray) {
-            RLMObject *selectedInstance = [self.parentWindowController.currentState.selectedType instanceAtIndex:row];
+            RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
-                RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.parentWindowController.currentState.selectedType
+                RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:displayedType
                                                                                                  index:row
                                                                                               property:propertyNode.property];
                 [self.parentWindowController addNavigationState:state
@@ -505,6 +533,25 @@
         [NSCursor pop];
         
         linkCursorDisplaying = NO;
+    }
+}
+
+#pragma mark - Private methods
+
+- (RLMTypeNode *)displayedType {
+    RLMNavigationState *currentState = self.parentWindowController.currentState;
+    
+    if ([currentState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)currentState;
+        RLMClazzNode *referringClazz = (RLMClazzNode *)arrayState.selectedType;
+        RLMObject *referringInstance = [referringClazz instanceAtIndex:arrayState.selectedInstanceIndex];
+        RLMProperty *referringProperty = arrayState.property;
+        return [[RLMArrayNode alloc] initWithReferringProperty:referringProperty
+                                                      onObject:referringInstance
+                                                         realm:self.parentWindowController.modelDocument.presentedRealm.realm];
+    }
+    else {
+        return self.parentWindowController.currentState.selectedType;
     }
 }
 
