@@ -137,7 +137,12 @@
                 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
-                return [NSString stringWithFormat:@"Link to %@", referredObject.objectSchema.className];
+                if (referredObject == nil) {
+                    return @"";
+                }
+                else {
+                    return [NSString stringWithFormat:@"Link to %@", referredObject.objectSchema.className];
+                }
             }
                 
             default:
@@ -425,7 +430,22 @@
         if (location.column < displayedType.propertyColumns.count) {
             RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
             
-            if (propertyNode.type == RLMPropertyTypeObject || propertyNode.type == RLMPropertyTypeArray) {
+            if (propertyNode.type == RLMPropertyTypeObject) {
+                if (location.row < displayedType.instanceCount) {
+                    if (!linkCursorDisplaying) {
+                        RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
+                        RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
+                        NSObject *propertyValue = selectedInstance[propertyNode.name];
+                        
+                        if (propertyValue != nil) {
+                            [self enableLinkCursor];
+                        }
+                    }
+                    
+                    return;
+                }
+            }
+            else if(propertyNode.type == RLMPropertyTypeArray) {
                 if (location.row < displayedType.instanceCount) {
                     if (!linkCursorDisplaying) {
                         [self enableLinkCursor];
@@ -437,6 +457,11 @@
         }
     }
     
+    [self disableLinkCursor];
+}
+
+- (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
+{
     [self disableLinkCursor];
 }
 
