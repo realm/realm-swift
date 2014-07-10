@@ -31,6 +31,9 @@ build/
 */Realm.framework
 Realm.framework
 
+# sh build.sh build-cocoa
+bin
+
 # sh build.sh docs
 /docs/output
 

@@ -50,14 +50,42 @@ EOF
 # Xcode Helpers
 ######################################
 
-XCVERSION=$(xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
+if [ -z "$XCODE_VERSION" ]; then
+    XCODE_VERSION=5
+fi
+
+xcode5() {
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild $@
+}
+
+xcode6() {
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild $@
+}
+
+xcode() {
+    rm -rf bin
+    case "$XCODE_VERSION" in
+        5)
+            xcode5 $@
+            ;;
+        6)
+            xcode6 $@
+            ;;
+        *)
+            echo "Unsupported version of xcode specified"
+            exit 1
+    esac
+    rm -rf bin
+}
 
 xc() {
-    echo "Building target \"$1\" with: $(xcodebuild -version)"
+    echo "Building target \"$1\" with xcode${XCODE_VERSION}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcodebuild $1 || exit 1
+        xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
             echo "The raw xcodebuild output is available in build.log"
             exit 1
@@ -69,7 +97,7 @@ xc() {
 
 xcrealm() {
     PROJECT=Realm.xcodeproj
-    if [[ "$XCVERSION" == "6" ]]; then
+    if [[ "$XCODE_VERSION" == "6" ]]; then
         PROJECT=Realm-Xcode6.xcodeproj
     fi
     xc "-project $PROJECT $1"
@@ -188,17 +216,10 @@ case "$COMMAND" in
         ;;
 
     "test-all")
-        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
         sh build.sh test "$XCMODE" || exit 1
         sh build.sh test-debug "$XCMODE" || exit 1
-        sudo xcode-select -s /Applications/Xcode6-Beta2.app/Contents/Developer || exit 1
-        fail=0
-        (
-            sh build.sh test "$XCMODE" || exit 1
-            sh build.sh test-debug "$XCMODE" || exit 1
-        ) || fail=1
-        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || exit 1
-        exit $fail
+        XCODE_VERSION=6 sh build.sh test "$XCMODE" || exit 1
+        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || exit 1
         ;;
 
     "test-ios")
