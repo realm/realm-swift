@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
+#import "RLMRealm_Dynamic.h"
 
 @interface DynamicTests : RLMTestCase
 @end
