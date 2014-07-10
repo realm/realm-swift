@@ -44,7 +44,7 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 
 ## Models
 
-Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects. Apart from the fact that they can be added to a Realm for persistence and sharing between threads, these are just regular objects. So you can add your own methods and protocols to them and use them like any other object.
+Realm data models are defined using traditional NSObject-style classes with @properties. Simply subclass RLMObject to create your Realm data model objects. Apart from the fact that they can be added to a Realm for persistence and sharing between threads, Realm model objects function like any other objective-c objects - you can add your own methods and protocols to them and use them like you would any other object. The only restriction is that objects can be used only on the thread on which they were created.
 
 If you have installed our plugin there will be a nice template to create the interface and implementation files in the "New File..." dialog.
 
@@ -77,7 +77,7 @@ See [RLMObject](api/Classes/RLMObject.html#) for more details.
 
 ## Persisting Objects
 
-Realm objects can be created and used standalone, just like regular objects. If you want them to persist and be sharable between threads, you just add them to a Realm. As all changes to objects in a Realm has to be done through write transactions, this is also the case for adding objects.
+Realm objects can be created and used standalone just like regular objects. To share objects between threads you must add and retrieve them from a Realm. As all changes to objects in a Realm has to be done through write transactions, this is also the case for adding objects.
 
 After you have added the object to the Realm you can continue using it, and all changes you make to it from now on will be persisted and available from other threads that uses the same realm.
 
@@ -97,9 +97,9 @@ author.name       = @"David Foster Wallace";
 author.birthdate  = [NSDate date];
 
 // Add object to Realm
-[realm beginWriteTransaction];  // Begin a transaction
-[realm addObject:author]        // Add the object
-[realm commitWriteTransaction]; // Commit the transaction
+[realm beginWriteTransaction];
+[realm addObject:author];
+[realm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
