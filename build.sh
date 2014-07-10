@@ -55,18 +55,17 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    rm -rf bin
     ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
     PATH=./bin:$PATH xcodebuild $@
 }
 
 xcode6() {
-    rm -rf bin
     ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
     PATH=./bin:$PATH xcodebuild $@
 }
 
 xcode() {
+    rm -rf bin
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -78,6 +77,7 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
+    rm -rf bin
 }
 
 xc() {
