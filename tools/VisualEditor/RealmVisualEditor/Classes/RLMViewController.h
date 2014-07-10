@@ -36,8 +36,4 @@
 
 - (void)setSelectionIndex:(NSUInteger)newIndex;
 
-- (void)enableViewDelegate;
-
-- (void)disableViewDelegate;
-
 @end

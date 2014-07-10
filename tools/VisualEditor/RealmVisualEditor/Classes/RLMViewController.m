@@ -78,15 +78,4 @@
     }
 }
 
-- (void)enableViewDelegate
-{
-    self.tableView.delegate = delegate;
-}
-
-- (void)disableViewDelegate
-{
-    delegate = self.tableView.delegate;
-    self.tableView.delegate = nil;
-}
-
 @end
