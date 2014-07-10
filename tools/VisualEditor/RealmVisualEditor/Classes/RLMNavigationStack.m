@@ -54,8 +54,9 @@
 - (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property
 {
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:typeNode
-                                                                                      index:selectionIndex
-                                                                                   property:property];
+                                                                                 typeIndex:selectionIndex
+                                                                                  property:property
+                                                                                arrayIndex:0];
     [self pushState:state];
     
     return state;

@@ -30,6 +30,11 @@
     return self;
 }
 
+- (void)updateSelectionToIndex:(NSInteger)index
+{
+    _selectedInstanceIndex = index;
+}
+
 - (BOOL)isEqualTo:(id)object
 {
     if ([object isKindOfClass:[self class]]) {

@@ -71,7 +71,7 @@
         [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
                                             withSelectionAtRow:0];
         [self.tableView reloadData];
-        [self setSelectionIndex:0];
+        [self setSelectionIndex:arrayState.arrayIndex];
     }
 }
 
@@ -211,6 +211,16 @@
 }
 
 #pragma mark - NSTableViewDelegate implementation
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    if (self.tableView == notification.object) {
+        RLMNavigationState *currentState = self.parentWindowController.currentState;
+        NSInteger selectedIndex = self.tableView.selectedRow;
+        
+        [currentState updateSelectionToIndex:selectedIndex];
+    }
+}
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
@@ -488,8 +498,9 @@
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:displayedType
-                                                                                                 index:row
-                                                                                              property:propertyNode.property];
+                                                                                             typeIndex:row
+                                                                                              property:propertyNode.property
+                                                                                            arrayIndex:0];
                 [self.parentWindowController addNavigationState:state
                                              fromViewController:self];
             }
@@ -524,25 +535,6 @@
         [NSCursor pop];
         
         linkCursorDisplaying = NO;
-    }
-}
-
-#pragma mark - Private methods
-
-- (RLMTypeNode *)displayedType {
-    RLMNavigationState *currentState = self.parentWindowController.currentState;
-    
-    if ([currentState isMemberOfClass:[RLMArrayNavigationState class]]) {
-        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)currentState;
-        RLMClazzNode *referringClazz = (RLMClazzNode *)arrayState.selectedType;
-        RLMObject *referringInstance = [referringClazz instanceAtIndex:arrayState.selectedInstanceIndex];
-        RLMProperty *referringProperty = arrayState.property;
-        return [[RLMArrayNode alloc] initWithReferringProperty:referringProperty
-                                                      onObject:referringInstance
-                                                         realm:self.parentWindowController.modelDocument.presentedRealm.realm];
-    }
-    else {
-        return self.parentWindowController.currentState.selectedType;
     }
 }
 

@@ -23,7 +23,8 @@
 @interface RLMArrayNavigationState : RLMNavigationState
 
 @property (nonatomic, readonly) RLMProperty *property;
+@property (nonatomic, readonly) NSInteger arrayIndex;
 
-- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property;
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type typeIndex:(NSInteger)typeIndex property:(RLMProperty *)property arrayIndex:(NSInteger)arrayIndex;
 
 @end

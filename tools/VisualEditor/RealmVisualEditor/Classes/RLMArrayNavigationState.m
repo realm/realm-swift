@@ -20,13 +20,19 @@
 
 @implementation RLMArrayNavigationState
 
-- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index property:(RLMProperty *)property
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type typeIndex:(NSInteger)typeIndex property:(RLMProperty *)property arrayIndex:(NSInteger)arrayIndex;
 {
     if (self = [super initWithSelectedType:type
-                                      index:index]) {
+                                      index:typeIndex]) {
         _property = property;
+        _arrayIndex = arrayIndex;
     }
     return self;
+}
+
+- (void)updateSelectionToIndex:(NSInteger)index
+{
+    _arrayIndex = index;
 }
 
 - (BOOL)isEqualTo:(id)object

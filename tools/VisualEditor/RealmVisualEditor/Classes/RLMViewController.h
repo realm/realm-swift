@@ -36,4 +36,6 @@
 
 - (void)setSelectionIndex:(NSUInteger)newIndex;
 
+- (RLMTypeNode *)displayedType;
+
 @end

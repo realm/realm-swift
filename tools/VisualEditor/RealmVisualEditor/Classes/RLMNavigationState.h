@@ -27,4 +27,6 @@
 
 - (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index;
 
+- (void)updateSelectionToIndex:(NSInteger)index;
+
 @end
