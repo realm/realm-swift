@@ -76,6 +76,8 @@
 
         [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
                     byExtendingSelection:NO];
+        
+        [tableView scrollRowToVisible:newIndex];
     }
 }
 
