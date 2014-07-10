@@ -20,6 +20,11 @@
 
 #import "RLMSidebarTableCellView.h"
 
+// private redeclaration
+@interface RLMRealm ()
+- (RLMArray *)allObjects:(NSString *)className;
+@end
+
 @implementation RLMClazzNode {
 
     NSMutableArray *displayedArrays;

@@ -190,8 +190,8 @@
         
         for (size_t i = 0; i < _rounds; i++) {
             // Create and execute query
-            RLMArray *v = [realm objects:[PerfObj className]
-                                   withPredicate:[NSPredicate predicateWithFormat:@"age == %i", i]];
+            RLMArray *v = [PerfObj objectsInRealm:realm
+                                    withPredicate:[NSPredicate predicateWithFormat:@"age == %i", i]];
             count += v.count;
         }
 
@@ -264,8 +264,8 @@
         for (size_t i = 0; i < _rounds; i++) {
             // Create and execute query
             
-            RLMArray *v = [realm objects:[PerfObj className]
-                                   withPredicate:[NSPredicate predicateWithFormat:@"name == %@", @"Sparse"]];
+            RLMArray *v = [PerfObj objectsInRealm:realm
+                                    withPredicate:[NSPredicate predicateWithFormat:@"name == %@", @"Sparse"]];
             count += v.count;
         }
 
@@ -340,8 +340,8 @@
         for (size_t i = 0; i < _rounds; i++) {
             // Create and execute query
             BOOL hired = i % 2;
-            RLMArray *v = [realm objects:[PerfObj className]
-                                   withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:hired]]];
+            RLMArray *v = [PerfObj objectsInRealm:realm
+                                    withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:hired]]];
             count += v.count;
         }
 
@@ -414,8 +414,8 @@
 
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
         // Create query (current employees between 20 and 30 years old)
-        RLMArray *res = [realm objects:[PerfObj className]
-                                 withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber  numberWithBool:YES]]];
+        RLMArray *res = [PerfObj objectsInRealm:realm
+                                  withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber  numberWithBool:YES]]];
 
 
         int agesum = 0;
@@ -441,8 +441,8 @@
         RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
 
         // Create query (current employees between 20 and 30 years old)
-        RLMArray *res = [realm objects:[PerfObj className]
-                                 withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:YES]]];
+        RLMArray *res = [PerfObj objectsInRealm:realm
+                                  withPredicate:[NSPredicate predicateWithFormat:@"age between %@ && hired == %@", @[@20, @30], [NSNumber numberWithBool:YES]]];
 
         // Manually optimized loop to avoid row creation
         int agesum = 0;
@@ -511,7 +511,7 @@
 
     RLMRealm *realm = [RLMRealm realmWithPath:[_utils pathForDataFile:@"perfemployees.realm"]];
     
-    RLMArray *allObjects = [realm allObjects:[PerfObj className]];
+    RLMArray *allObjects = [PerfObj allObjectsInRealm:realm];
         
     int agesum = 0;
     for (PerfObj *row in allObjects) {

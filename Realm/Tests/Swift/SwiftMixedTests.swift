@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import TestFramework
 
 class SwiftMixedTests: RLMTestCase {
     
@@ -33,10 +34,10 @@ class SwiftMixedTests: RLMTestCase {
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53])
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54])
         MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55])
-        MixedObject.createInRealm(realm, withObject: [true, data, 50])
+        MixedObject.createInRealm(realm, withObject: [true, data as NSData, 50])
         realm.commitWriteTransaction()
         
-        let objects = realm.allObjects(MixedObject.className())
+        let objects = MixedObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 5, "5 rows expected")
         XCTAssertTrue(objects[0].isKindOfClass(MixedObject.self), "MixedObject expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isKindOfClass(NSString.self), "NSString expected")

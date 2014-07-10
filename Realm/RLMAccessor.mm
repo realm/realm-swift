@@ -42,7 +42,7 @@ inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObject *obj) {
 
     if (!obj->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Attempting to modify object outside of a write transaction."
+                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on a RLMRealm instance first."
                                      userInfo:nil];
     }
 }
@@ -350,7 +350,7 @@ IMP RLMAccessorSetter(NSUInteger colIndex, char accessorCode) {
                 RLMSetLink(obj, colIndex, link);
             });
         case 't':
-            return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> val) {
+            return imp_implementationWithBlock(^(RLMObject *obj, RLMArray *val) {
                 RLMSetArray(obj, colIndex, val);
             });
         case '@':
@@ -364,24 +364,49 @@ IMP RLMAccessorSetter(NSUInteger colIndex, char accessorCode) {
     }
 }
 
-// getter for standalone
+// call getter for superclass for property at colIndex
+id RLMSuperGet(RLMObject *obj, NSUInteger colIndex) {
+    typedef id (*getter_type)(RLMObject *, SEL);
+    RLMProperty *prop = obj.objectSchema.properties[colIndex];
+    Class superClass = class_getSuperclass(obj.class);
+    SEL selector = NSSelectorFromString(prop.getterName);
+    getter_type superGetter = (getter_type)[superClass instanceMethodForSelector:selector];
+    return superGetter(obj, selector);
+}
+
+// call setter for superclass for property at colIndex
+void RLMSuperSet(RLMObject *obj, NSUInteger colIndex, id val) {
+    typedef id (*setter_type)(RLMObject *, SEL, RLMArray *ar);
+    RLMProperty *prop = obj.objectSchema.properties[colIndex];
+    Class superClass = class_getSuperclass(obj.class);
+    SEL selector = NSSelectorFromString(prop.setterName);
+    setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:selector];
+    superSetter(obj, selector, val);
+}
+
+// getter/setter for standalone
 IMP RLMAccessorStandaloneGetter(NSUInteger colIndex, char accessorCode, NSString *objectClassName) {
     // only override getters for RLMArray properties
     if (accessorCode == 't') {
         return imp_implementationWithBlock(^(RLMObject *obj) {
-            typedef id (*getter_type)(RLMObject *, SEL);
-            RLMProperty *prop = obj.RLMObject_schema.properties[colIndex];
-            Class superClass = class_getSuperclass(obj.class);
-            getter_type superGetter = (getter_type)class_getMethodImplementation(superClass, NSSelectorFromString(prop.getterName));
-            id val = superGetter(obj, NSSelectorFromString(prop.getterName));
+            id val = RLMSuperGet(obj, colIndex);
             if (!val) {
-                SEL setterSel = NSSelectorFromString(prop.setterName);
-                typedef void (*setter_type)(RLMObject *, SEL, id);
-                setter_type setter = (setter_type)class_getMethodImplementation(obj.class, setterSel);
                 val = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
-                setter(obj, setterSel, val);
+                RLMSuperSet(obj, colIndex, val);
             }
             return val;
+        });
+    }
+    return nil;
+}
+IMP RLMAccessorStandaloneSetter(NSUInteger colIndex, char accessorCode) {
+    // only override getters for RLMArray properties
+    if (accessorCode == 't') {
+        return imp_implementationWithBlock(^(RLMObject *obj, RLMArray *ar) {
+            // make copy when setting (as is the case for all other variants)
+            RLMArray *standaloneAr = [RLMArray standaloneArrayWithObjectClassName:ar.objectClassName];
+            [standaloneAr addObjectsFromArray:ar];
+            RLMSuperSet(obj, colIndex, standaloneAr);
         });
     }
     return nil;
@@ -526,7 +551,7 @@ Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema)
 
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
     return RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
-                                  RLMAccessorStandaloneGetter, NULL);
+                                  RLMAccessorStandaloneGetter, RLMAccessorStandaloneSetter);
 }
 
 // Dynamic accessor name for a classname
@@ -536,7 +561,7 @@ inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
 
 
 void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
-    RLMProperty *prop = obj.RLMObject_schema[propName];
+    RLMProperty *prop = obj.objectSchema[propName];
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
@@ -595,11 +620,11 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *propName) {
-    RLMProperty *prop = obj.RLMObject_schema[propName];
+    RLMProperty *prop = obj.objectSchema[propName];
     if (!prop) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : propName ? propName : @"nil",
+                                     userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Class name": [obj.class className]}];
     }
     NSUInteger col = prop.column;

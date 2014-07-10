@@ -16,10 +16,4 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
-
-@interface RLMObject (Schema)
-
-@property (nonatomic) RLMObjectSchema *RLMObject_schema;
-
-@end
+#import <TestFramework/RLMTestObjects.h>

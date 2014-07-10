@@ -79,7 +79,7 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger index) {
     return RLMCreateObjectAccessor(array->_realm,
                                    array->_objectClassName,
-                                   array->_backingLinkView->get_target_row(index));
+                                   array->_backingLinkView->get(index).get_index());
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
@@ -174,14 +174,25 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
+    // check attached for table and object
     RLMLinkViewArrayValidateAttached(self);
+    if (object->_realm && !object->_row.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
+    }
 
-    if (object->_row.get_table() != &_backingLinkView->get_parent()) {
+    // check that object types align
+    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object type does not match RLMArray"
                                      userInfo:nil];
     }
 
+    // if different tables then no match
+    if (object->_row.get_table() != &_backingLinkView->get_target_table()) {
+        return NSNotFound;
+    }
+
+    // call find on backing array
     size_t object_ndx = object->_row.get_index();
     size_t result = _backingLinkView->find(object_ndx);
     if (result == tightdb::not_found) {

@@ -28,7 +28,7 @@
 @implementation RLMObject
 
 @synthesize realm = _realm;
-@synthesize RLMObject_schema = _RLMObject_schema;
+@synthesize objectSchema = _objectSchema;
 
 
 // standalone init
@@ -36,7 +36,7 @@
     self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
 
     // set standalone accessor class
-    object_setClass(self, self.RLMObject_schema.standaloneClass);
+    object_setClass(self, self.objectSchema.standaloneClass);
     
     return self;
 }
@@ -65,7 +65,7 @@
     self = [super init];
     if (self) {
         _realm = realm;
-        _RLMObject_schema = schema;
+        _objectSchema = schema;
         if (useDefaults) {
             // set default values
             // FIXME: Cache defaultPropertyValues in this instance
@@ -83,7 +83,7 @@
 }
 
 void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
-    RLMObjectSchema *schema = obj.RLMObject_schema;
+    RLMObjectSchema *schema = obj.objectSchema;
     for (NSString *name in values) {
         // Validate Value
         RLMProperty *prop = schema[name];
@@ -100,7 +100,7 @@ void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
 }
 
 void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
-    NSArray *properties = obj.RLMObject_schema.properties;
+    NSArray *properties = obj.objectSchema.properties;
 
     if (array.count != properties.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
@@ -159,16 +159,28 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
-{
++ (RLMArray *)allObjectsInRealm:(RLMRealm *)realm {
+    return RLMGetObjects(realm, self.className, nil, nil);
+}
+
++ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ... {
     NSPredicate *outPredicate = nil;
     RLM_PREDICATE(predicateFormat, outPredicate);
     return [self objectsWithPredicate:outPredicate];
 }
 
-+ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
-{
++(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ... {
+    NSPredicate *outPredicate = nil;
+    RLM_PREDICATE(predicateFormat, outPredicate);
+    return [self objectsInRealm:realm withPredicate:outPredicate];
+}
+
++ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
+}
+
++(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate {
+    return RLMGetObjects(realm, self.className, predicate, nil);
 }
 
 - (NSString *)JSONString {
@@ -176,17 +188,19 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
+// overriddent at runtime per-class for performance
 + (NSString *)className {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
+    return NSStringFromClass(self);
 }
 
+// overriddent at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Method implemented at runtime" userInfo:nil];
+    return RLMSchema.sharedSchema[self.className];
 }
 
 - (NSString *)description
 {
-    NSString *baseClassName = self.RLMObject_schema.className;
+    NSString *baseClassName = self.objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
     
@@ -196,6 +210,27 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     [mString appendString:@"}"];
     
     return [NSString stringWithString:mString];
+}
+
+- (BOOL)isEqualToObject:(RLMObject *)object {
+    // if identical object
+    if (self == object) {
+        return YES;
+    }
+    // if not in realm or differing realms
+    if (_realm == nil || _realm != object.realm) {
+        return NO;
+    }
+    // if either are detached
+    if (!_row.is_attached() || !object->_row.is_attached()) {
+        return NO;
+    }
+    // if table and index are the same
+    return _row.get_table() == object->_row.get_table() && _row.get_index() == object->_row.get_index();
+}
+
+- (BOOL)isEqual:(id)object {
+    return [self isEqualToObject:object];
 }
 
 @end

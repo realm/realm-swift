@@ -213,7 +213,7 @@ inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can only add an object to a Realm during a write transaction"
+                                       reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on a RLMRealm instance first."
                                      userInfo:nil];
     }
 }
@@ -230,7 +230,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // set the realm and schema
     NSString *objectClassName = [object.class className];
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    object.RLMObject_schema = schema;
+    object.objectSchema = schema;
     object.realm = realm;
 
     // create row in table

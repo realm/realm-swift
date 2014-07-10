@@ -19,13 +19,12 @@
 #import "RLMInstanceTableViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
-#import "RLMObject+ResolvedClass.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMArrayNode.h"
 
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
-#
+
 #import "objc/objc-class.h"
 
 @implementation RLMInstanceTableViewController {
@@ -138,8 +137,7 @@
                 
             case RLMPropertyTypeObject: {
                 RLMObject *referredObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
-                return [NSString stringWithFormat:@"Link to %@", objectSchema.className];
+                return [NSString stringWithFormat:@"Link to %@", referredObject.objectSchema.className];
             }
                 
             default:
@@ -307,7 +305,7 @@
             case RLMPropertyTypeObject: {
                 if ([propertyValue isKindOfClass:[RLMObject class]]) {
                     RLMObject *referredObject = (RLMObject *)propertyValue;
-                    RLMObjectSchema *objectSchema = referredObject.RLMObject_schema;
+                    RLMObjectSchema *objectSchema = referredObject.objectSchema;
                     NSArray *properties = objectSchema.properties;
                     
                     NSString *toolTipString = @"";
@@ -472,14 +470,12 @@
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
                 RLMObject *linkedObject = (RLMObject *)propertyValue;
-                RLMObjectSchema *linkedObjectSchema = linkedObject.RLMObject_schema;
+                RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        RLMRealm *realm = linkedObject.realm;
-                        RLMObjectSchema *objectSchema = linkedObject.RLMObject_schema;
-                        NSString *className = objectSchema.className;
-                        RLMArray *allInstances = [realm allObjects:className];
+                        RLMArray *allInstances = [linkedObject.class allObjectsInRealm:linkedObject.realm];
+                        
                         NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
                         
                         RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:clazzNode

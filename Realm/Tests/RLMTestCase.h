@@ -18,15 +18,19 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
+
+#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
+#define SWIFT
+#import <TestFramework/RLMTestObjects.h>
+#else
 #import "RLMTestObjects.h"
+#endif
+
 
 NSString *RLMTestRealmPath();
 NSString *RLMDefaultRealmPath();
 NSString *RLMRealmPathForFile();
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define SWIFT
-#endif
 
 #if !defined(SWIFT)
 @interface XCTestExpectation : NSObject
