@@ -55,14 +55,18 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild $@
+    rm -rf bin
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild $@
 }
 
 xcode6() {
-    /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin/xcodebuild $@
+    rm -rf bin
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild $@
 }
 
-xcodebuild() {
+xcode() {
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -79,9 +83,9 @@ xcodebuild() {
 xc() {
     echo "Building target \"$1\" with xcode${XCODE_VERSION}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcodebuild $1 || exit 1
+        xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcodebuild $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
             echo "The raw xcodebuild output is available in build.log"
             exit 1
