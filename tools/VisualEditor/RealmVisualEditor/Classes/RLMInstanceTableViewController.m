@@ -446,7 +446,7 @@
                     return;
                 }
             }
-            else if(propertyNode.type == RLMPropertyTypeArray) {
+            else if (propertyNode.type == RLMPropertyTypeArray) {
                 if (location.row < displayedType.instanceCount) {
                     if (!linkCursorDisplaying) {
                         [self enableLinkCursor];
