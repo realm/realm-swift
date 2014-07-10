@@ -163,11 +163,6 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     return RLMGetObjects(realm, self.className, nil, nil);
 }
 
-- (RLMArray *)allInstancesInRealm:(RLMRealm *)realm {
-    NSString *className = self.objectSchema.className;
-    return RLMGetObjects(realm, className, nil, nil);
-}
-
 + (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ... {
     NSPredicate *outPredicate = nil;
     RLM_PREDICATE(predicateFormat, outPredicate);

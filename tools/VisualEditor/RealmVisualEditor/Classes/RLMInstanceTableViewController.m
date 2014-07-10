@@ -21,6 +21,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMArrayNode.h"
+#import "RLMRealmNode.h"
 
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
@@ -499,8 +500,7 @@
                 
                 for (RLMClazzNode *clazzNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
                     if ([clazzNode.name isEqualToString:linkedObjectSchema.className]) {
-                        RLMArray *allInstances = [linkedObject allInstancesInRealm:linkedObject.realm];
-                        
+                        RLMArray *allInstances = [linkedObject.realm allObjects:linkedObjectSchema.className];
                         NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
                         
                         RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:clazzNode

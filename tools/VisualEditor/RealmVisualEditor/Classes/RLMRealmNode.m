@@ -23,18 +23,6 @@
 #import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
 
-@interface RLMRealm ()
-
-// private constructor
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-
-@end
-
-
 @implementation RLMRealmNode
 
 - (instancetype)init
