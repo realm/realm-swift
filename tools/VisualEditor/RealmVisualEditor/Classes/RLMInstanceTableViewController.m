@@ -212,15 +212,6 @@
 
 #pragma mark - NSTableViewDelegate implementation
 
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    RLMTypeNode *displayedType = [self displayedType];
-    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:displayedType
-                                                                           index:self.tableView.selectedRow];
-    [self.parentWindowController addNavigationState:state
-                                 fromViewController:self];
-}
-
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.tableView) {
