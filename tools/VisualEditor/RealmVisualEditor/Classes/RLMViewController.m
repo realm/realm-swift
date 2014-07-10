@@ -30,6 +30,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+    _navigationFromHistory = NO;
 }
 
 #pragma mark - Public methods - Accessors
@@ -45,18 +46,14 @@
 
 #pragma mark - Public methods
 
-- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState enableDelegate:(BOOL)enableDelegate;
+- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    if (!enableDelegate) {
-        [self disableViewDelegate];
-    }
+    _navigationFromHistory = YES;
     
     [self performUpdateUsingState:newState
                          oldState:oldState];
     
-    if (!enableDelegate) {
-        [self enableViewDelegate];
-    }
+    _navigationFromHistory = NO;
 }
 
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
@@ -74,7 +71,9 @@
 {
     NSUInteger oldIndex = self.tableView.selectedRow;
     if (oldIndex != newIndex) {
-        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+        NSTableView *tableView = self.tableView;
+
+        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
                     byExtendingSelection:NO];
     }
 }

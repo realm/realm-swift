@@ -57,20 +57,20 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
-    RLMNavigationState *oldState = navigationStack.currentState;
-    
-    [navigationStack pushState:state];
-    [self updateNavigationButtons];
-
-    if (controller == self.tableViewController) {
-        [self.outlineViewController updateUsingState:state
-                                            oldState:oldState
-                                      enableDelegate:NO];
+    if (!controller.navigationFromHistory) {
+        RLMNavigationState *oldState = navigationStack.currentState;
+        
+        [navigationStack pushState:state];
+        [self updateNavigationButtons];
+        
+        if (controller == self.tableViewController || controller == nil) {
+            [self.outlineViewController updateUsingState:state
+                                                oldState:oldState];
+        }
+        
+        [self.tableViewController updateUsingState:state
+                                          oldState:oldState];
     }
-    
-    [self.tableViewController updateUsingState:state
-                                      oldState:oldState
-                                enableDelegate:NO];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
@@ -82,11 +82,9 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             RLMNavigationState *state = [navigationStack navigateBackward];
             if (state != nil) {
                 [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState
-                                              enableDelegate:NO];
+                                                       oldState:oldState];
                 [self.tableViewController updateUsingState:state
-                                                     oldState:oldState
-                                            enableDelegate:NO];
+                                                     oldState:oldState];
             }
             break;
         }
@@ -94,11 +92,9 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             RLMNavigationState *state = [navigationStack navigateForward];
             if (state != nil) {
                 [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState
-                                              enableDelegate:NO];
+                                                       oldState:oldState];
                 [self.tableViewController updateUsingState:state
-                                                     oldState:oldState
-                                            enableDelegate:NO];
+                                                     oldState:oldState];
             }
             break;
         }

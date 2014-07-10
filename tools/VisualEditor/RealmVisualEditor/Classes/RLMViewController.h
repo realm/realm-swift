@@ -25,9 +25,10 @@
 @interface RLMViewController : NSViewController
 
 @property (nonatomic, readonly) NSTableView *tableView;
+@property (nonatomic, readonly) BOOL navigationFromHistory;
 @property (nonatomic, weak) IBOutlet RLMRealmBrowserWindowController *parentWindowController;
 
-- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState enableDelegate:(BOOL)enableDelegate;
+- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState;
 
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState;
 
