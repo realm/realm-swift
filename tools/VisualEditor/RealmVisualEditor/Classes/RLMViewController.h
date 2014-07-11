@@ -26,6 +26,7 @@
 
 @property (nonatomic, readonly) NSTableView *tableView;
 @property (nonatomic, readonly) BOOL navigationFromHistory;
+@property (nonatomic, strong) RLMTypeNode *displayedType;
 @property (nonatomic, weak) IBOutlet RLMRealmBrowserWindowController *parentWindowController;
 
 - (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState;
@@ -35,9 +36,5 @@
 - (void)clearSelection;
 
 - (void)setSelectionIndex:(NSUInteger)newIndex;
-
-- (RLMTypeNode *)displayedType;
-
-- (void)setDisplayedType:(RLMTypeNode *)type;
 
 @end

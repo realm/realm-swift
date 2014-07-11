@@ -24,7 +24,6 @@
 @implementation RLMViewController {
 
     id delegate;
-    RLMTypeNode *nodeType;
 }
 
 #pragma mark - NSObject overrides
@@ -80,15 +79,6 @@
         
         [tableView scrollRowToVisible:newIndex];
     }
-}
-
-- (RLMTypeNode *)displayedType {
-    return nodeType;
-}
-
-- (void)setDisplayedType:(RLMTypeNode *)type
-{
-    nodeType = type;
 }
 
 @end
