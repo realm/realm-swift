@@ -21,19 +21,19 @@ import Foundation
 //
 // Support Swift enumeration
 //
-//extension RLMArray: Sequence {
-//
-//    func generate() -> GeneratorOf<RLMObject> {
-//        var i  = 0
-//        return GeneratorOf<RLMObject>({
-//            if (i >= self.count) {
-//                return .None
-//            } else {
-//                return self[i++] as? RLMObject
-//            }
-//        })
-//    }
-//}
+extension RLMArray: Sequence {
+
+    func generate() -> GeneratorOf<RLMObject> {
+        var i  = 0
+        return GeneratorOf<RLMObject>({
+            if (i >= self.count) {
+                return .None
+            } else {
+                return self[i++] as? RLMObject
+            }
+        })
+    }
+}
 
 // index subscripting for ranges on string
 // FIXME - put in an extension file
