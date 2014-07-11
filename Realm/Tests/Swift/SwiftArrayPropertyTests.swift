@@ -44,10 +44,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         XCTAssertEqualObjects((array.array[1] as SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
         XCTAssertEqualObjects((array.array[2] as SwiftStringObject).stringCol, "a", "Third element should have property value 'a'")
 
-        for idx in 0..<array.array.count {
-            if let obj = array.array[idx] as? SwiftStringObject {
-                XCTAssertFalse(obj.description.isEmpty, "Object should have description")
-            }
+        for obj in array.array {
+            XCTAssertFalse(obj.description.isEmpty, "Object should have description")
         }
     }
     

@@ -45,13 +45,13 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
 
-        let result = SwiftAggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let result: RLMArray = SwiftAggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
         XCTAssertEqual(result.count, 10, "10 objects added")
         
         var totalSum = 0
 
-        for idx in 0..<result.count {
-            if let ao = result[idx] as? SwiftAggregateObject {
+        for obj in result {
+            if let ao = obj as? SwiftAggregateObject {
                 totalSum += ao.intCol
             }
         }
@@ -275,13 +275,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let result = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let result: RLMArray = AggregateObject.objectsInRealm(realm, withPredicate: NSPredicate(format: "intCol < \(100)"))
         XCTAssertEqual(result.count, 10, "10 objects added")
 
         var totalSum: CInt = 0
 
-        for idx in 0..<result.count {
-            if let ao = result[idx] as? AggregateObject {
+        for obj in result {
+            if let ao = obj as? AggregateObject {
                 totalSum += ao.intCol
             }
         }
