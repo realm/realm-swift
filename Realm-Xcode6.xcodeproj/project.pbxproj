@@ -144,8 +144,8 @@
 		E8ED2BD2196DE9CE00477D2E /* RLMRealm_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = E8ED2BD0196DE9CE00477D2E /* RLMRealm_Dynamic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8F8D905196CB87E00475368 /* RLMSwiftSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D904196CB87E00475368 /* RLMSwiftSupport.swift */; };
 		E8F8D906196CB87E00475368 /* RLMSwiftSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D904196CB87E00475368 /* RLMSwiftSupport.swift */; };
-		E8F8D908196CB89100475368 /* Realm-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F8D907196CB89100475368 /* Realm-Bridging-Header.h */; };
-		E8F8D909196CB89100475368 /* Realm-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F8D907196CB89100475368 /* Realm-Bridging-Header.h */; };
+		E8F8D908196CB89100475368 /* Realm-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F8D907196CB89100475368 /* Realm-Bridging-Header.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E8F8D909196CB89100475368 /* Realm-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F8D907196CB89100475368 /* Realm-Bridging-Header.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8F8D90C196CB8DD00475368 /* SwiftTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90A196CB8DD00475368 /* SwiftTestCase.swift */; };
 		E8F8D90D196CB8DD00475368 /* SwiftTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90A196CB8DD00475368 /* SwiftTestCase.swift */; };
 		E8F8D90E196CB8DD00475368 /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
@@ -1066,7 +1066,7 @@
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Realm-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1095,7 +1095,7 @@
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Realm-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1299,7 +1299,7 @@
 				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = Realm;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Realm-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1325,7 +1325,7 @@
 				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = Realm;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Realm/Realm-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};

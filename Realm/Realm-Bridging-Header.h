@@ -18,7 +18,17 @@
 
 #import "RLMArray.h"
 #import "RLMObjectSchema.h"
-#import "RLMProperty_Private.h"
+#import "RLMProperty.h"
+
+@interface RLMProperty ()
+
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+                      column:(NSUInteger)column
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes;
+
+@end
 
 @interface RLMObjectSchema ()
 

@@ -23,3 +23,7 @@
 #import <Realm/RLMArray.h>
 #import <Realm/RLMSchema.h>
 #import <Realm/RLMMigration.h>
+
+// WARNING: For private use only (imported for Swift support)
+// TODO: Move header from Public to Project once rdar://17633863 is fixed
+#import <Realm/Realm-Bridging-Header.h>
