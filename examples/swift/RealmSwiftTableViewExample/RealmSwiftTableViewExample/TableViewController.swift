@@ -19,6 +19,11 @@
 import UIKit
 import Realm
 
+class DemoObject: RLMObject {
+    var title = ""
+    var date = NSDate()
+}
+
 class Cell: UITableViewCell {
     
     init(style: UITableViewCellStyle, reuseIdentifier: String!) {
@@ -93,7 +98,7 @@ class TableViewController: UITableViewController {
             // Get new realm and table since we are in a new thread
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()
-            for index in 0..5 {
+            for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
                 DemoObject.createInRealm(realm, withObject: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
