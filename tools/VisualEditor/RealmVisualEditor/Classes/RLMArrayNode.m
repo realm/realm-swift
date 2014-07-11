@@ -25,6 +25,7 @@
     RLMProperty *referringProperty;
     RLMObject *referringObject;
     RLMArray *displayedArray;
+    NSString *text;
 }
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
@@ -43,10 +44,24 @@
     return self;
 }
 
+- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode
+{
+    if (self = [super initWithSchema:classNode.schema
+                             inRealm:classNode.realm]) {
+        displayedArray = result;
+        text = searchText;
+    }
+
+    return self;
+}
+
 #pragma mark - RLMObjectNode overrides
 
 - (NSString *)name
 {
+    if (text) {
+        return text;
+    }
     return @"Array";
 }
 
@@ -75,8 +90,13 @@
 {
     RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
                                                                   owner:self];
-    
-    result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+    if (text) {
+        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", text];
+    }
+    else {
+        result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+    }
+
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;

@@ -38,4 +38,6 @@
 
 - (RLMTypeNode *)displayedType;
 
+- (void)setDisplayedType:(RLMTypeNode *)type;
+
 @end

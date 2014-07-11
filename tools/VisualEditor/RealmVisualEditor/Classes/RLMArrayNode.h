@@ -21,5 +21,6 @@
 @interface RLMArrayNode : RLMTypeNode
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
 
 @end

@@ -30,6 +30,7 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
+@property (nonatomic, strong) IBOutlet NSSearchField *searchField;
 @property (nonatomic, readonly) RLMNavigationState *currentState;
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller;

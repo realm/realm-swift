@@ -129,6 +129,21 @@
     return arrayNode;
 }
 
+- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result
+{
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:searchText result:result andParent:self];
+
+    if (displayedArrays.count == 0) {
+        [displayedArrays addObject:arrayNode];
+    }
+    else {
+        [displayedArrays replaceObjectAtIndex:0
+                                   withObject:arrayNode];
+    }
+
+    return arrayNode;
+}
+
 - (void)removeAllChildNodes
 {
     [displayedArrays removeAllObjects];

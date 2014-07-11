@@ -21,6 +21,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMArrayNavigationState.h"
+#import "RLMQueryNavigationState.h"
 
 @interface RLMTypeOutlineViewController ()
 
@@ -52,14 +53,15 @@
     [super performUpdateUsingState:newState
                           oldState:oldState];
  
-    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]]) {
+    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] ||
+        [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
         RLMClazzNode *parentNode = (RLMClazzNode *)oldState.selectedType;
         [parentNode removeAllChildNodes];
         [self.tableView reloadData];
     }
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        if (newState.selectedType != oldState.selectedType) {
+        if ([oldState isMemberOfClass:[RLMQueryNavigationState class]] || newState.selectedType != oldState.selectedType) {
             NSInteger typeIndex = [self.classesOutlineView rowForItem:newState.selectedType];
             
             [self setSelectionIndex:typeIndex];
@@ -77,6 +79,21 @@
         [self.classesOutlineView reloadData];
         [self.classesOutlineView expandItem:parentClassNode];
         
+        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
+        if (index != NSNotFound) {
+            [self setSelectionIndex:index];
+        }
+    }
+    else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
+        RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
+
+        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+
+        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromQuery:arrayState.searchText result:arrayState.results];
+
+        [self.classesOutlineView reloadData];
+        [self.classesOutlineView expandItem:parentClassNode];
+
         NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
         if (index != NSNotFound) {
             [self setSelectionIndex:index];

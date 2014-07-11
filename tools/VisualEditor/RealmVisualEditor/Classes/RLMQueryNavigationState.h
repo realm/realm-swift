@@ -16,28 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import "RLMNavigationState.h"
-#import "RLMArrayNavigationState.h"
-#import "RLMQueryNavigationState.h"
 
-@interface RLMNavigationStack : NSObject
+#import "RLMArrayNode.h"
 
-@property (nonatomic, readonly) RLMNavigationState *currentState;
+@interface RLMQueryNavigationState : RLMNavigationState
 
-- (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
+@property (nonatomic, readonly) RLMArray *results;
+@property (nonatomic, readonly) NSString *searchText;
 
-- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property;
-
-- (void)pushState:(RLMNavigationState *)state;
-
-- (RLMNavigationState *)navigateBackward;
-
-- (RLMNavigationState *)navigateForward;
-
-- (BOOL)canNavigateBackward;
-
-- (BOOL)canNavigateForward;
+- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMArray *)results;
 
 @end
