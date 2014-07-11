@@ -84,6 +84,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     NSString *searchText = searchCell.stringValue;
     RLMTypeNode *typeNode = navigationStack.currentState.selectedType;
 
+    // Return to parent class (showing all objects) when the user clears the search text
     if (searchText.length == 0) {
         if ([navigationStack.currentState isMemberOfClass:[RLMQueryNavigationState class]]) {
             RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode index:0];
@@ -145,20 +146,40 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 predicate = [predicate stringByAppendingFormat:@"%@ CONTAINS '%@'", columnName, searchText];
                 break;
             }
+            //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
+            case RLMPropertyTypeDouble:
+            {
+                double v;
+
+                if ([searchText isEqualToString:@"0"] ||
+                    [searchText isEqualToString:@"0.0"]) {
+                    v = 0;
+                }
+                else {
+                    v = [searchText doubleValue];
+                    if (v == 0.0)
+                        break;
+                }
+
+                if (predicate.length != 0) {
+                    predicate = [predicate stringByAppendingString:@" OR "];
+                }
+                predicate = [predicate stringByAppendingFormat:@"%@ = %f", columnName, v];
+                break;
+            }
         }
     }
 
-
+    RLMArray *result;
     if (predicate.length != 0) {
-        NSLog(predicate);
-
-        RLMArray *result = [realm objects:typeNode.name withPredicateFormat:predicate];
-        NSLog(@"results found: %d", (int)result.count);
-
-        RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
-        [self addNavigationState:state fromViewController:self.tableViewController];
+        result = [realm objects:typeNode.name withPredicateFormat:predicate];
+    }
+    else {
+        result = [[RLMArray alloc] init];
     }
 
+    RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
+    [self addNavigationState:state fromViewController:self.tableViewController];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
