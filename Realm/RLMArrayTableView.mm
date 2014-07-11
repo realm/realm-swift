@@ -19,7 +19,8 @@
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema.h"
+#import "RLMSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
@@ -73,15 +74,44 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
     RLMArrayTableViewValidateAttached(self);
 
     NSUInteger batchCount = 0, index = state->state, count = self.count;
-    
-    __autoreleasing id *autoreleasingBuffer = (__autoreleasing id *)(void *)buffer;
-    while (index < count && batchCount < len) {
-        autoreleasingBuffer[batchCount++] = RLMCreateAccessorForArrayIndex(self, index++);
+    __strong id *strongBuffer = nil;
+
+    // first time create our strong buffer
+    if (index == 0) {
+        strongBuffer = new id[len];
+        unsigned long *tmpBuffer = (unsigned long *)(void *)strongBuffer;
+        state->extra[0] = (long)tmpBuffer;
     }
-    
-    state->mutationsPtr = state->extra;
+    else {
+        void *tmpBuffer = (void *)state->extra[0];
+        strongBuffer = (__strong id *)tmpBuffer;
+    }
+
+    // delete strong buffer if done
+    if (index >= count) {
+        for (NSUInteger i = 0; i < len; i++) {
+            strongBuffer[i] = nil;
+        }
+        delete [] strongBuffer;
+    }
+
+    RLMObjectSchema *objectSchema = _realm.schema[_objectClassName];
+    Class accessorClass = objectSchema.accessorClass;
+    while (index < count && batchCount < len) {
+
+        // get acessor fot the object class
+        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:objectSchema defaultValues:NO];
+        accessor->_row = (*objectSchema->_table)[_backingView.get_source_ndx(index++)];
+
+        strongBuffer[batchCount] = accessor;
+        buffer[batchCount] = strongBuffer[batchCount];
+        batchCount++;
+    }
+
     state->itemsPtr = buffer;
     state->state = index;
+    state->mutationsPtr = state->extra+1;
+    
     return batchCount;
 }
 
