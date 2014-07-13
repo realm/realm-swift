@@ -64,7 +64,6 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
 
 - (void)persistToDefaultRealm:(NSDictionary*)foursquareVenues
 {
-    // Get an instance of the default Realm
     RLMRealm * defaultRealm = [RLMRealm defaultRealm];
     
     // Begin a write transaction to save to the default Realm
@@ -75,7 +74,7 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
         Venue *newVenue = [[Venue alloc] init];
         newVenue.foursquareID = venue[@"id"];
         newVenue.name = venue[@"name"];
-        
+
         // Add the Venue object to the default Realm - alternatively you could
         // serialize the API response as an NSArray and call addObjectsFromArray:
         [defaultRealm addObject:newVenue];
