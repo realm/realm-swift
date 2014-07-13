@@ -64,12 +64,6 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     return _backingView.size();
 }
 
-inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger index) {
-    return RLMCreateObjectAccessor(array->_realm,
-                                   array->_objectClassName,
-                                   array->_backingView.get_source_ndx(index));
-}
-
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMArrayTableViewValidateAttached(self);
 
@@ -121,7 +115,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayTableView *array, NSUInteger in
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateAccessorForArrayIndex(self, index);;
+    return RLMCreateObjectAccessor(_realm, _objectClassName, _backingView.get_source_ndx(index));
 }
 
 #pragma GCC diagnostic push
