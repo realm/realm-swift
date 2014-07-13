@@ -65,6 +65,7 @@
     __weak id objects[18];
     NSInteger count = 0;
     for (AggregateObject *ao in result) {
+        XCTAssertNotNil(ao, @"Object is not nil and accessible");
         objects[count++] = ao;
     }
     
