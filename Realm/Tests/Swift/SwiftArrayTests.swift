@@ -220,6 +220,7 @@ class SwiftArrayTests: RLMTestCase {
         realm.addObject(po3)
         
         let company = CompanyObject()
+        company.name = "name"
         company.employees = EmployeeObject.allObjectsInRealm(realm)
         realm.addObject(company)
         
