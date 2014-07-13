@@ -81,21 +81,4 @@
     }
 }
 
-- (RLMTypeNode *)displayedType {
-    RLMNavigationState *currentState = self.parentWindowController.currentState;
-    
-    if ([currentState isMemberOfClass:[RLMArrayNavigationState class]]) {
-        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)currentState;
-        RLMClazzNode *referringClazz = (RLMClazzNode *)arrayState.selectedType;
-        RLMObject *referringInstance = [referringClazz instanceAtIndex:arrayState.selectedInstanceIndex];
-        RLMProperty *referringProperty = arrayState.property;
-        return [[RLMArrayNode alloc] initWithReferringProperty:referringProperty
-                                                      onObject:referringInstance
-                                                         realm:self.parentWindowController.modelDocument.presentedRealm.realm];
-    }
-    else {
-        return self.parentWindowController.currentState.selectedType;
-    }
-}
-
 @end

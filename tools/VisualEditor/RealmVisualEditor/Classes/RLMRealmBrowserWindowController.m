@@ -20,6 +20,10 @@
 #import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
+@interface RLMRealm (Dynamic)
+- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
+@end
+
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 @implementation RLMRealmBrowserWindowController {
@@ -69,6 +73,113 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         [self.tableViewController updateUsingState:state
                                           oldState:oldState];
     }
+
+    // Searching is not implemented for link arrays yet
+    BOOL isArray = [state isMemberOfClass:[RLMArrayNavigationState class]];
+    [self.searchField setEnabled:!isArray];
+}
+
+- (IBAction)searchAction:(NSSearchFieldCell *)searchCell
+{
+    NSString *searchText = searchCell.stringValue;
+    RLMTypeNode *typeNode = navigationStack.currentState.selectedType;
+
+    // Return to parent class (showing all objects) when the user clears the search text
+    if (searchText.length == 0) {
+        if ([navigationStack.currentState isMemberOfClass:[RLMQueryNavigationState class]]) {
+            RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:typeNode index:0];
+            [self addNavigationState:state fromViewController:self.tableViewController];
+        }
+        return;
+    }
+
+    NSArray *columns = typeNode.propertyColumns;
+    NSUInteger columnCount = columns.count;
+    RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+
+    NSString *predicate = @"";
+
+    for (NSUInteger index = 0; index < columnCount; index++) {
+
+        RLMClazzProperty *property = columns[index];
+        NSString *columnName = property.name;
+
+        switch (property.type) {
+            case RLMPropertyTypeBool: {
+                if ([searchText caseInsensitiveCompare:@"true"] == NSOrderedSame||
+                    [searchText caseInsensitiveCompare:@"YES"] == NSOrderedSame) {
+                    if (predicate.length != 0) {
+                        predicate = [predicate stringByAppendingString:@" OR "];
+                    }
+                    predicate = [predicate stringByAppendingFormat:@"%@ = YES", columnName];
+                }
+                else if ([searchText caseInsensitiveCompare:@"false"] == NSOrderedSame ||
+                         [searchText caseInsensitiveCompare:@"NO"] == NSOrderedSame) {
+                    if (predicate.length != 0) {
+                        predicate = [predicate stringByAppendingString:@" OR "];
+                    }
+                    predicate = [predicate stringByAppendingFormat:@"%@ = NO", columnName];
+                }
+                break;
+            }
+            case RLMPropertyTypeInt: {
+                int v;
+                if ([searchText isEqualToString:@"0"]) {
+                    v = 0;
+                }
+                else {
+                    v = [searchText intValue];
+                    if (v == 0)
+                        break;
+                }
+
+                if (predicate.length != 0) {
+                    predicate = [predicate stringByAppendingString:@" OR "];
+                }
+                predicate = [predicate stringByAppendingFormat:@"%@ = %d", columnName, (int)v];
+                break;
+            }
+            case RLMPropertyTypeString: {
+                if (predicate.length != 0) {
+                    predicate = [predicate stringByAppendingString:@" OR "];
+                }
+                predicate = [predicate stringByAppendingFormat:@"%@ CONTAINS '%@'", columnName, searchText];
+                break;
+            }
+            //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
+            case RLMPropertyTypeDouble:
+            {
+                double v;
+
+                if ([searchText isEqualToString:@"0"] ||
+                    [searchText isEqualToString:@"0.0"]) {
+                    v = 0;
+                }
+                else {
+                    v = [searchText doubleValue];
+                    if (v == 0.0)
+                        break;
+                }
+
+                if (predicate.length != 0) {
+                    predicate = [predicate stringByAppendingString:@" OR "];
+                }
+                predicate = [predicate stringByAppendingFormat:@"%@ = %f", columnName, v];
+                break;
+            }
+        }
+    }
+
+    RLMArray *result;
+    if (predicate.length != 0) {
+        result = [realm objects:typeNode.name withPredicateFormat:predicate];
+    }
+    else {
+        result = [[RLMArray alloc] init];
+    }
+
+    RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
+    [self addNavigationState:state fromViewController:self.tableViewController];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons

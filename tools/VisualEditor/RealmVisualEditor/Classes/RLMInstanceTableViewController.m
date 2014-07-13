@@ -20,6 +20,7 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
+#import "RLMQueryNavigationState.h"
 #import "RLMArrayNode.h"
 #import "RLMRealmNode.h"
 
@@ -54,7 +55,7 @@
                           oldState:oldState];
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        
+        [self setDisplayedType:newState.selectedType];
         [(RLMTableView *)self.tableView formatColumnsToFitType:newState.selectedType
                                             withSelectionAtRow:newState.selectedInstanceIndex];
         [self.tableView reloadData];
@@ -68,10 +69,22 @@
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
                                                                          onObject:referingInstance
                                                                             realm:self.parentWindowController.modelDocument.presentedRealm.realm];
+        [self setDisplayedType:arrayNode];
         [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
                                             withSelectionAtRow:0];
         [self.tableView reloadData];
         [self setSelectionIndex:arrayState.arrayIndex];
+    }
+    else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
+        RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
+
+        RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText result:arrayState.results andParent:arrayState.selectedType];
+
+        [self setDisplayedType:arrayNode];
+        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
+                                            withSelectionAtRow:0];
+        [self.tableView reloadData];
+        [self setSelectionIndex:0];
     }
 }
 
