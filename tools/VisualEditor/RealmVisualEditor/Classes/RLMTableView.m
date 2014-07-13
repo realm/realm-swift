@@ -21,10 +21,10 @@
 #import "NSTableColumn+Resize.h"
 
 @implementation RLMTableView {
-	NSTrackingArea *trackingArea;
-	BOOL mouseOverView;
-	RLMTableLocation currentMouseLocation;
-	RLMTableLocation previousMouseLocation;
+    NSTrackingArea *trackingArea;
+    BOOL mouseOverView;
+    RLMTableLocation currentMouseLocation;
+    RLMTableLocation previousMouseLocation;
 }
 
 #pragma mark - NSObject overrides
@@ -40,14 +40,14 @@
                                                userInfo:nil];
     [self addTrackingArea:trackingArea];
     
-	mouseOverView = NO;
+    mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
 }
 
 - (void)dealloc
 {
-	[self removeTrackingArea:trackingArea];
+    [self removeTrackingArea:trackingArea];
 }
 
 #pragma mark - NSResponder overrides
@@ -64,7 +64,7 @@
 
 - (void)mouseEntered:(NSEvent*)event
 {
-	mouseOverView = YES;
+    mouseOverView = YES;
     
     if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterView:)]) {
         [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterView:self];
@@ -73,43 +73,42 @@
 
 - (void)mouseMoved:(NSEvent*)event
 {
-	id myDelegate = [self delegate];
+    id myDelegate = [self delegate];
     
-	if (!myDelegate) {
-		return; // No delegate, no need to track the mouse.
+    if (!myDelegate) {
+        return; // No delegate, no need to track the mouse.
     }
 
-	if (mouseOverView) {
-
-		currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
+    if (mouseOverView) {
+        currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 		
-		if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
-			return;
+        if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
+            return;
         }
-		else {
+        else {
             if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
             }
-            
+
             CGRect cellRect = [self rectOfLocation:previousMouseLocation];
-			[self setNeedsDisplayInRect:cellRect];
-            
-			previousMouseLocation = currentMouseLocation;
+            [self setNeedsDisplayInRect:cellRect];
+
+            previousMouseLocation = currentMouseLocation;
 
             if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
             }
 
-		}
+        }
 
         CGRect cellRect = [self rectOfLocation:currentMouseLocation];
         [self setNeedsDisplayInRect:cellRect];
-	}
+    }
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	mouseOverView = NO;
+    mouseOverView = NO;
     
     CGRect cellRect = [self rectOfLocation:currentMouseLocation];
     [self setNeedsDisplayInRect:cellRect];
