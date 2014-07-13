@@ -42,20 +42,32 @@
     [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     
     [realm commitWriteTransaction];
        
     RLMArray *result = [AggregateObject objectsInRealm:realm withPredicateFormat:@"intCol < %i", 100];
     
-    XCTAssertEqual(result.count, (NSUInteger)10, @"10 objects added");
-    
-    int totalSum = 0;
-    
+    XCTAssertEqual(result.count, (NSUInteger)18, @"18 objects added");
+
+    __weak id objects[18];
+    NSInteger count = 0;
     for (AggregateObject *ao in result) {
-        totalSum +=ao.intCol;
+        objects[count++] = ao;
     }
     
-    XCTAssertEqual(totalSum, 100, @"total sum should be 100");
+    XCTAssertEqual(count, 18, @"should have enumerated 18 objects");
+
+    for (int i = 0; i < count; i++) {
+        XCTAssertNil(objects[i], @"Object should have been released");
+    }
 }
 
 - (void)testReadOnly
