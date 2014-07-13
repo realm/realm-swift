@@ -5,6 +5,7 @@
 
 ### API breaking changes
 
+* Rename migration methods to -migrateDefaultRealmWithBlock: and -migrateRealmAtPath:withBlock:
 * Moved Realm specific query methods from RLMRealm to class methods on RLMObject (-allObjects: to +allObjectsInRealm: ect.)
 * Rename schemaForObject: to schemaForClassName: on RLMSchema
 * Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
