@@ -20,7 +20,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMObject.h"
-#import "RLMArray.h"
+#import "RLMArray_Private.hpp"
 #import "RLMProperty.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
@@ -139,29 +139,46 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
 }
 
+id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
+    if (!RLMIsObjectValidForProperty(obj, prop)) {
+        // check for object or array literals
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        if (prop.type == RLMPropertyTypeObject) {
+            // for object create and try to initialize with obj
+            return [[objSchema.objectClass alloc] initWithObject:obj];
+        }
+        else if (prop.type == RLMPropertyTypeArray && [obj isKindOfClass:NSArray.class]) {
+            // for arrays, create objects for each literal object and return new array
+            NSArray *arrayElements = obj;
+            RLMArray *objects = [RLMArray standaloneArrayWithObjectClassName:objSchema.className];
+            for (id el in arrayElements) {
+                [objects addObject:[[objSchema.objectClass alloc] initWithObject:el]];
+            }
+            return objects;
+        }
 
-NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *schema) {
-    NSArray *properties = schema.properties;
-    NSDictionary *defaults = [schema.objectClass defaultPropertyValues];
-    NSMutableDictionary *outDict = [dict mutableCopy];
+        // if not a literal throw
+        NSString *message = [NSString stringWithFormat:@"Invalid value type '%@' for property '%@'", obj ?: @"nil", prop.name];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+    }
+    return obj;
+}
+
+NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+    NSArray *properties = objectSchema.properties;
+    NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
+    NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     for (RLMProperty * prop in properties) {
-        // set defualt value if missing
-        if (!outDict[prop.name]) {
-            outDict[prop.name] = defaults[prop.name];
-        }
-
-        // validate
-        if (!RLMIsObjectValidForProperty(outDict[prop.name], prop)) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", prop.name]
-                                         userInfo:nil];
-        }
+        // set out object to validated input or default value
+        id obj = dict[prop.name];
+        obj = obj ?: defaults[prop.name];
+        outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
     }
     return outDict;
 }
 
-void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema) {
-    NSArray *props = schema.properties;
+NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+    NSArray *props = objectSchema.properties;
     if (array.count != props.count) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid array input. Number of array elements does not match number of properties."
@@ -169,12 +186,10 @@ void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema
     }
 
     // validate all values
+    NSMutableArray *outArray = [NSMutableArray arrayWithCapacity:props.count];
     for (NSUInteger i = 0; i < array.count; i++) {
-        if (!RLMIsObjectValidForProperty(array[i], props[i])) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"Invalid value type for %@", [props[i] name]]
-                                         userInfo:nil];
-        }
+        [outArray addObject:RLMValidatedObjectForProperty(array[i], props[i], schema)];
     }
+    return outArray;
 };
 

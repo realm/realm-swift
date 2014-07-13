@@ -43,12 +43,21 @@
 
 
 - (instancetype)initWithObject:(id)value {
-    id obj = [self init];
+    self = [self init];
     if ([value isKindOfClass:NSArray.class]) {
-        RLMPopulateObjectWithArray(obj, value);
+        // validate and populate
+        NSArray *array = RLMValidatedArrayForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        NSArray *properties = _objectSchema.properties;
+        for (NSUInteger i = 0; i < array.count; i++) {
+            [self setValue:array[i] forKeyPath:[properties[i] name]];
+        }
     }
     else if ([value isKindOfClass:NSDictionary.class]) {
-        RLMPopulateObjectWithDictionary(obj, value);
+        // validate and populate
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        for (NSString *name in dict) {
+            [self setValue:dict[name] forKeyPath:name];
+        }
     }
     else {
         @throw [NSException exceptionWithName:@"RLMException"
@@ -56,7 +65,7 @@
                                      userInfo:nil];
     }
 
-    return obj;
+    return self;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm
@@ -78,45 +87,12 @@
     return self;
 }
 
++(instancetype)createInDefaultRealmWithObject:(id)object {
+    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object);
+}
+
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
     return RLMCreateObjectInRealmWithValue(realm, [self className], value);
-}
-
-void RLMPopulateObjectWithDictionary(RLMObject *obj, NSDictionary *values) {
-    RLMObjectSchema *schema = obj.objectSchema;
-    for (NSString *name in values) {
-        // Validate Value
-        RLMProperty *prop = schema[name];
-        if (prop) {
-            id value = values[name];
-            if (!RLMIsObjectValidForProperty(value, prop)) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"Invalid value type for %@", name]
-                                             userInfo:nil];
-            }
-            [obj setValue:value forKeyPath:name];
-        }
-    }
-}
-
-void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
-    NSArray *properties = obj.objectSchema.properties;
-
-    if (array.count != properties.count) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array input. Number of array elements does not match number of properties." userInfo:nil];
-    }
-    
-    for (NSUInteger i = 0; i < array.count; i++) {
-        id value = array[i];
-        RLMProperty *property = properties[i];
-        
-        // Validate Value
-        if (!RLMIsObjectValidForProperty(value, property)) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid value type for %@", property.name] userInfo:nil];
-        }
-        [obj setValue:array[i] forKeyPath:property.name];
-
-    }
 }
 
 // default attributes for property implementation
