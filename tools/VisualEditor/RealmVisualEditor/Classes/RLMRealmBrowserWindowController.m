@@ -106,7 +106,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
         switch (property.type) {
             case RLMPropertyTypeBool: {
-                if ([searchText caseInsensitiveCompare:@"true"] == NSOrderedSame||
+                if ([searchText caseInsensitiveCompare:@"true"] == NSOrderedSame ||
                     [searchText caseInsensitiveCompare:@"YES"] == NSOrderedSame) {
                     if (predicate.length != 0) {
                         predicate = [predicate stringByAppendingString:@" OR "];
