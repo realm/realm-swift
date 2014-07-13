@@ -28,7 +28,12 @@
     RLMRealm *realm = self.realmWithTestPath;
     
     [realm beginWriteTransaction];
-    
+
+    // enumerate empty array
+    for (__unused id obj in [AggregateObject allObjectsInRealm:realm]) {
+        XCTFail(@"Should be empty");
+    }
+
     NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
     
