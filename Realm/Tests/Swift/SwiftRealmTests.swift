@@ -17,9 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 import TestFramework
 
-class SwiftRealmTests: RLMTestCase {
+class SwiftRealmTests: SwiftTestCase {
+
+    // No models
 
     func testRealmExists() {
         var realm = realmWithTestPath()
@@ -32,8 +35,101 @@ class SwiftRealmTests: RLMTestCase {
         realm.beginWriteTransaction()
         realm.commitWriteTransaction()
     }
+
+    // Swift models
     
     func testRealmAddAndRemoveObjects() {
+        var realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        SwiftStringObject.createInRealm(realm, withObject: ["a"])
+        SwiftStringObject.createInRealm(realm, withObject: ["b"])
+        SwiftStringObject.createInRealm(realm, withObject: ["c"])
+        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, 3, "Expecting 3 objects")
+        realm.commitWriteTransaction()
+        
+        // test again after write transaction
+        var objects = SwiftStringObject.allObjectsInRealm(realm)
+        XCTAssertEqual(objects.count, 3, "Expecting 3 objects")
+        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
+
+        realm.beginWriteTransaction()
+        realm.deleteObject(objects[2] as SwiftStringObject)
+        realm.deleteObject(objects[0] as SwiftStringObject)
+        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, 1, "Expecting 1 object")
+        realm.commitWriteTransaction()
+
+        objects = SwiftStringObject.allObjectsInRealm(realm)
+        XCTAssertEqual(objects.count, 1, "Expecting 1 object")
+        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "b", "Expecting column to be 'b'")
+    }
+
+    func testRealmIsUpdatedAfterBackgroundUpdate() {
+        let realm = realmWithTestPath()
+
+        // we have two notifications, one for opening the realm, and a second when performing our transaction
+        var noteCount = 0
+        let notificationFired = expectationWithDescription("notification fired")
+        let token = realm.addNotificationBlock { note, realm in
+            XCTAssertNotNil(realm, "Realm should not be nil")
+            if ++noteCount == 2 {
+                notificationFired.fulfill()
+            }
+        }
+
+        dispatch_async(dispatch_queue_create("background", nil)) {
+            let realm = self.realmWithTestPath()
+            realm.beginWriteTransaction()
+            SwiftStringObject.createInRealm(realm, withObject: ["string"])
+            realm.commitWriteTransaction()
+        }
+        waitForExpectationsWithTimeout(2.0, handler: nil)
+        realm.removeNotification(token)
+
+        // get object
+        let objects = SwiftStringObject.allObjectsInRealm(realm)
+        XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
+        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+    }
+
+// FIXME: Test passes ~50% of the time. Asana: https://app.asana.com/0/861870036984/14552787865017
+//    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
+//        let realm = realmWithTestPath()
+//
+//        // we have two notifications, one for opening the realm, and a second when performing our transaction
+//        var noteCount = 0
+//        let notificationFired = expectationWithDescription("notification fired")
+//        let token = realm.addNotificationBlock { note, realm in
+//            XCTAssertNotNil(realm, "Realm should not be nil")
+//            if ++noteCount == 2 {
+//                notificationFired.fulfill()
+//            }
+//        }
+//
+//        dispatch_async(dispatch_queue_create("background", nil)) {
+//            let realm = self.realmWithTestPath()
+//            let obj = SwiftStringObject(object: ["string"])
+//            realm.beginWriteTransaction()
+//            realm.addObject(obj)
+//            realm.commitWriteTransaction()
+//
+//            let objects = SwiftStringObject.allObjectsInRealm(realm)
+//            XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
+//            XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+//        }
+//        
+//        // this should complete very fast before the timer
+//        waitForExpectationsWithTimeout(0.01, handler: nil)
+//        realm.removeNotification(token)
+//        
+//        // get object
+//        let objects = SwiftStringObject.allObjectsInRealm(realm)
+//        XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
+//        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+//    }
+
+    // Objective-C models
+
+    func testRealmAddAndRemoveObjects_objc() {
         var realm = realmWithTestPath()
         realm.beginWriteTransaction()
         StringObject.createInRealm(realm, withObject: ["a"])
@@ -41,12 +137,12 @@ class SwiftRealmTests: RLMTestCase {
         StringObject.createInRealm(realm, withObject: ["c"])
         XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, 3, "Expecting 3 objects")
         realm.commitWriteTransaction()
-        
+
         // test again after write transaction
         var objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 3, "Expecting 3 objects")
-        XCTAssertEqualObjects(objects.firstObject().stringCol, "a", "Expecting column to be 'a'")
-        
+        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "a", "Expecting column to be 'a'")
+
         realm.beginWriteTransaction()
         realm.deleteObject(objects[2] as StringObject)
         realm.deleteObject(objects[0] as StringObject)
@@ -55,10 +151,10 @@ class SwiftRealmTests: RLMTestCase {
 
         objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 1, "Expecting 1 object")
-        XCTAssertEqualObjects(objects.firstObject().stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "b", "Expecting column to be 'b'")
     }
 
-    func testRealmIsUpdatedAfterBackgroundUpdate() {
+    func testRealmIsUpdatedAfterBackgroundUpdate_objc() {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
@@ -86,38 +182,39 @@ class SwiftRealmTests: RLMTestCase {
         XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
-    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
-        let realm = realmWithTestPath()
-
-        // we have two notifications, one for opening the realm, and a second when performing our transaction
-        var noteCount = 0
-        let notificationFired = expectationWithDescription("notification fired")
-        let token = realm.addNotificationBlock { note, realm in
-            XCTAssertNotNil(realm, "Realm should not be nil")
-            if ++noteCount == 2 {
-                notificationFired.fulfill()
-            }
-        }
-
-        dispatch_async(dispatch_queue_create("background", nil)) {
-            let realm = self.realmWithTestPath()
-            let obj = StringObject(object: ["string"])
-            realm.beginWriteTransaction()
-            realm.addObject(obj)
-            realm.commitWriteTransaction()
-
-            let objects = StringObject.allObjectsInRealm(realm)
-            XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-            XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
-        }
-        
-        // this should complete very fast before the timer
-        waitForExpectationsWithTimeout(0.01, handler: nil)
-        realm.removeNotification(token)
-        
-        // get object
-        let objects = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
-        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
-    }
+// FIXME: Test passes ~50% of the time. Asana: https://app.asana.com/0/861870036984/14552787865017
+//    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate_objc() {
+//        let realm = realmWithTestPath()
+//
+//        // we have two notifications, one for opening the realm, and a second when performing our transaction
+//        var noteCount = 0
+//        let notificationFired = expectationWithDescription("notification fired")
+//        let token = realm.addNotificationBlock { note, realm in
+//            XCTAssertNotNil(realm, "Realm should not be nil")
+//            if ++noteCount == 2 {
+//                notificationFired.fulfill()
+//            }
+//        }
+//
+//        dispatch_async(dispatch_queue_create("background", nil)) {
+//            let realm = self.realmWithTestPath()
+//            let obj = StringObject(object: ["string"])
+//            realm.beginWriteTransaction()
+//            realm.addObject(obj)
+//            realm.commitWriteTransaction()
+//
+//            let objects = StringObject.allObjectsInRealm(realm)
+//            XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
+//            XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
+//        }
+//
+//        // this should complete very fast before the timer
+//        waitForExpectationsWithTimeout(0.01, handler: nil)
+//        realm.removeNotification(token)
+//
+//        // get object
+//        let objects = StringObject.allObjectsInRealm(realm)
+//        XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
+//        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
+//    }
 }

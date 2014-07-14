@@ -23,6 +23,10 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
+#ifdef REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#endif
+
 #import <objc/runtime.h>
 
 @implementation RLMObject
@@ -32,15 +36,22 @@
 
 
 // standalone init
-- (instancetype)init {
-    self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
+- (instancetype)init
+{
+    if (RLMSchema.sharedSchema) {
+        self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
 
-    // set standalone accessor class
-    object_setClass(self, self.objectSchema.standaloneClass);
-    
+        // set standalone accessor class
+        object_setClass(self, self.objectSchema.standaloneClass);
+    }
+    else {
+        // if schema not initialized
+        // this is only used for introspection
+        self = [super init];
+    }
+
     return self;
 }
-
 
 - (instancetype)initWithObject:(id)value {
     id obj = [self init];
@@ -188,9 +199,15 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
-// overriddent at runtime per-class for performance
+// overridden at runtime per-class for performance
 + (NSString *)className {
-    return NSStringFromClass(self);
+    NSString *className = NSStringFromClass(self);
+#ifdef REALM_SWIFT
+    if ([RLMSwiftSupport isSwiftClassName:className]) {
+        className = [RLMSwiftSupport demangleClassName:className];
+    }
+#endif
+    return className;
 }
 
 // overriddent at runtime per-class for performance
