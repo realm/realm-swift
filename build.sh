@@ -285,7 +285,7 @@ case "$COMMAND" in
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -295,7 +295,7 @@ case "$COMMAND" in
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
