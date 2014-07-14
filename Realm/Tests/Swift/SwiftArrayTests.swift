@@ -58,7 +58,7 @@ class SwiftArrayTests: SwiftTestCase {
         
         XCTAssertEqual(totalSum, 100, "total sum should be 100")
     }
-    
+
     func testReadOnly() {
         let realm = realmWithTestPath()
         
@@ -111,7 +111,7 @@ class SwiftArrayTests: SwiftTestCase {
         // Test int average
         XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol").doubleValue, 1, 0.1, "Average should be 1.0")
         XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol").doubleValue, 0, 0.1, "Average should be 0.0")
-        
+
         // Test float average
         XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol").doubleValue, 0, 0.1, "Average should be 0.0")
         XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol").doubleValue, 1.2, 0.1, "Average should be 1.2")
@@ -151,7 +151,7 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqual(max.integerValue, 1, "Maximum should be 8")
         max = yesArray.maxOfProperty("intCol") as NSNumber
         XCTAssertEqual(max.integerValue, 0, "Maximum should be 10")
-        
+
         // Test float max
         max = noArray.maxOfProperty("floatCol") as NSNumber
         XCTAssertEqualWithAccuracy(max.floatValue, 0, 0.1, "Maximum should be 0.0f")
@@ -172,7 +172,7 @@ class SwiftArrayTests: SwiftTestCase {
     }
     
     func testArrayDescription() {
-        let realm = realmWithTestPath()
+        let realm = RLMRealm.defaultRealm()
         
         realm.beginWriteTransaction()
         
@@ -186,8 +186,8 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
         
-        let description = SwiftEmployeeObject.allObjectsInRealm(realm).description
-        
+        let description = SwiftEmployeeObject.allObjects().description
+
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
         
@@ -247,9 +247,17 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
-        
-        let allPeople = SwiftEmployeeObject.allObjectsInRealm(realm)
-        XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
+
+        realm.beginWriteTransaction()
+        peopleInCompany.removeLastObject()
+        XCTAssertEqual(peopleInCompany.count, 1, "1 remaining link")
+        peopleInCompany.replaceObjectAtIndex(0, withObject: po2)
+        XCTAssertEqual(peopleInCompany.count, 1, "1 link replaced")
+        peopleInCompany.insertObject(po1, atIndex: 0)
+        XCTAssertEqual(peopleInCompany.count, 2, "2 links")
+        peopleInCompany.removeAllObjects()
+        XCTAssertEqual(peopleInCompany.count, 0, "0 remaining links")
+        realm.commitWriteTransaction()
     }
 
     // Objective-C models
@@ -402,7 +410,7 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription_objc() {
-        let realm = realmWithTestPath()
+        let realm = RLMRealm.defaultRealm()
 
         realm.beginWriteTransaction()
 
@@ -416,7 +424,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let description = EmployeeObject.allObjectsInRealm(realm).description
+        let description = EmployeeObject.allObjects().description
 
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -424,7 +432,7 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertTrue((description as NSString).rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
 
-        XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
     func testDeleteLinksAndObjectsInArray_objc() {
