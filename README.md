@@ -1,12 +1,14 @@
 ![Realm](logo.png)
 
-Realm is a mobile database that runs directly inside phones, tablets or wearables. This repository holds the source code for the iOS & OSX versions of Realm, for both Swift & Objective-C
+Realm is a mobile database that runs directly inside phones, tablets or wearables.
+This repository holds the source code for the iOS & OSX versions of Realm, for both Swift & Objective-C.
+
 
 ## Features
 
-* **Mobile-first:** Realm is the first database built from the ground up to run directly inside phones, tablets and wearables
-* **Simple:** data is directly [exposed as objects](http://realm.io/docs/ios/latest/#models) and [queryable by code](http://realm.io/docs/ios/latest/#queries), removing the need for ORM's riddled with performance & maintenance issues. Plus, we've worked hard to [keep our API down to just 3 common classes](http://realm.io/docs/ios/latest/api/) (Object, Arrays and Realms) and 1 utility class (Migrations): most of our users pick it up intuitively, getting simple apps up & running in minutes.
-* **Modern:** Realm supports relationships, generics, vectorization and even Swift (experimental)
+* **Mobile-first:** Realm is the first database built from the ground up to run directly inside phones, tablets and wearables.
+* **Simple:** Data is directly [exposed as objects](http://realm.io/docs/ios/latest/#models) and [queryable by code](http://realm.io/docs/ios/latest/#queries), removing the need for ORM's riddled with performance & maintenance issues. Plus, we've worked hard to [keep our API down to just 3 common classes](http://realm.io/docs/ios/latest/api/) (Object, Arrays and Realms) and 1 utility class (Migrations): most of our users pick it up intuitively, getting simple apps up & running in minutes.
+* **Modern:** Realm supports relationships, generics, vectorization and even Swift (experimental).
 * **Fast:** Realm is faster than even raw SQLite on common operations, while maintaining an extremely rich feature set.
 
 ## Setting up Realm in your app
@@ -35,7 +37,10 @@ Documentation for Realm can be found at [realm.io/docs/ios](http://realm.io/docs
 
 ## Building Realm
 
+In case you don't want to use the precompiled version, you can build Realm yourself.
+
 Prerequisites:
+
 * Building Realm requires Xcode 5 or above
 * Building Realm with Swift support requires Xcode6-Beta3 specifically
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
@@ -43,6 +48,8 @@ Prerequisites:
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh ios`. You'll need an internet connection the first time you build Realm to download the core binary.
 
 Run `sh build.sh help` to see all the actions you can perform (build ios/osx, generate docs, test, etc.).
+
+Executing the examples under the /examples folder, requires that you have built the Realm.framework.
 
 ## License
 
