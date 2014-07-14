@@ -19,6 +19,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
+#import "RLMObjectStore.h"
 
 @implementation RLMArray
 
@@ -138,6 +139,13 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     RLMValidateMatchingObjectType(self, object);
     return [_backingArray indexOfObject:object];
 }
+
+- (void)deleteObjectsFromRealm {
+    for (RLMObject *obj in _backingArray) {
+        RLMDeleteObjectFromRealm(obj);
+    }
+}
+
 
 
 //
