@@ -76,6 +76,7 @@ class SwiftTestCase: XCTestCase {
         super.tearDown()
 
         // TODO: Reset Realm cache
+        RLMRealm.clearRealmCache()
 
         // Delete realm files
         deleteRealmFilesAtPath(defaultRealmPath())
