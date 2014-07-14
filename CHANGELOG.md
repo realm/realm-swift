@@ -14,6 +14,8 @@
 
 ### Enhancements
 
+* Added +createInDefaultRealmWithObject: method to RLMObject.
+* Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
 * Added method -deleteObjects: to batch delete objects from a Realm
 * New Xcode 6 project for experimental swift support.
 * New Realm Editor app for reading and editing Realm db files.
