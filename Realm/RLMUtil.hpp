@@ -30,8 +30,8 @@
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
-// returns a validated object for the given object converting object and array
-// literals as necessary
+// returns a validated object for an input object
+// creates new objects for child objects and array literals as necessary
 // throws if passed in literals are not compatible with prop
 id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema);
 
@@ -40,6 +40,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema);
 NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
 // throws if the values in dict are not valid for the given schema
+// inserts default values for missing properties
 // returns dictionary with default values and allocates child objects when applicable
 NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *objectSchema, RLMSchema *schema);
 

@@ -108,7 +108,7 @@
 + (NSString *)className;
 
 /**
- Create an RLMObject within the default Realm with a given object.
+ Create an RLMObject in the default Realm with a a given object.
 
  Creates an instance of this object and adds it to the default Realm populating
  the object with the given object.
@@ -124,7 +124,7 @@
 +(instancetype)createInDefaultRealmWithObject:(id)object;
 
 /**
- Create an RLMObject within a Realm with a given object.
+ Create an RLMObject in a Realm with a given object.
  
  Creates an instance of this object and adds it to the given Realm populating
  the object with the given object.
