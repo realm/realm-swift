@@ -84,7 +84,7 @@
     }
     
     // migrate default realm at v0 data model to the current version
-    [RLMRealm applyMigrationBlock:migrationBlock error:nil];
+    [RLMRealm migrateDefaultRealmWithBlock:migrationBlock];
     
     // print out all migrated objects in the default realm
     NSLog(@"Migrated objects in the default Realm: %@", [[Person allObjects] description]);
@@ -102,8 +102,8 @@
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
     
     // migrate realms at custom paths
-    [RLMRealm applyMigrationBlock:migrationBlock atPath:realmv1Path error:nil];
-    [RLMRealm applyMigrationBlock:migrationBlock atPath:realmv2Path error:nil];
+    [RLMRealm migrateRealmAtPath:realmv1Path withBlock:migrationBlock];
+    [RLMRealm migrateRealmAtPath:realmv2Path withBlock:migrationBlock];
 
     // print out all migrated objects in the migrated realms
     RLMRealm *realmv1 = [RLMRealm realmWithPath:realmv1Path];

@@ -596,9 +596,9 @@ Realms that contain at least one class that has been redefined must be migrated 
 
 Migrating a Realm to a new schema takes just two steps, and must be done before anything else so we recommend you complete them from inside your `[AppDelegate didFinishLaunchingWithOptions:]`:
 
-### 1. Define a Migration Block
+### Performing a Migration
 
-An `RLMMigrationBlock` will provides the logic for converting data models from previous schemas to the new schema.
+You define a migration be implementing an `RLMMigrationBlock` which you pass into a call to [`[RLMRealm migrateDefaultRealmWithBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateDefaultRealmWithBlock:) for the default Realm or [`[RLMRealm migrateRealmAtPath:withBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateRealmAtPath:withBlock:) for other Realm instances. Your migration block provides all the logic for converting data models from previous schemas to the new schema. 
 
 For example, suppose we want to migrate the 'Person' subclass from above. To do this, the minimal necessary migration block would look like the following:
 
@@ -624,6 +624,9 @@ RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
   // Must be a higher than the previous version or an RLMException is thrown
   return 1;
 }
+
+// Apply the migration block above to the default Realm
+[RLMRealm migrateDefaultRealmWithBlock:migrationBlock];
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
@@ -642,8 +645,8 @@ While this is the minimal acceptable migration, we probably want to use this blo
 {% highlight objective-c %}
 // Inside your [AppDelegate didFinishLaunchingWithOptions:]
 
-RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
-                                                 NSUInteger oldSchemaVersion) {
+// Perform a migration defining the migration block inline
+[RLMRealm migrateDefaultRealmWithBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
   // We haven’t migrated anything yet, so oldSchemaVersion == 0
   if (oldSchemaVersion < 1) { 
     // The enumerateObjects:block: method iterates
@@ -655,32 +658,12 @@ RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
       newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@",
                                          oldObject[@"firstName"],
                                          oldObject[@"lastName"]];          
-    }
+    }];
   }
   // Return the latest version number (always set manually)
   // Must be a higher than the previous version or an RLMException is thrown
   return 1;
-}
-{% endhighlight %}
-</div><!--/highlight-wrapper -->
-
-### 2. Apply Migration Block
-
-Calling [`[RLMRealm applyMigrationBlock:atPath:error]`](api/Classes/RLMRealm.html#//api/name/applyMigrationBlock:atPath:error:)
-will apply the migration logic you defined above to a specific Realm. In this method, the `atPath` parameter specifies the path to where the Realm is persisted on disk. You can retrieve the path for a Realm by calling [`[RLMRealm path]`](api/Classes/RLMRealm.html#//api/name/path) on an RLMRealm instance.
-
-<div class="highlight-wrapper">
-
-{% highlight swift %}
-
-{% endhighlight%}
-
-{% highlight objective-c %}
-// Inside your [AppDelegate didFinishLaunchingWithOptions:]
-
-// Apply the migration block above to the default Realm
-[RLMRealm applyMigrationBlock:migrationBlock
-                       atPath:[[RLMRealm defaultRealm] path] error:nil];
+}];
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
