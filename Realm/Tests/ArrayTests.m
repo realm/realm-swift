@@ -272,6 +272,7 @@
     [realm addObject:po3];
     
     CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
     company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
     [realm addObject:company];
     
