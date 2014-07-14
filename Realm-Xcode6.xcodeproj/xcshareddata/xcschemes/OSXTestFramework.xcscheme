@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8220319196DB760003D1E02"
+               BlueprintIdentifier = "E8018EB5196DCB87008F63C4"
                BuildableName = "OSXTestFrameworkTests.xctest"
                BlueprintName = "OSXTestFrameworkTests"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
