@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		42C2CEAF19471699001D0E13 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42C2CEAE19471699001D0E13 /* libc++.dylib */; };
-		B1387DE719597A2800D49C15 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1387DE619597A2800D49C15 /* Realm.framework */; };
+		42F06C3B1974065100CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C3A1974065100CF67D1 /* Realm.framework */; };
 		E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D318FEFFD70071CFAB /* Foundation.framework */; };
 		E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D518FEFFD70071CFAB /* CoreGraphics.framework */; };
 		E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D718FEFFD70071CFAB /* UIKit.framework */; };
@@ -20,11 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		02026CCB193D039900E4EEF8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/Debug/Realm.framework; sourceTree = "<group>"; };
-		02026CCD193D041E00E4EEF8 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
-		02C415551921C26600F858D9 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
 		42C2CEAE19471699001D0E13 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		B1387DE619597A2800D49C15 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/Release/Realm.framework; sourceTree = "<group>"; };
+		42F06C3A1974065100CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Debug/Realm.framework; sourceTree = "<group>"; };
 		E80762D018FEFFD70071CFAB /* RealmTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -39,7 +36,6 @@
 		E80762EC18FEFFD70071CFAB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E807630218FEFFF80071CFAB /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewController.h; sourceTree = "<group>"; };
 		E807630318FEFFF80071CFAB /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewController.m; sourceTree = "<group>"; };
-		E807630718FF00F00071CFAB /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,11 +43,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B1387DE719597A2800D49C15 /* Realm.framework in Frameworks */,
 				42C2CEAF19471699001D0E13 /* libc++.dylib in Frameworks */,
 				E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */,
 				E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */,
 				E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */,
+				42F06C3B1974065100CF67D1 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,12 +74,8 @@
 		E80762D218FEFFD70071CFAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B1387DE619597A2800D49C15 /* Realm.framework */,
+				42F06C3A1974065100CF67D1 /* Realm.framework */,
 				42C2CEAE19471699001D0E13 /* libc++.dylib */,
-				02026CCD193D041E00E4EEF8 /* libRealm.a */,
-				02026CCB193D039900E4EEF8 /* Realm.framework */,
-				02C415551921C26600F858D9 /* libRealm.a */,
-				E807630718FF00F00071CFAB /* libstdc++.6.dylib */,
 				E80762D318FEFFD70071CFAB /* Foundation.framework */,
 				E80762D518FEFFD70071CFAB /* CoreGraphics.framework */,
 				E80762D718FEFFD70071CFAB /* UIKit.framework */,
