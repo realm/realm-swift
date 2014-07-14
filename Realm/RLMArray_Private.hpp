@@ -55,7 +55,7 @@
 // create standalone array variant
 + (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;
 
-// deletes all objects in the RLMArray from thier containing realms
+// deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
 
 @end

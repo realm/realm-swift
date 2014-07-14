@@ -109,7 +109,7 @@
     [StringObject createInRealm:realm withObject:@[@"d"]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)4, @"Expecting 3 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)4, @"Expecting 4 objects");
 
     // remove from linkView
     [realm beginWriteTransaction];
