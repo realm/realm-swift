@@ -124,8 +124,15 @@ fi
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=latest
+    REALM_CORE_VERSION=0.23.0
 fi
+
+download_core() {
+    rm -rf core
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+}
 
 COMMAND="$1"
 XCMODE="$2"
@@ -149,13 +156,14 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
+        echo "Downloading dependency: core ${REALM_CORE_VERSION}"
         if ! [ -d core ]; then
-            curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-            unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-            rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+            download_core
+        elif ! $(head -n 1 core/release_notes.txt | grep ${REALM_CORE_VERSION} >/dev/null); then
+            download_core
         else
-            echo "The core library has already been downloaded."
-            echo "Consider removing the folder 'core' and rerun."
+            echo "The core library seems to be up to date."
+            echo "To force an update remove the folder 'core' and rerun."
         fi
         exit 0
         ;;

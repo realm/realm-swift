@@ -16,20 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+#import "Venue.h"
 
-@interface Dog : RLMObject
+@implementation Venue
 
-@property NSString *name;
-@property NSInteger age;
-@end
-
-// This protocol enables typed collections. i.e.:
-// RLMArray<Dog>
-@protocol Dog <NSObject>
-@end
-
-@interface Person : RLMObject
-@property NSString        *name;
-@property RLMArray<Dog>   *dogs;
 @end

@@ -145,7 +145,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjec
     NSDictionary *defaults = [schema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [dict mutableCopy];
     for (RLMProperty * prop in properties) {
-        // set defualt value if missing
+        // set default value if missing
         if (!outDict[prop.name]) {
             outDict[prop.name] = defaults[prop.name];
         }

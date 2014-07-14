@@ -16,19 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "AppDelegate.h"
 
-@class Utils;
-@interface Performance : NSObject
-
-
--(id)initWithUtils:(Utils *)utils;
-- (void)testInsert;
-- (void)testLinearInt;
-- (void)testLinearString;
-- (void)testMultipleConditions;
-- (void)testFetchAndIterate;
-- (void)testUnqualifiedFetchAndIterate;
-- (void)testWriteToDisk;
-- (void)testWriteTransaction;
-@end
+int main(int argc, char * argv[])
+{
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
+}

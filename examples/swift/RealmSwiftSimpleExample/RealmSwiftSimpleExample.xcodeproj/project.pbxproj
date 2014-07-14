@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D8B422A195AC994001FB682 /* Objects.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8B4229195AC994001FB682 /* Objects.m */; };
 		4DF358B11959A55300A56343 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF358B01959A55300A56343 /* AppDelegate.swift */; };
 		4DF358B31959A55300A56343 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF358B21959A55300A56343 /* Images.xcassets */; };
 /* End PBXBuildFile section */
@@ -55,13 +54,24 @@
 			remoteGlobalIDString = 4DF358AA1959A55300A56343;
 			remoteInfo = RealmSwiftSimpleExample;
 		};
+		E8EF0ABE196F760100F69914 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D1E47A1195C1BB40005280D /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8FE4140196DBA6700073FBB;
+			remoteInfo = OSXTestFramework;
+		};
+		E8EF0AC0196F760100F69914 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D1E47A1195C1BB40005280D /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8CA10F9196DC18A0044F8AA;
+			remoteInfo = iOSTestFramework;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4D1E47A1195C1BB40005280D /* Realm-Xcode6.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Realm-Xcode6.xcodeproj"; path = "../../../../Realm-Xcode6.xcodeproj"; sourceTree = "<group>"; };
-		4D8B4223195AC6BA001FB682 /* RealmSwiftSimpleExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmSwiftSimpleExample-Bridging-Header.h"; sourceTree = "<group>"; };
-		4D8B4226195AC6F5001FB682 /* Objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Objects.h; sourceTree = "<group>"; };
-		4D8B4229195AC994001FB682 /* Objects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Objects.m; sourceTree = "<group>"; };
 		4DF358AB1959A55300A56343 /* RealmSwiftSimpleExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmSwiftSimpleExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DF358AF1959A55300A56343 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4DF358B01959A55300A56343 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -94,6 +104,8 @@
 				4D1E47AB195C1BB40005280D /* OSX Tests.xctest */,
 				4D1E47AD195C1BB40005280D /* Realm.framework */,
 				4D1E47AF195C1BB40005280D /* iOS Tests.xctest */,
+				E8EF0ABF196F760100F69914 /* TestFramework.framework */,
+				E8EF0AC1196F760100F69914 /* TestFramework.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,11 +132,8 @@
 			children = (
 				4D1E47A1195C1BB40005280D /* Realm-Xcode6.xcodeproj */,
 				4DF358B01959A55300A56343 /* AppDelegate.swift */,
-				4D8B4226195AC6F5001FB682 /* Objects.h */,
-				4D8B4229195AC994001FB682 /* Objects.m */,
 				4DF358B21959A55300A56343 /* Images.xcassets */,
 				4DF358AE1959A55300A56343 /* Supporting Files */,
-				4D8B4223195AC6BA001FB682 /* RealmSwiftSimpleExample-Bridging-Header.h */,
 			);
 			path = RealmSwiftSimpleExample;
 			sourceTree = "<group>";
@@ -247,6 +256,20 @@
 			remoteRef = 4D1E47AE195C1BB40005280D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		E8EF0ABF196F760100F69914 /* TestFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TestFramework.framework;
+			remoteRef = E8EF0ABE196F760100F69914 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8EF0AC1196F760100F69914 /* TestFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TestFramework.framework;
+			remoteRef = E8EF0AC0196F760100F69914 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -272,7 +295,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D8B422A195AC994001FB682 /* Objects.m in Sources */,
 				4DF358B11959A55300A56343 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -386,7 +408,7 @@
 				INFOPLIST_FILE = RealmSwiftSimpleExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwiftSimpleExample/RealmSwiftSimpleExample-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -400,7 +422,7 @@
 				INFOPLIST_FILE = RealmSwiftSimpleExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwiftSimpleExample/RealmSwiftSimpleExample-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};

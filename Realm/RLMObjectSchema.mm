@@ -33,6 +33,14 @@
 
 @implementation RLMObjectSchema
 
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
+    self = [super init];
+    self.className = objectClassName;
+    self.properties = properties;
+    self.objectClass = objectClass;
+    return self;
+}
+
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
     return _propertiesByName[key];
@@ -75,7 +83,7 @@
     // create schema object and set properties
     RLMObjectSchema * schema = [RLMObjectSchema new];
     schema.properties = propArray;
-    schema.className = NSStringFromClass(objectClass);
+    schema.className = [objectClass className];
     schema.objectClass = objectClass;
     schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
 
@@ -94,7 +102,9 @@
         NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
-                                                       column:col];
+                                                       column:col
+                                              objectClassName:nil
+                                                   attributes:(RLMPropertyAttributes)0];
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
             tightdb::TableRef linkTable = table->get_link_target(col);
