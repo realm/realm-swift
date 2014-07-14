@@ -38,9 +38,9 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 ### Getting Help
 
 - Sign up for our [community newsletter](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts & tutorials about Realm.
-- **StackOverflow**: look for [previous questions under the tag realm](https://stackoverflow.com/questions/tagged/realm) — or [open a new one](http://stackoverflow.com/questions/ask?tags=realm).
-- **Twitter**: contact [@realm](http://twitter.com/realm) or use [#realm](https://twitter.com/search?q=%23realm&src=typd&f=realtime)
-- **Email**: [help@realm.io](mailto:help@realm.io)
+- **StackOverflow**: look for previous questions under the tag [#realm](https://stackoverflow.com/questions/tagged/realm) — or [open a new one](http://stackoverflow.com/questions/ask?tags=realm).
+- **Twitter**: contact [@realm](http://twitter.com/realm) or use [#realm](https://twitter.com/search?q=%23realm&src=typd&f=realtime).
+- **Email**: [help@realm.io](mailto:help@realm.io).
 
 ## Models
 
