@@ -16,9 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-/* This app gives a simple example of retrieving data from the foursquare REST API
-   and persisting it in a Realm. To run this app, you will need to provide a foursquare
-   client ID and client secret. To get these, signup at https://developer.foursquare.com/ */
+
+// This app gives a simple example of retrieving data from the foursquare REST API
+// and persisting it in a Realm. To run this app, you will need to provide a foursquare
+// client ID and client secret. To get these, signup at https://developer.foursquare.com/ 
+
 
 #import "AppDelegate.h"
 #import "Venue.h"
@@ -27,6 +29,7 @@
 #warning Provide your foursquare client ID and client secret
 NSString *clientID = @"YOUR CLIENT ID";
 NSString *clientSecret = @"YOUR CLIENT SECRET";
+
 
 @implementation AppDelegate
 
@@ -37,8 +40,14 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
     [self.window makeKeyAndVisible];
     UIViewController *rootVC = [[UIViewController alloc] init];
     [self.window setRootViewController:rootVC];
+    
+    // Ensure we start with an empty database
     [self deleteRealmFile];
+    
+    // Query Foursquare API 
     NSDictionary *foursquareVenues = [self getFoursquareVenues];
+    
+    // Persist the results to Realm
     [self persistToDefaultRealm:foursquareVenues];
     
     return YES;
@@ -53,10 +62,10 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
                            [NSURL URLWithString:[NSString stringWithFormat:@"https://api.foursquare.com/v2/venues/search?near=San%@Francisco&client_id=%@&client_secret=%@&v=20140101&limit=50", @"%20", clientID, clientSecret]]];
     
     // Serialize the NSData object from the response into an NSDictionary
-    NSDictionary *serializedResponse = [[NSJSONSerialization
-                                         JSONObjectWithData:apiResponse
-                                         options:kNilOptions
-                                         error:nil] objectForKey:@"response"];
+    NSDictionary *serializedResponse = [[NSJSONSerialization JSONObjectWithData:apiResponse
+                                                                        options:kNilOptions
+                                                                          error:nil] 
+                                        objectForKey:@"response"];
     
     // Extract the venues from the response as an NSDictionary
     return serializedResponse[@"venues"];
@@ -64,7 +73,8 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
 
 - (void)persistToDefaultRealm:(NSDictionary*)foursquareVenues
 {
-    RLMRealm * defaultRealm = [RLMRealm defaultRealm];
+   // Open the default Realm file
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
     
     // Begin a write transaction to save to the default Realm
     [defaultRealm beginWriteTransaction];
@@ -75,12 +85,12 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
         newVenue.foursquareID = venue[@"id"];
         newVenue.name = venue[@"name"];
 
-        // Add the Venue object to the default Realm - alternatively you could
-        // serialize the API response as an NSArray and call addObjectsFromArray:
+        // Add the Venue object to the default Realm 
+        // (alternatively you could serialize the API response as an NSArray and call addObjectsFromArray)
         [defaultRealm addObject:newVenue];
     }
     
-    // Perist all the Venues with a single commit
+    // Persist all the Venues with a single commit
     [defaultRealm commitWriteTransaction];
     
     // Show all the venues that were persisted
