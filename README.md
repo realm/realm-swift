@@ -33,14 +33,14 @@ Once your app is set up with Realm, our [documentation](#documentation) will gui
 
 Documentation for Realm can be found at [realm.io/docs/ios](http://realm.io/docs/ios). The API reference is located at [realm.io/docs/ios/latest/api](http://realm.io/docs/ios/latest/api).
 
-
 ## Building Realm
 
+Prerequisites:
 * Building Realm requires Xcode 5 or above
 * Building Realm with Swift support requires Xcode6-Beta3 specifically
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
 
-Once you have all the necessary requirements, building Realm.framework just takes a single command: `sh build.sh ios`. You'll need an internet connection the first time you build Realm to download the core binary.
+Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh ios`. You'll need an internet connection the first time you build Realm to download the core binary.
 
 Run `sh build.sh help` to see all the actions you can perform (build ios/osx, generate docs, test, etc.).
 
