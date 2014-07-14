@@ -16,13 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMNavigationState.h"
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+#import "RLMArrayNode.h"
 
-@class RLMRealmBrowserWindowController;
+@interface RLMArrayNavigationState : RLMNavigationState
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@property (nonatomic, readonly) RLMProperty *property;
+@property (nonatomic, readonly) NSInteger arrayIndex;
+
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type typeIndex:(NSInteger)typeIndex property:(RLMProperty *)property arrayIndex:(NSInteger)arrayIndex;
 
 @end

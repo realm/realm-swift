@@ -16,13 +16,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMNavigationState.h"
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+@implementation RLMNavigationState
 
-@class RLMRealmBrowserWindowController;
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index
+{
+    if (self = [super init]) {
+        _selectedType = type;
+        _selectedInstanceIndex = index;
+    }
+    
+    return self;
+}
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+- (void)updateSelectionToIndex:(NSInteger)index
+{
+    _selectedInstanceIndex = index;
+}
+
+- (BOOL)isEqualTo:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        RLMNavigationState *comparedState = (RLMNavigationState *)object;
+        BOOL result = self.selectedType == comparedState.selectedType &&
+                      self.selectedInstanceIndex == comparedState.selectedInstanceIndex;
+        
+        return result;
+    }
+    
+    return NO;
+}
 
 @end

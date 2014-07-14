@@ -242,11 +242,11 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
  default Realm is at a version other than <code>version</code>, the migration is applied.
  
  @param block       The block which migrates the Realm to the current version.
- @param error       The error that occured while applying the migration if any.
+ @return            The error that occured while applying the migration if any.
 
  @see               RLMMigration
  */
-+ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError **)error;
++ (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block;
 
 /**
  Performs a migration on a Realm at a path.
@@ -254,13 +254,13 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
  Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
  If the Realm is at a version other than <code>version</code>, the migration is applied.
  
- @param block       The block which migrates the Realm to the current version.
  @param realmPath   The path of the Realm to migrate.
- @param error       The error that occured while applying the migration if any.
+ @param block       The block which migrates the Realm to the current version.
+ @return            The error that occured while applying the migration if any.
  
  @see               RLMMigration
  */
-+ (void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError **)error;
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block;
 
 
 #pragma mark -

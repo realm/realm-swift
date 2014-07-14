@@ -16,13 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+#import "RLMNavigationState.h"
+#import "RLMArrayNavigationState.h"
+#import "RLMQueryNavigationState.h"
 
-@class RLMRealmBrowserWindowController;
+@interface RLMNavigationStack : NSObject
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@property (nonatomic, readonly) RLMNavigationState *currentState;
+
+- (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
+
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property;
+
+- (void)pushState:(RLMNavigationState *)state;
+
+- (RLMNavigationState *)navigateBackward;
+
+- (RLMNavigationState *)navigateForward;
+
+- (BOOL)canNavigateBackward;
+
+- (BOOL)canNavigateForward;
 
 @end

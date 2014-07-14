@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8FE413F196DBA6700073FBB"
+               BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
                BuildableName = "TestFramework.framework"
                BlueprintName = "OSXTestFramework"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
@@ -42,7 +42,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8FE413F196DBA6700073FBB"
+            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
             BuildableName = "TestFramework.framework"
             BlueprintName = "OSXTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
@@ -61,7 +61,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8FE413F196DBA6700073FBB"
+            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
             BuildableName = "TestFramework.framework"
             BlueprintName = "OSXTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
@@ -79,7 +79,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8FE413F196DBA6700073FBB"
+            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
             BuildableName = "TestFramework.framework"
             BlueprintName = "OSXTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">

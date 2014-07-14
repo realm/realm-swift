@@ -56,7 +56,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         XCTAssertEqual(totalSum, 100, "total sum should be 100")
     }
-    
+
     func testReadOnly() {
         let realm = realmWithTestPath()
         
@@ -154,7 +154,10 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription() {
-        let realm = realmWithTestPath()
+        // FIXME: Using realmWithTestPath() makes the tests fail
+        //        because accessors aren't cycled properly outside the default realm
+        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
+        let realm = Realm(rlmRealm: RLMRealm.defaultRealm())
         
         realm.beginWriteTransaction()
         
@@ -167,7 +170,7 @@ class SwiftArrayTests: SwiftTestCase {
         }
         
         realm.commitWriteTransaction()
-        
+
         let description = realm.objects(SwiftEmployeeObject()).description as NSString
         
         XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
@@ -176,7 +179,7 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
         
-        XCTAssertTrue(description.rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
     func testDeleteLinksAndObjectsInArray() {
@@ -229,9 +232,17 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
-        
-        let allPeople = realm.objects(SwiftEmployeeObject())
-        XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
+
+        realm.beginWriteTransaction()
+        peopleInCompany.removeLastObject()
+        XCTAssertEqual(peopleInCompany.count, 1, "1 remaining link")
+        peopleInCompany.replaceObjectAtIndex(0, withObject: po2)
+        XCTAssertEqual(peopleInCompany.count, 1, "1 link replaced")
+        peopleInCompany.insertObject(po1, atIndex: 0)
+        XCTAssertEqual(peopleInCompany.count, 2, "2 links")
+        peopleInCompany.removeAllObjects()
+        XCTAssertEqual(peopleInCompany.count, 0, "0 remaining links")
+        realm.commitWriteTransaction()
     }
 
     // Objective-C models
@@ -366,7 +377,10 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription_objc() {
-        let realm = realmWithTestPath()
+        // FIXME: Using realmWithTestPath() makes the tests fail
+        //        because accessors aren't cycled properly outside the default realm
+        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
+        let realm = Realm(rlmRealm: RLMRealm.defaultRealm())
 
         realm.beginWriteTransaction()
 
@@ -388,7 +402,7 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
 
-        XCTAssertTrue(description.rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
     func testDeleteLinksAndObjectsInArray_objc() {

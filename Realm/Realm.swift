@@ -75,11 +75,11 @@ class Realm {
     }
 
     class func applyMigrationBlock(error: AutoreleasingUnsafePointer<NSError?>, block: RealmMigrationBlock) {
-        RLMRealm.applyMigrationBlock(block, error: error)
+        RLMRealm.migrateDefaultRealmWithBlock(block)
     }
 
     class func applyMigrationBlock(atPath path: String, error: AutoreleasingUnsafePointer<NSError?>, block: RealmMigrationBlock) {
-        RLMRealm.applyMigrationBlock(block, atPath: path, error: error)
+        RLMRealm.migrateRealmAtPath(path, withBlock: block)
     }
 
     func addNotificationBlock(block: RealmNotificationBlock) -> RealmNotificationToken {
