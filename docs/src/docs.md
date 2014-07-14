@@ -10,7 +10,7 @@ tagline: ": iOS Guide"
 
 ### Manual installation
 
-1. Download the [latest release of Realm](http://static.realm.io/downloads/ios/latest) and extract the zip
+1. Download the [latest release of Realm](http://static.realm.io/downloads/ios/latest) and extract the zip.
 2. Drag Realm.framework from our release and into the Frameworks folder in your project in Xcode.
    Make sure **Copy items into destination group’s folder** is selected and press **Finish**.
 3. Click on the project in the Xcode file explorer.
