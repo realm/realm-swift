@@ -49,6 +49,6 @@
 @interface RLMObject ()
 
 + (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat args:(va_list)args;
++ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 
 @end

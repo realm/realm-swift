@@ -45,7 +45,7 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
 
-        let result = SwiftAggregateObject.objectsInRealm(realm, withPredicate: "intCol < %d", 100)
+        let result = SwiftAggregateObject.objectsInRealm(realm, "intCol < %d", 100)
         XCTAssertEqual(result.count, 10, "10 objects added")
         
         var totalSum = 0
@@ -91,8 +91,8 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
 
-        let noArray = SwiftAggregateObject.objectsInRealm(realm, withPredicate: "boolCol == NO")
-        let yesArray = SwiftAggregateObject.objectsInRealm(realm, withPredicate: "boolCol == YES")
+        let noArray = SwiftAggregateObject.objectsInRealm(realm, "boolCol == NO")
+        let yesArray = SwiftAggregateObject.objectsInRealm(realm, "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -286,7 +286,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let result = AggregateObject.objectsInRealm(realm, withPredicate: "intCol < %d", 100)
+        let result = AggregateObject.objectsInRealm(realm, "intCol < %d", 100)
         XCTAssertEqual(result.count, 10, "10 objects added")
 
         var totalSum: CInt = 0
@@ -332,8 +332,8 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let noArray = AggregateObject.objectsInRealm(realm, withPredicate: "boolCol == NO")
-        let yesArray = AggregateObject.objectsInRealm(realm, withPredicate: "boolCol == YES")
+        let noArray = AggregateObject.objectsInRealm(realm, "boolCol == NO")
+        let yesArray = AggregateObject.objectsInRealm(realm, "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum

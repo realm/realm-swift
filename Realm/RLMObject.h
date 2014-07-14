@@ -60,7 +60,7 @@
  
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
@@ -248,7 +248,7 @@
 
  @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
  */
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ...;
++ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.

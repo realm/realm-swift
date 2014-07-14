@@ -160,13 +160,13 @@
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-+(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ... {
++(RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
-    return [self objectsInRealm:realm withPredicateFormat:predicateFormat args:args];
+    return [self objectsInRealm:realm where:predicateFormat args:args];
 }
 
-+(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat args:(va_list)args {
++(RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args {
     return [self objectsInRealm:realm withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 

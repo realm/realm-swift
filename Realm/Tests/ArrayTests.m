@@ -58,7 +58,7 @@
     
     [realm commitWriteTransaction];
        
-    RLMArray *result = [AggregateObject objectsInRealm:realm withPredicateFormat:@"intCol < %i", 100];
+    RLMArray *result = [AggregateObject objectsInRealm:realm where:@"intCol < %i", 100];
     
     XCTAssertEqual(result.count, (NSUInteger)18, @"18 objects added");
 

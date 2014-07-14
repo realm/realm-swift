@@ -24,7 +24,7 @@ extension RLMObject {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 
-    class func objectsInRealm(realm: RLMRealm, withPredicate predicateFormat: String, _ args: CVarArg...) -> RLMArray {
-        return objectsInRealm(realm, withPredicateFormat: predicateFormat, args: getVaList(args))
+    class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArg...) -> RLMArray {
+        return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
     }
 }

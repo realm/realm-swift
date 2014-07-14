@@ -54,7 +54,7 @@
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
+- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate from the this Realm.
