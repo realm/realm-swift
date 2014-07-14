@@ -146,7 +146,13 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
+{
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+}
+
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
@@ -184,7 +190,13 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
+{
+    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                   reason:@"Method not implemented" userInfo:nil];
+}
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];

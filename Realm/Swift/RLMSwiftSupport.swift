@@ -18,36 +18,6 @@
 
 import Foundation
 
-//
-// Support Swift enumeration
-//
-extension RLMArray: Sequence {
-
-    func generate() -> GeneratorOf<RLMObject> {
-        var i  = 0
-        return GeneratorOf<RLMObject>({
-            if (i >= self.count) {
-                return .None
-            } else {
-                return self[i++] as? RLMObject
-            }
-        })
-    }
-}
-
-// index subscripting for ranges on string
-// FIXME - put in an extension file
-extension String {
-    subscript (r: Range<Int>) -> String {
-        get {
-            let startIndex = advance(self.startIndex, r.startIndex)
-            let endIndex = advance(startIndex, r.endIndex)
-
-            return self[Range(start: startIndex, end: endIndex)]
-        }
-    }
-}
-
 @objc class RLMSwiftSupport {
 
     class func isSwiftClassName(className: NSString) -> Bool {

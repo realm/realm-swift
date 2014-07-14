@@ -174,16 +174,24 @@ void RLMPopulateObjectWithArray(RLMObject *obj, NSArray *array) {
     return RLMGetObjects(realm, self.className, nil, nil);
 }
 
-+ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ... {
-    NSPredicate *outPredicate = nil;
-    RLM_PREDICATE(predicateFormat, outPredicate);
-    return [self objectsWithPredicate:outPredicate];
++ (RLMArray *)objectsWhere:(NSString *)predicateFormat, ... {
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objectsWhere:predicateFormat args:args];
+}
+
++ (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 +(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ... {
-    NSPredicate *outPredicate = nil;
-    RLM_PREDICATE(predicateFormat, outPredicate);
-    return [self objectsInRealm:realm withPredicate:outPredicate];
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objectsInRealm:realm withPredicateFormat:predicateFormat args:args];
+}
+
++(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat args:(va_list)args {
+    return [self objectsInRealm:realm withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 + (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate {

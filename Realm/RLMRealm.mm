@@ -507,9 +507,14 @@ static NSArray *s_objectDescriptors = nil;
 
 - (RLMArray *)objects:(NSString *)objectClassName withPredicateFormat:(NSString *)predicateFormat, ...
 {
-    NSPredicate *outPredicate = nil;
-    RLM_PREDICATE(predicateFormat, outPredicate);
-    return [self objects:objectClassName withPredicate:outPredicate];
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objects:objectClassName withPredicateFormat:predicateFormat args:args];
+}
+
+- (RLMArray *)objects:(NSString *)objectClassName withPredicateFormat:(NSString *)predicateFormat args:(va_list)args
+{
+    return [self objects:objectClassName withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate

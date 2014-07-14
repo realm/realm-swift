@@ -52,7 +52,7 @@
 
  @return    An RLMArray of results matching the given predicate.
 
- @see       RLMObject objectsWithPredicateFormat:
+ @see       RLMObject objectsWhere:
  */
 - (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
 
@@ -66,7 +66,7 @@
 
  @return    An RLMArray of results matching the given predicate.
 
- @see       RLMObject objectsWithPredicateFormat:
+ @see       RLMObject objectsWhere:
  */
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 

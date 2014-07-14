@@ -9,8 +9,8 @@
 * Moved Realm specific query methods from RLMRealm to class methods on RLMObject (-allObjects: to +allObjectsInRealm: ect.)
 * Rename schemaForObject: to schemaForClassName: on RLMSchema
 * Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
-* Removed -indexOfObjectWhere:, -objectsWhere: and -objectsOrderedBy:where: from RLMArray
-* Removed +objectsWhere: and +objectsOrderedBy:where: from RLMObject
+* Removed -objectsOrderedBy:where: from RLMArray
+* Removed +objectsOrderedBy:where: from RLMObject
 
 ### Enhancements
 
@@ -22,8 +22,8 @@
 * Added support for RLMArray properties on objects.
 * Added support for creating in-memory default Realm.
 * Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
-* Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
-* Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
+* Added -indexOfObjectWithPredicate:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
+* Added +objectsWithPredicate: to RLMObject
 * Now allows predicates comparing two object properties of the same type.
 * Implemented -indexOfObject: for RLMArray
 

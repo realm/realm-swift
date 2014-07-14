@@ -159,11 +159,11 @@
     RLMArray *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
 
-    RLMArray *results = [PersonObject objectsWithPredicateFormat:@"age == 27"];
+    RLMArray *results = [PersonObject objectsWhere:@"age == 27"];
     XCTAssertEqual(results.count, (NSUInteger)1, @"Expecting 1 results");
     
     // with order
-    results = [[PersonObject objectsWithPredicateFormat:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    results = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
     PersonObject *tim = results[0];
     XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
@@ -182,11 +182,11 @@
     RLMArray *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, (NSUInteger)3, @"Expecting 3 results");
     
-    RLMArray *some = [[PersonObject objectsWithPredicateFormat:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    RLMArray *some = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
     
     // query/order on array
-    XCTAssertEqual([all objectsWithPredicateFormat:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 result");
-    XCTAssertEqual([all objectsWithPredicateFormat:@"age == 28"].count, (NSUInteger)0, @"Expecting 0 results");
+    XCTAssertEqual([all objectsWhere:@"age == 27"].count, (NSUInteger)1, @"Expecting 1 result");
+    XCTAssertEqual([all objectsWhere:@"age == 28"].count, (NSUInteger)0, @"Expecting 0 results");
     some = [some arraySortedByProperty:@"age" ascending:NO];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
@@ -595,12 +595,12 @@
 
 - (void)testBooleanPredicate
 {
-    XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol == TRUE"].count,
+    XCTAssertEqual([BoolObject objectsWhere:@"boolCol == TRUE"].count,
                    (NSUInteger)0, @"== operator in bool predicate.");
-    XCTAssertEqual([BoolObject objectsWithPredicateFormat:@"boolCol != TRUE"].count,
+    XCTAssertEqual([BoolObject objectsWhere:@"boolCol != TRUE"].count,
                    (NSUInteger)0, @"== operator in bool predicate.");
 
-    XCTAssertThrowsSpecificNamed([BoolObject objectsWithPredicateFormat:@"boolCol >= TRUE"],
+    XCTAssertThrowsSpecificNamed([BoolObject objectsWhere:@"boolCol >= TRUE"],
                                  NSException,
                                  @"Invalid operator type",
                                  @"Invalid operator in bool predicate.");
@@ -740,7 +740,7 @@
 - (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
                                               expectedCount:(NSUInteger)expectedCount
 {
-    RLMArray *queryResult = [QueryObject objectsWithPredicateFormat:predicate];
+    RLMArray *queryResult = [QueryObject objectsWhere:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
                    predicate, expectedCount, actualCount);
@@ -775,7 +775,7 @@
     {
         [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
 
-        RLMArray *results = [QueryObject objectsWithPredicateFormat:@"bool1 = YES"];
+        RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
         XCTAssertEqual((int)results.count, 1);
 
         // Delete the (only) object in result set
@@ -805,7 +805,7 @@
     [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
     [realm commitWriteTransaction];
 
-    RLMArray *results = [QueryObject objectsWithPredicateFormat:@"bool1 = YES"];
+    RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
     XCTAssertEqual((int)results.count, 1);
 
     // Delete the (only) object in result set
