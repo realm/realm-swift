@@ -165,7 +165,7 @@ For example, the following calls `[RLMObject objectsOrderedBy:where:]` to sort t
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
 RLMArray *dogs = [[Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]
-                       arraySortedByProperty:@"name" ascending:YES];
+                            arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
