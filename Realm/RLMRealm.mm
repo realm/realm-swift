@@ -501,6 +501,24 @@ static NSArray *s_objectDescriptors = nil;
     RLMDeleteObjectFromRealm(object);
 }
 
+- (void)deleteObjects:(id)array {
+    if ([array isKindOfClass:NSArray.class]) {
+        // for arrays and standalone delete each individually
+        for (id obj in array) {
+            if ([obj isKindOfClass:RLMObject.class]) {
+                RLMDeleteObjectFromRealm(obj);
+            }
+        }
+    }
+    else if ([array isKindOfClass:RLMArray.class]) {
+        // call deleteObjectsFromRealm for our RLMArray
+        [(RLMArray *)array deleteObjectsFromRealm];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray or NSArray of RLMObjects" userInfo:nil];
+    }
+}
+
 - (RLMArray *)allObjects:(NSString *)objectClassName {
     return RLMGetObjects(self, objectClassName, nil, nil);
 }

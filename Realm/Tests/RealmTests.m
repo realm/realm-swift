@@ -84,6 +84,50 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testRealmBatchRemoveObjects {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    StringObject *strObj = [StringObject createInRealm:realm withObject:@[@"a"]];
+    [StringObject createInRealm:realm withObject:@[@"b"]];
+    [StringObject createInRealm:realm withObject:@[@"c"]];
+    [realm commitWriteTransaction];
+
+    // delete objects
+    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
+    [realm beginWriteTransaction];
+    [realm deleteObjects:objects];
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertThrows(strObj.stringCol, @"Object should be invalidated");
+
+    // add objects to linkView
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
+    [StringObject createInRealm:realm withObject:@[@"d"]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)4, @"Expecting 4 objects");
+
+    // remove from linkView
+    [realm beginWriteTransaction];
+    [realm deleteObjects:obj.array];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
+
+    // remove NSArray
+    NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
+    [realm beginWriteTransaction];
+    [realm deleteObjects:arrayOfLastObject];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
+}
+
+
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];

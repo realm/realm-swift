@@ -35,7 +35,7 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration 
 // add an object to the given realm
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
 
-// add an object to the given realm
+// delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
 // get objects of a given class

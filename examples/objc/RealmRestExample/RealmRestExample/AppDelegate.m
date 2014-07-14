@@ -95,7 +95,7 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
     
     // Show all the venues that were persisted
     NSLog(@"Here are all the venues persisted to the default Realm: \n\n %@",
-          [[defaultRealm allObjects:Venue.className] description]);
+          [[Venue allObjects] description]);
 }
 
 - (void)deleteRealmFile

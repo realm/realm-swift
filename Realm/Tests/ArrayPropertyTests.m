@@ -172,6 +172,7 @@
 
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
     company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
     [company.employees removeObjectAtIndex:1];
 

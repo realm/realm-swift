@@ -466,6 +466,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.addObject(po3)
 
         let company = CompanyObject()
+        company.name = "name"
         realm.addObject(company)
         company.employees = EmployeeObject.allObjectsInRealm(realm)
 

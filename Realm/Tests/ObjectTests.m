@@ -179,12 +179,32 @@
     XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
     
-    
-    EmployeeObject *objDefault = [[EmployeeObject alloc] initWithObject:@{}];
-    XCTAssertNil(objDefault.name, @"nil string is default for String property");
-    XCTAssertEqual(objDefault.age, 0, @"0 is default for int property");
-    XCTAssertEqual(objDefault.hired, NO, @"No is default for Bool property");
+    XCTAssertThrows([[EmployeeObject alloc] initWithObject:@{}], @"Initialization with missing values should throw");
+    XCTAssertNoThrow([[DefaultObject alloc] initWithObject:@{@"intCol": @1}],
+                     "Overriding some default values at initialization should not throw");
 }
+
+-(void)testObjectInitWithObjectLiterals {
+    NSArray *array = @[@"company", @[@[@"Alex", @29, @YES]]];
+    CompanyObject *company = [[CompanyObject alloc] initWithObject:array];
+    XCTAssertEqualObjects(company.name, array[0], @"Company name should be set");
+    XCTAssertEqualObjects([company.employees[0] name], array[1][0][0], @"First employee should be Alex");
+
+    NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
+    CompanyObject *dictCompany = [[CompanyObject alloc] initWithObject:dict];
+    XCTAssertEqualObjects(dictCompany.name, dict[@"name"], @"Company name should be set");
+    XCTAssertEqualObjects([dictCompany.employees[0] name], dict[@"employees"][0][@"name"], @"First employee should be Bjarne");
+
+    NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
+    XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidArray], @"Invalid sub-literal should throw");
+
+    OwnerObject *owner = [[OwnerObject alloc] initWithObject:@[@"Brian", @{@"dogName": @"Brido"}]];
+    XCTAssertEqualObjects(owner.dog.dogName, @"Brido");
+
+    OwnerObject *ownerArrayDog = [[OwnerObject alloc] initWithObject:@[@"JP", @[@"PJ"]]];
+    XCTAssertEqualObjects(ownerArrayDog.dog.dogName, @"PJ");
+}
+
 
 -(void)testObjectInitWithObjectTypeOther
 {
@@ -483,6 +503,47 @@
     
     [realm commitWriteTransaction];
 }
+
+-(void)testCreateInRealmWithObjectLiterals {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // create with array literals
+    [realm beginWriteTransaction];
+
+    NSArray *array = @[@"company", @[@[@"Alex", @29, @YES]]];
+    [CompanyObject createInDefaultRealmWithObject:array];
+
+    NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
+    [CompanyObject createInDefaultRealmWithObject:dict];
+
+    NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
+    XCTAssertThrows([CompanyObject createInDefaultRealmWithObject:invalidArray], @"Invalid sub-literal should throw");
+
+    [realm commitWriteTransaction];
+
+    // verify array literals
+    CompanyObject *company = CompanyObject.allObjects[0];
+    XCTAssertEqualObjects(company.name, array[0], @"Company name should be set");
+    XCTAssertEqualObjects([company.employees[0] name], array[1][0][0], @"First employee should be Alex");
+
+    CompanyObject *dictCompany = CompanyObject.allObjects[1];
+    XCTAssertEqualObjects(dictCompany.name, dict[@"name"], @"Company name should be set");
+    XCTAssertEqualObjects([dictCompany.employees[0] name], dict[@"employees"][0][@"name"], @"First employee should be Bjarne");
+
+    // create with object literals
+    [realm beginWriteTransaction];
+
+    [OwnerObject createInDefaultRealmWithObject:@[@"Brian", @{@"dogName": @"Brido"}]];
+    [OwnerObject createInDefaultRealmWithObject:@[@"JP", @[@"PJ"]]];
+
+    [realm commitWriteTransaction];
+
+    // verify object literals
+    OwnerObject *brian = OwnerObject.allObjects[0], *jp = OwnerObject.allObjects[1];
+    XCTAssertEqualObjects(brian.dog.dogName, @"Brido");
+    XCTAssertEqualObjects(jp.dog.dogName, @"PJ");
+}
+
 
 - (void)testCreateInRealmWithMissingValue
 {
