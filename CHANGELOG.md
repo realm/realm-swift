@@ -5,6 +5,7 @@
 
 ### API breaking changes
 
+* Added method -deleteObjects: to batch delete objects from a Realm
 * Rename migration methods to -migrateDefaultRealmWithBlock: and -migrateRealmAtPath:withBlock:
 * Moved Realm specific query methods from RLMRealm to class methods on RLMObject (-allObjects: to +allObjectsInRealm: ect.)
 * Rename schemaForObject: to schemaForClassName: on RLMSchema
