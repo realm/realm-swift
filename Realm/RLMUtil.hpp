@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConstants.h"
-#import "RLMObjectSchema.h"
+#import "RLMSchema.h"
 #import <objc/runtime.h>
 
 #import <tightdb/table.hpp>
@@ -30,12 +30,19 @@
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
+// returns a validated object for an input object
+// creates new objects for child objects and array literals as necessary
+// throws if passed in literals are not compatible with prop
+id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema);
+
 // throws if the values in array are not valid for the given schema
-void RLMValidateArrayAgainstObjectSchema(NSArray *array, RLMObjectSchema *schema);
+// returns array with allocated child objects
+NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
 // throws if the values in dict are not valid for the given schema
-// returns dictionary with default values when applicable
-NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *schema);
+// inserts default values for missing properties
+// returns dictionary with default values and allocates child objects when applicable
+NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {

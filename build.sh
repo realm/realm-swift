@@ -59,13 +59,15 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
+    mkdir -p build/DerivedData
     ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild $@
+    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
+    mkdir -p build/DerivedData
     ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild $@
+    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
@@ -281,10 +283,8 @@ case "$COMMAND" in
         cd examples
         if [[ "$XCVERSION" == "6" ]]; then
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        	xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
@@ -295,7 +295,6 @@ case "$COMMAND" in
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmPerformanceExample/RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;

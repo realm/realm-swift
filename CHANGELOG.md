@@ -14,6 +14,8 @@
 
 ### Enhancements
 
+* Added +createInDefaultRealmWithObject: method to RLMObject.
+* Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
 * New Xcode 6 project for experimental swift support.
 * Support for defining RLMObject models entirely in Swift (experimental, see known issues).
 * RLMArrays in Swift support Sequence-style enumeration (for obj in array).
