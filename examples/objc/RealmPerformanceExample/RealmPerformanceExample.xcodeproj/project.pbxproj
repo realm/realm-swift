@@ -9,12 +9,13 @@
 /* Begin PBXBuildFile section */
 		410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */; };
 		42515D8A19472A0F001C3DDF /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42515D8919472A0F001C3DDF /* libc++.dylib */; };
+		42F06C371974059300CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C361974059300CF67D1 /* Realm.framework */; };
+		42F06C39197405AE00CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C38197405AE00CF67D1 /* Realm.framework */; };
 		4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */; };
 		4DFD433A191A5CD300ABBFFE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD432E191A5CD300ABBFFE /* AppDelegate.m */; };
 		4DFD433D191A5CD300ABBFFE /* Performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD4333191A5CD300ABBFFE /* Performance.m */; };
 		4DFD433F191A5CD300ABBFFE /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD4337191A5CD300ABBFFE /* Utils.m */; };
 		4DFD4340191A5CD300ABBFFE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD4339191A5CD300ABBFFE /* ViewController.m */; };
-		B1387DE4195977EE00D49C15 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1387DE3195977EE00D49C15 /* Realm.framework */; };
 		E8615DCA191AF5A8005DD6C4 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8615DC8191AF5A8005DD6C4 /* ViewController_iPad.xib */; };
 		E8615DCB191AF5A8005DD6C4 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8615DC9191AF5A8005DD6C4 /* ViewController_iPhone.xib */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
@@ -27,6 +28,8 @@
 /* Begin PBXFileReference section */
 		410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		42515D8919472A0F001C3DDF /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		42F06C361974059300CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Release/Realm.framework; sourceTree = "<group>"; };
+		42F06C38197405AE00CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Debug/Realm.framework; sourceTree = "<group>"; };
 		4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		4DFD432D191A5CD300ABBFFE /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RealmPerformanceExample/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		4DFD432E191A5CD300ABBFFE /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RealmPerformanceExample/AppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -36,8 +39,6 @@
 		4DFD4337191A5CD300ABBFFE /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = RealmPerformanceExample/Utils.m; sourceTree = SOURCE_ROOT; };
 		4DFD4338191A5CD300ABBFFE /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = RealmPerformanceExample/ViewController.h; sourceTree = SOURCE_ROOT; };
 		4DFD4339191A5CD300ABBFFE /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = RealmPerformanceExample/ViewController.m; sourceTree = SOURCE_ROOT; };
-		4DFD4341191A5E1500ABBFFE /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../Realm.framework; sourceTree = "<group>"; };
-		B1387DE3195977EE00D49C15 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/Release/Realm.framework; sourceTree = "<group>"; };
 		E8615DC8191AF5A8005DD6C4 /* ViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPad.xib; sourceTree = "<group>"; };
 		E8615DC9191AF5A8005DD6C4 /* ViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPhone.xib; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* RealmPerformanceExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmPerformanceExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -55,10 +56,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B1387DE4195977EE00D49C15 /* Realm.framework in Frameworks */,
+				42F06C371974059300CF67D1 /* Realm.framework in Frameworks */,
 				42515D8A19472A0F001C3DDF /* libc++.dylib in Frameworks */,
 				410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */,
 				E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */,
+				42F06C39197405AE00CF67D1 /* Realm.framework in Frameworks */,
 				E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */,
 				E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */,
 			);
@@ -89,9 +91,9 @@
 		E9D58B4D1541A375009150B1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B1387DE3195977EE00D49C15 /* Realm.framework */,
+				42F06C38197405AE00CF67D1 /* Realm.framework */,
 				42515D8919472A0F001C3DDF /* libc++.dylib */,
-				4DFD4341191A5E1500ABBFFE /* Realm.framework */,
+				42F06C361974059300CF67D1 /* Realm.framework */,
 				E9D58B4E1541A375009150B1 /* UIKit.framework */,
 				E9D58B501541A375009150B1 /* Foundation.framework */,
 				E9D58B521541A375009150B1 /* CoreGraphics.framework */,
@@ -281,6 +283,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
+					"/Users/kneth/Projects/realm-cocoa/build/Release",
+					"/Users/kneth/Projects/realm-cocoa/build/Debug",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -306,6 +310,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
+					"/Users/kneth/Projects/realm-cocoa/build/Release",
+					"/Users/kneth/Projects/realm-cocoa/build/Debug",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
