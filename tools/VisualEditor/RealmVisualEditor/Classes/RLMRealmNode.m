@@ -20,20 +20,8 @@
 
 #import <Realm/Realm.h>
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
-
-@interface RLMRealm ()
-
-// private constructor
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-
-@end
-
 
 @implementation RLMRealmNode
 
@@ -110,16 +98,9 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"HeaderLabel"
-                                                      owner:self];
-    
-    result.textField.stringValue = @"classes".uppercaseString;
-    result.textField.textColor = [NSColor colorWithByteRed:145
-                                                     green:152
-                                                      blue:153
-                                                     alpha:255];
-    
-    [[result.button cell] setHighlightsBy:0];
+    NSTextField *result =  [tableView makeViewWithIdentifier:@"HeaderLabel"
+                                                       owner:self];
+    [result setStringValue:@"CLASSES"];
     
     return result;
 

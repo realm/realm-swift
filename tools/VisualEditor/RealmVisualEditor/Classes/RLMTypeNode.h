@@ -16,13 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import <Realm/Realm.h>
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+#import "RLMRealmOutlineNode.h"
+#import "RLMClazzProperty.h"
 
-@class RLMRealmBrowserWindowController;
+@interface RLMTypeNode : NSObject <RLMRealmOutlineNode>
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *schema;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSArray *propertyColumns;
+@property (nonatomic, readonly) NSUInteger instanceCount;
+
+- (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
+
+- (RLMObject *)instanceAtIndex:(NSUInteger)index;
+
+- (NSUInteger)indexOfInstance:(RLMObject *)instance;
 
 @end

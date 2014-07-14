@@ -16,13 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMQueryNavigationState.h"
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+@implementation RLMQueryNavigationState
 
-@class RLMRealmBrowserWindowController;
+- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMArray *)results;
+{
+    if (self = [super initWithSelectedType:type
+                                     index:0]) {
+        _results = results;
+        _searchText = searchText;
+    }
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+    return self;
+}
 
 @end

@@ -16,13 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+#import "RLMTypeNode.h"
 
-@class RLMRealmBrowserWindowController;
+@interface RLMNavigationState : NSObject
 
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@property (nonatomic, readonly) RLMTypeNode *selectedType;
+@property (nonatomic, readonly) NSInteger selectedInstanceIndex;
+
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index;
+
+- (void)updateSelectionToIndex:(NSInteger)index;
 
 @end

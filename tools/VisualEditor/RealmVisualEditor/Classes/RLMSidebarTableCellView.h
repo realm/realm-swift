@@ -18,11 +18,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "RLMViewController.h"
-#import "RLMClazzNode.h"
+@interface RLMSidebarTableCellView : NSTableCellView
 
-@class RLMRealmBrowserWindowController;
-
-@interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@property(strong) IBOutlet NSButton *button;
 
 @end
+
