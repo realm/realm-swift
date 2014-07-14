@@ -18,53 +18,99 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "NSTableColumn+Resize.h"
+#import "RLMNavigationStack.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
-@implementation RLMRealmBrowserWindowController
+@implementation RLMRealmBrowserWindowController {
 
-#pragma mark - NSWindowsController overrides
+    RLMNavigationStack *navigationStack;
+}
+
+#pragma mark - NSViewController overrides
 
 - (void)windowDidLoad
 {
-    [self.tableViewController viewDidLoad];
+    navigationStack = [[RLMNavigationStack alloc] init];
+    [self updateNavigationButtons];
+    
+    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    if (firstItem != nil) {
+        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem
+                                                                                   index:0];
+
+        [self addNavigationState:initState
+              fromViewController:nil];
+    }
+}
+
+#pragma mark - Public methods - Accessors
+
+- (RLMNavigationState *)currentState
+{
+    return navigationStack.currentState;
+}
+
+#pragma mark - Public methods
+
+- (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
+{
+    if (!controller.navigationFromHistory) {
+        RLMNavigationState *oldState = navigationStack.currentState;
         
+        [navigationStack pushState:state];
+        [self updateNavigationButtons];
+        
+        if (controller == self.tableViewController || controller == nil) {
+            [self.outlineViewController updateUsingState:state
+                                                oldState:oldState];
+        }
+        
+        [self.tableViewController updateUsingState:state
+                                          oldState:oldState];
+    }
 }
 
-- (void)updateSelectedTypeNode:(RLMObjectNode *)typeNode
+- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
 {
-    [self.outlineViewController selectTypeNode:typeNode];
-    [self.tableViewController updateSelectedObjectNode:typeNode];
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
+    switch (buttons.selectedSegment) {
+        case 0: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateBackward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state
+                                                       oldState:oldState];
+                [self.tableViewController updateUsingState:state
+                                                     oldState:oldState];
+            }
+            break;
+        }
+        case 1: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateForward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state
+                                                       oldState:oldState];
+                [self.tableViewController updateUsingState:state
+                                                     oldState:oldState];
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    
+    [self updateNavigationButtons];    
 }
 
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode
-{
-    [self.tableViewController updateSelectedObjectNode:outlineNode];
-}
+#pragma mark - Private methods
 
-- (void)classSelectionWasChangedTo:(RLMClazzNode *)classNode
+- (void)updateNavigationButtons
 {
-    [self.outlineViewController selectTypeNode:classNode];
-}
-
-- (void)addArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
-{
-    RLMClazzNode *selectedClassNode = (RLMClazzNode *)self.selectedTypeNode;
-    
-    RLMArrayNode *arrayNode = [selectedClassNode displayChildArray:array
-                                                      fromProperty:property
-                                                            object:object];
-    
-    NSOutlineView *outlineView = (NSOutlineView *)self.outlineViewController.view;
-    [outlineView reloadData];
-    
-    [outlineView expandItem:selectedClassNode];
-    
-    NSInteger index = [outlineView rowForItem:arrayNode];
-    if (index != NSNotFound) {
-        [outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                 byExtendingSelection:NO];
-    }    
+    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward]
+                            forSegment:0];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
+                            forSegment:1];
 }
 
 @end

@@ -18,17 +18,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "RLMObjectNode.h"
+#import "RLMTypeNode.h"
 #import "RLMViewController.h"
+#import "RLMTableView.h"
 
 @class RLMRealmBrowserWindowController;
 
-@interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, RLMTableViewDelegate>
 
-@property (nonatomic, weak) RLMRealmBrowserWindowController IBOutlet *parentWindowController;
-
-- (IBAction)userDoubleClicked:(id)sender;
-
-- (void)updateSelectedObjectNode:(RLMObjectNode *)outlineNode;
+@property (nonatomic, readonly) RLMTableView *realmTableView;
 
 @end

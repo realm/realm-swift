@@ -17,23 +17,26 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
 
-#import "RLMRealmOutlineNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMNavigationState.h"
+#import "RLMArrayNavigationState.h"
 
-@interface RLMObjectNode : NSObject <RLMRealmOutlineNode>
+@interface RLMNavigationStack : NSObject
 
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *schema;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSArray *propertyColumns;
-@property (nonatomic, readonly) NSUInteger instanceCount;
+@property (nonatomic, readonly) RLMNavigationState *currentState;
 
-- (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
+- (RLMNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex;
 
-- (RLMObject *)instanceAtIndex:(NSUInteger)index;
+- (RLMArrayNavigationState *)pushStateWithTypeNode:(RLMTypeNode *)typeNode index:(NSInteger)selectionIndex property:(RLMProperty *)property;
 
-- (NSUInteger)indexOfInstance:(RLMObject *)instance;
+- (void)pushState:(RLMNavigationState *)state;
+
+- (RLMNavigationState *)navigateBackward;
+
+- (RLMNavigationState *)navigateForward;
+
+- (BOOL)canNavigateBackward;
+
+- (BOOL)canNavigateForward;
 
 @end

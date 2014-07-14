@@ -16,10 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Foundation/Foundation.h>
+#import <Realm/Realm.h>
 
-@interface RLMArrayNode : RLMTypeNode
+#import "RLMRealmOutlineNode.h"
+#import "RLMClazzProperty.h"
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+@interface RLMTypeNode : NSObject <RLMRealmOutlineNode>
+
+@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *schema;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSArray *propertyColumns;
+@property (nonatomic, readonly) NSUInteger instanceCount;
+
+- (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
+
+- (RLMObject *)instanceAtIndex:(NSUInteger)index;
+
+- (NSUInteger)indexOfInstance:(RLMObject *)instance;
 
 @end

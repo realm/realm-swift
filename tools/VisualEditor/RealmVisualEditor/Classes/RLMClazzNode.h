@@ -18,12 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMObjectNode.h"
+#import "RLMTypeNode.h"
 #import "RLMArrayNode.h"
 
-@interface RLMClazzNode : RLMObjectNode
+@interface RLMClazzNode : RLMTypeNode
 
-- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object;
+- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
+
+- (void)removeAllChildNodes;
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
 

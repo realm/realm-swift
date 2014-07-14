@@ -18,7 +18,7 @@
 
 #import "RLMClazzNode.h"
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 
 // private redeclaration
 @interface RLMRealm ()
@@ -98,8 +98,8 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                      owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                                  owner:self];
 
     result.textField.stringValue = self.name;
     result.button.title = [NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
@@ -112,12 +112,11 @@
 
 #pragma mark - Public methods
 
-- (RLMArrayNode *)displayChildArray:(RLMArray *)array fromProperty:(RLMProperty *)property object:(RLMObject *)object
+- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object
 {
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithArray:array
-                                            withReferringProperty:property
-                                                         onObject:object
-                                                            realm:self.realm];
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:property
+                                                                     onObject:object
+                                                                        realm:self.realm];
     
     if (displayedArrays.count == 0) {
         [displayedArrays addObject:arrayNode];
@@ -128,6 +127,11 @@
     }
 
     return arrayNode;
+}
+
+- (void)removeAllChildNodes
+{
+    [displayedArrays removeAllObjects];
 }
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index

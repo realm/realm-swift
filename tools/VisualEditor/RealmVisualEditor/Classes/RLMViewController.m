@@ -18,22 +18,20 @@
 
 #import "RLMViewController.h"
 
-@implementation RLMViewController
+#import "RLMRealmBrowserWindowController.h"
+#import "RLMArrayNavigationState.h"
 
-#pragma mark - NSViewController overrides
+@implementation RLMViewController {
 
-- (void)setView:(NSView *)newValue
-{
-    [self viewWillLoad];
-    [super setView:newValue];
-    [self viewDidLoad];
+    id delegate;
 }
 
-- (void)loadView
+#pragma mark - NSObject overrides
+
+- (void)awakeFromNib
 {
-    [self viewWillLoad];
-    [super loadView];
-    [self viewDidLoad];
+    [super awakeFromNib];
+    _navigationFromHistory = NO;
 }
 
 #pragma mark - Public methods - Accessors
@@ -49,14 +47,55 @@
 
 #pragma mark - Public methods
 
-- (void)viewWillLoad
+- (void)updateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    // Empty default implementation - can be overridden by subclasses.
+    _navigationFromHistory = YES;
+    
+    [self performUpdateUsingState:newState
+                         oldState:oldState];
+    
+    _navigationFromHistory = NO;
 }
 
-- (void)viewDidLoad
+- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    // Empty default implementation - can be overridden by subclasses.    
+    // No action - should be implemented by subclasses.
+}
+
+- (void)clearSelection
+{
+    [self.tableView selectRowIndexes:nil
+                byExtendingSelection:NO];
+}
+
+- (void)setSelectionIndex:(NSUInteger)newIndex
+{
+    NSUInteger oldIndex = self.tableView.selectedRow;
+    if (oldIndex != newIndex) {
+        NSTableView *tableView = self.tableView;
+
+        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+                    byExtendingSelection:NO];
+        
+        [tableView scrollRowToVisible:newIndex];
+    }
+}
+
+- (RLMTypeNode *)displayedType {
+    RLMNavigationState *currentState = self.parentWindowController.currentState;
+    
+    if ([currentState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)currentState;
+        RLMClazzNode *referringClazz = (RLMClazzNode *)arrayState.selectedType;
+        RLMObject *referringInstance = [referringClazz instanceAtIndex:arrayState.selectedInstanceIndex];
+        RLMProperty *referringProperty = arrayState.property;
+        return [[RLMArrayNode alloc] initWithReferringProperty:referringProperty
+                                                      onObject:referringInstance
+                                                         realm:self.parentWindowController.modelDocument.presentedRealm.realm];
+    }
+    else {
+        return self.parentWindowController.currentState.selectedType;
+    }
 }
 
 @end

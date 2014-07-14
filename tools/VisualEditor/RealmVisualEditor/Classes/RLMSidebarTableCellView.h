@@ -16,10 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Cocoa/Cocoa.h>
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMSidebarTableCellView : NSTableCellView
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+@property(strong) IBOutlet NSButton *button;
 
 @end
+

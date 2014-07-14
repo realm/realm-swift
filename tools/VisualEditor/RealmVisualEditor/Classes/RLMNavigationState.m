@@ -16,10 +16,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import "RLMNavigationState.h"
 
-@interface RLMArrayNode : RLMTypeNode
+@implementation RLMNavigationState
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index
+{
+    if (self = [super init]) {
+        _selectedType = type;
+        _selectedInstanceIndex = index;
+    }
+    
+    return self;
+}
+
+- (void)updateSelectionToIndex:(NSInteger)index
+{
+    _selectedInstanceIndex = index;
+}
+
+- (BOOL)isEqualTo:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        RLMNavigationState *comparedState = (RLMNavigationState *)object;
+        BOOL result = self.selectedType == comparedState.selectedType &&
+                      self.selectedInstanceIndex == comparedState.selectedInstanceIndex;
+        
+        return result;
+    }
+    
+    return NO;
+}
 
 @end

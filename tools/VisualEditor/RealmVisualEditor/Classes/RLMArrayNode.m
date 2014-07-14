@@ -18,7 +18,7 @@
 
 #import "RLMArrayNode.h"
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 
 @implementation RLMArrayNode {
 
@@ -27,7 +27,7 @@
     RLMArray *displayedArray;
 }
 
-- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
+- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
     NSString *elementTypeName = property.objectClassName;
     RLMSchema *realmSchema = realm.schema;
@@ -37,7 +37,7 @@
                              inRealm:realm]) {
         referringProperty = property;
         referringObject = object;
-        displayedArray = array;
+        displayedArray = object[property.name];
     }
 
     return self;
@@ -73,8 +73,8 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                               owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                                  owner:self];
     
     result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];

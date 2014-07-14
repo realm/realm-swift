@@ -16,10 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Foundation/Foundation.h>
+
 #import "RLMTypeNode.h"
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMNavigationState : NSObject
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
+@property (nonatomic, readonly) RLMTypeNode *selectedType;
+@property (nonatomic, readonly) NSInteger selectedInstanceIndex;
+
+- (instancetype)initWithSelectedType:(RLMTypeNode *)type index:(NSInteger)index;
+
+- (void)updateSelectionToIndex:(NSInteger)index;
 
 @end
