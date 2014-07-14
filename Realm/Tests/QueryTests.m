@@ -767,4 +767,70 @@
     }
 }
 
+- (void)testLiveQueriesInsideTransaction
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    {
+        [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+
+        RLMArray *results = [QueryObject objectsWithPredicateFormat:@"bool1 = YES"];
+        XCTAssertEqual((int)results.count, 1);
+
+        // Delete the (only) object in result set
+        [realm deleteObject:[results lastObject]];
+        XCTAssertEqual((int)results.count, 0);
+
+        // Add an object that does not match query
+        QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+        XCTAssertEqual((int)results.count, 0);
+
+        // Change object to match query
+        q1.bool1 = YES;
+        XCTAssertEqual((int)results.count, 1);
+
+        // Add another object that matches
+        [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+        XCTAssertEqual((int)results.count, 2);
+    }
+    [realm commitWriteTransaction];
+}
+
+- (void)testLiveQueriesBetweenTransactions
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [QueryObject objectsWithPredicateFormat:@"bool1 = YES"];
+    XCTAssertEqual((int)results.count, 1);
+
+    // Delete the (only) object in result set
+    [realm beginWriteTransaction];
+    [realm deleteObject:[results lastObject]];
+    [realm commitWriteTransaction];
+    XCTAssertEqual((int)results.count, 0);
+
+    // Add an object that does not match query
+    [realm beginWriteTransaction];
+    QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [realm commitWriteTransaction];
+    XCTAssertEqual((int)results.count, 0);
+
+    // Change object to match query
+    [realm beginWriteTransaction];
+    q1.bool1 = YES;
+    [realm commitWriteTransaction];
+    XCTAssertEqual((int)results.count, 1);
+
+    // Add another object that matches
+    [realm beginWriteTransaction];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [realm commitWriteTransaction];
+    XCTAssertEqual((int)results.count, 2);
+}
+
 @end
