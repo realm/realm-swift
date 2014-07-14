@@ -230,12 +230,12 @@ If you use your default Realm in memory, it will not persist your RLMObjects, me
 
 ### Other Realms
 
-It’s sometimes useful to have multiple realms, persisted at different locations, for example if you have different data groupings, different databases per feature, or you need to package some read-only files with your app, separate from the database your users will be editing. See [`[RLMRealm realmWithPath:]`](api/Classes/RLMRealm.html#//api/name/realmWithPath:) and [`[RLMRealm realmWithPath:readOnly:error]`](api/Classes/RLMRealm.html#//api/name/realmWithPath:readOnly:error:) for more info.
+It’s sometimes useful to have multiple realms, persisted at different locations, for example if you have different data groupings, different databases per feature, or you need to package some read-only files with your app, separate from the database your users will be editing. See [`[RLMRealm realmWithPath:]`](api/Classes/RLMRealm.html#//api/name/realmWithPath:) and [`[RLMRealm realmWithPath:readOnly:error:]`](api/Classes/RLMRealm.html#//api/name/realmWithPath:readOnly:error:) for more info.
 
 ### Using a Realm Across Threads
 
 If you are trying to access the same realm file from different threads, you should call `[RLMRealm defaultRealm]`, `[RLMRealm realmWithPath:]` or `[RLMRealm realmWithPath:readOnly:error:]` to get a different Realm object for every thread of your app. As long as you specify the same path, all RLMRealm objects will map to the same file on disk.  
-**Do _not_ pass an RLMRealm object from thread to thread**. It’s totally fine to have many RLMRealm objects, all mapping to the same file. You can even have multiple RLMRealm objects pointing to the same file living on the same thread.
+**Do _not_ share RLMRealm objects across threads**. It’s totally fine to have many RLMRealm objects, all mapping to the same file. You can even have multiple RLMRealm objects pointing to the same file living on the same thread.
 
 ## Relationships
 
