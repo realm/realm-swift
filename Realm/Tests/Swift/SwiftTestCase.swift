@@ -75,7 +75,7 @@ class SwiftTestCase: XCTestCase {
     override func tearDown() {
         super.tearDown()
 
-        // TODO: Reset Realm cache
+        // Reset Realm cache
         RLMRealm.clearRealmCache()
 
         // Delete realm files
