@@ -56,6 +56,16 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     }
     ar->_backingView.sync_if_needed();
 }
+inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
+    // first verify attached
+    RLMArrayTableViewValidateAttached(ar);
+
+    if (!ar->_realm->_inWriteTransaction) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can't mutate a persisted array outside of a write transaction."
+                                     userInfo:nil];
+    }
+}
 
 //
 // public method implementations
@@ -318,6 +328,13 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
+}
+
+- (void)deleteObjectsFromRealm {
+    RLMArrayTableViewValidateInWriteTransaction(self);
+
+    // call clear to remove all from the realm
+    _backingView.clear();
 }
 
 @end

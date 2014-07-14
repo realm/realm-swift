@@ -210,6 +210,13 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (void)deleteObject:(RLMObject *)object;
 
+/**
+ Delete an NSArray or RLMArray of objects from this Realm.
+
+ @param array  RLMArray or NSArray of RLMObjects to be deleted.
+ */
+- (void)deleteObjects:(id)array;
+
 #pragma mark - Migrations
 
 /**

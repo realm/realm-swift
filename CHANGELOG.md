@@ -16,6 +16,7 @@
 
 * Added +createInDefaultRealmWithObject: method to RLMObject.
 * Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
+* Added method -deleteObjects: to batch delete objects from a Realm
 * New Xcode 6 project for experimental swift support.
 * Support for defining RLMObject models entirely in Swift (experimental, see known issues).
 * RLMArrays in Swift support Sequence-style enumeration (for obj in array).
