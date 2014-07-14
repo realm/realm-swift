@@ -90,7 +90,7 @@ author.name       = @"David Foster Wallace";
 author.birthdate  = [NSDate date];
 
 [realm beginWriteTransaction];  // Begin a transaction
-[realm addObject:author]        // Add the object
+[realm addObject:author];       // Add the object
 [realm commitWriteTransaction]; // Commit the transaction
 {% endhighlight %}
 
@@ -115,10 +115,10 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 
 {% highlight objective-c %}
 // On the default Realm:
-RLMArray *dogs = [Dog.className allObjects]; // retrieves all Dogs from the default Realm
+RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
 // On a specific Realm:
-RLMRealm *petsRealm = [RLMRealm initWithPath:"pets.realm"]; // get a specific Realm
+RLMRealm *petsRealm = [RLMRealm realmWithPath:"pets.realm"]; // get a specific Realm
 RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
@@ -139,14 +139,13 @@ For example, the following would extend our earlier example by calling `[RLMObje
 
 {% highlight objective-c %}
 // Using a predicate string:
-RLMArray *dogs = [Dog objectsWhere: @"color = 'tan' AND name BEGINSWITH 'B'"];
+RLMArray *dogs = [Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
 
 // … Or using an NSPredicate object:
-NSPredicate *pred = [NSPredicate predicateWithFormat: @"color = %@ AND name BEGINSWITH %@",
-                                                      @"tan", @"B"];
-RLMArray *dogs = [Dog objectsWhere: pred];
+NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
+                                                     @"tan", @"B"];
+RLMArray *dogs = [Dog objectsWithPredicate:pred];
 {% endhighlight %}
-
 </div><!--/highlight-wrapper -->
 
 For more, see [`[RLMObject objectsWhere:]`](api/Classes/RLMObject.html#//api/name/objectsWhere:).
@@ -165,14 +164,8 @@ For example, the following calls `[RLMObject objectsOrderedBy:where:]` to sort t
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray * dogs = [Dog objectsOrderedBy: @"name"
-                                  where: @"color = 'tan' AND name BEGINSWITH 'B'"];
-
-// … Or using an NSSortDescriptor object:
-NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey: @"name"
-                                                                  ascending: YES];
-RLMArray * dogs = [Dog objectsOrderedBy: sortDescriptor
-                                  where: @"color = 'tan' AND name BEGINSWITH 'B'"];
+RLMArray *dogs = [[Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]
+                       arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -193,8 +186,8 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMArray * tanDogs = [Dog objectsWhere: @"color = 'tan'"];
-RLMArray * tanDogsWithBNames = [tanDogs objectsWhere: @"name BEGINSWITH 'B'"];
+RLMArray *tanDogs = [Dog objectsWithPredicateFormat:@"color = 'tan'"];
+RLMArray *tanDogsWithBNames = [tanDogs objectsWithPredicateFormat:@"name BEGINSWITH 'B'"];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -353,9 +346,9 @@ You can access & assign RLMArray properties as usual:
 {% endhighlight%}
 
 {% highlight objective-c %}  
-RLMArray *some_dogs = [Dog objectsWhere:@"name contains 'Fido'"])
+RLMArray *some_dogs = [Dog objectsWithPredicateFormat:@"name contains 'Fido'"];
 jim.dogs = some_dogs;
-[jim.dogs addObject:rex]
+[jim.dogs addObject:rex];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -378,7 +371,7 @@ The auto-updating Realm will send out notifications every time the underlying Re
 {% highlight objective-c %}
 // Observe Realm Notifications
 
-self.token = [realm addNotification:^(NSString *note, RLMRealm * realm) {
+self.token = [realm addNotificationBlock:^(NSString *note, RLMRealm * realm) {
     [myViewController updateUI];
 }];
 {% endhighlight %}
@@ -518,12 +511,12 @@ There are several ways we may want to import this JSON into our Realm. You could
 @end
 
 // Contact.h
-@interface Venue : RLMObject
+@interface Contact : RLMObject
 @property NSString *phone;
 @end
 
 // Location.h
-@interface Venue : RLMObject
+@interface Location : RLMObject
 @property double   lat;
 @property double   lng;
 @property NSString *postalCode;
@@ -550,7 +543,7 @@ NSArray *venues = json[@"venues"];
 [defaultRealm beginWriteTransaction];
 // Save one Venue object (& dependents) for each element of the array
 [defaultRealm addObjectsFromArray:venues];
-[defaultRealm commitWritetransaction];
+[defaultRealm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -646,7 +639,7 @@ While this is the minimal acceptable migration, we probably want to use this blo
 // Inside your [AppDelegate didFinishLaunchingWithOptions:]
 
 // Perform a migration defining the migration block inline
-[RLMRealm migrateDefaultRealmWithBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+[RLMRealm migrateDefaultRealmWithBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
   // We haven’t migrated anything yet, so oldSchemaVersion == 0
   if (oldSchemaVersion < 1) { 
     // The enumerateObjects:block: method iterates
@@ -721,7 +714,7 @@ The logic in our migration block might look like the following.
   }
   
   return 2;
-}
+}];
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
