@@ -236,6 +236,7 @@ inline void RLMSetAnyProperty(__unsafe_unretained RLMObject *obj, NSUInteger col
             case 'i':
             case 's':
             case 'l':
+            case 'q':
                 obj->_row.set_mixed(col_ndx, (int64_t)[(NSNumber *)val longValue]);
                 return;
             case 'f':
@@ -510,7 +511,7 @@ Class RLMCreateAccessorClass(Class objectClass,
     }
     
     // create and register proxy class which derives from object class
-    NSString *objectClassName = NSStringFromClass(objectClass);
+    NSString *objectClassName = [objectClass className];
     NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:objectClassName];
     Class accClass = objc_getClass(accessorClassName.UTF8String);
     if (!accClass) {
@@ -647,5 +648,3 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
                                          userInfo:nil];
     }
 }
-
-

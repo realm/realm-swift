@@ -69,4 +69,7 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
 // schema based on tables in a Realm
 +(instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm;
 
+// class for string
++ (Class)classForString:(NSString *)className;
+
 @end

@@ -16,8 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-//
-//  Use this file to import your target's public headers that you would like to expose to Swift.
-//
+#import "RLMArray.h"
+#import "RLMObjectSchema.h"
+#import "RLMProperty.h"
 
-#import "Objects.h"
+@interface RLMProperty ()
+
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+                      column:(NSUInteger)column
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes;
+
+@end
+
+@interface RLMObjectSchema ()
+
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
+
+@end
+
+@interface RLMArray ()
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+
+@end
