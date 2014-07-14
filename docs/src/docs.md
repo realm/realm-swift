@@ -208,7 +208,7 @@ You may have noticed so far that we have always initialized access to our `realm
 
 ### In-Memory Default Realm
 
-The Default Realm is persisted to disk by default (to a file called “default.realm” under the Documents folder of your app), but you can also use it purely in memory by calling the following line before any call to `[RLMRealm defaultRealm]`
+The Default Realm is persisted to disk by default, but you can also use it purely in memory by calling the following line before any call to `[RLMRealm defaultRealm]`.
 
 <div class="highlight-wrapper">
 
