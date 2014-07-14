@@ -19,6 +19,7 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMObject.h"
+#import "RLMSchema_Private.h"
 
 // private properties
 @interface RLMProperty ()
@@ -30,12 +31,18 @@
 
 @implementation RLMProperty
 
--(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column {
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+                      column:(NSUInteger)column
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _column = column;
+        _objectClassName = objectClassName;
+        _attributes = attributes;
         [self updateAccessorNames];
         [self setObjcCodeFromType];
     }
@@ -134,7 +141,7 @@
                 _type = RLMPropertyTypeArray;
                 
                 // verify type
-                Class cls = NSClassFromString(self.objectClassName);
+                Class cls = [RLMSchema classForString:self.objectClassName];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
@@ -147,7 +154,7 @@
                 _type = RLMPropertyTypeObject;
                 
                 // verify type
-                Class cls = NSClassFromString(self.objectClassName);
+                Class cls = [RLMSchema classForString:self.objectClassName];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     if ([_objectClassName isEqualToString:@"RLMArray"]) {
                         @throw [NSException exceptionWithName:@"RLMException"

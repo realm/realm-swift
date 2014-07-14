@@ -19,6 +19,16 @@
 import UIKit
 import Realm
 
+class Dog: RLMObject {
+    var name = ""
+    var age = 0
+}
+
+class Person: RLMObject {
+    var name = ""
+    var dogs = RLMArray(objectClassName: Dog.className())
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
                             
@@ -52,8 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWriteTransaction()
         
         // Query
-        var results = realm.objects(Dog.className(), withPredicate: NSPredicate(format: "name contains 'x'"))
-        
+        var results = Dog.objectsInRealm(realm, withPredicate: NSPredicate(format: "name contains 'x'"))
+
         // Queries are chainable!
         var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
         println("Number of dogs: \(results.count)")
@@ -68,17 +78,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWriteTransaction()
 
         // Thread-safety
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
             let otherRealm = RLMRealm.defaultRealm()
-            var otherResults = otherRealm.objects(Dog.className(), withPredicate:NSPredicate(format:"name contains 'Rex'"))
+            var otherResults = Dog.objectsInRealm(otherRealm, withPredicate: NSPredicate(format:"name contains 'Rex'"))
             println("Number of dogs \(otherResults.count)")
-            })
+        })
         
         return true
     }
     
     func deleteRealmFile() {
-        
         let documentsPaths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
         var path = documentsPaths.stringByAppendingPathComponent("default.realm")
         NSFileManager.defaultManager().removeItemAtPath(path, error: nil)

@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8018ED3196DCC9F008F63C4"
-               BuildableName = "iOSTestFramework.framework"
+               BlueprintIdentifier = "E8CA10F8196DC18A0044F8AA"
+               BuildableName = "TestFramework.framework"
                BlueprintName = "iOSTestFramework"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
             </BuildableReference>
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8018EDD196DCC9F008F63C4"
+               BlueprintIdentifier = "E8CA1102196DC18A0044F8AA"
                BuildableName = "iOSTestFrameworkTests.xctest"
                BlueprintName = "iOSTestFrameworkTests"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
@@ -42,8 +42,8 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018ED3196DCC9F008F63C4"
-            BuildableName = "iOSTestFramework.framework"
+            BlueprintIdentifier = "E8CA10F8196DC18A0044F8AA"
+            BuildableName = "TestFramework.framework"
             BlueprintName = "iOSTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
          </BuildableReference>
@@ -61,8 +61,8 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018ED3196DCC9F008F63C4"
-            BuildableName = "iOSTestFramework.framework"
+            BlueprintIdentifier = "E8CA10F8196DC18A0044F8AA"
+            BuildableName = "TestFramework.framework"
             BlueprintName = "iOSTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
          </BuildableReference>
@@ -79,8 +79,8 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018ED3196DCC9F008F63C4"
-            BuildableName = "iOSTestFramework.framework"
+            BlueprintIdentifier = "E8CA10F8196DC18A0044F8AA"
+            BuildableName = "TestFramework.framework"
             BlueprintName = "iOSTestFramework"
             ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
          </BuildableReference>

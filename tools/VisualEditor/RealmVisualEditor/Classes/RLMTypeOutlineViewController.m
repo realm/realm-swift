@@ -20,6 +20,8 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMRealmOutlineNode.h"
+#import "RLMArrayNavigationState.h"
+#import "RLMQueryNavigationState.h"
 
 @interface RLMTypeOutlineViewController ()
 
@@ -31,21 +33,71 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)viewDidLoad
+- (void)awakeFromNib
 {
-    [super viewDidLoad];
-    
-    // We want the class outline to be expandedas default
-    [self.classesOutlineView expandItem:nil
-                         expandChildren:YES];
-    
-    // ... and the first class to be selected so something is displayed in the property pane.
-    id firstItem = self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    [super awakeFromNib];
+
+    // Expand the root item representing the selected realm.
+    RLMRealmNode *firstItem = self.parentWindowController.modelDocument.presentedRealm;
     if (firstItem != nil) {
-        NSInteger index = [self.classesOutlineView rowForItem:firstItem];
-        [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                             byExtendingSelection:NO];
-        [self selectOutlineItem:firstItem];
+        // We want the class outline to be expanded as default
+        [self.classesOutlineView expandItem:firstItem
+                             expandChildren:YES];
+    }
+}
+
+#pragma mark - RLMViewController overrides
+
+- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
+{
+    [super performUpdateUsingState:newState
+                          oldState:oldState];
+ 
+    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] ||
+        [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
+        RLMClazzNode *parentNode = (RLMClazzNode *)oldState.selectedType;
+        [parentNode removeAllChildNodes];
+        [self.tableView reloadData];
+    }
+    
+    if ([newState isMemberOfClass:[RLMNavigationState class]]) {
+        if ([oldState isMemberOfClass:[RLMQueryNavigationState class]] || newState.selectedType != oldState.selectedType) {
+            NSInteger typeIndex = [self.classesOutlineView rowForItem:newState.selectedType];
+            
+            [self setSelectionIndex:typeIndex];
+        }
+    }
+    else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
+        
+        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+        NSInteger selectionIndex = arrayState.selectedInstanceIndex;
+        RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
+        
+        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
+        
+        [self.classesOutlineView reloadData];
+        [self.classesOutlineView expandItem:parentClassNode];
+        
+        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
+        if (index != NSNotFound) {
+            [self setSelectionIndex:index];
+        }
+    }
+    else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
+        RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
+
+        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+
+        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromQuery:arrayState.searchText result:arrayState.results];
+
+        [self.classesOutlineView reloadData];
+        [self.classesOutlineView expandItem:parentClassNode];
+
+        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
+        if (index != NSNotFound) {
+            [self setSelectionIndex:index];
+        }
     }
 }
 
@@ -82,7 +134,7 @@
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    // There is always only one root node
+    // There is never more than one root node
     if (item == nil) {
         return 1;
     }
@@ -96,6 +148,17 @@
 }
 
 #pragma mark - NSOutlineViewDelegate implementation
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+    return [item isKindOfClass:[RLMRealmNode class]];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+    // Group headers should not be selectable
+    return ![item isKindOfClass:[RLMRealmNode class]];
+}
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
 {
@@ -125,11 +188,18 @@
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
         id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
-        [self selectOutlineItem:selectedItem];
+
+        // The arrays we get from link views are ephemeral, so we
+        // remove them when any class node is selected
+        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+            [self removeAllChildArrays];
+        }
+
+        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
+
+        [self.parentWindowController addNavigationState:state
+                                     fromViewController:self];
     }
-    
-    // NOTE: Remember to move the clearing of the row selection in the instance view
-    //[self.parentWindowController updateSelectedObjectNode:nil];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row
@@ -170,29 +240,13 @@
     return nil;
 }
 
-#pragma mark - Public methods
-
-- (void)selectTypeNode:(RLMObjectNode *)objectNode
-{
-    NSInteger index = [self.classesOutlineView rowForItem:objectNode];
-    
-    [self.classesOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:index]
-                         byExtendingSelection:NO];
-}
-
 #pragma mark - Private methods
 
-- (void)selectOutlineItem:(id)item
+- (void)removeAllChildArrays
 {
-    if ([item isKindOfClass:[RLMClazzNode class]]) {
-        RLMClazzNode *classNode = (RLMClazzNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:classNode];
-        return;
-    }
-    else if ([item isKindOfClass:[RLMArrayNode class]]) {
-        RLMArrayNode *arrayNode = (RLMArrayNode *)item;
-        [self.parentWindowController updateSelectedTypeNode:arrayNode];
-        return;
+    for (RLMClazzNode *node in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
+        [node removeAllChildNodes];
+        [self.classesOutlineView reloadItem:node];
     }
 }
 

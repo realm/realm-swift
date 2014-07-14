@@ -18,6 +18,8 @@
 * Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
 * Added method -deleteObjects: to batch delete objects from a Realm
 * New Xcode 6 project for experimental swift support.
+* Support for defining RLMObject models entirely in Swift (experimental, see known issues).
+* RLMArrays in Swift support Sequence-style enumeration (for obj in array).
 * New Realm Editor app for reading and editing Realm db files.
 * Added support for migrations.
 * Added support for RLMArray properties on objects.
@@ -27,6 +29,14 @@
 * Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
 * Now allows predicates comparing two object properties of the same type.
 * Implemented -indexOfObject: for RLMArray
+
+### Known Issues for Swift-defined models
+
+* Properties other than String, NSData and NSDate require a default value in the model. This can be an empty (but typed) array for array properties.
+* The previous caveat also implies that not all models defined in Objective-C can be used for object properties. Only Objective-C models with only implicit (i.e. primitives) or explicit default values can be used. However, any Objective-C model object can be used in a Swift array property.
+* Array property accessors don't work until its parent object has been added to a realm.
+* Realm-Bridging-Header.h is temporarily exposed as a public header. This is temporary and will be private again once rdar://17633863 is fixed.
+* Does not leverage Swift generics and still uses RLM-prefix everywhere. This is coming in #549.
 
 ### Bugfixes
 
