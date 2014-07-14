@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-               BuildableName = "RealmVisualEditor.app"
-               BlueprintName = "RealmVisualEditor"
-               ReferencedContainer = "container:RealmVisualEditor.xcodeproj">
+               BuildableName = "Realm Browser.app"
+               BlueprintName = "Realm Browser"
+               ReferencedContainer = "container:Realm Browser.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "84E0F96F1921F3B900D6CA14"
-               BuildableName = "RealmVisualEditorTests.xctest"
-               BlueprintName = "RealmVisualEditorTests"
-               ReferencedContainer = "container:RealmVisualEditor.xcodeproj">
+               BuildableName = "Realm BrowserTests.xctest"
+               BlueprintName = "Realm BrowserTests"
+               ReferencedContainer = "container:Realm Browser.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmVisualEditor.app"
-            BlueprintName = "RealmVisualEditor"
-            ReferencedContainer = "container:RealmVisualEditor.xcodeproj">
+            BuildableName = "Realm Browser.app"
+            BlueprintName = "Realm Browser"
+            ReferencedContainer = "container:Realm Browser.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmVisualEditor.app"
-            BlueprintName = "RealmVisualEditor"
-            ReferencedContainer = "container:RealmVisualEditor.xcodeproj">
+            BuildableName = "Realm Browser.app"
+            BlueprintName = "Realm Browser"
+            ReferencedContainer = "container:Realm Browser.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -80,9 +80,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmVisualEditor.app"
-            BlueprintName = "RealmVisualEditor"
-            ReferencedContainer = "container:RealmVisualEditor.xcodeproj">
+            BuildableName = "Realm Browser.app"
+            BlueprintName = "Realm Browser"
+            ReferencedContainer = "container:Realm Browser.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

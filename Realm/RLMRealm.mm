@@ -517,19 +517,21 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, predicate, nil);
 }
 
-+ (void)applyMigrationBlock:(RLMMigrationBlock)block error:(NSError *__autoreleasing *)error {
-    [self applyMigrationBlock:block atPath:[RLMRealm defaultPath] error:error];
++ (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block {
+    return [self migrateRealmAtPath:[RLMRealm defaultPath] withBlock:block];
 }
 
-+(void)applyMigrationBlock:(RLMMigrationBlock)block atPath:(NSString *)realmPath error:(NSError *__autoreleasing *)error {
-    RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:error];
-    if (error && *error) {
-        return;
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block {
+    NSError *error;
+    RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:&error];
+    if (error) {
+        return error;
     }
     [migration migrateWithBlock:block];
 
     // clear cache for future callers
     clearRealmCache();
+    return nil;
 }
 
 @end

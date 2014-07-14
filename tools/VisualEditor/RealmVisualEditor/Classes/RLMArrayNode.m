@@ -18,16 +18,17 @@
 
 #import "RLMArrayNode.h"
 
-#import "SidebarTableCellView.h"
+#import "RLMSidebarTableCellView.h"
 
 @implementation RLMArrayNode {
 
     RLMProperty *referringProperty;
     RLMObject *referringObject;
     RLMArray *displayedArray;
+    NSString *name;
 }
 
-- (instancetype)initWithArray:(RLMArray *)array withReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
+- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
     NSString *elementTypeName = property.objectClassName;
     RLMSchema *realmSchema = realm.schema;
@@ -37,7 +38,18 @@
                              inRealm:realm]) {
         referringProperty = property;
         referringObject = object;
-        displayedArray = array;
+        displayedArray = object[property.name];
+    }
+
+    return self;
+}
+
+- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode
+{
+    if (self = [super initWithSchema:classNode.schema
+                             inRealm:classNode.realm]) {
+        displayedArray = result;
+        name = searchText;
     }
 
     return self;
@@ -47,6 +59,9 @@
 
 - (NSString *)name
 {
+    if (name) {
+        return name;
+    }
     return @"Array";
 }
 
@@ -73,10 +88,15 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    SidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                               owner:self];
-    
-    result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
+                                                                  owner:self];
+    if (name) {
+        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
+    }
+    else {
+        result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+    }
+
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;

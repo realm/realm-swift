@@ -162,9 +162,10 @@ const NSUInteger kTopTipDelay = 250;
             [RealmTestClass2 createInRealm:realm withObject:@[@1111, @YES, tc1_0]];
             [RealmTestClass2 createInRealm:realm withObject:@[@2211, @YES, tc1_2]];
             [RealmTestClass2 createInRealm:realm withObject:@[@3322, @YES, tc1_4]];
+            [RealmTestClass2 createInRealm:realm withObject:@[@007,  @YES, [NSNull null]]];
             [RealmTestClass2 createInRealm:realm withObject:@[@4433, @NO,  tc1_6]];
             [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
-            //    [RealmTestClass2 createInRealm:realm withObject:@[@6655, @YES, nil]];
+            [RealmTestClass2 createInRealm:realm withObject:@[@003,  @YES, [NSNull null]]];
             [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
             [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];            
         }

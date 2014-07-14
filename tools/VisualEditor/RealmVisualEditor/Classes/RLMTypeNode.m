@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectNode.h"
+#import "RLMTypeNode.h"
 
-@implementation RLMObjectNode
+@implementation RLMTypeNode
 
 @dynamic name;
 @dynamic instanceCount;

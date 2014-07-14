@@ -16,24 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
+#import "RLMNavigationState.h"
 
-#import "RLMRealmOutlineNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMArrayNode.h"
 
-@interface RLMObjectNode : NSObject <RLMRealmOutlineNode>
+@interface RLMQueryNavigationState : RLMNavigationState
 
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *schema;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSArray *propertyColumns;
-@property (nonatomic, readonly) NSUInteger instanceCount;
+@property (nonatomic, readonly) RLMArray *results;
+@property (nonatomic, readonly) NSString *searchText;
 
-- (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
-
-- (RLMObject *)instanceAtIndex:(NSUInteger)index;
-
-- (NSUInteger)indexOfInstance:(RLMObject *)instance;
+- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMArray *)results;
 
 @end

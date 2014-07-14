@@ -337,15 +337,10 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessor and register with realm
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
-    // get object classname to use from the schema
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     
-    // get acessor fot the object class
-    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm
-                                                                     schema:realm.schema[objectClassName]
-                                                              defaultValues:NO];
-
-    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
+    // get accessor for the object class
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
     accessor->_row = (*objectSchema->_table)[index];
     return accessor;
 }
