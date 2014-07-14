@@ -52,9 +52,9 @@
 
  @return    An RLMArray of results matching the given predicate.
 
- @see       RLMObject objectsWithPredicateFormat:
+ @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
+- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -66,7 +66,7 @@
 
  @return    An RLMArray of results matching the given predicate.
 
- @see       RLMObject objectsWithPredicateFormat:
+ @see       RLMObject objectsWhere:
  */
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 

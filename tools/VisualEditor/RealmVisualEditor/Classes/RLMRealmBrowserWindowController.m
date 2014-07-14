@@ -21,7 +21,7 @@
 #import "RLMNavigationStack.h"
 
 @interface RLMRealm (Dynamic)
-- (RLMArray *)objects:(NSString *)className withPredicateFormat:(NSString *)predicateFormat, ...;
+- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 @end
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
@@ -174,7 +174,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
     RLMArray *result;
     if (predicate.length != 0) {
-        result = [realm objects:typeNode.name withPredicateFormat:predicate];
+        result = [realm objects:typeNode.name where:predicate];
     }
     else {
         result = [[RLMArray alloc] init];

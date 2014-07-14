@@ -178,7 +178,13 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     return result;
 }
 
-- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ... {
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self indexOfObjectWhere:predicateFormat args:args];
+}
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -207,12 +213,17 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
                                                  realm:_realm];
 }
 
-- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
 {
     // validate predicate
-    NSPredicate *outPred;
-    RLM_PREDICATE(predicateFormat, outPred);
-    return [self objectsWithPredicate:outPred];
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objectsWhere:predicateFormat args:args];
+}
+
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
+{
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate

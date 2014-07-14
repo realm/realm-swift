@@ -139,7 +139,7 @@ For example, the following would extend our earlier example by calling `[RLMObje
 
 {% highlight objective-c %}
 // Using a predicate string:
-RLMArray *dogs = [Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
+RLMArray *dogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
 
 // … Or using an NSPredicate object:
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
@@ -152,9 +152,9 @@ For more, see [`[RLMObject objectsWhere:]`](api/Classes/RLMObject.html#//api/nam
 
 ### Ordering Results
 
-In many cases it is desirable to be able to have a retrieval or query operation return an ordered result set. To enable this, RLMRealm and RLMObject support methods that allow you to specify a property name or [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html) to order the result set by.
+In many cases it is desirable to be able to have a retrieval or query operation return an ordered result set. To enable this, RLMArray supports method that allow you to specify a property name to order the result set by.
 
-For example, the following calls `[RLMObject objectsOrderedBy:where:]` to sort the returned dogs from the example above alphabetically by name:
+For example, the following calls `[RLMObject objectsWhere:where:]` to sort the returned dogs from the example above alphabetically by name:
 
 <div class="highlight-wrapper">
 
@@ -164,14 +164,14 @@ For example, the following calls `[RLMObject objectsOrderedBy:where:]` to sort t
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray *dogs = [[Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]
-                            arraySortedByProperty:@"name" ascending:YES];
+RLMArray *dogs = [[Dog objectWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
+                    arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
 
 
-For more, see [`[RLMObject objectsOrderedBy:where:]`](api/Classes/RLMObject.html#//api/name/objectsOrderedBy:where:).
+For more, see [`[RLMObject objectsWhere:]`](api/Classes/RLMObject.html#//api/name/objectsWhere:) and [`[RLMArray arraySortedByProperty:]`](api/Classes/RLMArray.html/#//api/name/arraySortedByProperty:).
 
 ### Chaining Queries
 
@@ -186,8 +186,8 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMArray *tanDogs = [Dog objectsWithPredicateFormat:@"color = 'tan'"];
-RLMArray *tanDogsWithBNames = [tanDogs objectsWithPredicateFormat:@"name BEGINSWITH 'B'"];
+RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan'"];
+RLMArray *tanDogsWithBNames = [tanDogs objectsWhere:@"name BEGINSWITH 'B'"];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -346,7 +346,7 @@ You can access & assign RLMArray properties as usual:
 {% endhighlight%}
 
 {% highlight objective-c %}  
-RLMArray *some_dogs = [Dog objectsWithPredicateFormat:@"name contains 'Fido'"];
+RLMArray *some_dogs = [Dog objectsWhere:@"name contains 'Fido'"];
 jim.dogs = some_dogs;
 [jim.dogs addObject:rex];
 {% endhighlight %}
@@ -506,7 +506,7 @@ There are several ways we may want to import this JSON into our Realm. You could
 @interface Venue : RLMObject
 @property NSString *id;
 @property NSString *name;
-@property Contact *contact;
+@property Contact  *contact;
 @property Location *location;
 @end
 

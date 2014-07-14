@@ -38,14 +38,11 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
 // predicate exception
 NSException *RLMPredicateException(NSString *name, NSString *reason);
 
-// This macro generates an NSPredicate from an NSString with optional format va_list
-#define RLM_PREDICATE(IN_PREDICATE_FORMAT, OUT_PREDICATE)   \
-if ([IN_PREDICATE_FORMAT isKindOfClass:[NSString class]]) { \
-    va_list args;                                           \
-    va_start(args, IN_PREDICATE_FORMAT);                    \
-    OUT_PREDICATE = [NSPredicate predicateWithFormat:IN_PREDICATE_FORMAT arguments:args]; \
-    va_end(args);                                           \
-} else if (IN_PREDICATE_FORMAT) {                           \
+// This macro validates predicate format with optional arguments
+#define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
+va_start(ARGS, PREDICATE_FORMAT);          \
+va_end(ARGS);                              \
+if (PREDICATE_FORMAT && ![PREDICATE_FORMAT isKindOfClass:[NSString class]]) {         \
     NSString *reason = @"predicate must be an NSString with optional format va_list"; \
     [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];       \
 }

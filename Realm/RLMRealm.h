@@ -183,7 +183,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Adds an object to be persisted it in this Realm.
  
- Once added, this object can be retrieved using the objectsWithPredicateFormat: selectors on RLMRealm and on
+ Once added, this object can be retrieved using the objectsWhere: selectors on RLMRealm and on
  subclasses of RLMObject. When added, all linked (child) objects referenced by this object will
  also be added to the Realm if they are not already in it. If linked objects already belong to a
  different Realm an exception will be thrown.

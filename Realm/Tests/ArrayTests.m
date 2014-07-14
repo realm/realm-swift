@@ -58,7 +58,7 @@
     
     [realm commitWriteTransaction];
        
-    RLMArray *result = [AggregateObject objectsInRealm:realm withPredicateFormat:@"intCol < %i", 100];
+    RLMArray *result = [AggregateObject objectsInRealm:realm where:@"intCol < %i", 100];
     
     XCTAssertEqual(result.count, (NSUInteger)18, @"18 objects added");
 
@@ -114,8 +114,8 @@
     
     [realm commitWriteTransaction];
     
-    RLMArray *noArray = [AggregateObject objectsWithPredicateFormat:@"boolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWithPredicateFormat:@"boolCol == YES"];
+    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
+    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
@@ -346,7 +346,7 @@
     [realm commitWriteTransaction];
 
     // test TableView RLMArray
-    RLMArray *results = [EmployeeObject objectsWithPredicateFormat:@"hired = YES"];
+    RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
     XCTAssertEqual((NSUInteger)0, [results indexOfObject:po1]);
     XCTAssertEqual((NSUInteger)1, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
