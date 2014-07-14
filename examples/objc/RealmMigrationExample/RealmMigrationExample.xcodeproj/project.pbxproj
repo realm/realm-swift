@@ -361,10 +361,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"${SRCROOT}/../../../build/${CONFIGURATION}",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
-				);
+				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/../../../build/${CONFIGURATION}";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmMigrationExample/RealmMigrationExample-Prefix.pch";
 				INFOPLIST_FILE = "RealmMigrationExample/RealmMigrationExample-Info.plist";
@@ -382,10 +379,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"${SRCROOT}/../../../build/${CONFIGURATION}",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
-				);
+				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/../../../build/${CONFIGURATION}";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmMigrationExample/RealmMigrationExample-Prefix.pch";
 				INFOPLIST_FILE = "RealmMigrationExample/RealmMigrationExample-Info.plist";

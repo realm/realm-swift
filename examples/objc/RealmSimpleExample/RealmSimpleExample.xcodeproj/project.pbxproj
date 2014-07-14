@@ -265,8 +265,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(PROJECT_DIR)",
-					"/Users/kneth/Projects/realm-cocoa/build/Debug",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";
@@ -285,8 +283,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(PROJECT_DIR)",
-					"/Users/kneth/Projects/realm-cocoa/build/Debug",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmSimpleExample/RealmSimpleExample-Prefix.pch";

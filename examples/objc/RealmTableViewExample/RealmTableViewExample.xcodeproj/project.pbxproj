@@ -276,8 +276,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
-					"/Users/kneth/Projects/realm-cocoa/build/Debug",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
@@ -300,8 +298,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"${SRCROOT}/../../../build/${CONFIGURATION}",
 					"$(inherited)",
-					"/Users/kneth/Projects/realm-cocoa/build/Debug",
-					"/Users/kneth/Projects/realm-cocoa/build/Release",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
