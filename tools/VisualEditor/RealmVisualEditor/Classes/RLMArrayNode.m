@@ -25,7 +25,7 @@
     RLMProperty *referringProperty;
     RLMObject *referringObject;
     RLMArray *displayedArray;
-    NSString *text;
+    NSString *name;
 }
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
@@ -49,7 +49,7 @@
     if (self = [super initWithSchema:classNode.schema
                              inRealm:classNode.realm]) {
         displayedArray = result;
-        text = searchText;
+        name = searchText;
     }
 
     return self;
@@ -59,8 +59,8 @@
 
 - (NSString *)name
 {
-    if (text) {
-        return text;
+    if (name) {
+        return name;
     }
     return @"Array";
 }
@@ -90,8 +90,8 @@
 {
     RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
                                                                   owner:self];
-    if (text) {
-        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", text];
+    if (name) {
+        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
         result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];

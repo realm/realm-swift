@@ -185,21 +185,21 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
-        NSOutlineView *outlineView = notification.object;
-        if (outlineView == self.classesOutlineView) {
-            id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
-            
-            // The arrays we get from link views are ephemeral, so we
-            // remove them when any class node is selected
-            if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
-                [self removeAllChildArrays];
-            }
-            
-            RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
-            
-            [self.parentWindowController addNavigationState:state
-                                         fromViewController:self];
+    NSOutlineView *outlineView = notification.object;
+    if (outlineView == self.classesOutlineView) {
+        id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
+
+        // The arrays we get from link views are ephemeral, so we
+        // remove them when any class node is selected
+        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+            [self removeAllChildArrays];
         }
+
+        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
+
+        [self.parentWindowController addNavigationState:state
+                                     fromViewController:self];
+    }
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row

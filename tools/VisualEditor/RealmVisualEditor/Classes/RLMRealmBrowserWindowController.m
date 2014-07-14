@@ -123,20 +123,20 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 break;
             }
             case RLMPropertyTypeInt: {
-                int v;
+                int value;
                 if ([searchText isEqualToString:@"0"]) {
-                    v = 0;
+                    value = 0;
                 }
                 else {
-                    v = [searchText intValue];
-                    if (v == 0)
+                    value = [searchText intValue];
+                    if (value == 0)
                         break;
                 }
 
                 if (predicate.length != 0) {
                     predicate = [predicate stringByAppendingString:@" OR "];
                 }
-                predicate = [predicate stringByAppendingFormat:@"%@ = %d", columnName, (int)v];
+                predicate = [predicate stringByAppendingFormat:@"%@ = %d", columnName, (int)value];
                 break;
             }
             case RLMPropertyTypeString: {
@@ -149,24 +149,26 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
             //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
             case RLMPropertyTypeDouble:
             {
-                double v;
+                double value;
 
                 if ([searchText isEqualToString:@"0"] ||
                     [searchText isEqualToString:@"0.0"]) {
-                    v = 0;
+                    value = 0.0;
                 }
                 else {
-                    v = [searchText doubleValue];
-                    if (v == 0.0)
+                    value = [searchText doubleValue];
+                    if (value == 0.0)
                         break;
                 }
 
                 if (predicate.length != 0) {
                     predicate = [predicate stringByAppendingString:@" OR "];
                 }
-                predicate = [predicate stringByAppendingFormat:@"%@ = %f", columnName, v];
+                predicate = [predicate stringByAppendingFormat:@"%@ = %f", columnName, value];
                 break;
             }
+            default:
+                break;
         }
     }
 
