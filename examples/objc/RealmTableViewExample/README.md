@@ -11,13 +11,13 @@ The application also demonstrates how to import large amounts of data in a backg
 You'll have to build the `Realm.framework` to be able to run this project. Run this command from the root of this repository:
 
 ```objc
-$ sh build.sh build
+$ sh build.sh ios
 ```
 
 If you wish to run in debug mode, you must build the framework for that configuration:
 
 ```obj_c
-$ sh build.sh build-debug
+$ sh build.sh ios-debug
 ```
 
 See [realm.io](http://realm.io/docs/ios) for documentation and more information about Realm.
