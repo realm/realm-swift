@@ -312,7 +312,6 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 
     // move last row to row we are deleting
     object->_row.get_table()->move_last_over(object->_row.get_index());
-    // FIXME - fix all accessors
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
