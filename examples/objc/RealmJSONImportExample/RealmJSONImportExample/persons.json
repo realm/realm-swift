@@ -1,0 +1,17 @@
+[
+ {
+    "name": "John Coltrane",
+    "birthdate": "September 23, 1926",
+    "friendCount": 123456
+ },
+ {
+    "name": "Miles Davis",
+    "birthdate": "May 26, 1926",
+    "friendCount": 234567
+ },
+ {
+    "name": "Duke Ellington",
+    "birthdate": "April 29, 1899",
+    "friendCount": 345678
+ }
+]
