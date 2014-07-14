@@ -172,6 +172,9 @@ class SwiftArrayTests: SwiftTestCase {
     }
     
     func testArrayDescription() {
+        // FIXME: Using realmWithTestPath() makes the tests fail
+        //        because accessors aren't cycled properly outside the default realm
+        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
         let realm = RLMRealm.defaultRealm()
         
         realm.beginWriteTransaction()
@@ -185,8 +188,8 @@ class SwiftArrayTests: SwiftTestCase {
         }
         
         realm.commitWriteTransaction()
-        
-        let description = SwiftEmployeeObject.allObjects().description
+
+        let description = SwiftEmployeeObject.allObjectsInRealm(realm).description
 
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -410,6 +413,9 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription_objc() {
+        // FIXME: Using realmWithTestPath() makes the tests fail
+        //        because accessors aren't cycled properly outside the default realm
+        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
         let realm = RLMRealm.defaultRealm()
 
         realm.beginWriteTransaction()
