@@ -292,7 +292,7 @@ rex.owner = jim;
 </div><!--/highlight-wrapper -->
  
 When you do queries, children will not be fetched into memory at query time, but you will be able to navigate the links automatically without having to manually fetch children, _i.e._ doing calls such as
- `rex.owner.some_other_relation.yet_another_relation` will automatically traverse the object graph for you to return the objects needed.
+ `rex.owner.address.country` will automatically traverse the object graph for you to return the objects needed.
  
 ### Many-to-Many
 

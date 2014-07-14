@@ -1,33 +1,18 @@
-0.21.0 Release notes (yyyy-MM-dd)
+0.80.0 Release notes (2014-07-15)
 =============================================================
-
-?? summary
 
 ### API breaking changes
 
 * Rename migration methods to -migrateDefaultRealmWithBlock: and -migrateRealmAtPath:withBlock:
 * Moved Realm specific query methods from RLMRealm to class methods on RLMObject (-allObjects: to +allObjectsInRealm: ect.)
-* Rename schemaForObject: to schemaForClassName: on RLMSchema
-* Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
-* Removed -objectsOrderedBy:where: from RLMArray
-* Removed +objectsOrderedBy:where: from RLMObject
 
 ### Enhancements
 
 * Added +createInDefaultRealmWithObject: method to RLMObject.
 * Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
 * Added method -deleteObjects: to batch delete objects from a Realm
-* New Xcode 6 project for experimental swift support.
 * Support for defining RLMObject models entirely in Swift (experimental, see known issues).
 * RLMArrays in Swift support Sequence-style enumeration (for obj in array).
-* New Realm Editor app for reading and editing Realm db files.
-* Added support for migrations.
-* Added support for RLMArray properties on objects.
-* Added support for creating in-memory default Realm.
-* Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
-* Added -indexOfObjectWithPredicate:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
-* Added +objectsWithPredicate: to RLMObject
-* Now allows predicates comparing two object properties of the same type.
 * Implemented -indexOfObject: for RLMArray
 
 ### Known Issues for Swift-defined models
@@ -38,9 +23,28 @@
 * Realm-Bridging-Header.h is temporarily exposed as a public header. This is temporary and will be private again once rdar://17633863 is fixed.
 * Does not leverage Swift generics and still uses RLM-prefix everywhere. This is coming in #549.
 
-### Bugfixes
 
-* None.
+0.22.0 Release notes
+=============================================================
+
+### API breaking changes
+
+* Rename schemaForObject: to schemaForClassName: on RLMSchema
+* Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
+* Removed -indexOfObjectWhere:, -objectsWhere: and -objectsOrderedBy:where: from RLMArray
+* Removed +objectsWhere: and +objectsOrderedBy:where: from RLMObject
+
+### Enhancements
+
+* New Xcode 6 project for experimental swift support.
+* New Realm Editor app for reading and editing Realm db files.
+* Added support for migrations.
+* Added support for RLMArray properties on objects.
+* Added support for creating in-memory default Realm.
+* Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
+* Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredi
+* Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
+* Now allows predicates comparing two object properties of the same type.
 
 
 0.20.0 Release notes (2014-05-28)
