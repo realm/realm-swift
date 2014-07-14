@@ -107,6 +107,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @interface CompanyObject : RLMObject
 
+@property NSString *name;
 @property RLMArray<EmployeeObject> *employees;
 
 @end

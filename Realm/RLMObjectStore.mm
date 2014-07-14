@@ -264,33 +264,33 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     RLMVerifyInWriteTransaction(realm);
 
     // create the object
-    RLMObjectSchema *schema = realm.schema[className];
-    RLMObject *object = [[schema.objectClass alloc] initWithRealm:realm schema:schema defaultValues:NO];
+    RLMSchema *schema = realm.schema;
+    RLMObjectSchema *objectSchema = schema[className];
+    RLMObject *object = [[objectSchema.objectClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
 
     // validate values, create row, and populate
     if ([value isKindOfClass:NSArray.class]) {
-        NSArray *array = value;
-        RLMValidateArrayAgainstObjectSchema(array, schema);
+        NSArray *array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
 
         // create row
-        size_t rowIndex = schema->_table->add_empty_row();
-        object->_row = (*schema->_table)[rowIndex];
+        size_t rowIndex = objectSchema->_table->add_empty_row();
+        object->_row = (*objectSchema->_table)[rowIndex];
 
         // populate
-        NSArray *props = schema.properties;
+        NSArray *props = objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
         }
     }
     else if ([value isKindOfClass:NSDictionary.class]) {
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, schema);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
 
         // create row
-        size_t rowIndex = schema->_table->add_empty_row();
-        object->_row = (*schema->_table)[rowIndex];
+        size_t rowIndex = objectSchema->_table->add_empty_row();
+        object->_row = (*objectSchema->_table)[rowIndex];
         
         // populate
-        NSArray *props = schema.properties;
+        NSArray *props = objectSchema.properties;
         for (RLMProperty *prop in props) {
             RLMDynamicSet(object, prop, dict[prop.name]);
         }
@@ -302,7 +302,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     }
 
     // switch class to use table backed accessor
-    object_setClass(object, schema.accessorClass);
+    object_setClass(object, objectSchema.accessorClass);
 
     return object;
 }
@@ -333,15 +333,10 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessor and register with realm
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
-    // get object classname to use from the schema
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     
-    // get acessor fot the object class
-    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm
-                                                                     schema:realm.schema[objectClassName]
-                                                              defaultValues:NO];
-
-    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
+    // get accessor for the object class
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
     accessor->_row = (*objectSchema->_table)[index];
     return accessor;
 }
