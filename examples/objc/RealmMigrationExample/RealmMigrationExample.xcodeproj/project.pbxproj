@@ -48,7 +48,6 @@
 		02DCBEAD195CF46800F1CBE6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		02DCBEB3195CF46800F1CBE6 /* RealmMigrationExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmMigrationExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		02DCBEB4195CF46800F1CBE6 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		02DCBECA195CF59300F1CBE6 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Debug/Realm.framework; sourceTree = "<group>"; };
 		02DCBECB195CF6A000F1CBE6 /* DataModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataModels.h; sourceTree = "<group>"; };
 		02DCBECC195CF6A000F1CBE6 /* DataModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModels.m; sourceTree = "<group>"; };
 		02DCBECE195CF80B00F1CBE6 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -105,7 +104,6 @@
 			isa = PBXGroup;
 			children = (
 				02DCBECE195CF80B00F1CBE6 /* libc++.dylib */,
-				02DCBECA195CF59300F1CBE6 /* Realm.framework */,
 				02DCBE9B195CF46800F1CBE6 /* Foundation.framework */,
 				02DCBE9D195CF46800F1CBE6 /* CoreGraphics.framework */,
 				02DCBE9F195CF46800F1CBE6 /* UIKit.framework */,
@@ -447,6 +445,7 @@
 				02DCBEC6195CF46800F1CBE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		02DCBEC7195CF46800F1CBE6 /* Build configuration list for PBXNativeTarget "RealmMigrationExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -455,6 +454,7 @@
 				02DCBEC9195CF46800F1CBE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
