@@ -239,7 +239,7 @@ If you are trying to access the same realm file from different threads, you shou
 
 ## Relationships
 
-Any two RLMObjects can be linked together. Assuming your Person model has already been defined ([see above](#defining-a-data-model)) let’s create another model called Dog:
+Any two RLMObjects can be linked together. Assuming your Person model has already been defined ([see above](#models)) let’s create another model called Dog:
 
 <div class="highlight-wrapper">
 
