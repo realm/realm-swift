@@ -22,6 +22,18 @@
 
 #import "RLMRealmOutlineNode.h"
 
+@interface RLMRealm ()
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
+                        error:(NSError **)outError;
+
+- (RLMArray *)allObjects:(NSString *)className;
+
+@end
+
 @interface RLMRealmNode : NSObject <RLMRealmOutlineNode>
 
 @property (nonatomic, readonly) RLMRealm *realm;

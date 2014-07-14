@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMObjectSchema.h>
+#import "RLMObjectSchema.h"
 
 /**---------------------------------------------------------------------------------------
  *  @name Realm Schema

@@ -21,7 +21,7 @@
 
 #if defined(__IPHONE_8_0) || defined(__MAC_10_10)
 #define SWIFT
-#import <TestFramework/RLMTestObjects.h>
+#import <TestFramework/TestFramework.h>
 #else
 #import "RLMTestObjects.h"
 #endif
@@ -50,6 +50,3 @@ NSString *RLMRealmPathForFile();
 #endif
 
 @end
-
-
-

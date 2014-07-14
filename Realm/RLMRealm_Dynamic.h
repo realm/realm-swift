@@ -71,4 +71,3 @@
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 @end
-

@@ -22,6 +22,10 @@
 #import "RLMObject.h"
 #import "RLMUtil.hpp"
 
+#ifdef REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#endif
+
 #import <objc/runtime.h>
 
 NSString *const c_objectTableNamePrefix = @"class_";
@@ -35,6 +39,7 @@ const size_t c_versionColumnIndex = 0;
 @end
 
 static RLMSchema *s_sharedSchema;
+static NSMutableDictionary *s_classNameToMangledName;
 
 @implementation RLMSchema
 
@@ -75,6 +80,9 @@ static RLMSchema *s_sharedSchema;
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // initialize mangled name mapping
+        s_classNameToMangledName = [NSMutableDictionary dictionary];
+
         // load object schemas for all RLMObject subclasses
         unsigned int numClasses;
         Class *classes = objc_copyClassList(&numClasses);
@@ -85,12 +93,26 @@ static RLMSchema *s_sharedSchema;
         for (unsigned int i = 0; i < numClasses; i++) {
             // if direct subclass
             if (class_getSuperclass(classes[i]) == RLMObject.class) {
-                // add to class list
-                RLMObjectSchema *object = [RLMObjectSchema schemaForObjectClass:classes[i]];
-                [schemaArray addObject:object];
+                RLMObjectSchema *objectSchema = nil;
+#ifdef REALM_SWIFT
+                // if swift
+                NSString *className = NSStringFromClass(classes[i]);
+                if ([RLMSwiftSupport isSwiftClassName:className]) {
+                    objectSchema = [RLMSwiftSupport schemaForObjectClass:classes[i]];
+                    objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(classes[i], objectSchema);
+                    s_classNameToMangledName[objectSchema.className] = objectSchema.objectClass;
+                }
+                else {
+                    objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
+                }
+#else
+                objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
+#endif
+                // add to list
+                [schemaArray addObject:objectSchema];
                 // implement sharedSchema and className for this class
-                RLMReplaceSharedSchemaMethod(classes[i], object);
-                RLMReplaceClassNameMethod(classes[i], object.className);
+                RLMReplaceSharedSchemaMethod(classes[i], objectSchema);
+                RLMReplaceClassNameMethod(classes[i], objectSchema.className);
             }
         }
         free(classes);
@@ -153,6 +175,15 @@ NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
+}
+
++ (Class)classForString:(NSString *)className {
+#ifdef REALM_SWIFT
+    if (s_classNameToMangledName[className]) {
+        className = s_classNameToMangledName[className];
+    }
+#endif
+    return NSClassFromString(className);
 }
 
 - (id)copyWithZone:(NSZone *)zone {
