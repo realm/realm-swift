@@ -447,7 +447,6 @@
 				02DCBEC6195CF46800F1CBE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 		02DCBEC7195CF46800F1CBE6 /* Build configuration list for PBXNativeTarget "RealmMigrationExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -456,7 +455,6 @@
 				02DCBEC9195CF46800F1CBE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
