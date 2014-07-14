@@ -22,7 +22,6 @@
 		02DCBED4195D274300F1CBE6 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 02DCBED1195D274300F1CBE6 /* default-v0.realm */; };
 		02DCBED5195D274300F1CBE6 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = 02DCBED2195D274300F1CBE6 /* default-v1.realm */; };
 		02DCBED6195D274300F1CBE6 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 02DCBED3195D274300F1CBE6 /* default-v2.realm */; };
-		42F06C35197401BF00CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C34197401BF00CF67D1 /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +55,6 @@
 		02DCBED1195D274300F1CBE6 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
 		02DCBED2195D274300F1CBE6 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
 		02DCBED3195D274300F1CBE6 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
-		42F06C34197401BF00CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Release/Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +66,6 @@
 				02DCBE9E195CF46800F1CBE6 /* CoreGraphics.framework in Frameworks */,
 				02DCBEA0195CF46800F1CBE6 /* UIKit.framework in Frameworks */,
 				02DCBE9C195CF46800F1CBE6 /* Foundation.framework in Frameworks */,
-				42F06C35197401BF00CF67D1 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +105,6 @@
 			isa = PBXGroup;
 			children = (
 				02DCBECE195CF80B00F1CBE6 /* libc++.dylib */,
-				42F06C34197401BF00CF67D1 /* Realm.framework */,
 				02DCBECA195CF59300F1CBE6 /* Realm.framework */,
 				02DCBE9B195CF46800F1CBE6 /* Foundation.framework */,
 				02DCBE9D195CF46800F1CBE6 /* CoreGraphics.framework */,

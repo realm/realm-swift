@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		42C2CEAF19471699001D0E13 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 42C2CEAE19471699001D0E13 /* libc++.dylib */; };
 		42F06C3B1974065100CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C3A1974065100CF67D1 /* Realm.framework */; };
-		42F06C3D1974066000CF67D1 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F06C3C1974066000CF67D1 /* Realm.framework */; };
 		E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D318FEFFD70071CFAB /* Foundation.framework */; };
 		E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D518FEFFD70071CFAB /* CoreGraphics.framework */; };
 		E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D718FEFFD70071CFAB /* UIKit.framework */; };
@@ -23,7 +22,6 @@
 /* Begin PBXFileReference section */
 		42C2CEAE19471699001D0E13 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		42F06C3A1974065100CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Debug/Realm.framework; sourceTree = "<group>"; };
-		42F06C3C1974066000CF67D1 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Release/Realm.framework; sourceTree = "<group>"; };
 		E80762D018FEFFD70071CFAB /* RealmTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -45,7 +43,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42F06C3D1974066000CF67D1 /* Realm.framework in Frameworks */,
 				42C2CEAF19471699001D0E13 /* libc++.dylib in Frameworks */,
 				E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */,
 				E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */,
@@ -77,7 +74,6 @@
 		E80762D218FEFFD70071CFAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				42F06C3C1974066000CF67D1 /* Realm.framework */,
 				42F06C3A1974065100CF67D1 /* Realm.framework */,
 				42C2CEAE19471699001D0E13 /* libc++.dylib */,
 				E80762D318FEFFD70071CFAB /* Foundation.framework */,
