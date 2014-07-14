@@ -559,7 +559,7 @@ When working with any database, it is likely your data model will change over ti
 {% endhighlight%}
 
 {% highlight objective-c %}
-@interface
+@interface Person : RLMObject
 @property NSString *firstName
 @property NSString *lastName
 @property int age
@@ -576,7 +576,7 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 {% endhighlight%}
 
 {% highlight objective-c %}
-@interface
+@interface Person : RLMObject
 @property NSString *fullName
 @property int age
 @end
