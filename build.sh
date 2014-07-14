@@ -28,6 +28,10 @@ command:
   clean [xcmode]:          clean up/remove all generated files
   build [xcmode]:          builds iOS and OS X frameworks with release configuration
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
+  ios [xcmode]:            builds iOS framework with release configuration
+  ios-debug [xcmode]:      builds iOS framework with debug configuration
+  osx [xcmode]:            builds OS X framework with release configuration
+  osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
   test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
