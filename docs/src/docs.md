@@ -165,7 +165,7 @@ For example, the following calls `[RLMObject objectsOrderedBy:where:]` to sort t
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
 RLMArray *dogs = [[Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]
-                       arraySortedByProperty:@"name" ascending:YES];
+                            arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -506,7 +506,7 @@ There are several ways we may want to import this JSON into our Realm. You could
 @interface Venue : RLMObject
 @property NSString *id;
 @property NSString *name;
-@property Contact  *contact;
+@property Contact *contact;
 @property Location *location;
 @end
 
@@ -517,8 +517,8 @@ There are several ways we may want to import this JSON into our Realm. You could
 
 // Location.h
 @interface Location : RLMObject
-@property double   lat;
-@property double   lng;
+@property double latitude;
+@property double longitude;
 @property NSString *postalCode;
 @property NSString *cc;
 @property NSString *state;
@@ -560,9 +560,9 @@ When working with any database, it is likely your data model will change over ti
 
 {% highlight objective-c %}
 @interface Person : RLMObject
-@property NSString *firstName
-@property NSString *lastName
-@property int age
+@property NSString *firstName;
+@property NSString *lastName;
+@property int age;
 @end
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
@@ -577,8 +577,8 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 
 {% highlight objective-c %}
 @interface Person : RLMObject
-@property NSString *fullName
-@property int age
+@property NSString *fullName;
+@property int age;
 @end
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
@@ -610,8 +610,7 @@ RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
   if (oldSchemaVersion < 1) { 
     // Nothing to do!
     // Realm will automatically detect new properties & removed properties
-    // And will update the schema on disk automatically        
-    }
+    // And will update the schema on disk automatically
   }
   // Return the latest version number (always set manually)
   // Must be a higher than the previous version or an RLMException is thrown
@@ -674,18 +673,18 @@ Suppose now we change the data model for the 'Person' subclass yet again, for a 
 
 {% highlight objective-c %}
 // v0
-@property NSString *firstName
-@property NSString *lastName
-@property int age
+@property NSString *firstName;
+@property NSString *lastName;
+@property int age;
 
 // v1
-@property NSString *fullName //new property
-@property int age
+@property NSString *fullName; // new property
+@property int age;
 
 // v2
-@property NSString *fullName
-@property NSString *email //new property
-@property int age
+@property NSString *fullName;
+@property NSString *email;   // new property
+@property int age;
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
@@ -707,12 +706,12 @@ The logic in our migration block might look like the following.
                                        oldObject[@"firstName"],
                                        oldObject[@"lastName"]];    
   } 
-  
+
   // Add the 'email' property to Realms with a schema version of 0 or 1
   if (oldSchemaVersion < 2) {    
     newObject[@"email"] = [[NSString alloc] init];
   }
-  
+
   return 2;
 }];
 {% endhighlight %}
