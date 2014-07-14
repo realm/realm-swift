@@ -29,26 +29,23 @@ import Foundation
         // Swift class names look like _TFC9swifttest5Shape
         // Format: _T{2 characters}{module length}{module}{class length}{class}
 
-        let originalName: String = className
-        let originalNameLength = countElements(originalName)
         var cursor = 4
-        var substring = originalName[cursor..<originalNameLength-cursor]
+        var substring = className.substringFromIndex(cursor) as NSString
 
         // Module
-        let moduleLength = substring.bridgeToObjectiveC().integerValue
+        let moduleLength = substring.integerValue
         let moduleLengthLength = countElements("\(moduleLength)")
-        let moduleName = substring[moduleLengthLength..<moduleLength]
+        let moduleName = substring.substringWithRange(NSRange(location: moduleLengthLength, length: moduleLength))
 
         // Update cursor and substring
-        cursor += moduleLengthLength + countElements(moduleName)
-        substring = originalName[cursor..<originalNameLength-cursor]
+        cursor += moduleLengthLength + countElements(moduleName!)
+        substring = className.substringFromIndex(cursor)
 
         // Class name
-        let classLength = substring.bridgeToObjectiveC().integerValue
+        let classLength = substring.integerValue
         let classLengthLength = countElements("\(classLength)")
-        let className = substring[classLengthLength..<classLength]
 
-        return className
+        return substring.substringWithRange(NSRange(location: classLengthLength, length: classLength))
     }
 
     class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
