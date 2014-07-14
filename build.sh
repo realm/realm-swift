@@ -130,7 +130,7 @@ fi
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.23.0
+    REALM_CORE_VERSION=0.80.0
 fi
 
 download_core() {
