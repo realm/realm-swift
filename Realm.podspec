@@ -21,5 +21,5 @@ Pod::Spec.new do |s|
   s.social_media_url    = "https://twitter.com/realm"
   s.documentation_url   = "http://realm.io/docs/ios/#{s.version}"
   s.vendored_frameworks = "realm-ios-#{s.version}/Realm.framework"
-  s.license             = { :type => 'Apache 2.0', :file => 'Realm.framework/Resources/LICENSE' }
+  s.license             = { :type => 'Apache 2.0', :file => 'realm-ios-#{s.version}/Realm.framework/Resources/LICENSE' }
 end
