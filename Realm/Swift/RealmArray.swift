@@ -18,15 +18,16 @@
 
 class RealmArray<T: RealmObject>: Sequence, Printable {
     var rlmArray: RLMArray
-    var count: Int { get { return rlmArray.count } }
-    var objectClassName: String { get { return rlmArray.objectClassName } }
-    var readOnly: Bool { get { return rlmArray.readOnly } }
-    var realm: Realm { get { return Realm(rlmRealm: rlmArray.realm) } }
+    var count: Int { return rlmArray.count }
+    var objectClassName: String { return rlmArray.objectClassName }
+    var readOnly: Bool { return rlmArray.readOnly }
+    var realm: Realm { return Realm(rlmRealm: rlmArray.realm) }
 
-    var description: String { get { return rlmArray.description } }
+    var description: String { return rlmArray.description }
+    var property: RLMArray { return rlmArray }
 
     init() {
-        rlmArray = RLMArray(objectClassName: NSStringFromClass(T.self))
+        rlmArray = RLMArray(objectClassName: RLMSwiftSupport.demangleClassName(NSStringFromClass(T.self)))
     }
 
     convenience init(rlmArray: RLMArray) {
@@ -34,7 +35,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         self.rlmArray = rlmArray
     }
 
-    subscript (index: UInt) -> T {
+    subscript(index: UInt) -> T {
         get {
             return rlmArray[Int(index)] as T
         }
@@ -73,8 +74,8 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         return rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMArray {
-        return rlmArray.objectsWhere(predicateFormat, args: getVaList(args))
+    func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RealmArray<T> {
+        return RealmArray<T>(rlmArray: rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
     }
 
     func objectsWithPredicate(predicate: NSPredicate) -> RealmArray<T> {
@@ -93,12 +94,12 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         return rlmArray.maxOfProperty(property)
     }
 
-    func sumOfProperty(property: String) -> AnyObject {
-        return rlmArray.sumOfProperty(property)
+    func sumOfProperty(property: String) -> Double {
+        return rlmArray.sumOfProperty(property) as Double
     }
 
-    func averageOfProperty(property: String) -> AnyObject {
-        return rlmArray.averageOfProperty(property)
+    func averageOfProperty(property: String) -> Double {
+        return rlmArray.averageOfProperty(property) as Double
     }
 
     func JSONString() -> String {
@@ -116,7 +117,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         })
     }
 
-    func addObject(object: RealmObject) {
+    func addObject(object: T) {
         rlmArray.addObject(object)
     }
 
@@ -124,7 +125,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         rlmArray.addObjectsFromArray(objects)
     }
 
-    func insertObject(object: RealmObject, atIndex index: UInt) {
+    func insertObject(object: T, atIndex index: UInt) {
         rlmArray.insertObject(object, atIndex: Int(index))
     }
 
@@ -140,7 +141,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         rlmArray.removeAllObjects()
     }
 
-    func replaceObjectAtIndex(index: UInt, withObject object: RealmObject) {
+    func replaceObjectAtIndex(index: UInt, withObject object: T) {
         rlmArray.replaceObjectAtIndex(Int(index), withObject: object)
     }
 }

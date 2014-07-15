@@ -19,7 +19,7 @@
 import UIKit
 import Realm
 
-class DemoObject: RLMObject {
+class DemoObject: RealmObject {
     var title = ""
     var date = NSDate()
 }
@@ -33,7 +33,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
     
-    var array = RLMArray()
+    var array = RealmArray<DemoObject>()
     var notificationToken: RLMNotificationToken?
 
     override func viewDidLoad() {
@@ -68,7 +68,7 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell? {
         let cell = tableView!.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
         
-        let object = array[indexPath!.row] as DemoObject
+        let object = array[UInt(indexPath!.row)]
         cell.textLabel.text = object.title
         cell.detailTextLabel.text = object.date.description
         
@@ -79,7 +79,7 @@ class TableViewController: UITableViewController {
         if editingStyle == .Delete {
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()
-            realm.deleteObject(array[indexPath.row] as RLMObject)
+            realm.deleteObject(array[UInt(indexPath.row)])
             realm.commitWriteTransaction()
         }
     }
@@ -87,7 +87,7 @@ class TableViewController: UITableViewController {
     // Actions
     
     func reloadData() {
-        array = DemoObject.allObjects().arraySortedByProperty("date", ascending: true)
+        array = Realm.defaultRealm().objects(DemoObject()).arraySortedByProperty("date", ascending: true)
         tableView.reloadData()
     }
     
@@ -96,7 +96,7 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = RLMRealm.defaultRealm()
+            let realm = Realm.defaultRealm()
             realm.beginWriteTransaction()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.

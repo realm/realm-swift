@@ -18,9 +18,9 @@
 
 class Realm {
     var rlmRealm: RLMRealm
-    var path: String { get { return rlmRealm.path } }
-    var readOnly: Bool { get { return rlmRealm.readOnly } }
-    var schema: RealmSchema { get { return rlmRealm.schema } }
+    var path: String { return rlmRealm.path }
+    var readOnly: Bool { return rlmRealm.readOnly }
+    var schema: RealmSchema { return rlmRealm.schema }
     var autorefresh: Bool {
         get {
             return rlmRealm.autorefresh
@@ -74,11 +74,11 @@ class Realm {
         rlmRealm.deleteObject(object)
     }
 
-    class func applyMigrationBlock(error: AutoreleasingUnsafePointer<NSError?>, block: RealmMigrationBlock) {
+    class func migrateDefaultRealmWithBlock(block: RealmMigrationBlock) {
         RLMRealm.migrateDefaultRealmWithBlock(block)
     }
 
-    class func applyMigrationBlock(atPath path: String, error: AutoreleasingUnsafePointer<NSError?>, block: RealmMigrationBlock) {
+    class func migrateRealmAtPath(path: String, withBlock block: RealmMigrationBlock) {
         RLMRealm.migrateRealmAtPath(path, withBlock: block)
     }
 

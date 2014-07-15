@@ -19,15 +19,6 @@
 import XCTest
 import Realm
 
-// Framework Extensions
-
-extension RealmObject {
-
-    class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-        return createInRealm(realm.rlmRealm, withObject: object)
-    }
-}
-
 // SwiftTestCase
 
 func testRealmPath() -> String {

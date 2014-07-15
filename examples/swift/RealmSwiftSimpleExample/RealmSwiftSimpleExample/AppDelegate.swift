@@ -19,14 +19,14 @@
 import UIKit
 import Realm
 
-class Dog: RLMObject {
+class Dog: RealmObject {
     var name = ""
     var age = 0
 }
 
-class Person: RLMObject {
+class Person: RealmObject {
     var name = ""
-    var dogs = RLMArray(objectClassName: Dog.className())
+    var dogs = RealmArray<Dog>().property
 }
 
 @UIApplicationMain
@@ -46,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         deleteRealmFile()
         
         // Create a standalone object
-        var mydog = Dog()
+        let mydog = Dog()
         
         // Set & read properties
         mydog.name = "Rex"
@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         println("Name of dog: \(mydog.name)")
         
         // Realms are used to group data together
-        let realm = RLMRealm.defaultRealm() // Create realm pointing to default file
+        let realm = Realm.defaultRealm() // Create realm pointing to default file
         
         // Save your object
         realm.beginWriteTransaction()
@@ -62,14 +62,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWriteTransaction()
         
         // Query
-        var results = Dog.objectsInRealm(realm, withPredicate: NSPredicate(format: "name contains 'x'"))
+        let results = realm.objects(Dog(), "name contains 'x'")
 
         // Queries are chainable!
-        var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
+        let results2 = results.objectsWhere("age > 8")
         println("Number of dogs: \(results.count)")
         
         // Link objects
-        var person = Person()
+        let person = Person()
         person.name = "Tim"
         person.dogs.addObject(mydog)
         
@@ -78,11 +78,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWriteTransaction()
 
         // Thread-safety
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-            let otherRealm = RLMRealm.defaultRealm()
-            var otherResults = Dog.objectsInRealm(otherRealm, withPredicate: NSPredicate(format:"name contains 'Rex'"))
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            let otherRealm = Realm.defaultRealm()
+            var otherResults = otherRealm.objects(Dog(), "name contains 'Rex'")
             println("Number of dogs \(otherResults.count)")
-        })
+        }
         
         return true
     }

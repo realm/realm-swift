@@ -21,7 +21,7 @@ import Realm
 
 // Old data models
 /* V0
-class Person: RLMObject {
+class Person: RealmObject {
     var firstName = ""
     var lastName = ""
     var age = 0
@@ -29,22 +29,22 @@ class Person: RLMObject {
 */
 
 /* V1
-class Person: RLMObject {
+class Person: RealmObject {
     var fullName = ""        // combine firstName and lastName into single field
     var age = 0
 }
 */
 
 /* V2 */
-class Pet: RLMObject {
+class Pet: RealmObject {
     var name = ""
     var type = ""
 }
 
-class Person: RLMObject {
+class Person: RealmObject {
     var fullName = ""
     var age = 0
-    var pets = RLMArray(objectClassName: Pet.className())
+    var pets = RealmArray<Pet>().property
 }
 
 @UIApplicationMain

@@ -94,29 +94,29 @@ class SwiftArrayTests: SwiftTestCase {
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
-        XCTAssertEqual(noArray.sumOfProperty("intCol") as Int, 4, "Sum should be 4")
-        XCTAssertEqual(yesArray.sumOfProperty("intCol") as Int, 0, "Sum should be 0")
+        XCTAssertEqual(noArray.sumOfProperty("intCol"), 4, "Sum should be 4")
+        XCTAssertEqual(yesArray.sumOfProperty("intCol"), 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol") as Float, 0, 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol") as Float, 7.2, 0.1, "Sum should be 7.2")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol"), 0, 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol"), 7.2, 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol") as Double, 10, 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol") as Double, 0, 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol"), 10, 0.1, "Sum should be 10.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol"), 0, 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol") as Double, 1, 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol") as Double, 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol"), 1, 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol"), 0, 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol") as Double, 0, 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol") as Double, 1.2, 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol"), 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol"), 1.2, 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol") as Double, 2.5, 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol") as Double, 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol"), 2.5, 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol"), 0, 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -315,29 +315,29 @@ class SwiftArrayTests: SwiftTestCase {
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
-        XCTAssertEqual(noArray.sumOfProperty("intCol") as Int, 4, "Sum should be 4")
-        XCTAssertEqual(yesArray.sumOfProperty("intCol") as Int, 0, "Sum should be 0")
+        XCTAssertEqual(noArray.sumOfProperty("intCol"), 4, "Sum should be 4")
+        XCTAssertEqual(yesArray.sumOfProperty("intCol"), 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol") as Float, 0, 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol") as Float, 7.2, 0.1, "Sum should be 7.2")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("floatCol"), 0, 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("floatCol"), 7.2, 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol") as Double, 10, 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol") as Double, 0, 0.1, "Sum should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.sumOfProperty("doubleCol"), 10, 0.1, "Sum should be 10.0")
+        XCTAssertEqualWithAccuracy(yesArray.sumOfProperty("doubleCol"), 0, 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol") as Double, 1, 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol") as Double, 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("intCol"), 1, 0.1, "Average should be 1.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("intCol"), 0, 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol") as Double, 0, 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol") as Double, 1.2, 0.1, "Average should be 1.2")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("floatCol"), 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("floatCol"), 1.2, 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol") as Double, 2.5, 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol") as Double, 0, 0.1, "Average should be 0.0")
+        XCTAssertEqualWithAccuracy(noArray.averageOfProperty("doubleCol"), 2.5, 0.1, "Average should be 2.5")
+        XCTAssertEqualWithAccuracy(yesArray.averageOfProperty("doubleCol"), 0, 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
