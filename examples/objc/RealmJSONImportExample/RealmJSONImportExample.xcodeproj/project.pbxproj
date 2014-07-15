@@ -7,14 +7,51 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42F618B0197532AA00BCAF48 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4221859419752EAA00829C2E /* Realm.framework */; };
 		E872E6F619742EC200D16712 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E872E6F519742EC200D16712 /* Foundation.framework */; };
 		E872E6F919742EC200D16712 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E872E6F819742EC200D16712 /* main.m */; };
 		E872E70419742EDE00D16712 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E872E70319742EDE00D16712 /* libc++.dylib */; };
-		E872E70619742EFC00D16712 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E872E70519742EFC00D16712 /* Realm.framework */; };
-		E872E70819742F1400D16712 /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E872E70519742EFC00D16712 /* Realm.framework */; };
 		E872E70B1974302E00D16712 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = E872E70A1974302E00D16712 /* Person.m */; };
 		E872E70E197435F500D16712 /* persons.json in Copy JSON */ = {isa = PBXBuildFile; fileRef = E872E70C197430E300D16712 /* persons.json */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4221859319752EAA00829C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 02C4145E191DE49600F858D9;
+			remoteInfo = "OSX Framework";
+		};
+		4221859519752EAA00829C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 02C4146E191DE49600F858D9;
+			remoteInfo = "OSX Tests";
+		};
+		4221859719752EAA00829C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 02C415051921B0C300F858D9;
+			remoteInfo = "iOS Library";
+		};
+		4221859919752EAA00829C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 02C415121921B0C400F858D9;
+			remoteInfo = "iOS Tests";
+		};
+		4221859B19752FFE00829C2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 02C4145D191DE49600F858D9;
+			remoteInfo = "OSX Framework";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		E872E70719742F0800D16712 /* Embed Framework */ = {
@@ -23,7 +60,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E872E70819742F1400D16712 /* Realm.framework in Embed Framework */,
 			);
 			name = "Embed Framework";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,12 +78,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4221858B19752EAA00829C2E /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../../Realm.xcodeproj; sourceTree = "<group>"; };
 		E872E6F219742EC200D16712 /* RealmJSONImportExample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RealmJSONImportExample; sourceTree = BUILT_PRODUCTS_DIR; };
 		E872E6F519742EC200D16712 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E872E6F819742EC200D16712 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E872E6FB19742EC200D16712 /* RealmJSONImportExample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmJSONImportExample-Prefix.pch"; sourceTree = "<group>"; };
 		E872E70319742EDE00D16712 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		E872E70519742EFC00D16712 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../Realm.framework; sourceTree = "<group>"; };
 		E872E7091974302E00D16712 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		E872E70A1974302E00D16712 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		E872E70C197430E300D16712 /* persons.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = persons.json; sourceTree = "<group>"; };
@@ -58,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E872E70619742EFC00D16712 /* Realm.framework in Frameworks */,
+				42F618B0197532AA00BCAF48 /* Realm.framework in Frameworks */,
 				E872E70419742EDE00D16712 /* libc++.dylib in Frameworks */,
 				E872E6F619742EC200D16712 /* Foundation.framework in Frameworks */,
 			);
@@ -67,12 +103,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4221858C19752EAA00829C2E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4221859419752EAA00829C2E /* Realm.framework */,
+				4221859619752EAA00829C2E /* OSX Tests.xctest */,
+				4221859819752EAA00829C2E /* libRealm.a */,
+				4221859A19752EAA00829C2E /* iOS Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		E872E6E919742EC200D16712 = {
 			isa = PBXGroup;
 			children = (
 				E872E6F719742EC200D16712 /* RealmJSONImportExample */,
 				E872E6F419742EC200D16712 /* Frameworks */,
 				E872E6F319742EC200D16712 /* Products */,
+				4221858B19752EAA00829C2E /* Realm.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -87,7 +135,6 @@
 		E872E6F419742EC200D16712 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E872E70519742EFC00D16712 /* Realm.framework */,
 				E872E70319742EDE00D16712 /* libc++.dylib */,
 				E872E6F519742EC200D16712 /* Foundation.framework */,
 			);
@@ -129,6 +176,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4221859C19752FFE00829C2E /* PBXTargetDependency */,
 			);
 			name = RealmJSONImportExample;
 			productName = RealmJSONImportExample;
@@ -154,12 +202,49 @@
 			mainGroup = E872E6E919742EC200D16712;
 			productRefGroup = E872E6F319742EC200D16712 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 4221858C19752EAA00829C2E /* Products */;
+					ProjectRef = 4221858B19752EAA00829C2E /* Realm.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				E872E6F119742EC200D16712 /* RealmJSONImportExample */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		4221859419752EAA00829C2E /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = 4221859319752EAA00829C2E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4221859619752EAA00829C2E /* OSX Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "OSX Tests.xctest";
+			remoteRef = 4221859519752EAA00829C2E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4221859819752EAA00829C2E /* libRealm.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRealm.a;
+			remoteRef = 4221859719752EAA00829C2E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		4221859A19752EAA00829C2E /* iOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Tests.xctest";
+			remoteRef = 4221859919752EAA00829C2E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E872E6EE19742EC200D16712 /* Sources */ = {
@@ -172,6 +257,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4221859C19752FFE00829C2E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "OSX Framework";
+			targetProxy = 4221859B19752FFE00829C2E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E872E6FE19742EC200D16712 /* Debug */ = {
@@ -247,10 +340,7 @@
 		E872E70119742EC200D16712 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/jp/realm/code/realm-cocoa/examples/objc",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmJSONImportExample/RealmJSONImportExample-Prefix.pch";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -261,10 +351,7 @@
 		E872E70219742EC200D16712 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/jp/realm/code/realm-cocoa/examples/objc",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmJSONImportExample/RealmJSONImportExample-Prefix.pch";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -291,6 +378,7 @@
 				E872E70219742EC200D16712 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
