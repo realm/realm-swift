@@ -44,8 +44,9 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 
 ## Models
 
-Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects.
+Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects. You can add your own methods and protocols to Realm data models like you would any other object.
 
+Relationships and nested data structures are modeled simply by including properties of the target type or RLMArray's for typed lists of objects.
 
 <div class="highlight-wrapper">
 
@@ -54,15 +55,29 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Person.h
+@class Person;
+
+// Model for Dog
+@interface Dog : RLMObject
+@property NSString *name;
+@property Person   *owner;
+@end
+RLM_ARRAY_TYPE(Dog) // define RLMArray<Dog>
+
+// Model for Person
 @interface Person : RLMObject
-@property (nonatomic, copy)   NSString *name;
-@property (nonatomic, strong) NSDate   *birthdate;
+@property NSString      *name;
+@property NSDate        *birthdate;
+@property RLMArray<Dog> *dogs;
+@end
+RLM_ARRAY_TYPE(Person) // define RLMArray<Person>
+
+// Implementations
+@implementation Dog
 @end
 
-// Person.m
 @implementation Person
-@end // none needed
+@end
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -85,13 +100,15 @@ All writes must be done via a write transaction:
 // Get the default Realm
 RLMRealm *realm = [RLMRealm defaultRealm];
 
+// Create object
 Person *author = [[Person alloc] init];
 author.name       = @"David Foster Wallace";
 author.birthdate  = [NSDate date];
 
-[realm beginWriteTransaction];  // Begin a transaction
-[realm addObject:author];       // Add the object
-[realm commitWriteTransaction]; // Commit the transaction
+// Add to Realm with transaction
+[realm beginWriteTransaction];
+[realm addObject:author];
+[realm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -118,8 +135,8 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
 // On a specific Realm:
-RLMRealm *petsRealm = [RLMRealm realmWithPath:"pets.realm"]; // get a specific Realm
-RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
+RLMRealm *petsRealm = [RLMRealm realmWithPath:@"pets.realm"]; // get a specific Realm
+RLMArray *pets = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -139,12 +156,12 @@ For example, the following would extend our earlier example by calling `[RLMObje
 
 {% highlight objective-c %}
 // Using a predicate string:
-RLMArray *dogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
+RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
 
 // … Or using an NSPredicate object:
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
                                                      @"tan", @"B"];
-RLMArray *dogs = [Dog objectsWithPredicate:pred];
+RLMArray *tanDogs2 = [Dog objectsWithPredicate:pred];
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
@@ -164,7 +181,7 @@ For example, the following calls `[RLMObject objectsWhere:where:]` to sort the r
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray *dogs = [[Dog objectWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
+RLMArray *dogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
                     arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
@@ -186,8 +203,8 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan'"];
-RLMArray *tanDogsWithBNames = [tanDogs objectsWhere:@"name BEGINSWITH 'B'"];
+RLMArray *tanDogs4 = [Dog objectsWhere:@"color = 'tan'"];
+RLMArray *tanDogsWithBNames = [tanDogs4 objectsWhere:@"name BEGINSWITH 'B'"];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -312,7 +329,7 @@ To add a “dogs” property on our Person model, that links to multiple dogs, w
 ... // property declarations
 @end
 
-RLM_ARRAY_TYPE(Dog) //Defines an RLMArray<Dog> type
+RLM_ARRAY_TYPE(Dog) // Defines an RLMArray<Dog> type
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -346,8 +363,9 @@ You can access & assign RLMArray properties as usual:
 {% endhighlight%}
 
 {% highlight objective-c %}  
+// Jim is owner of Rex and all dogs named "Fido"
 RLMArray *some_dogs = [Dog objectsWhere:@"name contains 'Fido'"];
-jim.dogs = some_dogs;
+[jim.dogs addObjectsFromArray:some_dogs];
 [jim.dogs addObject:rex];
 {% endhighlight %}
 
