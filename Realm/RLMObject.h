@@ -213,7 +213,7 @@
  [Predicates Programming Guide](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Predicates/predicates.html)
  for more information about building predicates.
 
- The comparison operands can be property names or constants. At least on of the operands must be a
+ The comparison operands can be property names or constants. At least one of the operands must be a
  property name.
  
  The comparison operators ==, <=, <, >=, >, !=, and BETWEEN are supported for int, long, float,
