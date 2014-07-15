@@ -592,8 +592,8 @@ class Contact : RLMObject {
 }
 
 class Location : RLMObject {
-    var latitude: Double = 0
-    var longitude: Double = 0
+    var lat: Double = 0
+    var lng: Double = 0
     var zipCode = ""
     var cc = ""
     var state = ""
