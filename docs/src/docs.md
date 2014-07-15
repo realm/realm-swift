@@ -44,28 +44,43 @@ Our Xcode plugin makes it easy to generate new Realm models (and will soon come 
 
 ## Models
 
-Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects.
+Realm data models are defined using traditional NSObject-style classes with @properties. Just subclass RLMObject to create your Realm data model objects. You can add your own methods and protocols to Realm data models like you would any other object.
 
+Relationships and nested data structures are modeled simply by including properties of the target type or RLMArray's for typed lists of objects.
 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-class Person : RLMObject {
+class Person: RLMObject {
     var name = ""
     var age = 0
 }
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Person.h
+@class Person;
+
+// Model for Dog
+@interface Dog : RLMObject
+@property NSString *name;
+@property Person   *owner;
+@end
+RLM_ARRAY_TYPE(Dog) // define RLMArray<Dog>
+
+// Model for Person
 @interface Person : RLMObject
-@property (nonatomic) NSString *name;
-@property (nonatomic) NSDate   *birthdate;
+@property NSString      *name;
+@property NSDate        *birthdate;
+@property RLMArray<Dog> *dogs;
+@end
+RLM_ARRAY_TYPE(Person) // define RLMArray<Person>
+
+// Implementations
+@implementation Dog
 @end
 
-// Person.m
 @implementation Person
-@end // none needed
+@end
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -82,10 +97,10 @@ All writes must be done via a write transaction:
 
 {% highlight swift %}
 // Get the default Realm
-var realm = RLMRealm.defaultRealm()
+let realm = RLMRealm.defaultRealm()
 
 // Create a Person object
-var author = Person()
+let author = Person()
 author.name = "David Foster Wallace"
 author.age  = 46
 
@@ -99,13 +114,15 @@ realm.commitWriteTransaction()
 // Get the default Realm
 RLMRealm *realm = [RLMRealm defaultRealm];
 
+// Create object
 Person *author = [[Person alloc] init];
 author.name       = @"David Foster Wallace";
 author.birthdate  = [NSDate date];
 
-[realm beginWriteTransaction];  // Begin a transaction
-[realm addObject:author];       // Add the object
-[realm commitWriteTransaction]; // Commit the transaction
+// Add to Realm with transaction
+[realm beginWriteTransaction];
+[realm addObject:author];
+[realm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -125,11 +142,11 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 
 {% highlight swift %}
 // Query the default Realm
-var dogs = Dog.allObjects()
+let dogs = Dog.allObjects()
 
 // Query a specific Realm
-var realm = RLMRealm.realmWithPath(realmPath, readOnly: false, error: nil)
-var otherDogs = Dog.allObjectsInRealm(realm)
+let realm = RLMRealm.realmWithPath(realmPath)
+let otherDogs = Dog.allObjectsInRealm(realm)
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -137,7 +154,7 @@ var otherDogs = Dog.allObjectsInRealm(realm)
 RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
 // On a specific Realm
-RLMRealm *petsRealm = [RLMRealm realmWithPath:"pets.realm"]; // get a specific Realm
+RLMRealm *petsRealm = [RLMRealm realmWithPath:@"pets.realm"]; // get a specific Realm
 RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
@@ -154,11 +171,11 @@ For example, the following would extend our earlier example by calling `[RLMObje
 
 {% highlight swift %}
 // Query using a predicate string:
-var dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
+let dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
 
 // Query using an NSPredicate object:
-var predicate = NSPredicate(format: "color = %@ AND name BEGINSWITH %@", "tan", "B")
-var dogs = Dog.objectsWithPredicate(predicate)
+let predicate = NSPredicate(format: "color = %@ AND name BEGINSWITH %@", "tan", "B")
+let dogs = Dog.objectsWithPredicate(predicate)
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -168,7 +185,7 @@ RLMArray *dogs = [Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINS
 // Query using an NSPredicate object
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
                                                      @"tan", @"B"];
-RLMArray *dogs = [Dog objectsWithPredicate:pred];
+RLMArray *tanDogs2 = [Dog objectsWithPredicate:pred];
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
@@ -190,7 +207,7 @@ dogs = dogs.arraySortedByProperty("name", ascending: true)
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray *dogs = [[Dog objectWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
+RLMArray *dogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
                     arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
@@ -208,8 +225,8 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-var tanDogs = Dog.objectsWhere("color = 'tan'")
-var tanDogsWithBNames = tanDogs.objectsWhere("name BEGINSWITH 'B'")
+let tanDogs = Dog.objectsWhere("color = 'tan'")
+let tanDogsWithBNames = tanDogs.objectsWhere("name BEGINSWITH 'B'")
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -235,7 +252,7 @@ The Default Realm is persisted to disk by default, but you can also use it purel
 {% highlight swift %}
 // You must call this method before accessing the default Realm
 RLMRealm.useInMemoryDefaultRealm()
-var realm = RLMRealm.defaultRealm()
+let realm = RLMRealm.defaultRealm()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -266,7 +283,7 @@ Any two RLMObjects can be linked together. Assuming your Person model has alread
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-class Dog : RLMObject {
+class Dog: RLMObject {
     var name = ""
 }
 {% endhighlight%}
@@ -292,7 +309,7 @@ Simply declare a property with the type of one of your RLMObject subclasses:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-class Dog : RLMObject {
+class Dog: RLMObject {
     ... // other property declarations
     var owner = Person()	
 }
@@ -314,8 +331,8 @@ This will create a property with name owner and type Person. You can assign and 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-var jim = Person()
-var rex = Dog()
+let jim = Person()
+let rex = Dog()
 rex.owner = jim
 {% endhighlight%}
 
@@ -348,7 +365,7 @@ To add a “dogs” property on our Person model, that links to multiple dogs, w
 ... // property declarations
 @end
 
-RLM_ARRAY_TYPE(Dog) //Defines an RLMArray<Dog> type
+RLM_ARRAY_TYPE(Dog) // Defines an RLMArray<Dog> type
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -359,7 +376,7 @@ You can then declare properties of the `RLMArray<Dog>` type:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-Class Person : RLMObject {
+class Person: RLMObject {
     ... // other property declarations
     var dogs = RLMArray(objectClassName: Dog.className())
 }
@@ -381,14 +398,15 @@ You can access & assign RLMArray properties as usual:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-var some_dogs = Dog.objectsWhere("name contains 'Fido'")
-jim.dogs = some_dogs;
+let someDogs = Dog.objectsWhere("name contains 'Fido'")
+jim.dogs = someDogs;
 jim.dogs.addObject(rex)
 {% endhighlight%}
 
 {% highlight objective-c %}  
-RLMArray *some_dogs = [Dog objectsWhere:@"name contains 'Fido'"];
-jim.dogs = some_dogs;
+// Jim is owner of Rex and all dogs named "Fido"
+RLMArray *someDogs = [Dog objectsWhere:@"name contains 'Fido'"];
+[jim.dogs addObjectsFromArray:someDogs];
 [jim.dogs addObject:rex];
 {% endhighlight %}
 
@@ -433,28 +451,26 @@ Realm can be very efficient when writing large amounts of data by batching toget
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-dispatch_async(queue, {
-
+dispatch_async(queue) {
     // Get realm and table instances for this thread
-    var realm = RLMRealm.defaultRealm()
+    let realm = RLMRealm.defaultRealm()
 
     // Break up the writing blocks into smaller portions
     // by starting a new transaction
-    for (var idx1 = 0; idx1 < 1000; idx1++) {
-	realm.beginWriteTransaction()
+    for idx1 in 0..<1000 {
+		realm.beginWriteTransaction()
 
-	// Add row via dictionary. Order is ignored.
-	for (var idx2 = 0; idx2 < 1000; idx2++) {
-	    Person.createInDefaultRealmWithObject(
-		["name": "\(idx1)", "age": idx2]
-	    );
-	}
+		// Add row via dictionary. Order is ignored.
+		for idx2 in 0..<1000 {
+	    	Person.createInDefaultRealmWithObject(
+				["name": "\(idx1)", "age": idx2])
+		}
 
-	// Commit the write transaction
-	// to make this data available to other threads
-	realm.commitWriteTransaction()
+		// Commit the write transaction
+		// to make this data available to other threads
+		realm.commitWriteTransaction()
     }
-});
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -509,29 +525,29 @@ The following is a simple example of how you can use Realm with a REST API. In t
 
 For a real-time example of a similar use case in action, check out our [video demo](http://static.realm.io/videos/demo.mp4).
 
-First we create an instance of the default Realm to persist the data to, and fetch our data set from the API. For simplicity in this example we use `[NSData initiWithContentsOfURL]`.
+First we create an instance of the default Realm to persist the data to, and fetch our data set from the API. For simplicity in this example we use `[NSData initWithContentsOfURL]`.
 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
 // Call the API
-var url = NSURL(string: "https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50")
-var response = NSData(contentsOfURL: url)
+let url = NSURL(string: "https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50")
+let response = NSData(contentsOfURL: url)
 
 // De-serialize the response to JSON
-var json = NSJSONSerialization.JSONObjectWithData(response,
+let json = NSJSONSerialization.JSONObjectWithData(response,
     options: NSJSONReadingOptions(0),
-    error: nil).objectForKey("response")
+    error: nil)["response"]
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMRealm * defaultRealm = [RLMRealm defaultRealm];
+RLMRealm *realm = [RLMRealm defaultRealm];
 
 // Call the API
 NSData *response = [ [NSData alloc] initWithContentsOfURL:
                      [NSURL URLWithString:@"https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50"]];
 
-// De-serialize the response to JSON
+// Deserialize the response to JSON
 NSDictionary *json = [[ NSJSONSerialization
                         JSONObjectWithData:response
                         options:kNilOptions
@@ -569,11 +585,11 @@ There are several ways we may want to import this JSON into our Realm. You could
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-class Contact : RLMObject {
+class Contact: RLMObject {
     var phone = ""
 }
 
-class Location : RLMObject {
+class Location: RLMObject {
     var latitude: Double = 0
     var longitude: Double = 0
     var zipCode = ""
@@ -582,7 +598,7 @@ class Location : RLMObject {
     var country = ""
 }
 
-class Venue : RLMObject {
+class Venue: RLMObject {
     var id = ""
     var name = ""
     var contact = Contact()
@@ -598,21 +614,24 @@ class Venue : RLMObject {
 @property Contact  *contact;
 @property Location *location;
 @end
+RLM_ARRAY_TYPE(Venue)
 
 // Contact.h
 @interface Contact : RLMObject
 @property NSString *phone;
 @end
+RLM_ARRAY_TYPE(Contact)
 
 // Location.h
 @interface Location : RLMObject
-@property double latitude;
-@property double longitude;
+@property double lat; // latitude
+@property double lng; // longitude
 @property NSString *postalCode;
 @property NSString *cc;
 @property NSString *state;
 @property NSString *country;
 @end
+RLM_ARRAY_TYPE(Location)
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -623,7 +642,7 @@ Since the result set is given to us as an array we can simply add it straight to
 
 {% highlight swift %}
 //Extract the array of venues from the response
-var venues: AnyObject! = json.objectForKey("venues")
+let venues = json["venues"] as Array!
 
 defaultRealm.beginWriteTransaction()
 // Save one Venue object (& dependents) for each element of the array
@@ -635,10 +654,12 @@ defaultRealm.commitWriteTransaction()
 //Extract the array of venues from the response
 NSArray *venues = json[@"venues"];
 
-[defaultRealm beginWriteTransaction];
+[realm beginWriteTransaction];
 // Save one Venue object (& dependents) for each element of the array
-[defaultRealm addObjectsFromArray:venues];
-[defaultRealm commitWriteTransaction];
+for (NSDictionary *venue in venues) {
+    [Venue createInDefaultRealmWithObject:venue];
+}
+[realm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -678,7 +699,7 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
-Just changing your code to the new definition will work fine, if you have no data stored on disk under the old schema. But if you do, there will be a mismatch between what Realm sees defined in code, and the data Realm sees on disk. In short if you change your schema definition in one of your models then instantiate a realm with [`[RLMRealm defaultRealm]`](api/Classes/RLMRealm.html#//api/name/defaultRealm) (or a similar realm instantiation call), that call will throw an NSException.
+Just changing your code to the new definition will work fine, if you have no data stored on disk under the old schema. But if you do, there will be a mismatch between what Realm sees defined in code, and the data Realm sees on disk. In short if you change your schema definition in one of your models and then instantiate a realm with [`[RLMRealm defaultRealm]`](api/Classes/RLMRealm.html#//api/name/defaultRealm) (or a similar realm instantiation call), that call will throw an NSException with a message that you should run a migration.
 
 Realms that contain at least one class that has been redefined must be migrated to the current schema before they can be accessed. To make this process easy, Realm provides specialized classes and methods for handling schema migration.
 
@@ -686,7 +707,7 @@ Migrating a Realm to a new schema takes just two steps, and must be done before 
 
 ### Performing a Migration
 
-You define a migration be implementing an `RLMMigrationBlock` which you pass into a call to [`[RLMRealm migrateDefaultRealmWithBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateDefaultRealmWithBlock:) for the default Realm or [`[RLMRealm migrateRealmAtPath:withBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateRealmAtPath:withBlock:) for other Realm instances. Your migration block provides all the logic for converting data models from previous schemas to the new schema. 
+You define a migration by implementing an `RLMMigrationBlock` which you pass into a call to [`[RLMRealm migrateDefaultRealmWithBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateDefaultRealmWithBlock:) for the default Realm or [`[RLMRealm migrateRealmAtPath:withBlock:]`](api/Classes/RLMRealm.html#//api/name/migrateRealmAtPath:withBlock:) for other Realm instances. Your migration block provides all the logic for converting data models from previous schemas to the new schema. 
 
 For example, suppose we want to migrate the 'Person' subclass from above. To do this, the minimal necessary migration block would look like the following:
 
@@ -710,7 +731,7 @@ RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
   // Return the latest version number (always set manually)
   // Must be a higher than the previous version or an RLMException is thrown
   return 1;
-}
+};
 
 // Apply the migration block above to the default Realm
 [RLMRealm migrateDefaultRealmWithBlock:migrationBlock];
@@ -719,9 +740,9 @@ RLMMigrationBlock migrationBlock = ^NSUInteger(RLMMigration *migration,
 
 At the very minimum, all we need to do is `return 1;` to indicate the that the schema has been upgraded (automatically) by Realm.  
 _N.B._ The version number returned can be either an integer (version) or timestamp (epoch). We recommend you set it manually in the code as it defines the current version of the schema your app is using.  
-While you must manually return the version number to the app at the end of your migration block, note that Realm takes care of updating the scham version number inside the realm on disk.
+While you must manually return the version number to the app at the end of your migration block, note that Realm takes care of updating the schema version number inside the realm on disk.
 
-While this is the minimal acceptable migration, we probably want to use this block to prefill the “fullName” property with something more meaningful. Within the migration block we can call [`[RLMMigration enumerateObjects:block:]`](api/Classes/RLMMigration.html#//api/name/enumerateObjects:block:) to enumerate each Realm Object of a certain type, and apply any necessary migration logic. Notice how for each enumeration the existing RLMObject instance is accessed via an `oldObject` variable, and the updated instance is accessed via `newObject`:
+While this is the minimal acceptable migration, we probably want to use this block to pre-fill the “fullName” property with something more meaningful. Within the migration block we can call [`[RLMMigration enumerateObjects:block:]`](api/Classes/RLMMigration.html#//api/name/enumerateObjects:block:) to enumerate each Realm Object of a certain type, and apply any necessary migration logic. Notice how for each enumeration the existing RLMObject instance is accessed via an `oldObject` variable, and the updated instance is accessed via `newObject`:
 
 <div class="highlight-wrapper">
 
@@ -792,23 +813,30 @@ The logic in our migration block might look like the following.
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Enumerate each 'Person' in the Realm
-[migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {    
-  
-  // Add the 'fullName' property only to Realms with a schema version of 0
-  if (oldSchemaVersion < 1) {    
-    newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@",
-                                       oldObject[@"firstName"],
-                                       oldObject[@"lastName"]];    
-  } 
+[RLMRealm migrateDefaultRealmWithBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    // We haven’t migrated anything yet, so oldSchemaVersion == 0
+    if (oldSchemaVersion < 1) {
+        // The enumerateObjects:block: method iterates
+        // over every 'Person' object stored in the Realm file
+        [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
 
-  // Add the 'email' property to Realms with a schema version of 0 or 1
-  if (oldSchemaVersion < 2) {    
-    newObject[@"email"] = [[NSString alloc] init];
-  }
+            // Add the 'fullName' property only to Realms with a schema version of 0
+            if (oldSchemaVersion < 1) {
+                newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@",
+                                          oldObject[@"firstName"],
+                                          oldObject[@"lastName"]];
+            }
 
-  return 2;
+            // Add the 'email' property to Realms with a schema version of 0 or 1
+            if (oldSchemaVersion < 2) {
+                newObject[@"email"] = [[NSString alloc] init];
+            }
+        }];            }
+    // Return the latest version number (always set manually)
+    // Must be a higher than the previous version or an RLMException is thrown
+    return 2;
 }];
+
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
