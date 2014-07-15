@@ -110,7 +110,6 @@ let realm = RLMRealm.defaultRealm()
 // Create a Person object
 let author = Person()
 author.name = "David Foster Wallace"
-author.birthdate = NSDate()
 
 // Add to the Realm inside a transaction
 realm.beginWriteTransaction()
@@ -124,8 +123,7 @@ RLMRealm *realm = [RLMRealm defaultRealm];
 
 // Create object
 Person *author = [[Person alloc] init];
-author.name       = @"David Foster Wallace";
-author.birthdate  = [NSDate date];
+author.name    = @"David Foster Wallace";
 
 // Add to Realm with transaction
 [realm beginWriteTransaction];
@@ -153,8 +151,8 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 let dogs = Dog.allObjects()
 
 // Query a specific Realm
-let realm = RLMRealm.realmWithPath(realmPath)
-let otherDogs = Dog.allObjectsInRealm(realm)
+let petsRealm = RLMRealm.realmWithPath("pets.realm")
+let otherDogs = Dog.allObjectsInRealm(petsRealm)
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -163,7 +161,7 @@ RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
 // On a specific Realm
 RLMRealm *petsRealm = [RLMRealm realmWithPath:@"pets.realm"]; // get a specific Realm
-RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
+RLMArray *otherDogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -179,18 +177,18 @@ For example, the following would extend our earlier example by calling `[RLMObje
 
 {% highlight swift %}
 // Query using a predicate string:
-let dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
+let tanDogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
 
 // Query using an NSPredicate object:
 let predicate = NSPredicate(format: "color = %@ AND name BEGINSWITH %@", "tan", "B")
-let dogs = Dog.objectsWithPredicate(predicate)
+let tanDogs2 = Dog.objectsWithPredicate(predicate)
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Query using a predicate string
-RLMArray *dogs = [Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
+// Using a predicate string
+RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"];
 
-// Query using an NSPredicate object
+// … Or using an NSPredicate object
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
                                                      @"tan", @"B"];
 RLMArray *tanDogs2 = [Dog objectsWithPredicate:pred];
@@ -209,13 +207,12 @@ For example, the following calls `[RLMObject objectsWhere:where:]` to sort the r
 
 {% highlight swift %}
 // Using a string (sort is ascending by default)
-var dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
-dogs = dogs.arraySortedByProperty("name", ascending: true)
+var sortedDogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'").arraySortedByProperty("name", ascending: true)
 {% endhighlight%}
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray *dogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
+RLMArray *sortedDogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
                     arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
@@ -301,10 +298,6 @@ class Dog: RLMObject {
 @interface Dog : RLMObject
 @property NSString *name;
 @end
-
-// Dog.m
-@implementation Dog
-@end //none needed
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -364,7 +357,7 @@ To add a “dogs” property on our Person model, that links to multiple dogs, w
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// Not needed in Swift
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -407,7 +400,7 @@ You can access & assign RLMArray properties as usual:
 
 {% highlight swift %}
 let someDogs = Dog.objectsWhere("name contains 'Fido'")
-jim.dogs = someDogs;
+jim.dogs.addObjectsFromArray(someDogs)
 jim.dogs.addObject(rex)
 {% endhighlight%}
 
@@ -598,8 +591,8 @@ class Contact: RLMObject {
 }
 
 class Location: RLMObject {
-    var lat = 0.0
-    var lng = 0.0
+    var lat = 0.0  // latitude
+    var lng = 0.0  // longitude
     var postalCode = ""
     var cc = ""
     var state = ""
@@ -681,7 +674,11 @@ When working with any database, it is likely your data model will change over ti
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person: RLMObject {
+    var firstName = ""
+    var firstName = ""
+    var age = 0
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -698,7 +695,10 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person: RLMObject {
+    var fullName = ""
+    var age = 0
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -794,23 +794,48 @@ Suppose now we change the data model for the 'Person' subclass yet again, for a 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// v0
+class Person: RLMObject {
+    var firstName = ""
+    var firstName = ""
+    var age = 0
+}
+
+// v1
+class Person: RLMObject {
+    var fullName = "" // new property
+    var age = 0
+}
+
+// v2
+class Person: RLMObject {
+    var fullName = ""
+    var email = "" // new property
+    var age = 0
+}
 
 {% endhighlight%}
 
 {% highlight objective-c %}
 // v0
+@interface Person : RLMObject
 @property NSString *firstName;
 @property NSString *lastName;
 @property int age;
+@end
 
 // v1
+@interface Person : RLMObject
 @property NSString *fullName; // new property
 @property int age;
+@end
 
 // v2
+@interface Person : RLMObject
 @property NSString *fullName;
 @property NSString *email;   // new property
 @property int age;
+@end
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
