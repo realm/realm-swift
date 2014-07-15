@@ -21,6 +21,10 @@
 #import "RLMProperty.h"
 #import "RLMObject.h"
 
+@interface RLMRealm ()
++ (void)clearRealmCache;
+@end
+
 @interface RLMProperty ()
 
 - (instancetype)initWithName:(NSString *)name

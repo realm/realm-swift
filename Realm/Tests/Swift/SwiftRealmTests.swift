@@ -91,7 +91,8 @@ class SwiftRealmTests: SwiftTestCase {
         XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
-// FIXME: Test passes ~50% of the time. Asana: https://app.asana.com/0/861870036984/14552787865017
+// FIXME: https://app.asana.com/0/861870036984/14552787865017
+//
 //    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
 //        let realm = realmWithTestPath()
 //
