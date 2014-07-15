@@ -51,23 +51,31 @@ Relationships and nested data structures are modeled simply by including propert
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-class Person: RLMObject {
+// Dog model
+class Dog: RLMObject {
     var name = ""
-    var age = 0
+    var owner = Person()
+}
+
+// Person model
+class Person: RLMObject {
+    name = ""
+    birthdate = NSDate(timeIntervalSince1970: 1)
+    dogs = RLMArray(objectClassName: Dog.className())
 }
 {% endhighlight%}
 
 {% highlight objective-c %}
 @class Person;
 
-// Model for Dog
+// Dog model
 @interface Dog : RLMObject
 @property NSString *name;
 @property Person   *owner;
 @end
 RLM_ARRAY_TYPE(Dog) // define RLMArray<Dog>
 
-// Model for Person
+// Person model
 @interface Person : RLMObject
 @property NSString      *name;
 @property NSDate        *birthdate;
@@ -102,7 +110,7 @@ let realm = RLMRealm.defaultRealm()
 // Create a Person object
 let author = Person()
 author.name = "David Foster Wallace"
-author.age  = 46
+author.birthdate = NSDate()
 
 // Add to the Realm inside a transaction
 realm.beginWriteTransaction()
@@ -463,7 +471,7 @@ dispatch_async(queue) {
 		// Add row via dictionary. Order is ignored.
 		for idx2 in 0..<1000 {
 	    	Person.createInDefaultRealmWithObject(
-				["name": "\(idx1)", "age": idx2])
+				["name": "\(idx1)", "birthdate": NSDate(timeIntervalSince1970: idx2)])
 		}
 
 		// Commit the write transaction
