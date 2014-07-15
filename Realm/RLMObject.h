@@ -218,8 +218,8 @@
  
  The comparison operators ==, <=, <, >=, >, !=, and BETWEEN are supported for int, long, float,
  double, and NSDate property types. The comparison operators == and != are supported for bool
- properties. For NSString and NSData, we support the ==, !=, BEGINSWITH, CONTAINS, and ENDSWITH
- operators.
+ properties. For NSString and NSData properties, we support the ==, !=, BEGINSWITH, CONTAINS,
+ and ENDSWITH operators.
 
  The compound operators AND, OR, and NOT are all supported.
 
