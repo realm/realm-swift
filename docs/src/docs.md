@@ -50,14 +50,17 @@ Realm data models are defined using traditional NSObject-style classes with @pro
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person : RLMObject {
+    var name = ""
+    var age = 0
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
 // Person.h
 @interface Person : RLMObject
-@property (nonatomic, copy)   NSString *name;
-@property (nonatomic, strong) NSDate   *birthdate;
+@property (nonatomic) NSString *name;
+@property (nonatomic) NSDate   *birthdate;
 @end
 
 // Person.m
@@ -78,7 +81,18 @@ All writes must be done via a write transaction:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Get the default Realm
+var realm = RLMRealm.defaultRealm()
 
+// Create a Person object
+var author = Person()
+author.name = "David Foster Wallace"
+author.age  = 46
+
+// Add to the Realm inside a transaction
+realm.beginWriteTransaction()
+realm.addObject(author)
+realm.commitWriteTransaction()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -110,14 +124,19 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Query the default Realm
+var dogs = Dog.allObjects()
 
+// Query a specific Realm
+var realm = RLMRealm.realmWithPath(realmPath, readOnly: false, error: nil)
+var otherDogs = Dog.allObjectsInRealm(realm)
 {% endhighlight%}
 
 {% highlight objective-c %}
-// On the default Realm:
+// On the default Realm
 RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
-// On a specific Realm:
+// On a specific Realm
 RLMRealm *petsRealm = [RLMRealm realmWithPath:"pets.realm"]; // get a specific Realm
 RLMArray *dogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
@@ -134,14 +153,19 @@ For example, the following would extend our earlier example by calling `[RLMObje
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Query using a predicate string:
+var dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
 
+// Query using an NSPredicate object:
+var predicate = NSPredicate(format: "color = %@ AND name BEGINSWITH %@", "tan", "B")
+var dogs = Dog.objectsWithPredicate(predicate)
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Using a predicate string:
-RLMArray *dogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
+// Query using a predicate string
+RLMArray *dogs = [Dog objectsWithPredicateFormat:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
 
-// … Or using an NSPredicate object:
+// Query using an NSPredicate object
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
                                                      @"tan", @"B"];
 RLMArray *dogs = [Dog objectsWithPredicate:pred];
@@ -159,7 +183,9 @@ For example, the following calls `[RLMObject objectsWhere:where:]` to sort the r
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// Using a string (sort is ascending by default)
+var dogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
+dogs = dogs.arraySortedByProperty("name", ascending: true)
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -182,7 +208,8 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+var tanDogs = Dog.objectsWhere("color = 'tan'")
+var tanDogsWithBNames = tanDogs.objectsWhere("name BEGINSWITH 'B'")
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -206,7 +233,9 @@ The Default Realm is persisted to disk by default, but you can also use it purel
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// You must call this method before accessing the default Realm
+RLMRealm.useInMemoryDefaultRealm()
+var realm = RLMRealm.defaultRealm()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -237,7 +266,9 @@ Any two RLMObjects can be linked together. Assuming your Person model has alread
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Dog : RLMObject {
+    var name = ""
+}
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -261,7 +292,10 @@ Simply declare a property with the type of one of your RLMObject subclasses:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Dog : RLMObject {
+    ... // other property declarations
+    var owner = Person()	
+}
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -280,7 +314,9 @@ This will create a property with name owner and type Person. You can assign and 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+var jim = Person()
+var rex = Dog()
+rex.owner = jim
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -323,7 +359,10 @@ You can then declare properties of the `RLMArray<Dog>` type:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+Class Person : RLMObject {
+    ... // other property declarations
+    var dogs = RLMArray(objectClassName: Dog.className())
+}
 {% endhighlight%}
 
 {% highlight objective-c %}  
@@ -342,7 +381,9 @@ You can access & assign RLMArray properties as usual:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+var some_dogs = Dog.objectsWhere("name contains 'Fido'")
+jim.dogs = some_dogs;
+jim.dogs.addObject(rex)
 {% endhighlight%}
 
 {% highlight objective-c %}  
@@ -365,7 +406,9 @@ The auto-updating Realm will send out notifications every time the underlying Re
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+let token = realm.addNotificationBlock { note, realm in
+    viewController.updateUI()
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -450,7 +493,14 @@ First we create an instance of the default Realm to persist the data to, and fet
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Call the API
+var url = NSURL(string: "https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50")
+var response = NSData(contentsOfURL: url)
 
+// De-serialize the response to JSON
+var json = NSJSONSerialization.JSONObjectWithData(response,
+    options: NSJSONReadingOptions(0),
+    error: nil).objectForKey("response")
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -460,7 +510,7 @@ RLMRealm * defaultRealm = [RLMRealm defaultRealm];
 NSData *response = [ [NSData alloc] initWithContentsOfURL:
                      [NSURL URLWithString:@"https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50"]];
 
-// Serialize the response in JSON
+// De-serialize the response to JSON
 NSDictionary *json = [[ NSJSONSerialization
                         JSONObjectWithData:response
                         options:kNilOptions
@@ -498,7 +548,25 @@ There are several ways we may want to import this JSON into our Realm. You could
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+class Contact : RLMObject {
+    var phone = ""
+}
 
+class Location : RLMObject {
+    var latitude: Double = 0
+    var longitude: Double = 0
+    var zipCode = ""
+    var cc = ""
+    var state = ""
+    var country = ""
+}
+
+class Venue : RLMObject {
+    var id = ""
+    var name = ""
+    var contact = Contact()
+    var location = Location()
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -533,7 +601,13 @@ Since the result set is given to us as an array we can simply add it straight to
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+//Extract the array of venues from the response
+var venues = json.objectForKey("venues") as Array
 
+defaultRealm.beginWriteTransaction()
+// Save one Venue object (& dependents) for each element of the array
+defaultRealm.addObjectsFromArray(venues)
+defaultRealm.commitWriteTransaction()
 {% endhighlight%}
 
 {% highlight objective-c %}
