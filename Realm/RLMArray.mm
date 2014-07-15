@@ -19,6 +19,8 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
+#import "RLMObjectStore.h"
+#import "RLMQueryUtil.hpp"
 
 @implementation RLMArray
 
@@ -139,6 +141,13 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [_backingArray indexOfObject:object];
 }
 
+- (void)deleteObjectsFromRealm {
+    for (RLMObject *obj in _backingArray) {
+        RLMDeleteObjectFromRealm(obj);
+    }
+}
+
+
 
 //
 // Methods unsupported on standalone RLMArray instances
@@ -146,7 +155,14 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
+{
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objectsWhere:predicateFormat args:args];
+}
+
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
@@ -184,7 +200,14 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
+{
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self indexOfObjectWhere:predicateFormat args:args];
+}
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Method not implemented" userInfo:nil];

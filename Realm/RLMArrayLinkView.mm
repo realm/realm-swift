@@ -202,6 +202,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     return result;
 }
 
+
+- (void)deleteObjectsFromRealm {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
+    // delete all target rows from the realm
+    self->_backingLinkView->remove_all_target_rows();
+}
+
+
 @end
 
 

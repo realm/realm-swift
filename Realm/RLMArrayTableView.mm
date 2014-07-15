@@ -56,6 +56,16 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     }
     ar->_backingView.sync_if_needed();
 }
+inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
+    // first verify attached
+    RLMArrayTableViewValidateAttached(ar);
+
+    if (!ar->_realm->_inWriteTransaction) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can't mutate a persisted array outside of a write transaction."
+                                     userInfo:nil];
+    }
+}
 
 //
 // public method implementations
@@ -168,7 +178,13 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     return result;
 }
 
-- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ... {
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self indexOfObjectWhere:predicateFormat args:args];
+}
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -197,12 +213,17 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
                                                  realm:_realm];
 }
 
-- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
 {
     // validate predicate
-    NSPredicate *outPred;
-    RLM_PREDICATE(predicateFormat, outPred);
-    return [self objectsWithPredicate:outPred];
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self objectsWhere:predicateFormat args:args];
+}
+
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
+{
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
@@ -318,6 +339,13 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
+}
+
+- (void)deleteObjectsFromRealm {
+    RLMArrayTableViewValidateInWriteTransaction(self);
+
+    // call clear to remove all from the realm
+    _backingView.clear();
 }
 
 @end

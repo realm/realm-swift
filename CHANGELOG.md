@@ -1,12 +1,34 @@
-0.21.0 Release notes (yyyy-MM-dd)
+0.80.0 Release notes (2014-07-15)
 =============================================================
-
-?? summary
 
 ### API breaking changes
 
 * Rename migration methods to -migrateDefaultRealmWithBlock: and -migrateRealmAtPath:withBlock:
 * Moved Realm specific query methods from RLMRealm to class methods on RLMObject (-allObjects: to +allObjectsInRealm: ect.)
+
+### Enhancements
+
+* Added +createInDefaultRealmWithObject: method to RLMObject.
+* Added support for array and object literals when calling -createWithObject: and -initWithObject: variants.
+* Added method -deleteObjects: to batch delete objects from a Realm
+* Support for defining RLMObject models entirely in Swift (experimental, see known issues).
+* RLMArrays in Swift support Sequence-style enumeration (for obj in array).
+* Implemented -indexOfObject: for RLMArray
+
+### Known Issues for Swift-defined models
+
+* Properties other than String, NSData and NSDate require a default value in the model. This can be an empty (but typed) array for array properties.
+* The previous caveat also implies that not all models defined in Objective-C can be used for object properties. Only Objective-C models with only implicit (i.e. primitives) or explicit default values can be used. However, any Objective-C model object can be used in a Swift array property.
+* Array property accessors don't work until its parent object has been added to a realm.
+* Realm-Bridging-Header.h is temporarily exposed as a public header. This is temporary and will be private again once rdar://17633863 is fixed.
+* Does not leverage Swift generics and still uses RLM-prefix everywhere. This is coming in #549.
+
+
+0.22.0 Release notes
+=============================================================
+
+### API breaking changes
+
 * Rename schemaForObject: to schemaForClassName: on RLMSchema
 * Removed -objects:where: and -objects:orderedBy:where: from RLMRealm
 * Removed -indexOfObjectWhere:, -objectsWhere: and -objectsOrderedBy:where: from RLMArray
@@ -20,14 +42,9 @@
 * Added support for RLMArray properties on objects.
 * Added support for creating in-memory default Realm.
 * Added -objectsWithClassName:predicateFormat: and -objectsWithClassName:predicate: to RLMRealm
-* Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredicate: and -arraySortedByProperty:ascending: to RLMArray
+* Added -indexOfObjectWithPredicateFormat:, -indexOfObjectWithPredicate:, -objectsWithPredicateFormat:, -objectsWithPredi
 * Added +objectsWithPredicateFormat: and +objectsWithPredicate: to RLMObject
 * Now allows predicates comparing two object properties of the same type.
-* Implemented -indexOfObject: for RLMArray
-
-### Bugfixes
-
-* None.
 
 
 0.20.0 Release notes (2014-05-28)

@@ -198,7 +198,7 @@
  
  @return    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
-- (NSUInteger)indexOfObjectWithPredicateFormat:(NSString *)predicateFormat, ...;
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
 /**
  Gets the index of the first object matching the predicate.
@@ -216,7 +216,7 @@
  
  @return                An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
+- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.

@@ -28,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4DE0B141194747F70092154B"
-               BuildableName = "RealmSimpleExampleTests.xctest"
-               BlueprintName = "RealmSimpleExampleTests"
-               ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

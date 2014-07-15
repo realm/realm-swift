@@ -149,11 +149,11 @@
     XCTAssertThrows([intArray.intArray minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
     XCTAssertThrows([intArray.intArray maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
 
-    XCTAssertThrows([intArray.intArray objectsWithPredicateFormat:@"intCol == 1"], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
     XCTAssertThrows([intArray.intArray arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
     
-    XCTAssertThrows([intArray.intArray indexOfObjectWithPredicateFormat:@"intCol == 1"], @"Not yet implemented");
+    XCTAssertThrows([intArray.intArray indexOfObjectWhere:@"intCol == 1"], @"Not yet implemented");
     XCTAssertThrows(([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
 
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
@@ -172,6 +172,7 @@
 
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
     company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
     [company.employees removeObjectAtIndex:1];
 

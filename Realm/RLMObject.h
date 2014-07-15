@@ -60,7 +60,7 @@
  
  ### Querying
  
- You can query an object directly via the class methods: allObjects, objectsWithPredicateFormat:, objectsOrderedBy:withPredicateFormat: and objectForKeyedSubscript:
+ You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
  These methods allow you to easily query a custom subclass for instances of this class in the
  default Realm. To search in a Realm other than the default Realm use the interface on an RLMRealm instance.
  
@@ -108,7 +108,23 @@
 + (NSString *)className;
 
 /**
- Create an RLMObject within a Realm with a given object.
+ Create an RLMObject in the default Realm with a a given object.
+
+ Creates an instance of this object and adds it to the default Realm populating
+ the object with the given object.
+
+ @param object  The object used to populate the object. This can be any key/value compliant
+ object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+ an NSArray with one object for each persisted property. An exception will be
+ thrown if all required properties are not present or no default is provided.
+ When passing in an NSArray, all properties must be present and valid.
+
+ @see   defaultPropertyValues
+ */
++(instancetype)createInDefaultRealmWithObject:(id)object;
+
+/**
+ Create an RLMObject in a Realm with a given object.
  
  Creates an instance of this object and adds it to the given Realm populating
  the object with the given object.
@@ -197,7 +213,7 @@
  
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWithPredicateFormat:(NSString *)predicateFormat, ...;
++ (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...;
 
 
 /**
@@ -232,7 +248,7 @@
 
  @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
  */
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicateFormat:(NSString *)predicateFormat, ...;
++ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.

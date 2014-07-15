@@ -84,6 +84,50 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testRealmBatchRemoveObjects {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    StringObject *strObj = [StringObject createInRealm:realm withObject:@[@"a"]];
+    [StringObject createInRealm:realm withObject:@[@"b"]];
+    [StringObject createInRealm:realm withObject:@[@"c"]];
+    [realm commitWriteTransaction];
+
+    // delete objects
+    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
+    [realm beginWriteTransaction];
+    [realm deleteObjects:objects];
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)0, @"Expecting 0 objects");
+    XCTAssertThrows(strObj.stringCol, @"Object should be invalidated");
+
+    // add objects to linkView
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
+    [StringObject createInRealm:realm withObject:@[@"d"]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)4, @"Expecting 4 objects");
+
+    // remove from linkView
+    [realm beginWriteTransaction];
+    [realm deleteObjects:obj.array];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
+
+    // remove NSArray
+    NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
+    [realm beginWriteTransaction];
+    [realm deleteObjects:arrayOfLastObject];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
+}
+
+
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
@@ -115,43 +159,46 @@
     XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
-// FIXME: Test passes ~50% of the time. Asana: https://app.asana.com/0/861870036984/14552787865017
-//- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
-//    RLMRealm *realm = [self realmWithTestPath];
-//
-//    // we have two notifications, one for opening the realm, and a second when performing our transaction
-//    __block NSUInteger noteCount = 0;
-//    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-//    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
-//        XCTAssertNotNil(realm, @"Realm should not be nil");
-//        if (++noteCount == 2) {
-//            [notificationFired fulfill];
-//        }
-//     }];
-//    
-//    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-//    dispatch_async(queue, ^{
-//        RLMRealm *realm = [self realmWithTestPath];
-//        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
-//        [realm beginWriteTransaction];
-//        [realm addObject:obj];
-//        [realm commitWriteTransaction];
-//
-//        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-//        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-//        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
-//    });
-//    
-//    // this should complete very fast before the timer
-//    [self waitForExpectationsWithTimeout:0.01 handler:nil];
-//    [realm removeNotification:token];
-//        
-//    // get object
-//    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-//    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-//    StringObject *obj = objects.firstObject;
-//    XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
-//}
+// FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
+// Asana: https://app.asana.com/0/861870036984/14552787865017
+#ifndef REALM_SWIFT
+- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    // we have two notifications, one for opening the realm, and a second when performing our transaction
+    __block NSUInteger noteCount = 0;
+    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+        XCTAssertNotNil(realm, @"Realm should not be nil");
+        if (++noteCount == 2) {
+            [notificationFired fulfill];
+        }
+     }];
+    
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+        [realm beginWriteTransaction];
+        [realm addObject:obj];
+        [realm commitWriteTransaction];
+
+        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
+    });
+    
+    // this should complete very fast before the timer
+    [self waitForExpectationsWithTimeout:0.01 handler:nil];
+    [realm removeNotification:token];
+        
+    // get object
+    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+    StringObject *obj = objects.firstObject;
+    XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
+}
+#endif
 
 /* FIXME: disabled until we have per file compile options
  - (void)testRealmWriteImplicitCommit

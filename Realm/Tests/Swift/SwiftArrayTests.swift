@@ -45,7 +45,7 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
 
-        let results = realm.objects(SwiftAggregateObject(), withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let results = realm.objects(SwiftAggregateObject(), "intCol < %d", 100)
         XCTAssertEqual(results.count, 10, "10 objects added")
         
         var totalSum = 0
@@ -89,8 +89,8 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
 
-        let noArray = realm.objects(SwiftAggregateObject(), withPredicate: NSPredicate(format: "boolCol == NO"))
-        let yesArray = realm.objects(SwiftAggregateObject(), withPredicate: NSPredicate(format: "boolCol == YES"))
+        let noArray = realm.objects(SwiftAggregateObject(), "boolCol == NO")
+        let yesArray = realm.objects(SwiftAggregateObject(), "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -154,10 +154,7 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription() {
-        // FIXME: Using realmWithTestPath() makes the tests fail
-        //        because accessors aren't cycled properly outside the default realm
-        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
-        let realm = Realm(rlmRealm: RLMRealm.defaultRealm())
+        let realm = realmWithTestPath()
         
         realm.beginWriteTransaction()
         
@@ -172,6 +169,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let description = realm.objects(SwiftEmployeeObject()).description as NSString
+        XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         
         XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -268,7 +266,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let results = realm.objects(AggregateObject(), withPredicate: NSPredicate(format: "intCol < \(100)"))
+        let results = realm.objects(AggregateObject(), "intCol < %d", 100)
         XCTAssertEqual(results.count, 10, "10 objects added")
 
         var totalSum: CInt = 0
@@ -312,8 +310,8 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let noArray = realm.objects(AggregateObject(), withPredicate: NSPredicate(format: "boolCol == NO"))
-        let yesArray = realm.objects(AggregateObject(), withPredicate: NSPredicate(format: "boolCol == YES"))
+        let noArray = realm.objects(AggregateObject(), "boolCol == NO")
+        let yesArray = realm.objects(AggregateObject(), "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -377,10 +375,7 @@ class SwiftArrayTests: SwiftTestCase {
     }
 
     func testArrayDescription_objc() {
-        // FIXME: Using realmWithTestPath() makes the tests fail
-        //        because accessors aren't cycled properly outside the default realm
-        //        Asana: https://app.asana.com/0/14632725644365/14638503942511
-        let realm = Realm(rlmRealm: RLMRealm.defaultRealm())
+        let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
 
@@ -430,6 +425,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.addObject(po3)
 
         let company = CompanyObject()
+        company.name = "name"
         realm.addObject(company)
         company.employees = realm.objects(EmployeeObject()).rlmArray
 
