@@ -47,12 +47,24 @@ static NSString * const kTableName = @"table";
 {
     [super viewDidLoad];
     [self setupUI];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
     
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
-    self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+    self.notification = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
         [weakSelf reloadData];
     }];
+
+    // Encrypt realm file
+    NSError *error = nil;
+    NSDictionary *fileAttributes = @{NSFileProtectionKey: NSFileProtectionComplete};
+    BOOL success = [[NSFileManager defaultManager] setAttributes:fileAttributes
+                                                    ofItemAtPath:realm.path error:&error];
+    if (!success) {
+        NSLog(@"encryption attribute was not successfully set on realm file");
+        NSLog(@"error: %@", error.localizedDescription);
+    }
     [self reloadData];
 }
 

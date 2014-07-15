@@ -45,7 +45,16 @@ class TableViewController: UITableViewController {
         notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
             self.reloadData()
         }
-        
+
+        // Encrypt realm file
+        var error: NSError?
+        let success = NSFileManager.defaultManager().setAttributes([NSFileProtectionKey: NSFileProtectionComplete],
+            ofItemAtPath: RLMRealm.defaultRealm().path, error: &error)
+        if !success {
+            println("encryption attribute was not successfully set on realm file")
+            println("error: \(error?.localizedDescription)")
+        }
+
         reloadData()
     }
     
