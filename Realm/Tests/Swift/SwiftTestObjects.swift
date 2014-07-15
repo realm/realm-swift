@@ -39,7 +39,7 @@ class SwiftObject: RealmObject {
     var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
     var dateCol = NSDate(timeIntervalSince1970: 1)
     var objectCol = SwiftBoolObject()
-    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    var arrayCol = RealmArray<SwiftBoolObject>().property
 }
 
 class SwiftOptionalObject: RealmObject {
@@ -79,13 +79,13 @@ class SwiftEmployeeObject: RealmObject {
 }
 
 class SwiftCompanyObject: RealmObject {
-    var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
+    var employees = RealmArray<SwiftEmployeeObject>().property
 }
 
 class SwiftArrayPropertyObject: RealmObject {
     var name = ""
-    var array = RLMArray(objectClassName: SwiftStringObject.className())
-    var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    var array = RealmArray<SwiftStringObject>().property
+    var intArray = RealmArray<SwiftIntObject>().property
 }
 
 class SwiftDynamicObject: RealmObject {

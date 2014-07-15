@@ -169,15 +169,15 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let description = realm.objects(SwiftEmployeeObject()).description as NSString
-        XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
         
-        XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
+        XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RealmArray")
         
-        XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
+        XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RealmArray")
         
-        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RealmArray")
     }
 
     func testDeleteLinksAndObjectsInArray() {
@@ -210,7 +210,7 @@ class SwiftArrayTests: SwiftTestCase {
         
         realm.commitWriteTransaction()
         
-        let peopleInCompany = company.employees
+        let peopleInCompany = RealmArray<SwiftEmployeeObject>(rlmArray: company.employees)
         XCTAssertEqual(peopleInCompany.count, 3, "No links should have been deleted")
         
         realm.beginWriteTransaction()
@@ -219,17 +219,17 @@ class SwiftArrayTests: SwiftTestCase {
         
         XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
         
-        var test = peopleInCompany[0] as SwiftEmployeeObject
-        XCTAssertEqual(test.age, po1.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
-        XCTAssertEqual(test.hired, po1.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        var person0 = peopleInCompany[0]
+        XCTAssertEqual(person0.age, po1.age, "Should be equal")
+        XCTAssertEqualObjects(person0.name, po1.name, "Should be equal")
+        XCTAssertEqual(person0.hired, po1.hired, "Should be equal")
+        // XCTAssertEqualObjects(person0, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
-        test = peopleInCompany[1] as SwiftEmployeeObject
-        XCTAssertEqual(test.age, po3.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
-        XCTAssertEqual(test.hired, po3.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        let person1 = peopleInCompany[1]
+        XCTAssertEqual(person1.age, po3.age, "Should be equal")
+        XCTAssertEqualObjects(person1.name, po3.name, "Should be equal")
+        XCTAssertEqual(person1.hired, po3.hired, "Should be equal")
+        // XCTAssertEqualObjects(person1, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         realm.beginWriteTransaction()
         peopleInCompany.removeLastObject()
@@ -391,13 +391,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         let description = realm.objects(EmployeeObject()).description as NSString
 
-        XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
+        XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RealmArray")
 
-        XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
-        XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
+        XCTAssertTrue(description.rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RealmArray")
 
-        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
+        XCTAssertTrue(description.rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RealmArray")
     }
 
     func testDeleteLinksAndObjectsInArray_objc() {
@@ -431,7 +431,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.commitWriteTransaction()
 
-        let peopleInCompany = company.employees
+        let peopleInCompany = RealmArray<EmployeeObject>(rlmArray: company.employees)
         XCTAssertEqual(peopleInCompany.count, 3, "No links should have been deleted")
 
         realm.beginWriteTransaction()
@@ -440,17 +440,17 @@ class SwiftArrayTests: SwiftTestCase {
 
         XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
 
-        var test = peopleInCompany[0] as EmployeeObject
-        XCTAssertEqual(test.age, po1.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
-        XCTAssertEqual(test.hired, po1.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        let person0 = peopleInCompany[0]
+        XCTAssertEqual(person0.age, po1.age, "Should be equal")
+        XCTAssertEqualObjects(person0.name, po1.name, "Should be equal")
+        XCTAssertEqual(person0.hired, po1.hired, "Should be equal")
+        // XCTAssertEqualObjects(person0, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
-        test = peopleInCompany[1] as EmployeeObject
-        XCTAssertEqual(test.age, po3.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
-        XCTAssertEqual(test.hired, po3.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        let person1 = peopleInCompany[1]
+        XCTAssertEqual(person1.age, po3.age, "Should be equal")
+        XCTAssertEqualObjects(person1.name, po3.name, "Should be equal")
+        XCTAssertEqual(person1.hired, po3.hired, "Should be equal")
+        // XCTAssertEqualObjects(person1, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
         
         let allPeople = realm.objects(EmployeeObject())
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")

@@ -26,6 +26,7 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
+//            let realm = dynamicRealmWithTestPathAndSchema(nil)
             let realm = RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withObject: ["column1", 1])

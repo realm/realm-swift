@@ -82,7 +82,7 @@ class SwiftRealmTests: SwiftTestCase {
             SwiftStringObject.createInRealm(realm, withObject: ["string"])
             realm.commitWriteTransaction()
         }
-        waitForExpectationsWithTimeout(2.0, handler: nil)
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
 
         // get object
@@ -174,7 +174,7 @@ class SwiftRealmTests: SwiftTestCase {
             StringObject.createInRealm(realm, withObject: ["string"])
             realm.commitWriteTransaction()
         }
-        waitForExpectationsWithTimeout(2.0, handler: nil)
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
 
         // get object

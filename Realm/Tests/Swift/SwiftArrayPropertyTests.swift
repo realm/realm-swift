@@ -87,13 +87,13 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         XCTAssertEqualObjects(children[1].stringCol, "b", "Second child should be 'b'")
     }
 
-    // FIXME: Support standalone RLMArray's in Swift-defined models
+    // FIXME: Support standalone RealmArray's in Swift-defined models
 //    func testStandalone() {
 //        let realm = realmWithTestPath()
 //        
 //        let array = SwiftArrayPropertyObject()
 //        array.name = "name"
-//        XCTAssertNotNil(array.array, "RLMArray property should get created on access")
+//        XCTAssertNotNil(array.array, "RealmArray property should get created on access")
 //        
 //        let obj = SwiftStringObject()
 //        obj.stringCol = "a"
@@ -179,7 +179,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
         let array = ArrayPropertyObject()
         array.name = "name"
-        XCTAssertNotNil(array.array, "RLMArray property should get created on access")
+        XCTAssertNotNil(array.array, "RealmArray property should get created on access")
 
         let obj = StringObject()
         obj.stringCol = "a"
