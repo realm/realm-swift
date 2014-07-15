@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Realm-Xcode6.xcodeproj">
+      location = "self:RealmSwiftExamples.xcodeproj">
    </FileRef>
 </Workspace>
