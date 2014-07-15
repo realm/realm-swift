@@ -159,42 +159,42 @@
     XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
-- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-
-    // we have two notifications, one for opening the realm, and a second when performing our transaction
-    __block NSUInteger noteCount = 0;
-    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (++noteCount == 2) {
-            [notificationFired fulfill];
-        }
-     }];
-    
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        RLMRealm *realm = [self realmWithTestPath];
-        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
-        [realm beginWriteTransaction];
-        [realm addObject:obj];
-        [realm commitWriteTransaction];
-
-        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
-    });
-    
-    // this should complete very fast before the timer
-    [self waitForExpectationsWithTimeout:0.01 handler:nil];
-    [realm removeNotification:token];
-        
-    // get object
-    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-    StringObject *obj = objects.firstObject;
-    XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
-}
+//- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
+//    RLMRealm *realm = [self realmWithTestPath];
+//
+//    // we have two notifications, one for opening the realm, and a second when performing our transaction
+//    __block NSUInteger noteCount = 0;
+//    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+//    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+//        XCTAssertNotNil(realm, @"Realm should not be nil");
+//        if (++noteCount == 2) {
+//            [notificationFired fulfill];
+//        }
+//     }];
+//    
+//    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+//    dispatch_async(queue, ^{
+//        RLMRealm *realm = [self realmWithTestPath];
+//        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+//        [realm beginWriteTransaction];
+//        [realm addObject:obj];
+//        [realm commitWriteTransaction];
+//
+//        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+//        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+//        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
+//    });
+//    
+//    // this should complete very fast before the timer
+//    [self waitForExpectationsWithTimeout:0.01 handler:nil];
+//    [realm removeNotification:token];
+//        
+//    // get object
+//    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+//    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+//    StringObject *obj = objects.firstObject;
+//    XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
+//}
 
 /* FIXME: disabled until we have per file compile options
  - (void)testRealmWriteImplicitCommit
