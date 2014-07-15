@@ -40,7 +40,7 @@ const NSUInteger kTopTipDelay = 250;
 
 - (BOOL)application:(NSApplication *)application openFile:(NSString *)filename
 {
-    NSURL *fileUrl = [NSURL URLWithString:[@"file://" stringByAppendingString:filename]];
+	NSURL *fileUrl = [NSURL fileURLWithPath:filename];
     
     NSDocumentController *documentController = [[NSDocumentController alloc] init];
     [documentController openDocumentWithContentsOfURL:fileUrl
