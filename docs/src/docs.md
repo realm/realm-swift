@@ -433,7 +433,28 @@ Realm can be very efficient when writing large amounts of data by batching toget
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+dispatch_async(queue, {
 
+    // Get realm and table instances for this thread
+    var realm = RLMRealm.defaultRealm()
+
+    // Break up the writing blocks into smaller portions
+    // by starting a new transaction
+    for (var idx1 = 0; idx1 < 1000; idx1++) {
+	realm.beginWriteTransaction()
+
+	// Add row via dictionary. Order is ignored.
+	for (var idx2 = 0; idx2 < 1000; idx2++) {
+	    Person.createInDefaultRealmWithObject(
+		["name": "\(idx1)", "age": idx2]
+	    );
+	}
+
+	// Commit the write transaction
+	// to make this data available to other threads
+	realm.commitWriteTransaction()
+    }
+});
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -602,7 +623,7 @@ Since the result set is given to us as an array we can simply add it straight to
 
 {% highlight swift %}
 //Extract the array of venues from the response
-var venues = json.objectForKey("venues") as Array
+var venues: AnyObject! = json.objectForKey("venues")
 
 defaultRealm.beginWriteTransaction()
 // Save one Venue object (& dependents) for each element of the array
