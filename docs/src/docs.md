@@ -472,7 +472,7 @@ First we create an instance of the default Realm to persist the data to, and fet
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMRealm * defaultRealm = [RLMRealm defaultRealm];
+RLMRealm * realm = [RLMRealm defaultRealm];
 
 // Call the API
 NSData *response = [ [NSData alloc] initWithContentsOfURL:
@@ -527,21 +527,24 @@ There are several ways we may want to import this JSON into our Realm. You could
 @property Contact  *contact;
 @property Location *location;
 @end
+RLM_ARRAY_TYPE(Venue)
 
 // Contact.h
 @interface Contact : RLMObject
 @property NSString *phone;
 @end
+RLM_ARRAY_TYPE(Contact)
 
 // Location.h
 @interface Location : RLMObject
-@property double latitude;
-@property double longitude;
+@property double lat; // latitude
+@property double lng; // longitude
 @property NSString *postalCode;
 @property NSString *cc;
 @property NSString *state;
 @property NSString *country;
 @end
+RLM_ARRAY_TYPE(Location)
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -558,10 +561,12 @@ Since the result set is given to us as an array we can simply add it straight to
 //Extract the array of venues from the response
 NSArray *venues = json[@"venues"];
 
-[defaultRealm beginWriteTransaction];
+[realm beginWriteTransaction];
 // Save one Venue object (& dependents) for each element of the array
-[defaultRealm addObjectsFromArray:venues];
-[defaultRealm commitWriteTransaction];
+for (NSDictionary *venue in venues) {
+    [Venue createInDefaultRealmWithObject:venue];
+}
+[realm commitWriteTransaction];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
