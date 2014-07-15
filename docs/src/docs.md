@@ -150,7 +150,7 @@ let otherDogs = Dog.allObjectsInRealm(realm)
 {% endhighlight%}
 
 {% highlight objective-c %}
-// On the default Realm
+// On the default Realm:
 RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
 // On a specific Realm
@@ -558,7 +558,7 @@ NSDictionary *json = [[ NSJSONSerialization
 
 The response contains a JSON array of venues similar to this:
 
-{% highlight objective-c %}
+{% highlight json %}
 {
   "venues": [
     {
@@ -577,7 +577,7 @@ The response contains a JSON array of venues similar to this:
       }
     }
   ]
-}    
+}
 {% endhighlight %}
 
 There are several ways we may want to import this JSON into our Realm. You could read the NSDictionary and map the properties to a single RLMObject manually via a custom insert function. For the sake of this example, we will instead directly insert the NSDictionary in the Realm and have it automatically be mapped to a hierarchy of RLMObjects that will be created on the fly for us. For this to work, we need an RLMObject structure whose properties will match all the keys in the JSON exactly. JSON keys not matched by an RLMObject property will be ignored on insert. The following RLMObject declarations would work:
@@ -590,9 +590,9 @@ class Contact: RLMObject {
 }
 
 class Location: RLMObject {
-    var latitude: Double = 0
-    var longitude: Double = 0
-    var zipCode = ""
+    var lat = 0.0
+    var lng = 0.0
+    var postalCode = ""
     var cc = ""
     var state = ""
     var country = ""
@@ -642,12 +642,14 @@ Since the result set is given to us as an array we can simply add it straight to
 
 {% highlight swift %}
 //Extract the array of venues from the response
-let venues = json["venues"] as Array!
+let venues = json["venues"] as [NSDictionary]
 
-defaultRealm.beginWriteTransaction()
+realm.beginWriteTransaction()
 // Save one Venue object (& dependents) for each element of the array
-defaultRealm.addObjectsFromArray(venues)
-defaultRealm.commitWriteTransaction()
+for venue in venues {
+    Venue.createInDefaultRealmWithObject(venue)
+}
+realm.commitWriteTransaction()
 {% endhighlight%}
 
 {% highlight objective-c %}
