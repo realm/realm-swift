@@ -290,7 +290,7 @@ case "$COMMAND" in
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
 
-        # Not all examples can be build using Xcode 6
+        # Not all examples can be built using Xcode 6
         if [[ "$XCVERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
@@ -308,7 +308,7 @@ case "$COMMAND" in
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
 
-        # Not all examples can be build using Xcode 6
+        # Not all examples can be built using Xcode 6
         if [[ "$XCVERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi 
