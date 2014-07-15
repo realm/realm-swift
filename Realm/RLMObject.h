@@ -209,6 +209,25 @@
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
+ See Apple's
+ [Predicates Programming Guide](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Predicates/predicates.html)
+ for more information about building predicates.
+
+ The comparison operands can be property names or constants. At least on of the operands must be a
+ property name.
+ 
+ The comparison operators ==, <=, <, >=, >, !=, and BETWEEN are supported for int, long, float,
+ double, and NSDate property types. The comparison operators == and != are supported for bool
+ properties. For NSString and NSData, we support the ==, !=, BEGINSWITH, CONTAINS, and ENDSWITH
+ operators.
+
+ The compound operators AND, OR, and NOT are all supported.
+
+ Note, although there's no support for the aggregate expression type, we do support the BETWEEN
+ operator type using object values. Here's an example:
+
+    RLMArray *results = [Person objectsWhere:@"age BETWEEN %@", @[42, 43]];
+
  @param predicateFormat The predicate format string which can accept variable arguments.
  
  @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
@@ -218,6 +237,8 @@
 
 /**
  Get objects matching the given predicate for this type from the default Realm.
+
+ See objectsWhere: for more information on supported predicates.
 
  @param predicate   The predicate to filter the objects.
 
