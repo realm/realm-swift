@@ -1,5 +1,10 @@
 In the examples folder, you will find the following examples:
 
+RealmSimpleExample
+-------------------
+This app covers several introductory concepts about Realm. Without any UI distractions, just a little console output.
+
+
 RealmTableViewExample
 ---------------------
 This app demonstrates how Realm can be the data source for TableViews.

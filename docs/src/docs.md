@@ -51,20 +51,31 @@ Relationships and nested data structures are modeled simply by including propert
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Dog model
+class Dog: RLMObject {
+    var name = ""
+    var owner = Person()
+}
 
+// Person model
+class Person: RLMObject {
+    name = ""
+    birthdate = NSDate(timeIntervalSince1970: 1)
+    dogs = RLMArray(objectClassName: Dog.className())
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
 @class Person;
 
-// Model for Dog
+// Dog model
 @interface Dog : RLMObject
 @property NSString *name;
 @property Person   *owner;
 @end
 RLM_ARRAY_TYPE(Dog) // define RLMArray<Dog>
 
-// Model for Person
+// Person model
 @interface Person : RLMObject
 @property NSString      *name;
 @property NSDate        *birthdate;
@@ -93,7 +104,17 @@ All writes must be done via a write transaction:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Get the default Realm
+let realm = RLMRealm.defaultRealm()
 
+// Create a Person object
+let author = Person()
+author.name = "David Foster Wallace"
+
+// Add to the Realm inside a transaction
+realm.beginWriteTransaction()
+realm.addObject(author)
+realm.commitWriteTransaction()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -102,8 +123,7 @@ RLMRealm *realm = [RLMRealm defaultRealm];
 
 // Create object
 Person *author = [[Person alloc] init];
-author.name       = @"David Foster Wallace";
-author.birthdate  = [NSDate date];
+author.name    = @"David Foster Wallace";
 
 // Add to Realm with transaction
 [realm beginWriteTransaction];
@@ -127,16 +147,21 @@ The most basic method for retrieving objects from a Realm is [`[RLMObject allObj
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Query the default Realm
+let dogs = Dog.allObjects()
 
+// Query a specific Realm
+let petsRealm = RLMRealm.realmWithPath("pets.realm")
+let otherDogs = Dog.allObjectsInRealm(petsRealm)
 {% endhighlight%}
 
 {% highlight objective-c %}
 // On the default Realm:
 RLMArray *dogs = [Dog allObjects]; // retrieves all Dogs from the default Realm
 
-// On a specific Realm:
+// On a specific Realm
 RLMRealm *petsRealm = [RLMRealm realmWithPath:@"pets.realm"]; // get a specific Realm
-RLMArray *pets = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
+RLMArray *otherDogs = [Dog allObjectsInRealm:petsRealm]; // retrieve all Dogs from that Realm
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -151,14 +176,19 @@ For example, the following would extend our earlier example by calling `[RLMObje
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Query using a predicate string:
+let tanDogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'")
 
+// Query using an NSPredicate object:
+let predicate = NSPredicate(format: "color = %@ AND name BEGINSWITH %@", "tan", "B")
+let tanDogs2 = Dog.objectsWithPredicate(predicate)
 {% endhighlight%}
 
 {% highlight objective-c %}
-// Using a predicate string:
-RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]; 
+// Using a predicate string
+RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"];
 
-// … Or using an NSPredicate object:
+// … Or using an NSPredicate object
 NSPredicate *pred = [NSPredicate predicateWithFormat:@"color = %@ AND name BEGINSWITH %@",
                                                      @"tan", @"B"];
 RLMArray *tanDogs2 = [Dog objectsWithPredicate:pred];
@@ -176,12 +206,13 @@ For example, the following calls `[RLMObject objectsWhere:where:]` to sort the r
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// Using a string (sort is ascending by default)
+var sortedDogs = Dog.objectsWhere("color = 'tan' AND name BEGINSWITH 'B'").arraySortedByProperty("name", ascending: true)
 {% endhighlight%}
 
 {% highlight objective-c %}
 // Using a string (sort is ascending by default)
-RLMArray *dogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
+RLMArray *sortedDogs = [[Dog objectsWhere:@"color = 'tan' AND name BEGINSWITH 'B'"]
                     arraySortedByProperty:@"name" ascending:YES];
 {% endhighlight %}
 
@@ -199,12 +230,13 @@ For example, if we wanted a result set for just the tan colored dogs, and the ta
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+let tanDogs = Dog.objectsWhere("color = 'tan'")
+let tanDogsWithBNames = tanDogs.objectsWhere("name BEGINSWITH 'B'")
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMArray *tanDogs4 = [Dog objectsWhere:@"color = 'tan'"];
-RLMArray *tanDogsWithBNames = [tanDogs4 objectsWhere:@"name BEGINSWITH 'B'"];
+RLMArray *tanDogs = [Dog objectsWhere:@"color = 'tan'"];
+RLMArray *tanDogsWithBNames = [tanDogs objectsWhere:@"name BEGINSWITH 'B'"];
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -223,7 +255,9 @@ The Default Realm is persisted to disk by default, but you can also use it purel
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// You must call this method before accessing the default Realm
+RLMRealm.useInMemoryDefaultRealm()
+let realm = RLMRealm.defaultRealm()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -254,7 +288,9 @@ Any two RLMObjects can be linked together. Assuming your Person model has alread
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Dog: RLMObject {
+    var name = ""
+}
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -262,10 +298,6 @@ Any two RLMObjects can be linked together. Assuming your Person model has alread
 @interface Dog : RLMObject
 @property NSString *name;
 @end
-
-// Dog.m
-@implementation Dog
-@end //none needed
 {% endhighlight %}
 
 </div><!--/highlight-wrapper -->
@@ -278,7 +310,10 @@ Simply declare a property with the type of one of your RLMObject subclasses:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Dog: RLMObject {
+    ... // other property declarations
+    var owner = Person()	
+}
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -297,7 +332,9 @@ This will create a property with name owner and type Person. You can assign and 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+let jim = Person()
+let rex = Dog()
+rex.owner = jim
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -320,7 +357,7 @@ To add a “dogs” property on our Person model, that links to multiple dogs, w
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+// Not needed in Swift
 {% endhighlight%}
 
 {% highlight objective-c %} 
@@ -340,7 +377,10 @@ You can then declare properties of the `RLMArray<Dog>` type:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person: RLMObject {
+    ... // other property declarations
+    var dogs = RLMArray(objectClassName: Dog.className())
+}
 {% endhighlight%}
 
 {% highlight objective-c %}  
@@ -359,13 +399,15 @@ You can access & assign RLMArray properties as usual:
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+let someDogs = Dog.objectsWhere("name contains 'Fido'")
+jim.dogs.addObjectsFromArray(someDogs)
+jim.dogs.addObject(rex)
 {% endhighlight%}
 
 {% highlight objective-c %}  
 // Jim is owner of Rex and all dogs named "Fido"
-RLMArray *some_dogs = [Dog objectsWhere:@"name contains 'Fido'"];
-[jim.dogs addObjectsFromArray:some_dogs];
+RLMArray *someDogs = [Dog objectsWhere:@"name contains 'Fido'"];
+[jim.dogs addObjectsFromArray:someDogs];
 [jim.dogs addObject:rex];
 {% endhighlight %}
 
@@ -383,7 +425,9 @@ The auto-updating Realm will send out notifications every time the underlying Re
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+let token = realm.addNotificationBlock { note, realm in
+    viewController.updateUI()
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -408,7 +452,26 @@ Realm can be very efficient when writing large amounts of data by batching toget
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+dispatch_async(queue) {
+    // Get realm and table instances for this thread
+    let realm = RLMRealm.defaultRealm()
 
+    // Break up the writing blocks into smaller portions
+    // by starting a new transaction
+    for idx1 in 0..<1000 {
+		realm.beginWriteTransaction()
+
+		// Add row via dictionary. Order is ignored.
+		for idx2 in 0..<1000 {
+	    	Person.createInDefaultRealmWithObject(
+				["name": "\(idx1)", "birthdate": NSDate(timeIntervalSince1970: idx2)])
+		}
+
+		// Commit the write transaction
+		// to make this data available to other threads
+		realm.commitWriteTransaction()
+    }
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -468,17 +531,24 @@ First we create an instance of the default Realm to persist the data to, and fet
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// Call the API
+let url = NSURL(string: "https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50")
+let response = NSData(contentsOfURL: url)
 
+// De-serialize the response to JSON
+let json = NSJSONSerialization.JSONObjectWithData(response,
+    options: NSJSONReadingOptions(0),
+    error: nil)["response"]
 {% endhighlight%}
 
 {% highlight objective-c %}
-RLMRealm * realm = [RLMRealm defaultRealm];
+RLMRealm *realm = [RLMRealm defaultRealm];
 
 // Call the API
 NSData *response = [ [NSData alloc] initWithContentsOfURL:
                      [NSURL URLWithString:@"https://api.foursquare.com/v2/venues/search?near=San%20Francisco&limit=50"]];
 
-// Serialize the response in JSON
+// Deserialize the response to JSON
 NSDictionary *json = [[ NSJSONSerialization
                         JSONObjectWithData:response
                         options:kNilOptions
@@ -489,7 +559,7 @@ NSDictionary *json = [[ NSJSONSerialization
 
 The response contains a JSON array of venues similar to this:
 
-{% highlight objective-c %}
+{% highlight json %}
 {
   "venues": [
     {
@@ -508,7 +578,7 @@ The response contains a JSON array of venues similar to this:
       }
     }
   ]
-}    
+}
 {% endhighlight %}
 
 There are several ways we may want to import this JSON into our Realm. You could read the NSDictionary and map the properties to a single RLMObject manually via a custom insert function. For the sake of this example, we will instead directly insert the NSDictionary in the Realm and have it automatically be mapped to a hierarchy of RLMObjects that will be created on the fly for us. For this to work, we need an RLMObject structure whose properties will match all the keys in the JSON exactly. JSON keys not matched by an RLMObject property will be ignored on insert. The following RLMObject declarations would work:
@@ -516,7 +586,25 @@ There are several ways we may want to import this JSON into our Realm. You could
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+class Contact: RLMObject {
+    var phone = ""
+}
 
+class Location: RLMObject {
+    var lat = 0.0  // latitude
+    var lng = 0.0  // longitude
+    var postalCode = ""
+    var cc = ""
+    var state = ""
+    var country = ""
+}
+
+class Venue: RLMObject {
+    var id = ""
+    var name = ""
+    var contact = Contact()
+    var location = Location()
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -554,7 +642,15 @@ Since the result set is given to us as an array we can simply add it straight to
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+//Extract the array of venues from the response
+let venues = json["venues"] as [NSDictionary]
 
+realm.beginWriteTransaction()
+// Save one Venue object (& dependents) for each element of the array
+for venue in venues {
+    Venue.createInDefaultRealmWithObject(venue)
+}
+realm.commitWriteTransaction()
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -578,7 +674,11 @@ When working with any database, it is likely your data model will change over ti
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person: RLMObject {
+    var firstName = ""
+    var firstName = ""
+    var age = 0
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -595,7 +695,10 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
-
+class Person: RLMObject {
+    var fullName = ""
+    var age = 0
+}
 {% endhighlight%}
 
 {% highlight objective-c %}
@@ -606,7 +709,7 @@ Next, we want to update the data model to require a 'fullName' property, rather 
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
-Just changing your code to the new definition will work fine, if you have no data stored on disk under the old schema. But if you do, there will be a mismatch between what Realm sees defined in code, and the data Realm sees on disk. In short if you change your schema definition in one of your models and then instantiate a realm with [`[RLMRealm defaultRealm]`](api/Classes/RLMRealm.html#//api/name/defaultRealm) (or a similar realm instantiation call), that call will throw an NSException with a message that you should do a migration.
+Just changing your code to the new definition will work fine, if you have no data stored on disk under the old schema. But if you do, there will be a mismatch between what Realm sees defined in code, and the data Realm sees on disk. In short if you change your schema definition in one of your models and then instantiate a realm with [`[RLMRealm defaultRealm]`](api/Classes/RLMRealm.html#//api/name/defaultRealm) (or a similar realm instantiation call), that call will throw an NSException with a message that you should run a migration.
 
 Realms that contain at least one class that has been redefined must be migrated to the current schema before they can be accessed. To make this process easy, Realm provides specialized classes and methods for handling schema migration.
 
@@ -691,23 +794,48 @@ Suppose now we change the data model for the 'Person' subclass yet again, for a 
 <div class="highlight-wrapper">
 
 {% highlight swift %}
+// v0
+class Person: RLMObject {
+    var firstName = ""
+    var firstName = ""
+    var age = 0
+}
+
+// v1
+class Person: RLMObject {
+    var fullName = "" // new property
+    var age = 0
+}
+
+// v2
+class Person: RLMObject {
+    var fullName = ""
+    var email = "" // new property
+    var age = 0
+}
 
 {% endhighlight%}
 
 {% highlight objective-c %}
 // v0
+@interface Person : RLMObject
 @property NSString *firstName;
 @property NSString *lastName;
 @property int age;
+@end
 
 // v1
+@interface Person : RLMObject
 @property NSString *fullName; // new property
 @property int age;
+@end
 
 // v2
+@interface Person : RLMObject
 @property NSString *fullName;
 @property NSString *email;   // new property
 @property int age;
+@end
 {% endhighlight %}
 </div><!--/highlight-wrapper -->
 
