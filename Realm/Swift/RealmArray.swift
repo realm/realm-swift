@@ -124,7 +124,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         rlmArray.addObjectsFromArray(objects)
     }
 
-    func insertObject(object: RLMObject, atIndex index: UInt) {
+    func insertObject(object: RealmObject, atIndex index: UInt) {
         rlmArray.insertObject(object, atIndex: Int(index))
     }
 
@@ -140,7 +140,7 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         rlmArray.removeAllObjects()
     }
 
-    func replaceObjectAtIndex(index: UInt, withObject object: RLMObject) {
+    func replaceObjectAtIndex(index: UInt, withObject object: RealmObject) {
         rlmArray.replaceObjectAtIndex(Int(index), withObject: object)
     }
 }
