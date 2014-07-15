@@ -24,7 +24,3 @@ RealmRestExample
 Using data from FourSquare, the example shows how you can populate
 a Realm with external json data.
 
-
-RealmJSONImportExample
-----------------------
-This is an OSX application that show how simple it is to import JSON data in Realm.
