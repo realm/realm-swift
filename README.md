@@ -51,6 +51,13 @@ Run `sh build.sh help` to see all the actions you can perform (build ios/osx, ge
 
 Executing the examples under the /examples folder, requires that you have built the Realm.framework.
 
+## Contributing
+
+We would love your contributions to Realm!
+For legal reasons we do need to make a CLA, which we are in the process of defining.
+Until that's published here, your are welcome to make a Pull Request,
+but we will have to copy your contribution into a new PR with your permission and close the original PR. 
+
 ## License
 
 Realm Cocoa is published under the Apache 2.0 license.
