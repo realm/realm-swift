@@ -12,6 +12,12 @@
 #          to be run with zsh.
 set -o pipefail
 
+# You can override the version of the core library
+# Otherwise, use the default value
+if [ -z "$REALM_CORE_VERSION" ]; then
+    REALM_CORE_VERSION=0.80.1
+fi
+
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
 
 if ! [ -z "${JENKINS_HOME}" ]; then
@@ -125,12 +131,6 @@ fi
 # Xcode sets this variable - set to current directory if running standalone
 if [ -z "$SRCROOT" ]; then
     SRCROOT="$(pwd)"
-fi
-
-# You can override the version of the core library
-# Otherwise, use the default value
-if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.0
 fi
 
 download_core() {
