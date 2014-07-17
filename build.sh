@@ -368,29 +368,26 @@ case "$COMMAND" in
         s3cmd put -r docs/output/$VERSION s3://static.realm.io/docs/ios/ || exit 1
         
         # Zip & upload release
-        mkdir -p release/browser release/ios release/osx release/docs release/examples/objc || exit 1
-        cp -R "build/DerivedData/Realm Browser/Build/Products/Release/Realm Browser.app" "release/browser/Realm Browser.app" || exit 1
-        cp -R build/Release/Realm.framework release/ios/Realm.framework || exit 1
-        cp -R build/DerivedData/Realm/Build/Products/Release/Realm.framework release/osx/Realm.framework || exit 1
-        cp -R docs/output/$VERSION release/docs || exit 1
-        cp -R examples/objc/RealmMigrationExample release/examples/objc/RealmMigrationExample || exit 1
-        cp -R examples/objc/RealmRestExample release/examples/objc/RealmRestExample || exit 1
-        cp -R examples/objc/RealmSimpleExample release/examples/objc/RealmSimpleExample || exit 1
-        cp -R examples/objc/RealmTableViewExample release/examples/objc/RealmTableViewExample || exit 1
+        RELEASE_DIR=$(mktemp -dt "$0")
+        mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/docs $RELEASE_DIR/examples/objc || exit 1
+        cp -R "build/DerivedData/Realm Browser/Build/Products/$RELEASE_DIR/Realm Browser.app" "$RELEASE_DIR/browser/Realm Browser.app" || exit 1
+        cp -R build/$RELEASE_DIR/Realm.framework $RELEASE_DIR/ios/Realm.framework || exit 1
+        cp -R build/DerivedData/Realm/Build/Products/$RELEASE_DIR/Realm.framework $RELEASE_DIR/osx/Realm.framework || exit 1
+        cp -R docs/output/$VERSION $RELEASE_DIR/docs || exit 1
+        cp -R examples/objc/RealmMigrationExample $RELEASE_DIR/examples/objc/RealmMigrationExample || exit 1
+        cp -R examples/objc/RealmRestExample $RELEASE_DIR/examples/objc/RealmRestExample || exit 1
+        cp -R examples/objc/RealmSimpleExample $RELEASE_DIR/examples/objc/RealmSimpleExample || exit 1
+        cp -R examples/objc/RealmTableViewExample $RELEASE_DIR/examples/objc/RealmTableViewExample || exit 1
 
-        # TODO: Move examples to release/examples
-        # TODO: Update framework path in all project in release/examples
+        # TODO: Update framework path in all projects in $RELEASE_DIR/examples
 
         ZIPNAME=realm-cocoa-$(sh build.sh get-version).zip
-        (cd release && zip -r $ZIPNAME ios osx browser docs || exit 1)
-        s3cmd put release/$ZIPNAME s3://static.realm.io/downloads/cocoa/ || exit 1
+        (cd $RELEASE_DIR && zip -r $ZIPNAME ios osx browser docs || exit 1)
+        s3cmd put $RELEASE_DIR/$ZIPNAME s3://static.realm.io/downloads/cocoa/ || exit 1
 
         # Update "latest" redirect on static.realm.io
-        touch latest || exit 1
-        s3cmd put latest --add-header "x-amz-website-redirect-location:http://static.realm.io/downloads/cocoa/$ZIPNAME" s3://static.realm.io/downloads/cocoa/ || exit 1
-
-        # Clean up
-        sh build.sh clean "$XCMODE" || exit 1
+        touch $RELEASE_DIR/latest || exit 1
+        s3cmd put $RELEASE_DIR/latest --add-header "x-amz-website-redirect-location:http://static.realm.io/downloads/cocoa/$ZIPNAME" s3://static.realm.io/downloads/cocoa/ || exit 1
 
         # Submit to CocoaPods
         sh build.sh pod-deploy || exit 1
