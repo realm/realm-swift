@@ -53,10 +53,7 @@ Executing the examples under the /examples folder, requires that you have built 
 
 ## Contributing
 
-We would love your contributions to Realm!
-For legal reasons we do need to make a CLA, which we are in the process of defining.
-Until that's published here, your are welcome to make a Pull Request,
-but we will have to copy your contribution into a new PR with your permission and close the original PR. 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
 
 ## License
 
