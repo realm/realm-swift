@@ -155,10 +155,6 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme OSX -configuration Debug clean" || exit 1
-        xcrealm "-scheme OSX -configuration Release clean" || exit 1
         git clean -xdf -e core
         exit 0
         ;;
@@ -289,6 +285,7 @@ case "$COMMAND" in
             xcodebuild -project tools/VisualEditor/Realm\ Browser.xcodeproj -scheme RealmVisualEditor -IDECustomDerivedDataLocation=../../build/DerivedData -configuration Release clean build $CODESIGN_PARAMS | xcpretty
         else
             echo "Realm Browser can only be built with Xcode 5."
+            exit 1
         fi
         exit 0
         ;;
@@ -396,7 +393,7 @@ case "$COMMAND" in
         sh build.sh clean "$XCMODE" || exit 1
 
         # Submit to CocoaPods
-        sh build.sh pod-release || exit 1
+        sh build.sh pod-deploy || exit 1
 
         echo "Realm Cocoa $VERSION was successfully released"
         exit 0
