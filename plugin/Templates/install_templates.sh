@@ -1,5 +1,5 @@
 #!/bin/sh
-PATH=/bin:/usr/bin
+PATH=/bin:/usr/bin:/usr/libexec
 
 # User File Templates
 
@@ -33,11 +33,10 @@ do
     echo "Installing '$class' class template in '$classTemplatesDir'"
 
     INFO_PLIST_PATH="$classTemplatesDir/TemplateInfo.plist"
-    PLIST_BUDDY=/usr/libexec/PlistBuddy
-    $PLIST_BUDDY -c "Print :Options:1:Values:" "$INFO_PLIST_PATH" | grep $class >/dev/null
+    PlistBuddy -c "Print :Options:1:Values:" "$INFO_PLIST_PATH" | grep $class >/dev/null
     rc=$?
     if [[ $rc != 0 ]] ; then
-      $PLIST_BUDDY -c "Add :Options:1:Values: string '$class'" "$INFO_PLIST_PATH"
+      PlistBuddy -c "Add :Options:1:Values: string '$class'" "$INFO_PLIST_PATH"
     fi
   done
 done
