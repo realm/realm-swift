@@ -17,19 +17,23 @@ XCODE_DIR=$(xcode-select -p)
 IOS_CLASS_TEMPLATES_DIR="$XCODE_DIR/Platforms/iPhoneOS.platform/Developer/Library/Xcode/Templates/File Templates/Cocoa Touch/Objective-C class.xctemplate"
 OSX_CLASS_TEMPLATES_DIR="$XCODE_DIR/Library/Xcode/Templates/File Templates/Cocoa/Objective-C class.xctemplate"
 
-for dir in "class_templates/*/"
+LOCAL_CLASS_TEMPLATES_DIR="class_templates/*/"
+
+for dir in ${LOCAL_CLASS_TEMPLATES_DIR%*/}
 do
   for classTemplatesDir in "$IOS_CLASS_TEMPLATES_DIR" "$OSX_CLASS_TEMPLATES_DIR"
   do
     mkdir -p "$classTemplatesDir"
-    cp -R ${dir%*/} "$classTemplatesDir"
+    cp -R "$dir" "$classTemplatesDir"
 
-    PLIST_BUDDY=/usr/libexec/PlistBuddy
     class=$(basename $dir)
+    class=${class/Swift/}
+    class=${class/Objective-C/}
 
     echo "Installing '$class' class template in '$classTemplatesDir'"
 
     INFO_PLIST_PATH="$classTemplatesDir/TemplateInfo.plist"
+    PLIST_BUDDY=/usr/libexec/PlistBuddy
     $PLIST_BUDDY -c "Print :Options:1:Values:" "$INFO_PLIST_PATH" | grep $class >/dev/null
     rc=$?
     if [[ $rc != 0 ]] ; then
