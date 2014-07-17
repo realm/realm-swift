@@ -217,6 +217,15 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (void)deleteObjects:(id)array;
 
+/**
+ Get all objects of a given type in this Realm.
+
+ @param objectClassName  NSString name of the RLMObject subclass to retrieve on e.g. MyClass.className.
+ 
+ @return An RLMArray of all objects in this realm of the given type.
+ */
+- (RLMArray *)allObjects:(NSString *)objectClassName
+
 #pragma mark - Migrations
 
 /**
