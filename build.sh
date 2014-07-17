@@ -369,11 +369,10 @@ case "$COMMAND" in
         
         # Zip & upload release
         RELEASE_DIR=$(mktemp -dt "$0")
-        mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/docs $RELEASE_DIR/examples/objc || exit 1
+        mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/examples/objc || exit 1
         cp -R "build/DerivedData/Realm Browser/Build/Products/$RELEASE_DIR/Realm Browser.app" "$RELEASE_DIR/browser/Realm Browser.app" || exit 1
         cp -R build/$RELEASE_DIR/Realm.framework $RELEASE_DIR/ios/Realm.framework || exit 1
         cp -R build/DerivedData/Realm/Build/Products/$RELEASE_DIR/Realm.framework $RELEASE_DIR/osx/Realm.framework || exit 1
-        cp -R docs/output/$VERSION $RELEASE_DIR/docs || exit 1
         cp -R examples/objc/RealmMigrationExample $RELEASE_DIR/examples/objc/RealmMigrationExample || exit 1
         cp -R examples/objc/RealmRestExample $RELEASE_DIR/examples/objc/RealmRestExample || exit 1
         cp -R examples/objc/RealmSimpleExample $RELEASE_DIR/examples/objc/RealmSimpleExample || exit 1
