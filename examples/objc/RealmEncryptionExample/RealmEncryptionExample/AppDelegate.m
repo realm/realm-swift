@@ -19,7 +19,7 @@
 #import "AppDelegate.h"
 #import <Realm/Realm.h>
 
-// Define your models
+// Model definition
 @interface StringObject : RLMObject
 @property NSString *stringProp;
 @end
@@ -38,7 +38,7 @@
     [self.window setRootViewController:rootVC];
 
     // Realms are used to group data together
-    RLMRealm *realm = [RLMRealm defaultRealm]; // Create realm at default path
+    RLMRealm *realm = [RLMRealm defaultRealm]; // Create realm pointing to default file
 
     // Encrypt realm file
     NSError *error = nil;
@@ -57,8 +57,9 @@
     [realm addObject:obj];
     [realm commitWriteTransaction];
 
-    // Read an object from the realm
-    NSLog(@"all strings: %@", [StringObject allObjects]);
+    // Read all string objects from the encrypted realm
+    NSLog(@"all string objects: %@", [StringObject allObjects]);
+    
     return YES;
 }
 
