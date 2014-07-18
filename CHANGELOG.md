@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixed Unicode support (Chinese, Russian, etc.). Closing #612 and #604.
+
+
 0.80.0 Release notes (2014-07-15)
 =============================================================
 

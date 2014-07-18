@@ -102,7 +102,8 @@ inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"String size overflow" userInfo:nil];
         
     }
-    return tightdb::StringData(string.UTF8String, string.length);
+    return tightdb::StringData(string.UTF8String,
+                               [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
 // Binary convertion utilities

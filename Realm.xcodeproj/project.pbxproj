@@ -130,6 +130,7 @@
 		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
 		5BDDB6ED195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
 		5BDDB6EE195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
+		5BF3465E19793BDB00D9BFD4 /* UtilTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3465B1979330B00D9BFD4 /* UtilTests.m */; };
 		84449B3119508AD2000F077D /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84449B3019508AD2000F077D /* SchemaTests.mm */; };
 		84449B3219508AD2000F077D /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84449B3019508AD2000F077D /* SchemaTests.mm */; };
 		E82827D81947780D0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
@@ -230,6 +231,7 @@
 		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
 		5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
 		5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
+		5BF3465B1979330B00D9BFD4 /* UtilTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UtilTests.m; sourceTree = "<group>"; };
 		84449B3019508AD2000F077D /* SchemaTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SchemaTests.mm; sourceTree = "<group>"; };
 		E82827D91947782C0090B385 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E870366619502D2900D0EB8A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -343,6 +345,7 @@
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				84449B3019508AD2000F077D /* SchemaTests.mm */,
 				4D8D90AF192B7FC4004C89AA /* TransactionTests.m */,
+				5BF3465B1979330B00D9BFD4 /* UtilTests.m */,
 				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
 				02C4148F191DE68900F858D9 /* RLMTestCase.m */,
 				02E4D6EE192E583A0082808D /* RLMTestObjects.h */,
@@ -754,6 +757,7 @@
 				4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */,
 				02DCBE8E195A22C000F1CBE6 /* MigrationTests.mm in Sources */,
 				02026CAC19363B5300E4EEF8 /* ArrayTests.m in Sources */,
+				5BF3465E19793BDB00D9BFD4 /* UtilTests.m in Sources */,
 				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
 				02026CAF193662AF00E4EEF8 /* LinkTests.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
