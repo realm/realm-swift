@@ -377,6 +377,14 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
+- (void)doWriteTransaction:(void (^)(void))transactionBlock {
+    NSParameterAssert(transactionBlock);
+    
+    [self beginWriteTransaction];
+    transactionBlock();
+    [self commitWriteTransaction];
+}
+
 - (void)beginWriteTransaction {
     if (!self.inWriteTransaction) {
         try {

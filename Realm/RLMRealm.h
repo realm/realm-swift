@@ -158,6 +158,12 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (void)commitWriteTransaction;
 
+
+/**
+ Convenient method to call a block inside a transaction
+ */
+- (void)doWriteTransaction:(void (^)(void))transactionBlock;
+
 /**
  Update an RLMRealm and outstanding objects to point to the most recent data for this RLMRealm.
  */
