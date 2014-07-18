@@ -2,7 +2,7 @@
 
 @interface StringObject : RLMObject
 
-@property NSString *stringCol;
+@property NSString *stringProp;
 
 @end
 
@@ -10,19 +10,19 @@ RLM_ARRAY_TYPE(StringObject);
 
 @interface RubyMotionRealmObject : RLMObject
 
-@property BOOL          boolCol;
-@property int           intCol;
-@property float         floatCol;
-@property double        doubleCol;
-@property NSString     *stringCol;
-@property NSData       *binaryCol;
-@property NSDate       *dateCol;
-@property bool          cBoolCol;
-@property long          longCol;
-@property id            mixedCol;
-@property StringObject *objectCol;
+@property BOOL          boolProp;
+@property int           intProp;
+@property float         floatProp;
+@property double        doubleProp;
+@property NSString     *stringProp;
+@property NSData       *binaryProp;
+@property NSDate       *dateProp;
+@property bool          cBoolProp;
+@property long          longProp;
+@property id            mixedProp;
+@property StringObject *objectProp;
 
 // FIXME: Support array properties in RubyMotion
-// @property RLMArray<StringObject> *arrayCol;
+// @property RLMArray<StringObject> *arrayProp;
 
 @end
