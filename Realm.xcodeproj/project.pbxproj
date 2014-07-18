@@ -131,6 +131,7 @@
 		5BDDB6ED195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
 		5BDDB6EE195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
 		5BF3465E19793BDB00D9BFD4 /* UtilTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3465B1979330B00D9BFD4 /* UtilTests.m */; };
+		5BF3465F1979447000D9BFD4 /* UtilTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3465B1979330B00D9BFD4 /* UtilTests.m */; };
 		84449B3119508AD2000F077D /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84449B3019508AD2000F077D /* SchemaTests.mm */; };
 		84449B3219508AD2000F077D /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84449B3019508AD2000F077D /* SchemaTests.mm */; };
 		E82827D81947780D0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
@@ -712,6 +713,7 @@
 				4DE0B18D1948830D0092154B /* EnumeratorTests.m in Sources */,
 				02DCBE8D195A22C000F1CBE6 /* MigrationTests.mm in Sources */,
 				02026CAB19363B5300E4EEF8 /* ArrayTests.m in Sources */,
+				5BF3465F1979447000D9BFD4 /* UtilTests.m in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
 				02026CAE193662AF00E4EEF8 /* LinkTests.m in Sources */,
 				02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */,
