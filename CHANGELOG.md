@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fixed Unicode support (Chinese, Russian, etc.). Closing #612 and #604.
-
+* Fixed keyed subscripting for standalone RLMObjects.
 
 0.80.0 Release notes (2014-07-15)
 =============================================================
