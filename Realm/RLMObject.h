@@ -296,7 +296,7 @@
 //
 // Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
 // with an RLMArray property by defining a protocol for the object type which the RLMArray will
-// hold. To define an protocol for an object you can use the macro RLM_OBJECT_PROTOCOL:
+// hold. To define an protocol for an object you can use the macro RLM_ARRAY_TYPE:
 //
 // ie. RLM_ARRAY_TYPE(ObjectType)
 //

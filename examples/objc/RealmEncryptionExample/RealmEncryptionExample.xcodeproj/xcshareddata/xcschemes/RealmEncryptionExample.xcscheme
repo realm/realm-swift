@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DE0B126194747F70092154B"
-               BuildableName = "RealmSimpleExample.app"
-               BlueprintName = "RealmSimpleExample"
-               ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+               BuildableName = "RealmEncryptionExample.app"
+               BlueprintName = "RealmEncryptionExample"
+               ReferencedContainer = "container:RealmEncryptionExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DE0B126194747F70092154B"
-            BuildableName = "RealmSimpleExample.app"
-            BlueprintName = "RealmSimpleExample"
-            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+            BuildableName = "RealmEncryptionExample.app"
+            BlueprintName = "RealmEncryptionExample"
+            ReferencedContainer = "container:RealmEncryptionExample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -52,9 +52,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DE0B126194747F70092154B"
-            BuildableName = "RealmSimpleExample.app"
-            BlueprintName = "RealmSimpleExample"
-            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+            BuildableName = "RealmEncryptionExample.app"
+            BlueprintName = "RealmEncryptionExample"
+            ReferencedContainer = "container:RealmEncryptionExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DE0B126194747F70092154B"
-            BuildableName = "RealmSimpleExample.app"
-            BlueprintName = "RealmSimpleExample"
-            ReferencedContainer = "container:RealmSimpleExample.xcodeproj">
+            BuildableName = "RealmEncryptionExample.app"
+            BlueprintName = "RealmEncryptionExample"
+            ReferencedContainer = "container:RealmEncryptionExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
