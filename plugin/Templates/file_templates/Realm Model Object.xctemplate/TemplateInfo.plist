@@ -35,6 +35,7 @@
 	<key>Platforms</key>
 	<array>
 		<string>com.apple.platform.iphoneos</string>
+		<string>com.apple.platform.macosx</string>
 	</array>
 	<key>Summary</key>
 	<string>A Realm model object</string>
