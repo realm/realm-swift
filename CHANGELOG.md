@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* Fixed Unicode support (Chinese, Russian, etc.). Closing #612 and #604.
+* Improved Unicode support in property names and string contents (Chinese, Russian, etc.). Closing #612 and #604.
 * Potential bugs fixed related to migration when properties are removed.
 * Fixed keyed subscripting for standalone RLMObjects.
 

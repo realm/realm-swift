@@ -92,3 +92,7 @@ class SwiftDynamicObject: RLMObject {
     var stringCol = "a"
     var intCol = 0
 }
+
+class SwiftUTF8Object: RLMObject {
+    var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+}
