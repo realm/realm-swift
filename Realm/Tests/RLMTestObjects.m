@@ -44,6 +44,9 @@
 @implementation BinaryObject
 @end
 
+@implementation UTF8Object
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject

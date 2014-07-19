@@ -66,6 +66,10 @@
 
 @end
 
+@interface UTF8Object : RLMObject
+@property NSString *柱колоéнǢкƱаم;
+@end
+
 RLM_ARRAY_TYPE(StringObject)
 RLM_ARRAY_TYPE(IntObject)
 

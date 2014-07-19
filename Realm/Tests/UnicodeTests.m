@@ -23,13 +23,6 @@ static const NSString *kUTF8TestString = @"值значен™👍☞⎠‱௹♣
 @interface UnicodeTests : RLMTestCase
 @end
 
-@interface UTF8Object : RLMObject
-@property NSString *柱колоéнǢкƱаم;
-@end
-
-@implementation UTF8Object
-@end
-
 @implementation UnicodeTests
 
 - (void)testUTF8StringContents
@@ -41,7 +34,7 @@ static const NSString *kUTF8TestString = @"值значен™👍☞⎠‱௹♣
     [realm commitWriteTransaction];
 
     StringObject *obj1 = [[StringObject allObjectsInRealm:realm] firstObject];
-    XCTAssertEqualObjects(obj1.stringCol, kUTF8TestString);
+    XCTAssertEqualObjects(obj1.stringCol, kUTF8TestString, @"Storing and retrieving a string with UTF8 content should work");
 
     StringObject *obj2 = [[StringObject objectsInRealm:realm where:@"stringCol == %@", kUTF8TestString] firstObject];
     XCTAssertEqualObjects(obj1, obj2, @"Querying a realm searching for a string with UTF8 content should work");
@@ -56,7 +49,7 @@ static const NSString *kUTF8TestString = @"值значен™👍☞⎠‱௹♣
     [realm commitWriteTransaction];
 
     UTF8Object *obj1 = [[UTF8Object allObjectsInRealm:realm] firstObject];
-    XCTAssertEqualObjects(obj1.柱колоéнǢкƱаم, kUTF8TestString);
+    XCTAssertEqualObjects(obj1.柱колоéнǢкƱаم, kUTF8TestString, @"Storing and retrieving a string with UTF8 content should work");
 
     // Test fails because of rdar://17735684
     // NSPredicate does not support UTF8 keypaths
