@@ -15,7 +15,7 @@ set -o pipefail
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.1
+    REALM_CORE_VERSION=0.80.2
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
