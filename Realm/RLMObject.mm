@@ -135,7 +135,12 @@
 #pragma GCC diagnostic pop
 
 -(id)objectForKeyedSubscript:(NSString *)key {
-    return RLMDynamicGet(self, key);
+    if (_realm) {
+        return RLMDynamicGet(self, key);
+    }
+    else {
+        return [self valueForKey:key];
+    }
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {

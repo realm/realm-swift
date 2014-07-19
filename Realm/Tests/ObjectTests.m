@@ -216,7 +216,7 @@
 - (void)testObjectSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
     IntObject *obj0 = [IntObject createInRealm:realm withObject:@[@10]];
     IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@20]];
@@ -234,6 +234,12 @@
 
 - (void)testKeyedSubscripting
 {
+    // standalone
+    EmployeeObject *objs = [[EmployeeObject alloc] initWithObject:@{@"name" : @"Test0", @"age" : @23, @"hired": @NO}];
+    XCTAssertEqualObjects(objs[@"name"], @"Test0",  @"Name should be Test0");
+    XCTAssertEqualObjects(objs[@"age"], @23,  @"age should be 23");
+    XCTAssertEqualObjects(objs[@"hired"], @NO,  @"hired should be NO");
+
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     EmployeeObject *obj0 = [EmployeeObject createInRealm:realm withObject:@{@"name" : @"Test1", @"age" : @24, @"hired": @NO}];
