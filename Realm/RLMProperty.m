@@ -33,14 +33,12 @@
 
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
-                      column:(NSUInteger)column
              objectClassName:(NSString *)objectClassName
                   attributes:(RLMPropertyAttributes)attributes {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
-        _column = column;
         _objectClassName = objectClassName;
         _attributes = attributes;
         [self updateAccessorNames];

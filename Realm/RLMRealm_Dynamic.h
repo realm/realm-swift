@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
+#import "RLMObjectSchema.h"
 
 @interface RLMRealm (Dynamic)
 
@@ -70,4 +71,17 @@
  */
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
+@end
+
+@interface RLMObjectSchema (Dynamic)
+/**
+ Initialize an RLMObjectSchema with classname, objectClass, and an array of properties
+
+ @param objectClassName     The name of the class used to refer to objects of this type.
+ @param objectClass         The objective-c class used when creating instances of this type.
+ @param properties          An array RLMProperty describing the persisted properties for this type.
+
+ @return    An initialized instance of RLMObjectSchema.
+ */
+- (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
 @end
