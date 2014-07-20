@@ -24,11 +24,6 @@
 // object property definition
 @interface RLMProperty : NSObject
 
-- (instancetype)initWithName:(NSString *)name
-                        type:(RLMPropertyType)type
-             objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
-
 /**
  Property name.
  */
