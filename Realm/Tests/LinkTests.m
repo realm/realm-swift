@@ -236,6 +236,22 @@
     XCTAssertThrows([realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
 }
 
+- (void)testLinkTooManyRelationships
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    OwnerObject *owner = [[OwnerObject alloc] init];
+    owner.name = @"Tim";
+    owner.dog = [[DogObject alloc] init];
+    owner.dog.dogName = @"Harvie";
+
+    [realm beginWriteTransaction];
+    [realm addObject:owner];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows([realm objects:[OwnerObject className] where:@"dog.dogName.first = 'Fifo'"], @"3 levels of relationship");
+
+}
 - (void)testLinkQueryMany
 {
     RLMRealm *realm = [self realmWithTestPath];
