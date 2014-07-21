@@ -16,6 +16,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+/*
+ Store archived objects in a data column with a sentinal sequence of bytes and
+ inside a top level NSDictionary that keeps track of the stored object class.
+ This allows for native columns with data in the table to have the correct
+ object class available for migrations etc.
+ 
+ 
+ //TODO: RH: One possible, alternative aproach would be to have an internal
+ realm object that we could use to hold onto the metadata via a link table entry.
+ ie:
+ 
+ @interface _RLMNativeObjectWrapper
+ @property (nonatomic, copy) NSData *archivedObject;
+ @property (nonatomic, copy) NSString *className;
+ @property (nonatomic) BOOL archivedObjectIsNil;
+ @property (nonatomic, strong) id _inMemoryCachedObject; // realm ignored property
+ @end
+ 
+ We would need to be careful to make sure that we didn't leak the internal object
+ externally, and would also need to make sure that we handled NSArrays of native
+ objects correctly..
+ 
+ */
 
 #import <Foundation/Foundation.h>
 

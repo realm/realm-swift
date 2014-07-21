@@ -20,11 +20,6 @@
 #import <Foundation/Foundation.h>
 #import "RLMNativeObjectSupport.h"
 
-/*
- Store archived objects in a data column with a sentinal sequence of bytes and
- inside a top level NSDictionary.
- */
-
 static const uint8_t RLMNativeObjectSentinalBytes[] = {0x89, 0x52, 0x4E, 0x4F}; // ?RNO
 
 static NSString * const kRLMNativeObjectDataTypeKey         = @"type";
