@@ -13,3 +13,7 @@ The application also demonstrates how to import larger amounts of data in a back
 ## RealmSwiftSimpleExample
 
 This app covers several introductory concepts about Realm. With as few distractions as possible.
+
+## RealmEncryptionExample
+
+This simple app shows how to use an encrypted realm.

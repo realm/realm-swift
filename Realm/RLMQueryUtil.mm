@@ -209,7 +209,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
                                        @"NSDiacriticInsensitivePredicateOption not supported for string type");
     }
     
-    tightdb::StringData sd([(NSString *)value UTF8String]);
+    tightdb::StringData sd = RLMStringDataWithNSString(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             query.begins_with(index, sd, caseSensitive);

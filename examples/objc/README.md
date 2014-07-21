@@ -24,3 +24,7 @@ RealmRestExample
 Using data from FourSquare, the example shows how you can populate
 a Realm with external json data.
 
+
+RealmEncryptionExample
+----------------------
+This simple app shows how to use an encrypted realm.

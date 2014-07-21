@@ -20,23 +20,11 @@
 #import <Realm/Realm.h>
 
 // Define your models
-@interface Dog : RLMObject
-@property NSString *name;
-@property NSInteger age;
+@interface StringObject : RLMObject
+@property NSString *stringProp;
 @end
 
-@implementation Dog
-// No need for implementation
-@end
-
-RLM_ARRAY_TYPE(Dog)
-
-@interface Person : RLMObject
-@property NSString        *name;
-@property RLMArray<Dog>   *dogs;
-@end
-
-@implementation Person
+@implementation StringObject
 @end
 
 @implementation AppDelegate
@@ -48,58 +36,30 @@ RLM_ARRAY_TYPE(Dog)
     [self.window makeKeyAndVisible];
     UIViewController *rootVC = [[UIViewController alloc] init];
     [self.window setRootViewController:rootVC];
-    
-    [self deleteRealmFile];
-    
-    // Create a standalone object
-    Dog *mydog = [[Dog alloc] init];
-    
-    // Set & read properties
-    mydog.name = @"Rex";
-    mydog.age = 9;
-    NSLog(@"Name of dog: %@", mydog.name);
-    
+
     // Realms are used to group data together
-    RLMRealm *realm = [RLMRealm defaultRealm]; // Create realm pointing to default file
+    RLMRealm *realm = [RLMRealm defaultRealm]; // Create realm at default path
+
+    // Encrypt realm file
+    NSError *error = nil;
+    NSDictionary *fileAttributes = @{NSFileProtectionKey: NSFileProtectionComplete};
+    BOOL success = [[NSFileManager defaultManager] setAttributes:fileAttributes
+                                                    ofItemAtPath:realm.path error:&error];
+    if (!success) {
+        NSLog(@"encryption attribute was not successfully set on realm file");
+        NSLog(@"error: %@", error.localizedDescription);
+    }
     
-    // Save your object
+    // Save an object
     [realm beginWriteTransaction];
-    [realm addObject:mydog];
-    [realm commitWriteTransaction];
-    
-    // Query
-    RLMArray *results = [Dog objectsInRealm:realm where:@"name contains 'x'"];
-    
-    // Queries are chainable!
-    RLMArray *results2 = [results objectsWhere:@"age > 8"];
-    NSLog(@"Number of dogs: %li", (unsigned long)results2.count);
-    
-    // Link objects
-    Person *person = [[Person alloc] init];
-    person.name = @"Tim";
-    [person.dogs addObject:mydog];
-    
-    [realm beginWriteTransaction];
-    [realm addObject:person];
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringProp = @"abcd";
+    [realm addObject:obj];
     [realm commitWriteTransaction];
 
-    // Thread-safety
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,	0),	^{
-        RLMRealm *otherRealm = [RLMRealm defaultRealm];
-        RLMArray *otherResults = [Dog objectsInRealm:otherRealm where:@"name contains 'Rex'"];
-        NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
-    });
-    
+    // Read an object from the realm
+    NSLog(@"all strings: %@", [StringObject allObjects]);
     return YES;
-}
-
-
-- (void)deleteRealmFile
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
 
 @end
