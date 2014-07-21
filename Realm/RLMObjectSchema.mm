@@ -21,6 +21,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMNativeObjectSupport.h"
 
 #import <tightdb/table.hpp>
 
@@ -111,6 +112,23 @@
             prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
         }
 
+        if (prop.type == RLMPropertyTypeData){
+            // possibly an archived object... if so, we need to grab these properties from the db, not our current object Class state
+            if (table->size()){
+                tightdb::BinaryData data = table->get_binary(col, 0);
+                NSData *dObj = [NSData dataWithBytes:data.data() length:data.size()];
+                NSString *className = RLMNativeObjectClassNameFromData(dObj);
+
+                if (className && className.length > 0){
+                    prop.nativeObjectClassName = className;
+                    prop.objectIsNativeAndRequiresArchivingForStorage = YES;
+                }
+                
+            } else {
+                // table is empty, safe to assume that the current object class schema details are valid.
+            }
+        }
+        
         [propArray addObject:prop];
     }
     

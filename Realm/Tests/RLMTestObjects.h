@@ -66,6 +66,13 @@
 
 @end
 
+@interface NativeObject : RLMObject
+
+@property NSURL *nativeCol;
+@property NSData *dataCol;
+
+@end
+
 RLM_ARRAY_TYPE(StringObject)
 RLM_ARRAY_TYPE(IntObject)
 

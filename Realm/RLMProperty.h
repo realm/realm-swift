@@ -45,6 +45,19 @@
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
+ Returns YES if the object is a native object implementing the NSCoding
+ protocol. Internally the property will be encoded to NSData before being 
+ stored using RLMPropertyTypeData. NSKeyedArchiver / NSKeyedUnarchiver 
+ will be used to archive and unarchive the object for storage.
+ */
+@property (nonatomic, readonly) BOOL objectIsNativeAndRequiresArchivingForStorage;
+
+/**
+ Native object class name - ie NSURL or CLLocation.
+ */
+@property (nonatomic, readonly, copy) NSString *nativeObjectClassName;
+
+/**
  Returns YES if property objects are equal
  */
 -(BOOL)isEqualToProperty:(RLMProperty *)prop;

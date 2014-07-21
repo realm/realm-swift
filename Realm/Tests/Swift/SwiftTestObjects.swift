@@ -92,3 +92,10 @@ class SwiftDynamicObject: RLMObject {
     var stringCol = "a"
     var intCol = 0
 }
+
+// FIXME: Re-enable once we support native objects in a schema from Swift.
+//class SwiftNativeObject: RLMObject {
+//    var nativeCol: NSURL?
+//    var dataCol: NSData?
+//}
+

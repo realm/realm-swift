@@ -44,6 +44,9 @@
 @implementation BinaryObject
 @end
 
+@implementation NativeObject
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject

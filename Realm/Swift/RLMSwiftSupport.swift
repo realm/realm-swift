@@ -108,6 +108,18 @@ import Foundation
                 let objectClassName = (mirror.value as RLMArray).objectClassName
                 (p, t) = (RLMProperty(name: name, type: .Array, column: column, objectClassName: objectClassName, attributes: attr), "@\"RLMArray\"")
             default:
+                // FIXME: this currently fails to work :: rdar://17739540: ER: Swift: It should be possible to downcast from Any to AnyObject.
+//                if let nativeObject = mirror.value as? AnyObject {
+//                    if nativeObject is NSCoding {
+//                        let mangledClassName = NSStringFromClass(nativeObject.class())
+//                        let objectClassName = demangleClassName(mangledClassName)
+//                        let typeEncoding = "@\"\(mangledClassName))\""
+//                        (p, t) = (RLMProperty(name: name, type: .Data, column: column, objectClassName: nil, attributes: attr), typeEncoding)
+//                                            //p.nativeObjectClassName = objectClassName;
+//                                            //p.objectIsNativeAndRequiresArchivingForStorage = true;
+//                        break;
+//                    }
+//                }
                 println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
                 assert(false)
             }

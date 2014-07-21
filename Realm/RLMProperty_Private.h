@@ -37,6 +37,9 @@
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 
+@property (nonatomic) BOOL objectIsNativeAndRequiresArchivingForStorage;
+@property (nonatomic, copy) NSString *nativeObjectClassName;
+
 // private properties
 @property (nonatomic, assign) char objcType;
 
