@@ -251,13 +251,13 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
     tightdb::StringData sd([(NSString *)value UTF8String]);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'BEGINSWITH' is not support");
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'BEGINSWITH' is not supported");
             break;
         case NSEndsWithPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'ENDSWITH' is not support");
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'ENDSWITH' is not supported");
             break;
         case NSContainsPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'CONTAINS' is not support");
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'CONTAINS' is not supported");
             break;
         case NSEqualToPredicateOperatorType:
             query.and_query(table->link(firstIndex).column<String>(secondIndex) == sd);

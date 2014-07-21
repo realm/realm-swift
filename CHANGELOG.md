@@ -7,7 +7,10 @@
 
 ### Enhancements
 
-* Adding support for link queries. See issue #617.
+* Adding support for basic querying of relationships (both one-to-one and one-to-many).
+  Binary data (`NSData)` properties cannot be queries, and the predicates `BEGINSWITH`, 
+  `ENDSWITH`, and `CONTAINS` are not supported for strings. Likewise, it is 
+  not possible to do case insensitive matches on strings. See issue #617.
 
 ### Bugfixes
 

@@ -156,13 +156,8 @@
     [realm addObject:owner1];
     [realm commitWriteTransaction];
 
-    NSPredicate *p1 = [NSPredicate predicateWithFormat:@"dog.dogName = 'Harvie'"];
-    NSUInteger count1 = [[realm objects:@"OwnerObject" withPredicate:p1] count];
-    XCTAssertEqual(count1, (NSUInteger)1, @"Expecting 1 dog");
-
-    NSPredicate *p2 = [NSPredicate predicateWithFormat:@"dog.dogName = 'eivraH'"];
-    NSUInteger count2 = [[realm objects:@"OwnerObject" withPredicate:p2] count];
-    XCTAssertEqual(count2, (NSUInteger)0, @"Expecting 0 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dog");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
 
     OwnerObject *owner2 = [[OwnerObject alloc] init];
     owner2.name = @"Joe";
@@ -173,13 +168,8 @@
     [realm addObject:owner2];
     [realm commitWriteTransaction];
 
-    NSPredicate *p3 = [NSPredicate predicateWithFormat:@"dog.dogName = 'Harvie'"];
-    NSUInteger count3 = [[realm objects:@"OwnerObject" withPredicate:p3] count];
-    XCTAssertEqual(count3, (NSUInteger)2, @"Expecting 2 dogs");
-
-    NSPredicate *p4 = [NSPredicate predicateWithFormat:@"dog.dogName = 'eivraH'"];
-    NSUInteger count4 = [[realm objects:@"OwnerObject" withPredicate:p4] count];
-    XCTAssertEqual(count4, (NSUInteger)0, @"Expecting 0 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
 
     OwnerObject *owner3 = [[OwnerObject alloc] init];
     owner3.name = @"Jim";
@@ -190,17 +180,9 @@
     [realm addObject:owner3];
     [realm commitWriteTransaction];
 
-    NSPredicate *p5 = [NSPredicate predicateWithFormat:@"dog.dogName = 'Harvie'"];
-    NSUInteger count5 = [[realm objects:@"OwnerObject" withPredicate:p5] count];
-    XCTAssertEqual(count5, (NSUInteger)2, @"Expecting 2 dogs");
-
-    NSPredicate *p6 = [NSPredicate predicateWithFormat:@"dog.dogName = 'eivraH'"];
-    NSUInteger count6 = [[realm objects:@"OwnerObject" withPredicate:p6] count];
-    XCTAssertEqual(count6, (NSUInteger)0, @"Expecting 0 dogs");
-
-    NSPredicate *p7 = [NSPredicate predicateWithFormat:@"dog.dogName = 'Fido'"];
-    NSUInteger count7 = [[realm objects:@"OwnerObject" withPredicate:p7] count];
-    XCTAssertEqual(count7, (NSUInteger)1, @"Expecting 1 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Fido'"] count]), (NSUInteger)1, @"Expecting 1 dogs");
 }
 
 - (void)testLinkQueryAllTypes
@@ -228,27 +210,24 @@
     [realm addObject:linkToAllTypes];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.boolCol = YES"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.boolCol = NO"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = YES"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.boolCol = NO"] count], (NSUInteger)0, @"0 expected");
 
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.intCol = 1"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.intCol != 1"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol = 1"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol != 1"] count], (NSUInteger)0, @"0 expected");
 
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.floatCol = 1.1"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.floatCol < 1.1"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol = 1.1"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol < 1.1"] count], (NSUInteger)0, @"0 expected");
 
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.doubleCol = 1.11"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.doubleCol > 1.11"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol = 1.11"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol > 1.11"] count], (NSUInteger)0, @"0 expected");
 
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.longCol = 11"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.longCol != 11"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol = 11"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol != 11"] count], (NSUInteger)0, @"0 expected");
 
-    NSPredicate *p1 = [NSPredicate predicateWithFormat:@"allTypesCol.dateCol = %@", now];
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" withPredicate:p1] count], (NSUInteger)1, @"1 expected");
-    NSPredicate *p2 = [NSPredicate predicateWithFormat:@"allTypesCol.dateCol != %@", now];
-    XCTAssertEqual([[realm objects:@"LinkToAllTypesObject" withPredicate:p2] count], (NSUInteger)0, @"0 expected");
-
-    XCTAssertThrows([realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
+    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol = %@", now] count]), (NSUInteger)1, @"1 expected");
+    XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol != %@", now] count]), (NSUInteger)0, @"0 expected");
+    XCTAssertThrows([realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
 }
 
 - (void)testLinkQueryMany
