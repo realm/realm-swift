@@ -188,7 +188,12 @@
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Fido'"] count]), (NSUInteger)1, @"Expecting 1 dogs");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"ANY dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
+    
+    // test !=
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName != 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dogs");
 
+    // test invalid operators
+    XCTAssertThrows([realm objects:[OwnerObject className] where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
 }
 
 - (void)testLinkQueryAllTypes
@@ -209,8 +214,8 @@
     linkToAllTypes.allTypesCol.cBoolCol = YES;
     linkToAllTypes.allTypesCol.longCol = 11;
     linkToAllTypes.allTypesCol.mixedCol = @0;
-    linkToAllTypes.allTypesCol.objectCol = [[StringObject alloc] init];
-    linkToAllTypes.allTypesCol.objectCol.stringCol = @"string";
+    StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+    linkToAllTypes.allTypesCol.objectCol = obj;
 
     [realm beginWriteTransaction];
     [realm addObject:linkToAllTypes];
@@ -223,9 +228,11 @@
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol != 1"] count], (NSUInteger)0, @"0 expected");
 
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol = 1.1"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol <= 1.1"] count], (NSUInteger)1, @"1 expected");
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol < 1.1"] count], (NSUInteger)0, @"0 expected");
-
+    
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol = 1.11"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol >= 1.11"] count], (NSUInteger)1, @"1 expected");
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol > 1.11"] count], (NSUInteger)0, @"0 expected");
 
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.longCol = 11"] count], (NSUInteger)1, @"1 expected");
@@ -233,7 +240,15 @@
 
     XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol = %@", now] count]), (NSUInteger)1, @"1 expected");
     XCTAssertEqual(([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.dateCol != %@", now] count]), (NSUInteger)0, @"0 expected");
-    XCTAssertThrows([realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
+}
+
+- (void)testLinkQueryInvalid {
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.mixedCol = 'a'"], @"Mixed data not supported");
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.invalidCol = 'a'"], @"Invalid column name should throw");
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol BETWEEN %@", @[@1.1, @1.2]];
+    XCTAssertThrows([LinkToAllTypesObject objectsWithPredicate:pred], @"BETWEEN query should throw");
 }
 
 - (void)testLinkTooManyRelationships
