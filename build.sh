@@ -77,7 +77,6 @@ xcode6() {
 }
 
 xcode() {
-    rm -rf bin
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -89,7 +88,6 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
 }
 
 xc() {
