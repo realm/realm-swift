@@ -239,6 +239,8 @@
     XCTAssertEqualObjects(objs[@"name"], @"Test0",  @"Name should be Test0");
     XCTAssertEqualObjects(objs[@"age"], @23,  @"age should be 23");
     XCTAssertEqualObjects(objs[@"hired"], @NO,  @"hired should be NO");
+    objs[@"name"] = @"Test1";
+    XCTAssertEqualObjects(objs.name, @"Test1",  @"Name should be Test1");
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
