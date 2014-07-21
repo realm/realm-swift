@@ -144,7 +144,7 @@
 		84D7990819388E8900FC76A0 /* RLMRealmNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmNode.h; path = Classes/RLMRealmNode.h; sourceTree = "<group>"; };
 		84D7990919388E8900FC76A0 /* RLMRealmNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMRealmNode.m; path = Classes/RLMRealmNode.m; sourceTree = "<group>"; };
 		84D7990A19388E8900FC76A0 /* RLMRealmOutlineNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealmOutlineNode.h; path = Classes/RLMRealmOutlineNode.h; sourceTree = "<group>"; };
-		84E0F94C1921F3B900D6CA14 /* RealmBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84E0F94C1921F3B900D6CA14 /* Realm Browser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Realm Browser.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		84E0F94F1921F3B900D6CA14 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		84E0F9521921F3B900D6CA14 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		84E0F9531921F3B900D6CA14 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -344,7 +344,7 @@
 		84E0F94D1921F3B900D6CA14 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				84E0F94C1921F3B900D6CA14 /* RealmBrowser.app */,
+				84E0F94C1921F3B900D6CA14 /* Realm Browser.app */,
 				84E0F9701921F3B900D6CA14 /* RealmBrowserTests.xctest */,
 			);
 			name = Products;
@@ -445,7 +445,7 @@
 			);
 			name = RealmBrowser;
 			productName = RealmVisualEditor;
-			productReference = 84E0F94C1921F3B900D6CA14 /* RealmBrowser.app */;
+			productReference = 84E0F94C1921F3B900D6CA14 /* Realm Browser.app */;
 			productType = "com.apple.product-type.application";
 		};
 		84E0F96F1921F3B900D6CA14 /* RealmBrowserTests */ = {
@@ -748,7 +748,7 @@
 				INFOPLIST_FILE = "RealmVisualEditor/RealmBrowser-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = RealmBrowser;
+				PRODUCT_NAME = "Realm Browser";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -771,7 +771,7 @@
 				INFOPLIST_FILE = "RealmVisualEditor/RealmBrowser-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = RealmBrowser;
+				PRODUCT_NAME = "Realm Browser";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
