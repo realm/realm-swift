@@ -248,7 +248,7 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
     }
 
     tightdb::TableRef table = query.get_table();
-    tightdb::StringData sd([(NSString *)value UTF8String]);
+    tightdb::StringData sd = RLMStringDataWithNSString(value);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
             @throw RLMPredicateException(@"Invalid type", @"Predicate 'BEGINSWITH' is not supported");
