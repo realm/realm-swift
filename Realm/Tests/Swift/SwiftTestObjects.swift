@@ -99,3 +99,6 @@ class SwiftDynamicObject: RLMObject {
 //    var dataCol: NSData?
 //}
 
+class SwiftUTF8Object: RLMObject {
+    var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+}
