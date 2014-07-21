@@ -260,7 +260,7 @@
     arrPropObj1.name = @"Test";
     for(NSUInteger i=0; i<10; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = [NSString stringWithFormat:@"%lu", i];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [arrPropObj1.array addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
@@ -278,7 +278,7 @@
     arrPropObj2.name = @"Test";
     for(NSUInteger i=0; i<4; i++) {
         StringObject *sobj = [[StringObject alloc] init];
-        sobj.stringCol = [NSString stringWithFormat:@"%lu", i];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
         [arrPropObj2.array addObject:sobj];
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;

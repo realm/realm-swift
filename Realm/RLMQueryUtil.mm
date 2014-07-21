@@ -459,7 +459,7 @@ void update_query_with_value_expression(RLMSchema *schema,
     }
     else if ([arr count] > 2) {
         @throw RLMPredicateException(@"Invalid predicate",
-                                     [NSString stringWithFormat:@"Too many levels of relationships: %lu > 2", [arr count]]);
+                                     [NSString stringWithFormat:@"Too many levels of relationships: %lu > 2", (unsigned long)[arr count]]);
     }
 
     BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
