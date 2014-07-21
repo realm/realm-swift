@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Added a helper method to RLMRealm to perform a block inside a transaction.
 
 ### Bugfixes
 
