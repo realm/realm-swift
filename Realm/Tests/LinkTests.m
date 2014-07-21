@@ -251,6 +251,46 @@
     XCTAssertThrows([realm objects:@"LinkToAllTypesObject" where:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
 }
 
+- (void)testLinkQueryMany
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    ArrayPropertyObject *arrPropObj1 = [[ArrayPropertyObject alloc] init];
+    arrPropObj1.name = @"Test";
+    for(NSUInteger i=0; i<10; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", i];
+        [arrPropObj1.array addObject:sobj];
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        [arrPropObj1.intArray addObject:iobj];
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:arrPropObj1];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"array.stringCol = '1'"] count], (NSUInteger)1, @"1 expected");
+
+    ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
+    arrPropObj2.name = @"Test";
+    for(NSUInteger i=0; i<4; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", i];
+        [arrPropObj2.array addObject:sobj];
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        [arrPropObj2.intArray addObject:iobj];
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:arrPropObj2];
+    [realm commitWriteTransaction];
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 2"] count], (NSUInteger)2, @"2 expected");
+}
+
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
 /*
 - (void)testCircularLinks 

@@ -445,7 +445,7 @@ void update_query_with_value_expression(RLMObjectSchema *desc, tightdb::Query &q
     //        and loop through the elements of arr to build up link query
     if ([arr count] == 2) {
         isLinkQuery = YES;
-        if (firstProp.type != RLMPropertyTypeObject) {
+        if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
             throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", firstColumnName]);
         }
         TableRef secondTable = query.get_table()->get_link_target(size_t(firstIndex));
