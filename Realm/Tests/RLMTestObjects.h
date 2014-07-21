@@ -66,8 +66,15 @@
 
 @end
 
+@interface NativeObject : RLMObject
+
+@property NSURL *nativeCol;
+@property NSData *dataCol;
+
 @interface UTF8Object : RLMObject
+
 @property NSString *柱колоéнǢкƱаم;
+
 @end
 
 RLM_ARRAY_TYPE(StringObject)

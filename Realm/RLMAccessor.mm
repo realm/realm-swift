@@ -23,6 +23,7 @@
 #import "RLMUtil.hpp"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
+#import "RLMNativeObjectSupport.h"
 
 #import <objc/runtime.h>
 
@@ -120,6 +121,30 @@ inline void RLMSetData(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, 
     obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
 }
 
+// native object storage getter/setter
+inline id<NSCoding> RLMGetArchivedNativeObject(__unsafe_unretained RLMObject *obj, NSUInteger colIndex) {
+    RLMProperty *prop = obj.objectSchema.properties[colIndex];
+
+    NSData *data = RLMGetData(obj, colIndex);
+    id result = RLMNativeObjectFromData(data);
+    
+    //compare class and log if not matching
+    if (result && ![result isKindOfClass:NSClassFromString(prop.nativeObjectClassName)]){
+        NSLog(@"Warning: native object property class mis-match. If you change the class of an archived native object property \
+              you must manually convert all property objects to their new class via migration. property: %@ expects \
+              an object of class %@, however value:%@ is an object of class %@ (stored as %@).", prop,
+              prop.nativeObjectClassName, result, NSStringFromClass([result class]), RLMNativeObjectClassNameFromData(data));
+    }
+    
+    return result;
+}
+
+inline void RLMSetNativeArchivedObject(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained id<NSCoding> objToArchive) {
+    RLMProperty *prop = obj.objectSchema.properties[colIndex];
+    NSData *data = RLMDataFromNativeObject((id<NSObject, NSCoding>)objToArchive, prop.nativeObjectClassName);
+    RLMSetData(obj, colIndex, data);
+}
+
 // link getter/setter
 inline RLMObject *RLMGetLink(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSString *objectClassName) {
     RLMVerifyAttached(obj);
@@ -196,6 +221,11 @@ inline id RLMGetAnyProperty(__unsafe_unretained RLMObject *obj, NSUInteger col_n
         case RLMPropertyTypeData: {
             tightdb::BinaryData bd = mixed.get_binary();
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+
+            RLMProperty *prop = obj.objectSchema.properties[col_ndx];
+            if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                return [NSKeyedUnarchiver unarchiveObjectWithData:d];
+            }
             return d;
         }
         case RLMPropertyTypeArray:
@@ -251,6 +281,12 @@ inline void RLMSetAnyProperty(__unsafe_unretained RLMObject *obj, NSUInteger col
                 return;
         }
     }
+    RLMProperty *prop = obj.objectSchema.properties[col_ndx];
+    if (RLMNativeObjectSupportsArchiving(val) && prop.objectIsNativeAndRequiresArchivingForStorage) {
+        NSData *encodedData = RLMDataFromNativeObject(val, prop.nativeObjectClassName);
+        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(encodedData));
+        return;
+    }
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
 }
 
@@ -288,7 +324,11 @@ IMP RLMAccessorGetter(NSUInteger colIndex, char accessorCode, NSString *objectCl
             });
         case 'e':
             return imp_implementationWithBlock(^(RLMObject *obj) {
-                return RLMGetData(obj, colIndex);
+                RLMProperty *prop = obj.objectSchema.properties[colIndex];
+                if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                    return (id)RLMGetArchivedNativeObject(obj, colIndex);
+                }
+                return (id)RLMGetData(obj, colIndex);
             });
         case 'k':
             return imp_implementationWithBlock(^id(RLMObject *obj) {
@@ -344,6 +384,11 @@ IMP RLMAccessorSetter(NSUInteger colIndex, char accessorCode) {
             });
         case 'e':
             return imp_implementationWithBlock(^(RLMObject *obj, NSData *data) {
+                RLMProperty *prop = obj.objectSchema.properties[colIndex];
+                if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                    RLMSetNativeArchivedObject(obj, colIndex, data);
+                    return;
+                }
                 RLMSetData(obj, colIndex, data);
             });
         case 'k':
@@ -602,6 +647,10 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
             RLMSetDate(obj, col, val);
             break;
         case 'e':
+            if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                RLMSetNativeArchivedObject(obj, col, val);
+                break;
+            }
             RLMSetData(obj, col, val);
             break;
         case 'k':
@@ -638,7 +687,12 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
         case 'c': return @(RLMGetBool(obj, col));
         case 's': return RLMGetString(obj, col);
         case 'a': return RLMGetDate(obj, col);
-        case 'e': return RLMGetData(obj, col);
+        case 'e': {
+            if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                return RLMGetArchivedNativeObject(obj, col);
+            }
+            return RLMGetData(obj, col);
+        }
         case 'k': return RLMGetLink(obj, col, prop.objectClassName);
         case 't': return RLMGetArray(obj, col, prop.objectClassName);
         case '@': return RLMGetAnyProperty(obj, col);

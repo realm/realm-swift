@@ -336,9 +336,14 @@ void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query &
         case type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
             break;
-        case type_Binary:
+        case type_Binary: {
+            if (prop.objectIsNativeAndRequiresArchivingForStorage){
+                @throw RLMPredicateException(@"Unsupported native object",
+                                             [NSString stringWithFormat:@"Native object class %@ not supported", prop.nativeObjectClassName]);
+            }
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
+        }
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                            [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);

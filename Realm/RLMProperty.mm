@@ -20,6 +20,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
+#import "RLMNativeObjectSupport.h"
 
 // private properties
 @interface RLMProperty ()
@@ -153,6 +154,12 @@
                                                  userInfo:nil];
                 }
             }
+            else if (RLMNativeObjectSupportsArchiving((id)NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]))) {
+                // NSCoding supported classes can be archived as data
+                _type = RLMPropertyTypeData;
+                _objectIsNativeAndRequiresArchivingForStorage = YES;
+                _nativeObjectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
+            }
             else {
                 // get object class and set type
                 _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
@@ -167,7 +174,7 @@
                                                      userInfo:nil];
                     }
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject or implement the NSCoding protocol", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
@@ -240,6 +247,10 @@
         return NO;
     }
     return [self isEqualToProperty:object];
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p> {name:'%@', type:%i, objectClassName:'%@'}", NSStringFromClass([self class]), self, _name, _type, _objectClassName];
 }
 
 @end

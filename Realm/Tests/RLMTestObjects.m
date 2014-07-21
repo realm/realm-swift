@@ -44,6 +44,9 @@
 @implementation BinaryObject
 @end
 
+@implementation NativeObject
+@end
+
 @implementation UTF8Object
 @end
 

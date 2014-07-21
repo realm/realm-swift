@@ -93,6 +93,12 @@ class SwiftDynamicObject: RLMObject {
     var intCol = 0
 }
 
+// FIXME: Re-enable once we support native objects in a schema from Swift.
+//class SwiftNativeObject: RLMObject {
+//    var nativeCol: NSURL?
+//    var dataCol: NSData?
+//}
+
 class SwiftUTF8Object: RLMObject {
     var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }

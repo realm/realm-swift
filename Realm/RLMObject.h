@@ -47,6 +47,7 @@
  - `NSData`
  - RLMObject subclasses, so you can have many-to-one relationships.
  - `RLMArray<X>`, where X is an RLMObject subclass, so you can have many-to-many relationships.
+ - Native objects that implement the NSCoding protocol 
  
  ### Attributes for Properties
 

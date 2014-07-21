@@ -107,6 +107,10 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             }
             return NO;
         case RLMPropertyTypeData:
+            if (property.objectIsNativeAndRequiresArchivingForStorage){
+                //validate using our stored objectClassName
+                return [obj isKindOfClass:NSClassFromString(property.nativeObjectClassName)];
+            }
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return object_has_valid_type(obj);
