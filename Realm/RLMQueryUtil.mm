@@ -488,11 +488,11 @@ void update_query_with_value_expression(RLMObjectSchema *desc, tightdb::Query &q
         case type_DateTime:
             if (isLinkQuery) {
                 add_datetime_constraint_to_link_query(query, operatorType, firstIndex, secondIndex,
-                                                  double([(NSDate *)value timeIntervalSince1970]));
+                                                      double([(NSDate *)value timeIntervalSince1970]));
             }
             else {
                 add_datetime_constraint_to_query(query, operatorType, firstIndex,
-                                                 double([(NSDate *)value timeIntervalSince1970]));
+                                                    double([(NSDate *)value timeIntervalSince1970]));
             }
             break;
         case type_Double:

@@ -95,7 +95,6 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @interface LinkToAllTypesObject : RLMObject
 @property AllTypesObject *allTypesCol;
-//@property RLMArray<AllTypesObject> *allTypesManyCol;
 @end
 
 
