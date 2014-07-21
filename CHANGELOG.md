@@ -15,7 +15,7 @@
 ### Bugfixes
 
 * Improved Unicode support in property names and string contents (Chinese, Russian, etc.). Closing #612 and #604.
-* Potential bugs fixed related to migration when properties are removed.
+* Potential bugs fixed relating to migration (addition/removal of properties).
 * Fixed keyed subscripting for standalone RLMObjects.
 
 0.80.0 Release notes (2014-07-15)
