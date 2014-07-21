@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.80.1 Release notes (2014-07-21)
 =============================================================
 
 ### API breaking changes
@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Adding support for link queries. See issue #617.
 
 ### Bugfixes
 
