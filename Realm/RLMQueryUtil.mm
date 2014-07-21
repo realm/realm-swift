@@ -19,6 +19,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 
 #include <tightdb.hpp>
 using namespace tightdb;
@@ -119,6 +120,43 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
     }
 }
 
+template <typename T>
+void add_numeric_constraint_to_link_query(tightdb::Query& query,
+                                          RLMPropertyType datatype,
+                                          NSPredicateOperatorType operatorType,
+                                          NSUInteger firstIndex,
+                                          NSUInteger secondIndex,
+                                          T value)
+{
+    tightdb::TableRef table = query.get_table();
+
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) < value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) <= value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) > value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) >= value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) == value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<T>(secondIndex) != value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Invalid operator type",
+                                         [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype)]);
+            break;
+    }
+}
+
+
 void add_bool_constraint_to_query(tightdb::Query & query,
                                   NSPredicateOperatorType operatorType,
                                   NSUInteger index,
@@ -133,6 +171,27 @@ void add_bool_constraint_to_query(tightdb::Query & query,
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                            [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
+            break;
+    }
+}
+
+void add_bool_constraint_to_link_query(tightdb::Query& query,
+                                       NSPredicateOperatorType operatorType,
+                                       NSUInteger firstIndex,
+                                       NSUInteger secondIndex,
+                                       bool value) {
+
+    tightdb::TableRef table = query.get_table();
+    switch (operatorType) {
+        case NSEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Bool>(secondIndex) == value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Bool>(secondIndex) == value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Invalid operator type",
+                                         [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -174,6 +233,45 @@ void add_string_constraint_to_query(tightdb::Query & query,
     }
 }
 
+// FIXME: beginsWith, endsWith, contains missing
+// FIXME: not case sensitive
+void add_string_constraint_to_link_query(tightdb::Query& query,
+                                         NSPredicateOperatorType operatorType,
+                                         NSComparisonPredicateOptions predicateOptions,
+                                         NSUInteger firstIndex,
+                                         NSUInteger secondIndex,
+                                         NSString* value) {
+    bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
+    if (diacriticInsensitive) {
+        @throw RLMPredicateException(@"Invalid predicate option",
+                                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
+    }
+
+    tightdb::TableRef table = query.get_table();
+    tightdb::StringData sd = RLMStringDataWithNSString(value);
+    switch (operatorType) {
+        case NSBeginsWithPredicateOperatorType:
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'BEGINSWITH' is not supported");
+            break;
+        case NSEndsWithPredicateOperatorType:
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'ENDSWITH' is not supported");
+            break;
+        case NSContainsPredicateOperatorType:
+            @throw RLMPredicateException(@"Invalid type", @"Predicate 'CONTAINS' is not supported");
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<String>(secondIndex) == sd);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<String>(secondIndex) != sd);
+            break;
+        default:
+            @throw RLMPredicateException(@"Invalid operator type",
+                                         [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
+            break;
+    }
+}
+
 void add_datetime_constraint_to_query(tightdb::Query & query,
                                       NSPredicateOperatorType operatorType,
                                       NSUInteger index,
@@ -200,6 +298,39 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                            [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
+            break;
+    }
+}
+
+void add_datetime_constraint_to_link_query(tightdb::Query& query,
+                                           NSPredicateOperatorType operatorType,
+                                           NSUInteger firstIndex,
+                                           NSUInteger secondIndex,
+                                           double value)
+{
+    tightdb::TableRef table = query.get_table();
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) < value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) <= value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) > value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) >= value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) == value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.and_query(table->link(firstIndex).column<Int>(secondIndex) != value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Invalid operator type",
+                                         [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
             break;
     }
 }
@@ -294,50 +425,125 @@ void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation
     }
 }
 
-void update_query_with_value_expression(RLMObjectSchema * desc, tightdb::Query & query,
-                                        NSString * columnName, id value, NSPredicateOperatorType operatorType,
+void update_query_with_value_expression(RLMSchema *schema,
+                                        RLMObjectSchema *desc,
+                                        tightdb::Query &query,
+                                        NSString *columnName,
+                                        id value,
+                                        NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions)
 {
     // validate object type
-    NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
-    RLMProperty *prop = desc[columnName];
-    
+    NSArray *arr = [columnName componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"."]];
+    NSString *firstColumnName = [arr objectAtIndex:0];
+    NSString *secondColumnName;
+
+    BOOL isLinkQuery = NO;
+    NSUInteger firstIndex, secondIndex = 0;
+    RLMPropertyType secondType = RLMPropertyTypeAny;
+
+    firstIndex = RLMValidatedColumnIndex(desc, firstColumnName);
+    RLMProperty *firstProp = desc[firstColumnName];
+
+    // FIXME: when core support multiple levels of link queries, change == to >=
+    //        and loop through the elements of arr to build up link query
+    if ([arr count] == 2) {
+        isLinkQuery = YES;
+        if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
+            throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", firstColumnName]);
+        }
+        secondColumnName = [arr objectAtIndex:1];
+        RLMProperty *secondProp = schema[firstProp.objectClassName][secondColumnName];
+        secondType = secondProp.type;
+        secondIndex = RLMValidatedColumnIndex(schema[firstProp.objectClassName], secondColumnName);
+    }
+    else if ([arr count] > 2) {
+        @throw RLMPredicateException(@"Invalid predicate",
+                                     [NSString stringWithFormat:@"Too many levels of relationships: %lu > 2", [arr count]]);
+    }
+
     BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
-    validate_value_for_query(value, prop, betweenOperation);
+    if (!isLinkQuery) {
+        validate_value_for_query(value, firstProp, betweenOperation);
+    }
     
     if (betweenOperation) {
-        add_between_constraint_to_query(query, prop.type, index, value);
+        add_between_constraint_to_query(query, firstProp.type, firstIndex, value);
         return;
     }
     
     // finally cast to native types and add query clause
-    RLMPropertyType type = prop.type;
+    RLMPropertyType type;
+    if (isLinkQuery) {
+        type = secondType;
+    }
+    else {
+        type = firstProp.type;
+    }
     switch (type) {
         case type_Bool:
-            add_bool_constraint_to_query(query, operatorType, index,
-                                         bool([(NSNumber *)value boolValue]));
+            if (isLinkQuery) {
+                add_bool_constraint_to_link_query(query, operatorType, firstIndex, secondIndex, bool([(NSNumber *)value boolValue]));
+            }
+            else {
+                add_bool_constraint_to_query(query, operatorType, firstIndex,
+                                             bool([(NSNumber *)value boolValue]));
+            }
             break;
         case type_DateTime:
-            add_datetime_constraint_to_query(query, operatorType, index,
-                                             double([(NSDate *)value timeIntervalSince1970]));
+            if (isLinkQuery) {
+                add_datetime_constraint_to_link_query(query, operatorType, firstIndex, secondIndex,
+                                                      double([(NSDate *)value timeIntervalSince1970]));
+            }
+            else {
+                add_datetime_constraint_to_query(query, operatorType, firstIndex,
+                                                    double([(NSDate *)value timeIntervalSince1970]));
+            }
             break;
         case type_Double:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, [(NSNumber *)value doubleValue]);
+            if (isLinkQuery) {
+                add_numeric_constraint_to_link_query(query, type, operatorType,
+                                                     firstIndex, secondIndex, Double([(NSNumber *)value doubleValue]));
+            }
+            else {
+                add_numeric_constraint_to_query(query, type, operatorType,
+                                                firstIndex, [(NSNumber *)value doubleValue]);
+            }
             break;
         case type_Float:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, [(NSNumber *)value floatValue]);
+            if (isLinkQuery) {
+                add_numeric_constraint_to_link_query(query, type, operatorType, firstIndex,
+                                                     secondIndex, Float([(NSNumber *)value floatValue]));
+            }
+            else {
+                add_numeric_constraint_to_query(query, type, operatorType,
+                                                firstIndex, [(NSNumber *)value floatValue]);
+            }
             break;
         case type_Int:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, [(NSNumber *)value intValue]);
+            if (isLinkQuery) {
+                add_numeric_constraint_to_link_query(query, type, operatorType, firstIndex,
+                                                     secondIndex, Int([(NSNumber *)value intValue]));
+            }
+            else {
+                add_numeric_constraint_to_query(query, type, operatorType,
+                                                firstIndex, [(NSNumber *)value intValue]);
+            }
             break;
         case type_String:
-            add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
+            if (isLinkQuery) {
+                add_string_constraint_to_link_query(query, operatorType, predicateOptions,
+                                                    firstIndex, secondIndex, value);
+            }
+            else {
+                add_string_constraint_to_query(query, operatorType, predicateOptions, firstIndex, value);
+            }
             break;
         case type_Binary:
-            add_binary_constraint_to_query(query, operatorType, index, value);
+            if (isLinkQuery) {
+                @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+            }
+            add_binary_constraint_to_query(query, operatorType, firstIndex, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
@@ -414,7 +620,8 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     }
 }
     
-void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schema, tightdb::Query & query)
+void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
+                                 RLMObjectSchema *objectSchema, tightdb::Query & query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -425,7 +632,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
                 // Add all of the subpredicates.
                 query.group();
                 for (NSPredicate * subp in comp.subpredicates) {
-                    update_query_with_predicate(subp, schema, query);
+                    update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
@@ -438,7 +645,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
                     if (i > 0) {
                         query.Or();
                     }
-                    update_query_with_predicate(subp, schema, query);
+                    update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
@@ -446,7 +653,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
             case NSNotPredicateType:
                 // Add the negated subpredicate
                 query.Not();
-                update_query_with_predicate(comp.subpredicates.firstObject, schema, query);
+                update_query_with_predicate(comp.subpredicates.firstObject, schema, objectSchema, query);
                 break;
                 
             default:
@@ -465,15 +672,21 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
         // we are limited here to KeyPath expressions and constantValue expressions from validation
         if (exp1Type == NSKeyPathExpressionType) {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_column_expression(schema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
+                update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
             else {
-                update_query_with_value_expression(schema, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType, compp.options);
+                update_query_with_value_expression(schema, objectSchema, query,
+                                                   compp.leftExpression.keyPath,
+                                                   compp.rightExpression.constantValue,
+                                                   compp.predicateOperatorType, compp.options);
             }
         }
         else {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_value_expression(schema, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType, compp.options);
+                update_query_with_value_expression(schema, objectSchema, query,
+                                                   compp.rightExpression.keyPath,
+                                                   compp.leftExpression.constantValue,
+                                                   compp.predicateOperatorType, compp.options);
             }
             else {
                 @throw RLMPredicateException(@"Invalid predicate expressions",
@@ -490,17 +703,19 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectSchema *schema)
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema *schema,
+                                 RLMObjectSchema *objectSchema)
 {
     // parse and apply predicate tree
     if (predicate) {
         if ([predicate isKindOfClass:[NSString class]]) {
             update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
                                         schema,
+                                        objectSchema,
                                         *query);
         }
         else if ([predicate isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(predicate, schema, *query);
+            update_query_with_predicate(predicate, schema, objectSchema, *query);
         }
         else {
             @throw RLMPredicateException(@"Invalid argument",
