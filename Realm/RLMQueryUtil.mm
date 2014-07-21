@@ -425,8 +425,12 @@ void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation
     }
 }
 
-void update_query_with_value_expression(RLMObjectSchema *desc, tightdb::Query &query,
-                                        NSString *columnName, id value, NSPredicateOperatorType operatorType,
+void update_query_with_value_expression(RLMSchema *schema,
+                                        RLMObjectSchema *desc,
+                                        tightdb::Query &query,
+                                        NSString *columnName,
+                                        id value,
+                                        NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions)
 {
     // validate object type
@@ -448,12 +452,10 @@ void update_query_with_value_expression(RLMObjectSchema *desc, tightdb::Query &q
         if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
             throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", firstColumnName]);
         }
-        TableRef secondTable = query.get_table()->get_link_target(size_t(firstIndex));
-        RLMObjectSchema *secondDesc = [RLMObjectSchema schemaForTable:&(*secondTable) className:@"tmp"];
         secondColumnName = [arr objectAtIndex:1];
-        secondIndex = RLMValidatedColumnIndex(secondDesc, secondColumnName);
-        RLMProperty *secondProp = secondDesc[secondColumnName];
+        RLMProperty *secondProp = schema[firstProp.objectClassName][secondColumnName];
         secondType = secondProp.type;
+        secondIndex = RLMValidatedColumnIndex(schema[firstProp.objectClassName], secondColumnName);
     }
     else if ([arr count] > 2) {
         @throw RLMPredicateException(@"Invalid predicate",
@@ -618,7 +620,8 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     }
 }
     
-void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schema, tightdb::Query & query)
+void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
+                                 RLMObjectSchema *objectSchema, tightdb::Query & query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -629,7 +632,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
                 // Add all of the subpredicates.
                 query.group();
                 for (NSPredicate * subp in comp.subpredicates) {
-                    update_query_with_predicate(subp, schema, query);
+                    update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
@@ -642,7 +645,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
                     if (i > 0) {
                         query.Or();
                     }
-                    update_query_with_predicate(subp, schema, query);
+                    update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
@@ -650,7 +653,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
             case NSNotPredicateType:
                 // Add the negated subpredicate
                 query.Not();
-                update_query_with_predicate(comp.subpredicates.firstObject, schema, query);
+                update_query_with_predicate(comp.subpredicates.firstObject, schema, objectSchema, query);
                 break;
                 
             default:
@@ -669,15 +672,21 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
         // we are limited here to KeyPath expressions and constantValue expressions from validation
         if (exp1Type == NSKeyPathExpressionType) {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_column_expression(schema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
+                update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
             else {
-                update_query_with_value_expression(schema, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType, compp.options);
+                update_query_with_value_expression(schema, objectSchema, query,
+                                                   compp.leftExpression.keyPath,
+                                                   compp.rightExpression.constantValue,
+                                                   compp.predicateOperatorType, compp.options);
             }
         }
         else {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_value_expression(schema, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType, compp.options);
+                update_query_with_value_expression(schema, objectSchema, query,
+                                                   compp.rightExpression.keyPath,
+                                                   compp.leftExpression.constantValue,
+                                                   compp.predicateOperatorType, compp.options);
             }
             else {
                 @throw RLMPredicateException(@"Invalid predicate expressions",
@@ -694,17 +703,19 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectSchema *schem
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectSchema *schema)
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema *schema,
+                                 RLMObjectSchema *objectSchema)
 {
     // parse and apply predicate tree
     if (predicate) {
         if ([predicate isKindOfClass:[NSString class]]) {
             update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
                                         schema,
+                                        objectSchema,
                                         *query);
         }
         else if ([predicate isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(predicate, schema, *query);
+            update_query_with_predicate(predicate, schema, objectSchema, *query);
         }
         else {
             @throw RLMPredicateException(@"Invalid argument",
