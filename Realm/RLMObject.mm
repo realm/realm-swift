@@ -144,7 +144,12 @@
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    RLMDynamicValidatedSet(self, key, obj);
+    if (_realm) {
+        RLMDynamicValidatedSet(self, key, obj);
+    }
+    else {
+        [self setValue:obj forKey:key];
+    }
 }
 
 + (RLMArray *)allObjects {

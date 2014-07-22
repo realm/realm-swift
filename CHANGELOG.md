@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.80.1 Release notes (2014-07-21)
 =============================================================
 
 ### API breaking changes
@@ -7,7 +7,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Adding support for basic querying of relationships (both one-to-one and one-to-many).
+  Binary data (`NSData)` properties cannot be queries, and the predicates `BEGINSWITH`, 
+  `ENDSWITH`, and `CONTAINS` are not supported for strings. Likewise, it is 
+  not possible to do case insensitive matches on strings. See issue #617.
+* Added a helper method to RLMRealm to perform a block inside a transaction.
 
 ### Bugfixes
 
