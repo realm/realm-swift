@@ -133,10 +133,16 @@ if [ -z "$SRCROOT" ]; then
 fi
 
 download_core() {
-    rm -rf core
+    echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    (
+        cd /tmp
+        unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+        mv core core-${REALM_CORE_VERSION}
+        rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    )
+    mv /tmp/core-${REALM_CORE_VERSION} .
+    ln -s core-${REALM_CORE_VERSION} core
 }
 
 COMMAND="$1"
@@ -161,8 +167,9 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
-        echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-        if ! [ -d core ]; then
+        if ! [ -L core ]; then
+            echo "core is not a symlink. Deleting..."
+            rm -rf core
             download_core
         elif ! $(head -n 1 core/release_notes.txt | grep ${REALM_CORE_VERSION} >/dev/null); then
             download_core
