@@ -8,7 +8,7 @@
 ### Enhancements
 
 * Added support for basic querying of RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
-  e.g. `[Person objectsWhere:@"dog.name == 'Alfonso'"]` or `[Person objectsWhere:@"ANY dogs.name == 'Alfonso"]`
+  e.g. `[Person objectsWhere:@"dog.name == 'Alfonso'"]` or `[Person objectsWhere:@"ANY dogs.name == 'Alfonso'"]`
   Supports all normal operators for numeric and date types. Does not support NSData properties or `BEGINSWITH`, `ENDSWITH`, `CONTAINS` 
   and other options for string properties.
 * Added support for querying for object equality in RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
