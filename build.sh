@@ -137,6 +137,7 @@ download_core() {
     curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
     (
         cd /tmp
+        rm -rf core "core-${REALM_CORE_VERSION}.zip" || exit 1
         unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
         mv core core-${REALM_CORE_VERSION}
         rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
