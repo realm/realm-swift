@@ -767,6 +767,19 @@
     }
 }
 
+
+- (void)testFloatQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(([[realm objects:[QueryObject className] where:@"float2 = 1.7"] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[QueryObject className] where:@"float2 = %f", 1.7f] count]), (NSUInteger)1, @"1 object excepted");
+}
+
 - (void)testLiveQueriesInsideTransaction
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

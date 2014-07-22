@@ -21,6 +21,8 @@
 * Fixed Unicode support in property names and string contents (Chinese, Russian, etc.). Closing #612 and #604.
 * Fixed bugs related to migration when properties are removed.
 * Fixed keyed subscripting for standalone RLMObjects.
+* Fixed bug related to query float properties: `floatProperty = 1.7` since 1.7 is less than `FLT_MAX` and greater than `-FLT_MAX`.
+
 
 0.80.0 Release notes (2014-07-15)
 =============================================================
