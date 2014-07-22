@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ##################################################################################
 # Custom build tool for Realm Objective C binding.
