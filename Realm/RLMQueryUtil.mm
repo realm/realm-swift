@@ -20,6 +20,7 @@
 #import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObject_Private.h"
 
 #include <tightdb.hpp>
 using namespace tightdb;
@@ -336,12 +337,32 @@ void add_datetime_constraint_to_link_query(tightdb::Query& query,
 }
 
 void add_between_constraint_to_query(tightdb::Query & query,
-                                     RLMPropertyType dataType,
-                                     NSUInteger index,
+                                     RLMObjectSchema *desc,
+                                     NSString *columnName,
                                      NSArray *array) {
+    // get prop and index
+    RLMProperty *prop = desc[columnName];
+    NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
+    
+    // validate value
+    if ([array isKindOfClass:[NSArray class]]) {
+        if (array.count == 2) {
+            if (!RLMIsObjectValidForProperty(array.firstObject, prop) ||
+                !RLMIsObjectValidForProperty(array.lastObject, prop)) {
+                @throw RLMPredicateException(@"Invalid value",
+                                             [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
+            }
+        } else {
+            @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
+        }
+    } else {
+        @throw RLMPredicateException(@"Invalid value", @"object must be of type NSArray for BETWEEN operations");
+    }
+    
+    // add to query
     id from = array.firstObject;
     id to = array.lastObject;
-    switch (dataType) {
+    switch (prop.type) {
         case type_DateTime:
             query.between_datetime(index,
                                    double([(NSDate *)from timeIntervalSince1970]),
@@ -369,8 +390,11 @@ void add_between_constraint_to_query(tightdb::Query & query,
             break;
         }
         default:
-            @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations", RLMTypeToString(dataType)]);
+        {
+            NSString *message = [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations",
+                                 RLMTypeToString(prop.type)];
+            @throw RLMPredicateException(@"Unsupported predicate value type", message);
+        }
     }
 }
 
@@ -401,149 +425,150 @@ void add_binary_constraint_to_query(tightdb::Query & query,
             break;
     }
 }
+    
+void add_link_contraint_to_query(tightdb::Query & query,
+                                 NSPredicateOperatorType operatorType,
+                                 NSUInteger column,
+                                 RLMObject *obj) {
+    if (operatorType != NSEqualToPredicateOperatorType) {
+        @throw RLMPredicateException(@"Invalid operator type", @"Only 'Equal' operator supported for object comparison");
+    }
+    query.links_to(column, obj->_row.get_index());
+}
+ 
+void update_link_query_with_value_expression(RLMSchema *schema,
+                                             RLMObjectSchema *desc,
+                                             tightdb::Query &query,
+                                             NSArray *paths,
+                                             id value,
+                                             NSComparisonPredicate *pred)
+{
+    if (pred.predicateOperatorType == NSBetweenPredicateOperatorType) {
+        @throw RLMPredicateException(@"Invalid predicate", @"BETWEEN operator not supported for KeyPath queries.");
+    }
 
-void validate_value_for_query(id value, RLMProperty *prop, BOOL betweenOperation) {
-    if (betweenOperation) {
-        if ([value isKindOfClass:[NSArray class]]) {
-            NSArray *array = value;
-            if (array.count == 2) {
-                if (!RLMIsObjectValidForProperty(array.firstObject, prop) ||
-                    !RLMIsObjectValidForProperty(array.lastObject, prop)) {
-                    @throw RLMPredicateException(@"Invalid value",
-                                                [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
-                }
-            } else {
-                @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
-            }
-        } else {
-            @throw RLMPredicateException(@"Invalid value", @"object must be of type NSArray for BETWEEN operations");
-        }
-    } else {
-        if (!RLMIsObjectValidForProperty(value, prop)) {
-            @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", RLMTypeToString(prop.type)]);
-        }
+    // FIXME: when core support multiple levels of link queries, change == to >=
+    //        and loop through the elements of arr to build up link query
+    if (paths.count != 2) {
+        @throw RLMPredicateException(@"Invalid predicate", @"Only KeyPaths one level deep are currently supported");
+    }
+    
+    // get the first index and property
+    NSUInteger idx1 = RLMValidatedColumnIndex(desc, paths[0]);
+    RLMProperty *firstProp = desc[paths[0]];
+
+    // make sure we have a valid property type
+    if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
+        throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", paths[0]]);
+    }
+
+    // get the next level index and property
+    NSUInteger idx2 = RLMValidatedColumnIndex(schema[firstProp.objectClassName], paths[1]);
+    RLMProperty *secondProp = schema[firstProp.objectClassName][paths[1]];
+
+    // validate value
+    if (!RLMIsObjectValidForProperty(value, secondProp)) {
+        @throw RLMPredicateException(@"Invalid value",
+                                     [NSString stringWithFormat:@"object for property '%@' must be of type '%@'",
+                                      secondProp.name, RLMTypeToString(secondProp.type)]);
+    }
+
+    // finally cast to native types and add query clause
+    RLMPropertyType type = secondProp.type;
+    NSPredicateOperatorType opType = pred.predicateOperatorType;
+    switch (type) {
+        case type_Bool:
+            add_bool_constraint_to_link_query(query, opType, idx1, idx2, bool([(NSNumber *)value boolValue]));
+            break;
+        case type_DateTime:
+            add_datetime_constraint_to_link_query(query, opType, idx1, idx2, double([(NSDate *)value timeIntervalSince1970]));
+            break;
+        case type_Double:
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Double([(NSNumber *)value doubleValue]));
+            break;
+        case type_Float:
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Float([(NSNumber *)value floatValue]));
+            break;
+        case type_Int:
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([(NSNumber *)value intValue]));
+            break;
+        case type_String:
+            add_string_constraint_to_link_query(query, opType, pred.options, idx1, idx2, value);
+            break;
+        case type_Binary:
+            @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+        case type_Link:
+            add_link_contraint_to_query(query, opType, idx1, value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Unsupported predicate value type",
+                                         [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);
     }
 }
 
 void update_query_with_value_expression(RLMSchema *schema,
                                         RLMObjectSchema *desc,
                                         tightdb::Query &query,
-                                        NSString *columnName,
+                                        NSString *keyPath,
                                         id value,
-                                        NSPredicateOperatorType operatorType,
-                                        NSComparisonPredicateOptions predicateOptions)
+                                        NSComparisonPredicate *pred)
 {
-    // validate object type
-    NSArray *arr = [columnName componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"."]];
-    NSString *firstColumnName = [arr objectAtIndex:0];
-    NSString *secondColumnName;
+    // split keypath
+    NSArray *paths = [keyPath componentsSeparatedByString:@"."];
+    RLMProperty *prop = desc[paths[0]];
 
-    BOOL isLinkQuery = NO;
-    NSUInteger firstIndex, secondIndex = 0;
-    RLMPropertyType secondType = RLMPropertyTypeAny;
-
-    firstIndex = RLMValidatedColumnIndex(desc, firstColumnName);
-    RLMProperty *firstProp = desc[firstColumnName];
-
-    // FIXME: when core support multiple levels of link queries, change == to >=
-    //        and loop through the elements of arr to build up link query
-    if ([arr count] == 2) {
-        isLinkQuery = YES;
-        if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
-            throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", firstColumnName]);
-        }
-        secondColumnName = [arr objectAtIndex:1];
-        RLMProperty *secondProp = schema[firstProp.objectClassName][secondColumnName];
-        secondType = secondProp.type;
-        secondIndex = RLMValidatedColumnIndex(schema[firstProp.objectClassName], secondColumnName);
-    }
-    else if ([arr count] > 2) {
+    // make sure we are not comparing on RLMArray
+    if (prop.type == RLMPropertyTypeArray) {
         @throw RLMPredicateException(@"Invalid predicate",
-                                     [NSString stringWithFormat:@"Too many levels of relationships: %lu > 2", (unsigned long)[arr count]]);
+                                     @"RLMArray predicates must contain the ANY modifier");
     }
 
-    BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
-    if (!isLinkQuery) {
-        validate_value_for_query(value, firstProp, betweenOperation);
-    }
-    
-    if (betweenOperation) {
-        add_between_constraint_to_query(query, firstProp.type, firstIndex, value);
+    // check to see if this is a link query
+    if (paths.count > 1) {
+        update_link_query_with_value_expression(schema, desc, query, paths, value, pred);
         return;
     }
     
+    // check to see if this is a between query
+    if (pred.predicateOperatorType == NSBetweenPredicateOperatorType) {
+        add_between_constraint_to_query(query, desc, keyPath, value);
+        return;
+    }
+    
+    // get prop and index
+    NSUInteger index = RLMValidatedColumnIndex(desc, keyPath);
+    
+    // validate value
+    if (!RLMIsObjectValidForProperty(value, prop)) {
+        @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", RLMTypeToString(prop.type)]);
+    }
+    
     // finally cast to native types and add query clause
-    RLMPropertyType type;
-    if (isLinkQuery) {
-        type = secondType;
-    }
-    else {
-        type = firstProp.type;
-    }
+    RLMPropertyType type = prop.type;
     switch (type) {
         case type_Bool:
-            if (isLinkQuery) {
-                add_bool_constraint_to_link_query(query, operatorType, firstIndex, secondIndex, bool([(NSNumber *)value boolValue]));
-            }
-            else {
-                add_bool_constraint_to_query(query, operatorType, firstIndex,
-                                             bool([(NSNumber *)value boolValue]));
-            }
+            add_bool_constraint_to_query(query, pred.predicateOperatorType, index, bool([(NSNumber *)value boolValue]));
             break;
         case type_DateTime:
-            if (isLinkQuery) {
-                add_datetime_constraint_to_link_query(query, operatorType, firstIndex, secondIndex,
-                                                      double([(NSDate *)value timeIntervalSince1970]));
-            }
-            else {
-                add_datetime_constraint_to_query(query, operatorType, firstIndex,
-                                                    double([(NSDate *)value timeIntervalSince1970]));
-            }
+            add_datetime_constraint_to_query(query, pred.predicateOperatorType, index, double([(NSDate *)value timeIntervalSince1970]));
             break;
         case type_Double:
-            if (isLinkQuery) {
-                add_numeric_constraint_to_link_query(query, type, operatorType,
-                                                     firstIndex, secondIndex, Double([(NSNumber *)value doubleValue]));
-            }
-            else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                firstIndex, [(NSNumber *)value doubleValue]);
-            }
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value doubleValue]);
             break;
         case type_Float:
-            if (isLinkQuery) {
-                add_numeric_constraint_to_link_query(query, type, operatorType, firstIndex,
-                                                     secondIndex, Float([(NSNumber *)value floatValue]));
-            }
-            else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                firstIndex, [(NSNumber *)value floatValue]);
-            }
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value floatValue]);
             break;
         case type_Int:
-            if (isLinkQuery) {
-                add_numeric_constraint_to_link_query(query, type, operatorType, firstIndex,
-                                                     secondIndex, Int([(NSNumber *)value intValue]));
-            }
-            else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                firstIndex, [(NSNumber *)value intValue]);
-            }
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value intValue]);
             break;
         case type_String:
-            if (isLinkQuery) {
-                add_string_constraint_to_link_query(query, operatorType, predicateOptions,
-                                                    firstIndex, secondIndex, value);
-            }
-            else {
-                add_string_constraint_to_query(query, operatorType, predicateOptions, firstIndex, value);
-            }
+            add_string_constraint_to_query(query, pred.predicateOperatorType, pred.options, index, value);
             break;
         case type_Binary:
-            if (isLinkQuery) {
-                @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
-            }
-            add_binary_constraint_to_query(query, operatorType, firstIndex, value);
+            add_binary_constraint_to_query(query, pred.predicateOperatorType, index, value);
+            break;
+        case type_Link:
+            add_link_contraint_to_query(query, pred.predicateOperatorType, index, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
@@ -583,7 +608,12 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     
     NSUInteger rightIndex = RLMValidatedColumnIndex(scheme, rightColumnName);
     RLMPropertyType rightType = [scheme[rightColumnName] type];
-    
+
+    if (leftType == RLMPropertyTypeArray || rightType == RLMPropertyTypeArray) {
+        @throw RLMPredicateException(@"Invalid predicate",
+                                     @"RLMArray predicates must contain the ANY modifier");
+    }
+
     // TODO: Should we handle special case where left row is the same as right row (tautology)
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
     if (leftType == rightType) {
@@ -658,7 +688,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
                 
             default:
                 @throw RLMPredicateException(@"Invalid compound predicate type",
-                                               @"Only support AND, OR and NOT predicate types");
+                                             @"Only support AND, OR and NOT predicate types");
         }
     }
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
@@ -667,37 +697,65 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
         // validate expressions
         NSExpressionType exp1Type = validated_expression_type(compp.leftExpression);
         NSExpressionType exp2Type = validated_expression_type(compp.rightExpression);
-        
-        // figure out if we have column expression or value expression and update query accordingly
-        // we are limited here to KeyPath expressions and constantValue expressions from validation
-        if (exp1Type == NSKeyPathExpressionType) {
-            if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
+
+        // check modifier
+        if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
+            // no support for ALL queries
+            @throw RLMPredicateException(@"Invalid predicate",
+                                         @"ALL modifier not supported");
+        }
+        else if (compp.comparisonPredicateModifier == NSAnyPredicateModifier) {
+            // for ANY queries
+            if (exp1Type != NSKeyPathExpressionType || exp2Type != NSConstantValueExpressionType) {
+                @throw RLMPredicateException(@"Invalid predicate",
+                                             @"Predicate with ANY modifier must compare a KeyPath with RLMArray with a value");
             }
-            else {
-                update_query_with_value_expression(schema, objectSchema, query,
-                                                   compp.leftExpression.keyPath,
-                                                   compp.rightExpression.constantValue,
-                                                   compp.predicateOperatorType, compp.options);
+
+            // split keypath
+            NSArray *paths = [compp.leftExpression.keyPath componentsSeparatedByString:@"."];
+
+            // first component of keypath must be RLMArray
+            RLMProperty *arrayProp = objectSchema[paths[0]];
+            if (arrayProp.type != RLMPropertyTypeArray) {
+                @throw RLMPredicateException(@"Invalid predicate",
+                                             @"Predicate with ANY modifier must compare a KeyPath with RLMArray with a value");
             }
+
+            if (paths.count == 1) {
+                // querying on object identity
+                NSUInteger idx = RLMValidatedColumnIndex(objectSchema, arrayProp.name);
+                add_link_contraint_to_query(query, compp.predicateOperatorType, idx, compp.rightExpression.constantValue);
+            }
+            else if (paths.count > 1) {
+                // querying on object properties
+                update_link_query_with_value_expression(schema, objectSchema, query, paths, compp.rightExpression.constantValue, compp);
+            }
+            return;
+        }
+        else if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
+            // both expression are KeyPaths
+            update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath,
+                                                compp.predicateOperatorType);
+        }
+        else if (exp1Type == NSKeyPathExpressionType && exp2Type == NSConstantValueExpressionType) {
+            // comparing keypath to value
+            update_query_with_value_expression(schema, objectSchema, query, compp.leftExpression.keyPath,
+                                               compp.rightExpression.constantValue, compp);
+        }
+        else if (exp1Type == NSConstantValueExpressionType && exp2Type == NSKeyPathExpressionType) {
+            // comparing value to keypath
+            update_query_with_value_expression(schema, objectSchema, query, compp.rightExpression.keyPath,
+                                               compp.leftExpression.constantValue, compp);
         }
         else {
-            if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_value_expression(schema, objectSchema, query,
-                                                   compp.rightExpression.keyPath,
-                                                   compp.leftExpression.constantValue,
-                                                   compp.predicateOperatorType, compp.options);
-            }
-            else {
-                @throw RLMPredicateException(@"Invalid predicate expressions",
-                                               @"Tring to compare two constant values");
-            }
+            @throw RLMPredicateException(@"Invalid predicate expressions",
+                                         @"Tring to compare two constant values");
         }
     }
     else {
         // invalid predicate type
         @throw RLMPredicateException(@"Invalid predicate",
-                                       @"Only support compound and comparison predicates");
+                                     @"Only support compound and comparison predicates");
     }
 }
 
