@@ -369,7 +369,7 @@ case "$COMMAND" in
     "prepare-release")
         # Clean & Build iOS/OSX
         sh build.sh clean "$XCMODE" || exit 1
-        sh build.sh build "$XCMODE" || exit 1
+        sh build.sh test "$XCMODE" || exit 1
         
         # Build Browser
         sh build.sh browser "$XCMODE" || exit 1
@@ -381,7 +381,6 @@ case "$COMMAND" in
         
         # Zip & upload release
         RELEASE_DIR=$(mktemp -dt "$0")
-        echo ${RELEASE_DIR}
         mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/examples/objc $RELEASE_DIR/plugin || exit 1
         cp -R plugin $RELEASE_DIR || exit 1
         cp -R build/DerivedData/RealmBrowser-*/Build/Products/Release/Realm\ Browser.app "$RELEASE_DIR/browser/Realm Browser.app" || exit 1
@@ -399,6 +398,16 @@ case "$COMMAND" in
         ZIPNAME=realm-cocoa-$VERSION.zip
         (cd $RELEASE_DIR && zip -r $ZIPNAME * || exit 1)
         s3cmd put $RELEASE_DIR/$ZIPNAME s3://static.realm.io/downloads/cocoa/ || exit 1
+
+        # Zip & upload CocoaPods release
+        COCOAPODS_RELEASE_DIR=$(mktemp -dt "$0")
+        mkdir -p $COCOAPODS_RELEASE_DIR/ios $COCOAPODS_RELEASE_DIR/osx || exit 1
+        cp -R build/Release/Realm.framework $COCOAPODS_RELEASE_DIR/ios/Realm.framework || exit 1
+        cp -R build/DerivedData/Realm-*/Build/Products/Release/Realm.framework $RELEASE_DIR/osx/Realm.framework || exit 1
+
+        COCOAPODS_ZIPNAME=realm-cocoapods-$VERSION.zip
+        (cd $COCOAPODS_RELEASE_DIR && zip -r $COCOAPODS_ZIPNAME * || exit 1)
+        s3cmd put $COCOAPODS_RELEASE_DIR/$COCOAPODS_ZIPNAME s3://static.realm.io/downloads/cocoapods/ || exit 1
 
         echo "Realm Cocoa $VERSION was successfully prepared for released.\nPlease perform manual tests and then run 'deploy-release' to finalize the release process."
         exit 0
