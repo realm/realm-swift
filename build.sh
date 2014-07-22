@@ -15,7 +15,7 @@ set -o pipefail
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.2
+    REALM_CORE_VERSION=0.80.3
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -95,9 +95,10 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        mkdir -p build
+        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
-            echo "The raw xcodebuild output is available in build.log"
+            echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
