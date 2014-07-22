@@ -227,9 +227,12 @@
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol = 1"] count], (NSUInteger)1, @"1 expected");
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.intCol != 1"] count], (NSUInteger)0, @"0 expected");
 
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol = 1.1"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol <= 1.1"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.floatCol < 1.1"] count], (NSUInteger)0, @"0 expected");
+    NSPredicate *predEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol = %f", 1.1];
+    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predEq].count, (NSUInteger)1, @"1 expected");
+    NSPredicate *predLessEq = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol <= %f", 1.1];
+    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLessEq].count, (NSUInteger)1, @"1 expected");
+    NSPredicate *predLess = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol < %f", 1.1];
+    XCTAssertEqual([LinkToAllTypesObject objectsInRealm:realm withPredicate:predLess].count, (NSUInteger)0, @"1 expected");
     
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol = 1.11"] count], (NSUInteger)1, @"1 expected");
     XCTAssertEqual([[realm objects:[LinkToAllTypesObject className] where:@"allTypesCol.doubleCol >= 1.11"] count], (NSUInteger)1, @"1 expected");
@@ -246,7 +249,9 @@
     XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.binaryCol = 'a'"], @"Binary data not supported");
     XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.mixedCol = 'a'"], @"Mixed data not supported");
     XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.invalidCol = 'a'"], @"Invalid column name should throw");
-    
+
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.longCol = 'a'"], @"Wrong data type should throw");
+
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol BETWEEN %@", @[@1.1, @1.2]];
     XCTAssertThrows([LinkToAllTypesObject objectsWithPredicate:pred], @"BETWEEN query should throw");
 }
@@ -317,12 +322,18 @@
     
     StringObject *stringObj0 = [[StringObject alloc] initWithObject:@[@"string0"]];
     StringObject *stringObj1 = [[StringObject alloc] initWithObject:@[@"string1"]];
-    
+    StringObject *stringObj2 = [[StringObject alloc] initWithObject:@[@"string2"]];
+
     [realm beginWriteTransaction];
 
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj0]];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj1]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj0]];
+    AllTypesObject *obj0 = [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj0]];
+    AllTypesObject *obj1 = [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj1]];
+    AllTypesObject *obj2 = [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj0]];
+    AllTypesObject *obj3 = [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj2]];
+
+    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj0, obj1]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj1]]];
+    [ArrayOfAllTypesObject createInDefaultRealmWithObject:@[@[obj0, obj2, obj3]]];
 
     [realm commitWriteTransaction];
     
@@ -330,9 +341,23 @@
     XCTAssertEqual([AllTypesObject objectsWithPredicate:pred1].count, 2U, @"Count should be 2");
     NSPredicate *pred2 = [NSPredicate predicateWithFormat:@"objectCol = %@", stringObj1];
     XCTAssertEqual([AllTypesObject objectsWithPredicate:pred2].count, 1U, @"Count should be 1");
-    
+
+    // invalid object queries
     NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
+
+    NSPredicate *pred4 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj0];
+    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred4].count, 2U, @"Count should be 2");
+    NSPredicate *pred5 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj1];
+    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred5].count, 2U, @"Count should be 2");
+    NSPredicate *pred6 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj2];
+    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred6].count, 1U, @"Count should be 1");
+
+    // invalid object keypath queries
+    NSPredicate *pred7 = [NSPredicate predicateWithFormat:@"array.objectCol != %@", stringObj2];
+    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred7], @"Operator other than = should throw");
+    NSPredicate *pred8 = [NSPredicate predicateWithFormat:@"array.objectCol == %@", obj0];
+    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred8], @"Wrong object type should throw");
 }
 
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects

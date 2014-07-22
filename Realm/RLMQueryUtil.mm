@@ -428,17 +428,12 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     
 void add_link_contraint_to_query(tightdb::Query & query,
                                  NSPredicateOperatorType operatorType,
-                                 RLMProperty *prop,
+                                 NSUInteger column,
                                  RLMObject *obj) {
     if (operatorType != NSEqualToPredicateOperatorType) {
         @throw RLMPredicateException(@"Invalid operator type", @"Only 'Equal' operator supported for object comparison");
     }
-    if (![obj isKindOfClass:RLMObject.class] || ![prop.objectClassName isEqualToString:[obj.class className]]) {
-        @throw RLMPredicateException(@"Invalid object type",
-                                     [NSString stringWithFormat:@"Object for column '%@' must be of type '%@'",
-                                      prop.name, prop.objectClassName]);
-    }
-    query.links_to(prop.column, obj->_row.get_index());
+    query.links_to(column, obj->_row.get_index());
 }
  
 void update_link_query_with_value_expression(RLMSchema *schema,
@@ -471,6 +466,13 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     NSUInteger idx2 = RLMValidatedColumnIndex(schema[firstProp.objectClassName], columns[1]);
     RLMProperty *secondProp = schema[firstProp.objectClassName][columns[1]];
 
+    // validate value
+    if (!RLMIsObjectValidForProperty(value, secondProp)) {
+        @throw RLMPredicateException(@"Invalid value",
+                                     [NSString stringWithFormat:@"object for property '%@' must be of type '%@'",
+                                      secondProp.name, RLMTypeToString(secondProp.type)]);
+    }
+
     // finally cast to native types and add query clause
     RLMPropertyType type = secondProp.type;
     switch (type) {
@@ -494,6 +496,9 @@ void update_link_query_with_value_expression(RLMSchema *schema,
             break;
         case type_Binary:
             @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+        case type_Link:
+            add_link_contraint_to_query(query, opType, idx1, value);
+            break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);
@@ -555,7 +560,7 @@ void update_query_with_value_expression(RLMSchema *schema,
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
         case type_Link:
-            add_link_contraint_to_query(query, operatorType, prop, value);
+            add_link_contraint_to_query(query, operatorType, index, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",

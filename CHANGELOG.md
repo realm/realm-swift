@@ -7,9 +7,9 @@
 
 ### Enhancements
 
-* Added support for basic querying of relationships (both one-to-one and one-to-many).
+* Added support for basic querying of RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
   Does not support NSData properties or `BEGINSWITH`, `ENDSWITH`, `CONTAINS` and other options for string properties.
-* Added support for querying for specific objects in one-to-one relationships.
+* Added support for querying for object equality in RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
 * Added a helper method to RLMRealm to perform a block inside a transaction.
 
 ### Bugfixes
