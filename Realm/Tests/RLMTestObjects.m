@@ -52,6 +52,9 @@
 @implementation AllTypesObject
 @end
 
+@implementation LinkToAllTypesObject
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
