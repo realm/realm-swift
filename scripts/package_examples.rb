@@ -51,35 +51,35 @@ end
 # Script
 ##########################
 
-# objc_examples = [
-#   "examples/ios/objc/RealmExamples.xcodeproj",
-#   "examples/osx/objc/RealmExamples.xcodeproj"
-# ]
+objc_examples = [
+  "examples/ios/objc/RealmExamples.xcodeproj",
+  "examples/osx/objc/RealmExamples.xcodeproj"
+]
 
-# objc_examples.each do |example|
-#   remove_subprojects_from_example(example)
+objc_examples.each do |example|
+  remove_subprojects_from_example(example)
 
-#   framework_search_paths_to_replace = "../../../build/${CONFIGURATION}"
-#   filepath = File.join(example, "project.pbxproj")
-#   contents = File.read(filepath)
-#   if contents.include?(framework_search_paths_to_replace)
-#     # static framework approach
-#     File.open(filepath, "w") do |file|
-#       file.puts contents.gsub(framework_search_paths_to_replace, "../../")
-#     end
-#   else
-#     # dynamic framework approach
-#     add_framework(example, "../../Realm.framework")
-#   end
-# end
+  framework_search_paths_to_replace = "../../../build/${CONFIGURATION}"
+  filepath = File.join(example, "project.pbxproj")
+  contents = File.read(filepath)
+  if contents.include?(framework_search_paths_to_replace)
+    # static framework approach
+    File.open(filepath, "w") do |file|
+      file.puts contents.gsub(framework_search_paths_to_replace, "../../")
+    end
+  else
+    # dynamic framework approach
+    add_framework(example, "../../Realm.framework")
+  end
+end
 
-# # Update RubyMotion sample
+# Update RubyMotion sample
 
-# rakefile_path = "examples/ios/rubymotion/Simple/Rakefile"
-# contents = File.read(rakefile_path)
-# File.open(rakefile_path, "w") do |file|
-#   file.puts contents.gsub("../../../../", "../../../")
-# end
+rakefile_path = "examples/ios/rubymotion/Simple/Rakefile"
+contents = File.read(rakefile_path)
+File.open(rakefile_path, "w") do |file|
+  file.puts contents.gsub("../../../../", "../../../")
+end
 
 swift_examples = [
   "examples/ios/swift/RealmExamples.xcodeproj"
