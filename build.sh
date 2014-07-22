@@ -15,7 +15,7 @@ set -o pipefail
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.1
+    REALM_CORE_VERSION=0.80.3
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -45,6 +45,7 @@ command:
   test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
+  browser [xcmode]:        builds the RealmBrowser OSX app
   verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
   docs:                    builds docs in docs/output
   get-version:             get the current version
@@ -65,19 +66,18 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
-    rm -rf bin
+    rm -rf build/bin
+    mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -89,7 +89,6 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
 }
 
 xc() {
@@ -97,9 +96,10 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        mkdir -p build
+        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
-            echo "The raw xcodebuild output is available in build.log"
+            echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
@@ -134,10 +134,18 @@ if [ -z "$SRCROOT" ]; then
 fi
 
 download_core() {
-    rm -rf core
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    echo "Downloading dependency: core ${REALM_CORE_VERSION}"
+    TMP_DIR="$(mktemp -dt "$0")"
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip" || exit 1
+    (
+        cd "${TMP_DIR}"
+        unzip "core-${REALM_CORE_VERSION}.zip" || exit 1
+        mv core core-${REALM_CORE_VERSION} || exit 1
+        rm -f "core-${REALM_CORE_VERSION}.zip" || exit 1
+    )
+    rm -rf core-${REALM_CORE_VERSION} core || exit 1
+    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} . || exit 1
+    ln -s core-${REALM_CORE_VERSION} core || exit 1
 }
 
 COMMAND="$1"
@@ -162,8 +170,9 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
-        echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-        if ! [ -d core ]; then
+        if ! [ -L core ]; then
+            echo "core is not a symlink. Deleting..."
+            rm -rf core
             download_core
         elif ! $(head -n 1 core/release_notes.txt | grep ${REALM_CORE_VERSION} >/dev/null); then
             download_core
@@ -281,17 +290,17 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        if [[ "$XCVERSION" == "6" ]]; then
+        if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
-        xc "-project objc/RealmSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
-        if [[ "$XCVERSION" != "6" ]]; then
+        if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
         exit 0
@@ -299,7 +308,7 @@ case "$COMMAND" in
 
     "examples-debug")
         cd examples
-        if [[ "$XCVERSION" == "6" ]]; then
+        if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
@@ -309,9 +318,22 @@ case "$COMMAND" in
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
-        if [[ "$XCVERSION" != "6" ]]; then
+        if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi 
+        exit 0
+        ;;
+
+    ######################################
+    # Browser
+    ######################################
+    "browser")
+        if [[ "$XCODE_VERSION" != "6" ]]; then
+            xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
+        else
+            echo "Realm Browser can only be built with Xcode 5."
+            exit 1
+        fi
         exit 0
         ;;
 
@@ -326,14 +348,16 @@ case "$COMMAND" in
 
     "set-version")
         realm_version="$2"
-        version_file="Realm/Realm-Info.plist"
+        version_files="Realm/Realm-Info.plist tools/RealmBrowser/RealmBrowser/RealmBrowser-Info.plist"
 
         if [ -z "$realm_version" ]; then
             echo "You must specify a version."
             exit 1
-        fi 
-        PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
-        PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        fi
+        for version_file in $version_files; do 
+            PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
+            PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        done
         exit 0
         ;;
 

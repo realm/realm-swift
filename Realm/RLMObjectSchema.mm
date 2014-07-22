@@ -102,9 +102,9 @@
         NSString *name = RLMStringDataToNSString(table->get_column_name(col).data());
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
-                                                       column:col
                                               objectClassName:nil
                                                    attributes:(RLMPropertyAttributes)0];
+        prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
             tightdb::TableRef linkTable = table->get_link_target(col);

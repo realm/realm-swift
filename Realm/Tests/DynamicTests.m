@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMSchema_Private.h"
 
 @interface DynamicTests : RLMTestCase
 @end
@@ -53,6 +54,19 @@
     XCTAssertEqual(array.count, (NSUInteger)2, @"Array should have 2 elements");
     XCTAssertNotEqual(array.objectClassName, DynamicObject.className,
                       @"Array class should by a dynamic object class");
+}
+
+- (void)testDynamicSchema {
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
+                                                     type:RLMPropertyTypeInt
+                                          objectClassName:nil
+                                               attributes:0];
+    RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
+                                                                   objectClass:RLMObject.class properties:@[prop]];
+    schema.objectSchema = @[objectSchema];
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:schema];
+    XCTAssertNotNil(dyrealm, @"dynamic realm shouldn't be nil");
 }
 
 - (void)testDynamicProperties {

@@ -44,9 +44,18 @@
 @implementation BinaryObject
 @end
 
+@implementation UTF8Object
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
+@end
+
+@implementation ArrayOfAllTypesObject
+@end
+
+@implementation LinkToAllTypesObject
 @end
 
 #pragma mark - Real Life Objects

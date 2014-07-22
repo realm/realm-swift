@@ -1,12 +1,10 @@
-# Realm Visual Editor
+# Realm Browser
 
 This project builds a Mac OS app that allows you to open, browse & edit .realm files.
-
 
 ## Installing
 
 If you are just looking to install this app on your machine, the easiest way is to download the [latest release of Realm](http://realm.io/docs/ios/latest). The zip releases contain an easy-to-build version of this tool under the `tools/` folder.
-
 
 ## Modifying
 
@@ -18,6 +16,6 @@ If you want to modify this tool, read on for instructions on how to build it loc
   - Build the “OSX Framework” target.
   - Under “Products” in Xcode’s File navigator, right click on the “Realm.framework” product and select “Show in Finder”.
   - Copy the Realm.framework back to the build sub-directory in the Realm project directory.
-2. Build the Visual Editor application
-  - Open the tools/RealmVisualEditor.xcodeproj project in Xcode
+2. Build the Realm Browser application
+  - Open the tools/RealmBrowser/RealmBrowser.xcodeproj project in Xcode
   - Build and run!

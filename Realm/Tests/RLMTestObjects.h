@@ -66,6 +66,10 @@
 
 @end
 
+@interface UTF8Object : RLMObject
+@property NSString *柱колоéнǢкƱаم;
+@end
+
 RLM_ARRAY_TYPE(StringObject)
 RLM_ARRAY_TYPE(IntObject)
 
@@ -85,6 +89,16 @@ RLM_ARRAY_TYPE(IntObject)
 @property id            mixedCol;
 @property StringObject *objectCol;
 
+@end
+
+RLM_ARRAY_TYPE(AllTypesObject)
+
+@interface LinkToAllTypesObject : RLMObject
+@property AllTypesObject *allTypesCol;
+@end
+
+@interface ArrayOfAllTypesObject : RLMObject
+@property RLMArray<AllTypesObject> *array;
 @end
 
 #pragma mark - Real Life Objects

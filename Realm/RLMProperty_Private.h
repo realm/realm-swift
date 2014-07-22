@@ -29,7 +29,6 @@
 
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
-                      column:(NSUInteger)column
              objectClassName:(NSString *)objectClassName
                   attributes:(RLMPropertyAttributes)attributes;
 
