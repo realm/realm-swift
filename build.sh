@@ -58,6 +58,19 @@ EOF
 }
 
 ######################################
+# Variables
+######################################
+
+# Xcode sets this variable - set to current directory if running standalone
+if [ -z "$SRCROOT" ]; then
+    SRCROOT="$(pwd)"
+fi
+
+COMMAND="$1"
+XCMODE="$2"
+: ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
+
+######################################
 # Xcode Helpers
 ######################################
 
@@ -67,12 +80,12 @@ fi
 
 xcode5() {
     ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
-    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation="${SRCROOT}/build/DerivedData" $@
 }
 
 xcode6() {
     ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
-    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation="${SRCROOT}/build/DerivedData" $@
 }
 
 xcode() {
@@ -125,13 +138,8 @@ if [ "$#" -eq 0 -o "$#" -gt 2 ]; then
 fi
 
 ######################################
-# Variables
+# Download Core
 ######################################
-
-# Xcode sets this variable - set to current directory if running standalone
-if [ -z "$SRCROOT" ]; then
-    SRCROOT="$(pwd)"
-fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
@@ -148,10 +156,9 @@ download_core() {
     ln -s core-${REALM_CORE_VERSION} core || exit 1
 }
 
-COMMAND="$1"
-XCMODE="$2"
-: ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
-
+######################################
+# Command Handling
+######################################
 
 case "$COMMAND" in
 
@@ -159,10 +166,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme OSX -configuration Debug clean" || exit 1
-        xcrealm "-scheme OSX -configuration Release clean" || exit 1
+        rm -rf build || exit 1
         exit 0
         ;;
 
@@ -359,6 +363,68 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    ######################################
+    # Releasing
+    ######################################
+    "prepare-release")
+        # Clean & Build iOS/OSX
+        sh build.sh clean "$XCMODE" || exit 1
+        sh build.sh build "$XCMODE" || exit 1
+        
+        # Build Browser
+        sh build.sh browser "$XCMODE" || exit 1
+
+        # Build and upload docs
+        sh build.sh docs || exit 1
+        VERSION=$(sh build.sh get-version)
+        s3cmd put -r docs/output/$VERSION s3://static.realm.io/docs/ios/ || exit 1
+        
+        # Zip & upload release
+        RELEASE_DIR=$(mktemp -dt "$0")
+        echo ${RELEASE_DIR}
+        mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/examples/objc $RELEASE_DIR/plugin || exit 1
+        cp -R plugin $RELEASE_DIR || exit 1
+        cp -R build/DerivedData/RealmBrowser-*/Build/Products/Release/Realm\ Browser.app "$RELEASE_DIR/browser/Realm Browser.app" || exit 1
+        cp -R build/Release/Realm.framework $RELEASE_DIR/ios/Realm.framework || exit 1
+        cp -R build/DerivedData/Realm-*/Build/Products/Release/Realm.framework $RELEASE_DIR/osx/Realm.framework || exit 1
+        # TODO: Move examples in accordance with this structure: https://github.com/realm/realm-cocoa/pull/631#issuecomment-49680698
+        cp -R examples/objc $RELEASE_DIR/examples || exit 1
+        cp LICENSE $RELEASE_DIR/LICENSE.txt || exit 1
+        # Generate docs.webloc
+        echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\
+        <plist version=\"1.0\"><dict><key>URL</key><string>http://realm.io/docs/cocoa/${VERSION}</string></dict></plist>" > $RELEASE_DIR/docs.webloc || exit 1
+
+        # TODO: Update framework path in all example projects
+
+        ZIPNAME=realm-cocoa-$VERSION.zip
+        (cd $RELEASE_DIR && zip -r $ZIPNAME * || exit 1)
+        s3cmd put $RELEASE_DIR/$ZIPNAME s3://static.realm.io/downloads/cocoa/ || exit 1
+
+        echo "Realm Cocoa $VERSION was successfully prepared for released.\nPlease perform manual tests and then run 'deploy-release' to finalize the release process."
+        exit 0
+        ;;
+
+    "deploy-release")
+        TMP_DIR=$(mktemp -dt "$0")
+        VERSION=$(sh build.sh get-version)
+        ZIPNAME=realm-cocoa-$VERSION.zip
+
+        # Update "latest" redirect on static.realm.io
+        touch $TMP_DIR/latest || exit 1
+        s3cmd put $TMP_DIR/latest --add-header "x-amz-website-redirect-location:http://static.realm.io/downloads/cocoa/$ZIPNAME" s3://static.realm.io/downloads/cocoa/ || exit 1
+
+        # Submit to CocoaPods
+        sh build.sh pod-deploy || exit 1
+
+        echo "Realm Cocoa $VERSION was successfully released"
+        exit 0
+        ;;
+
+    "pod-deploy")
+        pod spec lint || exit 1
+        pod trunk push || exit 1
+        exit 0
+        ;;
     *)
         usage
         exit 1
