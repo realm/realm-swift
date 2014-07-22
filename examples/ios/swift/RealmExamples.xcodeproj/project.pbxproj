@@ -1,0 +1,784 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E8359CC7197E523F008FA094 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8359C28197E51AB008FA094 /* Realm.framework */; };
+		E8359CC8197E5243008FA094 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8359C28197E51AB008FA094 /* Realm.framework */; };
+		E8359CCA197E524A008FA094 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8359C28197E51AB008FA094 /* Realm.framework */; };
+		E8359CCB197E524D008FA094 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8359C28197E51AB008FA094 /* Realm.framework */; };
+		E8359CD1197E526C008FA094 /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E8359C2C197E51AB008FA094 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E8359CD3197E5277008FA094 /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E8359C2C197E51AB008FA094 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E8359CD5197E527F008FA094 /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E8359C2C197E51AB008FA094 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E8359CD7197E5288008FA094 /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E8359C2C197E51AB008FA094 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E8359CDB197E529E008FA094 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8359CD9197E529E008FA094 /* AppDelegate.swift */; };
+		E8359CE2197E53C4008FA094 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8359CDE197E53C4008FA094 /* AppDelegate.swift */; };
+		E8359CE3197E53C4008FA094 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8359CDF197E53C4008FA094 /* Images.xcassets */; };
+		E8359CE5197E53C4008FA094 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8359CE1197E53C4008FA094 /* TableViewController.swift */; };
+		E8359CEC197E5403008FA094 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8359CE7197E5403008FA094 /* AppDelegate.swift */; };
+		E8359CED197E5403008FA094 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8359CE8197E5403008FA094 /* default-v0.realm */; };
+		E8359CEE197E5403008FA094 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8359CE9197E5403008FA094 /* default-v1.realm */; };
+		E8359CEF197E5403008FA094 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8359CEA197E5403008FA094 /* default-v2.realm */; };
+		E8359CF4197E5427008FA094 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8359CF2197E5427008FA094 /* AppDelegate.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E8359C27197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8D89B981955FC6D00CF2B9A;
+			remoteInfo = OSX;
+		};
+		E8359C29197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8D89BA31955FC6D00CF2B9A;
+			remoteInfo = "OSX Tests";
+		};
+		E8359C2B197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E856D1D5195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		E8359C2D197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E856D1DF195614A400FB2FCF;
+			remoteInfo = "iOS Tests";
+		};
+		E8359C2F197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8FE4140196DBA6700073FBB;
+			remoteInfo = OSXTestFramework;
+		};
+		E8359C31197E51AB008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E8CA10F9196DC18A0044F8AA;
+			remoteInfo = iOSTestFramework;
+		};
+		E8359CBF197E5227008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		E8359CC1197E5231008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		E8359CC3197E5235008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		E8359CC5197E5238008FA094 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E8359CCC197E5250008FA094 /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E8359CD1197E526C008FA094 /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359CCD197E5257008FA094 /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E8359CD3197E5277008FA094 /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359CCE197E525B008FA094 /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E8359CD5197E527F008FA094 /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359CCF197E5262008FA094 /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E8359CD7197E5288008FA094 /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Realm-Xcode6.xcodeproj"; path = "../../../Realm-Xcode6.xcodeproj"; sourceTree = "<group>"; };
+		E8359C37197E51B5008FA094 /* Encryption.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Encryption.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8359C5A197E51C2008FA094 /* Migration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Migration.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8359C7D197E51D0008FA094 /* Simple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Simple.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8359CA0197E51DC008FA094 /* TableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8359CD9197E529E008FA094 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8359CDA197E529E008FA094 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8359CDE197E53C4008FA094 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8359CDF197E53C4008FA094 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E8359CE0197E53C4008FA094 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8359CE1197E53C4008FA094 /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		E8359CE7197E5403008FA094 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8359CE8197E5403008FA094 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
+		E8359CE9197E5403008FA094 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
+		E8359CEA197E5403008FA094 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
+		E8359CEB197E5403008FA094 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8359CF2197E5427008FA094 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8359CF3197E5427008FA094 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E8359C34197E51B5008FA094 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CCB197E524D008FA094 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C57197E51C2008FA094 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CCA197E524A008FA094 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C7A197E51D0008FA094 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CC7197E523F008FA094 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C9D197E51DC008FA094 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CC8197E5243008FA094 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E8359C1F197E51AB008FA094 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E8359C28197E51AB008FA094 /* Realm.framework */,
+				E8359C2A197E51AB008FA094 /* OSX Tests.xctest */,
+				E8359C2C197E51AB008FA094 /* Realm.framework */,
+				E8359C2E197E51AB008FA094 /* iOS Tests.xctest */,
+				E8359C30197E51AB008FA094 /* TestFramework.framework */,
+				E8359C32197E51AB008FA094 /* TestFramework.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E8359CD8197E529E008FA094 /* Simple */ = {
+			isa = PBXGroup;
+			children = (
+				E8359CD9197E529E008FA094 /* AppDelegate.swift */,
+				E8359CDA197E529E008FA094 /* Info.plist */,
+			);
+			path = Simple;
+			sourceTree = "<group>";
+		};
+		E8359CDD197E53C4008FA094 /* TableView */ = {
+			isa = PBXGroup;
+			children = (
+				E8359CDE197E53C4008FA094 /* AppDelegate.swift */,
+				E8359CDF197E53C4008FA094 /* Images.xcassets */,
+				E8359CE0197E53C4008FA094 /* Info.plist */,
+				E8359CE1197E53C4008FA094 /* TableViewController.swift */,
+			);
+			path = TableView;
+			sourceTree = "<group>";
+		};
+		E8359CE6197E5403008FA094 /* Migration */ = {
+			isa = PBXGroup;
+			children = (
+				E8359CE7197E5403008FA094 /* AppDelegate.swift */,
+				E8359CE8197E5403008FA094 /* default-v0.realm */,
+				E8359CE9197E5403008FA094 /* default-v1.realm */,
+				E8359CEA197E5403008FA094 /* default-v2.realm */,
+				E8359CEB197E5403008FA094 /* Info.plist */,
+			);
+			path = Migration;
+			sourceTree = "<group>";
+		};
+		E8359CF1197E5427008FA094 /* Encryption */ = {
+			isa = PBXGroup;
+			children = (
+				E8359CF2197E5427008FA094 /* AppDelegate.swift */,
+				E8359CF3197E5427008FA094 /* Info.plist */,
+			);
+			path = Encryption;
+			sourceTree = "<group>";
+		};
+		E8D59313197E514F00E3A893 = {
+			isa = PBXGroup;
+			children = (
+				E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */,
+				E8359CD8197E529E008FA094 /* Simple */,
+				E8359CDD197E53C4008FA094 /* TableView */,
+				E8359CE6197E5403008FA094 /* Migration */,
+				E8359CF1197E5427008FA094 /* Encryption */,
+				E8D5931D197E514F00E3A893 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E8D5931D197E514F00E3A893 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E8359C37197E51B5008FA094 /* Encryption.app */,
+				E8359C5A197E51C2008FA094 /* Migration.app */,
+				E8359C7D197E51D0008FA094 /* Simple.app */,
+				E8359CA0197E51DC008FA094 /* TableView.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E8359C36197E51B5008FA094 /* Encryption */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8359C50197E51B5008FA094 /* Build configuration list for PBXNativeTarget "Encryption" */;
+			buildPhases = (
+				E8359C33197E51B5008FA094 /* Sources */,
+				E8359C34197E51B5008FA094 /* Frameworks */,
+				E8359C35197E51B5008FA094 /* Resources */,
+				E8359CCF197E5262008FA094 /* Embed Framework */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8359CC6197E5238008FA094 /* PBXTargetDependency */,
+			);
+			name = Encryption;
+			productName = Encryption;
+			productReference = E8359C37197E51B5008FA094 /* Encryption.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8359C59197E51C2008FA094 /* Migration */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8359C73197E51C3008FA094 /* Build configuration list for PBXNativeTarget "Migration" */;
+			buildPhases = (
+				E8359C56197E51C2008FA094 /* Sources */,
+				E8359C57197E51C2008FA094 /* Frameworks */,
+				E8359C58197E51C2008FA094 /* Resources */,
+				E8359CCE197E525B008FA094 /* Embed Framework */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8359CC4197E5235008FA094 /* PBXTargetDependency */,
+			);
+			name = Migration;
+			productName = Migration;
+			productReference = E8359C5A197E51C2008FA094 /* Migration.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8359C7C197E51D0008FA094 /* Simple */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8359C96197E51D0008FA094 /* Build configuration list for PBXNativeTarget "Simple" */;
+			buildPhases = (
+				E8359C79197E51D0008FA094 /* Sources */,
+				E8359C7A197E51D0008FA094 /* Frameworks */,
+				E8359C7B197E51D0008FA094 /* Resources */,
+				E8359CCC197E5250008FA094 /* Embed Framework */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8359CC0197E5227008FA094 /* PBXTargetDependency */,
+			);
+			name = Simple;
+			productName = Simple;
+			productReference = E8359C7D197E51D0008FA094 /* Simple.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8359C9F197E51DC008FA094 /* TableView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8359CB9197E51DD008FA094 /* Build configuration list for PBXNativeTarget "TableView" */;
+			buildPhases = (
+				E8359C9C197E51DC008FA094 /* Sources */,
+				E8359C9D197E51DC008FA094 /* Frameworks */,
+				E8359C9E197E51DC008FA094 /* Resources */,
+				E8359CCD197E5257008FA094 /* Embed Framework */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8359CC2197E5231008FA094 /* PBXTargetDependency */,
+			);
+			name = TableView;
+			productName = TableView;
+			productReference = E8359CA0197E51DC008FA094 /* TableView.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E8D59314197E514F00E3A893 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					E8359C36197E51B5008FA094 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+					E8359C59197E51C2008FA094 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+					E8359C7C197E51D0008FA094 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+					E8359C9F197E51DC008FA094 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+				};
+			};
+			buildConfigurationList = E8D59317197E514F00E3A893 /* Build configuration list for PBXProject "RealmExamples" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E8D59313197E514F00E3A893;
+			productRefGroup = E8D5931D197E514F00E3A893 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E8359C1F197E51AB008FA094 /* Products */;
+					ProjectRef = E8359C1E197E51AB008FA094 /* Realm-Xcode6.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				E8359C7C197E51D0008FA094 /* Simple */,
+				E8359C9F197E51DC008FA094 /* TableView */,
+				E8359C59197E51C2008FA094 /* Migration */,
+				E8359C36197E51B5008FA094 /* Encryption */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		E8359C28197E51AB008FA094 /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = E8359C27197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8359C2A197E51AB008FA094 /* OSX Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "OSX Tests.xctest";
+			remoteRef = E8359C29197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8359C2C197E51AB008FA094 /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = E8359C2B197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8359C2E197E51AB008FA094 /* iOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Tests.xctest";
+			remoteRef = E8359C2D197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8359C30197E51AB008FA094 /* TestFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TestFramework.framework;
+			remoteRef = E8359C2F197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8359C32197E51AB008FA094 /* TestFramework.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = TestFramework.framework;
+			remoteRef = E8359C31197E51AB008FA094 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E8359C35197E51B5008FA094 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C58197E51C2008FA094 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CEF197E5403008FA094 /* default-v2.realm in Resources */,
+				E8359CEE197E5403008FA094 /* default-v1.realm in Resources */,
+				E8359CED197E5403008FA094 /* default-v0.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C7B197E51D0008FA094 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C9E197E51DC008FA094 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CE3197E53C4008FA094 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E8359C33197E51B5008FA094 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CF4197E5427008FA094 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C56197E51C2008FA094 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CEC197E5403008FA094 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C79197E51D0008FA094 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CDB197E529E008FA094 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8359C9C197E51DC008FA094 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8359CE2197E53C4008FA094 /* AppDelegate.swift in Sources */,
+				E8359CE5197E53C4008FA094 /* TableViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8359CC0197E5227008FA094 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = iOS;
+			targetProxy = E8359CBF197E5227008FA094 /* PBXContainerItemProxy */;
+		};
+		E8359CC2197E5231008FA094 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = iOS;
+			targetProxy = E8359CC1197E5231008FA094 /* PBXContainerItemProxy */;
+		};
+		E8359CC4197E5235008FA094 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = iOS;
+			targetProxy = E8359CC3197E5235008FA094 /* PBXContainerItemProxy */;
+		};
+		E8359CC6197E5238008FA094 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = iOS;
+			targetProxy = E8359CC5197E5238008FA094 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E8359C51197E51B5008FA094 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Encryption/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8359C52197E51B5008FA094 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = Encryption/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E8359C74197E51C3008FA094 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Migration/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8359C75197E51C3008FA094 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = Migration/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E8359C97197E51D0008FA094 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Simple/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8359C98197E51D0008FA094 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = Simple/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E8359CBA197E51DD008FA094 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TableView/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8359CBB197E51DD008FA094 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				INFOPLIST_FILE = TableView/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E8D59336197E514F00E3A893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEFINES_MODULE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E8D59337197E514F00E3A893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				DEFINES_MODULE = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E8359C50197E51B5008FA094 /* Build configuration list for PBXNativeTarget "Encryption" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8359C51197E51B5008FA094 /* Debug */,
+				E8359C52197E51B5008FA094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		E8359C73197E51C3008FA094 /* Build configuration list for PBXNativeTarget "Migration" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8359C74197E51C3008FA094 /* Debug */,
+				E8359C75197E51C3008FA094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		E8359C96197E51D0008FA094 /* Build configuration list for PBXNativeTarget "Simple" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8359C97197E51D0008FA094 /* Debug */,
+				E8359C98197E51D0008FA094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		E8359CB9197E51DD008FA094 /* Build configuration list for PBXNativeTarget "TableView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8359CBA197E51DD008FA094 /* Debug */,
+				E8359CBB197E51DD008FA094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		E8D59317197E514F00E3A893 /* Build configuration list for PBXProject "RealmExamples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8D59336197E514F00E3A893 /* Debug */,
+				E8D59337197E514F00E3A893 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E8D59314197E514F00E3A893 /* Project object */;
+}
