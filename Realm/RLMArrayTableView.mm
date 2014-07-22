@@ -230,7 +230,8 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
 {
     // copy array and apply new predicate creating a new query and view
     RLMArrayTableView *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema[self.objectClassName]);
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema,
+                                array.realm.schema[self.objectClassName]);
     array->_backingView = array.backingQuery->find_all();
     return array;
 }
