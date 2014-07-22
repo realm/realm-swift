@@ -426,7 +426,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     }
 }
     
-void add_link_contraint_to_query(tightdb::Query & query,
+void add_link_constraint_to_query(tightdb::Query & query,
                                  NSPredicateOperatorType operatorType,
                                  NSUInteger column,
                                  RLMObject *obj) {
@@ -447,8 +447,8 @@ void update_link_query_with_value_expression(RLMSchema *schema,
         @throw RLMPredicateException(@"Invalid predicate", @"BETWEEN operator not supported for KeyPath queries.");
     }
 
-    // FIXME: when core support multiple levels of link queries, change == to >=
-    //        and loop through the elements of arr to build up link query
+    // FIXME: when core support multiple levels of link queries
+    //        loop through the elements of arr to build up link query
     if (paths.count != 2) {
         @throw RLMPredicateException(@"Invalid predicate", @"Only KeyPaths one level deep are currently supported");
     }
@@ -459,7 +459,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
 
     // make sure we have a valid property type
     if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
-        throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", paths[0]]);
+        @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", paths[0]]);
     }
 
     // get the next level index and property
@@ -498,7 +498,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
         case type_Binary:
             @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
         case type_Link:
-            add_link_contraint_to_query(query, opType, idx1, value);
+            add_link_constraint_to_query(query, opType, idx1, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
@@ -568,7 +568,7 @@ void update_query_with_value_expression(RLMSchema *schema,
             add_binary_constraint_to_query(query, pred.predicateOperatorType, index, value);
             break;
         case type_Link:
-            add_link_contraint_to_query(query, pred.predicateOperatorType, index, value);
+            add_link_constraint_to_query(query, pred.predicateOperatorType, index, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
@@ -724,7 +724,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
             if (paths.count == 1) {
                 // querying on object identity
                 NSUInteger idx = RLMValidatedColumnIndex(objectSchema, arrayProp.name);
-                add_link_contraint_to_query(query, compp.predicateOperatorType, idx, compp.rightExpression.constantValue);
+                add_link_constraint_to_query(query, compp.predicateOperatorType, idx, compp.rightExpression.constantValue);
             }
             else if (paths.count > 1) {
                 // querying on object properties

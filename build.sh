@@ -360,14 +360,16 @@ case "$COMMAND" in
 
     "set-version")
         realm_version="$2"
-        version_file="Realm/Realm-Info.plist"
+        version_files="Realm/Realm-Info.plist tools/RealmBrowser/RealmBrowser/RealmBrowser-Info.plist"
 
         if [ -z "$realm_version" ]; then
             echo "You must specify a version."
             exit 1
-        fi 
-        PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
-        PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        fi
+        for version_file in $version_files; do 
+            PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
+            PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        done
         exit 0
         ;;
 
