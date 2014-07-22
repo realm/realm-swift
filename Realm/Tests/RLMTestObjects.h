@@ -91,6 +91,16 @@ RLM_ARRAY_TYPE(IntObject)
 
 @end
 
+RLM_ARRAY_TYPE(AllTypesObject)
+
+@interface LinkToAllTypesObject : RLMObject
+@property AllTypesObject *allTypesCol;
+@end
+
+@interface ArrayOfAllTypesObject : RLMObject
+@property RLMArray<AllTypesObject> *array;
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
