@@ -52,6 +52,7 @@ command:
   test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
+  browser [xcmode]:        builds the RealmBrowser OSX app
   verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
   docs:                    builds docs in docs/output
   get-version:             get the current version
@@ -141,14 +142,16 @@ fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip"
+    TMP_DIR="$(mktemp -dt "$0")"
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
     (
-        cd /tmp
-        unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+        cd "${TMP_DIR}"
+        unzip "core-${REALM_CORE_VERSION}.zip"
         mv core core-${REALM_CORE_VERSION}
-        rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+        rm -f "core-${REALM_CORE_VERSION}.zip"
     )
-    mv /tmp/core-${REALM_CORE_VERSION} .
+    rm -rf core-${REALM_CORE_VERSION} core
+    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
     ln -s core-${REALM_CORE_VERSION} core
 }
 
@@ -323,6 +326,19 @@ case "$COMMAND" in
         # Not all examples can be built using Xcode 6
         if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        fi 
+        exit 0
+        ;;
+
+    ######################################
+    # Browser
+    ######################################
+    "browser")
+        if [[ "$XCODE_VERSION" != "6" ]]; then
+            xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
+        else
+            echo "Realm Browser can only be built with Xcode 5."
+            exit 1
         fi
         exit 0
         ;;

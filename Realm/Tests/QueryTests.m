@@ -324,12 +324,6 @@
     XCTAssertNoThrow([realm objects:className where:@"stringCol ENDSWITH 'test'"], @"ENDSWITH");
     XCTAssertNoThrow([realm objects:className where:@"stringCol == 'test'"], @"==");
     XCTAssertNoThrow([realm objects:className where:@"stringCol != 'test'"], @"!=");
-    
-    // ANY
-    XCTAssertNoThrow([realm objects:className where:@"ANY intCol > 5"], @"ANY int > constant");
-    
-    // ALL
-    XCTAssertNoThrow([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
 }
 
 - (void)testPredicateNotSupported
@@ -348,6 +342,12 @@
     
     // testing for null
     XCTAssertThrows([realm objects:className where:@"stringCol = nil"], @"test for nil");
+
+    // ANY
+    XCTAssertThrows([realm objects:className where:@"ANY intCol > 5"], @"ANY int > constant");
+
+    // ALL
+    XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
 }
 
 - (void)testPredicateMisuse
