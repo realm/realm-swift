@@ -288,7 +288,7 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        if [[ "$XCVERSION" == "6" ]]; then
+        if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
@@ -298,7 +298,7 @@ case "$COMMAND" in
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
-        if [[ "$XCVERSION" != "6" ]]; then
+        if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
         exit 0
@@ -306,7 +306,7 @@ case "$COMMAND" in
 
     "examples-debug")
         cd examples
-        if [[ "$XCVERSION" == "6" ]]; then
+        if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
@@ -316,7 +316,7 @@ case "$COMMAND" in
         xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
-        if [[ "$XCVERSION" != "6" ]]; then
+        if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi 
         exit 0
@@ -326,7 +326,7 @@ case "$COMMAND" in
     # Browser
     ######################################
     "browser")
-        if [[ "$XCVERSION" != "6" ]]; then
+        if [[ "$XCODE_VERSION" != "6" ]]; then
             xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
         else
             echo "Realm Browser can only be built with Xcode 5."
