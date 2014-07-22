@@ -451,7 +451,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     // FIXME: when core support multiple levels of link queries, change == to >=
     //        and loop through the elements of arr to build up link query
     if (columns.count != 2) {
-        @throw RLMPredicateException(@"Invalid predicate", @"Only KeyPaths 2 one level deep are currently supported");
+        @throw RLMPredicateException(@"Invalid predicate", @"Only KeyPaths one level deep are currently supported");
     }
     
     // get the first index and property
