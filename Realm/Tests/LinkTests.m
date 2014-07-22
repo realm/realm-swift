@@ -158,7 +158,7 @@
 
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dog");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
-    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"ANY dog.dogName = 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dog");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dog");
 
 
     OwnerObject *owner2 = [[OwnerObject alloc] init];
@@ -172,7 +172,7 @@
 
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
-    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"ANY dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
 
 
     OwnerObject *owner3 = [[OwnerObject alloc] init];
@@ -187,7 +187,7 @@
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'eivraH'"] count]), (NSUInteger)0, @"Expecting 0 dogs");
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Fido'"] count]), (NSUInteger)1, @"Expecting 1 dogs");
-    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"ANY dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
+    XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName = 'Harvie'"] count]), (NSUInteger)2, @"Expecting 2 dogs");
     
     // test !=
     XCTAssertEqual(([[realm objects:[OwnerObject className] where:@"dog.dogName != 'Harvie'"] count]), (NSUInteger)1, @"Expecting 1 dogs");
@@ -254,6 +254,8 @@
 
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"allTypesCol.floatCol BETWEEN %@", @[@1.1, @1.2]];
     XCTAssertThrows([LinkToAllTypesObject objectsWithPredicate:pred], @"BETWEEN query should throw");
+
+    XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"intArray.intCol > 5"], @"RLMArray query without ANY modifier should throw");
 }
 
 - (void)testLinkTooManyRelationships
@@ -290,9 +292,9 @@
     [realm addObject:arrPropObj1];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"array.stringCol = '1'"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY array.stringCol = '1'"] count], (NSUInteger)1, @"1 expected");
 
     ArrayPropertyObject *arrPropObj2 = [[ArrayPropertyObject alloc] init];
     arrPropObj2.name = @"Test";
@@ -307,9 +309,9 @@
     [realm beginWriteTransaction];
     [realm addObject:arrPropObj2];
     [realm commitWriteTransaction];
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
-    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 2"] count], (NSUInteger)2, @"2 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 10"] count], (NSUInteger)0, @"0 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 5"] count], (NSUInteger)1, @"1 expected");
+    XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], (NSUInteger)2, @"2 expected");
 }
 
 - (void)testQueryWithObjects
@@ -346,11 +348,11 @@
     NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
 
-    NSPredicate *pred4 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj0];
+    NSPredicate *pred4 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj0];
     XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred4].count, 2U, @"Count should be 2");
-    NSPredicate *pred5 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj1];
+    NSPredicate *pred5 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj1];
     XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred5].count, 2U, @"Count should be 2");
-    NSPredicate *pred6 = [NSPredicate predicateWithFormat:@"array.objectCol = %@", stringObj2];
+    NSPredicate *pred6 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj2];
     XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred6].count, 1U, @"Count should be 1");
 
     // invalid object keypath queries
@@ -358,6 +360,12 @@
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred7], @"Operator other than = should throw");
     NSPredicate *pred8 = [NSPredicate predicateWithFormat:@"array.objectCol == %@", obj0];
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred8], @"Wrong object type should throw");
+
+    // check for ANY object in array
+    NSPredicate *pred9 = [NSPredicate predicateWithFormat:@"ANY array = %@", obj0];
+    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred9].count, 2U, @"Count should be 2");
+    NSPredicate *pred10 = [NSPredicate predicateWithFormat:@"array = %@", obj3];
+    XCTAssertThrows([ArrayOfAllTypesObject objectsWithPredicate:pred10].count, @"Array query without ANY should throw");
 }
 
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects

@@ -8,10 +8,11 @@
 ### Enhancements
 
 * Added support for basic querying of RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
+  e.g. `[Person objectsWhere:@"dog.name == 'Alfonso'"]` or `[Person objectsWhere:@"ANY dogs.name == 'Alfonso"]`
   Supports all normal operators for numeric and date types. Does not support NSData properties or `BEGINSWITH`, `ENDSWITH`, `CONTAINS` 
   and other options for string properties.
 * Added support for querying for object equality in RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
-  e.g. `[Person objectsWhere:@"dog == %@", myDog]` or `[Person objectsWhere:@"friends.dog == %@", myDog]`
+  e.g. `[Person objectsWhere:@"dog == %@", myDog]` `[Person objectsWhere:@"ANY dogs == %@", myDog]` `[Person objectsWhere:@"ANY friends.dog == %@", dog]`
   Only supports comparing objects for equality (i.e. ==)
 * Added a helper method to RLMRealm to perform a block inside a transaction.
 
