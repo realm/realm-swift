@@ -204,7 +204,7 @@ case "$COMMAND" in
             xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
             xcrealm "-scheme iOS -configuration Release"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir Release || exit 1
+            mkdir -p Release || exit 1
             cp -R Release-iphoneos/Realm.framework Release || exit 1
             lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Release/Realm.framework || exit 1
