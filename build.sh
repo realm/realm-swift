@@ -289,43 +289,41 @@ case "$COMMAND" in
     # Examples
     ######################################
     "examples")
-        cd examples
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
-        	xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
+        	xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
         else
             # Not all examples can be built using Xcode 6
-            xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
-        (cd ios/rubymotion/Simple && rake build) || exit 1
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Release clean build ${CODESIGN_PARAMS}"
+        (cd examples/ios/rubymotion/Simple && rake build) || exit 1
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Release clean build ${CODESIGN_PARAMS}"
 
         exit 0
         ;;
 
     "examples-debug")
-        cd examples
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
-            xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
         else
             # Not all examples can be built using Xcode 6
-            xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
-        (cd ios/rubymotion/Simple && rake build) || exit 1
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Debug clean build ${CODESIGN_PARAMS}"
+        (cd examples/ios/rubymotion/Simple && rake build) || exit 1
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Debug clean build ${CODESIGN_PARAMS}"
 
         exit 0
         ;;
