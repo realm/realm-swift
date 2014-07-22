@@ -134,15 +134,17 @@ fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    TMP_DIR="$(mktemp -dt "$0")"
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip" || exit 1
     (
-        cd /tmp
-        unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-        mv core core-${REALM_CORE_VERSION}
-        rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+        cd "${TMP_DIR}"
+        unzip "core-${REALM_CORE_VERSION}.zip" || exit 1
+        mv core core-${REALM_CORE_VERSION} || exit 1
+        rm -f "core-${REALM_CORE_VERSION}.zip" || exit 1
     )
-    mv /tmp/core-${REALM_CORE_VERSION} .
-    ln -s core-${REALM_CORE_VERSION} core
+    rm -rf core-${REALM_CORE_VERSION} core || exit 1
+    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} . || exit 1
+    ln -s core-${REALM_CORE_VERSION} core || exit 1
 }
 
 COMMAND="$1"
