@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-               BuildableName = "RealmBrowser.app"
+               BuildableName = "Realm Browser.app"
                BlueprintName = "RealmBrowser"
                ReferencedContainer = "container:RealmBrowser.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmBrowser.app"
+            BuildableName = "Realm Browser.app"
             BlueprintName = "RealmBrowser"
             ReferencedContainer = "container:RealmBrowser.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmBrowser.app"
+            BuildableName = "Realm Browser.app"
             BlueprintName = "RealmBrowser"
             ReferencedContainer = "container:RealmBrowser.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "RealmBrowser.app"
+            BuildableName = "Realm Browser.app"
             BlueprintName = "RealmBrowser"
             ReferencedContainer = "container:RealmBrowser.xcodeproj">
          </BuildableReference>
