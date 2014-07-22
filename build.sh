@@ -65,6 +65,12 @@ if [ -z "$XCODE_VERSION" ]; then
     XCODE_VERSION=5
 fi
 
+if [ "$XCODE_VERSION" -eq "6" ]; then
+    SIMULATOR_VERSION="8.0"
+else
+    SIMULATOR_VERSION="7.1"
+fi
+
 xcode5() {
     ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=${SRCROOT}/build/DerivedData $@
@@ -159,8 +165,8 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator${SIMULATOR_VERSION} clean" || exit 1
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator${SIMULATOR_VERSION} clean" || exit 1
         xcrealm "-scheme OSX -configuration Debug clean" || exit 1
         xcrealm "-scheme OSX -configuration Release clean" || exit 1
         exit 0
@@ -246,7 +252,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator${SIMULATOR_VERSION} test"
         exit 0
         ;;
 
@@ -256,7 +262,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator${SIMULATOR_VERSION} test"
         exit 0
         ;;
 
