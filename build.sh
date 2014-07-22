@@ -31,7 +31,7 @@ Usage: sh $0 command [argument]
 
 command:
   download-core:           downloads core library (binary version)
-  clean [xcmode]:          clean up/remove all generated files
+  clean [xcmode]:          clean up/remove all generated or non git-versioned files
   build [xcmode]:          builds iOS and OS X frameworks with release configuration
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
@@ -47,6 +47,9 @@ command:
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
   verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
   docs:                    builds docs in docs/output
+  browser:                 builds "Realm Browser.app"
+  deploy:                  build/generate everything required for deployment, uploads to S3, updates CocoaPods
+  pod-deploy:              lints and uploads Realm.podspec
   get-version:             get the current version
   set-version version:     set the version
 
@@ -66,18 +69,18 @@ fi
 
 xcode5() {
     mkdir -p build/DerivedData
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
     mkdir -p build/DerivedData
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
-    rm -rf bin
+    rm -rf build/bin
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -89,7 +92,7 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
+    rm -rf build/bin
 }
 
 xc() {
@@ -97,9 +100,10 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        mkdir build &> /dev/null
+        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
-            echo "The raw xcodebuild output is available in build.log"
+            echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
@@ -151,10 +155,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme OSX -configuration Debug clean" || exit 1
-        xcrealm "-scheme OSX -configuration Release clean" || exit 1
+        git clean -xdf -e core
         exit 0
         ;;
 
@@ -277,6 +278,19 @@ case "$COMMAND" in
         ;;
 
     ######################################
+    # Tools
+    ######################################
+    "browser")
+        if [[ "$XCVERSION" != "6" ]]; then
+            xcodebuild -project tools/VisualEditor/Realm\ Browser.xcodeproj -scheme RealmVisualEditor -IDECustomDerivedDataLocation=../../build/DerivedData -configuration Release clean build $CODESIGN_PARAMS | xcpretty
+        else
+            echo "Realm Browser can only be built with Xcode 5."
+            exit 1
+        fi
+        exit 0
+        ;;
+
+    ######################################
     # Examples
     ######################################
     "examples")
@@ -311,7 +325,7 @@ case "$COMMAND" in
         # Not all examples can be built using Xcode 6
         if [[ "$XCVERSION" != "6" ]]; then
             xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        fi 
+        fi
         exit 0
         ;;
 
@@ -334,6 +348,56 @@ case "$COMMAND" in
         fi 
         PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
         PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
+        exit 0
+        ;;
+
+    ######################################
+    # Deploying
+    ######################################
+    "deploy")
+        # Clean & Build iOS/OSX
+        sh build.sh clean "$XCMODE" || exit 1
+        sh build.sh build "$XCMODE" || exit 1
+        
+        # Build Browser
+        sh build.sh browser "$XCMODE" || exit 1
+
+        # Build and upload docs
+        sh build.sh docs || exit 1
+        VERSION=$(sh build.sh get-version)
+        s3cmd put -r docs/output/$VERSION s3://static.realm.io/docs/ios/ || exit 1
+        
+        # Zip & upload release
+        RELEASE_DIR=$(mktemp -dt "$0")
+        mkdir -p $RELEASE_DIR/browser $RELEASE_DIR/ios $RELEASE_DIR/osx $RELEASE_DIR/examples/objc || exit 1
+        cp -R "build/DerivedData/Realm Browser/Build/Products/$RELEASE_DIR/Realm Browser.app" "$RELEASE_DIR/browser/Realm Browser.app" || exit 1
+        cp -R build/$RELEASE_DIR/Realm.framework $RELEASE_DIR/ios/Realm.framework || exit 1
+        cp -R build/DerivedData/Realm/Build/Products/$RELEASE_DIR/Realm.framework $RELEASE_DIR/osx/Realm.framework || exit 1
+        cp -R examples/objc/RealmMigrationExample $RELEASE_DIR/examples/objc/RealmMigrationExample || exit 1
+        cp -R examples/objc/RealmRestExample $RELEASE_DIR/examples/objc/RealmRestExample || exit 1
+        cp -R examples/objc/RealmSimpleExample $RELEASE_DIR/examples/objc/RealmSimpleExample || exit 1
+        cp -R examples/objc/RealmTableViewExample $RELEASE_DIR/examples/objc/RealmTableViewExample || exit 1
+
+        # TODO: Update framework path in all projects in $RELEASE_DIR/examples
+
+        ZIPNAME=realm-cocoa-$(sh build.sh get-version).zip
+        (cd $RELEASE_DIR && zip -r $ZIPNAME ios osx browser docs || exit 1)
+        s3cmd put $RELEASE_DIR/$ZIPNAME s3://static.realm.io/downloads/cocoa/ || exit 1
+
+        # Update "latest" redirect on static.realm.io
+        touch $RELEASE_DIR/latest || exit 1
+        s3cmd put $RELEASE_DIR/latest --add-header "x-amz-website-redirect-location:http://static.realm.io/downloads/cocoa/$ZIPNAME" s3://static.realm.io/downloads/cocoa/ || exit 1
+
+        # Submit to CocoaPods
+        sh build.sh pod-deploy || exit 1
+
+        echo "Realm Cocoa $VERSION was successfully released"
+        exit 0
+        ;;
+
+    "pod-deploy")
+        pod spec lint || exit 1
+        pod trunk push || exit 1
         exit 0
         ;;
 
