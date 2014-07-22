@@ -377,7 +377,7 @@ case "$COMMAND" in
         # Build and upload docs
         sh build.sh docs || exit 1
         VERSION=$(sh build.sh get-version)
-        s3cmd put -r docs/output/$VERSION s3://static.realm.io/docs/ios/ || exit 1
+        s3cmd put -r docs/output/$VERSION s3://static.realm.io/docs/cocoa/ || exit 1
         
         # Zip & upload release
         RELEASE_DIR=$(mktemp -dt "$0")
