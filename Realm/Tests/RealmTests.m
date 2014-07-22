@@ -127,6 +127,15 @@
     XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
 }
 
+- (void)testRealmTransactionBlock {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withObject:@[@"b"]];
+    }];
+    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
 
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {

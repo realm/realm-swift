@@ -11,6 +11,7 @@
   Binary data (`NSData)` properties cannot be queries, and the predicates `BEGINSWITH`, 
   `ENDSWITH`, and `CONTAINS` are not supported for strings. Likewise, it is 
   not possible to do case insensitive matches on strings. See issue #617.
+* Added a helper method to RLMRealm to perform a block inside a transaction.
 
 ### Bugfixes
 

@@ -429,6 +429,13 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
+- (void)transactionWithBlock:(void(^)(void))block {
+    [self beginWriteTransaction];
+    block();
+    [self commitWriteTransaction];
+}
+
+
 /*
 - (void)rollbackWriteTransaction {
     if (self.transactionMode == RLMTransactionModeWrite) {
