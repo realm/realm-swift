@@ -773,11 +773,21 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [FloatObject createInRealm:realm withObject:@[@1.7f]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(([[realm objects:[QueryObject className] where:@"float2 = 1.7"] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[QueryObject className] where:@"float2 = %f", 1.7f] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > %d", 1] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = 1.7"] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %f", 1.7f] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1.0"] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol >= 1.0"] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol < 1.0"] count]), (NSUInteger)0, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol <= 1.0"] count]), (NSUInteger)0, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %e", 1.7] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = 3.5e+38"] count]), @"Too large to be a float");
+    XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = -3.5e+38"] count]), @"Too small to be a float");
 }
 
 - (void)testLiveQueriesInsideTransaction
