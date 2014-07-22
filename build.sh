@@ -65,19 +65,18 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
-    rm -rf bin
+    rm -rf build/bin
+    mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -89,7 +88,6 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
 }
 
 xc() {
