@@ -15,7 +15,7 @@ set -o pipefail
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.2
+    REALM_CORE_VERSION=0.80.3
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -66,19 +66,18 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    mkdir -p build/DerivedData
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
-    rm -rf bin
+    rm -rf build/bin
+    mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
         5)
             xcode5 $@
@@ -90,7 +89,6 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
 }
 
 xc() {
@@ -98,9 +96,10 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode $1 || exit 1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        xcode $1 | tee build.log | xcpretty -c ${XCPRETTY_PARAMS}
+        mkdir -p build
+        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
         if [ "$?" -ne 0 ]; then
-            echo "The raw xcodebuild output is available in build.log"
+            echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
@@ -135,10 +134,16 @@ if [ -z "$SRCROOT" ]; then
 fi
 
 download_core() {
-    rm -rf core
+    echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
-    rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    (
+        cd /tmp
+        unzip "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+        mv core core-${REALM_CORE_VERSION}
+        rm -f "/tmp/core-${REALM_CORE_VERSION}.zip" || exit 1
+    )
+    mv /tmp/core-${REALM_CORE_VERSION} .
+    ln -s core-${REALM_CORE_VERSION} core
 }
 
 COMMAND="$1"
@@ -163,8 +168,9 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
-        echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-        if ! [ -d core ]; then
+        if ! [ -L core ]; then
+            echo "core is not a symlink. Deleting..."
+            rm -rf core
             download_core
         elif ! $(head -n 1 core/release_notes.txt | grep ${REALM_CORE_VERSION} >/dev/null); then
             download_core
