@@ -18,11 +18,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface RealmVisualEditorTests : XCTestCase
+@interface RealmBrowserTests : XCTestCase
 
 @end
 
-@implementation RealmVisualEditorTests
+@implementation RealmBrowserTests
 
 - (void)setUp
 {
