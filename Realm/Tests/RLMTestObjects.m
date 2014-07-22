@@ -52,6 +52,9 @@
 @implementation AllTypesObject
 @end
 
+@implementation ArrayOfAllTypesObject
+@end
+
 @implementation LinkToAllTypesObject
 @end
 
