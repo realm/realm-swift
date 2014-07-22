@@ -225,7 +225,7 @@ case "$COMMAND" in
             xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
             xcrealm "-scheme iOS -configuration Debug"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir Debug || exit 1
+            mkdir -p Debug || exit 1
             cp -R Debug-iphoneos/Realm.framework Debug || exit 1
             lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Debug/Realm.framework || exit 1
