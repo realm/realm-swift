@@ -20,6 +20,7 @@
 #import "RLMUtil.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObject_Private.h"
 
 #include <tightdb.hpp>
 using namespace tightdb;
@@ -424,6 +425,21 @@ void add_binary_constraint_to_query(tightdb::Query & query,
             break;
     }
 }
+    
+void add_link_contraint_to_query(tightdb::Query & query,
+                                 NSPredicateOperatorType operatorType,
+                                 RLMProperty *prop,
+                                 RLMObject *obj) {
+    if (operatorType != NSEqualToPredicateOperatorType) {
+        @throw RLMPredicateException(@"Invalid operator type", @"Only 'Equal' operator supported for object comparison");
+    }
+    if (![obj isKindOfClass:RLMObject.class] || ![prop.objectClassName isEqualToString:[obj.class className]]) {
+        @throw RLMPredicateException(@"Invalid object type",
+                                     [NSString stringWithFormat:@"Object for column '%@' must be of type '%@'",
+                                      prop.name, prop.objectClassName]);
+    }
+    query.links_to(prop.column, obj->_row.get_index());
+}
  
 void update_link_query_with_value_expression(RLMSchema *schema,
                                              RLMObjectSchema *desc,
@@ -509,7 +525,6 @@ void update_query_with_value_expression(RLMSchema *schema,
     RLMProperty *prop = desc[columnName];
     NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
     
-    
     // validate value
     if (!RLMIsObjectValidForProperty(value, prop)) {
         @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", RLMTypeToString(prop.type)]);
@@ -538,6 +553,9 @@ void update_query_with_value_expression(RLMSchema *schema,
             break;
         case type_Binary:
             add_binary_constraint_to_query(query, operatorType, index, value);
+            break;
+        case type_Link:
+            add_link_contraint_to_query(query, operatorType, prop, value);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",

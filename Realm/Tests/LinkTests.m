@@ -307,6 +307,34 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"intArray.intCol > 2"] count], (NSUInteger)2, @"2 expected");
 }
 
+- (void)testQueryWithObjects
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    NSDate *date3 = [date2 dateByAddingTimeInterval:1];
+    
+    StringObject *stringObj0 = [[StringObject alloc] initWithObject:@[@"string0"]];
+    StringObject *stringObj1 = [[StringObject alloc] initWithObject:@[@"string1"]];
+    
+    [realm beginWriteTransaction];
+
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj0]];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj1]];
+    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj0]];
+
+    [realm commitWriteTransaction];
+    
+    NSPredicate *pred1 = [NSPredicate predicateWithFormat:@"objectCol = %@", stringObj0];
+    XCTAssertEqual([AllTypesObject objectsWithPredicate:pred1].count, 2U, @"Count should be 2");
+    NSPredicate *pred2 = [NSPredicate predicateWithFormat:@"objectCol = %@", stringObj1];
+    XCTAssertEqual([AllTypesObject objectsWithPredicate:pred2].count, 1U, @"Count should be 1");
+    
+    NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
+    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
+}
+
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
 /*
 - (void)testCircularLinks 

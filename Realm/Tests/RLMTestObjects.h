@@ -97,7 +97,6 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property AllTypesObject *allTypesCol;
 @end
 
-
 #pragma mark - Real Life Objects
 #pragma mark -
 
