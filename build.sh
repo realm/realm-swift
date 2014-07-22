@@ -65,24 +65,18 @@ if [ -z "$XCODE_VERSION" ]; then
     XCODE_VERSION=5
 fi
 
-if [ "$XCODE_VERSION" -eq "6" ]; then
-    SIMULATOR_VERSION="8.0"
-else
-    SIMULATOR_VERSION="7.1"
-fi
-
 xcode5() {
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
-    PATH=build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
-    PATH=build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
+    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
-    rm -rf build/bin
+    rm -rf bin
     mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
         5)
@@ -95,6 +89,7 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
+    rm -rf bin
 }
 
 xc() {
@@ -165,8 +160,8 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator${SIMULATOR_VERSION} clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator${SIMULATOR_VERSION} clean" || exit 1
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
         xcrealm "-scheme OSX -configuration Debug clean" || exit 1
         xcrealm "-scheme OSX -configuration Release clean" || exit 1
         exit 0
@@ -252,7 +247,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator${SIMULATOR_VERSION} test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
         exit 0
         ;;
 
@@ -262,7 +257,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator${SIMULATOR_VERSION} test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
         exit 0
         ;;
 
@@ -310,7 +305,6 @@ case "$COMMAND" in
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Release clean build ${CODESIGN_PARAMS}"
-
         exit 0
         ;;
 
@@ -320,7 +314,7 @@ case "$COMMAND" in
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
-        
+
         # FIXME: Re-enable once CI has RubyMotion
         # (cd examples/ios/rubymotion/Simple && rake build) || exit 1
         XCODE_VERSION=5
@@ -330,7 +324,6 @@ case "$COMMAND" in
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Debug clean build ${CODESIGN_PARAMS}"
-
         exit 0
         ;;
 
