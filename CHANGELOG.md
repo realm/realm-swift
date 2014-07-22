@@ -1,4 +1,4 @@
-0.80.1 Release notes (2014-07-21)
+0.81.0 Release notes (2014-07-22)
 =============================================================
 
 ### API breaking changes
@@ -7,9 +7,10 @@
 
 ### Enhancements
 
+* Updating to core library version 0.80.3.
 * Added support for basic querying of RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
   e.g. `[Person objectsWhere:@"dog.name == 'Alfonso'"]` or `[Person objectsWhere:@"ANY dogs.name == 'Alfonso'"]`
-  Supports all normal operators for numeric and date types. Does not support NSData properties or `BEGINSWITH`, `ENDSWITH`, `CONTAINS` 
+  Supports all normal operators for numeric and date types. Does not support NSData properties or `BEGINSWITH`, `ENDSWITH`, `CONTAINS`
   and other options for string properties.
 * Added support for querying for object equality in RLMObject and RLMArray properties (one-to-one and one-to-many relationships).
   e.g. `[Person objectsWhere:@"dog == %@", myDog]` `[Person objectsWhere:@"ANY dogs == %@", myDog]` `[Person objectsWhere:@"ANY friends.dog == %@", dog]`
@@ -21,6 +22,8 @@
 * Fixed Unicode support in property names and string contents (Chinese, Russian, etc.). Closing #612 and #604.
 * Fixed bugs related to migration when properties are removed.
 * Fixed keyed subscripting for standalone RLMObjects.
+* Fixed bug related to double clicking on a .realm file to launch the Realm Browser (thanks to Dean Moore).
+
 
 0.80.0 Release notes (2014-07-15)
 =============================================================
