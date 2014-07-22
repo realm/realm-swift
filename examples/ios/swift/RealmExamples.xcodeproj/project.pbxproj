@@ -744,6 +744,7 @@
 				E8359C52197E51B5008FA094 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8359C73197E51C3008FA094 /* Build configuration list for PBXNativeTarget "Migration" */ = {
 			isa = XCConfigurationList;
@@ -752,6 +753,7 @@
 				E8359C75197E51C3008FA094 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8359C96197E51D0008FA094 /* Build configuration list for PBXNativeTarget "Simple" */ = {
 			isa = XCConfigurationList;
@@ -760,6 +762,7 @@
 				E8359C98197E51D0008FA094 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8359CB9197E51DD008FA094 /* Build configuration list for PBXNativeTarget "TableView" */ = {
 			isa = XCConfigurationList;
@@ -768,6 +771,7 @@
 				E8359CBB197E51DD008FA094 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8D59317197E514F00E3A893 /* Build configuration list for PBXProject "RealmExamples" */ = {
 			isa = XCConfigurationList;

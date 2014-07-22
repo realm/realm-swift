@@ -880,6 +880,7 @@
 				E820EE38197E4DCC00E92DFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E820EE7E197E4F8800E92DFD /* Build configuration list for PBXNativeTarget "Encryption" */ = {
 			isa = XCConfigurationList;
@@ -888,6 +889,7 @@
 				E820EE80197E4F8800E92DFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8C39FF1197E48D7003C8591 /* Build configuration list for PBXNativeTarget "Migration" */ = {
 			isa = XCConfigurationList;
