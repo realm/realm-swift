@@ -20,8 +20,8 @@ Pod::Spec.new do |s|
   s.library                 = "c++"
   s.requires_arc            = true
   s.social_media_url        = "https://twitter.com/realm"
-  s.documentation_url       = "http://realm.io/docs/ios/#{s.version}"
-  s.ios.vendored_frameworks = "ios/Realm.framework"
-  s.osx.vendored_frameworks = "osx/Realm.framework"
-  s.license                 = { :type => 'Apache 2.0', :file => "ios/Realm.framework/Resources/LICENSE" }
+  s.documentation_url       = "http://realm.io/docs/cocoa/#{s.version}"
+  s.ios.vendored_frameworks = "realm-cocoapods-#{s.version}/ios/Realm.framework"
+  s.osx.vendored_frameworks = "realm-cocoapods-#{s.version}/osx/Realm.framework"
+  s.license                 = { :type => 'Apache 2.0', :file => "realm-cocoapods-#{s.version}/ios/Realm.framework/Resources/LICENSE" }
 end
