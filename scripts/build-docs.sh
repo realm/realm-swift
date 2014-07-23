@@ -22,12 +22,12 @@ appledoc \
     --no-warn-undocumented-member \
     --ignore "Realm/RLMArrayAccessor.h" \
     --ignore "Realm/RLMArrayAccessor.mm" \
-    --ignore "Realm/RLMProperty.h" \
-    --ignore "Realm/RLMProperty.m" \
     --ignore "Realm/RLMObjectSchema.h" \
     --ignore "Realm/RLMSchema.h" \
     --ignore "Realm/RLMQueryUtil.h" \
     --ignore "Realm/RLMUtil.h" \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
+    --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests/QueryTests.m" \
     --ignore "Realm/Tests/TransactionTests.m" \
     --ignore "Realm/Tests/ObjectTests.m" \
@@ -63,12 +63,12 @@ appledoc \
     --no-warn-undocumented-member \
     --ignore "Realm/RLMArrayAccessor.h" \
     --ignore "Realm/RLMArrayAccessor.mm" \
-    --ignore "Realm/RLMProperty.h" \
-    --ignore "Realm/RLMProperty.m" \
     --ignore "Realm/RLMObjectSchema.h" \
     --ignore "Realm/RLMSchema.h" \
     --ignore "Realm/RLMQueryUtil.h" \
     --ignore "Realm/RLMUtil.h" \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
+    --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests/QueryTests.m" \
     --ignore "Realm/Tests/TransactionTests.m" \
     --ignore "Realm/Tests/ObjectTests.m" \
