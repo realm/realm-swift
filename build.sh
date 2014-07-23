@@ -76,7 +76,7 @@ xcode6() {
 }
 
 xcode() {
-    if [ -L build/bin]; then
+    if [ -L build/bin ]; then
         unlink build/bin
     fi
     rm -rf build/bin
