@@ -66,17 +66,17 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild $@
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin bin || exit 1
-    PATH=./bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    PATH=./build/bin:$PATH xcodebuild $@
 }
 
 xcode() {
-    rm -rf bin
+    rm -rf build/bin
     mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
         5)
@@ -89,7 +89,6 @@ xcode() {
             echo "Unsupported version of xcode specified"
             exit 1
     esac
-    rm -rf bin
 }
 
 xc() {
@@ -305,6 +304,7 @@ case "$COMMAND" in
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Release clean build ${CODESIGN_PARAMS}"
+
         exit 0
         ;;
 
@@ -314,7 +314,7 @@ case "$COMMAND" in
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
-
+        
         # FIXME: Re-enable once CI has RubyMotion
         # (cd examples/ios/rubymotion/Simple && rake build) || exit 1
         XCODE_VERSION=5
@@ -324,6 +324,7 @@ case "$COMMAND" in
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme REST -configuration Debug clean build ${CODESIGN_PARAMS}"
+
         exit 0
         ;;
 
