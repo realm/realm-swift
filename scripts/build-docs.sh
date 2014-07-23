@@ -20,6 +20,7 @@ appledoc \
     --no-warn-invalid-crossref \
     --no-warn-undocumented-object \
     --no-warn-undocumented-member \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/RLMArrayAccessor.h" \
     --ignore "Realm/RLMArrayAccessor.mm" \
     --ignore "Realm/RLMProperty.h" \
@@ -63,6 +64,7 @@ appledoc \
     --no-warn-invalid-crossref \
     --no-warn-undocumented-object \
     --no-warn-undocumented-member \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/RLMArrayAccessor.h" \
     --ignore "Realm/RLMArrayAccessor.mm" \
     --ignore "Realm/RLMProperty.h" \
