@@ -40,11 +40,11 @@ class SwiftLinkTests: SwiftTestCase {
         let dogs = SwiftDogObject.allObjectsInRealm(realm)
         XCTAssertEqual(owners.count, 1, "Expecting 1 owner")
         XCTAssertEqual(dogs.count, 1, "Expecting 1 dog")
-        XCTAssertEqualObjects((owners[0] as SwiftOwnerObject).name, "Tim", "Tim is named Tim")
-        XCTAssertEqualObjects((dogs[0] as SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqual((owners[0] as SwiftOwnerObject).name, "Tim", "Tim is named Tim")
+        XCTAssertEqual((dogs[0] as SwiftDogObject).dogName, "Harvie", "Harvie is named Harvie")
         
         let tim = owners[0] as SwiftOwnerObject
-        XCTAssertEqualObjects(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
+        XCTAssertEqual(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
     }
     
     func testMultipleOwnerLink() {
@@ -113,8 +113,8 @@ class SwiftLinkTests: SwiftTestCase {
 //        realm.commitWriteTransaction()
 //        
 //        let obj2 = SwiftCircleObject.allObjectsInRealm(realm).firstObject() as SwiftCircleObject
-//        XCTAssertEqualObjects(obj2.data, "b", "data should be 'b'")
-//        XCTAssertEqualObjects(obj2.data, obj2.next.data, "objects should be equal")
+//        XCTAssertEqual(obj2.data, "b", "data should be 'b'")
+//        XCTAssertEqual(obj2.data, obj2.next.data, "objects should be equal")
 //    }
 
     // Objective-C models
@@ -135,11 +135,11 @@ class SwiftLinkTests: SwiftTestCase {
         let dogs = DogObject.allObjectsInRealm(realm)
         XCTAssertEqual(owners.count, 1, "Expecting 1 owner")
         XCTAssertEqual(dogs.count, 1, "Expecting 1 dog")
-        XCTAssertEqualObjects((owners[0] as OwnerObject).name, "Tim", "Tim is named Tim")
-        XCTAssertEqualObjects((dogs[0] as DogObject).dogName, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqual((owners[0] as OwnerObject).name, "Tim", "Tim is named Tim")
+        XCTAssertEqual((dogs[0] as DogObject).dogName, "Harvie", "Harvie is named Harvie")
 
         let tim = owners[0] as OwnerObject
-        XCTAssertEqualObjects(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
+        XCTAssertEqual(tim.dog.dogName, "Harvie", "Tim's dog should be Harvie")
     }
 
     func testMultipleOwnerLink_objc() {
@@ -208,7 +208,7 @@ class SwiftLinkTests: SwiftTestCase {
 //        realm.commitWriteTransaction()
 //
 //        let obj2 = CircleObject.allObjectsInRealm(realm).firstObject() as CircleObject
-//        XCTAssertEqualObjects(obj2.data, "b", "data should be 'b'")
-//        XCTAssertEqualObjects(obj2.data, obj2.next.data, "objects should be equal")
+//        XCTAssertEqual(obj2.data, "b", "data should be 'b'")
+//        XCTAssertEqual(obj2.data, obj2.next.data, "objects should be equal")
 //    }
 }

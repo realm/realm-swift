@@ -40,13 +40,13 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "SwiftDynamicObject should have 2 properties")
-        XCTAssertEqualObjects(dynSchema.properties[0].name, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type
         let array = SwiftDynamicObject.allObjectsInRealm(dyrealm)
         XCTAssertEqual(array.count, 2, "Array should have 2 elements")
-        XCTAssertEqualObjects(array.objectClassName, SwiftDynamicObject.className(), "Array class should by a dynamic object class")
+        XCTAssertEqual(array.objectClassName, SwiftDynamicObject.className(), "Array class should by a dynamic object class")
     }
 
     func testDynamicProperties() {
@@ -63,8 +63,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")
 
-        XCTAssertEqualObjects((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
-        XCTAssertEqualObjects(((array[1] as RLMObject)["stringCol"] as String), "column2", "Second object should have column value column2")
+        XCTAssertEqual((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
+        XCTAssertEqual(((array[1] as RLMObject)["stringCol"] as String), "column2", "Second object should have column value column2")
     }
 
     // FIXME: Uncomment once Swift-defined models support RLMPropertyTypeAny
@@ -94,16 +94,16 @@ class SwiftDynamicTests: SwiftTestCase {
 //        let schema = dyrealm.schema[SwiftAllTypesObject.className()]
 //        for idx in 0..<10 {
 //            let propName = schema.properties[idx].name
-//            XCTAssertEqualObjects(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject, "Invalid property value")
-//            XCTAssertEqualObjects(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject, "Invalid property value")
+//            XCTAssertEqual(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject, "Invalid property value")
+//            XCTAssertEqual(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject, "Invalid property value")
 //        }
 //
 //        // check sub object type
-//        XCTAssertEqualObjects((schema.properties[10] as RLMProperty).objectClassName, "StringObject", "Sub-object type in schema should be 'StringObject'")
+//        XCTAssertEqual((schema.properties[10] as RLMProperty).objectClassName, "StringObject", "Sub-object type in schema should be 'StringObject'")
 //
 //        // check object equality
 //        XCTAssertNil((array[0] as RLMObject)["objectCol"], "object should be nil")
-//        XCTAssertEqualObjects(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject, "string", "Child object should have string value 'column'")
+//        XCTAssertEqual(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject, "string", "Child object should have string value 'column'")
 //    }
 
     // Objective-C models
@@ -125,13 +125,13 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[DynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "DynamicObject should have 2 properties")
-        XCTAssertEqualObjects(dynSchema.properties[0].name, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type
         let array = DynamicObject.allObjectsInRealm(dyrealm)
         XCTAssertEqual(array.count, 2, "Array should have 2 elements")
-        XCTAssertEqualObjects(array.objectClassName, DynamicObject.className(), "Array class should by a dynamic object class")
+        XCTAssertEqual(array.objectClassName, DynamicObject.className(), "Array class should by a dynamic object class")
     }
 
     func testDynamicProperties_objc() {
@@ -148,8 +148,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("DynamicObject")
 
-        XCTAssertEqualObjects((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
-        XCTAssertEqualObjects(((array[1] as RLMObject)["stringCol"] as String), "column2", "Second object should have column value column2")
+        XCTAssertEqual((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
+        XCTAssertEqual(((array[1] as RLMObject)["stringCol"] as String), "column2", "Second object should have column value column2")
     }
 
     func testDynamicTypes_objc() {
@@ -178,15 +178,15 @@ class SwiftDynamicTests: SwiftTestCase {
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
             let propName = schema.properties[idx].name
-            XCTAssertEqualObjects(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject, "Invalid property value")
-            XCTAssertEqualObjects(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject, "Invalid property value")
+            XCTAssertEqual(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject, "Invalid property value")
+            XCTAssertEqual(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject, "Invalid property value")
         }
 
         // check sub object type
-        XCTAssertEqualObjects((schema.properties[10] as RLMProperty).objectClassName, "StringObject", "Sub-object type in schema should be 'StringObject'")
+        XCTAssertEqual((schema.properties[10] as RLMProperty).objectClassName, "StringObject", "Sub-object type in schema should be 'StringObject'")
 
         // check object equality
         XCTAssertNil((array[0] as RLMObject)["objectCol"], "object should be nil")
-        XCTAssertEqualObjects(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject, "string", "Child object should have string value 'column'")
+        XCTAssertEqual(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject, "string", "Child object should have string value 'column'")
     }
 }
