@@ -16,6 +16,7 @@
   e.g. `[Person objectsWhere:@"dog == %@", myDog]` `[Person objectsWhere:@"ANY dogs == %@", myDog]` `[Person objectsWhere:@"ANY friends.dog == %@", dog]`
   Only supports comparing objects for equality (i.e. ==)
 * Added a helper method to RLMRealm to perform a block inside a transaction.
+* OSX framework now supported in CocoaPods.
 
 ### Bugfixes
 
