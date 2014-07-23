@@ -41,7 +41,7 @@ class SwiftMixedTests: SwiftTestCase {
         XCTAssertEqual(objects.count, 5, "5 rows expected")
         XCTAssertTrue(objects[0].isKindOfClass(MixedObject.self), "MixedObject expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isKindOfClass(NSString.self), "NSString expected")
-        XCTAssertTrue((objects[0] as MixedObject)["other"].isEqualToString("Jens"), "'Jens' expected")
+        XCTAssertTrue((objects[0] as MixedObject)["other"].isEqual("Jens"), "'Jens' expected")
 
         // FIXME: See above
         // XCTAssertTrue((objects[1] as MixedObject)["other"].isKindOfClass(NSNumber.self), "NSNumber expected")

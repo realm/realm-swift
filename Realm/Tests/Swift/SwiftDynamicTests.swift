@@ -178,8 +178,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
             let propName = schema.properties[idx].name
-            XCTAssertTrue(obj1[idx].isEqualTo((array[0] as RLMObject)[propName]), "Invalid property value")
-            XCTAssertTrue(obj2[idx].isEqualTo((array[1] as RLMObject)[propName]), "Invalid property value")
+            XCTAssertTrue(obj1[idx].isEqual((array[0] as RLMObject)[propName]), "Invalid property value")
+            XCTAssertTrue(obj2[idx].isEqual((array[1] as RLMObject)[propName]), "Invalid property value")
         }
 
         // check sub object type
