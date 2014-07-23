@@ -170,6 +170,10 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
+        if [ "$REALM_CORE_VERSION" = "current" ]; then
+            echo "Using the available version of core"
+            exit 0
+        fi
         if ! [ -L core ]; then
             echo "core is not a symlink. Deleting..."
             rm -rf core
@@ -178,7 +182,6 @@ case "$COMMAND" in
             download_core
         else
             echo "The core library seems to be up to date."
-            echo "To force an update remove the folder 'core' and rerun."
         fi
         exit 0
         ;;
