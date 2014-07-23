@@ -21,8 +21,9 @@ extension RLMArray: Sequence {
     // Support Sequence-style enumeration
 
     public func generate() -> GeneratorOf<RLMObject> {
+        var i: UInt  = 0
+
         return GeneratorOf<RLMObject> {
-            var i: UInt  = 0
             if (i >= self.count) {
                 return .None
             } else {

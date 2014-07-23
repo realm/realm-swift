@@ -76,6 +76,9 @@ xcode6() {
 }
 
 xcode() {
+    if [ -L build/bin ]; then
+        unlink build/bin
+    fi
     rm -rf build/bin
     mkdir -p build/DerivedData
     case "$XCODE_VERSION" in
