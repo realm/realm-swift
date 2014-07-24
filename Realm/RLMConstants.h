@@ -83,23 +83,47 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 //    RLMPropertyAttributeDeleteAlways = 1 << 1
 };
 
+/**
+ Property types supported in Realm models.
+ 
+ See [Realm Models](http://realm.io/docs/cocoa/latest/#models)
+ */
 // Make sure numbers match those in <tightdb/data_type.hpp>
-typedef NS_ENUM(int32_t, RLMPropertyType) {    
+typedef NS_ENUM(int32_t, RLMPropertyType) {
+    ////////////////////////////////
     // Primitive types
-    RLMPropertyTypeInt      = 0,
-    RLMPropertyTypeBool     = 1,
-    RLMPropertyTypeFloat    = 9,
-    RLMPropertyTypeDouble   = 10,
-    
+    ////////////////////////////////
+
+    /** Integer type: NSInteger, int, long, Int (Swift) */
+    RLMPropertyTypeInt    = 0,
+    /** Boolean type: BOOL, bool, Bool (Swift) */
+    RLMPropertyTypeBool   = 1,
+    /** Float type: CGFloat, float, Float (Swift) */
+    RLMPropertyTypeFloat  = 9,
+    /** Double type: CGFloat, double, Double (Swift) */
+    RLMPropertyTypeDouble = 10,
+
+    ////////////////////////////////
     // Object types
-    RLMPropertyTypeString   = 2,
-    RLMPropertyTypeData     = 4,
-    RLMPropertyTypeAny      = 6,
-    RLMPropertyTypeDate     = 7,
-    
+    ////////////////////////////////
+
+    /** String type: NSString, String (Swift) */
+    RLMPropertyTypeString = 2,
+    /** Data type: NSData */
+    RLMPropertyTypeData   = 4,
+    /** Any type: id, **not supported in Swift** */
+    RLMPropertyTypeAny    = 6,
+    /** Date type: NSDate */
+    RLMPropertyTypeDate   = 7,
+
+    ////////////////////////////////
     // Array/Linked object types
-    RLMPropertyTypeObject   = 12,
-    RLMPropertyTypeArray    = 13,
+    ////////////////////////////////
+
+    /** Object type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+    RLMPropertyTypeObject = 12,
+    /** Array type. See [Realm Models](http://realm.io/docs/cocoa/latest/#models) */
+    RLMPropertyTypeArray  = 13,
 };
 
 // Posted by RLMRealm when it changes, that is when a table is

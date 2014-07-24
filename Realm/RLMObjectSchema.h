@@ -19,14 +19,20 @@
 #import <Foundation/Foundation.h>
 #import "RLMProperty.h"
 
-/**---------------------------------------------------------------------------------------
- *  @name Object Schema
- * ---------------------------------------------------------------------------------------
+/**
+ This class represents Realm model object schemas persisted to Realm in an RLMSchema.
+
+ When using Realm, RLMObjectSchema objects allow performing migrations and
+ introspecting the database's schema.
+
+ Object schemas map to tables in the core database.
  */
 @interface RLMObjectSchema : NSObject<NSCopying>
 
 /**
- Array of persisted properties for an object.
+ Array of persisted RLMProperty objects for an object.
+ 
+ @see RLMProperty
  */
 @property (nonatomic, readonly, copy) NSArray *properties;
 
@@ -36,11 +42,11 @@
 @property (nonatomic, readonly) NSString *className;
 
 /**
- Lookup a property object by name.
+ Retrieve an RLMProperty object by name.
  
- @param propertyName The properties name.
+ @param propertyName The property's name.
  
- @return    RLMProperty object or nil if there is no property with the given name.
+ @return RLMProperty object or nil if there is no property with the given name.
  */
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
