@@ -46,7 +46,7 @@
 /**
  Initializes an empty RLMArray with an objectClassName representing the class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName
++ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;
 
 /**---------------------------------------------------------------------------------------
  *  @name RLMArray Properties
