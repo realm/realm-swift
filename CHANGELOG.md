@@ -1,4 +1,4 @@
-0.82.0 Release notes (YYY-MM-DD)
+0.82.0 Release notes (YYYY-MM-DD)
 =============================================================
 
 ### API breaking changes
@@ -7,6 +7,7 @@
 
 ### Enhancements
 
+* Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
 * Using NSNumber properties (unsupported) now throws a more informative exception.
 
 ### Bugfixes
