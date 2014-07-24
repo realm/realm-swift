@@ -7,7 +7,7 @@
 
 ### Enhancements
 
-* None.
+* Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
 
 ### Bugfixes
 
