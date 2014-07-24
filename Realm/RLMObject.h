@@ -290,18 +290,19 @@
 
 @end
 
-//---------------------------------------------------------------------------------------
-// @name RLMArray Property Declaration
-//---------------------------------------------------------------------------------------
-//
-// Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
-// with an RLMArray property by defining a protocol for the object type which the RLMArray will
-// hold. To define an protocol for an object you can use the macro RLM_ARRAY_TYPE:
-//
-// ie. RLM_ARRAY_TYPE(ObjectType)
-//
-//     @property RLMArray<ObjectType> *arrayOfObjectTypes;
-//
+/**---------------------------------------------------------------------------------------
+ *  @name RLMArray Property Declaration
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Properties on RLMObjects of type RLMArray must have an associated type. A type is associated
+ with an RLMArray property by defining a protocol for the object type which the RLMArray will
+ hold. To define an protocol for an object you can use the macro RLM_ARRAY_TYPE:
+ 
+     RLM_ARRAY_TYPE(ObjectType)
+     ...
+     @property RLMArray<ObjectType> *arrayOfObjectTypes;
+  */
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
