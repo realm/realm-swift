@@ -102,12 +102,6 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeArray    = 13,
 };
 
-
-typedef NS_ENUM(NSInteger, RLMSortOrder) {
-    RLMSortOrderAscending =  0,
-    RLMSortOrderDescending =  1,
-};
-
 // Posted by RLMRealm when it changes, that is when a table is
 // added, removed, or changed in any way.
 
