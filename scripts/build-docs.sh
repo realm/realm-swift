@@ -36,9 +36,7 @@ appledoc \
     Realm
 
 sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/index.html
-sed -i '' -e '/RLMSortOrder/d' ${SRCROOT}/docs/html/index.html
 sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/hierarchy.html
-sed -i '' -e '/RLMSortOrder/d' ${SRCROOT}/docs/html/hierarchy.html
 
 mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
