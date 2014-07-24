@@ -62,13 +62,13 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return array.count
+        return Int(array.count)
     }
 
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell? {
         let cell = tableView!.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
         
-        let object = array[indexPath!.row] as DemoObject
+        let object = array[UInt(indexPath!.row)] as DemoObject
         cell.textLabel.text = object.title
         cell.detailTextLabel.text = object.date.description
         
@@ -79,7 +79,7 @@ class TableViewController: UITableViewController {
         if editingStyle == .Delete {
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()
-            realm.deleteObject(array[indexPath.row] as RLMObject)
+            realm.deleteObject(array[UInt(indexPath.row)] as RLMObject)
             realm.commitWriteTransaction()
         }
     }

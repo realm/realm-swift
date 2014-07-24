@@ -3,7 +3,8 @@
 
 ### API breaking changes
 
-* None.
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta4. 
+  Other versions of Xcode cannot build that project.
 
 ### Enhancements
 

@@ -20,24 +20,25 @@ extension RLMArray: Sequence {
 
     // Support Sequence-style enumeration
 
-    func generate() -> GeneratorOf<RLMObject> {
-        var i  = 0
-        return GeneratorOf<RLMObject>({
+    public func generate() -> GeneratorOf<RLMObject> {
+        var i: UInt  = 0
+
+        return GeneratorOf<RLMObject> {
             if (i >= self.count) {
                 return .None
             } else {
                 return self[i++] as? RLMObject
             }
-        })
+        }
     }
 
     // Swift query convenience functions
 
-    func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> Int {
+    public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
         return indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMArray {
+    public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMArray {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 }
