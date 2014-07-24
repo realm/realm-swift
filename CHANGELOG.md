@@ -1,3 +1,18 @@
+0.82.0 Release notes (YYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Using NSNumber properties (unsupported) now throws a more informative exception.
+
+### Bugfixes
+
+* None.
+
 0.81.0 Release notes (2014-07-22)
 =============================================================
 

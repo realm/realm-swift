@@ -151,6 +151,11 @@
                                                  userInfo:nil];
                 }
             }
+            else if ([type isEqualToString:@"@\"NSNumber\""]) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:[NSString stringWithFormat:@"'NSNumber' cannot be used as an RLMObject property. Instead, please use one of NSInteger, int, long, Int (Swift), BOOL, bool, Bool (Swift), CGFloat, float, Float (Swift), CGFloat, double, Double (Swift)"]
+                                             userInfo:nil];
+            }
             else {
                 // get object class and set type
                 _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
