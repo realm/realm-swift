@@ -23,21 +23,14 @@ appledoc \
     --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/RLMArrayAccessor.h" \
     --ignore "Realm/RLMArrayAccessor.mm" \
-    --ignore "Realm/RLMProperty.h" \
-    --ignore "Realm/RLMProperty.m" \
-    --ignore "Realm/RLMObjectSchema.h" \
-    --ignore "Realm/RLMSchema.h" \
     --ignore "Realm/RLMQueryUtil.h" \
     --ignore "Realm/RLMUtil.h" \
-    --ignore "Realm/Tests/QueryTests.m" \
-    --ignore "Realm/Tests/TransactionTests.m" \
-    --ignore "Realm/Tests/ObjectTests.m" \
+    --ignore "Realm/RLMRealm_Dynamic.h" \
+    --ignore "Realm/Realm-Bridging-Header.h" \
+    --ignore "Realm/Tests" \
     --template ${SRCROOT}/docs/templates \
     --exit-threshold 1 \
     Realm
-
-sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/index.html
-sed -i '' -e '/RLMPropertyType/d' ${SRCROOT}/docs/html/hierarchy.html
 
 mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
