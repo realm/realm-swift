@@ -153,7 +153,7 @@
             }
             else if ([type isEqualToString:@"@\"NSNumber\""]) {
                 @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types."]
+                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/latest/api/Constants/RLMPropertyType.html for all supported types."]
                                              userInfo:nil];
             }
             else {
