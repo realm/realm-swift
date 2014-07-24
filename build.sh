@@ -228,6 +228,7 @@ case "$COMMAND" in
     "ios")
         xcrealm "-scheme iOS -configuration Release"
         if [[ "$XCODE_VERSION" == "6" ]]; then
+            echo "FIXME: add platform error"
         else
             add_platform_error "build/Release" "ios"
         fi
@@ -237,6 +238,7 @@ case "$COMMAND" in
     "osx")
         xcrealm "-scheme OSX -configuration Release"
         if [[ "$XCODE_VERSION" == "6" ]]; then
+            echo "FIXME: add platform error"
         else
             add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
         fi
@@ -246,6 +248,7 @@ case "$COMMAND" in
     "ios-debug")
         xcrealm "-scheme iOS -configuration Debug"
         if [[ "$XCODE_VERSION" == "6" ]]; then
+            echo "FIXME: add platform error"
         else
             add_platform_error "build/Debug" "ios"
         fi
@@ -255,6 +258,7 @@ case "$COMMAND" in
     "osx-debug")
         xcrealm "-scheme OSX -configuration Debug"
         if [[ "$XCODE_VERSION" == "6" ]]; then
+            echo "FIXME: add platform error"
         else
             add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
         fi
