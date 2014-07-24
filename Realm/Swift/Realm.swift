@@ -34,7 +34,7 @@ public class Realm {
         return Realm(rlmRealm: RLMRealm.defaultRealm())
     }
 
-    init(rlmRealm: RLMRealm) {
+    public init(rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 

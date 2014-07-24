@@ -169,7 +169,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let description = realm.objects(SwiftEmployeeObject()).description as NSString
-        XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
+        XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
         
         XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RealmArray")
         XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RealmArray")

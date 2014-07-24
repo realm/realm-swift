@@ -52,12 +52,8 @@ func deleteRealmFilesAtPath(path: String) {
     assert(error == nil, "Unable to delete realm")
 }
 
-func realmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, dynamic: false, schema: schema, error: nil)
-}
-
-func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, dynamic: true, schema: schema, error: nil)
+func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> Realm {
+    return Realm(rlmRealm: RLMRealm.realmWithPath(testRealmPath(), readOnly: false, dynamic: true, schema: schema, error: nil))
 }
 
 class SwiftTestCase: XCTestCase {
