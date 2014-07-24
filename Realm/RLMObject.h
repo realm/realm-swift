@@ -67,7 +67,6 @@
  ### Relationships
  
  See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
- 
  */
 
 

@@ -30,18 +30,18 @@ class SwiftMixedTests: SwiftTestCase {
         realm.beginWriteTransaction()
         MixedObject.createInRealm(realm, withObject: [true, "Jens", 50])
         // FIXME: Adding this object makes the test fail
-        // MixedObject.createInRealm(realm, withObject: [true, 10, 52])
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53])
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54])
-        MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55])
-        MixedObject.createInRealm(realm, withObject: [true, data as NSData, 50])
+        // MixedObject.createInRealm(realm, withObject: [true, 10, 52] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, data as NSData, 50] as NSArray)
         realm.commitWriteTransaction()
 
         let objects = MixedObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 5, "5 rows expected")
         XCTAssertTrue(objects[0].isKindOfClass(MixedObject.self), "MixedObject expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isKindOfClass(NSString.self), "NSString expected")
-        XCTAssertTrue((objects[0] as MixedObject)["other"].isEqualToString("Jens"), "'Jens' expected")
+        XCTAssertTrue((objects[0] as MixedObject)["other"].isEqual("Jens"), "'Jens' expected")
 
         // FIXME: See above
         // XCTAssertTrue((objects[1] as MixedObject)["other"].isKindOfClass(NSNumber.self), "NSNumber expected")
