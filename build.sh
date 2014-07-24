@@ -171,7 +171,7 @@ case "$COMMAND" in
     ######################################
     "download-core")
         if [ "$REALM_CORE_VERSION" = "current" ]; then
-            echo "Using the available version of core"
+            echo "Using version of core already in core/ directory"
             exit 0
         fi
         if ! [ -L core ]; then
