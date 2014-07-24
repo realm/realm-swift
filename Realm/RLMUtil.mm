@@ -55,7 +55,9 @@ inline bool nsnumber_is_like_float(NSObject *obj)
             strcmp(data_type, @encode(long long)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
+            strcmp(data_type, @encode(unsigned long long)) == 0 ||
+            // A double is like float if it fits within float bounds
+            (strcmp(data_type, @encode(double)) == 0 && ABS([(NSNumber *)obj doubleValue]) < FLT_MAX));
 }
 
 inline bool nsnumber_is_like_double(NSObject *obj)
@@ -70,19 +72,6 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-// Predicate to check if a NSNumber can be casted to a float value:
-// integers, floats and small doubles
-// casting might lead to loss of precision!!!
-inline bool nsnumber_can_be_float(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    if (strcmp(data_type, @encode(double)) == 0) {
-        double tmp = [(NSNumber *)obj doubleValue];
-        return !(tmp > FLT_MAX || tmp < -FLT_MAX);
-    }
-    return true;
 }
 
 inline bool object_has_valid_type(id obj)
@@ -111,7 +100,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             return NO;
         case RLMPropertyTypeFloat:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_float(obj) || nsnumber_can_be_float(obj);
+                return nsnumber_is_like_float(obj);
             }
             return NO;
         case RLMPropertyTypeDouble:

@@ -67,12 +67,6 @@
  ### Relationships
  
  See our [iOS guide](http://realm.io/docs/ios/latest) for more details.
- 
- ### Note on float
- 
- In some cases, double values are converted automatically to float values. This might
- lead to loss of precision.
- 
  */
 
 
