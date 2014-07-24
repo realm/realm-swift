@@ -153,7 +153,7 @@
             }
             else if ([type isEqualToString:@"@\"NSNumber\""]) {
                 @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"'NSNumber' cannot be used as an RLMObject property. Instead, please use one of NSInteger, int, long, Int (Swift), BOOL, bool, Bool (Swift), CGFloat, float, Float (Swift), CGFloat, double, Double (Swift)"]
+                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types."]
                                              userInfo:nil];
             }
             else {
