@@ -67,7 +67,6 @@
  ### Relationships
  
  See our [iOS guide](http://realm.io/docs/ios/latest) for more details.
- 
  */
 
 

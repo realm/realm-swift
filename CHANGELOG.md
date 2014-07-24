@@ -11,7 +11,8 @@
 
 ### Bugfixes
 
-* None.
+* Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
+
 
 0.81.0 Release notes (2014-07-22)
 =============================================================
