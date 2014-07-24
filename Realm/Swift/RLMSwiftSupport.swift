@@ -49,8 +49,6 @@ import Foundation
     }
 
     public class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
-        let className = demangleClassName(NSStringFromClass(aClass))
-
         let swiftObject = (aClass as RLMObject.Type)()
         let reflection = reflect(swiftObject)
         let ignoredPropertiesForClass = aClass.ignoredProperties() as NSArray?
@@ -68,43 +66,47 @@ import Foundation
             properties += createPropertyForClass(aClass,
                 mirror: reflection[i].1,
                 name: propertyName,
-                attr: aClass.attributesForProperty(propertyName))
+                attr: aClass.attributesForProperty(propertyName),
+                column: UInt(properties.count))
         }
 
-        return RLMObjectSchema(className: className as NSString?, objectClass: aClass, properties: properties)
+        return RLMObjectSchema(className: demangleClassName(NSStringFromClass(aClass)),
+            objectClass: aClass,
+            properties: properties)
     }
 
     class func createPropertyForClass(aClass: AnyClass,
         mirror: Mirror,
         name: String,
-        attr: RLMPropertyAttributes) -> RLMProperty {
+        attr: RLMPropertyAttributes,
+        column: UInt) -> RLMProperty {
             var p: RLMProperty?
             var t: String?
             let valueType = mirror.valueType
             switch valueType {
                 // Detect basic types (including optional versions)
             case is Bool.Type, is Bool?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Bool, objectClassName: nil, attributes: attr), "c")
+                (p, t) = (RLMProperty(name: name, type: .Bool, objectClassName: nil, attributes: attr, column: column), "c")
             case is Int.Type, is Int?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr), "i")
+                (p, t) = (RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr, column: column), "i")
             case is Float.Type, is Float?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Float, objectClassName: nil, attributes: attr), "f")
+                (p, t) = (RLMProperty(name: name, type: .Float, objectClassName: nil, attributes: attr, column: column), "f")
             case is Double.Type, is Double?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Double, objectClassName: nil, attributes: attr), "d")
+                (p, t) = (RLMProperty(name: name, type: .Double, objectClassName: nil, attributes: attr, column: column), "d")
             case is String.Type, is String?.Type:
-                (p, t) = (RLMProperty(name: name, type: .String, objectClassName: nil, attributes: attr), "S")
+                (p, t) = (RLMProperty(name: name, type: .String, objectClassName: nil, attributes: attr, column: column), "S")
             case is NSData.Type, is NSData?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Data, objectClassName: nil, attributes: attr), "@\"NSData\"")
+                (p, t) = (RLMProperty(name: name, type: .Data, objectClassName: nil, attributes: attr, column: column), "@\"NSData\"")
             case is NSDate.Type, is NSDate?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Date, objectClassName: nil, attributes: attr), "@\"NSDate\"")
+                (p, t) = (RLMProperty(name: name, type: .Date, objectClassName: nil, attributes: attr, column: column), "@\"NSDate\"")
             case let objectType as RLMObject.Type:
                 let mangledClassName = NSStringFromClass(objectType.self)
                 let objectClassName = demangleClassName(mangledClassName)
                 let typeEncoding = "@\"\(mangledClassName))\""
-                (p, t) = (RLMProperty(name: name, type: .Object, objectClassName: objectClassName, attributes: attr), typeEncoding)
+                (p, t) = (RLMProperty(name: name, type: .Object, objectClassName: objectClassName, attributes: attr, column: column), typeEncoding)
             case let c as RLMArray.Type:
                 let objectClassName = (mirror.value as RLMArray).objectClassName
-                (p, t) = (RLMProperty(name: name, type: .Array, objectClassName: objectClassName, attributes: attr), "@\"RLMArray\"")
+                (p, t) = (RLMProperty(name: name, type: .Array, objectClassName: objectClassName, attributes: attr, column: column), "@\"RLMArray\"")
             default:
                 println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
                 assert(false)
