@@ -16,98 +16,92 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-class RealmArray<T: RealmObject>: Sequence, Printable {
-    var rlmArray: RLMArray
-    var count: Int { return rlmArray.count }
-    var objectClassName: String { return rlmArray.objectClassName }
-    var readOnly: Bool { return rlmArray.readOnly }
-    var realm: Realm { return Realm(rlmRealm: rlmArray.realm) }
+import Foundation
 
-    var description: String { return rlmArray.description }
-    var property: RLMArray { return rlmArray }
+public class RealmArray<T: RealmObject>: Sequence, Printable {
+    public var rlmArray: RLMArray
+    public var count: UInt { return rlmArray.count }
+    public var objectClassName: String { return rlmArray.objectClassName }
+    public var readOnly: Bool { return rlmArray.readOnly }
+    public var realm: Realm { return Realm(rlmRealm: rlmArray.realm) }
 
-    init() {
+    public var description: String { return rlmArray.description }
+    public var property: RLMArray { return rlmArray }
+
+    public init() {
         rlmArray = RLMArray(objectClassName: RLMSwiftSupport.demangleClassName(NSStringFromClass(T.self)))
     }
 
-    convenience init(rlmArray: RLMArray) {
+    public convenience init(rlmArray: RLMArray) {
         self.init()
         self.rlmArray = rlmArray
     }
 
-    subscript(index: UInt) -> T {
+    public subscript(index: UInt) -> T {
         get {
-            return rlmArray[Int(index)] as T
+            return rlmArray[index] as T
         }
         set {
-            return rlmArray[Int(index)] = newValue
+            return rlmArray[index] = newValue
         }
     }
 
-    func firstObject() -> T? {
+    public func firstObject() -> T? {
         return rlmArray.firstObject() as T?
     }
 
-    func lastObject() -> T? {
+    public func lastObject() -> T? {
         return rlmArray.lastObject() as T?
     }
 
-    func indexOfObject(object: T) -> UInt? {
-        let index = rlmArray.indexOfObject(object)
-        if index == NSNotFound {
-            return nil
-        }
-        return UInt(index)
+    public func indexOfObject(object: T) -> UInt? {
+        return rlmArray.indexOfObject(object)
     }
 
-    func indexOfObjectWithPredicate(predicate: NSPredicate) -> UInt? {
-        let index = rlmArray.indexOfObjectWithPredicate(predicate)
-        if index == NSNotFound {
-            return nil
-        }
-        return UInt(index)
+    public func indexOfObjectWithPredicate(predicate: NSPredicate) -> UInt? {
+        return rlmArray.indexOfObjectWithPredicate(predicate)
     }
 
     // Swift query convenience functions
 
-    func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> Int {
+    public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
         return rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RealmArray<T> {
+    public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
     }
 
-    func objectsWithPredicate(predicate: NSPredicate) -> RealmArray<T> {
+    public func objectsWithPredicate(predicate: NSPredicate) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: rlmArray.objectsWithPredicate(predicate))
     }
 
-    func arraySortedByProperty(property: String, ascending: Bool) -> RealmArray<T> {
+    public func arraySortedByProperty(property: String, ascending: Bool) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: rlmArray.arraySortedByProperty(property, ascending: ascending))
     }
 
-    func minOfProperty(property: String) -> AnyObject {
+    public func minOfProperty(property: String) -> AnyObject {
         return rlmArray.minOfProperty(property)
     }
 
-    func maxOfProperty(property: String) -> AnyObject {
+    public func maxOfProperty(property: String) -> AnyObject {
         return rlmArray.maxOfProperty(property)
     }
 
-    func sumOfProperty(property: String) -> Double {
+    public func sumOfProperty(property: String) -> Double {
         return rlmArray.sumOfProperty(property) as Double
     }
 
-    func averageOfProperty(property: String) -> Double {
+    public func averageOfProperty(property: String) -> Double {
         return rlmArray.averageOfProperty(property) as Double
     }
 
-    func JSONString() -> String {
+    public func JSONString() -> String {
         return rlmArray.JSONString()
     }
 
-    func generate() -> GeneratorOf<T> {
-        var i  = 0
+    public func generate() -> GeneratorOf<T> {
+        var i: UInt = 0
         return GeneratorOf<T>({
             if (i >= self.rlmArray.count) {
                 return .None
@@ -117,31 +111,31 @@ class RealmArray<T: RealmObject>: Sequence, Printable {
         })
     }
 
-    func addObject(object: T) {
+    public func addObject(object: T) {
         rlmArray.addObject(object)
     }
 
-    func addObjects(objects: [AnyObject]) {
+    public func addObjects(objects: [AnyObject]) {
         rlmArray.addObjectsFromArray(objects)
     }
 
-    func insertObject(object: T, atIndex index: UInt) {
-        rlmArray.insertObject(object, atIndex: Int(index))
+    public func insertObject(object: T, atIndex index: UInt) {
+        rlmArray.insertObject(object, atIndex: index)
     }
 
-    func removeObjectAtIndex(index: UInt) {
-        rlmArray.removeObjectAtIndex(Int(index))
+    public func removeObjectAtIndex(index: UInt) {
+        rlmArray.removeObjectAtIndex(index)
     }
 
-    func removeLastObject() {
+    public func removeLastObject() {
         rlmArray.removeLastObject()
     }
 
-    func removeAllObjects() {
+    public func removeAllObjects() {
         rlmArray.removeAllObjects()
     }
 
-    func replaceObjectAtIndex(index: UInt, withObject object: T) {
-        rlmArray.replaceObjectAtIndex(Int(index), withObject: object)
+    public func replaceObjectAtIndex(index: UInt, withObject object: T) {
+        rlmArray.replaceObjectAtIndex(index, withObject: object)
     }
 }

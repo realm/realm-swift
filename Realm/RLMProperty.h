@@ -18,8 +18,8 @@
 
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
-#import <Realm/RLMObject.h>
+#import "RLMConstants.h"
+#import "RLMObject.h"
 
 // object property definition
 @interface RLMProperty : NSObject

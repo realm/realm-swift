@@ -62,7 +62,7 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return array.count
+        return Int(array.count)
     }
 
     override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell? {

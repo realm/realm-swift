@@ -18,21 +18,21 @@
 
 import Foundation
 
-typealias RealmObject = RLMObject
-typealias RealmSchema = RLMSchema
-typealias RealmObjectSchema = RLMObjectSchema
-typealias RealmMigration = RLMMigration
-typealias RealmNotificationToken = RLMNotificationToken
-typealias RealmMigrationBlock = RLMMigrationBlock
-typealias RealmNotificationBlock = RLMNotificationBlock
+public typealias RealmObject = RLMObject
+public typealias RealmSchema = RLMSchema
+public typealias RealmObjectSchema = RLMObjectSchema
+public typealias RealmMigration = RLMMigration
+public typealias RealmNotificationToken = RLMNotificationToken
+public typealias RealmMigrationBlock = RLMMigrationBlock
+public typealias RealmNotificationBlock = RLMNotificationBlock
 
-@objc class RLMSwiftSupport {
+@objc public class RLMSwiftSupport {
 
-    class func isSwiftClassName(className: NSString) -> Bool {
+    public class func isSwiftClassName(className: NSString) -> Bool {
         return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
     }
 
-    class func demangleClassName(className: NSString) -> NSString {
+    public class func demangleClassName(className: NSString) -> NSString {
         // Swift mangling details found here: http://www.eswick.com/2014/06/inside-swift
         // Swift class names look like _TFC9swifttest5Shape
         // Format: _T{2 characters}{module length}{module}{class length}{class}
@@ -56,7 +56,7 @@ typealias RealmNotificationBlock = RLMNotificationBlock
         return substring.substringWithRange(NSRange(location: classLengthLength, length: classLength))
     }
 
-    class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
+    public class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
         let className = demangleClassName(NSStringFromClass(aClass))
 
         let swiftObject = (aClass as RLMObject.Type)()
