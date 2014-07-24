@@ -208,9 +208,9 @@ case "$COMMAND" in
             xcrealm "-scheme iOS -configuration Release"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
             mkdir -p Release || exit 1
-            cp -R Release-iphoneos/Realm.framework Release || exit 1
+            cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
             lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
-            mv Realm Release/Realm.framework || exit 1
+            mv Realm Release-iphone/Realm.framework || exit 1
         else
             xcrealm "-scheme iOS -configuration Release"
         fi
@@ -229,9 +229,9 @@ case "$COMMAND" in
             xcrealm "-scheme iOS -configuration Debug"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
             mkdir -p Debug || exit 1
-            cp -R Debug-iphoneos/Realm.framework Debug || exit 1
+            cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
             lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
-            mv Realm Debug/Realm.framework || exit 1
+            mv Realm Debug-iphone/Realm.framework || exit 1
         else
             xcrealm "-scheme iOS -configuration Debug"
         fi
