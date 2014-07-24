@@ -168,7 +168,7 @@ add_platform_error() {
         echo "\n#if TARGET_OS_MAC" >> "$REALM_H_PATH" || exit 1
         echo "#error Attempting to use Realm's iOS framework in an OSX project." >> "$REALM_H_PATH" || exit 1
     else
-        echo "\n#if !TARGET_OS_MAC" >> "$REALM_H_PATH" || exit 1
+        echo "\n#if TARGET_OS_IPHONE" >> "$REALM_H_PATH" || exit 1
         echo "#error Attempting to use Realm's OSX framework in an iOS project." >> "$REALM_H_PATH" || exit 1
     fi
     echo "#endif\n" >> "$REALM_H_PATH" || exit 1
@@ -228,7 +228,7 @@ case "$COMMAND" in
     "ios")
         xcrealm "-scheme iOS -configuration Release"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            echo "FIXME: add platform error"
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Release-iphoneos" "ios"
         else
             add_platform_error "build/Release" "ios"
         fi
@@ -238,7 +238,7 @@ case "$COMMAND" in
     "osx")
         xcrealm "-scheme OSX -configuration Release"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            echo "FIXME: add platform error"
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Release" "osx"
         else
             add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
         fi
@@ -248,7 +248,7 @@ case "$COMMAND" in
     "ios-debug")
         xcrealm "-scheme iOS -configuration Debug"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            echo "FIXME: add platform error"
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Debug-iphoneos" "ios"
         else
             add_platform_error "build/Debug" "ios"
         fi
@@ -258,7 +258,7 @@ case "$COMMAND" in
     "osx-debug")
         xcrealm "-scheme OSX -configuration Debug"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            echo "FIXME: add platform error"
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Debug" "osx"
         else
             add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
         fi
