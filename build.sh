@@ -155,6 +155,30 @@ COMMAND="$1"
 XCMODE="$2"
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
+######################################
+# Add Platform Error
+######################################
+
+add_platform_error() {
+    FRAMEWORK_PATH="$1"     # /path/to/framework/ (i.e. framework at /path/to/framework/Realm.framework)
+    FRAMEWORK_PLATFORM="$2" # must be "ios" or "osx"
+    REALM_H_PATH="$FRAMEWORK_PATH/Realm.framework/Headers/Realm.h"
+    
+    if [[ "$FRAMEWORK_PLATFORM" == "ios" ]]; then
+        echo "\n#if TARGET_OS_MAC" >> "$REALM_H_PATH" || exit 1
+        echo "#error Attempting to use Realm's iOS framework in an OSX project." >> "$REALM_H_PATH" || exit 1
+    else
+        echo "\n#if !TARGET_OS_MAC" >> "$REALM_H_PATH" || exit 1
+        echo "#error Attempting to use Realm's OSX framework in an iOS project." >> "$REALM_H_PATH" || exit 1
+    fi
+    echo "#endif\n" >> "$REALM_H_PATH" || exit 1
+
+    echo "Platform error message added to framework at '$FRAMEWORK_PATH'"
+}
+
+######################################
+# Command Handling
+######################################
 
 case "$COMMAND" in
 
@@ -203,21 +227,37 @@ case "$COMMAND" in
 
     "ios")
         xcrealm "-scheme iOS -configuration Release"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+        else
+            add_platform_error "build/Release" "ios"
+        fi
         exit 0
         ;;
 
     "osx")
         xcrealm "-scheme OSX -configuration Release"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+        else
+            add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
+        fi
         exit 0
         ;;
 
     "ios-debug")
         xcrealm "-scheme iOS -configuration Debug"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+        else
+            add_platform_error "build/Debug" "ios"
+        fi
         exit 0
         ;;
 
     "osx-debug")
         xcrealm "-scheme OSX -configuration Debug"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+        else
+            add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
+        fi
         exit 0
         ;;
 
