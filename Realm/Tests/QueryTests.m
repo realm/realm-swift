@@ -776,16 +776,17 @@
     [FloatObject createInRealm:realm withObject:@[@1.7f]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > %d", 1] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = 1.7"] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %f", 1.7f] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1.0"] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol >= 1.0"] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol < 1.0"] count]), (NSUInteger)0, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol <= 1.0"] count]), (NSUInteger)0, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), (NSUInteger)1, @"1 object excepted");
-    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %e", 1.7] count]), (NSUInteger)1, @"1 object excepted");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1"] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > %d", 1] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = 1.7"] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %f", 1.7f] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol > 1.0"] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol >= 1.0"] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol < 1.0"] count]), (NSUInteger)0, @"0 objects expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol <= 1.0"] count]), (NSUInteger)0, @"0 objects expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol BETWEEN %@", @[@1.0, @2.0]] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol = %e", 1.7] count]), (NSUInteger)1, @"1 object expected");
+    XCTAssertEqual(([[realm objects:[FloatObject className] where:@"floatCol == %f", FLT_MAX] count]), (NSUInteger)0, @"0 objects expected");
     XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = 3.5e+38"] count]), @"Too large to be a float");
     XCTAssertThrows(([[realm objects:[FloatObject className] where:@"floatCol = -3.5e+38"] count]), @"Too small to be a float");
 }
