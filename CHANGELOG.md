@@ -1,3 +1,18 @@
+0.82.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
+
+### Bugfixes
+
+* None.
+
 0.81.0 Release notes (2014-07-22)
 =============================================================
 

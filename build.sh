@@ -226,10 +226,19 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        xcrealm "-scheme iOS -configuration Release"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Release-iphoneos" "ios"
+            # Build Universal Simulator/Device framework
+            xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
+            xcrealm "-scheme iOS -configuration Release"
+            cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
+            mkdir -p Release || exit 1
+            cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
+            lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
+            mv Realm Release-iphone/Realm.framework || exit 1
+
+            add_platform_error "Release-iphone" "ios"
         else
+            xcrealm "-scheme iOS -configuration Release"
             add_platform_error "build/Release" "ios"
         fi
         exit 0
@@ -246,10 +255,19 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        xcrealm "-scheme iOS -configuration Debug"
         if [[ "$XCODE_VERSION" == "6" ]]; then
-            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Debug-iphoneos" "ios"
+            # Build Universal Simulator/Device framework
+            xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
+            xcrealm "-scheme iOS -configuration Debug"
+            cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
+            mkdir -p Debug || exit 1
+            cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
+            lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
+            mv Realm Debug-iphone/Realm.framework || exit 1
+
+            add_platform_error "Debug-iphone" "ios"
         else
+            xcrealm "-scheme iOS -configuration Debug"
             add_platform_error "build/Debug" "ios"
         fi
         exit 0
@@ -339,7 +357,7 @@ case "$COMMAND" in
         cd examples
         if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+            xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
@@ -357,7 +375,7 @@ case "$COMMAND" in
         cd examples
         if [[ "$XCODE_VERSION" == "6" ]]; then
             xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        	xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+            xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         fi
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
