@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##################################################################################
 # Custom build tool for Realm Objective C binding.
@@ -11,6 +11,13 @@
 #          not strip away this feature. Also, this will fail if somebody forces the script
 #          to be run with zsh.
 set -o pipefail
+
+error() {
+    echo "The script ended with an error at line $1"
+    exit 1
+}
+
+trap 'error ${LINENO}' ERR
 
 # You can override the version of the core library
 # Otherwise, use the default value
@@ -66,12 +73,12 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
@@ -97,7 +104,7 @@ xcode() {
 xc() {
     echo "Building target \"$1\" with xcode${XCODE_VERSION}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode $1 || exit 1
+        xcode $1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
         xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
@@ -106,7 +113,7 @@ xc() {
             exit 1
         fi
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool $1 || exit 1
+        xctool $1
     fi
 }
 
@@ -139,22 +146,21 @@ fi
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$(mktemp -dt "$0")"
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip" || exit 1
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
     (
         cd "${TMP_DIR}"
-        unzip "core-${REALM_CORE_VERSION}.zip" || exit 1
-        mv core core-${REALM_CORE_VERSION} || exit 1
-        rm -f "core-${REALM_CORE_VERSION}.zip" || exit 1
+        unzip "core-${REALM_CORE_VERSION}.zip"
+        mv core core-${REALM_CORE_VERSION}
+        rm -f "core-${REALM_CORE_VERSION}.zip"
     )
-    rm -rf core-${REALM_CORE_VERSION} core || exit 1
-    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} . || exit 1
-    ln -s core-${REALM_CORE_VERSION} core || exit 1
+    rm -rf core-${REALM_CORE_VERSION} core
+    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
+    ln -s core-${REALM_CORE_VERSION} core
 }
 
 COMMAND="$1"
 XCMODE="$2"
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
-
 
 case "$COMMAND" in
 
@@ -162,10 +168,10 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme OSX -configuration Debug clean" || exit 1
-        xcrealm "-scheme OSX -configuration Release clean" || exit 1
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean"
+        xcrealm "-scheme OSX -configuration Debug clean"
+        xcrealm "-scheme OSX -configuration Release clean"
         exit 0
         ;;
 
@@ -193,14 +199,14 @@ case "$COMMAND" in
     # Building
     ######################################
     "build")
-        sh build.sh ios "$XCMODE" || exit 1
-        sh build.sh osx "$XCMODE" || exit 1
+        sh build.sh ios "$XCMODE"
+        sh build.sh osx "$XCMODE"
         exit 0
         ;;
 
     "build-debug")
-        sh build.sh ios-debug "$XCMODE" || exit 1
-        sh build.sh osx-debug "$XCMODE" || exit 1
+        sh build.sh ios-debug "$XCMODE"
+        sh build.sh osx-debug "$XCMODE"
         exit 0
         ;;
 
@@ -247,7 +253,7 @@ case "$COMMAND" in
         ;;
 
     "docs")
-        sh scripts/build-docs.sh || exit 1
+        sh scripts/build-docs.sh
         exit 0
         ;;
 
@@ -267,10 +273,10 @@ case "$COMMAND" in
         ;;
 
     "test-all")
-        sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-debug "$XCMODE" || exit 1
-        XCODE_VERSION=6 sh build.sh test "$XCMODE" || exit 1
-        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || exit 1
+        sh build.sh test "$XCMODE"
+        sh build.sh test-debug "$XCMODE"
+        XCODE_VERSION=6 sh build.sh test "$XCMODE"
+        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE"
         ;;
 
     "test-ios")
@@ -299,9 +305,9 @@ case "$COMMAND" in
         ;;
 
     "verify")
-        sh build.sh docs || exit 1
-        sh build.sh test-all "$XCMODE" || exit 1
-        sh build.sh examples "$XCMODE" || exit 1
+        sh build.sh docs
+        sh build.sh test-all "$XCMODE"
+        sh build.sh examples "$XCMODE"
         exit 0
         ;;
 
@@ -309,7 +315,7 @@ case "$COMMAND" in
     # Docs
     ######################################
     "docs")
-        sh scripts/build-docs.sh || exit 1
+        sh scripts/build-docs.sh
         exit 0
         ;;
 
