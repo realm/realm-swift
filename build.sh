@@ -163,15 +163,17 @@ add_platform_error() {
     FRAMEWORK_PATH="$1"     # /path/to/framework/ (i.e. framework at /path/to/framework/Realm.framework)
     FRAMEWORK_PLATFORM="$2" # must be "ios" or "osx"
     REALM_H_PATH="$FRAMEWORK_PATH/Realm.framework/Headers/Realm.h"
-    
+
+    txt="\n"
     if [[ "$FRAMEWORK_PLATFORM" == "ios" ]]; then
-        echo "\n#if TARGET_OS_MAC" >> "$REALM_H_PATH" || exit 1
-        echo "#error Attempting to use Realm's iOS framework in an OSX project." >> "$REALM_H_PATH" || exit 1
+        txt="${txt}#if TARGET_OS_MAC\n"
+        txt="${txt}#error Attempting to use Realm's iOS framework in an OSX project.\n"
     else
-        echo "\n#if TARGET_OS_IPHONE" >> "$REALM_H_PATH" || exit 1
-        echo "#error Attempting to use Realm's OSX framework in an iOS project." >> "$REALM_H_PATH" || exit 1
+        txt="${txt}#if TARGET_OS_IPHONE\n"
+        txt="${txt}#error Attempting to use Realm's OSX framework in an iOS project.\n"
     fi
-    echo "#endif\n" >> "$REALM_H_PATH" || exit 1
+    txt="${txt}#endif\n"
+    echo "${txt}" >> "$REALM_H_PATH" || exit 1
 
     echo "Platform error message added to framework at '$FRAMEWORK_PATH'"
 }
