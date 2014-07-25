@@ -71,7 +71,7 @@ xcode5() {
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode6-Beta4.app/Contents/Developer/usr/bin build/bin || exit 1
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
@@ -173,6 +173,10 @@ case "$COMMAND" in
     # Download Core Library
     ######################################
     "download-core")
+        if [ "$REALM_CORE_VERSION" = "current" ]; then
+            echo "Using version of core already in core/ directory"
+            exit 0
+        fi
         if ! [ -L core ]; then
             echo "core is not a symlink. Deleting..."
             rm -rf core
@@ -181,7 +185,6 @@ case "$COMMAND" in
             download_core
         else
             echo "The core library seems to be up to date."
-            echo "To force an update remove the folder 'core' and rerun."
         fi
         exit 0
         ;;
