@@ -208,14 +208,16 @@ case "$COMMAND" in
         if [[ "$XCODE_VERSION" == "6" ]]; then
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Release"
+            xcrealm "-scheme iOS -configuration Release -sdk iphoneos"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Release || exit 1
+            mkdir -p Release-iphone || exit 1
             cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
             lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Release-iphone/Realm.framework || exit 1
+            codesign --force --sign 8C002B6298E1D2801CB1C3A6F1DE4084C2D35DC4 Release-iphone/Realm.framework/Realm || exit 1
         else
             xcrealm "-scheme iOS -configuration Release"
+            codesign --force --sign 8C002B6298E1D2801CB1C3A6F1DE4084C2D35DC4 build/Release/Realm.framework/Versions/A/Realm || exit 1
         fi
         exit 0
         ;;
@@ -229,14 +231,16 @@ case "$COMMAND" in
         if [[ "$XCODE_VERSION" == "6" ]]; then
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Debug"
+            xcrealm "-scheme iOS -configuration Debug -sdk iphoneos"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Debug || exit 1
+            mkdir -p Debug-iphone || exit 1
             cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
             lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Debug-iphone/Realm.framework || exit 1
+            codesign --force --sign 8C002B6298E1D2801CB1C3A6F1DE4084C2D35DC4 Debug-iphone/Realm.framework/Realm || exit 1
         else
             xcrealm "-scheme iOS -configuration Debug"
+            codesign --force --sign 8C002B6298E1D2801CB1C3A6F1DE4084C2D35DC4 build/Debug/Realm.framework/Versions/A/Realm || exit 1
         fi
         exit 0
         ;;

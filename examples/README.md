@@ -56,7 +56,7 @@ This simple app shows how to use an encrypted realm.
 
 ## iOS (RubyMotion)
 
-***RubyMotion support is in the experimental phase. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
+***RubyMotion support is experimental. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
 
 In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
 

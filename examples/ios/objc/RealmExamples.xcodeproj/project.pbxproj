@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		E83F734E1982334E0026921F /* Framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = E83F734F1982334E0026921F /* Build configuration list for PBXAggregateTarget "Framework" */;
+			buildPhases = (
+				E83F7352198233560026921F /* Build Framework */,
+			);
+			dependencies = (
+			);
+			name = Framework;
+			productName = Framework;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		E819EE75197E4115002E70EA /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E819EE74197E4115002E70EA /* libc++.dylib */; };
 		E820EE04197E4B5B00E92DFD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E820EE03197E4B5B00E92DFD /* main.m */; };
@@ -23,6 +37,15 @@
 		E820EE8B197E4FA300E92DFD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E820EE86197E4FA300E92DFD /* AppDelegate.m */; };
 		E820EE8E197E4FA300E92DFD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E820EE8A197E4FA300E92DFD /* main.m */; };
 		E820EE8F197E4FAE00E92DFD /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E819EE74197E4115002E70EA /* libc++.dylib */; };
+		E83F7354198233FD0026921F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F7355198233FD0026921F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F7356198233FD0026921F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F7357198233FD0026921F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F7358198233FD0026921F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F735C1982342E0026921F /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F7360198234460026921F /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F73641982345C0026921F /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
+		E83F736B198234820026921F /* Realm.framework in Embed Framework */ = {isa = PBXBuildFile; fileRef = E83F7353198233FD0026921F /* Realm.framework */; };
 		E8C39FB9197E47A4003C8591 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8C39FB2197E47A4003C8591 /* AppDelegate.m */; };
 		E8C39FBC197E47A4003C8591 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8C39FB6197E47A4003C8591 /* main.m */; };
 		E8C39FC5197E48D7003C8591 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8C7C6C6197E3F2B00B8E963 /* Foundation.framework */; };
@@ -47,70 +70,99 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		E820EE46197E4E0800E92DFD /* PBXContainerItemProxy */ = {
+		E83F7359198234180026921F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
+			containerPortal = E8C7C6BB197E3F2B00B8E963 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
+			remoteGlobalIDString = E83F734E1982334E0026921F;
+			remoteInfo = Framework;
 		};
-		E820EE90197E4FB600E92DFD /* PBXContainerItemProxy */ = {
+		E83F735D198234320026921F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
+			containerPortal = E8C7C6BB197E3F2B00B8E963 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
+			remoteGlobalIDString = E83F734E1982334E0026921F;
+			remoteInfo = Framework;
 		};
-		E8C39FBE197E47E1003C8591 /* PBXContainerItemProxy */ = {
+		E83F73611982344A0026921F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
+			containerPortal = E8C7C6BB197E3F2B00B8E963 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
+			remoteGlobalIDString = E83F734E1982334E0026921F;
+			remoteInfo = Framework;
 		};
-		E8C3A004197E498A003C8591 /* PBXContainerItemProxy */ = {
+		E83F7365198234600026921F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
+			containerPortal = E8C7C6BB197E3F2B00B8E963 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
+			remoteGlobalIDString = E83F734E1982334E0026921F;
+			remoteInfo = Framework;
 		};
-		E8C3A049197E49F5003C8591 /* PBXContainerItemProxy */ = {
+		E83F7368198234710026921F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
+			containerPortal = E8C7C6BB197E3F2B00B8E963 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 421A99481933646F00F5E4D4;
-			remoteInfo = "iOS Framework";
-		};
-		E8CCD4C2197E408D001F5604 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C4145E191DE49600F858D9;
-			remoteInfo = "OSX Framework";
-		};
-		E8CCD4C4197E408D001F5604 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C4146E191DE49600F858D9;
-			remoteInfo = "OSX Tests";
-		};
-		E8CCD4C6197E408D001F5604 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C415051921B0C300F858D9;
-			remoteInfo = "iOS Library";
-		};
-		E8CCD4C8197E408D001F5604 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C415121921B0C400F858D9;
-			remoteInfo = "iOS Tests";
+			remoteGlobalIDString = E83F734E1982334E0026921F;
+			remoteInfo = Framework;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E83F735B1982341F0026921F /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E83F735C1982342E0026921F /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E83F735F198234380026921F /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E83F7360198234460026921F /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E83F7363198234520026921F /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E83F73641982345C0026921F /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E83F7367198234650026921F /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E83F736A198234790026921F /* Embed Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E83F736B198234820026921F /* Realm.framework in Embed Framework */,
+			);
+			name = "Embed Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		E819EE74197E4115002E70EA /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -130,6 +182,7 @@
 		E820EE87197E4FA300E92DFD /* Encryption-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Encryption-Info.plist"; sourceTree = "<group>"; };
 		E820EE88197E4FA300E92DFD /* Encryption-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Encryption-Prefix.pch"; sourceTree = "<group>"; };
 		E820EE8A197E4FA300E92DFD /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E83F7353198233FD0026921F /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Release/Realm.framework; sourceTree = "<group>"; };
 		E8C39FB1197E47A4003C8591 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E8C39FB2197E47A4003C8591 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E8C39FB6197E47A4003C8591 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -157,7 +210,6 @@
 		E8C7C6C8197E3F2B00B8E963 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E8C7C6CA197E3F2B00B8E963 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E8C7C6E8197E3F2B00B8E963 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Realm.xcodeproj; path = ../../../Realm.xcodeproj; sourceTree = "<group>"; };
 		E8C7C71B197E3FB100B8E963 /* Simple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Simple.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -170,6 +222,7 @@
 				E820EE0B197E4DCB00E92DFD /* CoreGraphics.framework in Frameworks */,
 				E820EE0C197E4DCB00E92DFD /* UIKit.framework in Frameworks */,
 				E820EE0A197E4DCB00E92DFD /* Foundation.framework in Frameworks */,
+				E83F7357198233FD0026921F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,6 +234,7 @@
 				E820EE53197E4F8800E92DFD /* CoreGraphics.framework in Frameworks */,
 				E820EE54197E4F8800E92DFD /* UIKit.framework in Frameworks */,
 				E820EE52197E4F8800E92DFD /* Foundation.framework in Frameworks */,
+				E83F7358198233FD0026921F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +246,7 @@
 				E8C39FC6197E48D7003C8591 /* CoreGraphics.framework in Frameworks */,
 				E8C39FC7197E48D7003C8591 /* UIKit.framework in Frameworks */,
 				E8C39FC5197E48D7003C8591 /* Foundation.framework in Frameworks */,
+				E83F7355198233FD0026921F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +258,7 @@
 				E8C3A00C197E49B5003C8591 /* CoreGraphics.framework in Frameworks */,
 				E8C3A00D197E49B5003C8591 /* UIKit.framework in Frameworks */,
 				E8C3A00B197E49B5003C8591 /* Foundation.framework in Frameworks */,
+				E83F7356198233FD0026921F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +270,7 @@
 				E8C7C71D197E3FB100B8E963 /* CoreGraphics.framework in Frameworks */,
 				E8C7C71E197E3FB100B8E963 /* UIKit.framework in Frameworks */,
 				E8C7C71C197E3FB100B8E963 /* Foundation.framework in Frameworks */,
+				E83F7354198233FD0026921F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +350,7 @@
 		E8C7C6BA197E3F2B00B8E963 = {
 			isa = PBXGroup;
 			children = (
-				E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */,
+				E83F7353198233FD0026921F /* Realm.framework */,
 				E820EE84197E4FA300E92DFD /* Encryption */,
 				E8C39FB0197E47A4003C8591 /* Simple */,
 				E8C39FF7197E48F6003C8591 /* Migration */,
@@ -328,17 +385,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E8CCD4BB197E408D001F5604 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E8CCD4C3197E408D001F5604 /* Realm.framework */,
-				E8CCD4C5197E408D001F5604 /* OSX Tests.xctest */,
-				E8CCD4C7197E408D001F5604 /* libRealm.a */,
-				E8CCD4C9197E408D001F5604 /* iOS Tests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -349,11 +395,12 @@
 				E820EE05197E4DCB00E92DFD /* Sources */,
 				E820EE06197E4DCB00E92DFD /* Frameworks */,
 				E820EE07197E4DCB00E92DFD /* Resources */,
+				E83F7367198234650026921F /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E820EE47197E4E0800E92DFD /* PBXTargetDependency */,
+				E83F7366198234600026921F /* PBXTargetDependency */,
 			);
 			name = TableView;
 			productName = TableView;
@@ -366,12 +413,12 @@
 			buildPhases = (
 				E820EE4D197E4F8800E92DFD /* Sources */,
 				E820EE4E197E4F8800E92DFD /* Frameworks */,
-				E820EE4F197E4F8800E92DFD /* Resources */,
+				E83F736A198234790026921F /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E820EE91197E4FB600E92DFD /* PBXTargetDependency */,
+				E83F7369198234710026921F /* PBXTargetDependency */,
 			);
 			name = Encryption;
 			productName = Encryption;
@@ -385,11 +432,12 @@
 				E8C39FC0197E48D7003C8591 /* Sources */,
 				E8C39FC1197E48D7003C8591 /* Frameworks */,
 				E8C39FC2197E48D7003C8591 /* Resources */,
+				E83F735F198234380026921F /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E8C3A005197E498A003C8591 /* PBXTargetDependency */,
+				E83F735E198234320026921F /* PBXTargetDependency */,
 			);
 			name = Migration;
 			productName = Migration;
@@ -402,12 +450,12 @@
 			buildPhases = (
 				E8C3A006197E49B5003C8591 /* Sources */,
 				E8C3A007197E49B5003C8591 /* Frameworks */,
-				E8C3A008197E49B5003C8591 /* Resources */,
+				E83F7363198234520026921F /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E8C3A04A197E49F5003C8591 /* PBXTargetDependency */,
+				E83F73621982344A0026921F /* PBXTargetDependency */,
 			);
 			name = REST;
 			productName = REST;
@@ -420,12 +468,12 @@
 			buildPhases = (
 				E8C7C717197E3FB100B8E963 /* Sources */,
 				E8C7C718197E3FB100B8E963 /* Frameworks */,
-				E8C7C719197E3FB100B8E963 /* Resources */,
+				E83F735B1982341F0026921F /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E8C39FBF197E47E1003C8591 /* PBXTargetDependency */,
+				E83F735A198234180026921F /* PBXTargetDependency */,
 			);
 			name = Simple;
 			productName = Simple;
@@ -453,12 +501,6 @@
 			mainGroup = E8C7C6BA197E3F2B00B8E963;
 			productRefGroup = E8C7C6C4197E3F2B00B8E963 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = E8CCD4BB197E408D001F5604 /* Products */;
-					ProjectRef = E8C7C6FE197E3F5900B8E963 /* Realm.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				E8C7C71A197E3FB100B8E963 /* Simple */,
@@ -466,40 +508,10 @@
 				E8C3A009197E49B5003C8591 /* REST */,
 				E820EE08197E4DCB00E92DFD /* TableView */,
 				E820EE50197E4F8800E92DFD /* Encryption */,
+				E83F734E1982334E0026921F /* Framework */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		E8CCD4C3197E408D001F5604 /* Realm.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Realm.framework;
-			remoteRef = E8CCD4C2197E408D001F5604 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E8CCD4C5197E408D001F5604 /* OSX Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "OSX Tests.xctest";
-			remoteRef = E8CCD4C4197E408D001F5604 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E8CCD4C7197E408D001F5604 /* libRealm.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRealm.a;
-			remoteRef = E8CCD4C6197E408D001F5604 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E8CCD4C9197E408D001F5604 /* iOS Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "iOS Tests.xctest";
-			remoteRef = E8CCD4C8197E408D001F5604 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E820EE07197E4DCB00E92DFD /* Resources */ = {
@@ -507,13 +519,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E820EE4C197E4EE400E92DFD /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E820EE4F197E4F8800E92DFD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,21 +532,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E8C3A008197E49B5003C8591 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E8C7C719197E3FB100B8E963 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E83F7352198233560026921F /* Build Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ../../../\nif [[ ! -d \"build/Release\" ]]; then\n    sh build.sh ios\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E820EE05197E4DCB00E92DFD /* Sources */ = {
@@ -595,30 +603,30 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		E820EE47197E4E0800E92DFD /* PBXTargetDependency */ = {
+		E83F735A198234180026921F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = E820EE46197E4E0800E92DFD /* PBXContainerItemProxy */;
+			target = E83F734E1982334E0026921F /* Framework */;
+			targetProxy = E83F7359198234180026921F /* PBXContainerItemProxy */;
 		};
-		E820EE91197E4FB600E92DFD /* PBXTargetDependency */ = {
+		E83F735E198234320026921F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = E820EE90197E4FB600E92DFD /* PBXContainerItemProxy */;
+			target = E83F734E1982334E0026921F /* Framework */;
+			targetProxy = E83F735D198234320026921F /* PBXContainerItemProxy */;
 		};
-		E8C39FBF197E47E1003C8591 /* PBXTargetDependency */ = {
+		E83F73621982344A0026921F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = E8C39FBE197E47E1003C8591 /* PBXContainerItemProxy */;
+			target = E83F734E1982334E0026921F /* Framework */;
+			targetProxy = E83F73611982344A0026921F /* PBXContainerItemProxy */;
 		};
-		E8C3A005197E498A003C8591 /* PBXTargetDependency */ = {
+		E83F7366198234600026921F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = E8C3A004197E498A003C8591 /* PBXContainerItemProxy */;
+			target = E83F734E1982334E0026921F /* Framework */;
+			targetProxy = E83F7365198234600026921F /* PBXContainerItemProxy */;
 		};
-		E8C3A04A197E49F5003C8591 /* PBXTargetDependency */ = {
+		E83F7369198234710026921F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			name = "iOS Framework";
-			targetProxy = E8C3A049197E49F5003C8591 /* PBXContainerItemProxy */;
+			target = E83F734E1982334E0026921F /* Framework */;
+			targetProxy = E83F7368198234710026921F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -628,6 +636,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TableView/TableView-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -645,6 +657,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TableView/TableView-Prefix.pch";
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
@@ -658,6 +674,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Encryption/Encryption-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -665,6 +685,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -675,11 +696,30 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Encryption/Encryption-Prefix.pch";
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		E83F73501982334E0026921F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E83F73511982334E0026921F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -688,6 +728,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Migration/Migration-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -705,6 +749,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Migration/Migration-Prefix.pch";
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
@@ -718,6 +766,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REST/REST-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -735,6 +787,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "REST/REST-Prefix.pch";
 				INFOPLIST_FILE = "REST/REST-Info.plist";
@@ -761,7 +817,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -778,10 +834,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -806,7 +859,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -815,10 +868,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Realm,
-				);
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -830,7 +880,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = (
+					"../../../build/${CONFIGURATION}",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Simple/Simple-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -854,7 +907,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = "../../../build/${CONFIGURATION}";
+				FRAMEWORK_SEARCH_PATHS = (
+					"../../../build/${CONFIGURATION}",
+					"/Users/jp/realm/code/realm-cocoa/build/Release",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Simple/Simple-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/Simple/Simple-Info.plist";
@@ -887,6 +943,15 @@
 			buildConfigurations = (
 				E820EE7F197E4F8800E92DFD /* Debug */,
 				E820EE80197E4F8800E92DFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E83F734F1982334E0026921F /* Build configuration list for PBXAggregateTarget "Framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E83F73501982334E0026921F /* Debug */,
+				E83F73511982334E0026921F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
