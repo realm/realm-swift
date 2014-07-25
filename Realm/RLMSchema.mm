@@ -144,7 +144,7 @@ static NSMutableDictionary *s_classNameToMangledName;
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
-            object->_table = table;
+            object->_table = move(table);
             [schemaArray addObject:object];
         }
     }
@@ -163,18 +163,18 @@ inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
         
         // set initial version
         table->add_empty_row();
-        (*table)[0].set_int(c_versionColumnIndex, 0);
+        table->get(0).set_int(c_versionColumnIndex, 0);
     }
-    return table;
+    return move(table);
 }
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
-    return (NSUInteger)(*RLMVersionTable(realm))[0].get_int(c_versionColumnIndex);
+    return NSUInteger(RLMVersionTable(realm)->get(0).get_int(c_versionColumnIndex));
 
 }
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
-    (*RLMVersionTable(realm))[0].set_int(c_versionColumnIndex, version);
+    RLMVersionTable(realm)->get(0).set_int(c_versionColumnIndex, version);
 }
 
 + (Class)classForString:(NSString *)className {
