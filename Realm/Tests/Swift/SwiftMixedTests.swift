@@ -28,33 +28,31 @@ class SwiftMixedTests: SwiftTestCase {
 
         // FIXME: add object with subtable
         realm.beginWriteTransaction()
-        MixedObject.createInRealm(realm, withObject: [true, "Jens", 50])
-        // FIXME: Adding this object makes the test fail
-        // MixedObject.createInRealm(realm, withObject: [true, 10, 52])
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53])
-        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54])
-        MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55])
-        MixedObject.createInRealm(realm, withObject: [true, data, 50])
+        MixedObject.createInRealm(realm, withObject: [true, "Jens", 50] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, 10, 52] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, data, 50] as NSArray)
         realm.commitWriteTransaction()
 
         let objects = realm.objects(MixedObject())
-        XCTAssertEqual(objects.count, 5, "5 rows expected")
+        XCTAssertEqual(objects.count, 6, "6 rows expected")
         XCTAssertTrue((objects[0] as AnyObject) is MixedObject, "MixedObject expected")
         XCTAssertTrue(objects[0].other is NSString, "NSString expected")
-        XCTAssertEqualObjects(objects[0].other as NSString, "Jens", "'Jens' expected")
+        XCTAssertEqual(objects[0].other as NSString, "Jens", "'Jens' expected")
 
-        // FIXME: See above
-        // XCTAssertTrue((objects[1] as MixedObject)["other"].isKindOfClass(NSNumber.self), "NSNumber expected")
-        // XCTAssertEqual(((objects[1] as MixedObject)["other"] as NSNumber).longLongValue, 10, "'10' expected")
+        XCTAssertTrue(objects[1]["other"].isKindOfClass(NSNumber.self), "NSNumber expected")
+        XCTAssertEqual((objects[1]["other"] as NSNumber).longLongValue, 10, "'10' expected")
 
-        XCTAssertTrue(objects[1].other is Float, "Float expected")
-        XCTAssertEqual(objects[1].other as Float, 3.1, "'3.1' expected")
+        XCTAssertTrue(objects[2].other is Float, "Float expected")
+        XCTAssertEqual(objects[2].other as Float, 3.1, "'3.1' expected")
 
-        XCTAssertTrue(objects[2].other is Double, "Double expected")
-        XCTAssertEqual(objects[2].other as Double, 3.1, "'3.1' expected")
+        XCTAssertTrue(objects[3].other is Double, "Double expected")
+        XCTAssertEqual(objects[3].other as Double, 3.1, "'3.1' expected")
 
-        XCTAssertTrue(objects[3].other is NSDate, "NSDate expected")
+        XCTAssertTrue(objects[4].other is NSDate, "NSDate expected")
 
-        XCTAssertTrue(objects[4].other is NSData, "NSData expected")
+        XCTAssertTrue(objects[5].other is NSData, "NSData expected")
     }
 }

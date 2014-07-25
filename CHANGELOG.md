@@ -1,3 +1,18 @@
+0.82.0 Release notes (YYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta4.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 0.81.0 Release notes (2014-07-22)
 =============================================================
 

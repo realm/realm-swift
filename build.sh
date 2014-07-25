@@ -71,11 +71,14 @@ xcode5() {
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta3.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode6-Beta4.app/Contents/Developer/usr/bin build/bin || exit 1
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode() {
+    if [ -L build/bin ]; then
+        unlink build/bin
+    fi
     rm -rf build/bin
     mkdir -p build/DerivedData
     case "$XCODE_VERSION" in

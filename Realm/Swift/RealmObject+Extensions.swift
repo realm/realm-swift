@@ -18,7 +18,7 @@
 
 extension RealmObject {
 
-    class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
+    public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
         return createInRealm(realm.rlmRealm, withObject: object)
     }
 }

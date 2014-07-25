@@ -16,12 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-class Realm {
-    var rlmRealm: RLMRealm
-    var path: String { return rlmRealm.path }
-    var readOnly: Bool { return rlmRealm.readOnly }
-    var schema: RealmSchema { return rlmRealm.schema }
-    var autorefresh: Bool {
+public class Realm {
+    public var rlmRealm: RLMRealm
+    public var path: String { return rlmRealm.path }
+    public var readOnly: Bool { return rlmRealm.readOnly }
+    public var schema: RealmSchema { return rlmRealm.schema }
+    public var autorefresh: Bool {
         get {
             return rlmRealm.autorefresh
         }
@@ -30,75 +30,75 @@ class Realm {
         }
     }
 
-    class func defaultRealm() -> Realm {
+    public class func defaultRealm() -> Realm {
         return Realm(rlmRealm: RLMRealm.defaultRealm())
     }
 
-    init(rlmRealm: RLMRealm) {
+    public init(rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 
-    convenience init(path: String!) {
+    public convenience init(path: String!) {
         self.init(path: path, readOnly: false, error: nil)
     }
 
-    convenience init(path: String!, readOnly readonly: Bool, error: AutoreleasingUnsafePointer<NSError?>) {
+    public convenience init(path: String!, readOnly readonly: Bool, error: AutoreleasingUnsafePointer<NSError?>) {
         self.init(rlmRealm: RLMRealm.realmWithPath(path, readOnly: readonly, error: error))
     }
 
-    class func useInMemoryDefaultRealm() {
+    public class func useInMemoryDefaultRealm() {
         RLMRealm.useInMemoryDefaultRealm()
     }
 
-    func beginWriteTransaction() {
+    public func beginWriteTransaction() {
         rlmRealm.beginWriteTransaction()
     }
 
-    func commitWriteTransaction() {
+    public func commitWriteTransaction() {
         rlmRealm.commitWriteTransaction()
     }
 
-    func refresh() {
+    public func refresh() {
         rlmRealm.refresh()
     }
 
-    func addObject(object: RealmObject) {
+    public func addObject(object: RealmObject) {
         rlmRealm.addObject(object)
     }
 
-    func addObjects(objects: [AnyObject]) {
+    public func addObjects(objects: [AnyObject]) {
         rlmRealm.addObjectsFromArray(objects)
     }
 
-    func deleteObject(object: RealmObject) {
+    public func deleteObject(object: RealmObject) {
         rlmRealm.deleteObject(object)
     }
 
-    class func migrateDefaultRealmWithBlock(block: RealmMigrationBlock) {
+    public class func migrateDefaultRealmWithBlock(block: RealmMigrationBlock) {
         RLMRealm.migrateDefaultRealmWithBlock(block)
     }
 
-    class func migrateRealmAtPath(path: String, withBlock block: RealmMigrationBlock) {
+    public class func migrateRealmAtPath(path: String, withBlock block: RealmMigrationBlock) {
         RLMRealm.migrateRealmAtPath(path, withBlock: block)
     }
 
-    func addNotificationBlock(block: RealmNotificationBlock) -> RealmNotificationToken {
+    public func addNotificationBlock(block: RealmNotificationBlock) -> RealmNotificationToken {
         return rlmRealm.addNotificationBlock(block)
     }
 
-    func removeNotification(notificationToken: RealmNotificationToken) {
+    public func removeNotification(notificationToken: RealmNotificationToken) {
         rlmRealm.removeNotification(notificationToken)
     }
 
-    func objects<T: RealmObject>(typeObject: T) -> RealmArray<T> {
+    public func objects<T: RealmObject>(typeObject: T) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: T.self.allObjectsInRealm(rlmRealm))
     }
 
-    func objects<T: RealmObject>(typeObject: T, _ predicateFormat: String, _ args: CVarArg...) -> RealmArray<T> {
+    public func objects<T: RealmObject>(typeObject: T, _ predicateFormat: String, _ args: CVarArg...) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: T.self.objectsInRealm(rlmRealm, `where`: predicateFormat, args: getVaList(args)))
     }
 
-    func objects<T: RealmObject>(typeObject: T, withPredicate predicate: NSPredicate) -> RealmArray<T> {
+    public func objects<T: RealmObject>(typeObject: T, withPredicate predicate: NSPredicate) -> RealmArray<T> {
         return RealmArray<T>(rlmArray: T.self.objectsInRealm(rlmRealm, withPredicate: predicate))
     }
 }
