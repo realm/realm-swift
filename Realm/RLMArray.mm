@@ -231,7 +231,7 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (NSString *)description
 {
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%x> (\n", (unsigned int)self];
     unsigned long index = 0, skipped = 0;
     for (NSObject *obj in self) {
         // Indent child objects
@@ -244,7 +244,8 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
     
     // Remove last comma and newline characters
-    [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
+    if(self.count > 0)
+        [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
     if (skipped) {
         [mString appendFormat:@"\n\t... %lu objects skipped.", skipped];
     }
