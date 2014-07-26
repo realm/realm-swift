@@ -159,6 +159,10 @@ static NSArray *s_objectDescriptors = nil;
 @synthesize inWriteTransaction = _inWriteTransaction;
 @synthesize group = _group;
 
++ (NSString *)defaultRealmPath {
+    return s_defaultRealmPath;
+}
+
 + (BOOL)isCoreDebug {
     return tightdb::Version::has_feature(tightdb::feature_Debug);
 }

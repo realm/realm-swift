@@ -23,6 +23,23 @@
 @interface RLMRealm : NSObject
 
 /**---------------------------------------------------------------------------------------
+ *  @name Default Realm Path
+ * ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns the location of the default Realm as a string.
+ 
+ `~/Documents/default.realm` on OSX.
+
+ `default.realm` in your application's documents directory on iOS.
+ 
+ @return Location of the default Realm.
+
+ @see defaultRealm
+ */
++ (NSString *)defaultRealmPath;
+
+/**---------------------------------------------------------------------------------------
  *  @name Creating & Initializing a Realm
  * ---------------------------------------------------------------------------------------
  */
