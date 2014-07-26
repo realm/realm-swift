@@ -1,6 +1,3 @@
-[![Pod Version](http://img.shields.io/cocoapods/v/Realm.svg?style=flat)](http://cocoadocs.org/docsets/Realm/)
-[![Pod Platform](http://img.shields.io/cocoapods/p/Realm.svg?style=flat)](http://cocoadocs.org/docsets/Realm/)
-[![Pod License](http://img.shields.io/cocoapods/l/Realm.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0.html)
 ![Realm](logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
