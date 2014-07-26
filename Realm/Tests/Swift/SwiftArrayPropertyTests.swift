@@ -23,6 +23,34 @@ import TestFramework
 class SwiftArrayPropertyTests: SwiftTestCase {
 
     // Swift models
+
+    func testBasicArray() {
+        let string = SwiftStringObject()
+        string.stringCol = "string"
+
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        realm.addObject(string)
+        realm.commitWriteTransaction()
+
+        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, 1, "There should be a single SwiftStringObject in the realm")
+
+        let array = SwiftArrayPropertyObject()
+        array.name = "arrayObject"
+        // FIXME: Should be able to add object to array here
+        // Asana: https://app.asana.com/0/861870036984/13438276206884
+        // array.array.addObject(string)
+
+        realm.beginWriteTransaction()
+        realm.addObject(array)
+        array.array.addObject(string)
+        realm.commitWriteTransaction()
+
+        let arrayObjects = SwiftArrayPropertyObject.allObjectsInRealm(realm)
+
+        XCTAssertEqual(arrayObjects.count, 1, "There should be a single SwiftStringObject in the realm")
+        XCTAssertEqual((arrayObjects.firstObject() as SwiftArrayPropertyObject).array.firstObject() as SwiftStringObject, string, "First array object should be the string object we added")
+    }
     
     func testPopulateEmptyArray() {
         let realm = realmWithTestPath()
@@ -108,6 +136,31 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 //    }
 
     // Objective-C models
+
+    func testBasicArray_objc() {
+        let string = StringObject()
+        string.stringCol = "string"
+
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        realm.addObject(string)
+        realm.commitWriteTransaction()
+
+        XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, 1, "There should be a single StringObject in the realm")
+
+        let array = ArrayPropertyObject()
+        array.name = "arrayObject"
+        array.array.addObject(string)
+
+        realm.beginWriteTransaction()
+        realm.addObject(array)
+        realm.commitWriteTransaction()
+
+        let arrayObjects = ArrayPropertyObject.allObjectsInRealm(realm)
+
+        XCTAssertEqual(arrayObjects.count, 1, "There should be a single StringObject in the realm")
+        XCTAssertEqual((arrayObjects.firstObject() as ArrayPropertyObject).array.firstObject() as StringObject, string, "First array object should be the string object we added")
+    }
 
     func testPopulateEmptyArray_objc() {
         let realm = realmWithTestPath()

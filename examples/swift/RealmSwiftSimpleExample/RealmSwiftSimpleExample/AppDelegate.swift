@@ -71,10 +71,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Link objects
         var person = Person()
         person.name = "Tim"
-        person.dogs.addObject(mydog)
         
         realm.beginWriteTransaction()
         realm.addObject(person)
+        person.dogs.addObject(mydog)
         realm.commitWriteTransaction()
 
         // Thread-safety

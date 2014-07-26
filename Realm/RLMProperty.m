@@ -35,16 +35,28 @@
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
                   attributes:(RLMPropertyAttributes)attributes {
+    return [self initWithName:name
+                         type:type
+              objectClassName:objectClassName
+                   attributes:attributes
+                       column:0];
+}
+
+- (instancetype)initWithName:(NSString *)name
+                        type:(RLMPropertyType)type
+             objectClassName:(NSString *)objectClassName
+                  attributes:(RLMPropertyAttributes)attributes
+                      column:(NSUInteger)column {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
         _attributes = attributes;
+        _column = column;
         [self updateAccessorNames];
         [self setObjcCodeFromType];
     }
-    
     return self;
 }
 

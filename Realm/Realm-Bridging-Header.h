@@ -30,7 +30,8 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
+                  attributes:(RLMPropertyAttributes)attributes
+                      column:(NSUInteger)column;
 
 @end
 

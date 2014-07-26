@@ -13,6 +13,7 @@
 ### Bugfixes
 
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
+* Fixed bug in Swift array properties where array properties accessed the wrong property.
 
 
 0.81.0 Release notes (2014-07-22)
