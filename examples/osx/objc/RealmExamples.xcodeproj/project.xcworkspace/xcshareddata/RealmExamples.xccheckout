@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>F1BF0C39-C027-4D6B-B2C5-8B06A14F0368</string>
+	<key>IDESourceControlProjectName</key>
+	<string>RealmExamples</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>E5A8A3F6-FBBD-4E05-8C9C-01DA327F8DC8</key>
+		<string>ssh://github.com/realm/realm-cocoa.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>examples/osx/objc/RealmExamples.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>E5A8A3F6-FBBD-4E05-8C9C-01DA327F8DC8</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/realm/realm-cocoa.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>E5A8A3F6-FBBD-4E05-8C9C-01DA327F8DC8</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E5A8A3F6-FBBD-4E05-8C9C-01DA327F8DC8</string>
+			<key>IDESourceControlWCCName</key>
+			<string>realm-cocoa</string>
+		</dict>
+	</array>
+</dict>
+</plist>
