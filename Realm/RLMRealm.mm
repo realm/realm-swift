@@ -159,10 +159,6 @@ static NSArray *s_objectDescriptors = nil;
 @synthesize inWriteTransaction = _inWriteTransaction;
 @synthesize group = _group;
 
-+ (NSString *)defaultRealmPath {
-    return s_defaultRealmPath;
-}
-
 + (BOOL)isCoreDebug {
     return tightdb::Version::has_feature(tightdb::feature_Debug);
 }
@@ -187,7 +183,7 @@ static NSArray *s_objectDescriptors = nil;
     return self;
 }
 
-+(NSString *)defaultPath
++ (NSString *)defaultRealmPath
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -205,24 +201,13 @@ static NSArray *s_objectDescriptors = nil;
 
 + (instancetype)defaultRealm
 {
-    return [RLMRealm realmWithPath:RLMRealm.defaultPath readOnly:NO error:nil];
-}
-
-+ (void)setDefaultRealmPath:(NSString *)path
-{
-    // if already set then throw
-    @synchronized(s_realmsPerPath) {
-        if (s_realmsPerPath.count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm path before creating or getting an RLMRealm instance" userInfo:nil];
-        }
-    }
-    s_defaultRealmPath = path;
+    return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
 }
 
 + (void)useInMemoryDefaultRealm
 {
     @synchronized(s_realmsPerPath) {
-        if (realmsAtPath(RLMRealm.defaultPath).count) {
+        if (realmsAtPath([RLMRealm defaultRealmPath]).count) {
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
         }
     }
@@ -280,7 +265,7 @@ static NSArray *s_objectDescriptors = nil;
 
     NSError *error = nil;
     try {
-        if (s_useInMemoryDefaultRealm && [path isEqualToString:RLMRealm.defaultPath]) { // Only for default realm
+        if (s_useInMemoryDefaultRealm && [path isEqualToString:[RLMRealm defaultRealmPath]]) { // Only for default realm
             realm->_sharedGroup = new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly);
         } else {
         	realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
@@ -552,7 +537,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 + (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block {
-    return [self migrateRealmAtPath:[RLMRealm defaultPath] withBlock:block];
+    return [self migrateRealmAtPath:[RLMRealm defaultRealmPath] withBlock:block];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block {
