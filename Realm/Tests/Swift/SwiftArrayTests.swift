@@ -170,7 +170,7 @@ class SwiftArrayTests: SwiftTestCase {
         dateMaxOutput = yesArray.maxOfProperty("dateCol") as NSDate
         XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, "Maximum should be dateMinInput")
     }
-    
+
     func testArrayDescription() {
         let realm = realmWithTestPath()
         
@@ -190,10 +190,10 @@ class SwiftArrayTests: SwiftTestCase {
 
         XCTAssertTrue((description as NSString).rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
-        
+
         XCTAssertTrue((description as NSString).rangeOfString("age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).rangeOfString("24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
-        
+
         XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
@@ -220,7 +220,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.addObject(po1)
         realm.addObject(po2)
         realm.addObject(po3)
-        
+
         let company = SwiftCompanyObject()
         realm.addObject(company)
         company.employees = SwiftEmployeeObject.allObjectsInRealm(realm)
@@ -235,18 +235,18 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
         
         XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
-        
+
         var test = peopleInCompany[0] as SwiftEmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
+        XCTAssertEqual(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
-        
+        // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+
         test = peopleInCompany[1] as SwiftEmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
+        XCTAssertEqual(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        // XCTAssertEqual(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         realm.beginWriteTransaction()
         peopleInCompany.removeLastObject()
@@ -476,15 +476,15 @@ class SwiftArrayTests: SwiftTestCase {
 
         var test = peopleInCompany[0] as EmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po1.name, "Should be equal")
+        XCTAssertEqual(test.name!, po1.name!, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         test = peopleInCompany[1] as EmployeeObject
         XCTAssertEqual(test.age, po3.age, "Should be equal")
-        XCTAssertEqualObjects(test.name, po3.name, "Should be equal")
+        XCTAssertEqual(test.name!, po3.name!, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
-        // XCTAssertEqualObjects(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+        // XCTAssertEqual(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         let allPeople = EmployeeObject.allObjectsInRealm(realm)
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")

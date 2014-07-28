@@ -45,10 +45,14 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
--(void)testRealmFailure
+- (void)testRealmFailure
 {
     XCTAssertThrows([RLMRealm realmWithPath:@"/dev/null"], @"Shouldn't exist");
+}
 
+- (void)testDefaultRealmPath
+{
+    XCTAssertEqualObjects([[RLMRealm defaultRealm] path], [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
 }
 
 - (void)testRealmPath

@@ -55,7 +55,9 @@ inline bool nsnumber_is_like_float(NSObject *obj)
             strcmp(data_type, @encode(long long)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
+            strcmp(data_type, @encode(unsigned long long)) == 0 ||
+            // A double is like float if it fits within float bounds
+            (strcmp(data_type, @encode(double)) == 0 && ABS([(NSNumber *)obj doubleValue]) <= FLT_MAX));
 }
 
 inline bool nsnumber_is_like_double(NSObject *obj)

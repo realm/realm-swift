@@ -19,22 +19,26 @@
 #import <Foundation/Foundation.h>
 #import "RLMObjectSchema.h"
 
-/**---------------------------------------------------------------------------------------
- *  @name Realm Schema
- * ---------------------------------------------------------------------------------------
+/**
+ This class represents the collection of model object schemas persisted to Realm.
+
+ When using Realm, RLMSchema objects allow performing migrations and
+ introspecting the database's schema.
+
+ Schemas map to collections of tables in the core database.
  */
 @interface RLMSchema : NSObject<NSCopying>
 
 /**
- An NSArray containing RLMObjectSchema for all object types in this Realm. Meant
+ An NSArray containing RLMObjectSchema's for all object types in this Realm. Meant
  to be used during migrations for dynamic introspection.
  
- @see       RLMObjectSchema
+ @see RLMObjectSchema
  */
 @property (nonatomic, readonly, copy) NSArray *objectSchema;
 
 /**
- Returns an RLMObjectSchema for the given class in this RLMSchema.
+ Returns an RLMObjectSchema for the given class name in this RLMSchema.
  
  @param className   The object class name.
  @return            RLMObjectSchema for the given class in this RLMSchema.
@@ -44,7 +48,7 @@
 - (RLMObjectSchema *)schemaForClassName:(NSString *)className;
 
 /**
- Lookup an RLMObjectSchema for the given class in this Realm. Throws if there
+ Look up an RLMObjectSchema for the given class name in this Realm. Throws if there
  is no object of type className in this RLMSchema instance.
  
  @param className   The object class name.
@@ -55,4 +59,3 @@
 - (RLMObjectSchema *)objectForKeyedSubscript:(id <NSCopying>)className;
 
 @end
-

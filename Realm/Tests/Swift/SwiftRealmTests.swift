@@ -29,7 +29,11 @@ class SwiftRealmTests: SwiftTestCase {
         XCTAssertNotNil(realm, "realm should not be nil");
         XCTAssertTrue((realm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
     }
-    
+
+    func testDefaultRealmPath() {
+        XCTAssertEqual(RLMRealm.defaultRealm().path!, RLMRealm.defaultRealmPath(), "Default Realm path should be correct.")
+    }
+
     func testEmptyWriteTransaction() {
         var realm = realmWithTestPath()
         realm.beginWriteTransaction()
@@ -50,7 +54,7 @@ class SwiftRealmTests: SwiftTestCase {
         // test again after write transaction
         var objects = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 3, "Expecting 3 objects")
-        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
+        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
 
         realm.beginWriteTransaction()
         realm.deleteObject(objects[2] as SwiftStringObject)
@@ -60,7 +64,7 @@ class SwiftRealmTests: SwiftTestCase {
 
         objects = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 1, "Expecting 1 object")
-        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "b", "Expecting column to be 'b'")
     }
 
     func testRealmIsUpdatedAfterBackgroundUpdate() {
@@ -88,7 +92,7 @@ class SwiftRealmTests: SwiftTestCase {
         // get object
         let objects = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
 // FIXME: https://app.asana.com/0/861870036984/14552787865017
@@ -115,7 +119,7 @@ class SwiftRealmTests: SwiftTestCase {
 //
 //            let objects = SwiftStringObject.allObjectsInRealm(realm)
 //            XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-//            XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+//            XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
 //        }
 //        
 //        // this should complete very fast before the timer
@@ -125,7 +129,7 @@ class SwiftRealmTests: SwiftTestCase {
 //        // get object
 //        let objects = SwiftStringObject.allObjectsInRealm(realm)
 //        XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
-//        XCTAssertEqualObjects((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+//        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
 //    }
 
     // Objective-C models
@@ -142,7 +146,7 @@ class SwiftRealmTests: SwiftTestCase {
         // test again after write transaction
         var objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 3, "Expecting 3 objects")
-        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "a", "Expecting column to be 'a'")
+        XCTAssertEqual((objects[0] as StringObject).stringCol!, "a", "Expecting column to be 'a'")
 
         realm.beginWriteTransaction()
         realm.deleteObject(objects[2] as StringObject)
@@ -152,7 +156,7 @@ class SwiftRealmTests: SwiftTestCase {
 
         objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 1, "Expecting 1 object")
-        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqual((objects[0] as StringObject).stringCol!, "b", "Expecting column to be 'b'")
     }
 
     func testRealmIsUpdatedAfterBackgroundUpdate_objc() {
@@ -180,7 +184,7 @@ class SwiftRealmTests: SwiftTestCase {
         // get object
         let objects = StringObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual((objects[0] as StringObject).stringCol!, "string", "Value of first column should be 'string'")
     }
 
 // FIXME: Test passes ~50% of the time. Asana: https://app.asana.com/0/861870036984/14552787865017
@@ -206,7 +210,7 @@ class SwiftRealmTests: SwiftTestCase {
 //
 //            let objects = StringObject.allObjectsInRealm(realm)
 //            XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-//            XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
+//            XCTAssertEqual((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
 //        }
 //
 //        // this should complete very fast before the timer
@@ -216,6 +220,6 @@ class SwiftRealmTests: SwiftTestCase {
 //        // get object
 //        let objects = StringObject.allObjectsInRealm(realm)
 //        XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
-//        XCTAssertEqualObjects((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
+//        XCTAssertEqual((objects[0] as StringObject).stringCol, "string", "Value of first column should be 'string'")
 //    }
 }

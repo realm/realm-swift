@@ -3,15 +3,20 @@
 
 ### API breaking changes
 
-* None.
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta4.
 
 ### Enhancements
 
 * Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
+* Using NSNumber properties (unsupported) now throws a more informative exception.
+* Added `[RLMRealm defaultRealmPath]`
 
 ### Bugfixes
 
-* None.
+* Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
+* Fixed potential bug related to the handling of array properties (RLMArray).
+* Fixed bug where array properties accessed the wrong property.
+
 
 0.81.0 Release notes (2014-07-22)
 =============================================================

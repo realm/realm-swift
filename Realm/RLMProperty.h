@@ -16,26 +16,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMObject.h>
 
-// object property definition
+/**
+ This class models properties persisted to Realm in an RLMObjectSchema.
+ 
+ When using Realm, RLMProperty objects allow performing migrations and 
+ introspecting the database's schema.
+ 
+ These properties map to columns in the core database.
+ */
 @interface RLMProperty : NSObject
 
 /**
  Property name.
  */
-@property (nonatomic, readonly) NSString * name;
+@property (nonatomic, readonly) NSString *name;
 
 /**
  Property type.
+ 
+ @see RLMPropertyType
  */
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
  Property attributes.
+ 
+ @see RLMPropertyAttributes
  */
 @property (nonatomic, readonly) RLMPropertyAttributes attributes;
 
@@ -47,6 +57,6 @@
 /**
  Returns YES if property objects are equal
  */
--(BOOL)isEqualToProperty:(RLMProperty *)prop;
+- (BOOL)isEqualToProperty:(RLMProperty *)prop;
 
 @end
