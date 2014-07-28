@@ -84,6 +84,20 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
+- (void)testInQuery
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"a"]];
+    [realm commitWriteTransaction];
+    void (^inQuery)() = ^{
+        [StringObject objectsInRealm:realm where:@"stringCol IN %@", @[@"a"]];
+    };
+    XCTAssertThrowsSpecificNamed(inQuery(), NSException,
+                                 @"Invalid operator type",
+                                 @"%@ operator invalid in string comparison.",
+                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
+}
 
 -(void)testQueryBetween
 {
