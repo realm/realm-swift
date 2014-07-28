@@ -258,9 +258,6 @@ inline void RLMSetAnyProperty(__unsafe_unretained RLMObject *obj, NSUInteger col
 IMP RLMAccessorGetter(NSUInteger colIndex, char accessorCode, NSString *objectClassName) {
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(RLMObject *obj) {
-                return (int)RLMGetLong(obj, colIndex);
-            });
         case 'l':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMGetLong(obj, colIndex);
@@ -311,9 +308,6 @@ IMP RLMAccessorGetter(NSUInteger colIndex, char accessorCode, NSString *objectCl
 IMP RLMAccessorSetter(NSUInteger colIndex, char accessorCode) {
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(RLMObject *obj, int val) {
-                RLMSetLong(obj, colIndex, val);
-            });
         case 'l':
             return imp_implementationWithBlock(^(RLMObject *obj, long val) {
                 RLMSetLong(obj, colIndex, val);
@@ -630,7 +624,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
-        case 'i': return @((int)RLMGetLong(obj, col));
+        case 'i':
         case 'l': return @(RLMGetLong(obj, col));
         case 'f': return @(RLMGetFloat(obj, col));
         case 'd': return @(RLMGetDouble(obj, col));
