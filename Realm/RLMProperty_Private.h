@@ -24,8 +24,7 @@
 
 // creates an RLMProperty object from a runtime property
 +(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
-                              attributes:(RLMPropertyAttributes)attributes
-                                  column:(NSUInteger)column;
+                              attributes:(RLMPropertyAttributes)attributes;
 
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type

@@ -183,14 +183,12 @@
 
 +(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
                               attributes:(RLMPropertyAttributes)attributes
-                                  column:(NSUInteger)column
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
     prop->_attributes = attributes;
-    prop->_column = column;
     
     // parse attributes
     unsigned int attCount;
