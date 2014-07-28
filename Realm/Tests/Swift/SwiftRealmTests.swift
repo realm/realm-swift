@@ -29,7 +29,11 @@ class SwiftRealmTests: SwiftTestCase {
         XCTAssertNotNil(realm, "realm should not be nil");
         XCTAssertTrue((realm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
     }
-    
+
+    func testDefaultRealmPath() {
+        XCTAssertEqual(RLMRealm.defaultRealm().path!, RLMRealm.defaultRealmPath(), "Default Realm path should be correct.")
+    }
+
     func testEmptyWriteTransaction() {
         var realm = realmWithTestPath()
         realm.beginWriteTransaction()

@@ -151,6 +151,11 @@
                                                  userInfo:nil];
                 }
             }
+            else if ([type isEqualToString:@"@\"NSNumber\""]) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/latest/api/Constants/RLMPropertyType.html for all supported types."]
+                                             userInfo:nil];
+            }
             else {
                 // get object class and set type
                 _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
@@ -178,14 +183,12 @@
 
 +(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
                               attributes:(RLMPropertyAttributes)attributes
-                                  column:(NSUInteger)column
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
     prop->_attributes = attributes;
-    prop->_column = column;
     
     // parse attributes
     unsigned int attCount;

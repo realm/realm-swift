@@ -15,7 +15,7 @@ set -o pipefail
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.80.3
+    REALM_CORE_VERSION=0.80.4
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -208,9 +208,9 @@ case "$COMMAND" in
         if [[ "$XCODE_VERSION" == "6" ]]; then
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Release"
+            xcrealm "-scheme iOS -configuration Release -sdk iphoneos"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Release || exit 1
+            mkdir -p Release-iphone || exit 1
             cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
             lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Release-iphone/Realm.framework || exit 1
@@ -229,9 +229,9 @@ case "$COMMAND" in
         if [[ "$XCODE_VERSION" == "6" ]]; then
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Debug"
+            xcrealm "-scheme iOS -configuration Debug -sdk iphoneos"
             cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Debug || exit 1
+            mkdir -p Debug-iphone || exit 1
             cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
             lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Debug-iphone/Realm.framework || exit 1
@@ -325,7 +325,7 @@ case "$COMMAND" in
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        #xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
         if [[ "$XCODE_VERSION" != "6" ]]; then
@@ -343,7 +343,7 @@ case "$COMMAND" in
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        #xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
 
         # Not all examples can be built using Xcode 6
         if [[ "$XCODE_VERSION" != "6" ]]; then

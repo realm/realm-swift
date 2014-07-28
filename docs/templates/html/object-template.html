@@ -11,17 +11,17 @@
 	<body>
 		<header id="top_header">
 			<div id="library" class="hideInXcode">
-				{{#page}}<h1><a id="libraryTitle" href="http://realm.io">&larr; go back to realm.io</a></h1>
-				<a id="xcode_img" style="visibility:hidden" href="docs-for-xcode://"><img src="../img/xcode-icon.png" width="33px"></a>
-				<a id="dash_img" style="visibility:hidden" href="dash-feed://"><img src="../img/dash-icon.png"></a>
+				{{#page}}<h1><a id="libraryTitle" href="http://realm.io">&nbsp;&nbsp;&larr; go back to realm.io</a></h1>
+				<a id="xcode_img" href="docs-for-xcode://http%3A%2F%2Fcocoadocs.org%2Fdocsets%2FRealm%2Fxcode-docset.atom"><img src="../img/xcode-icon.png" width="33px"></a>
+				<a id="dash_img" href="dash-feed://http%3A%2F%2Fcocoadocs.org%2Fdocsets%2FRealm%2FRealm.xml"><img src="../img/dash-icon.png"></a>
 				<a id="developerHome" href="../index.html">{{projectCompany}}</a>{{/page}}
 				<div id="dropdown">
 				  <div id="dash" class="popup-link">
-				    <p>Click to add to <a id="dash_link" href="dash-feed://">Dash</a></p>
+				    <p>Click to add to <a id="dash_link" href="dash-feed://http%3A%2F%2Fcocoadocs.org%2Fdocsets%2FRealm%2FRealm.xml">Dash</a></p>
 				    <p class="subtext"><a href="http://kapeli.com/dash">What is Dash?</a></p>
 				  </div>
 				  <div id="xcode" class="popup-link">
-				    <p>Click to <a id="xcode_link" href="docs-for-xcode://">add to Xcode</a></p>
+				    <p>Click to <a id="xcode_link" href="docs-for-xcode://http%3A%2F%2Fcocoadocs.org%2Fdocsets%2FRealm%2Fxcode-docset.atom">add to Xcode</a></p>
 				    <p class="subtext">(via <a href="http://documancer.com/xcode/">Docs for Xcode</a>)</p>
 				  </div>
 				</div>
@@ -294,21 +294,6 @@
 
 	  ga('create', 'UA-50247013-1', 'realm.io');
 	  ga('send', 'pageview');
-	</script>
-	<script>
-      url = document.URL;
-      url = url.substring(0, url.indexOf("api/")+4);
-      
-	  a = document.getElementById('xcode_link');
-	  a.href += encodeURIComponent(url + 'realm.atom');
-	  var a = document.getElementById('xcode_img');
-	  a.href += encodeURIComponent(url + 'realm.atom');
-	  a.style.visibility='visible';
-	  var a = document.getElementById('dash_link');
-	  a.href += encodeURIComponent(url + 'realm.xml');
-	  var a = document.getElementById('dash_img');
-	  a.href += encodeURIComponent(url + 'realm.xml');
-	  a.style.visibility='visible';
 	</script>
 </html>
 

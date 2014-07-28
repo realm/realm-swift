@@ -57,11 +57,11 @@ SF_OTHER_LIB_PATH="${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a"
 SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
 
 # Step 1 - build other platform
-xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
+xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk "${SF_OTHER_PLATFORM}${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
 
 # Step 2 - move files and make fat
-mkdir -p ${BUILD_DIR}/${CONFIGURATION}
-xcrun lipo -create ${SF_LIB_PATH} ${SF_OTHER_LIB_PATH} -output ${SF_FAT_PATH}
+mkdir -p "${BUILD_DIR}/${CONFIGURATION}"
+xcrun lipo -create "${SF_LIB_PATH}" "${SF_OTHER_LIB_PATH}" -output "${SF_FAT_PATH}"
 
 # Step 3 - combine with core library
-xcrun libtool -static -o ${SF_COMBINED_PATH} ${SF_FAT_PATH} ${SF_CORE_PATH}
+xcrun libtool -static -o "${SF_COMBINED_PATH}" "${SF_FAT_PATH}" "${SF_CORE_PATH}"
