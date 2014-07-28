@@ -287,6 +287,19 @@
  */
 - (NSString *)JSONString;
 
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Serializing Objects to NSDictionary
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns this object represented as a NSDictionary.
+
+ @return    NSDictionary representation of this object.
+ */
+- (NSDictionary *)NSDictionary;
+
 @end
 
 //---------------------------------------------------------------------------------------
