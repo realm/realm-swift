@@ -76,7 +76,11 @@
 -(void)setObjcCodeFromType {
     switch (_type) {
         case RLMPropertyTypeInt:
+#if defined(__LP64__) && __LP64__
+            _objcType = 'l';
+#else
             _objcType = 'i';
+#endif
             break;
         case RLMPropertyTypeBool:
             _objcType = 'c';
