@@ -22,12 +22,39 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
+#import "RLMArray.h"
 
 #ifdef REALM_SWIFT
 #import <Realm/Realm-Swift.h>
 #endif
 
 #import <objc/runtime.h>
+
+// Private Category to perform "primitiveSelectors"
+@interface NSObject (PrimitiveSelection)
+- (void *)performPrimitiveSelector:(SEL)selector;
+@end
+
+@implementation NSObject (PrimitiveSelection)
+- (void *)performPrimitiveSelector:(SEL)selector {
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:selector]];
+  [invocation setSelector:selector];
+  [invocation setTarget:self];
+
+  [invocation invoke];
+
+  NSUInteger length = [[invocation methodSignature] methodReturnLength];
+
+  // If method is non-void:
+  if (length > 0) {
+    void *buffer = (void *)malloc(length);
+    [invocation getReturnValue:buffer];
+    return buffer;
+  }
+  // If method is void:
+  return NULL;
+}
+@end
 
 @implementation RLMObject
 
@@ -188,10 +215,120 @@
     return RLMGetObjects(realm, self.className, predicate, nil);
 }
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+- (NSDictionary *)NSDictionary {
+
+  if (![self isKindOfClass:[RLMObject class]]) {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
+  }
+
+  NSMutableDictionary *objDictionary = [NSMutableDictionary dictionary];
+  NSArray *properties = self.objectSchema.properties;
+  for (RLMProperty *property in properties) {
+    NSString *propertyName = property.name;
+    SEL propertySelector = NSSelectorFromString(propertyName);
+    if ([self respondsToSelector:propertySelector]) {
+
+      //TODO: Refactor that
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+
+      switch (property.type) {
+          //Primitive types
+        case RLMPropertyTypeDouble:
+        {
+          double *result = (double *)[self performPrimitiveSelector:propertySelector];
+          [objDictionary setValue:[NSNumber numberWithDouble:*result] forKey:propertyName];
+          free(result);
+          break;
+        }
+        case RLMPropertyTypeBool:
+        {
+          BOOL *result = (BOOL *)[self performPrimitiveSelector:propertySelector];
+          [objDictionary setValue:[NSNumber numberWithBool:*result] forKey:propertyName];
+          free(result);
+          break;
+        }
+        case RLMPropertyTypeFloat:
+        {
+          float *result = (float *)[self performPrimitiveSelector:propertySelector];
+          [objDictionary setValue:[NSNumber numberWithFloat:*result] forKey:propertyName];
+          free(result);
+          break;
+        }
+        case RLMPropertyTypeInt:
+        {
+          int *result = (int *)[self performPrimitiveSelector:propertySelector];
+          [objDictionary setValue:[NSNumber numberWithInt:*result] forKey:propertyName];
+          free(result);
+          break;
+        }
+          //non-primitive types
+        case RLMPropertyTypeArray:
+        {
+          RLMArray *propertyValue = (RLMArray *)[self performSelector:propertySelector];
+          [objDictionary setValue:[propertyValue NSArray] forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeObject:
+        {
+          id propertyValue = [self performSelector:propertySelector];
+
+          NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue NSDictionary];
+          [objDictionary setValue:dictionaryProperty forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeData:
+        {
+          id propertyValue = [self performSelector:propertySelector];
+          NSString *dataString = [(NSData *)propertyValue base64EncodedStringWithOptions:0];
+          [objDictionary setValue:dataString forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeDate:
+        {
+          //TODO: Let user override formatter
+          id propertyValue = [self performSelector:propertySelector];
+          NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+          formatter.dateStyle = NSDateFormatterFullStyle;
+          NSString *dateString = [formatter stringFromDate:(NSDate *)propertyValue];
+          [objDictionary setValue:dateString forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeString:
+        {
+          id propertyValue = [self performSelector:propertySelector];
+          [objDictionary setValue:propertyValue forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeAny:
+        {
+          //FIXME: Must not ignore other properties
+          break;
+        }
+        default:
+          @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
+          break;
+      }
+
+    }
+  }
+#pragma clang diagnostic pop
+  return [NSDictionary dictionaryWithDictionary:objDictionary];
 }
+
+- (NSString *)JSONString {
+  NSError *error = nil;
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self NSDictionary]
+                                                     options:NSJSONWritingPrettyPrinted
+                                                       error:&error];
+
+  if (error) {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMObject specified" userInfo:nil];
+  } else {
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+  }
+}
+
 
 // overridden at runtime per-class for performance
 + (NSString *)className {
