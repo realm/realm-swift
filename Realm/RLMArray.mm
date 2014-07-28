@@ -220,9 +220,25 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 }
 #pragma GCC diagnostic pop
 
+- (NSArray *)NSArray {
+  NSMutableArray *array = [NSMutableArray array];
+  for (RLMObject *object in self) {
+    [array addObject:[object NSDictionary]];
+  }
+  return [NSArray arrayWithArray:array];
+}
+
 - (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+  NSError *error = nil;
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self NSArray]
+                                                     options:NSJSONWritingPrettyPrinted
+                                                       error:&error];
+
+  if (error) {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMArray specified" userInfo:nil];
+  } else {
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+  }
 }
 
 

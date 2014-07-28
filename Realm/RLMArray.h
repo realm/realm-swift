@@ -313,6 +313,19 @@
  */
 - (NSString *)JSONString;
 
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Serializing an Arrat to NSArray
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns this Array represented as a NSAray.
+
+ @return    NSArray representation of this RLMArray.
+ */
+- (NSArray *)NSArray;
+
 
 #pragma mark -
 
