@@ -14,6 +14,7 @@
 ### Bugfixes
 
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
+* Fixed potential bug related to the handling of array properties (RLMArray).
 
 
 0.81.0 Release notes (2014-07-22)
