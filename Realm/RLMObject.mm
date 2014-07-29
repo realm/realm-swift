@@ -216,7 +216,7 @@
     return RLMGetObjects(realm, self.className, predicate, nil);
 }
 
-- (NSDictionary *)NSDictionary {
+- (NSDictionary *)JSONDictionary {
 
   if (![self isKindOfClass:[RLMObject class]]) {
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
@@ -229,58 +229,23 @@
     SEL propertySelector = NSSelectorFromString(propertyName);
     if ([self respondsToSelector:propertySelector]) {
 
-      //TODO: Refactor that
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+      id propertyValue = RLMDynamicGet(self, propertyName);
 
       switch (property.type) {
-          //Primitive types
-        case RLMPropertyTypeDouble:
-        {
-          double *result = (double *)[self performPrimitiveSelector:propertySelector];
-          [objDictionary setValue:[NSNumber numberWithDouble:*result] forKey:propertyName];
-          free(result);
-          break;
-        }
-        case RLMPropertyTypeBool:
-        {
-          BOOL *result = (BOOL *)[self performPrimitiveSelector:propertySelector];
-          [objDictionary setValue:[NSNumber numberWithBool:*result] forKey:propertyName];
-          free(result);
-          break;
-        }
-        case RLMPropertyTypeFloat:
-        {
-          float *result = (float *)[self performPrimitiveSelector:propertySelector];
-          [objDictionary setValue:[NSNumber numberWithFloat:*result] forKey:propertyName];
-          free(result);
-          break;
-        }
-        case RLMPropertyTypeInt:
-        {
-          int *result = (int *)[self performPrimitiveSelector:propertySelector];
-          [objDictionary setValue:[NSNumber numberWithInt:*result] forKey:propertyName];
-          free(result);
-          break;
-        }
-          //non-primitive types
+      //non-primitive types
         case RLMPropertyTypeArray:
         {
-          RLMArray *propertyValue = (RLMArray *)[self performSelector:propertySelector];
-          [objDictionary setValue:[propertyValue NSArray] forKey:propertyName];
+          [objDictionary setValue:[propertyValue JSONArray] forKey:propertyName];
           break;
         }
         case RLMPropertyTypeObject:
         {
-          id propertyValue = [self performSelector:propertySelector];
-
-          NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue NSDictionary];
+          NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue JSONDictionary];
           [objDictionary setValue:dictionaryProperty forKey:propertyName];
           break;
         }
         case RLMPropertyTypeData:
         {
-          id propertyValue = [self performSelector:propertySelector];
           NSString *dataString = [(NSData *)propertyValue base64EncodedStringWithOptions:0];
           [objDictionary setValue:dataString forKey:propertyName];
           break;
@@ -288,7 +253,6 @@
         case RLMPropertyTypeDate:
         {
           //TODO: Let user override formatter
-          id propertyValue = [self performSelector:propertySelector];
           NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
           formatter.dateStyle = NSDateFormatterFullStyle;
           NSString *dateString = [formatter stringFromDate:(NSDate *)propertyValue];
@@ -297,7 +261,6 @@
         }
         case RLMPropertyTypeString:
         {
-          id propertyValue = [self performSelector:propertySelector];
           [objDictionary setValue:propertyValue forKey:propertyName];
           break;
         }
