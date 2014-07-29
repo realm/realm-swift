@@ -217,6 +217,10 @@
 }
 
 - (NSDictionary *)JSONDictionary {
+  return [self JSONDictionaryWithRootClassname:self.objectSchema.className];
+}
+
+- (NSDictionary *)JSONDictionaryWithRootClassname:(NSString *)rootClassname {
 
   if (![self isKindOfClass:[RLMObject class]]) {
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
@@ -232,7 +236,6 @@
       id propertyValue = RLMDynamicGet(self, propertyName);
 
       switch (property.type) {
-      //non-primitive types
         case RLMPropertyTypeArray:
         {
           [objDictionary setValue:[propertyValue JSONArray] forKey:propertyName];
@@ -240,8 +243,12 @@
         }
         case RLMPropertyTypeObject:
         {
-          NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue JSONDictionary];
-          [objDictionary setValue:dictionaryProperty forKey:propertyName];
+          // ignore circular relationships
+          NSString *currentClassname = self.objectSchema.className;
+          if (![rootClassname isEqualToString:currentClassname]) {
+            NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue JSONDictionaryWithRootClassname:rootClassname];
+            [objDictionary setValue:dictionaryProperty forKey:propertyName];
+          }
           break;
         }
         case RLMPropertyTypeData:
@@ -254,7 +261,7 @@
         {
           //TODO: Let user override formatter
           NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-          formatter.dateStyle = NSDateFormatterFullStyle;
+          formatter.dateStyle = NSDateFormatterFullStyle; // default formatter
           NSString *dateString = [formatter stringFromDate:(NSDate *)propertyValue];
           [objDictionary setValue:dateString forKey:propertyName];
           break;
@@ -266,10 +273,12 @@
         }
         case RLMPropertyTypeAny:
         {
-          //FIXME: Must not ignore other properties
+          //FIXME: Should id properties be ignored?
           break;
         }
         default:
+          // for all primitive properties, RLMDynamicGet already returns a NSNumber wrapping the value
+          [objDictionary setValue:propertyValue forKey:propertyName];
           break;
       }
 
