@@ -220,17 +220,17 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 }
 #pragma GCC diagnostic pop
 
-- (NSArray *)NSArray {
+- (NSArray *)JSONArray {
   NSMutableArray *array = [NSMutableArray array];
   for (RLMObject *object in self) {
-    [array addObject:[object NSDictionary]];
+    [array addObject:[object JSONDictionary]];
   }
   return [NSArray arrayWithArray:array];
 }
 
 - (NSString *)JSONString {
   NSError *error = nil;
-  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self NSArray]
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self JSONArray]
                                                      options:NSJSONWritingPrettyPrinted
                                                        error:&error];
 

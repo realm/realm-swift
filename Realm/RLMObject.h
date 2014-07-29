@@ -290,15 +290,15 @@
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Serializing Objects to NSDictionary
+ *  @name Serializing Objects to Cocoa-Touch Dictionary
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns this object represented as a NSDictionary.
+ Returns this object represented as a Cocoa-Touch Dictionary.
 
- @return    NSDictionary representation of this object.
+ @return    Cocoa-Touch Dictionary representation of this object.
  */
-- (NSDictionary *)NSDictionary;
+- (NSDictionary *)JSONDictionary;
 
 @end
 

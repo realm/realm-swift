@@ -324,7 +324,7 @@
 
  @return    NSArray representation of this RLMArray.
  */
-- (NSArray *)NSArray;
+- (NSArray *)JSONArray;
 
 
 #pragma mark -

@@ -23,6 +23,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 #import "RLMArray.h"
+#import "RLMAccessor.h"
 
 #ifdef REALM_SWIFT
 #import <Realm/Realm-Swift.h>
@@ -306,19 +307,17 @@
           break;
         }
         default:
-          @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
           break;
       }
 
     }
   }
-#pragma clang diagnostic pop
   return [NSDictionary dictionaryWithDictionary:objDictionary];
 }
 
 - (NSString *)JSONString {
   NSError *error = nil;
-  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self NSDictionary]
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self JSONDictionary]
                                                      options:NSJSONWritingPrettyPrinted
                                                        error:&error];
 
