@@ -178,21 +178,6 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     return result;
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
-    va_list args;
-    RLM_VARARG(predicateFormat, args);
-    return [self indexOfObjectWhere:predicateFormat args:args];
-}
-
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
 #pragma GCC diagnostic pop
 
 - (void)setBackingQuery:(tightdb::Query *)backingQuery {

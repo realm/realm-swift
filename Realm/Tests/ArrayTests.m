@@ -352,5 +352,21 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
 }
 
+- (void)testIndexOfObjectWhere
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+    XCTAssertEqual((NSUInteger)0, ([results indexOfObjectWhere:@"age = %d", 40]));
+    XCTAssertEqual((NSUInteger)1, ([results indexOfObjectWhere:@"age = %d", 25]));
+    XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 30]));
+}
+
 
 @end
