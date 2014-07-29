@@ -368,5 +368,28 @@
     XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 30]));
 }
 
+- (void)testSubqueryLifetime
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [realm commitWriteTransaction];
+
+    RLMArray *subarray = nil;
+    void *addr = NULL;
+    {
+        __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+        subarray = [results objectsWhere:@"age = 40"];
+        addr = (__bridge void *)results;
+    }
+    {
+        __unused __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = NO"];
+    }
+
+    XCTAssertEqualObjects(@"Jill", subarray[0][@"name"]);
+}
+
 
 @end
