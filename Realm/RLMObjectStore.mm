@@ -242,8 +242,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
         id value = nil;
-        if ([object respondsToSelector:NSSelectorFromString(prop.name)]) {
-            value = [object valueForKey:prop.name];
+        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
+            value = [object valueForKey:prop.getterName];
         }
 
         // FIXME: Add condition to check for Mixed once it can support a nil value.

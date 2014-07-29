@@ -49,6 +49,23 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testCustomAccessorsWithObjectInit
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    CustomAccessorsObject *ca = [[CustomAccessorsObject alloc] init];
+    ca.name = @"name";
+    [realm addObject:ca];
+    XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
+    
+    [ca setTheInt:99];
+    [realm commitWriteTransaction];
+    
+    CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];
+    XCTAssertEqual((int)objectFromRealm.age, (int)99, @"age property should be 99");
+}
+
 - (void)testObjectSubclass
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
