@@ -388,7 +388,26 @@
         __unused __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = NO"];
     }
 
-    XCTAssertEqualObjects(@"Jill", subarray[0][@"name"]);
+    XCTAssertEqualObjects(@"Joe", subarray[0][@"name"]);
+}
+
+- (void)testSortingExistingQuery
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *sortedAge = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
+    RLMArray *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:NO];
+
+    XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
+    XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+
+
 }
 
 
