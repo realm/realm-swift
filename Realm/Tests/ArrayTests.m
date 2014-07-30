@@ -378,11 +378,9 @@
     [realm commitWriteTransaction];
 
     RLMArray *subarray = nil;
-    void *addr = NULL;
     {
         __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
         subarray = [results objectsWhere:@"age = 40"];
-        addr = (__bridge void *)results;
     }
     {
         __unused __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = NO"];
@@ -406,9 +404,6 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
-
-
 }
-
 
 @end
