@@ -61,7 +61,7 @@ import Foundation
         // super is an implicit property on Swift objects
         for i in 1..<reflection.count {
             let propertyName = reflection[i].0
-            if ignoredPropertiesForClass?.containsObject(propertyName) {
+            if ignoredPropertiesForClass && ignoredPropertiesForClass!.containsObject(propertyName) {
                 continue
             }
 
