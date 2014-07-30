@@ -320,5 +320,10 @@
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
 
+#pragma mark -
+
+- (instancetype)init __attribute__((unavailable("RLMArrays cannot be created directly")));
++ (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
+
 @end
 
