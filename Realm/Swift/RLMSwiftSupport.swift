@@ -86,7 +86,12 @@ import Foundation
             case is Bool.Type, is Bool?.Type:
                 (p, t) = (RLMProperty(name: name, type: .Bool, objectClassName: nil, attributes: attr), "c")
             case is Int.Type, is Int?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr), "l")
+                p = RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr)
+#if arch(x86_64) || arch(arm64)
+                t = "l"
+#else
+                t = "i"
+#endif
             case is Float.Type, is Float?.Type:
                 (p, t) = (RLMProperty(name: name, type: .Float, objectClassName: nil, attributes: attr), "f")
             case is Double.Type, is Double?.Type:
