@@ -96,3 +96,12 @@ class SwiftDynamicObject: RLMObject {
 class SwiftUTF8Object: RLMObject {
     var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
+
+class SwiftIgnoredPropertyObject: RLMObject {
+    var ignore = ""
+    var str = ""
+    override class func ignoredProperties() -> [AnyObject] {
+        return ["ignore"]
+    }
+}
+
