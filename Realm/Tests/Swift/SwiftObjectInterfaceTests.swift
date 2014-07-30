@@ -137,4 +137,10 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqual(objectFromRealm.stringCol!, "stringVal", "Should be stringVal")
     }
+
+    func testIgnoredPropertySchema() {
+        var obj = SwiftIgnoredPropertyObject()
+        XCTAssertEqual(obj.objectSchema.properties.count, 1)
+        XCTAssertEqual(obj.objectSchema.properties[0].name!, "str")
+    }
 }
