@@ -95,6 +95,27 @@ class SwiftRealmTests: SwiftTestCase {
         XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
+    func testRealmIgnoresProperties() {
+        let realm = realmWithTestPath()
+        
+        let object = SwiftIgnoredPropertiesObject()
+        realm.beginWriteTransaction()
+        object.name = "@fz"
+        object.age = 31
+        realm.addObject(object)
+        realm.commitWriteTransaction()
+
+        // This shouldn't do anything.
+        realm.beginWriteTransaction()
+        object.runtimeProperty = NSObject()
+        realm.commitWriteTransaction()
+
+        let objects = SwiftIgnoredPropertiesObject.allObjectsInRealm(realm)
+        XCTAssertEqual(objects.count, 1, "There should be 1 object of type SwiftIgnoredPropertiesObject")
+        XCTAssertNil((objects[0] as SwiftIgnoredPropertiesObject).runtimeProperty, "Ignored property should be nil")
+        XCTAssertEqual((objects[0] as SwiftIgnoredPropertiesObject).name, "@fz", "Value of the name column doesn't match the assigned one.")
+    }
+
 // FIXME: https://app.asana.com/0/861870036984/14552787865017
 //
 //    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
