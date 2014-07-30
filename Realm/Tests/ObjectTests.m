@@ -623,12 +623,16 @@
     [realm commitWriteTransaction];
     XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
                                  @"RLMException", "Invalid property name");
+    XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
+                                 @"RLMException", "Invalid property name");
 }
 
 - (void)testUnretainedRealmObjectUnknownKey
 {
     IntObject *obj = [[IntObject alloc] init];
     XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
+                                 @"NSUnknownKeyException");
+    XCTAssertThrowsSpecificNamed([obj setObject:0 forKeyedSubscript:@""], NSException,
                                  @"NSUnknownKeyException");
 }
 
