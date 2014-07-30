@@ -27,8 +27,8 @@
 #import <Realm/Realm.h>
 
 #warning Provide your foursquare client ID and client secret
-NSString *clientID = @"B24JYU5DQ2ZYV2IQ4C51IAPDOSYH4GZTFCQO4MGUG12FUPIQ";
-NSString *clientSecret = @"0FHSVHUYZHIYB3SDHR5Y0IBMFGJQIMNSFIX0LPPXSDWIUCT2";
+NSString *clientID = @"YOUR CLIENT ID";
+NSString *clientSecret = @"YOUR CLIENT SECRET";
 
 @implementation AppDelegate
 
