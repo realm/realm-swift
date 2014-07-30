@@ -632,7 +632,7 @@
     IntObject *obj = [[IntObject alloc] init];
     XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
                                  @"NSUnknownKeyException");
-    XCTAssertThrowsSpecificNamed([obj setObject:0 forKeyedSubscript:@""], NSException,
+    XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
                                  @"NSUnknownKeyException");
 }
 
