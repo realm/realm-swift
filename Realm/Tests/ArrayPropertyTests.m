@@ -159,6 +159,9 @@
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
 
     XCTAssertThrows([intArray.intArray JSONString], @"Not yet implemented");
+
+    // test standalone with literals
+    __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
 }
 
 - (void)testIndexOfObject
