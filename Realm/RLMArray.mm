@@ -234,7 +234,7 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (NSString *)description
 {
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%x> (\n", (unsigned int)self];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
     unsigned long index = 0, skipped = 0;
     for (NSObject *obj in self) {
         // Indent child objects
