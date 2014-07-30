@@ -209,14 +209,17 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
+                                                                   arguments:args]];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+    RLMArray *objects = [self objectsWithPredicate:predicate];
+    if ([objects count] == 0) {
+        return NSNotFound;
+    }
+    return [self indexOfObject:[objects firstObject]];
 }
 #pragma GCC diagnostic pop
 

@@ -330,9 +330,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateViewWithOrder(view, objectSchema, order, YES);
     
     // create and populate array
-    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
-                                                                             query:query view:view
-                                                                             realm:realm];
+    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName view:view realm:realm];
     return array;
 }
 
