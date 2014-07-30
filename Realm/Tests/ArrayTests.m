@@ -236,6 +236,10 @@
     
     NSString *description = [[EmployeeObject allObjects] description];
     
+    NSString* pointer = [NSString stringWithFormat:@"%x", (int)[EmployeeObject allObjects]];
+    
+    XCTAssertTrue([description rangeOfString:pointer].location != NSNotFound, @"Pointer to self should be included in \"description\" on RLMArray");
+
     XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
     XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
     
@@ -245,6 +249,11 @@
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMArray");
     
     XCTAssertThrowsSpecificNamed(([[EmployeeObject allObjects] JSONString]), NSException, @"RLMNotImplementedException", @"Not yet implemented");
+    
+    NSString *emptyDescription = [[[EmployeeObject allObjects] objectsWhere:@"age == 25"] description];
+    XCTAssertTrue([emptyDescription rangeOfString:@")"].location != NSNotFound, @"'regression: empty RLMArray removed trailing \")\" from \"description\"");
+
+    
 }
 
 - (void)testDeleteLinksAndObjectsInArray
