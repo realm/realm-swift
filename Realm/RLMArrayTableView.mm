@@ -74,38 +74,28 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMArrayTableViewValidateAttached(self);
 
-    NSUInteger batchCount = 0, index = state->state, count = self.count;
-    __strong id *strongBuffer = nil;
-
-    // first time create our strong buffer
-    if (index == 0) {
-        strongBuffer = new id[len];
-        unsigned long *tmpBuffer = (unsigned long *)(void *)strongBuffer;
-        state->extra[0] = (long)tmpBuffer;
+    __autoreleasing NSMutableArray *items;
+    if (state->state == 0) {
+        items = [NSMutableArray arrayWithCapacity:len];
+        state->extra[0] = (long)items;
+        state->extra[1] = self.count;
     }
     else {
-        void *tmpBuffer = (void *)state->extra[0];
-        strongBuffer = (__strong id *)tmpBuffer;
+        items = (__bridge id)(void *)state->extra[0];
     }
 
-    // delete strong buffer if done
-    if (index >= count) {
-        for (NSUInteger i = 0; i < len; i++) {
-            strongBuffer[i] = nil;
-        }
-        delete [] strongBuffer;
-    }
+    [items removeAllObjects];
+
+    NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
     RLMObjectSchema *objectSchema = _realm.schema[_objectClassName];
     Class accessorClass = objectSchema.accessorClass;
     while (index < count && batchCount < len) {
-
         // get acessor fot the object class
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:objectSchema defaultValues:NO];
         accessor->_row = (*objectSchema->_table)[_backingView.get_source_ndx(index++)];
-
-        strongBuffer[batchCount] = accessor;
-        buffer[batchCount] = strongBuffer[batchCount];
+        [items addObject:accessor];
+        buffer[batchCount] = accessor;
         batchCount++;
     }
 

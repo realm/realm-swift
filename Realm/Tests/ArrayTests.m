@@ -74,6 +74,14 @@
     for (int i = 0; i < count; i++) {
         XCTAssertNil(objects[i], @"Object should have been released");
     }
+
+    @autoreleasepool {
+        for (AggregateObject *ao in result) {
+            objects[0] = ao;
+            break;
+        }
+    }
+    XCTAssertNil(objects[0], @"Object should have been released");
 }
 
 - (void)testReadOnly
