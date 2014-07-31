@@ -537,11 +537,6 @@ void update_query_with_value_expression(RLMSchema *schema,
     
     // get prop and index
     NSUInteger index = RLMValidatedColumnIndex(desc, keyPath);
-
-    // validate predicate operator
-    if (pred.predicateOperatorType == NSInPredicateOperatorType) {
-        @throw RLMPredicateException(@"Invalid operator type", @"Unsupported predicate operator 'IN'");
-    }
     
     // validate value
     if (!RLMIsObjectValidForProperty(value, prop)) {
@@ -704,7 +699,10 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
         NSExpressionType exp2Type = validated_expression_type(compp.rightExpression);
 
         // check modifier
-        if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
+        if (compp.predicateOperatorType == NSInPredicateOperatorType) {
+            @throw RLMPredicateException(@"Invalid operator type", @"Unsupported predicate operator 'IN'");
+        }
+        else if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
             // no support for ALL queries
             @throw RLMPredicateException(@"Invalid predicate",
                                          @"ALL modifier not supported");

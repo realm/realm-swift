@@ -90,10 +90,15 @@
     [realm beginWriteTransaction];
     [StringObject createInRealm:realm withObject:@[@"a"]];
     [realm commitWriteTransaction];
-    void (^inQuery)() = ^{
-        [StringObject objectsInRealm:realm where:@"stringCol IN %@", @[@"a"]];
-    };
-    XCTAssertThrowsSpecificNamed(inQuery(), NSException,
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol IN %@", @[@"a"]];
+    XCTAssertThrowsSpecificNamed([StringObject objectsWithPredicate:pred], NSException,
+                                 @"Invalid operator type",
+                                 @"%@ operator invalid in string comparison.",
+                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
+    
+    NSPredicate *keyPred = [NSPredicate predicateWithFormat:@"employees.name IN %@", @[@"a"]];
+    XCTAssertThrowsSpecificNamed([CompanyObject objectsWithPredicate:keyPred], NSException,
                                  @"Invalid operator type",
                                  @"%@ operator invalid in string comparison.",
                                  [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
