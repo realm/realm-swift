@@ -155,6 +155,32 @@ COMMAND="$1"
 XCMODE="$2"
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
+######################################
+# Add Platform Error
+######################################
+
+add_platform_error() {
+    FRAMEWORK_PATH="$1"     # /path/to/framework/ (i.e. framework at /path/to/framework/Realm.framework)
+    FRAMEWORK_PLATFORM="$2" # must be "ios" or "osx"
+    REALM_H_PATH="$FRAMEWORK_PATH/Realm.framework/Headers/Realm.h"
+
+    txt="\n"
+    if [[ "$FRAMEWORK_PLATFORM" == "ios" ]]; then
+        txt="${txt}#if TARGET_OS_MAC\n"
+        txt="${txt}#error Attempting to use Realm's iOS framework in an OSX project.\n"
+    else
+        txt="${txt}#if TARGET_OS_IPHONE\n"
+        txt="${txt}#error Attempting to use Realm's OSX framework in an iOS project.\n"
+    fi
+    txt="${txt}#endif\n"
+    echo "${txt}" >> "$REALM_H_PATH" || exit 1
+
+    echo "Platform error message added to framework at '$FRAMEWORK_PATH'"
+}
+
+######################################
+# Command Handling
+######################################
 
 case "$COMMAND" in
 
@@ -214,14 +240,22 @@ case "$COMMAND" in
             cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
             lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Release-iphone/Realm.framework || exit 1
+
+            add_platform_error "Release-iphone" "ios"
         else
             xcrealm "-scheme iOS -configuration Release"
+            add_platform_error "build/Release" "ios"
         fi
         exit 0
         ;;
 
     "osx")
         xcrealm "-scheme OSX -configuration Release"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Release" "osx"
+        else
+            add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
+        fi
         exit 0
         ;;
 
@@ -235,14 +269,22 @@ case "$COMMAND" in
             cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
             lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
             mv Realm Debug-iphone/Realm.framework || exit 1
+
+            add_platform_error "Debug-iphone" "ios"
         else
             xcrealm "-scheme iOS -configuration Debug"
+            add_platform_error "build/Debug" "ios"
         fi
         exit 0
         ;;
 
     "osx-debug")
         xcrealm "-scheme OSX -configuration Debug"
+        if [[ "$XCODE_VERSION" == "6" ]]; then
+            add_platform_error "build/DerivedData/Realm-Xcode6/Build/Products/Debug" "osx"
+        else
+            add_platform_error "build/DerivedData/Realm/Build/Products/Release" "osx"
+        fi
         exit 0
         ;;
 
