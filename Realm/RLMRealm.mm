@@ -188,6 +188,13 @@ static NSArray *s_objectDescriptors = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+
+#if !TARGET_OS_IPHONE
+        [[NSFileManager defaultManager] createDirectoryAtPath:[s_defaultRealmPath stringByDeletingLastPathComponent]
+                                  withIntermediateDirectories:YES
+                                                   attributes:nil
+                                                        error:nil];
+#endif
     });
     return s_defaultRealmPath;
 }
