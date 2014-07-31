@@ -10,11 +10,19 @@
 * Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
 * Using NSNumber properties (unsupported) now throws a more informative exception.
 * Added `[RLMRealm defaultRealmPath]`
+* Proper implementation for [RLMArray indexOfObjectWhere:]
+* The default Realm path on OS X is now ~/Library/Application Support/[bundle
+  identifier]/default.realm rather than ~/Documents
 
 ### Bugfixes
 
+* Fixed a bug which could cause a crash during RLMArray destruction after a query. 
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
 * Fixed potential bug related to the handling of array properties (RLMArray).
+* Fixed bug where array properties accessed the wrong property.
+* Fixed bug that prevented objects with custom getters to be added to a Realm.
+* Fixed a bug where initializing a standalone object with an array literal would 
+  trigger an exception.
 * Clarified exception messages when using unsupported NSPredicate operators.
 
 

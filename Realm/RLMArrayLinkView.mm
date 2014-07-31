@@ -29,9 +29,7 @@
 //
 // RLMArray implementation
 //
-@implementation RLMArrayLinkView {
-    tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
-}
+@implementation RLMArrayLinkView 
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view

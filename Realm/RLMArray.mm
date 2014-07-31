@@ -209,14 +209,17 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
+                                                                   arguments:args]];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
 {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
+    RLMArray *objects = [self objectsWithPredicate:predicate];
+    if ([objects count] == 0) {
+        return NSNotFound;
+    }
+    return [self indexOfObject:[objects firstObject]];
 }
 #pragma GCC diagnostic pop
 
@@ -231,7 +234,7 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (NSString *)description
 {
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithString:@"RLMArray (\n"];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
     unsigned long index = 0, skipped = 0;
     for (NSObject *obj in self) {
         // Indent child objects
@@ -244,7 +247,8 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
     
     // Remove last comma and newline characters
-    [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
+    if(self.count > 0)
+        [mString deleteCharactersInRange:NSMakeRange(mString.length-2, 2)];
     if (skipped) {
         [mString appendFormat:@"\n\t... %lu objects skipped.", skipped];
     }

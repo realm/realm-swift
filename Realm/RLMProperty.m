@@ -76,7 +76,11 @@
 -(void)setObjcCodeFromType {
     switch (_type) {
         case RLMPropertyTypeInt:
+#if defined(__LP64__) && __LP64__
+            _objcType = 'l';
+#else
             _objcType = 'i';
+#endif
             break;
         case RLMPropertyTypeBool:
             _objcType = 'c';
@@ -183,14 +187,12 @@
 
 +(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
                               attributes:(RLMPropertyAttributes)attributes
-                                  column:(NSUInteger)column
 {
     // create new property
     NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
     prop->_attributes = attributes;
-    prop->_column = column;
     
     // parse attributes
     unsigned int attCount;

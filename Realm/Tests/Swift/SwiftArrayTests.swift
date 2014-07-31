@@ -434,29 +434,23 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertTrue((description as NSString).rangeOfString("912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
+    func makeEmployee(realm: RLMRealm, _ age: Int32, _ name: String, _ hired: Bool) -> EmployeeObject {
+        let employee = EmployeeObject()
+        employee.age = age
+        employee.name = name
+        employee.hired = hired
+        realm.addObject(employee)
+        return employee
+    }
+
     func testDeleteLinksAndObjectsInArray_objc() {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
 
-        let po1 = EmployeeObject()
-        po1.age = 40
-        po1.name = "Joe"
-        po1.hired = true
-
-        let po2 = EmployeeObject()
-        po2.age = 30
-        po2.name = "John"
-        po2.hired = false
-
-        let po3 = EmployeeObject()
-        po3.age = 25
-        po3.name = "Jill"
-        po3.hired = true
-
-        realm.addObject(po1)
-        realm.addObject(po2)
-        realm.addObject(po3)
+        let po1 = makeEmployee(realm, 40, "Joe", true)
+        let po2 = makeEmployee(realm, 30, "John", false)
+        let po3 = makeEmployee(realm, 25, "Jill", true)
 
         let company = CompanyObject()
         company.name = "name"
@@ -488,5 +482,53 @@ class SwiftArrayTests: SwiftTestCase {
 
         let allPeople = EmployeeObject.allObjectsInRealm(realm)
         XCTAssertEqual(allPeople.count, 3, "Only links should have been deleted, not the employees")
+    }
+
+    func testIndexOfObject_objc() {
+        let realm = realmWithTestPath()
+
+        realm.beginWriteTransaction()
+        let po1 = makeEmployee(realm, 40, "Joe", true)
+        let po2 = makeEmployee(realm, 30, "John", false)
+        let po3 = makeEmployee(realm, 25, "Jill", true)
+        realm.commitWriteTransaction()
+
+        let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
+        XCTAssertEqual(2, results.count)
+        XCTAssertEqual(0, results.indexOfObject(po1));
+        XCTAssertEqual(1, results.indexOfObject(po3));
+        XCTAssertEqual(NSNotFound, Int(results.indexOfObject(po2)));
+    }
+
+    func testIndexOfObjectWhere_objc() {
+        let realm = realmWithTestPath()
+
+        realm.beginWriteTransaction()
+        makeEmployee(realm, 40, "Joe", true)
+        makeEmployee(realm, 30, "John", false)
+        makeEmployee(realm, 25, "Jill", true)
+        realm.commitWriteTransaction()
+
+        let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
+        XCTAssertEqual(2, results.count)
+        XCTAssertEqual(0, results.indexOfObjectWhere("age = %d", 40))
+        XCTAssertEqual(1, results.indexOfObjectWhere("age = %d", 25))
+        XCTAssertEqual(NSNotFound, Int(results.indexOfObjectWhere("age = %d", 30)))
+    }
+
+    func testSortingExistingQuery_objc() {
+        let realm = realmWithTestPath()
+
+        realm.beginWriteTransaction()
+        makeEmployee(realm, 20, "A", true)
+        makeEmployee(realm, 30, "B", false)
+        makeEmployee(realm, 40, "C", true)
+        realm.commitWriteTransaction()
+
+        let sortedByAge = EmployeeObject.allObjectsInRealm(realm).arraySortedByProperty("age", ascending: true)
+        let sortedByName = sortedByAge.arraySortedByProperty("name", ascending: false)
+
+        XCTAssertEqual(20, (sortedByAge[0] as EmployeeObject).age)
+        XCTAssertEqual(40, (sortedByName[0] as EmployeeObject).age)
     }
 }

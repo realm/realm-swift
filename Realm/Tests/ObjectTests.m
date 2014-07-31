@@ -614,4 +614,26 @@
     XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
+- (void)testRetainedRealmObjectUnknownKey
+{
+    IntObject *obj = [[IntObject alloc] init];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
+                                 @"RLMException", "Invalid property name");
+    XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
+                                 @"RLMException", "Invalid property name");
+}
+
+- (void)testUnretainedRealmObjectUnknownKey
+{
+    IntObject *obj = [[IntObject alloc] init];
+    XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
+                                 @"NSUnknownKeyException");
+    XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
+                                 @"NSUnknownKeyException");
+}
+
 @end

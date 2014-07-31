@@ -96,3 +96,14 @@ class SwiftDynamicObject: RLMObject {
 class SwiftUTF8Object: RLMObject {
     var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
+
+class SwiftIgnoredPropertiesObject: RLMObject {
+    var name = ""
+    var age = 0
+    var runtimeProperty: AnyObject?
+    
+    override class func ignoredProperties() -> [AnyObject]! {
+        return ["runtimeProperty"]
+    }
+
+}

@@ -33,14 +33,10 @@
 //
 @implementation RLMArrayTableView
 
-@dynamic backingQuery;
-
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                  query:(tightdb::Query *)query
-                                   view:(tightdb::TableView &)view
+                                   view:(tightdb::TableView const &)view
                                   realm:(RLMRealm *)realm{
     RLMArrayTableView *ar = [[RLMArrayTableView alloc] initWithObjectClassName:objectClassName];
-    ar.backingQuery = query;
     ar->_backingView = view;
     ar->_realm = realm;
     ar->_readOnly = YES;
@@ -178,40 +174,7 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     return result;
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
-    va_list args;
-    RLM_VARARG(predicateFormat, args);
-    return [self indexOfObjectWhere:predicateFormat args:args];
-}
-
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
 #pragma GCC diagnostic pop
-
-- (void)setBackingQuery:(tightdb::Query *)backingQuery {
-    _backingQuery.reset(backingQuery);
-}
-
-- (tightdb::Query *)backingQuery {
-    return _backingQuery.get();
-}
-
-- (RLMArray *)copy {
-    RLMArrayTableViewValidateAttached(self);
-
-    tightdb::TableView viewCopy = _backingView.get_parent().where(&_backingView).find_all();
-    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
-                                                 query:new tightdb::Query(*_backingQuery)
-                                                  view:viewCopy
-                                                 realm:_realm];
-}
 
 - (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
 {
@@ -228,25 +191,29 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
 
 - (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
 {
+    RLMArrayTableViewValidateAttached(self);
+
     // copy array and apply new predicate creating a new query and view
-    RLMArrayTableView *array = [self copy];
-    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, array.realm.schema,
-                                array.realm.schema[self.objectClassName]);
-    array->_backingView = array.backingQuery->find_all();
-    return array;
+    tightdb::Query query = _backingView.get_parent().where();
+    query.tableview(_backingView);
+
+    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName view:query.find_all() realm:_realm];
 }
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    // copy array and apply new predicate
-    RLMArrayTableView *array = [self copy];
-    RLMObjectSchema *schema = array.realm.schema[self.objectClassName];
-    tightdb::TableView view = array.backingQuery->find_all();
+    RLMArrayTableViewValidateAttached(self);
+
+    tightdb::Query query = _backingView.get_parent().where();
+    query.tableview(_backingView);
     
     // apply order
-    RLMUpdateViewWithOrder(view, schema, property, ascending);
-    array->_backingView = view;
-    return array;
+    RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
+                                                                   view:query.find_all()
+                                                                  realm:_realm];
+    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
+    return ar;
 }
 
 -(id)minOfProperty:(NSString *)property {

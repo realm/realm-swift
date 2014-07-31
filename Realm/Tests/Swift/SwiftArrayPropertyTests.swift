@@ -23,22 +23,50 @@ import TestFramework
 class SwiftArrayPropertyTests: SwiftTestCase {
 
     // Swift models
-    
+
+    func testBasicArray() {
+        let string = SwiftStringObject()
+        string.stringCol = "string"
+
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        realm.addObject(string)
+        realm.commitWriteTransaction()
+
+        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, 1, "There should be a single SwiftStringObject in the realm")
+
+        let array = SwiftArrayPropertyObject()
+        array.name = "arrayObject"
+        // FIXME: Should be able to add object to array here
+        // Asana: https://app.asana.com/0/861870036984/13438276206884
+        // array.array.addObject(string)
+
+        realm.beginWriteTransaction()
+        realm.addObject(array)
+        array.array.addObject(string)
+        realm.commitWriteTransaction()
+
+        let arrayObjects = SwiftArrayPropertyObject.allObjectsInRealm(realm)
+
+        XCTAssertEqual(arrayObjects.count, 1, "There should be a single SwiftStringObject in the realm")
+        XCTAssertEqual((arrayObjects.firstObject() as SwiftArrayPropertyObject).array.firstObject() as SwiftStringObject, string, "First array object should be the string object we added")
+    }
+
     func testPopulateEmptyArray() {
         let realm = realmWithTestPath()
-        
+
         realm.beginWriteTransaction()
         let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []]);
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, 0, "Should start with no array elements")
-        
+
         let obj = SwiftStringObject()
         obj.stringCol = "a"
         array.array.addObject(obj)
         array.array.addObject(SwiftStringObject.createInRealm(realm, withObject: ["b"]))
         array.array.addObject(obj)
         realm.commitWriteTransaction()
-        
+
         XCTAssertEqual(array.array.count, 3, "Should have three elements in array")
         XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
         XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
@@ -48,21 +76,21 @@ class SwiftArrayPropertyTests: SwiftTestCase {
             XCTAssertFalse(obj.description.isEmpty, "Object should have description")
         }
     }
-    
+
     func testModifyDetatchedArray() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
         let arObj = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, 0, "Should start with no array elements")
-        
+
         let obj = SwiftStringObject()
         obj.stringCol = "a"
         let array = arObj.array
         array.addObject(obj)
         array.addObject(SwiftStringObject.createInRealm(realm, withObject: ["b"]))
         realm.commitWriteTransaction()
-        
+
         XCTAssertEqual(array.count, 2, "Should have two elements in array")
         XCTAssertEqual((array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
         XCTAssertEqual((array[1] as SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
@@ -70,44 +98,69 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
     func testInsertMultiple() {
         let realm = realmWithTestPath()
-        
+
         realm.beginWriteTransaction()
-        
+
         let obj = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["arrayObject", [], []])
         let child1 = SwiftStringObject.createInRealm(realm, withObject: ["a"])
         let child2 = SwiftStringObject()
         child2.stringCol = "b"
         obj.array.addObjectsFromArray([child2, child1])
         realm.commitWriteTransaction()
-        
+
         let children = SwiftStringObject.allObjectsInRealm(realm)
         XCTAssertEqual((children[0] as SwiftStringObject).stringCol, "a", "First child should be 'a'")
         XCTAssertEqual((children[1] as SwiftStringObject).stringCol, "b", "Second child should be 'b'")
     }
 
     // FIXME: Support standalone RLMArray's in Swift-defined models
-//    func testStandalone() {
-//        let realm = realmWithTestPath()
-//        
-//        let array = SwiftArrayPropertyObject()
-//        array.name = "name"
-//        XCTAssertNotNil(array.array, "RLMArray property should get created on access")
-//        
-//        let obj = SwiftStringObject()
-//        obj.stringCol = "a"
-//        array.array.addObject(obj)
-//        array.array.addObject(obj)
-//        
-//        realm.beginWriteTransaction()
-//        realm.addObject(array)
-//        realm.commitWriteTransaction()
-//        
-//        XCTAssertEqual(array.array.count, 2, "Should have two elements in array")
-//        XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
-//        XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "a", "Second element should have property value 'a'")
-//    }
+    //    func testStandalone() {
+    //        let realm = realmWithTestPath()
+    //
+    //        let array = SwiftArrayPropertyObject()
+    //        array.name = "name"
+    //        XCTAssertNotNil(array.array, "RLMArray property should get created on access")
+    //
+    //        let obj = SwiftStringObject()
+    //        obj.stringCol = "a"
+    //        array.array.addObject(obj)
+    //        array.array.addObject(obj)
+    //
+    //        realm.beginWriteTransaction()
+    //        realm.addObject(array)
+    //        realm.commitWriteTransaction()
+    //
+    //        XCTAssertEqual(array.array.count, 2, "Should have two elements in array")
+    //        XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
+    //        XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "a", "Second element should have property value 'a'")
+    //    }
 
     // Objective-C models
+
+    func testBasicArray_objc() {
+        let string = StringObject()
+        string.stringCol = "string"
+
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        realm.addObject(string)
+        realm.commitWriteTransaction()
+
+        XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, 1, "There should be a single StringObject in the realm")
+
+        let array = ArrayPropertyObject()
+        array.name = "arrayObject"
+        array.array.addObject(string)
+
+        realm.beginWriteTransaction()
+        realm.addObject(array)
+        realm.commitWriteTransaction()
+
+        let arrayObjects = ArrayPropertyObject.allObjectsInRealm(realm)
+
+        XCTAssertEqual(arrayObjects.count, 1, "There should be a single StringObject in the realm")
+        XCTAssertEqual((arrayObjects.firstObject() as ArrayPropertyObject).array.firstObject() as StringObject, string, "First array object should be the string object we added")
+    }
 
     func testPopulateEmptyArray_objc() {
         let realm = realmWithTestPath()

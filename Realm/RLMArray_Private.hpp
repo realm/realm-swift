@@ -81,16 +81,10 @@
 //
 @interface RLMArrayTableView : RLMArray {
     tightdb::TableView _backingView;
-    tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   query:(tightdb::Query *)query
-                                    view:(tightdb::TableView &)view
+                                    view:(tightdb::TableView const &)view
                                    realm:(RLMRealm *)realm;
-
-// custom getter/setter for query - query lifcycle management
-// is different from other accessors and requires special treatment
-@property (nonatomic, assign) tightdb::Query *backingQuery;
 
 @end
 

@@ -242,8 +242,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
         id value = nil;
-        if ([object respondsToSelector:NSSelectorFromString(prop.name)]) {
-            value = [object valueForKey:prop.name];
+        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
+            value = [object valueForKey:prop.getterName];
         }
 
         // FIXME: Add condition to check for Mixed once it can support a nil value.
@@ -330,9 +330,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateViewWithOrder(view, objectSchema, order, YES);
     
     // create and populate array
-    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
-                                                                             query:query view:view
-                                                                             realm:realm];
+    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName view:view realm:realm];
     return array;
 }
 

@@ -352,5 +352,58 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
 }
 
+- (void)testIndexOfObjectWhere
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+    XCTAssertEqual((NSUInteger)0, ([results indexOfObjectWhere:@"age = %d", 40]));
+    XCTAssertEqual((NSUInteger)1, ([results indexOfObjectWhere:@"age = %d", 25]));
+    XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 30]));
+}
+
+- (void)testSubqueryLifetime
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [realm commitWriteTransaction];
+
+    RLMArray *subarray = nil;
+    {
+        __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+        subarray = [results objectsWhere:@"age = 40"];
+    }
+    {
+        __unused __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = NO"];
+    }
+
+    XCTAssertEqualObjects(@"Joe", subarray[0][@"name"]);
+}
+
+- (void)testSortingExistingQuery
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"A",  @"age": @20, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *sortedAge = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
+    RLMArray *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:NO];
+
+    XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
+    XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+}
 
 @end
