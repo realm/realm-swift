@@ -34,6 +34,8 @@
  - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
  - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
  
+ RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
+ lazily created when accessed, or can be obtained by querying a Realm.
  */
 
 @interface RLMArray : NSObject<NSFastEnumeration>
@@ -322,7 +324,21 @@
 
 #pragma mark -
 
+/**---------------------------------------------------------------------------------------
+ *  @name Unavailable Methods
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ -[RLMArray init] is not available because RLMArrays cannot be created directly.
+ RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ */
 - (instancetype)init __attribute__((unavailable("RLMArrays cannot be created directly")));
+
+/**
+ +[RLMArray new] is not available because RLMArrays cannot be created directly.
+ RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ */
 + (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
 
 @end
