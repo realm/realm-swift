@@ -51,8 +51,6 @@
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
 
-    // Test JSON output
-    XCTAssertThrows([array.array JSONString], @"Not yet implemented");
 }
 
 

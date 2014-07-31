@@ -243,8 +243,7 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMArray");
-    
-    XCTAssertThrowsSpecificNamed(([[EmployeeObject allObjects] JSONString]), NSException, @"RLMNotImplementedException", @"Not yet implemented");
+
 }
 
 - (void)testDeleteLinksAndObjectsInArray
@@ -352,5 +351,32 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
 }
 
+#pragma mark - Serialization
+
+- (void)testArraySerialization
+{
+  RLMRealm *realm = [RLMRealm defaultRealm];
+
+  // create with array literals
+  [realm beginWriteTransaction];
+
+  NSDictionary *dict1 = @{@"name":@"company", @"employees":@[@{@"name":@"Alex", @"age":@29, @"hired":@YES}]};
+  [CompanyObject createInDefaultRealmWithObject:dict1];
+
+  NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
+  [CompanyObject createInDefaultRealmWithObject:dict];
+
+  [realm commitWriteTransaction];
+
+  RLMArray *nestedArray = [CompanyObject allObjects];
+  NSArray *objArray = [nestedArray JSONArray];
+  NSArray *testArray = @[dict1, dict];
+  XCTAssertEqualObjects(objArray, testArray);
+
+  NSString *objString = [nestedArray JSONString];
+  NSString *testString =	@"[\n  {\n    \"name\" : \"company\",\n    \"employees\" : [\n      {\n        \"age\" : 29,\n        \"name\" : \"Alex\",\n        \"hired\" : true\n      }\n    ]\n  },\n  {\n    \"name\" : \"dictionaryCompany\",\n    \"employees\" : [\n      {\n        \"age\" : 32,\n        \"name\" : \"Bjarne\",\n        \"hired\" : false\n      }\n    ]\n  }\n]";
+  XCTAssertEqualObjects(objString, testString);
+
+}
 
 @end

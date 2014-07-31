@@ -129,7 +129,6 @@
     XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
     
-    XCTAssertThrowsSpecificNamed([soInit JSONString], NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 -(void)testObjectInitWithObjectTypeArray
@@ -659,7 +658,7 @@
     XCTAssertEqualObjects(objTestDictionary, objDictionary);
 
     NSString *objString = [c JSONString];
-    NSString *objTestString = @"{\n  \"intCol\" : 54,\n  \"longCol\" : 99,\n  \"binaryCol\" : \"AAE=\",\n  \"dateCol\" : \"Wednesday, December 31, 1969\",\n  \"doubleCol\" : 0.8,\n  \"floatCol\" : 0.7,\n  \"boolCol\" : false,\n  \"objectCol\" : {\n    \"stringCol\" : \"c\"\n  },\n  \"cBoolCol\" : false,\n  \"stringCol\" : \"foo\"\n}";
+    NSString *objTestString = @"{\n  \"boolCol\" : false,\n  \"doubleCol\" : 0.8,\n  \"stringCol\" : \"foo\",\n  \"intCol\" : 54,\n  \"binaryCol\" : \"AAE=\",\n  \"dateCol\" : \"Wednesday, December 31, 1969\",\n  \"longCol\" : 99,\n  \"objectCol\" : {\n    \"stringCol\" : \"c\"\n  },\n  \"cBoolCol\" : false,\n  \"floatCol\" : 0.7\n}";
     XCTAssertEqualObjects(objTestString, objString);
 }
 
@@ -671,6 +670,7 @@
     circleObj.data = @"Parent data";
     circleObj.next = circleObj;
     [realm addObject:circleObj];
+    [realm commitWriteTransaction];
 
     NSDictionary *objTestDictionary = @{@"data": @"Parent data"};
     NSDictionary *objDictionary = [circleObj JSONDictionary];
@@ -679,32 +679,6 @@
     NSString *objString = [circleObj JSONString];
     NSString *objTestString = @"{\n  \"data\" : \"Parent data\"\n}";
     XCTAssertEqualObjects(objTestString, objString);
-}
-
-- (void)testArraySerialization
-{
-  RLMRealm *realm = [RLMRealm defaultRealm];
-
-  // create with array literals
-  [realm beginWriteTransaction];
-
-  NSDictionary *dict1 = @{@"name":@"company", @"employees":@[@{@"name":@"Alex", @"age":@29, @"hired":@YES}]};
-  [CompanyObject createInDefaultRealmWithObject:dict1];
-
-  NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
-  [CompanyObject createInDefaultRealmWithObject:dict];
-
-  [realm commitWriteTransaction];
-
-  RLMArray *nestedArray = [CompanyObject allObjects];
-  NSArray *objArray = [nestedArray JSONArray];
-  NSArray *testArray = @[dict1, dict];
-  XCTAssertEqualObjects(objArray, testArray);
-
-  NSString *objString = [nestedArray JSONString];
-  NSString *testString =	@"[\n  {\n    \"name\" : \"company\",\n    \"employees\" : [\n      {\n        \"name\" : \"Alex\",\n        \"age\" : 29,\n        \"hired\" : true\n      }\n    ]\n  },\n  {\n    \"name\" : \"dictionaryCompany\",\n    \"employees\" : [\n      {\n        \"name\" : \"Bjarne\",\n        \"age\" : 32,\n        \"hired\" : false\n      }\n    ]\n  }\n]";
-  XCTAssertEqualObjects(objString, testString);
-
 }
 
 @end

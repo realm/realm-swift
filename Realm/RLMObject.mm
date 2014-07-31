@@ -217,7 +217,7 @@
 }
 
 - (NSDictionary *)JSONDictionary {
-  return [self JSONDictionaryWithRootClassname:NSStringFromClass([self class])];
+  return [self JSONDictionaryWithRootClassname:[[self class] className]];
 }
 
 - (NSDictionary *)JSONDictionaryWithRootClassname:(NSString *)rootClassname {
