@@ -16,17 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMArray.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMPlatform.h>
-
-// WARNING: For private use only (imported for Swift support)
-// TODO: Move header from Public to Project once rdar://17633863 is fixed
-#ifdef REALM_SWIFT
-#import <Realm/Realm-Bridging-Header.h>
+#if TARGET_OS_MAC && !TARGET_IPHONE_SIMULATOR
+#error Attempting to use Realm's iOS framework in an OSX project.
 #endif
