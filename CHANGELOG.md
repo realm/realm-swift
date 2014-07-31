@@ -24,6 +24,7 @@
 * Fixed a bug where initializing a standalone object with an array literal would 
   trigger an exception.
 * Clarified exception messages when using unsupported NSPredicate operators.
+* Clarified exception messages when using unsupported property types on RLMObject subclasses.
 
 
 0.81.0 Release notes (2014-07-22)
