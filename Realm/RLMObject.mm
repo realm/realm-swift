@@ -22,12 +22,40 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
+#import "RLMArray.h"
+#import "RLMAccessor.h"
 
 #ifdef REALM_SWIFT
 #import <Realm/Realm-Swift.h>
 #endif
 
 #import <objc/runtime.h>
+
+// Private Category to perform "primitiveSelectors"
+@interface NSObject (PrimitiveSelection)
+- (void *)performPrimitiveSelector:(SEL)selector;
+@end
+
+@implementation NSObject (PrimitiveSelection)
+- (void *)performPrimitiveSelector:(SEL)selector {
+  NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:selector]];
+  [invocation setSelector:selector];
+  [invocation setTarget:self];
+
+  [invocation invoke];
+
+  NSUInteger length = [[invocation methodSignature] methodReturnLength];
+
+  // If method is non-void:
+  if (length > 0) {
+    void *buffer = (void *)malloc(length);
+    [invocation getReturnValue:buffer];
+    return buffer;
+  }
+  // If method is void:
+  return NULL;
+}
+@end
 
 @implementation RLMObject
 
@@ -188,10 +216,90 @@
     return RLMGetObjects(realm, self.className, predicate, nil);
 }
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+- (NSDictionary *)JSONDictionary {
+  return [self JSONDictionaryWithRootClassname:self.objectSchema.className];
 }
+
+- (NSDictionary *)JSONDictionaryWithRootClassname:(NSString *)rootClassname {
+
+  if (![self isKindOfClass:[RLMObject class]]) {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
+  }
+
+  NSMutableDictionary *objDictionary = [NSMutableDictionary dictionary];
+  NSArray *properties = self.objectSchema.properties;
+  for (RLMProperty *property in properties) {
+    NSString *propertyName = property.name;
+    SEL propertySelector = NSSelectorFromString(propertyName);
+    if ([self respondsToSelector:propertySelector]) {
+
+      id propertyValue = RLMDynamicGet(self, propertyName);
+
+      switch (property.type) {
+        case RLMPropertyTypeArray:
+        {
+          [objDictionary setValue:[propertyValue JSONArray] forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeObject:
+        {
+          // ignore circular relationships
+          NSString *currentClassname = self.objectSchema.className;
+          if (![rootClassname isEqualToString:currentClassname]) {
+            NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue JSONDictionaryWithRootClassname:rootClassname];
+            [objDictionary setValue:dictionaryProperty forKey:propertyName];
+          }
+          break;
+        }
+        case RLMPropertyTypeData:
+        {
+          NSString *dataString = [(NSData *)propertyValue base64EncodedStringWithOptions:0];
+          [objDictionary setValue:dataString forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeDate:
+        {
+          //TODO: Let user override formatter
+          NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+          formatter.dateStyle = NSDateFormatterFullStyle; // default formatter
+          NSString *dateString = [formatter stringFromDate:(NSDate *)propertyValue];
+          [objDictionary setValue:dateString forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeString:
+        {
+          [objDictionary setValue:propertyValue forKey:propertyName];
+          break;
+        }
+        case RLMPropertyTypeAny:
+        {
+          //FIXME: Should id properties be ignored?
+          break;
+        }
+        default:
+          // for all primitive properties, RLMDynamicGet already returns a NSNumber wrapping the value
+          [objDictionary setValue:propertyValue forKey:propertyName];
+          break;
+      }
+
+    }
+  }
+  return [NSDictionary dictionaryWithDictionary:objDictionary];
+}
+
+- (NSString *)JSONString {
+  NSError *error = nil;
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self JSONDictionary]
+                                                     options:NSJSONWritingPrettyPrinted
+                                                       error:&error];
+
+  if (error) {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMObject specified" userInfo:nil];
+  } else {
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+  }
+}
+
 
 // overridden at runtime per-class for performance
 + (NSString *)className {

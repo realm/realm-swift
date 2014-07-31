@@ -287,6 +287,19 @@
  */
 - (NSString *)JSONString;
 
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Serializing Objects to Cocoa-Touch Dictionary
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns this object represented as a Cocoa-Touch Dictionary.
+
+ @return    Cocoa-Touch Dictionary representation of this object.
+ */
+- (NSDictionary *)JSONDictionary;
+
 @end
 
 /**---------------------------------------------------------------------------------------
