@@ -204,12 +204,14 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
     RLMArrayTableViewValidateAttached(self);
+
+    tightdb::Query query = _backingView.get_parent().where();
+    query.tableview(_backingView);
     
     // apply order
-    RLMArrayTableView *ar = [RLMArrayTableView
-                             arrayWithObjectClassName:self.objectClassName
-                             view:_backingView.get_parent().where(&_backingView).find_all()
-                             realm:_realm];
+    RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
+                                                                   view:query.find_all()
+                                                                  realm:_realm];
     RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
     return ar;
 }
