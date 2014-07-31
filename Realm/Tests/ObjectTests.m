@@ -614,4 +614,97 @@
     XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
 }
 
+#pragma mark - Serialization Tests
+
+- (void)testAllKindSerialization
+{
+    const char bin[4] = { 0, 1, 2, 3 };
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    AllTypesObject *c = [[AllTypesObject alloc] init];
+
+    c.boolCol   = NO;
+    c.intCol  = 54;
+    c.floatCol = 0.7f;
+    c.doubleCol = 0.8;
+    c.stringCol = @"foo";
+    c.binaryCol = bin1;
+    c.dateCol = timeZero;
+    c.cBoolCol = false;
+    c.longCol = (long)99;
+    c.mixedCol = @"string";
+    StringObject *strObj = [[StringObject alloc] init];
+    strObj.stringCol = @"c";
+    c.objectCol = strObj;
+    [realm addObject:c];
+    [realm commitWriteTransaction];
+
+    NSDictionary *objTestDictionary = @{
+                                    @"boolCol":@NO,
+                                    @"intCol":@54,
+                                    @"floatCol":@0.7f,
+                                    @"doubleCol":@0.8,
+                                    @"stringCol":@"foo",
+                                    @"binaryCol":@"AAE=", //default encoding (base64)
+                                    @"dateCol":@"Wednesday, December 31, 1969", //default Formatter
+                                    @"cBoolCol":@NO,
+                                    @"longCol":@((long)99),
+                                    @"objectCol":@{@"stringCol": @"c"}
+                                    };
+
+    NSDictionary *objDictionary = [c JSONDictionary];
+    XCTAssertEqualObjects(objTestDictionary, objDictionary);
+
+    NSString *objString = [c JSONString];
+    NSString *objTestString = @"{\n  \"intCol\" : 54,\n  \"longCol\" : 99,\n  \"binaryCol\" : \"AAE=\",\n  \"dateCol\" : \"Wednesday, December 31, 1969\",\n  \"doubleCol\" : 0.8,\n  \"floatCol\" : 0.7,\n  \"boolCol\" : false,\n  \"objectCol\" : {\n    \"stringCol\" : \"c\"\n  },\n  \"cBoolCol\" : false,\n  \"stringCol\" : \"foo\"\n}";
+    XCTAssertEqualObjects(objTestString, objString);
+}
+
+- (void)testCircularSerialization
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    CircleObject *circleObj = [[CircleObject alloc] init];
+    circleObj.data = @"Parent data";
+    circleObj.next = circleObj;
+    [realm addObject:circleObj];
+
+    NSDictionary *objTestDictionary = @{@"data": @"Parent data"};
+    NSDictionary *objDictionary = [circleObj JSONDictionary];
+    XCTAssertEqualObjects(objTestDictionary, objDictionary);
+
+    NSString *objString = [circleObj JSONString];
+    NSString *objTestString = @"{\n  \"data\" : \"Parent data\"\n}";
+    XCTAssertEqualObjects(objTestString, objString);
+}
+
+- (void)testArraySerialization
+{
+  RLMRealm *realm = [RLMRealm defaultRealm];
+
+  // create with array literals
+  [realm beginWriteTransaction];
+
+  NSDictionary *dict1 = @{@"name":@"company", @"employees":@[@{@"name":@"Alex", @"age":@29, @"hired":@YES}]};
+  [CompanyObject createInDefaultRealmWithObject:dict1];
+
+  NSDictionary *dict = @{@"name": @"dictionaryCompany", @"employees": @[@{@"name": @"Bjarne", @"age": @32, @"hired": @NO}]};
+  [CompanyObject createInDefaultRealmWithObject:dict];
+
+  [realm commitWriteTransaction];
+
+  RLMArray *nestedArray = [CompanyObject allObjects];
+  NSArray *objArray = [nestedArray JSONArray];
+  NSArray *testArray = @[dict1, dict];
+  XCTAssertEqualObjects(objArray, testArray);
+
+  NSString *objString = [nestedArray JSONString];
+  NSString *testString =	@"[\n  {\n    \"name\" : \"company\",\n    \"employees\" : [\n      {\n        \"name\" : \"Alex\",\n        \"age\" : 29,\n        \"hired\" : true\n      }\n    ]\n  },\n  {\n    \"name\" : \"dictionaryCompany\",\n    \"employees\" : [\n      {\n        \"name\" : \"Bjarne\",\n        \"age\" : 32,\n        \"hired\" : false\n      }\n    ]\n  }\n]";
+  XCTAssertEqualObjects(objString, testString);
+
+}
+
 @end
