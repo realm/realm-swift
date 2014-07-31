@@ -26,6 +26,7 @@
   trigger an exception.
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
+* Fixed a memory leak when breaking out of a for-in loop on RLMArray.
 
 
 0.81.0 Release notes (2014-07-22)
