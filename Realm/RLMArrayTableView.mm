@@ -337,9 +337,17 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     }
 }
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+- (NSString *)JSONString { //FIXME: duplicate from RLMArray method's definition
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self JSONArray]
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+
+    if (error) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMArray specified" userInfo:nil];
+    } else {
+        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }
 }
 
 - (void)deleteObjectsFromRealm {
