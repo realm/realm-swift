@@ -217,7 +217,7 @@
 }
 
 - (NSDictionary *)JSONDictionary {
-  return [self JSONDictionaryWithRootClassname:self.objectSchema.className];
+  return [self JSONDictionaryWithRootClassname:NSStringFromClass([self class])];
 }
 
 - (NSDictionary *)JSONDictionaryWithRootClassname:(NSString *)rootClassname {
@@ -244,7 +244,7 @@
         case RLMPropertyTypeObject:
         {
           // ignore circular relationships
-          NSString *currentClassname = self.objectSchema.className;
+          NSString *currentClassname = property.objectClassName;
           if (![rootClassname isEqualToString:currentClassname]) {
             NSDictionary *dictionaryProperty = [(RLMObject *)propertyValue JSONDictionaryWithRootClassname:rootClassname];
             [objDictionary setValue:dictionaryProperty forKey:propertyName];
