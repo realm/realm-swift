@@ -11,6 +11,8 @@
 * Using NSNumber properties (unsupported) now throws a more informative exception.
 * Added `[RLMRealm defaultRealmPath]`
 * Proper implementation for [RLMArray indexOfObjectWhere:]
+* The default Realm path on OS X is now ~/Library/Application Support/[bundle
+  identifier]/default.realm rather than ~/Documents
 
 ### Bugfixes
 
