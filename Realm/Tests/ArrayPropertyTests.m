@@ -198,4 +198,50 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 }
 
+- (void)testFastEnumeration
+{
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+
+    // enumerate empty array
+    for (__unused id obj in company.employees) {
+        XCTFail(@"Should be empty");
+    }
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 30; ++i) {
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+        [company.employees addObject:eo];
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(company.employees.count, (NSUInteger)30);
+
+    __weak id objects[30];
+    NSInteger count = 0;
+    for (EmployeeObject *e in company.employees) {
+        XCTAssertNotNil(e, @"Object is not nil and accessible");
+        objects[count++] = e;
+    }
+
+    XCTAssertEqual(count, 30, @"should have enumerated 30 objects");
+
+    for (int i = 0; i < count; i++) {
+        XCTAssertNil(objects[i], @"Object should have been released");
+    }
+
+    @autoreleasepool {
+        for (EmployeeObject *e in company.employees) {
+            objects[0] = e;
+            break;
+        }
+    }
+    XCTAssertNil(objects[0], @"Object should have been released");
+}
+
 @end
