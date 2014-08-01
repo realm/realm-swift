@@ -226,6 +226,12 @@
     NSInteger count = 0;
     for (EmployeeObject *e in company.employees) {
         XCTAssertNotNil(e, @"Object is not nil and accessible");
+        if (count > 16) {
+            // 16 is the size of blocks fast enumeration happens to ask for at
+            // the moment, but of course that's just an implementation detail
+            // that may change
+            XCTAssertNil(objects[count - 16]);
+        }
         objects[count++] = e;
     }
 
