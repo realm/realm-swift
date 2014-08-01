@@ -84,6 +84,25 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
+- (void)testInQuery
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"a"]];
+    [realm commitWriteTransaction];
+    
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol IN %@", @[@"a"]];
+    XCTAssertThrowsSpecificNamed([StringObject objectsWithPredicate:pred], NSException,
+                                 @"Invalid operator type",
+                                 @"%@ operator invalid in string comparison.",
+                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
+    
+    NSPredicate *keyPred = [NSPredicate predicateWithFormat:@"employees.name IN %@", @[@"a"]];
+    XCTAssertThrowsSpecificNamed([CompanyObject objectsWithPredicate:keyPred], NSException,
+                                 @"Invalid operator type",
+                                 @"%@ operator invalid in string comparison.",
+                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
+}
 
 -(void)testQueryBetween
 {
