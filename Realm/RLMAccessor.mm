@@ -407,9 +407,10 @@ IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
     // only override getters for RLMArray properties
     if (accessorCode == 't') {
         NSString *propName = prop.name;
-        return imp_implementationWithBlock(^(RLMObject *obj, RLMArray *ar) {
+        NSString *objectClassName = prop.objectClassName;
+        return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
-            RLMArray *standaloneAr = [RLMArray standaloneArrayWithObjectClassName:ar.objectClassName];
+            RLMArray *standaloneAr = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
             [standaloneAr addObjectsFromArray:ar];
             RLMSuperSet(obj, propName, standaloneAr);
         });

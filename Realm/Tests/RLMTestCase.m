@@ -51,9 +51,13 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 }
 
 NSString *RLMDefaultRealmPath() {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    return [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
+#if TARGET_OS_IPHONE
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+#else
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
+    path = [path stringByAppendingPathComponent:[[[NSBundle mainBundle] executablePath] lastPathComponent]];
+#endif
+    return [path stringByAppendingPathComponent:@"default.realm"];
 }
 
 NSString *RLMTestRealmPath() {
