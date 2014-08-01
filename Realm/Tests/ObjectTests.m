@@ -636,4 +636,38 @@
                                  @"NSUnknownKeyException");
 }
 
+- (void)testEquality
+{
+    IntObject *obj = [[IntObject alloc] init];
+    IntObject *otherObj = [[IntObject alloc] init];
+    BoolObject *boolObj = [[BoolObject alloc] init];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *otherRealm = [self realmWithTestPath];
+
+    XCTAssertTrue([obj isEqual:obj], @"Same instance.");
+    XCTAssertFalse([obj isEqual:otherObj], @"Comparison outside of realm.");
+
+    [realm beginWriteTransaction];
+    [realm addObject: obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertFalse([obj isEqual:otherObj], @"One in realm, the other is not.");
+    XCTAssertTrue([obj isEqual:[IntObject allObjects][0]], @"Same table and index.");
+
+    [otherRealm beginWriteTransaction];
+    [otherRealm addObject: otherObj];
+    [otherRealm commitWriteTransaction];
+
+    XCTAssertFalse([obj isEqual:otherObj], @"Different realms.");
+
+    [realm beginWriteTransaction];
+    [realm addObject: otherObj];
+    [realm addObject: boolObj];
+    [realm commitWriteTransaction];
+
+    XCTAssertFalse([obj isEqual:[IntObject allObjects][1]], @"Same table, different index.");
+    XCTAssertFalse([obj isEqual:[BoolObject allObjects][0]], @"Different tables.");
+}
+
 @end
