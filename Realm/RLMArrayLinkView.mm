@@ -83,16 +83,38 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMLinkViewArrayValidateAttached(self);
 
-    NSUInteger batchCount = 0, index = state->state, count = self.count;
-    
-    __autoreleasing id *autoreleasingBuffer = (__autoreleasing id *)(void *)buffer;
-    while (index < count && batchCount < len) {
-        autoreleasingBuffer[batchCount++] = RLMCreateAccessorForArrayIndex(self, index++);
+    __autoreleasing RLMCArrayHolder *items;
+    if (state->state == 0) {
+        items = [[RLMCArrayHolder alloc] initWithSize:len];
+        state->extra[0] = (long)items;
+        state->extra[1] = self.count;
     }
-    
-    state->mutationsPtr = state->extra;
+    else {
+        items = (__bridge id)(void *)state->extra[0];
+        [items resize:len];
+    }
+
+    NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
+
+    // ARC (sometimes) autoreleases objects return from RLMCreateAccessorForArrayIndex,
+    // resulting in them staying alive excessively long in some cases without this
+    @autoreleasepool {
+        while (index < count && batchCount < len) {
+            RLMObject *accessor = RLMCreateAccessorForArrayIndex(self, index++);
+            items->array[batchCount] = accessor;
+            buffer[batchCount] = accessor;
+            batchCount++;
+        }
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        items->array[i] = nil;
+    }
+
     state->itemsPtr = buffer;
     state->state = index;
+    state->mutationsPtr = state->extra+1;
+
     return batchCount;
 }
 

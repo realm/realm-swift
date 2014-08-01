@@ -66,6 +66,12 @@
     NSInteger count = 0;
     for (AggregateObject *ao in result) {
         XCTAssertNotNil(ao, @"Object is not nil and accessible");
+        if (count > 16) {
+            // 16 is the size of blocks fast enumeration happens to ask for at
+            // the moment, but of course that's just an implementation detail
+            // that may change
+            XCTAssertNil(objects[count - 16]);
+        }
         objects[count++] = ao;
     }
     
@@ -74,6 +80,14 @@
     for (int i = 0; i < count; i++) {
         XCTAssertNil(objects[i], @"Object should have been released");
     }
+
+    @autoreleasepool {
+        for (AggregateObject *ao in result) {
+            objects[0] = ao;
+            break;
+        }
+    }
+    XCTAssertNil(objects[0], @"Object should have been released");
 }
 
 - (void)testReadOnly

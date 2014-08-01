@@ -257,3 +257,28 @@ void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 }
 
 @end
+
+//
+// RLMCArrayHolder implementation
+//
+@implementation RLMCArrayHolder
+- (instancetype)initWithSize:(NSUInteger)arraySize {
+    if ((self = [super init])) {
+        size = arraySize;
+        array = new id[size];
+    }
+    return self;
+}
+
+- (void)resize:(NSUInteger)newSize {
+    if (newSize != size) {
+        delete [] array;
+        size = newSize;
+        array = new id[size];
+    }
+}
+
+- (void)dealloc {
+    delete [] array;
+}
+@end
