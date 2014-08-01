@@ -13,6 +13,7 @@
 * Proper implementation for [RLMArray indexOfObjectWhere:]
 * The default Realm path on OS X is now ~/Library/Application Support/[bundle
   identifier]/default.realm rather than ~/Documents
+* We now check that the correct framework (ios or osx) is used at compile time.
 
 ### Bugfixes
 

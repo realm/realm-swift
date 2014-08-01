@@ -17,6 +17,8 @@
 		0207AB88195DFA15007EFB12 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB85195DFA15007EFB12 /* MigrationTests.mm */; };
 		0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB86195DFA15007EFB12 /* SchemaTests.mm */; };
 		0207AB8A195DFA15007EFB12 /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB86195DFA15007EFB12 /* SchemaTests.mm */; };
+		024E6094198B2D51002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6093198B2D51002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		26F3CA6A1986CC9B004623E1 /* SwiftPropertyTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */; };
 		26F3CA6B1986CC9C004623E1 /* SwiftPropertyTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */; };
 		E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; };
@@ -247,6 +249,8 @@
 		0207AB7E195DF9FB007EFB12 /* RLMMigration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMMigration.mm; sourceTree = "<group>"; };
 		0207AB85195DFA15007EFB12 /* MigrationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MigrationTests.mm; sourceTree = "<group>"; };
 		0207AB86195DFA15007EFB12 /* SchemaTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SchemaTests.mm; sourceTree = "<group>"; };
+		024E6093198B2D51002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
+		024E6096198B2D59002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
@@ -364,6 +368,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		024E6092198B2D51002FA042 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				024E6093198B2D51002FA042 /* RLMPlatform.h */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		024E6095198B2D59002FA042 /* osx */ = {
+			isa = PBXGroup;
+			children = (
+				024E6096198B2D59002FA042 /* RLMPlatform.h */,
+			);
+			path = osx;
+			sourceTree = "<group>";
+		};
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
 			isa = PBXGroup;
 			children = (
@@ -488,6 +508,8 @@
 				E88C36FE19745E3200C9963D /* Swift */,
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
 				E81A1F821955FC9300FDED82 /* RLMUtil.mm */,
+				024E6095198B2D59002FA042 /* osx */,
+				024E6092198B2D51002FA042 /* ios */,
 				E8D89B9B1955FC6D00CF2B9A /* Supporting Files */,
 			);
 			path = Realm;
@@ -549,6 +571,7 @@
 				E856D1F51956154C00FB2FCF /* RLMArray.h in Headers */,
 				0207AB82195DF9FB007EFB12 /* RLMMigration.h in Headers */,
 				E856D2051956154C00FB2FCF /* RLMProperty.h in Headers */,
+				024E6094198B2D51002FA042 /* RLMPlatform.h in Headers */,
 				E856D2021956154C00FB2FCF /* RLMObjectStore.h in Headers */,
 				E856D2071956154C00FB2FCF /* RLMQueryUtil.hpp in Headers */,
 				E8F8D909196CB89100475368 /* Realm-Bridging-Header.h in Headers */,
@@ -588,6 +611,7 @@
 				E81A1FA11955FC9300FDED82 /* RLMProperty.h in Headers */,
 				0207AB81195DF9FB007EFB12 /* RLMMigration.h in Headers */,
 				E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */,
+				024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */,
 				E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */,
 				E81A1F9D1955FC9300FDED82 /* RLMObjectStore.h in Headers */,
 				E8F8D908196CB89100475368 /* Realm-Bridging-Header.h in Headers */,
