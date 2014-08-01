@@ -174,7 +174,7 @@
                                                      userInfo:nil];
                     }
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"Property of type '%@' must descend from RLMObject", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
