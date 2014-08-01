@@ -62,6 +62,3 @@ xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" 
 # Step 2 - move files and make fat
 mkdir -p "${BUILD_DIR}/${CONFIGURATION}"
 xcrun lipo -create "${SF_LIB_PATH}" "${SF_OTHER_LIB_PATH}" -output "${SF_FAT_PATH}"
-
-# Step 3 - combine with core library
-xcrun libtool -static -o "${SF_COMBINED_PATH}" "${SF_FAT_PATH}" "${SF_CORE_PATH}"
