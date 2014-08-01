@@ -83,17 +83,16 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMLinkViewArrayValidateAttached(self);
 
-    __autoreleasing NSMutableArray *items;
+    __autoreleasing RLMCArrayHolder *items;
     if (state->state == 0) {
-        items = [NSMutableArray arrayWithCapacity:len];
+        items = [[RLMCArrayHolder alloc] initWithSize:len];
         state->extra[0] = (long)items;
         state->extra[1] = self.count;
     }
     else {
         items = (__bridge id)(void *)state->extra[0];
+        [items resize:len];
     }
-
-    [items removeAllObjects];
 
     NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
@@ -102,10 +101,14 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     @autoreleasepool {
         while (index < count && batchCount < len) {
             RLMObject *accessor = RLMCreateAccessorForArrayIndex(self, index++);
-            [items addObject:accessor];
+            items->array[batchCount] = accessor;
             buffer[batchCount] = accessor;
             batchCount++;
         }
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        items->array[i] = nil;
     }
 
     state->itemsPtr = buffer;

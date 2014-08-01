@@ -74,17 +74,16 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMArrayTableViewValidateAttached(self);
 
-    __autoreleasing NSMutableArray *items;
+    __autoreleasing RLMCArrayHolder *items;
     if (state->state == 0) {
-        items = [NSMutableArray arrayWithCapacity:len];
+        items = [[RLMCArrayHolder alloc] initWithSize:len];
         state->extra[0] = (long)items;
         state->extra[1] = self.count;
     }
     else {
         items = (__bridge id)(void *)state->extra[0];
+        [items resize:len];
     }
-
-    [items removeAllObjects];
 
     NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
@@ -94,9 +93,13 @@ inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
         // get acessor fot the object class
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:objectSchema defaultValues:NO];
         accessor->_row = (*objectSchema->_table)[_backingView.get_source_ndx(index++)];
-        [items addObject:accessor];
+        items->array[batchCount] = accessor;
         buffer[batchCount] = accessor;
         batchCount++;
+    }
+
+    for (NSUInteger i = batchCount; i < len; ++i) {
+        items->array[i] = nil;
     }
 
     state->itemsPtr = buffer;

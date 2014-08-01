@@ -88,5 +88,21 @@
 
 @end
 
+//
+// A simple holder for a C array of ids to enable autoreleasing the array without
+// the runtime overhead of a NSMutableArray
+//
+@interface RLMCArrayHolder : NSObject {
+@public
+    __strong id *array;
+    NSUInteger size;
+}
+
+- (instancetype)initWithSize:(NSUInteger)size;
+
+// Reallocate the array if it is not already the given size
+- (void)resize:(NSUInteger)size;
+@end
+
 
 
