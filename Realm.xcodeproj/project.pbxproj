@@ -40,6 +40,8 @@
 		022C8BEE1942550000BCDB9D /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */; };
 		0282CDC8196B0DC200A34A04 /* RLMRealm_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = 0282CDC7196B0DC200A34A04 /* RLMRealm_Dynamic.h */; };
 		0282CDC9196B0DC200A34A04 /* RLMRealm_Dynamic.h in Headers */ = {isa = PBXBuildFile; fileRef = 0282CDC7196B0DC200A34A04 /* RLMRealm_Dynamic.h */; };
+		02889106198AE108007D8FB2 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 02889105198AE108007D8FB2 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		02889109198AE111007D8FB2 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 02889108198AE111007D8FB2 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		02C4147B191DE49600F858D9 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.m */; };
 		02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
@@ -176,6 +178,8 @@
 		02026D0E193E8BC900E4EEF8 /* RLMArrayLinkView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMArrayLinkView.mm; sourceTree = "<group>"; };
 		02026D15193E8F6400E4EEF8 /* RLMArray.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMArray.mm; sourceTree = "<group>"; };
 		0282CDC7196B0DC200A34A04 /* RLMRealm_Dynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Dynamic.h; sourceTree = "<group>"; };
+		02889105198AE108007D8FB2 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
+		02889108198AE111007D8FB2 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		02C4145E191DE49600F858D9 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C41462191DE49600F858D9 /* Realm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		02C4146E191DE49600F858D9 /* OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -278,6 +282,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		02889104198AE108007D8FB2 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				02889105198AE108007D8FB2 /* RLMPlatform.h */,
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		02889107198AE111007D8FB2 /* osx */ = {
+			isa = PBXGroup;
+			children = (
+				02889108198AE111007D8FB2 /* RLMPlatform.h */,
+			);
+			path = osx;
+			sourceTree = "<group>";
+		};
 		02C41460191DE49600F858D9 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,6 +336,8 @@
 				02E4D6A7192E3DC40082808D /* RLMSchema.mm */,
 				02E4D6A8192E3DC40082808D /* RLMUtil.hpp */,
 				02E4D6A9192E3DC40082808D /* RLMUtil.mm */,
+				02889107198AE111007D8FB2 /* osx */,
+				02889104198AE108007D8FB2 /* ios */,
 				02C41461191DE49600F858D9 /* Supporting Files */,
 			);
 			path = Realm;
@@ -433,6 +455,7 @@
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6BA192E3DC40082808D /* RLMConstants.h in Headers */,
 				02F4EAF6195DF0A6008743D9 /* RLMMigration.h in Headers */,
+				02889109198AE111007D8FB2 /* RLMPlatform.h in Headers */,
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
 				02F4EAF7195DF0B0008743D9 /* RLMMigration_Private.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
@@ -462,6 +485,7 @@
 				02E4D6D1192E3DC40082808D /* RLMProperty.h in Headers */,
 				02026CA419354DDF00E4EEF8 /* RLMMigration.h in Headers */,
 				02E4D6BB192E3DC40082808D /* RLMConstants.h in Headers */,
+				02889106198AE108007D8FB2 /* RLMPlatform.h in Headers */,
 				02E4D6CF192E3DC40082808D /* RLMProperty_Private.h in Headers */,
 				02E4D6DF192E3DC40082808D /* RLMSchema_Private.h in Headers */,
 				02E4D6BF192E3DC40082808D /* RLMObject_Private.h in Headers */,
