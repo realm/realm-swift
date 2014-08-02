@@ -213,6 +213,65 @@
 }
 #endif
 
+
+- (void)testAutoUpdate {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    // turn autorefresh off
+    realm.autorefresh = NO;
+    
+    // we have two notifications, one for opening the realm, and a second when performing our transaction
+    __block NSUInteger noteCount = 0;
+    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+        XCTAssertNotNil(realm, @"Realm should not be nil");
+        if (++noteCount == 2) {
+            [notificationFired fulfill];
+        }
+    }];
+    
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [realm commitWriteTransaction];
+    });
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    // should have only one object
+    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    XCTAssertEqual(objects.count, 0U, @"There should be 0 objects of type StringObject");
+    
+    // call refresh
+    [realm refresh];
+    objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    XCTAssertEqual(objects.count, 1U, @"There should be 1 objects of type StringObject");
+    
+    // reset count and create new expectation
+    noteCount = 0;
+    notificationFired = [self expectationWithDescription:@"notification fired"];
+    
+    // turn on autorefresh
+    realm.autorefresh = YES;
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"another string"]];
+        [realm commitWriteTransaction];
+    });
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    // refresh should have been called automatically
+    objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    XCTAssertEqual(objects.count, 2U, @"There should be 2 objects of type StringObject");
+    
+    [realm removeNotification:token];
+}
+
+
 /* FIXME: disabled until we have per file compile options
  - (void)testRealmWriteImplicitCommit
  {

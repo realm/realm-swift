@@ -32,4 +32,6 @@
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
+- (void)notifyIfChanged;
+
 @end

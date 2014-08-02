@@ -88,7 +88,12 @@ inline NSError* make_realm_error(RLMError code, exception &ex) {
     return wt;
 }
 - (void)checkForUpdate {
-    [_realm refresh];
+    if (_realm.autorefresh) {
+        [_realm refresh];
+    }
+    else {
+        [_realm notifyIfChanged];
+    }
 }
 @end
 
@@ -349,14 +354,18 @@ static NSArray *s_objectDescriptors = nil;
     if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
     }
+
+    // set autoreresh - starts timer on osx
+    realm.autorefresh = YES;
     
-    // start update timer
+#if !TARGET_IPHONE
+    // start update timer on osx
     realm->_updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                            target:[RLMWeakTarget createWithRealm:realm]
                                                          selector:@selector(checkForUpdate)
                                                          userInfo:nil
                                                           repeats:YES];
-    
+#endif
     return realm;
 }
 
@@ -424,7 +433,12 @@ static NSArray *s_objectDescriptors = nil;
             NSArray *realms = realmsAtPath(_path);
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
-                    [realm performSelector:@selector(refresh) onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                    if (realm.autorefresh) {
+                       [realm performSelector:@selector(refresh) onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                    }
+                    else {
+                        [realm performSelector:@selector(notifyIfChanged) onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                    }
                 }
             }
             
@@ -481,6 +495,19 @@ static NSArray *s_objectDescriptors = nil;
     }
     if (_writeLogs) {
         delete _writeLogs;
+    }
+}
+
+- (void)notifyIfChanged {
+    try {
+        // if changed notify
+        if (_sharedGroup->has_changed()) { // Throws
+            // send notification that someone else changed the realm
+            [self sendNotifications];
+        }
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
     }
 }
 
