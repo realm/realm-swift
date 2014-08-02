@@ -84,7 +84,7 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
 @implementation RLMTestCase
 #if !defined(SWIFT)
 {
-    XCTestExpectation *_expectation;
+    NSMutableArray *_expectations;
 }
 #endif
 
@@ -135,19 +135,25 @@ void RLMDeleteRealmFilesAtPath(NSString *path) {
 - (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(__unused id)noop {
     NSDate *endDate = [NSDate dateWithTimeIntervalSinceNow:interval];
     NSLog(@"start");
-    while (!_expectation->_fulfilled && [endDate timeIntervalSinceNow] > 0) {
+    while (!_expectations.count && [endDate timeIntervalSinceNow] > 0) {
+        for (NSInteger i = (NSInteger)_expectations.count-1; i > 0; i--) {
+            if (((XCTestExpectation *)_expectations[i])->_fulfilled) {
+                [_expectations removeObjectAtIndex:i];
+            }
+        }
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:endDate];
     }
     NSLog(@"end");
 
-    if (!_expectation->_fulfilled) {
+    if (_expectations.count) {
         XCTFail(@"Wait for expectation timed out after %f seconds", interval);
     }
 }
 
 - (XCTestExpectation *)expectationWithDescription:(__unused NSString *)desc {
-    _expectation = [[XCTestExpectation alloc] init];
-    return _expectation;
+    XCTestExpectation *exp = [[XCTestExpectation alloc] init];
+    [_expectations addObject:exp];
+    return exp;
 }
 #endif
 
