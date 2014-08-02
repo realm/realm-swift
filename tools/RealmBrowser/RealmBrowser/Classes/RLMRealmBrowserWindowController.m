@@ -24,6 +24,10 @@
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 @end
 
+@interface RLMArray (Private)
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
+
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 @implementation RLMRealmBrowserWindowController {
@@ -177,7 +181,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         result = [realm objects:typeNode.name where:predicate];
     }
     else {
-        result = [[RLMArray alloc] init];
+        result = [[RLMArray alloc] initWithObjectClassName:typeNode.name];
     }
 
     RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
