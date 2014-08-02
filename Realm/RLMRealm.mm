@@ -432,7 +432,7 @@ static NSArray *s_objectDescriptors = nil;
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
                     if (realm.autorefresh) {
-                       [realm performSelector:@selector(refresh) onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                        [realm performSelector:@selector(refresh) onThread:realm->_thread withObject:nil waitUntilDone:NO];
                     }
                     else {
                         [realm performSelector:@selector(notifyIfChanged) onThread:realm->_thread withObject:nil waitUntilDone:NO];
