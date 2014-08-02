@@ -222,7 +222,7 @@
     
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
-    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
+    __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
