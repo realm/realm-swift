@@ -655,11 +655,9 @@
                                     };
 
     NSDictionary *objDictionary = [c JSONDictionary];
-    XCTAssertEqualObjects(objTestDictionary, objDictionary);
-
-    NSString *objString = [c JSONString];
-    NSString *objTestString = @"{\n  \"boolCol\" : false,\n  \"doubleCol\" : 0.8,\n  \"stringCol\" : \"foo\",\n  \"intCol\" : 54,\n  \"binaryCol\" : \"AAE=\",\n  \"dateCol\" : \"Wednesday, December 31, 1969\",\n  \"longCol\" : 99,\n  \"objectCol\" : {\n    \"stringCol\" : \"c\"\n  },\n  \"cBoolCol\" : false,\n  \"floatCol\" : 0.7\n}";
-    XCTAssertEqualObjects(objTestString, objString);
+    for (NSString *key in objDictionary) {
+        XCTAssertEqualObjects(objTestDictionary[key], objDictionary[key]);
+    }
 }
 
 - (void)testCircularSerialization

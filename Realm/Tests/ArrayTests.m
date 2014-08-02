@@ -356,8 +356,6 @@
 - (void)testArraySerialization
 {
   RLMRealm *realm = [RLMRealm defaultRealm];
-
-  // create with array literals
   [realm beginWriteTransaction];
 
   NSDictionary *dict1 = @{@"name":@"company", @"employees":@[@{@"name":@"Alex", @"age":@29, @"hired":@YES}]};
@@ -369,13 +367,11 @@
   [realm commitWriteTransaction];
 
   RLMArray *nestedArray = [CompanyObject allObjects];
+
   NSArray *objArray = [nestedArray JSONArray];
   NSArray *testArray = @[dict1, dict];
-  XCTAssertEqualObjects(objArray, testArray);
-
-  NSString *objString = [nestedArray JSONString];
-  NSString *testString =	@"[\n  {\n    \"name\" : \"company\",\n    \"employees\" : [\n      {\n        \"age\" : 29,\n        \"name\" : \"Alex\",\n        \"hired\" : true\n      }\n    ]\n  },\n  {\n    \"name\" : \"dictionaryCompany\",\n    \"employees\" : [\n      {\n        \"age\" : 32,\n        \"name\" : \"Bjarne\",\n        \"hired\" : false\n      }\n    ]\n  }\n]";
-  XCTAssertEqualObjects(objString, testString);
+  XCTAssertEqual([objArray count], [testArray count]);
+  XCTAssertEqualObjects(dict1[@"employees"][0][@"name"], objArray[0][@"employees"][0][@"name"]); //testing nested array structures
 
 }
 
