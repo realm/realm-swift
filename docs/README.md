@@ -7,7 +7,7 @@ You probably want to go and [read the docs on the Realm project website](http://
 
 ## API Reference
 
-You probably to go and [read the API reference on the Realm project website](http://realm.io/docs/ios/latest/api). The API reference is generate from comments in the source code of this repository.
+You probably want to go and [read the API reference on the Realm project website](http://realm.io/docs/ios/latest/api). The API reference is generated from comments in the source code of this repository.
 
 You can generate the API docs locally by running `sh build.sh docs` from the root of this repository. This requires installation of [appledoc](https://github.com/tomaz/appledoc/releases/tag/v2.2-963). You will find the output `docs/output/`.
 
