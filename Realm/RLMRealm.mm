@@ -184,6 +184,7 @@ static NSArray *s_objectDescriptors = nil;
         _thread = [NSThread currentThread];
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
+        _autorefresh = YES;
     }
     return self;
 }
@@ -354,9 +355,6 @@ static NSArray *s_objectDescriptors = nil;
     if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
     }
-
-    // set autoreresh - starts timer on osx
-    realm.autorefresh = YES;
     
 #if !TARGET_IPHONE
     // start update timer on osx

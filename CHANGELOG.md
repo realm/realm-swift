@@ -7,6 +7,7 @@
 
 ### Enhancements
 
+* Now support disabling the `autorefresh` property on RLMRealm instances.
 * Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
 * Using NSNumber properties (unsupported) now throws a more informative exception.
 * Added `[RLMRealm defaultRealmPath]`
