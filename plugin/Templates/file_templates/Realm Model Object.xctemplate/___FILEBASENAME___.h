@@ -9,7 +9,7 @@
 #import <Realm/Realm.h>
 
 @interface ___FILEBASENAMEASIDENTIFIER___ : RLMObject
-// Add properties here to define the model
+<# Add properties here to define the model #>
 @end
 
 // This protocol enables typed collections. i.e.:
