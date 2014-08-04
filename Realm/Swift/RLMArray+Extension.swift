@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extension RLMArray: Sequence {
+extension RLMArray: SequenceType {
 
     // Support Sequence-style enumeration
 
@@ -34,11 +34,11 @@ extension RLMArray: Sequence {
 
     // Swift query convenience functions
 
-    public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArg...) -> UInt {
+    public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArgType...) -> UInt {
         return indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    public func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMArray {
+    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 }

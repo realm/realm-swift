@@ -20,11 +20,11 @@ extension RLMObject {
 
     // Swift query convenience functions
 
-    public class func objectsWhere(predicateFormat: String, _ args: CVarArg...) -> RLMArray {
+    public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 
-    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArg...) -> RLMArray {
+    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
         return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
     }
 }

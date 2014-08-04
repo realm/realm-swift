@@ -34,7 +34,7 @@ class SwiftMixedTests: SwiftTestCase {
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Float, 53] as NSArray)
         MixedObject.createInRealm(realm, withObject: [true, 3.1 as Double, 54] as NSArray)
         MixedObject.createInRealm(realm, withObject: [true, NSDate(), 55] as NSArray)
-        MixedObject.createInRealm(realm, withObject: [true, data as NSData, 50] as NSArray)
+        MixedObject.createInRealm(realm, withObject: [true, data!, 50] as NSArray)
         realm.commitWriteTransaction()
 
         let objects = MixedObject.allObjectsInRealm(realm)

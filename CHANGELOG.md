@@ -1,3 +1,16 @@
+0.83.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta5.
+* Properties to be persisted in Swift classes must be explicitly declared as `dynamic`
+
+### Enhancements
+
+### Bugfixes
+
+
 0.82.0 Release notes (2014-08-05)
 =============================================================
 
