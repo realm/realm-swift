@@ -122,13 +122,26 @@
 
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
-
+    
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
     XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
+    
+    // add objects to linkView
+    [realm beginWriteTransaction];
+    [obj.array addObject:[StringObject createInRealm:realm withObject:@[@"a"]]];
+    [obj.array addObject:[[StringObject alloc] initWithObject:@[@"b"]]];
+    [realm commitWriteTransaction];
+    
+    // remove objects from realm
+    XCTAssertEqual(obj.array.count, (NSUInteger)2, @"Expecting 2 objects");
+    [realm beginWriteTransaction];
+    [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
 }
 
 - (void)testRealmTransactionBlock {
