@@ -322,11 +322,11 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
     // create view from table and predicate
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
-    tightdb::Query *query = new tightdb::Query(objectSchema->_table->where());
-    RLMUpdateQueryWithPredicate(query, predicate, realm.schema, objectSchema);
+    tightdb::Query query = objectSchema->_table->where();
+    RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
     
     // create view and sort
-    tightdb::TableView view = query->find_all();
+    tightdb::TableView view = query.find_all();
     RLMUpdateViewWithOrder(view, objectSchema, order, YES);
     
     // create and populate array
