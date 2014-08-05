@@ -8,8 +8,11 @@
 
 ### Enhancements
 
+* None
+
 ### Bugfixes
 
+* Fixed a memory leak when querying for objects.
 
 0.82.0 Release notes (2014-08-05)
 =============================================================
@@ -43,7 +46,8 @@
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
 * Fixed a memory leak when breaking out of a for-in loop on RLMArray.
-* Fixed memory leak when removing objects from a RLMArray property.
+* Fixed a memory leak when removing objects from a RLMArray property.
+* Fixed a memory leak when querying for objects.
 
 
 0.81.0 Release notes (2014-07-22)
