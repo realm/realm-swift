@@ -95,6 +95,7 @@
     if (tableView == self.tableView) {
         RLMTypeNode *displayedType = [self displayedType];
         NSUInteger count = displayedType.instanceCount;
+        
         return count;
     }
     
@@ -104,63 +105,110 @@
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.tableView) {
-        
-        NSUInteger columnIndex = [self.tableView.tableColumns
-                                  indexOfObject:tableColumn];
+        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         
         RLMTypeNode *displayedType = [self displayedType];
-        
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
+        
         NSString *propertyName = clazzProperty.name;
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
-        NSObject *propertyValue = selectedInstance[propertyName];
         
-        switch (clazzProperty.type) {
-            case RLMPropertyTypeInt:
-            case RLMPropertyTypeBool:
-            case RLMPropertyTypeFloat:
-            case RLMPropertyTypeDouble:
-                if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                    return propertyValue;
+        NSObject *propertyValue = selectedInstance[propertyName];
+
+        return [self.class printablePropertyValue:propertyValue ofType:clazzProperty.type];
+    }
+    
+    return nil;
+}
+
++(id)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
+{
+    return [self printablePropertyValue:propertyValue ofType:propertyType linkFormat:NO];
+}
+
++(id)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType linkFormat:(BOOL)linkFormat
+{
+    switch (propertyType) {
+        case RLMPropertyTypeBool:
+            if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                if (linkFormat) {
+                    return (BOOL)propertyValue ? @"TRUE" : @"FALSE";
                 }
-                break;
-                
-                
-            case RLMPropertyTypeString:
-                if ([propertyValue isKindOfClass:[NSString class]]) {
-                    return propertyValue;
-                }
-                break;
-                
-            case RLMPropertyTypeData:
+                return propertyValue;
+            }
+            break;
+
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                return propertyValue;
+            }
+            break;
+            
+        case RLMPropertyTypeString:
+            if ([propertyValue isKindOfClass:[NSString class]]) {
+                return propertyValue;
+            }
+            break;
+        
+        case RLMPropertyTypeData:
+            if (linkFormat) {
                 return @"<Data>";
-                
-            case RLMPropertyTypeAny:
-                return @"<Any>";
-                
-            case RLMPropertyTypeDate:
-                if ([propertyValue isKindOfClass:[NSDate class]]) {
-                    return propertyValue;
-                }
-                break;
-                
-            case RLMPropertyTypeArray: {
-                RLMArray *referredObject = (RLMArray *)propertyValue;
-                return [NSString stringWithFormat:@"List of links to %@", referredObject.objectClassName];
             }
+            
+            // Will eventually return an image if present
+            return @"<Data>";
+            
+        case RLMPropertyTypeAny:
+            return @"<Any>";
+            
+        case RLMPropertyTypeDate:
+            if ([propertyValue isKindOfClass:[NSDate class]]) {
+                if (linkFormat) {
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    formatter.dateStyle = NSDateFormatterMediumStyle;
+                    formatter.timeStyle = NSDateFormatterShortStyle;
                 
-            case RLMPropertyTypeObject: {
-                RLMObject *referredObject = (RLMObject *)propertyValue;
-                if (referredObject == nil) {
-                    return @"";
+                    return [formatter stringFromDate:(NSDate *)propertyValue];
                 }
-                else {
-                    return [NSString stringWithFormat:@"Link to %@", referredObject.objectSchema.className];
-                }
+                
+                return propertyValue;
             }
+            
+        case RLMPropertyTypeArray: {
+            RLMArray *referredArray = (RLMArray *)propertyValue;
+            
+            if (linkFormat) {
+                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, (unsigned long)referredArray.count];
+            }
+            
+            // Will show count as a badge instead
+            return [NSString stringWithFormat:@"List of %@", referredArray.objectClassName];
+        }
+            
+        case RLMPropertyTypeObject: {
+            RLMObject *referredObject = (RLMObject *)propertyValue;
+            if (referredObject == nil) {
+                return @"";
+            }
+            
+            if (linkFormat) {
+                return referredObject.objectSchema.className;
+            }
+            
+            NSString *returnString = [NSString stringWithFormat:@"%@(", referredObject.objectSchema.className];
+            
+            for (RLMProperty *property in referredObject.objectSchema.properties) {
+                id propertyValue = referredObject[property.name];
+                id propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type linkFormat:YES];
                 
-            default:
-                break;
+                returnString = [returnString stringByAppendingFormat:@"%@, ", propertyDescription];
+            }
+            
+            returnString = [returnString substringToIndex:returnString.length - 2];
+            
+            return [returnString stringByAppendingString:@")"];
         }
     }
     
