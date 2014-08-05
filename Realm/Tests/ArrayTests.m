@@ -440,6 +440,10 @@ static vm_size_t get_resident_size() {
 
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol = 'a'"];
 
+    // Check for memory leaks when creating queries by comparing the memory usage
+    // before and after creating a very large number of queries. Anything less
+    // than doubling is allowed as there's going to be some natural fluctuation,
+    // and failing to clean up 10k queries resulted in far more than doubling.
     vm_size_t size = get_resident_size();
     for (int i = 0; i < 10000; ++i) {
         @autoreleasepool {
