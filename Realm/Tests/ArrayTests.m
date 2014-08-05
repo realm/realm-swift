@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import <mach/mach.h>
+
 @interface ArrayTests : RLMTestCase
 @end
 
@@ -418,6 +420,34 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+}
+
+static vm_size_t get_resident_size() {
+    struct task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&info, &size);
+    return info.resident_size;
+}
+
+- (void)testQueryMemoryUsage {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringCol = @"a";
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol = 'a'"];
+
+    vm_size_t size = get_resident_size();
+    for (int i = 0; i < 10000; ++i) {
+        @autoreleasepool {
+            RLMArray *matches = [StringObject objectsInRealm:realm withPredicate:pred];
+            XCTAssertEqualObjects([matches[0] stringCol], @"a");
+        }
+    }
+    XCTAssertLessThan(get_resident_size(), size * 2);
 }
 
 @end

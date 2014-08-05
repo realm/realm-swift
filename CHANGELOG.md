@@ -8,8 +8,11 @@
 
 ### Enhancements
 
+* None
+
 ### Bugfixes
 
+* Fixed a memory leak when querying for objects.
 
 0.82.0 Release notes (2014-08-05)
 =============================================================
