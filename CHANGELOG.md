@@ -19,6 +19,7 @@
 
 ### Bugfixes
 
+* Fixed rapid growth of the realm file size.
 * Fixed a bug which could cause a crash during RLMArray destruction after a query. 
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
 * Fixed potential bug related to the handling of array properties (RLMArray).
@@ -29,6 +30,7 @@
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
 * Fixed a memory leak when breaking out of a for-in loop on RLMArray.
+* Fixed memory leak when removing objects from a RLMArray property.
 
 
 0.81.0 Release notes (2014-07-22)
