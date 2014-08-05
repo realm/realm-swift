@@ -22,29 +22,29 @@ import Realm
 // Old data models
 /* V0
 class Person: RLMObject {
-    var firstName = ""
-    var lastName = ""
-    var age = 0
+    dynamic var firstName = ""
+    dynamic var lastName = ""
+    dynamic var age = 0
 }
 */
 
 /* V1
 class Person: RLMObject {
-    var fullName = ""        // combine firstName and lastName into single field
-    var age = 0
+    dynamic var fullName = ""        // combine firstName and lastName into single field
+    dynamic var age = 0
 }
 */
 
 /* V2 */
 class Pet: RLMObject {
-    var name = ""
-    var type = ""
+    dynamic var name = ""
+    dynamic var type = ""
 }
 
 class Person: RLMObject {
-    var fullName = ""
-    var age = 0
-    var pets = RLMArray(objectClassName: Pet.className())
+    dynamic var fullName = ""
+    dynamic var age = 0
+    dynamic var pets = RLMArray(objectClassName: Pet.className())
 }
 
 @UIApplicationMain
