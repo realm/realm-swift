@@ -40,7 +40,7 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "SwiftDynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name!!, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type
@@ -125,7 +125,7 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[DynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "DynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name!!, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type

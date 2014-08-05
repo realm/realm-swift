@@ -20,7 +20,7 @@ import UIKit
 import Realm
 
 class StringObject: RLMObject {
-    var stringProp = ""
+    dynamic var stringProp = ""
 }
 
 @UIApplicationMain
