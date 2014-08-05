@@ -501,7 +501,7 @@ Class RLMCreateAccessorClass(Class objectClass,
                              IMP (*setterGetter)(RLMProperty *, char)) {
 
     // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
-    if (objectClass == RLMObject.class) {
+    if (RLMIsObjectClass(objectClass)) {
         return objectClass;
     }
     
@@ -511,7 +511,7 @@ Class RLMCreateAccessorClass(Class objectClass,
     }
     
     // if objectClass is a dicrect RLMSubclass use it, otherwise use proxy class
-    if (class_getSuperclass(objectClass) != RLMObject.class) {
+    if (!RLMIsObjectSubclass(objectClass)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
     

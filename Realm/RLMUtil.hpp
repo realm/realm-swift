@@ -45,18 +45,21 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
 NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
 // C version of isKindOfClass
-inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
-    while (class1) {
-        if (class1 == class2) return YES;
-        class1 = class_getSuperclass(class1);
+inline BOOL RLMIsKindOfClass(Class cls, const char *name) {
+    while (cls) {
+        if (strcmp(class_getName(cls), name) == 0) return YES;
+        cls = class_getSuperclass(cls);
     }
     return NO;
 }
 
-// Determines if class1 descends from class2
-inline BOOL RLMIsSubclass(Class class1, Class class2) {
-    class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
+inline BOOL RLMIsObjectClass(Class cls) {
+    return strcmp(class_getName(cls), "RLMObject") == 0;
+}
+
+// Determines if a class is a subclass of a class named RLMObject
+inline BOOL RLMIsObjectSubclass(Class cls) {
+    return RLMIsObjectClass(class_getSuperclass(cls));
 }
 
 // Translate an rlmtype to a string representation

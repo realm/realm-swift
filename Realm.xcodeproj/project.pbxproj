@@ -88,8 +88,8 @@
 		02E4D6CF192E3DC40082808D /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69D192E3DC40082808D /* RLMProperty_Private.h */; };
 		02E4D6D0192E3DC40082808D /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69E192E3DC40082808D /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6D1192E3DC40082808D /* RLMProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69E192E3DC40082808D /* RLMProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		02E4D6D2192E3DC40082808D /* RLMProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.m */; };
-		02E4D6D3192E3DC40082808D /* RLMProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.m */; };
+		02E4D6D2192E3DC40082808D /* RLMProperty.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.mm */; };
+		02E4D6D3192E3DC40082808D /* RLMProperty.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69F192E3DC40082808D /* RLMProperty.mm */; };
 		02E4D6D4192E3DC40082808D /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */; };
 		02E4D6D5192E3DC40082808D /* RLMQueryUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */; };
 		02E4D6D6192E3DC40082808D /* RLMQueryUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */; };
@@ -207,7 +207,7 @@
 		02E4D69C192E3DC40082808D /* RLMObjectStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMObjectStore.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		02E4D69D192E3DC40082808D /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty_Private.h; sourceTree = "<group>"; };
 		02E4D69E192E3DC40082808D /* RLMProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty.h; sourceTree = "<group>"; };
-		02E4D69F192E3DC40082808D /* RLMProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMProperty.m; sourceTree = "<group>"; };
+		02E4D69F192E3DC40082808D /* RLMProperty.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = RLMProperty.mm; sourceTree = "<group>"; };
 		02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMQueryUtil.hpp; sourceTree = "<group>"; };
 		02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMQueryUtil.mm; sourceTree = "<group>"; };
 		02E4D6A2192E3DC40082808D /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
@@ -320,7 +320,7 @@
 				02E4D69B192E3DC40082808D /* RLMObjectStore.h */,
 				02E4D69C192E3DC40082808D /* RLMObjectStore.mm */,
 				02E4D69E192E3DC40082808D /* RLMProperty.h */,
-				02E4D69F192E3DC40082808D /* RLMProperty.m */,
+				02E4D69F192E3DC40082808D /* RLMProperty.mm */,
 				02E4D69D192E3DC40082808D /* RLMProperty_Private.h */,
 				02E4D6A0192E3DC40082808D /* RLMQueryUtil.hpp */,
 				02E4D6A1192E3DC40082808D /* RLMQueryUtil.mm */,
@@ -705,7 +705,7 @@
 				02E4D6C2192E3DC40082808D /* RLMObject.mm in Sources */,
 				02E4D6C8192E3DC40082808D /* RLMObjectSchema.mm in Sources */,
 				02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */,
-				02E4D6D2192E3DC40082808D /* RLMProperty.m in Sources */,
+				02E4D6D2192E3DC40082808D /* RLMProperty.mm in Sources */,
 				02E4D6D6192E3DC40082808D /* RLMQueryUtil.mm in Sources */,
 				02E4D6DC192E3DC40082808D /* RLMRealm.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
@@ -751,7 +751,7 @@
 				02E4D6C3192E3DC40082808D /* RLMObject.mm in Sources */,
 				02E4D6C9192E3DC40082808D /* RLMObjectSchema.mm in Sources */,
 				02E4D6CD192E3DC40082808D /* RLMObjectStore.mm in Sources */,
-				02E4D6D3192E3DC40082808D /* RLMProperty.m in Sources */,
+				02E4D6D3192E3DC40082808D /* RLMProperty.mm in Sources */,
 				02E4D6D7192E3DC40082808D /* RLMQueryUtil.mm in Sources */,
 				02E4D6DD192E3DC40082808D /* RLMRealm.mm in Sources */,
 				02E4D6E3192E3DC40082808D /* RLMSchema.mm in Sources */,

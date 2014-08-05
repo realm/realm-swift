@@ -81,7 +81,7 @@ static NSMutableDictionary *s_classNameToMangledName;
     unsigned int numClasses;
     Class *classes = objc_copyClassList(&numClasses);
     for (unsigned int i = 0; i < numClasses; i++) {
-        if (class_getSuperclass(classes[i]) == RLMObject.class) {
+        if (RLMIsObjectSubclass(classes[i])) {
             block(classes[i]);
         }
     }

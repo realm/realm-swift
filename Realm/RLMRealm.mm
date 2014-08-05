@@ -547,12 +547,12 @@ static NSArray *s_objectDescriptors = nil;
     if ([array isKindOfClass:NSArray.class]) {
         // for arrays and standalone delete each individually
         for (id obj in array) {
-            if ([obj isKindOfClass:RLMObject.class]) {
+            if (RLMIsKindOfClass([obj class], "RLMObject")) {
                 RLMDeleteObjectFromRealm(obj);
             }
         }
     }
-    else if ([array isKindOfClass:RLMArray.class]) {
+    else if (RLMIsKindOfClass([array class], "RLMArray")) {
         // call deleteObjectsFromRealm for our RLMArray
         [(RLMArray *)array deleteObjectsFromRealm];
     }

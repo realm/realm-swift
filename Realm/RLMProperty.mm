@@ -16,10 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObject.h"
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
-#import "RLMObject.h"
 #import "RLMSchema_Private.h"
+#import "RLMUtil.hpp"
 
 // private properties
 @interface RLMProperty ()
@@ -44,7 +45,7 @@
         [self updateAccessorNames];
         [self setObjcCodeFromType];
     }
-    
+
     return self;
 }
 
@@ -108,7 +109,7 @@
     if (self.objcType == 'q') {
         _objcType = 'l';    // collapse these as they are the same
     }
-    
+
     // map to RLMPropertyType
     switch (self.objcType) {
         case 'i':   // int
@@ -146,10 +147,10 @@
                 // get object class from type string - @"RLMArray<objectClassName>"
                 _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
                 _type = RLMPropertyTypeArray;
-                
+
                 // verify type
                 Class cls = [RLMSchema classForString:self.objectClassName];
-                if (class_getSuperclass(cls) != RLMObject.class) {
+                if (!RLMIsObjectSubclass(cls)) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
                                                  userInfo:nil];
@@ -164,10 +165,10 @@
                 // get object class and set type
                 _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
                 _type = RLMPropertyTypeObject;
-                
+
                 // verify type
                 Class cls = [RLMSchema classForString:self.objectClassName];
-                if (class_getSuperclass(cls) != RLMObject.class) {
+                if (!RLMIsObjectSubclass(cls)) {
                     if ([_objectClassName isEqualToString:@"RLMArray"]) {
                         @throw [NSException exceptionWithName:@"RLMException"
                                                        reason:@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>"
@@ -193,7 +194,7 @@
     RLMProperty *prop = [RLMProperty new];
     prop->_name = name;
     prop->_attributes = attributes;
-    
+
     // parse attributes
     unsigned int attCount;
     objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);
@@ -220,17 +221,17 @@
         }
     }
     free(atts);
-    
+
     // throw if there was no type
     if (!validType) {
         NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    
+
     // update getter/setter names
     [prop updateAccessorNames];
-    
+
     return prop;
 }
 
