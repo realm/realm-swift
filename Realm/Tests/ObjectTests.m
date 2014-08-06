@@ -197,6 +197,8 @@
 
     NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
     XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidArray], @"Invalid sub-literal should throw");
+    NSDictionary *invalidDict= @{@"employees": @[@[@"Alex", @29, @2]]};
+    XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidDict], @"Dictionary missing properties should throw");
 
     OwnerObject *owner = [[OwnerObject alloc] initWithObject:@[@"Brian", @{@"dogName": @"Brido"}]];
     XCTAssertEqualObjects(owner.dog.dogName, @"Brido");
