@@ -46,10 +46,15 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
+//- (void)userClickedAtLocation:(RLMTableLocation)location;
+//
+//- (void)userDoubleClickedatLocation:(RLMTableLocation)location;
+
 @end
 
 @interface RLMTableView : NSTableView
 
 - (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+
 
 @end

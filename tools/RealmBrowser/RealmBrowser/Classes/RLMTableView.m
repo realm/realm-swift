@@ -71,7 +71,7 @@
     }
 }
 
-- (void)mouseMoved:(NSEvent*)event
+- (void)mouseMoved:(NSEvent *)event
 {
     id myDelegate = [self delegate];
     
@@ -121,6 +121,20 @@
     }
 
 }
+
+//-(void)mouseUp:(NSEvent *)theEvent {
+//    if (theEvent.clickCount > 1) {
+//        if (self.delegate && [self.delegate respondsToSelector:@selector(userDoubleClickedatLocation:)]) {
+//            [(id<RLMTableViewDelegate>)self.delegate userDoubleClickedatLocation:currentMouseLocation];
+//        }
+//    }
+//    else {
+//        if (self.delegate && [self.delegate respondsToSelector:@selector(userClickedAtLocation:)]) {
+//            [(id<RLMTableViewDelegate>)self.delegate userClickedAtLocation:currentMouseLocation];
+//        }
+//    }
+//}
+
 
 #pragma mark - NSView overrides
 

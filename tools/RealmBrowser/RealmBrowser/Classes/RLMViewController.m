@@ -72,12 +72,10 @@
 {
     NSUInteger oldIndex = self.tableView.selectedRow;
     if (oldIndex != newIndex) {
-        NSTableView *tableView = self.tableView;
-
-        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
                     byExtendingSelection:NO];
         
-        [tableView scrollRowToVisible:newIndex];
+        [self.tableView scrollRowToVisible:newIndex];
     }
 }
 
