@@ -4,11 +4,11 @@
 ### API breaking changes
 
 * Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta5.
-* Properties to be persisted in Swift classes must be explicitly declared as `dynamic`
+* Properties to be persisted in Swift classes must be explicitly declared as `dynamic`.
 
 ### Enhancements
 
-* None
+* Add support for querying for nil object properties.
 
 ### Bugfixes
 
