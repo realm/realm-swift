@@ -146,14 +146,15 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
 id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     if (!RLMIsObjectValidForProperty(obj, prop)) {
         // check for object or array literals
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
             return [[objSchema.objectClass alloc] initWithObject:obj];
         }
         else if (prop.type == RLMPropertyTypeArray && [obj isKindOfClass:NSArray.class]) {
             // for arrays, create objects for each literal object and return new array
             NSArray *arrayElements = obj;
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [RLMArray standaloneArrayWithObjectClassName:objSchema.className];
             for (id el in arrayElements) {
                 [objects addObject:[[objSchema.objectClass alloc] initWithObject:el]];
@@ -162,7 +163,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
         }
 
         // if not a literal throw
-        NSString *message = [NSString stringWithFormat:@"Invalid value type '%@' for property '%@'", obj ?: @"nil", prop.name];
+        NSString *message = [NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj ?: @"nil", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
     }
     return obj;
