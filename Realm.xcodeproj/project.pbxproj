@@ -129,7 +129,6 @@
 		4DE0B18E1949A6820092154B /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0B18C1948830D0092154B /* EnumeratorTests.m */; };
 		4DFB045D192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
 		4DFB045E192F877300F36C59 /* ObjectInterfaceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */; };
-		4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
 		5BDDB6ED195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
 		5BDDB6EE195777E400D43452 /* RLMPredicateUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */; };
 		5BF3465E19793BDB00D9BFD4 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF3465B1979330B00D9BFD4 /* UnicodeTests.m */; };
@@ -138,10 +137,7 @@
 		84449B3219508AD2000F077D /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84449B3019508AD2000F077D /* SchemaTests.mm */; };
 		E82827D81947780D0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C414DE1921B07200F858D9 /* Foundation.framework */; };
 		E82827DA1947782C0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82827D91947782C0090B385 /* Foundation.framework */; };
-		E82827DE19477A3F0090B385 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB045F192F9DD700F36C59 /* CHANGELOG.md */; };
 		E82827DF19477A9D0090B385 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82827D91947782C0090B385 /* Foundation.framework */; };
-		E870366719502D2900D0EB8A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E870366619502D2900D0EB8A /* LICENSE */; };
-		E870366819502D2900D0EB8A /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E870366619502D2900D0EB8A /* LICENSE */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -233,13 +229,11 @@
 		4DE0B175194855E30092154B /* PropertyTypeTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PropertyTypeTest.mm; sourceTree = "<group>"; };
 		4DE0B18C1948830D0092154B /* EnumeratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnumeratorTests.m; sourceTree = "<group>"; };
 		4DFB045C192F877300F36C59 /* ObjectInterfaceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectInterfaceTests.m; sourceTree = "<group>"; };
-		4DFB045F192F9DD700F36C59 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG.md; sourceTree = "<group>"; };
 		5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
 		5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
 		5BF3465B1979330B00D9BFD4 /* UnicodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnicodeTests.m; sourceTree = "<group>"; };
 		84449B3019508AD2000F077D /* SchemaTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SchemaTests.mm; sourceTree = "<group>"; };
 		E82827D91947782C0090B385 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		E870366619502D2900D0EB8A /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -354,7 +348,6 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
-				02C41475191DE49600F858D9 /* Supporting Files */,
 				02CF6578193A3BB200E01CFD /* ArrayPropertyTests.m */,
 				02026CAA19363B5300E4EEF8 /* ArrayTests.m */,
 				02026CB619379EB700E4EEF8 /* DynamicTests.m */,
@@ -387,6 +380,7 @@
 				02C41476191DE49600F858D9 /* RealmTests-Info.plist */,
 			);
 			name = "Supporting Files";
+			path = Realm/Tests;
 			sourceTree = "<group>";
 		};
 		E82827DB194778360090B385 /* iOS */ = {
@@ -410,12 +404,11 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
-				E918909B177B677900653D7A /* Frameworks */,
-				E870366619502D2900D0EB8A /* LICENSE */,
-				E918909A177B677900653D7A /* Products */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
-				4DFB045F192F9DD700F36C59 /* CHANGELOG.md */,
+				02C41475191DE49600F858D9 /* Supporting Files */,
+				E918909B177B677900653D7A /* Frameworks */,
+				E918909A177B677900653D7A /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -622,8 +615,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DFB0460192F9DD700F36C59 /* CHANGELOG.md in Resources */,
-				E870366719502D2900D0EB8A /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -631,8 +622,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E82827DE19477A3F0090B385 /* CHANGELOG.md in Resources */,
-				E870366819502D2900D0EB8A /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

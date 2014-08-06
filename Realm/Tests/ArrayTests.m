@@ -451,7 +451,7 @@ static vm_size_t get_resident_size() {
             XCTAssertEqualObjects([matches[0] stringCol], @"a");
         }
     }
-    XCTAssertLessThan(get_resident_size(), size * 2);
+    XCTAssert(get_resident_size() < size * 2);
 }
 
 @end
