@@ -10,6 +10,6 @@
 
 @interface RLMBadgeTableCellView : NSTableCellView
 
-@property (strong) IBOutlet NSButton *button;
+@property (strong) IBOutlet NSButton *badge;
 
 @end

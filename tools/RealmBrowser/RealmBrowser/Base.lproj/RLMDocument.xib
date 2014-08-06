@@ -156,7 +156,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="HeaderLabel" verticalHuggingPriority="750" id="PND-Eu-oGc">
+                                                                <textField identifier="BadgeHeaderLabel" verticalHuggingPriority="750" id="PND-Eu-oGc">
                                                                     <rect key="frame" x="1" y="1" width="120" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="zj3-PN-ZMF">
@@ -177,7 +177,7 @@
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sfV-Rt-g6l">
+                                                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sfV-Rt-g6l" userLabel="Badge - Instance count">
                                                                             <rect key="frame" x="76" y="2" width="37" height="17"/>
                                                                             <buttonCell key="cell" type="roundRect" title="Instance count" bezelStyle="roundedRect" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zSi-U4-6OL">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -186,7 +186,7 @@
                                                                         </button>
                                                                     </subviews>
                                                                     <connections>
-                                                                        <outlet property="button" destination="sfV-Rt-g6l" id="KPF-bp-aWT"/>
+                                                                        <outlet property="badge" destination="sfV-Rt-g6l" id="1I3-sk-c3Y"/>
                                                                         <outlet property="textField" destination="Nlc-2I-yjr" id="2m1-ZK-oEF"/>
                                                                     </connections>
                                                                 </customView>
@@ -205,7 +205,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="HeaderLabel" verticalHuggingPriority="750" id="rHO-Uc-l2q">
+                                                                <textField identifier="BasicHeaderLabel" verticalHuggingPriority="750" id="rHO-Uc-l2q">
                                                                     <rect key="frame" x="124" y="1" width="100" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="GSv-Zw-bmz">
@@ -219,8 +219,8 @@
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93e-Tp-EKj">
-                                                                            <rect key="frame" x="5" y="3" width="287" height="17"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="contents" id="qpt-2p-N69">
+                                                                            <rect key="frame" x="3" y="3" width="86" height="17"/>
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="contents" id="qpt-2p-N69">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -246,7 +246,7 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="HeaderLabel" verticalHuggingPriority="750" id="hwm-z8-EUZ">
+                                                                <textField identifier="BoolHeaderLabel" verticalHuggingPriority="750" id="hwm-z8-EUZ">
                                                                     <rect key="frame" x="227" y="1" width="50" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="Qeh-eE-9Rk">

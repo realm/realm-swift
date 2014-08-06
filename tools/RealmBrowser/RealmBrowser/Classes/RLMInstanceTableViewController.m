@@ -117,21 +117,22 @@
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
         id propertyValue = selectedInstance[clazzProperty.name];
+        RLMPropertyType type = clazzProperty.type;
         
         NSTableCellView *cellView;
-        if (clazzProperty.type == RLMPropertyTypeArray) {
+        if (type == RLMPropertyTypeArray) {
             RLMBadgeTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BadgeCell" owner:self];
 
-            badgeCellView.button.hidden = NO;
-            badgeCellView.button.title = [NSString stringWithFormat:@"%lu", (unsigned long)[(RLMArray *)propertyValue count]];
-            [badgeCellView.button.cell setHighlightsBy:0];
+            badgeCellView.badge.hidden = NO;
+            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", (unsigned long)[(RLMArray *)propertyValue count]];
+            [badgeCellView.badge.cell setHighlightsBy:0];
 
-            NSString *formattedText = [self.class printablePropertyValue:propertyValue ofType:clazzProperty.type];
+            NSString *formattedText = [self.class printablePropertyValue:propertyValue ofType:type];
             badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
 
             cellView = badgeCellView;
         }
-        else if (clazzProperty.type == RLMPropertyTypeBool) {
+        else if (type == RLMPropertyTypeBool) {
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
             
             BOOL boolValue;
@@ -145,14 +146,20 @@
         else {
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
             
-            NSString *formattedText = [self.class printablePropertyValue:propertyValue ofType:clazzProperty.type];
+            NSString *formattedText = [self.class printablePropertyValue:propertyValue ofType:type];
             
-            if (clazzProperty.type == RLMPropertyTypeObject) {
+            if (type == RLMPropertyTypeObject) {
                 basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
             } else {
                 basicCellView.textField.stringValue = formattedText;
             }
             
+            if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
+                basicCellView.textField.alignment = NSRightTextAlignment;
+            } else {
+                basicCellView.textField.alignment = NSLeftTextAlignment;
+            }
+        
             cellView = basicCellView;
         }
         
@@ -182,7 +189,15 @@
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
             if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                return [(NSNumber *)propertyValue stringValue];
+                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+                if (propertyType == RLMPropertyTypeInt) {
+                    formatter.allowsFloats = YES;
+                } else {
+                    formatter.allowsFloats = YES;
+                    formatter.numberStyle = NSNumberFormatterDecimalStyle;
+                }
+                
+                return [formatter stringFromNumber:(NSNumber *)propertyValue];
             }
             break;
             
