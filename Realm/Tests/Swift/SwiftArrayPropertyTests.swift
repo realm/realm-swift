@@ -37,9 +37,9 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
         let array = SwiftArrayPropertyObject()
         array.name = "arrayObject"
-        // FIXME: Should be able to add object to array here
-        // Asana: https://app.asana.com/0/861870036984/13438276206884
-        // array.array.addObject(string)
+        array.array.addObject(string)
+        XCTAssertEqual(array.array.count, 1)
+        XCTAssertEqual((array.array.firstObject() as SwiftStringObject).stringCol, "string")
 
         realm.beginWriteTransaction()
         realm.addObject(array)
