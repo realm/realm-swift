@@ -77,49 +77,51 @@ static NSMutableDictionary *s_classNameToMangledName;
     }
 }
 
++ (void)enumerateRLMObjectSubclasses:(void (^)(Class))block {
+    unsigned int numClasses;
+    Class *classes = objc_copyClassList(&numClasses);
+    for (unsigned int i = 0; i < numClasses; i++) {
+        if (class_getSuperclass(classes[i]) == RLMObject.class) {
+            block(classes[i]);
+        }
+    }
+    free(classes);
+}
+
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // initialize mangled name mapping
         s_classNameToMangledName = [NSMutableDictionary dictionary];
 
-        // load object schemas for all RLMObject subclasses
-        unsigned int numClasses;
-        Class *classes = objc_copyClassList(&numClasses);
         NSMutableArray *schemaArray = [NSMutableArray array];
-        
-        // cache descriptors for all subclasses of RLMObject
         RLMSchema *schema = [[RLMSchema alloc] init];
-        for (unsigned int i = 0; i < numClasses; i++) {
-            // if direct subclass
-            if (class_getSuperclass(classes[i]) == RLMObject.class) {
-                RLMObjectSchema *objectSchema = nil;
+
+        [self enumerateRLMObjectSubclasses:^(Class cls) {
+            RLMObjectSchema *objectSchema = nil;
 #ifdef REALM_SWIFT
-                // if swift
-                NSString *className = NSStringFromClass(classes[i]);
-                if ([RLMSwiftSupport isSwiftClassName:className]) {
-                    objectSchema = [RLMSwiftSupport schemaForObjectClass:classes[i]];
-                    objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(classes[i], objectSchema);
-                    s_classNameToMangledName[objectSchema.className] = objectSchema.objectClass;
-                }
-                else {
-                    objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
-                }
-#else
-                objectSchema = [RLMObjectSchema schemaForObjectClass:classes[i]];
-#endif
-                // add to list
-                [schemaArray addObject:objectSchema];
-                // implement sharedSchema and className for this class
-                RLMReplaceSharedSchemaMethod(classes[i], objectSchema);
-                RLMReplaceClassNameMethod(classes[i], objectSchema.className);
+            NSString *className = NSStringFromClass(cls);
+            if ([RLMSwiftSupport isSwiftClassName:className]) {
+                objectSchema = [RLMSwiftSupport schemaForObjectClass:cls];
+                objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(cls, objectSchema);
+                s_classNameToMangledName[objectSchema.className] = objectSchema.objectClass;
             }
-        }
-        free(classes);
-        
+            else {
+                objectSchema = [RLMObjectSchema schemaForObjectClass:cls];
+            }
+#else
+            objectSchema = [RLMObjectSchema schemaForObjectClass:cls];
+#endif
+            // add to list
+            [schemaArray addObject:objectSchema];
+            // implement sharedSchema and className for this class
+            RLMReplaceSharedSchemaMethod(cls, objectSchema);
+            RLMReplaceClassNameMethod(cls, objectSchema.className);
+        }];
+
         // set class array
         schema.objectSchema = schemaArray;
-        
+
         // set shared schema
         s_sharedSchema = schema;
     });
