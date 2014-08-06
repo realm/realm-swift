@@ -433,7 +433,12 @@ void add_link_constraint_to_query(tightdb::Query & query,
     if (operatorType != NSEqualToPredicateOperatorType) {
         @throw RLMPredicateException(@"Invalid operator type", @"Only 'Equal' operator supported for object comparison");
     }
-    query.links_to(column, obj->_row.get_index());
+    if (obj) {
+        query.links_to(column, obj->_row.get_index());
+    }
+    else {
+        query.and_query(query.get_table()->column<Link>(column).is_null());
+    }
 }
  
 void update_link_query_with_value_expression(RLMSchema *schema,
