@@ -37,7 +37,6 @@
     // accessor ivars
     RLMRealm *_realm;
     NSString *_objectClassName;
-    BOOL _readOnly;     // YES for RLMArrays which are never mutable
 }
 
 /**
@@ -53,7 +52,7 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 // designated initializer for RLMArray subclasses
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName readOnly:(BOOL)readOnly;
+- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName;
 
 // create standalone array variant
 + (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;

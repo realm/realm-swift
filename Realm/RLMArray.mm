@@ -28,25 +28,25 @@
 @synthesize objectClassName = _objectClassName;
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
-    self = [self initViewWithObjectClassName:objectClassName readOnly:NO];
+    self = [super init];
     if (self) {
+        _objectClassName = objectClassName;
         _backingArray = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName readOnly:(BOOL)readOnly {
+- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName {
     self = [super init];
     if (self) {
         _objectClassName = objectClassName;
-        _readOnly = readOnly;
     }
     return self;
 
 }
 
 - (BOOL)isReadOnly {
-    return _readOnly;
+    return NO;
 }
 
 //

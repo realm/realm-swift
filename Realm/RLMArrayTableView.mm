@@ -36,10 +36,14 @@
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    view:(tightdb::TableView const &)view
                                   realm:(RLMRealm *)realm {
-    RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName readOnly:YES];
+    RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
     ar->_backingView = view;
     ar->_realm = realm;
     return ar;
+}
+
+- (BOOL)isReadOnly {
+    return YES;
 }
 
 //
