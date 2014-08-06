@@ -34,7 +34,7 @@
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view
                                          realm:(RLMRealm *)realm {
-    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName];
+    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initViewWithObjectClassName:objectClassName readOnly:NO];
     ar->_backingLinkView = view;
     ar->_realm = realm;
     return ar;

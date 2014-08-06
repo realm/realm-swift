@@ -26,15 +26,23 @@
 
 @synthesize realm = _realm;
 @synthesize objectClassName = _objectClassName;
-@dynamic readOnly;
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
+    self = [self initViewWithObjectClassName:objectClassName readOnly:NO];
+    if (self) {
+        _backingArray = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName readOnly:(BOOL)readOnly {
     self = [super init];
     if (self) {
         _objectClassName = objectClassName;
-        _readOnly = NO;
+        _readOnly = readOnly;
     }
     return self;
+
 }
 
 - (BOOL)isReadOnly {

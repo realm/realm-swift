@@ -15,6 +15,7 @@
 ### Bugfixes
 
 * Fixed a memory leak when querying for objects.
+* Fixed initializing array properties on standalone Swift RLMObject subclasses.
 
 0.82.0 Release notes (2014-08-05)
 =============================================================
