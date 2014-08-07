@@ -46,11 +46,11 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     if (awake) {
         return;
     }
-    
-    [super awakeFromNib];
     
     [self.tableView setTarget:self];
     [self.tableView setAction:@selector(userClicked:)];
@@ -240,8 +240,6 @@
             }
 
             return [NSString stringWithFormat:@"%@[]", referredArray.objectClassName];
-
-            break;
         }
             
         case RLMPropertyTypeDate:
@@ -252,11 +250,9 @@
             
         case RLMPropertyTypeData:
             return @"<Data>";
-            break;
             
         case RLMPropertyTypeAny:
             return @"<Any>";
-            break;
             
         case RLMPropertyTypeObject: {
             RLMObject *referredObject = (RLMObject *)propertyValue;
@@ -279,7 +275,6 @@
             returnString = [returnString substringToIndex:returnString.length - 2];
             
             return [returnString stringByAppendingString:@")"];
-            break;
         }
     }
     
@@ -459,7 +454,7 @@
     RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
 
-    NSNumber *result = sender.state == NSOnState ? @YES : @NO;
+    NSNumber *result = @(sender.state == NSOnState);
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     [realm beginWriteTransaction];

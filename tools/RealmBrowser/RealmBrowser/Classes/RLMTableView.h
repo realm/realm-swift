@@ -46,10 +46,6 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
-//- (void)userClickedAtLocation:(RLMTableLocation)location;
-//
-//- (void)userDoubleClickedatLocation:(RLMTableLocation)location;
-
 @end
 
 @interface RLMTableView : NSTableView
