@@ -20,6 +20,20 @@
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F8690311993F98100861FE4"
+               BuildableName = "TestHostTests.xctest"
+               BlueprintName = "TestHostTests"
+               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -35,6 +49,16 @@
                BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
                BuildableName = "iOS Device Tests.xctest"
                BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F8690311993F98100861FE4"
+               BuildableName = "TestHostTests.xctest"
+               BlueprintName = "TestHostTests"
                ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -76,15 +100,6 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
-            BuildableName = "iOS Device Tests.xctest"
-            BlueprintName = "iOS Device Tests"
-            ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
