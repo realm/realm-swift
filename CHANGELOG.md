@@ -11,6 +11,9 @@
 * Add support for querying for nil object properties.
 * Improve error message when specifying invalid literals when creating or 
   initializing RLMObjects.
+* Throw an exception when an RLMObject is used from the incorrect thread rather
+  than crashing in confusing ways.
+* Speed up RLMRealm instantiation and array property iteration.
 
 ### Bugfixes
 

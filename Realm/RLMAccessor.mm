@@ -33,6 +33,7 @@ inline void RLMVerifyAttached(__unsafe_unretained RLMObject *obj) {
                                        reason:@"Object has been deleted and is no longer valid."
                                      userInfo:nil];
     }
+    RLMCheckThread(obj->_realm);
 }
 
 // verify writable

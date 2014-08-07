@@ -47,6 +47,7 @@ inline void RLMLinkViewArrayValidateAttached(RLMArrayLinkView *ar) {
     if (!ar->_backingLinkView->is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
+    RLMCheckThread(ar->_realm);
 }
 inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *ar) {
     // first verify attached

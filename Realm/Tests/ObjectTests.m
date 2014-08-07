@@ -19,6 +19,8 @@
 #import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
+#import <libkern/OSAtomic.h>
+
 #pragma mark - Test Objects
 
 #pragma mark DefaultObject
@@ -670,6 +672,32 @@
 
     XCTAssertFalse([obj isEqual:[IntObject allObjects][1]], @"Same table, different index.");
     XCTAssertFalse([obj isEqual:[BoolObject allObjects][0]], @"Different tables.");
+}
+
+- (void)testCrossThreadAccess
+{
+    IntObject *obj = [[IntObject alloc] init];
+
+    // Standalone can be accessed from other threads
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    OSSpinLockLock(&spinlock);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertNoThrow(obj.intCol = 5);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
+
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    [RLMRealm.defaultRealm addObject:obj];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    XCTAssertNoThrow(obj.intCol);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows(obj.intCol);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
 }
 
 @end

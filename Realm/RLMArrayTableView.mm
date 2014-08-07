@@ -54,6 +54,7 @@ inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
     ar->_backingView.sync_if_needed();
+    RLMCheckThread(ar->_realm);
 }
 inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     // first verify attached

@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import <libkern/OSAtomic.h>
+
 @interface RLMRealm ()
 
 + (BOOL)isCoreDebug;
@@ -359,6 +361,22 @@
     NSError *error;
     XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
+}
+
+- (void)testCrossThreadAccess
+{
+    RLMRealm *realm = RLMRealm.defaultRealm;
+
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    OSSpinLockLock(&spinlock);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows([realm beginWriteTransaction]);
+        XCTAssertThrows([realm allObjects:@"IntObject"]);
+        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"]);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
 }
 
 @end

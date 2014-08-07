@@ -216,6 +216,7 @@ inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
                                        reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on a RLMRealm instance first."
                                      userInfo:nil];
     }
+    RLMCheckThread(realm);
 }
 
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
@@ -320,6 +321,8 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
+    RLMCheckThread(realm);
+
     // create view from table and predicate
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     tightdb::Query query = objectSchema->_table->where();
@@ -336,6 +339,8 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // Create accessor and register with realm
 RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
+    RLMCheckThread(realm);
+
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
     
     // get accessor for the object class
