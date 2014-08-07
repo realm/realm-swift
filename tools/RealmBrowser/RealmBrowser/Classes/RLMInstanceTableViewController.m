@@ -271,66 +271,6 @@
     return nil;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-    RLMTypeNode *displayedType = [self displayedType];
-    
-    if (tableView == self.tableView) {
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        NSString *propertyName = propertyNode.name;
-        
-        RLMObject *selectedObject = [displayedType instanceAtIndex:rowIndex];
-        
-        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-        
-        [realm beginWriteTransaction];
-        
-        switch (propertyNode.type) {
-            case RLMPropertyTypeBool:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).boolValue);
-                }
-                break;
-                
-            case RLMPropertyTypeInt:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).integerValue);
-                }
-                break;
-                
-            case RLMPropertyTypeFloat:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).floatValue);
-                }
-                break;
-                
-            case RLMPropertyTypeDouble:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).doubleValue);
-                }
-                break;
-                
-            case RLMPropertyTypeString:
-                if ([object isKindOfClass:[NSString class]]) {
-                    selectedObject[propertyName] = object;
-                }
-                break;
-                
-            case RLMPropertyTypeDate:
-            case RLMPropertyTypeData:
-            case RLMPropertyTypeObject:
-            case RLMPropertyTypeArray:
-                break;
-                
-            default:
-                break;
-        }
-        
-        [realm commitWriteTransaction];
-    }
-}
-
 #pragma mark - NSTableViewDelegate implementation
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -553,54 +493,72 @@
     
     frame.origin.x -= [self.tableView intercellSpacing].width*0.5;
     frame.origin.y -= [self.tableView intercellSpacing].height*0.5;
-    frame.size.width += [self.tableView intercellSpacing].width*0.5;
-    frame.size.height = 23;
+    frame.size.width += [self.tableView intercellSpacing].width;
+    frame.size.height += [self.tableView intercellSpacing].height;
     
     // Create a menu with a single menu item, and later populate it with the propertyValue
     NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@""
-                                                  action:NULL
-                                           keyEquivalent:@""];
+    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
     
     id result = nil;
     
-    if (propertyNode.type == RLMPropertyTypeDate) {
-        // Set up a date picker with no border or background
-        NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
-        datepicker.bordered = NO;
-        datepicker.drawsBackground = NO;
-        datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
-        datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
-        datepicker.dateValue = propertyValue;
-        
-        item.view = datepicker;
-        [menu addItem:item];
+    switch (propertyNode.type) {
+        case RLMPropertyTypeDate: {
+            frame.size.height = MAX(23.0, frame.size.height);
+            
+            // Set up a date picker with no border or background
+            NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
+            datepicker.bordered = NO;
+            datepicker.drawsBackground = NO;
+            datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
+            datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
+            datepicker.dateValue = propertyValue;
+            
+            item.view = datepicker;
+            [menu addItem:item];
+            
+            if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
+                result = datepicker.dateValue;
+            }
+        }
+            break;
+            
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeString: {
+            NSTextField *textField = [[NSTextField alloc] initWithFrame:frame];
+            textField.stringValue = propertyValue;
+            
+            item.view = textField;
+            [menu addItem:item];
+            
+            if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
+                
+                if (propertyNode.type == RLMPropertyTypeString) {
+                    result = textField.stringValue;
+                }
+                else if (propertyNode.type == RLMPropertyTypeInt) {
+                    result = @(textField.stringValue.integerValue);
+                }
+                else if (propertyNode.type == RLMPropertyTypeFloat) {
+                    result = @(textField.stringValue.floatValue);
+                }
+                else if (propertyNode.type == RLMPropertyTypeDouble) {
+                    result = @(textField.stringValue.doubleValue);
+                }
+            }
+        }
+            break;
+            
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeArray:
+            break;
+    }
 
-        if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
-            result = datepicker.dateValue;
-        }
-    }
-    else if (propertyNode.type == RLMPropertyTypeString) {
-        NSTextField *textField = [[NSTextField alloc] initWithFrame:frame];
-        textField.stringValue = propertyValue;
-        
-        item.view = textField;
-        [menu addItem:item];
-        
-        if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
-            result = textField.stringValue;
-        }
-    }
-    else if (propertyNode.type == RLMPropertyTypeInt) {
-        
-    }
-    else if (propertyNode.type == RLMPropertyTypeFloat) {
-        
-    }
-    else if (propertyNode.type == RLMPropertyTypeDouble) {
-        
-    }
-    
     if (result) {
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         [realm beginWriteTransaction];
@@ -610,67 +568,10 @@
     }
 }
 
+// Move code in here?
 -(id)editValue:(id)propertyValue ofType:(RLMPropertyType)propertyType inFrame:(CGRect)frame
 {
     return nil;
-}
-
-- (BOOL)old_tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
-        
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        
-        if (propertyNode.type == RLMPropertyTypeDate) {
-            // Create a frame which covers the cell to be edited
-            NSRect frame = [tableView frameOfCellAtColumn:[[tableView tableColumns] indexOfObject:tableColumn]
-                                                      row:row];
-            
-            frame.origin.x -= [tableView intercellSpacing].width * 0.5;
-            frame.origin.y -= [tableView intercellSpacing].height * 0.5;
-            frame.size.width += [tableView intercellSpacing].width * 0.5;
-            frame.size.height = 23;
-            
-            // Set up a date picker with no border or background
-            NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
-            datepicker.bordered = NO;
-            datepicker.drawsBackground = NO;
-            datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
-            datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
-            
-            RLMObject *selectedObject = [displayedType instanceAtIndex:row];
-            NSString *propertyName = propertyNode.name;
-            
-            datepicker.dateValue = selectedObject[propertyName];
-            
-            // Create a menu with a single menu item, and set the date picker as the menu item's view
-            NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@""
-                                                          action:NULL
-                                                   keyEquivalent:@""];
-            item.view = datepicker;
-            [menu addItem:item];
-            
-            // Display the menu, and if the user pressed enter rather than clicking away or hitting escape then process our new timestamp
-            BOOL userAcceptedEdit = [menu popUpMenuPositioningItem:nil
-                                                        atLocation:frame.origin
-                                                            inView:tableView];
-            if (userAcceptedEdit) {
-                RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-                
-                [realm beginWriteTransaction];
-                selectedObject[propertyName] = datepicker.dateValue;
-                [realm commitWriteTransaction];
-            }
-        }
-        else {
-            return YES;
-        }
-    }
-    
-    return NO;
 }
 
 #pragma mark - Public methods - Table view construction
