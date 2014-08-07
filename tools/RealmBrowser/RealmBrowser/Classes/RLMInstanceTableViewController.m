@@ -349,7 +349,6 @@
             }
                 
             default:
-                
                 break;
         }
     }
@@ -364,32 +363,25 @@
     if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
         RLMTypeNode *displayedType = [self displayedType];
         
-        if (location.column < displayedType.propertyColumns.count) {
+        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
             RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
             
             if (propertyNode.type == RLMPropertyTypeObject) {
-                if (location.row < displayedType.instanceCount) {
-                    if (!linkCursorDisplaying) {
-                        RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
-                        RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
-                        NSObject *propertyValue = selectedInstance[propertyNode.name];
-                        
-                        if (propertyValue != nil) {
-                            [self enableLinkCursor];
-                        }
-                    }
+                if (!linkCursorDisplaying) {
+                    RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
+                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
+                    NSObject *propertyValue = selectedInstance[propertyNode.name];
                     
-                    return;
-                }
-            }
-            else if (propertyNode.type == RLMPropertyTypeArray) {
-                if (location.row < displayedType.instanceCount) {
-                    if (!linkCursorDisplaying) {
+                    if (propertyValue != nil) {
                         [self enableLinkCursor];
                     }
-                    
-                    return;
                 }
+                
+                return;
+            }
+            else if (propertyNode.type == RLMPropertyTypeArray) {
+                [self enableLinkCursor];
+                return;
             }
         }
     }
@@ -454,8 +446,8 @@
     RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
 
-    NSNumber *result = @(sender.state == NSOnState);
-    
+    NSNumber *result = @((BOOL)(sender.state == NSOnState));
+
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
@@ -559,6 +551,9 @@
 
 - (void)enableLinkCursor
 {
+    if (linkCursorDisplaying) {
+        return;
+    }
     NSCursor *currentCursor = [NSCursor currentCursor];
     [currentCursor push];
     
