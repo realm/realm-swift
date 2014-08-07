@@ -115,20 +115,19 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            BOOL isValidObject = RLMIsSubclass([obj class], [RLMObject class]) &&
-                                 [[[obj class] className] isEqualToString:property.objectClassName];
-            return isValidObject || obj == nil || obj == NSNull.null;
+            Class cls = [obj class];
+            return obj == nil || obj == NSNull.null
+                || (RLMIsKindOfClass(cls, "RLMObject") && [[cls className] isEqualToString:property.objectClassName]);
         }
         case RLMPropertyTypeArray: {
-            if ([obj isKindOfClass:RLMArray.class]) {
+            if (RLMIsKindOfClass([obj class], "RLMArray")) {
                 return [[(RLMArray *)obj objectClassName] isEqualToString:property.objectClassName];
             }
             if ([obj isKindOfClass:NSArray.class]) {
                 // check each element for compliance
                 for (id el in obj) {
                     Class cls = [el class];
-                    if (!RLMIsKindOfclass(cls, RLMObject.class) ||
-                        ![[cls className] isEqualToString:property.objectClassName]) {
+                    if (!RLMIsKindOfClass(cls, "RLMObject") || ![[cls className] isEqualToString:property.objectClassName]) {
                         return NO;
                     }
                 }

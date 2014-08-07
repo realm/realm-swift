@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define REALM_SWIFT
+//#define REALM_SWIFT
 #endif
 
 /**
