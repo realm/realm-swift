@@ -8,6 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+@interface RLMNumberTextField : NSTextField
+
+@property (nonatomic) NSNumber *number;
+
+@end
+
+
 @interface RLMNumberTableCellView : NSTableCellView
 
 @end

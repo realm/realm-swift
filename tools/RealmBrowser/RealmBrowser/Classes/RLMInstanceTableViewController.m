@@ -172,6 +172,8 @@
             RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             
+            ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
+            
             return numberCellView;
         }
         else {
@@ -181,7 +183,8 @@
             
             if (type == RLMPropertyTypeObject) {
                 basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
-            } else {
+            }
+            else {
                 basicCellView.textField.stringValue = formattedText;
             }
             
