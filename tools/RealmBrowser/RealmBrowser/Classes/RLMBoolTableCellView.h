@@ -7,8 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
-@interface RLMBoolTableCellView : NSTableCellView
+@interface RLMBoolTableCellView : RLMTableCellView
 
 @property(strong) IBOutlet NSButton *checkBox;
 

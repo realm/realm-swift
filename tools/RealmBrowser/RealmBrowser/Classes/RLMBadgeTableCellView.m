@@ -10,13 +10,14 @@
 
 @implementation RLMBadgeTableCellView
 
-- (void)awakeFromNib {
-    // We want it to appear "inline"
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
     [self.badge.cell setBezelStyle:NSInlineBezelStyle];
 }
 
-// The standard rowSizeStyle does some specific layout for us. To customize layout for our button, we first call super and then modify things
-- (void)viewWillDraw {
+- (void)viewWillDraw
+{
     [super viewWillDraw];
     
     if (![self.badge isHidden]) {
@@ -29,6 +30,17 @@
         textFrame.size.width = NSMinX(badgeFrame) - NSMinX(textFrame);
         self.textField.frame = textFrame;
     }
+}
+
+-(NSSize)sizeThatFits
+{
+    [self.textField sizeToFit];
+    CGFloat textWidth = self.textField.bounds.size.width;
+
+    [self.badge sizeToFit];
+    CGFloat badgeWidth = self.badge.bounds.size.width;
+    
+    return NSMakeSize(textWidth + badgeWidth, 20.0);
 }
 
 @end

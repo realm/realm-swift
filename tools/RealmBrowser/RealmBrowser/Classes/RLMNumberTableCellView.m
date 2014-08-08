@@ -18,6 +18,7 @@
 @implementation RLMNumberTextField
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     self.numberFormatter = [[NSNumberFormatter alloc] init];
     [self.numberFormatter setHasThousandSeparators:NO];
     [self.numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
@@ -28,6 +29,9 @@
     if (self.number) {
         self.stringValue = [self.numberFormatter stringFromNumber:self.number];
     }
+    else {
+        self.stringValue = @"";
+    }
     
     return [super becomeFirstResponder];
 }
@@ -37,13 +41,8 @@
 
 @implementation RLMNumberTableCellView
 
-- (void)awakeFromNib {
-}
-
-- (void)viewWillDraw {
-    [super viewWillDraw];
-    self.textField.frame = self.bounds;
-}
-
-
 @end
+
+
+
+

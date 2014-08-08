@@ -10,14 +10,4 @@
 
 @implementation RLMBasicTableCellView
 
-- (void)awakeFromNib {
-}
-
-- (void)viewWillDraw {
-    [super viewWillDraw];
-    self.textField.frame = self.bounds;
-}
-
-
-
 @end

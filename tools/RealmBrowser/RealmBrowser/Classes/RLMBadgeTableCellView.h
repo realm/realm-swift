@@ -7,8 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
-@interface RLMBadgeTableCellView : NSTableCellView
+@interface RLMBadgeTableCellView : RLMTableCellView
 
 @property (strong) IBOutlet NSButton *badge;
 

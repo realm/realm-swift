@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
 @interface RLMNumberTextField : NSTextField
 
@@ -15,6 +16,6 @@
 @end
 
 
-@interface RLMNumberTableCellView : NSTableCellView
+@interface RLMNumberTableCellView : RLMTableCellView
 
 @end

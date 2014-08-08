@@ -110,7 +110,7 @@
                                             <nil key="backgroundColor"/>
                                         </clipView>
                                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="exH-b9-o3D">
-                                            <rect key="frame" x="0.0" y="397" width="255" height="16"/>
+                                            <rect key="frame" x="0.0" y="398" width="255" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="2YT-v9-0yd">
@@ -143,8 +143,8 @@
                                                     <tableViewGridLines key="gridStyleMask" vertical="YES" horizontal="YES"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn editable="NO" width="120" minWidth="16" maxWidth="1000" id="9Ld-M2-qQp" userLabel="Table Column - Badge">
-                                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                        <tableColumn editable="NO" width="121" minWidth="16" maxWidth="1000" id="9Ld-M2-qQp" userLabel="Table Column - Image">
+                                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="img header">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
@@ -156,38 +156,68 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="BadgeHeaderLabel" verticalHuggingPriority="750" id="PND-Eu-oGc">
-                                                                    <rect key="frame" x="1" y="1" width="120" height="17"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="zj3-PN-ZMF">
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
-                                                                <customView identifier="BadgeCell" id="6Uc-fM-hEg" userLabel="BadgeCellView" customClass="RLMBadgeTableCellView">
-                                                                    <rect key="frame" x="1" y="20" width="120" height="22"/>
+                                                                <tableCellView identifier="ImageCell" id="Zr3-Z6-MDj" customClass="RLMImageTableCellView">
+                                                                    <rect key="frame" x="1" y="1" width="121" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                    <subviews>
+                                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xdo-Iu-B5b">
+                                                                            <rect key="frame" x="3" y="0.0" width="17" height="17"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="RI4-MK-b13"/>
+                                                                        </imageView>
+                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oFu-wx-HHi">
+                                                                            <rect key="frame" x="25" y="0.0" width="96" height="17"/>
+                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="rLS-h6-dI2">
+                                                                                <font key="font" metaFont="system"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                    </subviews>
+                                                                    <connections>
+                                                                        <outlet property="imageView" destination="Xdo-Iu-B5b" id="h97-mK-0zd"/>
+                                                                        <outlet property="textField" destination="oFu-wx-HHi" id="nl5-ye-yK4"/>
+                                                                    </connections>
+                                                                </tableCellView>
+                                                            </prototypeCellViews>
+                                                        </tableColumn>
+                                                        <tableColumn editable="NO" width="120" minWidth="16" maxWidth="1000" id="j4J-kL-c21" userLabel="Table Column - Badge">
+                                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="badge header">
+                                                                <font key="font" metaFont="smallSystem"/>
+                                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                            </tableHeaderCell>
+                                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="0UD-k1-665">
+                                                                <font key="font" metaFont="system"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                            <prototypeCellViews>
+                                                                <customView identifier="BadgeCell" id="Hd5-t2-1T1" userLabel="BadgeCellView" customClass="RLMBadgeTableCellView">
+                                                                    <rect key="frame" x="125" y="1" width="120" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nlc-2I-yjr">
+                                                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cVi-ab-it6">
                                                                             <rect key="frame" x="5" y="2" width="287" height="18"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="badge" id="IBD-89-chX">
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="badge" id="wJ3-zo-4Dq">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sfV-Rt-g6l" userLabel="Badge - Instance count">
+                                                                        <button hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OXI-nk-7Bf" userLabel="Badge - Instance count">
                                                                             <rect key="frame" x="76" y="2" width="37" height="17"/>
-                                                                            <buttonCell key="cell" type="roundRect" title="Instance count" bezelStyle="roundedRect" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zSi-U4-6OL">
+                                                                            <buttonCell key="cell" type="roundRect" title="Instance count" bezelStyle="roundedRect" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EIT-dd-wAA">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                             </buttonCell>
                                                                         </button>
                                                                     </subviews>
                                                                     <connections>
-                                                                        <outlet property="badge" destination="sfV-Rt-g6l" id="1I3-sk-c3Y"/>
-                                                                        <outlet property="textField" destination="Nlc-2I-yjr" id="2m1-ZK-oEF"/>
+                                                                        <outlet property="badge" destination="OXI-nk-7Bf" id="9NU-Xe-ZID"/>
+                                                                        <outlet property="textField" destination="cVi-ab-it6" id="Pgq-bu-24o"/>
                                                                     </connections>
                                                                 </customView>
                                                             </prototypeCellViews>
@@ -205,17 +235,8 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="BasicHeaderLabel" verticalHuggingPriority="750" id="rHO-Uc-l2q">
-                                                                    <rect key="frame" x="124" y="1" width="100" height="17"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="GSv-Zw-bmz">
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
                                                                 <customView identifier="BasicCell" id="j4I-rB-nX0" userLabel="BasicCellView" customClass="RLMBasicTableCellView">
-                                                                    <rect key="frame" x="124" y="20" width="100" height="22"/>
+                                                                    <rect key="frame" x="248" y="1" width="100" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93e-Tp-EKj">
@@ -249,17 +270,8 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="NumberHeaderLabel" verticalHuggingPriority="750" id="BNQ-W0-mzD">
-                                                                    <rect key="frame" x="227" y="1" width="100" height="17"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="eV0-fC-9Kf">
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
                                                                 <customView identifier="NumberCell" id="Gj6-W6-FXj" userLabel="NumberCellView" customClass="RLMNumberTableCellView">
-                                                                    <rect key="frame" x="227" y="20" width="100" height="22"/>
+                                                                    <rect key="frame" x="351" y="1" width="100" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OBR-LJ-wHt" customClass="RLMNumberTextField">
@@ -296,17 +308,8 @@
                                                             </textFieldCell>
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
-                                                                <textField identifier="BoolHeaderLabel" verticalHuggingPriority="750" id="hwm-z8-EUZ">
-                                                                    <rect key="frame" x="330" y="1" width="50" height="17"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Header Label" usesSingleLineMode="YES" id="Qeh-eE-9Rk">
-                                                                        <font key="font" metaFont="smallSystem"/>
-                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    </textFieldCell>
-                                                                </textField>
                                                                 <customView identifier="BoolCell" id="sLz-cM-Sl8" userLabel="BoolCellView" customClass="RLMBoolTableCellView">
-                                                                    <rect key="frame" x="330" y="20" width="50" height="22"/>
+                                                                    <rect key="frame" x="454" y="1" width="50" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <button appearanceType="aqua" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CbB-PG-BtE">
@@ -396,7 +399,7 @@
                         <size key="minSize" width="96" height="22"/>
                         <size key="maxSize" width="96" height="22"/>
                         <searchField key="view" verticalHuggingPriority="750" id="d5n-tM-xUt">
-                            <rect key="frame" x="0.0" y="0.0" width="96" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="96" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" id="xW4-0M-Izf">
                                 <font key="font" metaFont="system"/>
@@ -435,6 +438,7 @@
         </customObject>
     </objects>
     <resources>
+        <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
     </resources>

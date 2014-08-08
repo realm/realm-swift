@@ -169,7 +169,7 @@
             
             return boolCellView;
         }
-        else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble)  {
+        else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
             RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             

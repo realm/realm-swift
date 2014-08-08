@@ -10,10 +10,8 @@
 
 @implementation RLMBoolTableCellView
 
-- (void)awakeFromNib {
-}
-
-- (void)viewWillDraw {
+- (void)viewWillDraw
+{
     [super viewWillDraw];
     
     CGRect frame = self.checkBox.frame;
@@ -23,6 +21,11 @@
     frame.origin.y = (CGRectGetHeight(bounds) - CGRectGetHeight(frame))/2.0;
     
     self.checkBox.frame = frame;
+}
+
+-(NSSize)sizeThatFits
+{
+    return self.checkBox.bounds.size;
 }
 
 @end
