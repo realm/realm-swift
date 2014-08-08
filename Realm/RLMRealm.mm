@@ -182,6 +182,7 @@ static NSArray *s_objectDescriptors = nil;
     if (self) {
         _path = path;
         _thread = [NSThread currentThread];
+        _threadID = pthread_mach_thread_np(pthread_self());
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _autorefresh = YES;
@@ -372,6 +373,8 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
+    RLMCheckThread(self);
+
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
     token.block = block;
@@ -380,6 +383,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)removeNotification:(RLMNotificationToken *)token {
+    RLMCheckThread(self);
     if (token) {
         [_notificationHandlers removeObjectForKey:token];
         token.realm = nil;
@@ -395,6 +399,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)beginWriteTransaction {
+    RLMCheckThread(self);
     if (!self.inWriteTransaction) {
         try {
             // if we are moving the transaction forward, send local notifications
@@ -420,6 +425,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)commitWriteTransaction {
+    RLMCheckThread(self);
     if (self.inWriteTransaction) {
         try {
             LangBindHelper::commit_and_continue_as_read(*_sharedGroup);
@@ -510,6 +516,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)refresh {
+    RLMCheckThread(self);
     try {
         // no-op if writing
         if (self.inWriteTransaction) {
@@ -565,20 +572,17 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClassName, nil, nil);
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ...
-{
+- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objects:objectClassName where:predicateFormat args:args];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args
-{
+- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
     return [self objects:objectClassName withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate
-{
+- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(self, objectClassName, predicate, nil);
 }
 

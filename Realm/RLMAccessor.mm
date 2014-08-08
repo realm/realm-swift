@@ -33,6 +33,7 @@ inline void RLMVerifyAttached(__unsafe_unretained RLMObject *obj) {
                                        reason:@"Object has been deleted and is no longer valid."
                                      userInfo:nil];
     }
+    RLMCheckThread(obj->_realm);
 }
 
 // verify writable
@@ -484,7 +485,7 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
     Class metaClass = objc_getMetaClass(class_getName(accessorClass));
     IMP imp = imp_implementationWithBlock(^{ return className; });
-    class_replaceMethod(metaClass, @selector(className), imp, "@:");
+    class_addMethod(metaClass, @selector(className), imp, "@:");
 }
 
 // implement the shared schema method

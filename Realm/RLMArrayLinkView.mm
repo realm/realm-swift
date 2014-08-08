@@ -17,12 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.hpp"
-#import "RLMRealm_Private.hpp"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
-#import "RLMSchema.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMConstants.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMConstants.h"
+#import "RLMSchema.h"
 
 #import <objc/runtime.h>
 
@@ -47,6 +48,7 @@ inline void RLMLinkViewArrayValidateAttached(RLMArrayLinkView *ar) {
     if (!ar->_backingLinkView->is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
+    RLMCheckThread(ar->_realm);
 }
 inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *ar) {
     // first verify attached
@@ -74,12 +76,6 @@ inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     return _backingLinkView->size();
 }
 
-inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger index) {
-    return RLMCreateObjectAccessor(array->_realm,
-                                   array->_objectClassName,
-                                   array->_backingLinkView->get(index).get_index());
-}
-
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMLinkViewArrayValidateAttached(self);
 
@@ -87,7 +83,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     if (state->state == 0) {
         items = [[RLMCArrayHolder alloc] initWithSize:len];
         state->extra[0] = (long)items;
-        state->extra[1] = self.count;
+        state->extra[1] = _backingLinkView->size();
     }
     else {
         items = (__bridge id)(void *)state->extra[0];
@@ -96,15 +92,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 
     NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
-    // ARC (sometimes) autoreleases objects return from RLMCreateAccessorForArrayIndex,
-    // resulting in them staying alive excessively long in some cases without this
-    @autoreleasepool {
-        while (index < count && batchCount < len) {
-            RLMObject *accessor = RLMCreateAccessorForArrayIndex(self, index++);
-            items->array[batchCount] = accessor;
-            buffer[batchCount] = accessor;
-            batchCount++;
-        }
+    RLMObjectSchema *objectSchema = _realm.schema[_objectClassName];
+    Class accessorClass = objectSchema.accessorClass;
+    tightdb::Table &table = *objectSchema->_table;
+    while (index < count && batchCount < len) {
+        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:objectSchema defaultValues:NO];
+        accessor->_row = table[_backingLinkView->get(index++).get_index()];
+        items->array[batchCount] = accessor;
+        buffer[batchCount] = accessor;
+        batchCount++;
     }
 
     for (NSUInteger i = batchCount; i < len; ++i) {
@@ -121,10 +117,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
 - (id)objectAtIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateAttached(self);
 
-    if (index >= self.count) {
+    if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateAccessorForArrayIndex(self, index);;
+    return RLMCreateObjectAccessor(_realm,
+                                   _objectClassName,
+                                   _backingLinkView->get(index).get_index());
 }
 
 - (void)addObject:(RLMObject *)object {
@@ -222,7 +220,6 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     return result;
 }
 
-
 - (void)deleteObjectsFromRealm {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
@@ -230,8 +227,4 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     self->_backingLinkView->remove_all_target_rows();
 }
 
-
 @end
-
-
-

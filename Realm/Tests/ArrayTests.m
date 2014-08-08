@@ -18,6 +18,7 @@
 
 #import "RLMTestCase.h"
 
+#import <libkern/OSAtomic.h>
 #import <mach/mach.h>
 
 @interface ArrayTests : RLMTestCase
@@ -452,6 +453,27 @@ static vm_size_t get_resident_size() {
         }
     }
     XCTAssert(get_resident_size() < size * 2);
+}
+
+- (void)testCrossThreadAccess
+{
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"name1"]];
+    [StringObject createInRealm:realm withObject:@[@"name2"]];
+    [realm commitWriteTransaction];
+
+    RLMArray *array = [StringObject allObjects];
+    XCTAssertNoThrow([array lastObject]);
+
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows([array lastObject]);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
 }
 
 @end
