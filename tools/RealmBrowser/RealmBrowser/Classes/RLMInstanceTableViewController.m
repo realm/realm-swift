@@ -61,6 +61,7 @@
     dateFormatter.timeStyle = NSDateFormatterShortStyle;
     
     numberFormatter = [[NSNumberFormatter alloc] init];
+    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     
     linkCursorDisplaying = NO;
     awake = YES;
@@ -217,7 +218,6 @@
                     numberFormatter.allowsFloats = NO;
                 } else {
                     numberFormatter.allowsFloats = YES;
-                    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
                 }
                 
                 return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
