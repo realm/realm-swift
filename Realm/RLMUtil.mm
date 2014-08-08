@@ -134,7 +134,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
                 }
                 return YES;
             }
-            if (obj == NSNull.null) {
+            if (!obj || obj == NSNull.null) {
                 return YES;
             }
             return NO;
@@ -177,7 +177,9 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjec
         // set out object to validated input or default value
         id obj = dict[prop.name];
         obj = obj ?: defaults[prop.name];
-        outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
+        obj = RLMValidatedObjectForProperty(obj, prop, schema);
+        if (obj && obj != NSNull.null)
+            outDict[prop.name] = obj;
     }
     return outDict;
 }

@@ -14,6 +14,8 @@
 * Throw an exception when an RLMObject is used from the incorrect thread rather
   than crashing in confusing ways.
 * Speed up RLMRealm instantiation and array property iteration.
+* Allow array and objection relation properties to be missing or null when
+  creating a RLMObject from a NSDictionary.
 
 ### Bugfixes
 
