@@ -21,7 +21,7 @@ import Foundation
 @objc public class RLMSwiftSupport {
 
     public class func isSwiftClassName(className: NSString) -> Bool {
-        return className.rangeOfString(".").location != NSNotFound
+        return className.rangeOfString(".").location != Foundation.NSNotFound
     }
 
     public class func demangleClassName(className: NSString) -> NSString {
