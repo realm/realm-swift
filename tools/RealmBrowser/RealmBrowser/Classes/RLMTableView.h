@@ -46,9 +46,9 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
-- (void)menuSelectedAddRow:(RLMTableLocation)location;
-
 - (void)menuSelectedDeleteRow:(RLMTableLocation)location;
+
+- (void)menuSelectedAddRow:(RLMTableLocation)location;
 
 
 @end

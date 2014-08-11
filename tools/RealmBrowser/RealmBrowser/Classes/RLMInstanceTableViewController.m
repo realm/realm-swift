@@ -40,6 +40,8 @@
     BOOL linkCursorDisplaying;
     NSDateFormatter *dateFormatter;
     NSNumberFormatter *numberFormatter;
+    
+    NSImage *tempImage;
 }
 
 #pragma mark - NSObject overrides
@@ -125,6 +127,21 @@
 
 #pragma mark - RLMTableViewDelegate implementation
 
+- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        
+    if (location.row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
+        return;
+    }
+    
+    RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
+    [realm beginWriteTransaction];
+    [realm deleteObject:selectedObject];
+    [realm commitWriteTransaction];
+    [self.tableView reloadData];
+}
+
 - (void)menuSelectedAddRow:(RLMTableLocation)location
 {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
@@ -190,17 +207,6 @@
 
 }
 
-- (void)menuSelectedDeleteRow:(RLMTableLocation)location
-{
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
-
-    [realm beginWriteTransaction];
-    [realm deleteObject:selectedObject];
-    [realm commitWriteTransaction];
-    [self.tableView reloadData];
-}
-
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     if (self.tableView == notification.object) {
@@ -214,9 +220,12 @@
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
         RLMTypeNode *displayedType = self.displayedType;
+        NSLog(@"vftc:%lu, dt.c:%lu tableColumns: %lu", columnIndex, displayedType.propertyColumns.count, tableView.tableColumns.count);
+
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
         id propertyValue = selectedInstance[clazzProperty.name];
@@ -253,6 +262,33 @@
             
             return numberCellView;
         }
+//        else if (type == RLMPropertyTypeData) {
+//            NSTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
+//            
+//            imageCellView.textField.stringValue = @"imagecell";
+//            
+//            if (tempImage) {
+//                NSLog(@"== Already had one ==");
+//                imageCellView.imageView.image = tempImage;
+//                return imageCellView;
+//            }
+//            
+//            NSData *data = propertyValue;
+//
+//            NSString *content = [self.class contentTypeForImageData:data];
+//            imageCellView.textField.stringValue = content;
+//            
+//            NSLog(@"=====%ld datacontent: %@", (long)rowIndex, content);
+//
+//            NSImage *image = [[NSImage alloc] initWithData:data];
+//            NSImage *thumbnail = RLMThumbnailImageFromImage(image);
+//            NSLog(@"======%ld image: %@", (long)rowIndex, thumbnail);
+//            
+//            tempImage = thumbnail;
+//            imageCellView.imageView.image = thumbnail;
+//            
+//            return imageCellView;
+//        }
         else {
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
             
@@ -271,6 +307,40 @@
     
     return nil;
 }
+
+//+ (NSString *)contentTypeForImageData:(NSData *)data
+//{
+//    uint8_t c;
+//    [data getBytes:&c length:1];
+//    
+//    switch (c) {
+//        case 0xFF:
+//            return @"image/jpeg";
+//        case 0x89:
+//            return @"image/png";
+//        case 0x47:
+//            return @"image/gif";
+//        case 0x49:
+//        case 0x4D:
+//            return @"image/tiff";
+//    }
+//    
+//    return nil;
+//}
+
+//static NSImage *RLMThumbnailImageFromImage(NSImage *image) {
+//    NSSize imageSize = [image size];
+//    CGFloat imageAspectRatio = imageSize.width/imageSize.height;
+//    
+//    NSSize thumbnailSize = NSMakeSize(30.0 * imageAspectRatio, 30.0);
+//    NSImage *thumbnailImage = [[NSImage alloc] initWithSize:thumbnailSize];
+//    [thumbnailImage lockFocus];
+//    [image drawInRect:NSMakeRect(0, 0, thumbnailSize.width, thumbnailSize.height) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+//    [thumbnailImage unlockFocus];
+//    
+//    return thumbnailImage;
+//}
+
 
 +(NSAttributedString *)linkStringWithString:(NSString *)string
 {

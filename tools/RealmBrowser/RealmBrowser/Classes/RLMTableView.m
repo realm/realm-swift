@@ -136,7 +136,26 @@
     if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidExitView:)]) {
         [(id<RLMTableViewDelegate>)self.delegate mouseDidExitView:self];
     }
+}
 
+-(void)keyDown:(NSEvent *)theEvent
+{
+    if (theEvent.modifierFlags & NSCommandKeyMask) {
+        RLMTableLocation location = RLMTableLocationMake(self.selectedRow, self.selectedColumn);
+        
+        if (theEvent.keyCode == 27) {
+            if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
+                [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:location];
+            }
+        }
+        else if (theEvent.keyCode == 51) {
+            if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
+                [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:location];
+            }
+        }
+    }
+    
+    [self interpretKeyEvents:@[theEvent]];
 }
 
 #pragma mark - NSView overrides
