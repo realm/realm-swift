@@ -384,8 +384,8 @@ void add_between_constraint_to_query(tightdb::Query & query,
         }
         case type_Int:
         {
-            int fromInt = [(NSNumber *)from longLongValue];
-            int toInt = [(NSNumber *)to longLongValue];
+            int64_t fromInt = [(NSNumber *)from longLongValue];
+            int64_t toInt = [(NSNumber *)to longLongValue];
             query.between(index, fromInt, toInt);
             break;
         }
