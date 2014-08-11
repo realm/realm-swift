@@ -23,17 +23,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMProperty.h"
 
-inline bool nsnumber_is_like_bool(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    // @encode(BOOL) is 'B' on iOS 64 and 'c'
-    // objcType is always 'c'. Therefore compare to "c".
-    
-    // FIXME: Need to support @(false) which returns a data_type of 'i'
-    return data_type[0] == 'c';
-}
-
-inline bool nsnumber_is_like_integer(NSObject *obj)
+static inline bool nsnumber_is_like_integer(id obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
@@ -45,7 +35,23 @@ inline bool nsnumber_is_like_integer(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline bool nsnumber_is_like_float(NSObject *obj)
+static inline bool nsnumber_is_like_bool(id obj)
+{
+    // @encode(BOOL) is 'B' on iOS 64 and 'c'
+    // objcType is always 'c'. Therefore compare to "c".
+    if ([obj objCType][0] == 'c') {
+        return true;
+    }
+
+    if (nsnumber_is_like_integer(obj)) {
+        int value = [obj intValue];
+        return value == 0 || value == 1;
+    }
+
+    return false;
+}
+
+static inline bool nsnumber_is_like_float(id obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
@@ -60,7 +66,7 @@ inline bool nsnumber_is_like_float(NSObject *obj)
             (strcmp(data_type, @encode(double)) == 0 && ABS([(NSNumber *)obj doubleValue]) <= FLT_MAX));
 }
 
-inline bool nsnumber_is_like_double(NSObject *obj)
+static inline bool nsnumber_is_like_double(id obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
@@ -74,7 +80,7 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline bool object_has_valid_type(id obj)
+static inline bool object_has_valid_type(id obj)
 {
     return ([obj isKindOfClass:[NSString class]] ||
             [obj isKindOfClass:[NSNumber class]] ||
