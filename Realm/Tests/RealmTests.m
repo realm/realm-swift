@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMRealm_Dynamic.h"
 
 #import <libkern/OSAtomic.h>
 
@@ -163,7 +164,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -196,7 +197,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -238,7 +239,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -290,7 +291,7 @@
 /* FIXME: disabled until we have per file compile options
  - (void)testRealmWriteImplicitCommit
  {
- RLMRealm * realm = [self realmWithTestPath];
+ RLMRealm *realm = [self realmWithTestPath];
  [realm beginWriteTransaction];
  RLMTable *table = [realm createTableWithName:@"table"];
  [table addColumnWithName:@"col0" type:RLMPropertyTypeInt];
@@ -371,9 +372,9 @@
     __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
     OSSpinLockLock(&spinlock);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows([realm beginWriteTransaction]);
-        XCTAssertThrows([realm allObjects:@"IntObject"]);
-        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"]);
+        XCTAssertThrows([realm beginWriteTransaction], @"No exception");
+        XCTAssertThrows([realm allObjects:@"IntObject"], @"No exception");
+        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"], @"No exception");
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);

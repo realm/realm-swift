@@ -60,8 +60,8 @@ NSExpressionType validated_expression_type(NSExpression *expression) {
 }
 
 //// apply an expression between two columns to a query
-//void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
-//                                         NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
+//void update_query_with_column_expression(RLMTable *table, tightdb::Query & query,
+//                                         NSString *col1, NSString *col2, NSPredicateOperatorType operatorType) {
 //    
 //    // only support equality for now
 //    if (operatorType != NSEqualToPredicateOperatorType) {
@@ -201,7 +201,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSComparisonPredicateOptions predicateOptions,
                                     NSUInteger index,
-                                    NSString * value) {
+                                    NSString *value) {
     bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     
@@ -605,7 +605,7 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
     }
 }
     
-void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
+void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString *leftColumnName, NSString *rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
     NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
@@ -655,18 +655,18 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
     }
 }
     
-void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
+void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema, tightdb::Query & query)
 {
     // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
-        NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
+        NSCompoundPredicate *comp = (NSCompoundPredicate *)predicate;
         
         switch ([comp compoundPredicateType]) {
             case NSAndPredicateType:
                 // Add all of the subpredicates.
                 query.group();
-                for (NSPredicate * subp in comp.subpredicates) {
+                for (NSPredicate *subp in comp.subpredicates) {
                     update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
@@ -676,7 +676,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
                 // Add all of the subpredicates with ors inbetween.
                 query.group();
                 for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
-                    NSPredicate * subp = comp.subpredicates[i];
+                    NSPredicate *subp = comp.subpredicates[i];
                     if (i > 0) {
                         query.Or();
                     }
@@ -697,7 +697,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
         }
     }
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
-        NSComparisonPredicate * compp = (NSComparisonPredicate *)predicate;
+        NSComparisonPredicate *compp = (NSComparisonPredicate *)predicate;
         
         // validate expressions
         NSExpressionType exp1Type = validated_expression_type(compp.leftExpression);
