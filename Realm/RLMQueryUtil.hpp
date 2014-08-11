@@ -28,7 +28,7 @@ extern NSString *const RLMPropertiesComparisonTypeMismatchException;
 extern NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException;
 
 // apply the given predicate to the passed in query, returning the updated query
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema * schema,
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema);
 
 // sort an existing view by the specified property name and direction

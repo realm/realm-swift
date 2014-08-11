@@ -362,13 +362,13 @@
     const float inputFloat = 231.0f;
     const double inputDouble = 123732.9231;
     const BOOL inputBool = NO;
-    NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
-    NSString * const inputString = @"Westeros";
-    NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
+    NSDate *const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
+    NSString *const inputString = @"Westeros";
+    NSData *const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
     id inputMixed = @"Tyrion";
     
-    NSDictionary * const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
-    NSArray * const keyPaths = inputKeyPathsAndValues.allKeys;
+    NSDictionary *const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
+    NSArray *const keyPaths = inputKeyPathsAndValues.allKeys;
     
     for (NSUInteger i = 0; i < keyPaths.count; i++) {
         NSString *keyToDefault = keyPaths[i];
@@ -381,7 +381,7 @@
     [realm commitWriteTransaction];
 
     // Test allObject for DefaultObject
-    NSDictionary * const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
+    NSDictionary *const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
     for (NSUInteger i = 0; i < keyPaths.count; i++) {
         NSString *keyToDefault = keyPaths[i];
         DefaultObject *object = [DefaultObject allObjects][i];
@@ -440,7 +440,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
+    NSDictionary *const dictValidAllTypes = @{@"boolCol" : @NO,
                                                @"intCol" : @54,
                                                @"floatCol" : @0.7f,
                                                @"doubleCol" : @0.8,
@@ -488,7 +488,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
     
     [realm beginWriteTransaction];
     

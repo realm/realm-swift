@@ -223,7 +223,7 @@
     
     // throw if there was no type
     if (!validType) {
-        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
+        NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }

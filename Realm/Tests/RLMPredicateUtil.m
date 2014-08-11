@@ -28,7 +28,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
 
 + (NSPredicate *(^)(NSExpression *, NSExpression *)) defaultPredicateGenerator
 {
-    return ^(NSExpression *leftExpression, NSExpression * rightExpression) {
+    return ^(NSExpression *leftExpression, NSExpression *rightExpression) {
         return [NSComparisonPredicate
                 predicateWithLeftExpression: leftExpression
                 rightExpression: rightExpression
@@ -66,8 +66,8 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
                                 options: (NSComparisonPredicateOptions) options
                                modifier: (NSComparisonPredicateModifier) modifier
 {
-    NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
-    NSExpression * right = expression;
+    NSExpression *left = [NSExpression expressionForKeyPath:keyPath];
+    NSExpression *right = expression;
 
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
@@ -80,8 +80,8 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
                              expression: (NSExpression *)expression
                                selector: (SEL)selector
 {
-    NSExpression * left = [NSExpression expressionForKeyPath:keyPath];
-    NSExpression * right = expression;
+    NSExpression *left = [NSExpression expressionForKeyPath:keyPath];
+    NSExpression *right = expression;
 
     return [NSComparisonPredicate predicateWithLeftExpression: left
                                               rightExpression: right
@@ -113,7 +113,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
     NSExpression *expression = [NSExpression expressionForConstantValue: @0];
 
     return ^BOOL(NSPredicateOperatorType operatorType) {
-        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+        NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                                expression: expression
                                                              operatorType: operatorType];
         return [RLMPredicateUtil isEmptyIntColWithPredicate:predicate];
@@ -125,7 +125,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
 
     return ^BOOL(NSPredicateOperatorType operatorType) {
-        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+        NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                                expression: expression
                                                              operatorType: operatorType];
         return [RLMPredicateUtil isEmptyFloatColWithPredicate:predicate];
@@ -137,7 +137,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
 
     return ^BOOL(NSPredicateOperatorType operatorType) {
-        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+        NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                                expression: expression
                                                              operatorType: operatorType];
         return [RLMPredicateUtil isEmptyDoubleColWithPredicate:predicate];
@@ -150,7 +150,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
                                 [NSDate dateWithTimeIntervalSinceNow:0]];
 
     return ^BOOL(NSPredicateOperatorType operatorType) {
-        NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+        NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                                expression: expression
                                                              operatorType: operatorType];
         return [RLMPredicateUtil isEmptyDateColWithPredicate:predicate];
@@ -166,7 +166,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0];
 
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
+    NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"intCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
@@ -178,7 +178,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0f];
 
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
+    NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"floatCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
@@ -190,7 +190,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
 {
     NSExpression *expression = [NSExpression expressionForConstantValue: @0.0];
 
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
+    NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"doubleCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {
@@ -203,7 +203,7 @@ const NSUInteger DEFAULT_COMPARISON_PREDICATE_MODIFIER = NSDirectPredicateModifi
     NSExpression *expression = [NSExpression expressionForConstantValue:
                                 [NSDate dateWithTimeIntervalSinceNow:0]];
 
-    NSPredicate * predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
+    NSPredicate *predicate = [RLMPredicateUtil comparisonWithKeyPath: @"dateCol"
                                                            expression: expression
                                                              selector: @selector(alwaysFalse:)];
     return ^BOOL() {

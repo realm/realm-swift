@@ -164,7 +164,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -197,7 +197,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -239,7 +239,7 @@
     // we have two notifications, one for opening the realm, and a second when performing our transaction
     __block NSUInteger noteCount = 0;
     __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm * realm) {
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (++noteCount == 2) {
             [notificationFired fulfill];
@@ -291,7 +291,7 @@
 /* FIXME: disabled until we have per file compile options
  - (void)testRealmWriteImplicitCommit
  {
- RLMRealm * realm = [self realmWithTestPath];
+ RLMRealm *realm = [self realmWithTestPath];
  [realm beginWriteTransaction];
  RLMTable *table = [realm createTableWithName:@"table"];
  [table addColumnWithName:@"col0" type:RLMPropertyTypeInt];
