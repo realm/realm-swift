@@ -124,12 +124,17 @@
     [realm commitWriteTransaction];
     
     RLMArray *betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
-    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 52");
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
     XCTAssertEqual(betweenArray.count, (NSUInteger)4, @"Should equal 4");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
     XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+
+    betweenArray = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+    betweenArray = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
     XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
 }
 

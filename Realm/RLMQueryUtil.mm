@@ -33,7 +33,7 @@ NSString *const RLMPropertiesComparisonTypeMismatchReason = @"Property type mism
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Comparison between %@ and %@";
 
 // small helper to create the many exceptions thrown when parsing predicates
-NSException *RLMPredicateException(NSString *name, NSString *reason) {
+static NSException *RLMPredicateException(NSString *name, NSString *reason) {
     return [NSException exceptionWithName:name reason:reason userInfo:nil];
 }
 
@@ -48,16 +48,6 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) 
 }
 
 namespace {
-
-// validate that we support the passed in expression type
-NSExpressionType validated_expression_type(NSExpression *expression) {
-    if (expression.expressionType != NSConstantValueExpressionType &&
-        expression.expressionType != NSKeyPathExpressionType) {
-        @throw RLMPredicateException(@"Invalid expression type",
-                                       @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
-    }
-    return expression.expressionType;
-}
 
 //// apply an expression between two columns to a query
 //void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
@@ -207,7 +197,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
     
     if (diacriticInsensitive) {
         @throw RLMPredicateException(@"Invalid predicate option",
-                                       @"NSDiacriticInsensitivePredicateOption not supported for string type");
+                                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
     }
     
     tightdb::StringData sd = RLMStringDataWithNSString(value);
@@ -336,65 +326,57 @@ void add_datetime_constraint_to_link_query(tightdb::Query& query,
     }
 }
 
+id value_for_expression(id value) {
+    if ([value isKindOfClass:[NSExpression class]]) {
+        return [value constantValue];
+    }
+    return value;
+}
+
 void add_between_constraint_to_query(tightdb::Query & query,
                                      RLMObjectSchema *desc,
                                      NSString *columnName,
                                      NSArray *array) {
-    // get prop and index
-    RLMProperty *prop = desc[columnName];
-    NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
-    
+
     // validate value
-    if ([array isKindOfClass:[NSArray class]]) {
-        if (array.count == 2) {
-            if (!RLMIsObjectValidForProperty(array.firstObject, prop) ||
-                !RLMIsObjectValidForProperty(array.lastObject, prop)) {
-                @throw RLMPredicateException(@"Invalid value",
-                                             [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
-            }
-        } else {
-            @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
-        }
-    } else {
+    if (![array isKindOfClass:[NSArray class]]) {
         @throw RLMPredicateException(@"Invalid value", @"object must be of type NSArray for BETWEEN operations");
     }
-    
+    if (array.count != 2) {
+        @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
+    }
+
+    id from = value_for_expression(array.firstObject);
+    id to = value_for_expression(array.lastObject);
+    RLMProperty *prop = desc[columnName];
+
+    if (!RLMIsObjectValidForProperty(from, prop) || !RLMIsObjectValidForProperty(to, prop)) {
+        @throw RLMPredicateException(@"Invalid value",
+                                     [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
+    }
+
+    NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
+
     // add to query
-    id from = array.firstObject;
-    id to = array.lastObject;
     switch (prop.type) {
         case type_DateTime:
             query.between_datetime(index,
-                                   double([(NSDate *)from timeIntervalSince1970]),
-                                   double([(NSDate *)to timeIntervalSince1970]));
+                                   [from timeIntervalSince1970],
+                                   [to timeIntervalSince1970]);
             break;
         case type_Double:
-        {
-            double fromDouble = [(NSNumber *)from doubleValue];
-            double toDouble = [(NSNumber *)to doubleValue];
-            query.between(index, fromDouble, toDouble);
+            query.between(index, [from doubleValue], [to doubleValue]);
             break;
-        }
         case type_Float:
-        {
-            float fromFloat = [(NSNumber *)from floatValue];
-            float toFloat = [(NSNumber *)to floatValue];
-            query.between(index, fromFloat, toFloat);
+            query.between(index, [from floatValue], [to floatValue]);
             break;
-        }
         case type_Int:
-        {
-            int64_t fromInt = [(NSNumber *)from longLongValue];
-            int64_t toInt = [(NSNumber *)to longLongValue];
-            query.between(index, fromInt, toInt);
+            query.between(index, [from longLongValue], [to longLongValue]);
             break;
-        }
         default:
-        {
             NSString *message = [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations",
                                  RLMTypeToString(prop.type)];
             @throw RLMPredicateException(@"Unsupported predicate value type", message);
-        }
     }
 }
 
@@ -483,19 +465,19 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     NSPredicateOperatorType opType = pred.predicateOperatorType;
     switch (type) {
         case type_Bool:
-            add_bool_constraint_to_link_query(query, opType, idx1, idx2, bool([(NSNumber *)value boolValue]));
+            add_bool_constraint_to_link_query(query, opType, idx1, idx2, bool([value boolValue]));
             break;
         case type_DateTime:
-            add_datetime_constraint_to_link_query(query, opType, idx1, idx2, double([(NSDate *)value timeIntervalSince1970]));
+            add_datetime_constraint_to_link_query(query, opType, idx1, idx2, double([value timeIntervalSince1970]));
             break;
         case type_Double:
-            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Double([(NSNumber *)value doubleValue]));
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Double([value doubleValue]));
             break;
         case type_Float:
-            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Float([(NSNumber *)value floatValue]));
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Float([value floatValue]));
             break;
         case type_Int:
-            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([(NSNumber *)value longLongValue]));
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([value longLongValue]));
             break;
         case type_String:
             add_string_constraint_to_link_query(query, opType, pred.options, idx1, idx2, value);
@@ -552,19 +534,19 @@ void update_query_with_value_expression(RLMSchema *schema,
     RLMPropertyType type = prop.type;
     switch (type) {
         case type_Bool:
-            add_bool_constraint_to_query(query, pred.predicateOperatorType, index, bool([(NSNumber *)value boolValue]));
+            add_bool_constraint_to_query(query, pred.predicateOperatorType, index, bool([value boolValue]));
             break;
         case type_DateTime:
-            add_datetime_constraint_to_query(query, pred.predicateOperatorType, index, double([(NSDate *)value timeIntervalSince1970]));
+            add_datetime_constraint_to_query(query, pred.predicateOperatorType, index, double([value timeIntervalSince1970]));
             break;
         case type_Double:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value doubleValue]);
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value doubleValue]);
             break;
         case type_Float:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value floatValue]);
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value floatValue]);
             break;
         case type_Int:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value longLongValue]);
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value longLongValue]);
             break;
         case type_String:
             add_string_constraint_to_query(query, pred.predicateOperatorType, pred.options, index, value);
@@ -666,24 +648,27 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
             case NSAndPredicateType:
                 // Add all of the subpredicates.
                 query.group();
-                for (NSPredicate * subp in comp.subpredicates) {
+                for (NSPredicate *subp in comp.subpredicates) {
                     update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
                 
-            case NSOrPredicateType:
+            case NSOrPredicateType: {
                 // Add all of the subpredicates with ors inbetween.
                 query.group();
-                for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
-                    NSPredicate * subp = comp.subpredicates[i];
-                    if (i > 0) {
+
+                bool first = true;
+                for (NSPredicate *subp in comp.subpredicates) {
+                    if (!first) {
                         query.Or();
                     }
+                    first = false;
                     update_query_with_predicate(subp, schema, objectSchema, query);
                 }
                 query.end_group();
                 break;
+            }
                 
             case NSNotPredicateType:
                 // Add the negated subpredicate
@@ -699,20 +684,20 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
         NSComparisonPredicate * compp = (NSComparisonPredicate *)predicate;
         
-        // validate expressions
-        NSExpressionType exp1Type = validated_expression_type(compp.leftExpression);
-        NSExpressionType exp2Type = validated_expression_type(compp.rightExpression);
-
         // check modifier
         if (compp.predicateOperatorType == NSInPredicateOperatorType) {
             @throw RLMPredicateException(@"Invalid operator type", @"Unsupported predicate operator 'IN'");
         }
-        else if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
+        if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
             // no support for ALL queries
             @throw RLMPredicateException(@"Invalid predicate",
                                          @"ALL modifier not supported");
         }
-        else if (compp.comparisonPredicateModifier == NSAnyPredicateModifier) {
+
+        NSExpressionType exp1Type = compp.leftExpression.expressionType;
+        NSExpressionType exp2Type = compp.rightExpression.expressionType;
+
+        if (compp.comparisonPredicateModifier == NSAnyPredicateModifier) {
             // for ANY queries
             if (exp1Type != NSKeyPathExpressionType || exp2Type != NSConstantValueExpressionType) {
                 @throw RLMPredicateException(@"Invalid predicate",
@@ -740,7 +725,20 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
             }
             return;
         }
-        else if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
+
+        if (compp.predicateOperatorType == NSBetweenPredicateOperatorType) {
+            // Inserting an array via %@ gives NSConstantValueExpressionType, but
+            // including it directly gives NSAggregateExpressionType
+            if (exp1Type != NSKeyPathExpressionType || (exp2Type != NSAggregateExpressionType && exp2Type != NSConstantValueExpressionType)) {
+                @throw RLMPredicateException(@"Invalid predicate",
+                                             @"Predicate with BETWEEN operator must compare a KeyPath with an aggregate with two values");
+            }
+            update_query_with_value_expression(schema, objectSchema, query, compp.leftExpression.keyPath,
+                                               compp.rightExpression.constantValue, compp);
+            return;
+        }
+
+        if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
             // both expression are KeyPaths
             update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath,
                                                 compp.predicateOperatorType);
@@ -757,7 +755,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMSchema *schema,
         }
         else {
             @throw RLMPredicateException(@"Invalid predicate expressions",
-                                         @"Tring to compare two constant values");
+                                         @"Predicate expressions must compare a keypath and another keypath or a constant value");
         }
     }
     else {
@@ -773,27 +771,26 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema 
                                  RLMObjectSchema *objectSchema)
 {
     // parse and apply predicate tree
-    if (predicate) {
-        if ([predicate isKindOfClass:[NSString class]]) {
-            update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
-                                        schema,
-                                        objectSchema,
-                                        *query);
-        }
-        else if ([predicate isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(predicate, schema, objectSchema, *query);
-        }
-        else {
-            @throw RLMPredicateException(@"Invalid argument",
-                                         @"Condition should be predicate as string or NSPredicate object");
-        }
-        
-        // Test the constructed query in core
-        std::string validateMessage = query->validate();
-        if (validateMessage != "") {
-            @throw RLMPredicateException(@"Invalid query",
-                                        [NSString stringWithCString:validateMessage.c_str() encoding:[NSString defaultCStringEncoding]]  );
-        }
+    if (!predicate) {
+        return;
+    }
+
+    if ([predicate isKindOfClass:[NSString class]]) {
+        predicate = [NSPredicate predicateWithFormat:predicate];
+    }
+
+    if (![predicate isKindOfClass:[NSPredicate class]]) {
+        @throw RLMPredicateException(@"Invalid argument",
+                                     @"Condition should be predicate as string or NSPredicate object");
+    }
+
+    update_query_with_predicate(predicate, schema, objectSchema, *query);
+
+    // Test the constructed query in core
+    std::string validateMessage = query->validate();
+    if (!validateMessage.empty()) {
+        @throw RLMPredicateException(@"Invalid query",
+                                     [NSString stringWithCString:validateMessage.c_str() encoding:[NSString defaultCStringEncoding]]  );
     }
 }
 
