@@ -16,6 +16,7 @@
 
 * Fixed a memory leak when querying for objects.
 * Fixed initializing array properties on standalone Swift RLMObject subclasses.
+* Fix for queries on 64bit integers.
 
 0.82.0 Release notes (2014-08-05)
 =============================================================
