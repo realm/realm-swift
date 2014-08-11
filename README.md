@@ -3,6 +3,8 @@
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS & OSX versions of Realm, for both Swift & Objective-C.
 
+[![Reference Status](https://www.versioneye.com/objective-c/realm/reference_badge.svg?style=flat)](https://www.versioneye.com/objective-c/realm/references)
+
 
 ## Features
 
