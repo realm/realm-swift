@@ -384,8 +384,8 @@ void add_between_constraint_to_query(tightdb::Query & query,
         }
         case type_Int:
         {
-            int fromInt = [(NSNumber *)from intValue];
-            int toInt = [(NSNumber *)to intValue];
+            int64_t fromInt = [(NSNumber *)from longLongValue];
+            int64_t toInt = [(NSNumber *)to longLongValue];
             query.between(index, fromInt, toInt);
             break;
         }
@@ -495,7 +495,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
             add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Float([(NSNumber *)value floatValue]));
             break;
         case type_Int:
-            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([(NSNumber *)value intValue]));
+            add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([(NSNumber *)value longLongValue]));
             break;
         case type_String:
             add_string_constraint_to_link_query(query, opType, pred.options, idx1, idx2, value);
@@ -564,7 +564,7 @@ void update_query_with_value_expression(RLMSchema *schema,
             add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value floatValue]);
             break;
         case type_Int:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value intValue]);
+            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [(NSNumber *)value longLongValue]);
             break;
         case type_String:
             add_string_constraint_to_query(query, pred.predicateOperatorType, pred.options, index, value);
