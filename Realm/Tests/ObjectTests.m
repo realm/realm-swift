@@ -376,49 +376,81 @@
     [realm commitWriteTransaction];
 }
 
-- (void)testDefaultValues
+- (NSDictionary *)defaultValuesDictionary {
+    return @{@"intCol" : @98,
+             @"floatCol" : @231.0f,
+             @"doubleCol" : @123732.9231,
+             @"boolCol" : @NO,
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:454321],
+             @"stringCol" : @"Westeros",
+             @"binaryCol" : [@"inputData" dataUsingEncoding:NSUTF8StringEncoding],
+             @"mixedCol" : @"Tyrion"};
+}
+
+- (void)testDefaultValuesFromNoValuePresent
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
-    const int inputInt = 98;
-    const float inputFloat = 231.0f;
-    const double inputDouble = 123732.9231;
-    const BOOL inputBool = NO;
-    NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
-    NSString * const inputString = @"Westeros";
-    NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
-    id inputMixed = @"Tyrion";
-    
-    NSDictionary * const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
-    NSArray * const keyPaths = inputKeyPathsAndValues.allKeys;
-    
-    for (NSUInteger i = 0; i < keyPaths.count; i++) {
-        NSString *keyToDefault = keyPaths[i];
-        NSMutableDictionary *dict = [inputKeyPathsAndValues mutableCopy];
-        [dict removeObjectForKey:keyToDefault];
-        
+
+    NSDictionary *inputValues = [self defaultValuesDictionary];
+    NSArray *keys = [inputValues allKeys]; // To ensure iteration order is stable
+    for (NSString *key in keys) {
+        NSMutableDictionary *dict = [inputValues mutableCopy];
+        [dict removeObjectForKey:key];
         [DefaultObject createInRealm:realm withObject:dict];
     }
-    
+
     [realm commitWriteTransaction];
 
     // Test allObject for DefaultObject
-    NSDictionary * const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
-    for (NSUInteger i = 0; i < keyPaths.count; i++) {
-        NSString *keyToDefault = keyPaths[i];
-        DefaultObject *object = [DefaultObject allObjects][i];
-        
-        for (NSUInteger j = 0; j < keyPaths.count; j++) {
-            NSString *key = keyPaths[j];
-            if ([key isEqualToString:keyToDefault]) {
-                XCTAssertEqualObjects([object valueForKey:keyToDefault], defaultKeyPathsAndValues[keyToDefault], @"Value should match value in defaultPropertyValues method");
+    NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
+    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    for (NSUInteger i = 0; i < keys.count; ++i) {
+        DefaultObject *object = allObjects[i];
+        for (NSUInteger j = 0; j < keys.count; ++j) {
+            NSString *key = keys[j];
+            if (i == j) {
+                XCTAssertEqualObjects(object[key], defaultValues[key]);
             }
             else {
-                XCTAssertEqualObjects([object valueForKey:key], inputKeyPathsAndValues[key], @"Value should match value that object was initialized with");
+                XCTAssertEqualObjects(object[key], inputValues[key]);
             }
-        }        
+        }
+    }
+}
+
+- (void)testDefaultValuesFromNSNull
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+
+    NSDictionary *inputValues = [self defaultValuesDictionary];
+    NSArray *keys = [inputValues allKeys]; // To ensure iteration order is stable
+    for (NSString *key in keys) {
+        NSMutableDictionary *dict = [inputValues mutableCopy];
+        dict[key] = NSNull.null;
+        [dict removeObjectForKey:key];
+        [DefaultObject createInRealm:realm withObject:dict];
+    }
+
+    [realm commitWriteTransaction];
+
+    // Test allObject for DefaultObject
+    NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
+    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    for (NSUInteger i = 0; i < keys.count; ++i) {
+        DefaultObject *object = allObjects[i];
+        for (NSUInteger j = 0; j < keys.count; ++j) {
+            NSString *key = keys[j];
+            if (i == j) {
+                XCTAssertEqualObjects(object[key], defaultValues[key]);
+            }
+            else {
+                XCTAssertEqualObjects(object[key], inputValues[key]);
+            }
+        }
     }
 }
 
