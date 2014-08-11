@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#import "RLMRealm_Dynamic.h"
 
 #import <libkern/OSAtomic.h>
 
@@ -371,9 +372,9 @@
     __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
     OSSpinLockLock(&spinlock);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows([realm beginWriteTransaction]);
-        XCTAssertThrows([realm allObjects:@"IntObject"]);
-        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"]);
+        XCTAssertThrows([realm beginWriteTransaction], @"No exception");
+        XCTAssertThrows([realm allObjects:@"IntObject"], @"No exception");
+        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"], @"No exception");
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);

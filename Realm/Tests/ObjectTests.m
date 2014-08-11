@@ -688,9 +688,11 @@
     });
     OSSpinLockLock(&spinlock);
 
-    [RLMRealm.defaultRealm beginWriteTransaction];
-    [RLMRealm.defaultRealm addObject:obj];
-    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
 
     XCTAssertNoThrow(obj.intCol);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
