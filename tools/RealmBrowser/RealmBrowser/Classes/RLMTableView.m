@@ -25,6 +25,7 @@
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+    NSMenu *rightClickMenu;
 }
 
 #pragma mark - NSObject overrides
@@ -40,6 +41,25 @@
     mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
+    
+    rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+    [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+" atIndex:0];
+    [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:@"-" atIndex:1];
+    [self setMenu:rightClickMenu];
+}
+
+- (void)selectedAddRow:(NSMenuItem *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:currentMouseLocation];
+    }
+}
+
+- (void)selectedDeleteRow:(NSMenuItem *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:currentMouseLocation];
+    }
 }
 
 - (void)dealloc

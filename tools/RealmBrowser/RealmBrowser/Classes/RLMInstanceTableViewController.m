@@ -81,7 +81,7 @@
     [super performUpdateUsingState:newState oldState:oldState];
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        [self setDisplayedType:newState.selectedType];
+        self.displayedType = newState.selectedType;
         [self.tableView reloadData];
         [(RLMTableView *)self.tableView formatColumnsToFitType:newState.selectedType withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
@@ -94,7 +94,7 @@
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
                                                                          onObject:referingInstance
                                                                             realm:self.parentWindowController.modelDocument.presentedRealm.realm];
-        [self setDisplayedType:arrayNode];
+        self.displayedType = arrayNode;
         [self.tableView reloadData];
         [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
@@ -104,7 +104,7 @@
 
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText result:arrayState.results andParent:arrayState.selectedType];
 
-        [self setDisplayedType:arrayNode];
+        self.displayedType = arrayNode;
         [self.tableView reloadData];
         [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
@@ -116,14 +116,90 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         return displayedType.instanceCount;
     }
     
     return 0;
 }
 
-#pragma mark - NSTableViewDelegate implementation
+#pragma mark - RLMTableViewDelegate implementation
+
+- (void)menuSelectedAddRow:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMTypeNode *displayedType = self.displayedType;
+    Class rlmObjectClass = NSClassFromString(displayedType.name);
+    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
+    if (!defaultPropertyValues) {
+        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
+    }
+    
+    [realm beginWriteTransaction];
+    [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+    [realm commitWriteTransaction];
+    
+    [self.tableView reloadData];
+}
+
+-(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
+{
+    NSMutableDictionary *defaultPropertyValues = [NSMutableDictionary dictionary];
+    
+    for (RLMProperty *property in typeNode.schema.properties) {
+        defaultPropertyValues[property.name] = [self defaultValueForPropertyType:property.type];
+    }
+    
+    return defaultPropertyValues;
+}
+
+-(id)defaultValueForPropertyType:(RLMPropertyType)propertyType
+{
+    switch (propertyType) {
+        case RLMPropertyTypeInt:
+            return @0;
+        
+        case RLMPropertyTypeFloat:
+            return @(0.0f);
+
+        case RLMPropertyTypeDouble:
+            return @0.0;
+            
+        case RLMPropertyTypeString:
+            return @"===STRING===";
+            
+        case RLMPropertyTypeBool:
+            return @NO;
+            
+        case RLMPropertyTypeArray:
+            return @[];
+            
+        case RLMPropertyTypeDate:
+            return [NSDate date];
+            
+        case RLMPropertyTypeData:
+            return @"<Data>";
+            
+        case RLMPropertyTypeAny:
+            return @"<Any>";
+            
+        case RLMPropertyTypeObject: {
+            return [NSNull null];
+        }
+    }
+
+}
+
+- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:selectedObject];
+    [realm commitWriteTransaction];
+    [self.tableView reloadData];
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
@@ -140,7 +216,7 @@
 {
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
         id propertyValue = selectedInstance[clazzProperty.name];
@@ -287,7 +363,7 @@
 - (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
     if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
@@ -364,7 +440,7 @@
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
     if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         
         if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
             RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
@@ -408,7 +484,7 @@
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
     
-    RLMTypeNode *displayedType = [self displayedType];
+    RLMTypeNode *displayedType = self.displayedType;
     RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
     
@@ -445,7 +521,7 @@
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
     
-    RLMTypeNode *displayedType = [self displayedType];
+    RLMTypeNode *displayedType = self.displayedType;
     RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
 
@@ -463,7 +539,7 @@
     NSInteger row = self.tableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
@@ -511,7 +587,7 @@
     NSInteger column = self.tableView.clickedColumn;
     NSInteger row = self.tableView.clickedRow;
     
-    RLMTypeNode *displayedType = [self displayedType];
+    RLMTypeNode *displayedType = self.displayedType;
     RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedObject = [displayedType instanceAtIndex:row];
     id propertyValue = selectedObject[propertyNode.name];
