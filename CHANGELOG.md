@@ -6,6 +6,9 @@
 ### Enhancements
 
 * Add support for the IN operator in predicates.
+* Switch to building the SDK from source when using CocoaPods and add a
+  Realm.Headers subspec for use in targets that should not link a copy of Realm
+  (such as test targets).
 
 ### Bugfixes
 
@@ -29,8 +32,6 @@
 * Speed up RLMRealm instantiation and array property iteration.
 * Allow array and objection relation properties to be missing or null when
   creating a RLMObject from a NSDictionary.
-* Add support for literal ranges to BETWEEN predicates.
-* Allow 0 and 1 where bools are expected in queries.
 
 ### Bugfixes
 
