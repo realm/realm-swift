@@ -372,8 +372,8 @@
     OSSpinLockLock(&spinlock);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         XCTAssertThrows([realm beginWriteTransaction]);
-        XCTAssertThrows([realm allObjects:@"IntObject"]);
-        XCTAssertThrows([realm objects:@"IntObject" where:@"intCol = 0"]);
+        XCTAssertThrows([IntObject allObjectsInRealm:realm]);
+        XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);

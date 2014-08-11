@@ -804,10 +804,17 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, N
     }
     
     // validate
-    RLMProperty *prop = schema[property];
+    RLMProperty *prop = RLMValidatedPropertyForSort(schema, property);
+    
+    // sort
+    view.sort(prop.column, ascending);
+}
+
+RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
+    RLMProperty *prop = schema[propName];
     if (!prop) {
         @throw RLMPredicateException(@"Invalid sort column",
-                                     [NSString stringWithFormat:@"Column named '%@' not found.", property]);
+                                     [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
     }
     
     switch (prop.type) {
@@ -817,11 +824,11 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, N
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeInt:
         case RLMPropertyTypeString:
-            view.sort(prop.column, ascending);
             break;
-            
         default:
             @throw RLMPredicateException(@"Invalid sort column type",
                                          @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
     }
+    
+    return prop;
 }
