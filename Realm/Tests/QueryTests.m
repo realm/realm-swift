@@ -955,7 +955,7 @@
     XCTAssertEqual([AllTypesObject objectsWithPredicate:longPred].count, 1U, @"Count should be 1");
 
     NSPredicate *longBetweenPred = [NSPredicate predicateWithFormat:@"longCol BETWEEN %@",
-                                    @[@((long)34359738367), @((long)34359738369)]];
+                                    @[@((long long)34359738367), @((long long)34359738369)]];
     XCTAssertEqual([AllTypesObject objectsWithPredicate:longBetweenPred].count, 1U, @"Count should be 1");
 
     // invalid object queries
