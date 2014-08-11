@@ -5,6 +5,8 @@
 
 * Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta5.
 * Properties to be persisted in Swift classes must be explicitly declared as `dynamic`.
+* Subclasses of RLMObject subclasses now throw an exception on startup, rather
+  than when added to a Realm.
 
 ### Enhancements
 
