@@ -25,7 +25,6 @@
 #include <tightdb.hpp>
 using namespace tightdb;
 
-
 NSString *const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonException = @"RLMUnsupportedTypesFoundInPropertyComparisonException";
 
@@ -33,7 +32,12 @@ NSString *const RLMPropertiesComparisonTypeMismatchReason = @"Property type mism
 NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Comparison between %@ and %@";
 
 // small helper to create the many exceptions thrown when parsing predicates
-static NSException *RLMPredicateException(NSString *name, NSString *reason) {
+static NSException *RLMPredicateException(NSString *name, NSString *format, ...) {
+    va_list args;
+    va_start(args, format);
+    NSString *reason = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+
     return [NSException exceptionWithName:name reason:reason userInfo:nil];
 }
 
@@ -42,7 +46,7 @@ NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName) 
     RLMProperty *prop = desc[columnName];
     if (!prop) {
         @throw RLMPredicateException(@"Invalid column name",
-                                       [NSString stringWithFormat:@"Column name %@ not found in table", columnName]);
+                                     @"Column name %@ not found in table", columnName);
     }
     return prop.column;
 }
@@ -106,8 +110,7 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype)]);
-            break;
+                                         @"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype));
     }
 }
 
@@ -142,8 +145,7 @@ void add_numeric_constraint_to_link_query(tightdb::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         [NSString stringWithFormat:@"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype)]);
-            break;
+                                         @"Operator type %lu not supported for type %@", (unsigned long)operatorType, RLMTypeToString(datatype));
     }
 }
 
@@ -161,8 +163,7 @@ void add_bool_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for bool type", (unsigned long)operatorType);
     }
 }
 
@@ -182,8 +183,7 @@ void add_bool_constraint_to_link_query(tightdb::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for bool type", (unsigned long)operatorType);
     }
 }
 
@@ -219,8 +219,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for string type", (unsigned long)operatorType);
     }
 }
 
@@ -258,8 +257,7 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for string type", (unsigned long)operatorType);
     }
 }
 
@@ -288,8 +286,7 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for type NSDate", (unsigned long)operatorType);
     }
 }
 
@@ -321,8 +318,7 @@ void add_datetime_constraint_to_link_query(tightdb::Query& query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                         [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for type NSDate", (unsigned long)operatorType);
     }
 }
 
@@ -352,7 +348,7 @@ void add_between_constraint_to_query(tightdb::Query & query,
 
     if (!RLMIsObjectValidForProperty(from, prop) || !RLMIsObjectValidForProperty(to, prop)) {
         @throw RLMPredicateException(@"Invalid value",
-                                     [NSString stringWithFormat:@"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type)]);
+                                     @"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type));
     }
 
     NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
@@ -374,9 +370,8 @@ void add_between_constraint_to_query(tightdb::Query & query,
             query.between(index, [from longLongValue], [to longLongValue]);
             break;
         default:
-            NSString *message = [NSString stringWithFormat:@"Object type %@ not supported for BETWEEN operations",
-                                 RLMTypeToString(prop.type)];
-            @throw RLMPredicateException(@"Unsupported predicate value type", message);
+            @throw RLMPredicateException(@"Unsupported predicate value type",
+                                         @"Object type %@ not supported for BETWEEN operations", RLMTypeToString(prop.type));
     }
 }
 
@@ -403,8 +398,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
-                                           [NSString stringWithFormat:@"Operator type %lu not supported for binary type", (unsigned long)operatorType]);
-            break;
+                                         @"Operator type %lu not supported for binary type", (unsigned long)operatorType);
     }
 }
     
@@ -446,7 +440,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
 
     // make sure we have a valid property type
     if (firstProp.type != RLMPropertyTypeObject && firstProp.type != RLMPropertyTypeArray) {
-        @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"column name '%@' is not a link", paths[0]]);
+        @throw RLMPredicateException(@"Invalid value", @"column name '%@' is not a link", paths[0]);
     }
 
     // get the next level index and property
@@ -456,8 +450,8 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     // validate value
     if (!RLMIsObjectValidForProperty(value, secondProp)) {
         @throw RLMPredicateException(@"Invalid value",
-                                     [NSString stringWithFormat:@"object for property '%@' must be of type '%@'",
-                                      secondProp.name, RLMTypeToString(secondProp.type)]);
+                                     @"object for property '%@' must be of type '%@'",
+                                     secondProp.name, RLMTypeToString(secondProp.type));
     }
 
     // finally cast to native types and add query clause
@@ -489,7 +483,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                         [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);
+                                         @"Object type %@ not supported", RLMTypeToString(type));
     }
 }
 
@@ -527,7 +521,7 @@ void update_query_with_value_expression(RLMSchema *schema,
     
     // validate value
     if (!RLMIsObjectValidForProperty(value, prop)) {
-        @throw RLMPredicateException(@"Invalid value", [NSString stringWithFormat:@"object must be of type %@", RLMTypeToString(prop.type)]);
+        @throw RLMPredicateException(@"Invalid value", @"object must be of type %@", RLMTypeToString(prop.type));
     }
     
     // finally cast to native types and add query clause
@@ -559,7 +553,7 @@ void update_query_with_value_expression(RLMSchema *schema,
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",
-                                           [NSString stringWithFormat:@"Object type %@ not supported", RLMTypeToString(type)]);
+                                         @"Object type %@ not supported", RLMTypeToString(type));
     }
 }
 
@@ -624,16 +618,16 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
                 break;
             default:
                 @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
-                                             [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason,
-                                              RLMTypeToString(leftType),
-                                              RLMTypeToString(rightType)]);
+                                             RLMUnsupportedTypesFoundInPropertyComparisonReason,
+                                             RLMTypeToString(leftType),
+                                             RLMTypeToString(rightType));
         }
     }
     else {
         @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
-                                     [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason,
-                                      RLMTypeToString(leftType),
-                                      RLMTypeToString(rightType)]);
+                                     RLMPropertiesComparisonTypeMismatchReason,
+                                     RLMTypeToString(leftType),
+                                     RLMTypeToString(rightType));
     }
 }
     
@@ -789,8 +783,7 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema 
     // Test the constructed query in core
     std::string validateMessage = query->validate();
     if (!validateMessage.empty()) {
-        @throw RLMPredicateException(@"Invalid query",
-                                     [NSString stringWithCString:validateMessage.c_str() encoding:[NSString defaultCStringEncoding]]  );
+        @throw RLMPredicateException(@"Invalid query", @"%s", validateMessage.c_str());
     }
 }
 
@@ -804,7 +797,7 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, N
     RLMProperty *prop = schema[property];
     if (!prop) {
         @throw RLMPredicateException(@"Invalid sort column",
-                                     [NSString stringWithFormat:@"Column named '%@' not found.", property]);
+                                     @"Column named '%@' not found.", property);
     }
     
     switch (prop.type) {
