@@ -118,8 +118,7 @@
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = self.displayedType;
-        return displayedType.instanceCount;
+        return self.displayedType.instanceCount;
     }
     
     return 0;
@@ -136,21 +135,22 @@
     [self setSelectionIndex:location.row];
 }
 
-- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+- (void)deleteRows
 {
-    if (location.row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
-        return;
-    }
-
+    NSMutableArray *objectsToDelete = [NSMutableArray array];
+    [self.tableView.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        RLMObject *object = [self.displayedType instanceAtIndex:idx];
+        [objectsToDelete addObject:object];
+    }];
+    
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
     [realm beginWriteTransaction];
-    [realm deleteObject:selectedObject];
+    [realm deleteObjects:objectsToDelete];
     [realm commitWriteTransaction];
     [self.tableView reloadData];
 }
 
-- (void)menuSelectedAddRow:(RLMTableLocation)location
+- (void)addRows
 {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMTypeNode *displayedType = self.displayedType;
@@ -160,8 +160,12 @@
         defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
     }
     
+    NSUInteger rowsToAdd = self.tableView.selectedRowIndexes.count;
+
     [realm beginWriteTransaction];
-    [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+    for (int i = 0; i < rowsToAdd; i++) {
+        [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+    }
     [realm commitWriteTransaction];
     
     [self.tableView reloadData];
@@ -231,7 +235,6 @@
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
         RLMTypeNode *displayedType = self.displayedType;
-        NSLog(@"vftc:%lu, dt.c:%lu tableColumns: %lu", columnIndex, displayedType.propertyColumns.count, tableView.tableColumns.count);
 
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
