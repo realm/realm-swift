@@ -124,12 +124,17 @@
     [realm commitWriteTransaction];
     
     RLMArray *betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
-    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 52");
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
     XCTAssertEqual(betweenArray.count, (NSUInteger)4, @"Should equal 4");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
     XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
     betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+
+    betweenArray = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
+    XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
+    betweenArray = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
     XCTAssertEqual(betweenArray.count, (NSUInteger)2, @"Should equal 2");
 }
 
@@ -423,8 +428,6 @@
     
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"invalid property/column");
-    
-    
 }
 
 - (void)testTwoColumnComparison
@@ -979,6 +982,30 @@
     XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred9].count, 2U, @"Count should be 2");
     NSPredicate *pred10 = [NSPredicate predicateWithFormat:@"array = %@", obj3];
     XCTAssertThrows([ArrayOfAllTypesObject objectsWithPredicate:pred10].count, @"Array query without ANY should throw");
+}
+
+- (void)testCompoundOrQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(2, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' or age > 40"] count]);
+}
+
+- (void)testCompoundAndQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
+    XCTAssertEqual(0, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
 @end

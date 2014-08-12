@@ -16,6 +16,7 @@
 * Speed up RLMRealm instantiation and array property iteration.
 * Allow array and objection relation properties to be missing or null when
   creating a RLMObject from a NSDictionary.
+* Add support for literal ranges to BETWEEN predicates.
 
 ### Bugfixes
 
