@@ -140,20 +140,6 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
 
 /**
- Create an RLMObject within a Realm with a JSONString.
- 
- Creates an instance of this object and adds it to the given Realm populating
- the object with the data in the given JSONString.
- 
- @param realm       The Realm in which this object is persisted.
- @param JSONString  An NSString with valid JSON. An exception will be thrown if required properties are
- not present in the JSON for which defaults are not provided.
- 
- @see   defaultPropertyValues
- */
-// +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
-
-/**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
