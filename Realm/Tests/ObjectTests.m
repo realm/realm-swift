@@ -214,7 +214,7 @@
     XCTAssertThrows([[CompanyObject alloc] initWithObject:@{}]);
     XCTAssertNoThrow(co = [[CompanyObject alloc] initWithObject:@{@"name": @"a"}]);
     XCTAssertEqualObjects(co.name, @"a");
-    XCTAssertEqual(co.employees.count, 0);
+    XCTAssertEqual(co.employees.count, 0U);
 
     OwnerObject *oo = nil;
     XCTAssertNoThrow(oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a"}]);
@@ -226,7 +226,7 @@
     CompanyObject *co = nil;
     XCTAssertNoThrow((co = [[CompanyObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
     XCTAssertEqualObjects(co.name, @"a");
-    XCTAssertEqual(co.employees.count, 0);
+    XCTAssertEqual(co.employees.count, 0U);
 
     OwnerObject *oo = nil;
     XCTAssertNoThrow((oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
