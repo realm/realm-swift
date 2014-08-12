@@ -125,15 +125,6 @@
     return nil;
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-+(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {
-    // parse with NSJSONSerialization
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
-
 -(id)objectForKeyedSubscript:(NSString *)key {
     if (_realm) {
         return RLMDynamicGet(self, key);

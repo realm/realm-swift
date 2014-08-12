@@ -40,9 +40,6 @@ RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *prop
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
 
-// predicate exception
-NSException *RLMPredicateException(NSString *name, NSString *reason);
-
 // This macro validates predicate format with optional arguments
 #define RLM_VARARG(PREDICATE_FORMAT, ARGS) \
 va_start(ARGS, PREDICATE_FORMAT);          \
