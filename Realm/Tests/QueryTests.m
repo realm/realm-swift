@@ -992,8 +992,8 @@
     [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(2, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
-    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' or age > 40"] count]);
+    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' or age > 40"] count]);
 }
 
 - (void)testCompoundAndQuery {
@@ -1004,8 +1004,8 @@
     [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
-    XCTAssertEqual(0, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
+    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
 @end
