@@ -123,6 +123,15 @@
     }
 }
 
+-(void)rightMouseDown:(NSEvent *)theEvent
+{
+    RLMTableLocation location = [self currentLocationAtPoint:[theEvent locationInWindow]];
+
+    [(id<RLMTableViewDelegate>)self.delegate selectedRow:location];
+
+    [super rightMouseDown:theEvent];
+}
+
 - (void)mouseExited:(NSEvent *)theEvent
 {
     mouseOverView = NO;

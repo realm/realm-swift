@@ -64,8 +64,7 @@
 
 - (void)clearSelection
 {
-    [self.tableView selectRowIndexes:nil
-                byExtendingSelection:NO];
+    [self.tableView selectRowIndexes:nil byExtendingSelection:NO];
 }
 
 - (void)setSelectionIndex:(NSUInteger)newIndex
@@ -79,3 +78,7 @@
 }
 
 @end
+
+
+
+

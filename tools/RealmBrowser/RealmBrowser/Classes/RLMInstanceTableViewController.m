@@ -85,7 +85,7 @@
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:newState.selectedType withSelectionAtRow:newState.selectedInstanceIndex];
+        [self.realmTableView formatColumnsToFitType:newState.selectedType withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
@@ -98,7 +98,7 @@
                                                                             realm:self.parentWindowController.modelDocument.presentedRealm.realm];
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -108,7 +108,7 @@
 
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
 }
@@ -127,14 +127,22 @@
 
 #pragma mark - RLMTableViewDelegate implementation
 
-- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+- (void)selectedRow:(RLMTableLocation)location
 {
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-        
     if (location.row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
         return;
     }
-    
+
+    [self setSelectionIndex:location.row];
+}
+
+- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+{
+    if (location.row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
+        return;
+    }
+
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
     [realm beginWriteTransaction];
     [realm deleteObject:selectedObject];
@@ -183,7 +191,7 @@
             return @0.0;
             
         case RLMPropertyTypeString:
-            return @"===STRING===";
+            return @"";
             
         case RLMPropertyTypeBool:
             return @NO;
@@ -210,17 +218,14 @@
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     if (self.tableView == notification.object) {
-        
-        RLMNavigationState *currentState = self.parentWindowController.currentState;
         NSInteger selectedIndex = self.tableView.selectedRow;
         
-        [currentState updateSelectionToIndex:selectedIndex];
+        [self.parentWindowController.currentState updateSelectionToIndex:selectedIndex];
     }
 }
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
         RLMTypeNode *displayedType = self.displayedType;
