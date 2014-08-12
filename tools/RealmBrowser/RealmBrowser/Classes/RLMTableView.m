@@ -42,24 +42,22 @@
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
     
+    unichar backspaceKey = NSBackspaceCharacter;
+
     rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-    [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+" atIndex:0];
-    [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:@"-" atIndex:1];
+    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:0];
+    addRowItem.tag = 5;
+    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
+    deleteRowItem.tag = 6;
+
+    NSMenuItem *addColumnItem = [rightClickMenu insertItemWithTitle:@"Add column" action:@selector(addColumns) keyEquivalent:@"+" atIndex:2];
+    addColumnItem.tag = 7;
+    addColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
+    NSMenuItem *deleteColumnItem = [rightClickMenu insertItemWithTitle:@"Delete column" action:@selector(deleteColumns) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:3];
+    deleteColumnItem.tag = 8;
+    deleteColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
+
     [self setMenu:rightClickMenu];
-}
-
-- (void)selectedAddRow:(NSMenuItem *)sender
-{
-    if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:currentMouseLocation];
-    }
-}
-
-- (void)selectedDeleteRow:(NSMenuItem *)sender
-{
-    if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:currentMouseLocation];
-    }
 }
 
 - (void)dealloc
@@ -115,7 +113,6 @@
             if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
             }
-
         }
 
         CGRect cellRect = [self rectOfLocation:currentMouseLocation];
@@ -126,8 +123,7 @@
 -(void)rightMouseDown:(NSEvent *)theEvent
 {
     RLMTableLocation location = [self currentLocationAtPoint:[theEvent locationInWindow]];
-
-    [(id<RLMTableViewDelegate>)self.delegate selectedRow:location];
+    [(id<RLMTableViewDelegate>)self.delegate rightClickedRow:location];
 
     [super rightMouseDown:theEvent];
 }
@@ -149,22 +145,103 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    if (theEvent.modifierFlags & NSCommandKeyMask) {
-        RLMTableLocation location = RLMTableLocationMake(self.selectedRow, self.selectedColumn);
-        
+    if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask) {
         if (theEvent.keyCode == 27) {
-            if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:location];
-            }
+            [self addRows];
         }
         else if (theEvent.keyCode == 51) {
-            if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:location];
-            }
+            [self deleteRows];
         }
     }
     
     [self interpretKeyEvents:@[theEvent]];
+}
+
+#pragma mark - Menu handling
+
+-(BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    NSLog(@"= = = = validate: %lu", menuItem.tag);
+
+    BOOL canDeleteRows = self.selectedRow >= 0 && self.selectedRow <= [self.dataSource numberOfRowsInTableView:self];
+    BOOL canDeleteColumns = NO;
+    BOOL multipleRows = NO;
+    BOOL multipleColumns = NO;
+    
+    switch (menuItem.tag) {
+        case 1: // Tools -> Add row
+        case 5: // Context -> Add row
+            menuItem.title = multipleRows ? @"Add rows" : @"Add row";
+            return YES;
+            
+        case 2: // Tools -> Delete row
+        case 6: // Context -> Delete row
+            menuItem.title = multipleRows ? @"Delete rows" : @"Delete row";
+            return canDeleteRows;
+
+        case 3: // Tools -> Add column
+        case 7: // Context -> Add column
+            menuItem.title = multipleRows ? @"Add columns" : @"Add column";
+            return YES;
+        
+        case 4: // Tools -> Delete column
+        case 8: // Context -> Delete column
+            menuItem.title = multipleColumns ? @"Delete columns" : @"Delete column";
+            return canDeleteColumns;
+            
+        default:
+            return YES;
+    }
+}
+
+- (IBAction)menuAddRow:(id)sender
+{
+    [self addRows];
+}
+
+- (IBAction)menuDeleteRow:(id)sender
+{
+    [self deleteRows];
+}
+
+- (IBAction)menuAddColumn:(id)sender
+{
+    [self addColumns];
+}
+
+- (IBAction)menuDeleteColumn:(id)sender
+{
+    [self deleteColumns];
+}
+
+#pragma mark - Helper methods
+
+-(void)addRows
+{
+    RLMTableLocation selectedLocation = RLMTableLocationMake(self.selectedRow, self.selectedColumn);
+    
+    if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:selectedLocation];
+    }
+}
+
+-(void)deleteRows
+{
+    RLMTableLocation selectedLocation = RLMTableLocationMake(self.selectedRow, self.selectedColumn);
+    
+    if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:selectedLocation];
+    }
+}
+
+-(void)addColumns
+{
+    NSLog(@"TV: addColumn");
+}
+
+-(void)deleteColumns
+{
+    NSLog(@"TV: deleteColumn");
 }
 
 #pragma mark - NSView overrides

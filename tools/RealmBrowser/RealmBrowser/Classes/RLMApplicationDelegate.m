@@ -101,7 +101,7 @@ const NSUInteger kTopTipDelay = 250;
                 alert.messageText = @"Open demo database?";
                 [alert addButtonWithTitle:@"Ok"];
                 [alert addButtonWithTitle:@"Cancel"];
-
+                
                 NSUInteger response = [alert runModal];
                 if (response == NSAlertFirstButtonReturn) {
                     NSDocumentController *documentController = [[NSDocumentController alloc] init];
@@ -120,7 +120,7 @@ const NSUInteger kTopTipDelay = 250;
 - (BOOL)createAndPopulateDemoDatabaseAtUrl:(NSURL *)url
 {
     NSString *path = url.path;
-
+    
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithPath:path
                                      readOnly:NO
@@ -130,19 +130,19 @@ const NSUInteger kTopTipDelay = 250;
         [realm beginWriteTransaction];
         
         
-//        NSURL *url1 = [[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[NSScreen mainScreen]];
-//        NSData *data1 = [NSData dataWithContentsOfURL:url1];
+        //        NSURL *url1 = [[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[NSScreen mainScreen]];
+        //        NSData *data1 = [NSData dataWithContentsOfURL:url1];
         
         for (NSUInteger index = 0; index < kTestDatabaseSizeMultiplicatorFactor; index++) {
-//            RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John", data1]];
-//            RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary", data1]];
-//            RealmTestClass0 *tc0_2 = [RealmTestClass0 createInRealm:realm withObject:@[@38, @"Peter", data1]];
-//            RealmTestClass0 *tc0_3 = [RealmTestClass0 createInRealm:realm withObject:@[@12, @"Susan", data1]];
-//            RealmTestClass0 *tc0_4 = [RealmTestClass0 createInRealm:realm withObject:@[@34, @"John", data1]];
-//            RealmTestClass0 *tc0_5 = [RealmTestClass0 createInRealm:realm withObject:@[@75, @"James", data1]];
-//            RealmTestClass0 *tc0_6 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Gilbert", data1]];
-//            RealmTestClass0 *tc0_7 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Ann", data1]];
-
+            //            RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John", data1]];
+            //            RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary", data1]];
+            //            RealmTestClass0 *tc0_2 = [RealmTestClass0 createInRealm:realm withObject:@[@38, @"Peter", data1]];
+            //            RealmTestClass0 *tc0_3 = [RealmTestClass0 createInRealm:realm withObject:@[@12, @"Susan", data1]];
+            //            RealmTestClass0 *tc0_4 = [RealmTestClass0 createInRealm:realm withObject:@[@34, @"John", data1]];
+            //            RealmTestClass0 *tc0_5 = [RealmTestClass0 createInRealm:realm withObject:@[@75, @"James", data1]];
+            //            RealmTestClass0 *tc0_6 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Gilbert", data1]];
+            //            RealmTestClass0 *tc0_7 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Ann", data1]];
+            
             RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John"]];
             RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary"]];
             RealmTestClass0 *tc0_2 = [RealmTestClass0 createInRealm:realm withObject:@[@38, @"Peter"]];
@@ -180,7 +180,7 @@ const NSUInteger kTopTipDelay = 250;
             [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
             [RealmTestClass2 createInRealm:realm withObject:@[@003,  @YES, [NSNull null]]];
             [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];            
+            [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];
         }
         
         [realm commitWriteTransaction];

@@ -127,7 +127,7 @@
 
 #pragma mark - RLMTableViewDelegate implementation
 
-- (void)selectedRow:(RLMTableLocation)location
+- (void)rightClickedRow:(RLMTableLocation)location
 {
     if (location.row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
         return;
@@ -226,6 +226,8 @@
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    NSTableCellView *cellView;
+    
     if (tableView == self.tableView) {
         NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
         RLMTypeNode *displayedType = self.displayedType;
@@ -246,7 +248,7 @@
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
             badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
             
-            return badgeCellView;
+            cellView = badgeCellView;
         }
         else if (type == RLMPropertyTypeBool) {
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
@@ -257,7 +259,7 @@
             }
             boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
             
-            return boolCellView;
+            cellView = boolCellView;
         }
         else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
             RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
@@ -265,7 +267,7 @@
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
             
-            return numberCellView;
+            cellView = numberCellView;
         }
 //        else if (type == RLMPropertyTypeData) {
 //            NSTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
@@ -292,7 +294,7 @@
 //            tempImage = thumbnail;
 //            imageCellView.imageView.image = thumbnail;
 //            
-//            return imageCellView;
+//            cellView = imageCellView;
 //        }
         else {
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
@@ -306,11 +308,13 @@
                 basicCellView.textField.stringValue = formattedText;
             }
             
-            return basicCellView;
+            cellView = basicCellView;
         }
+        
+        cellView.toolTip = [self tooltipForPropertyValue:propertyValue ofType:type];
     }
     
-    return nil;
+    return cellView;
 }
 
 //+ (NSString *)contentTypeForImageData:(NSData *)data
@@ -365,6 +369,7 @@
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
             if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                numberFormatter.maximumFractionDigits = 3;
                 if (propertyType == RLMPropertyTypeInt) {
                     numberFormatter.allowsFloats = NO;
                 } else {
@@ -435,76 +440,66 @@
     return nil;
 }
 
-- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
+-(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
-    if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = self.displayedType;
-        
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        
-        RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
-        NSObject *propertyValue = selectedInstance[propertyNode.name];
-        
-        switch (propertyNode.type) {
-            case RLMPropertyTypeDate: {
-                if ([propertyValue isKindOfClass:[NSDate class]]) {
-                    return [dateFormatter stringFromDate:(NSDate *)propertyValue];
-                }
-                break;
-            }
+    switch (propertyType) {
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                numberFormatter.maximumFractionDigits = UINT16_MAX;
                 
-            case RLMPropertyTypeObject: {
-                if ([propertyValue isKindOfClass:[RLMObject class]]) {
-                    RLMObject *referredObject = (RLMObject *)propertyValue;
-                    RLMObjectSchema *objectSchema = referredObject.objectSchema;
-                    NSArray *properties = objectSchema.properties;
-                    
-                    NSString *toolTipString = @"";
-                    for (RLMProperty *property in properties) {
-                        toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
-                    }
-                    
-                    return toolTipString;
+                return [numberFormatter stringFromNumber:propertyValue];
+            }
+            break;
+            
+        case RLMPropertyTypeObject:
+            if ([propertyValue isKindOfClass:[RLMObject class]]) {
+                RLMObject *referredObject = (RLMObject *)propertyValue;
+                RLMObjectSchema *objectSchema = referredObject.objectSchema;
+                NSArray *properties = objectSchema.properties;
+                
+                NSString *toolTipString = @"";
+                for (RLMProperty *property in properties) {
+                    toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
                 }
                 
-                break;
+                return toolTipString;
             }
+            break;
+            
+        case RLMPropertyTypeArray:
+            if ([propertyValue isKindOfClass:[RLMArray class]]) {
+                RLMArray *referredArray = (RLMArray *)propertyValue;
                 
-            case RLMPropertyTypeArray: {
-                if ([propertyValue isKindOfClass:[RLMArray class]]) {
-                    RLMArray *referredArray = (RLMArray *)propertyValue;
-                    
-                    // In order to avoid that we procedure very long tooltips for arrays we have
-                    // an upper limit on how many entries we will display. If the total item count
-                    // of the array is within the limit we simply use the default description of
-                    // the array, otherwise we construct the tooltip explicitly by concatenating the
-                    // descriptions of the all the first array items within the limit + an ellipis.
-                    if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
-                        return referredArray.description;
-                    }
-                    else {
-                        NSString *result = @"";
-                        for (NSUInteger index = 0; index < kMaxNumberOfArrayEntriesInToolTip; index++) {
-                            RLMObject *arrayItem = referredArray[index];
-                            NSString *description = [arrayItem.description stringByReplacingOccurrencesOfString:@"\n"
-                                                                                                     withString:@"\n\t"];
-                            description = [NSString stringWithFormat:@"\t[%lu] %@", index, description];
-                            if (index < kMaxNumberOfArrayEntriesInToolTip - 1) {
-                                description = [description stringByAppendingString:@","];
-                            }
-                            result = [[result stringByAppendingString:description] stringByAppendingString:@"\n"];
+                // In order to avoid that we procedure very long tooltips for arrays we have
+                // an upper limit on how many entries we will display. If the total item count
+                // of the array is within the limit we simply use the default description of
+                // the array, otherwise we construct the tooltip explicitly by concatenating the
+                // descriptions of the all the first array items within the limit + an ellipis.
+                if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
+                    return referredArray.description;
+                }
+                else {
+                    NSString *result = @"";
+                    for (NSUInteger index = 0; index < kMaxNumberOfArrayEntriesInToolTip; index++) {
+                        RLMObject *arrayItem = referredArray[index];
+                        NSString *description = [arrayItem.description stringByReplacingOccurrencesOfString:@"\n"
+                                                                                                 withString:@"\n\t"];
+                        description = [NSString stringWithFormat:@"\t[%lu] %@", index, description];
+                        if (index < kMaxNumberOfArrayEntriesInToolTip - 1) {
+                            description = [description stringByAppendingString:@","];
                         }
-                        result = [@"RLMArray (\n" stringByAppendingString:[result stringByAppendingString:@"\t...\n)"]];
-                        return result;
+                        result = [[result stringByAppendingString:description] stringByAppendingString:@"\n"];
                     }
+                    result = [@"RLMArray (\n" stringByAppendingString:[result stringByAppendingString:@"\t...\n)"]];
+                    return result;
                 }
-                break;
             }
-                
-            default:
-                break;
-        }
+            
+            break;
+            
+        default:
+            break;
     }
     
     return nil;
@@ -727,3 +722,6 @@
 }
 
 @end
+
+
+

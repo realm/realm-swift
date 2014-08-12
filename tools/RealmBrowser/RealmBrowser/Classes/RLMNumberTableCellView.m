@@ -20,9 +20,9 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.numberFormatter = [[NSNumberFormatter alloc] init];
-    [self.numberFormatter setHasThousandSeparators:NO];
-    [self.numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
-    [self.numberFormatter setMaximumFractionDigits:UINT16_MAX];
+    self.numberFormatter.hasThousandSeparators = NO;
+    self.numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    self.numberFormatter.maximumFractionDigits = UINT16_MAX;
 }
 
 -(BOOL)becomeFirstResponder {
