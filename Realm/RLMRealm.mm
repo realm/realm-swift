@@ -357,7 +357,7 @@ static NSArray *s_objectDescriptors = nil;
         cacheRealm(realm, path);
     }
     
-#if !TARGET_IPHONE
+#if !TARGET_OS_IPHONE
     // start update timer on osx
     realm->_updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                            target:[RLMWeakTarget createWithRealm:realm]
