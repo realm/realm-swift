@@ -275,7 +275,7 @@ static NSArray *s_objectDescriptors = nil;
     }
     
     // try to reuse existing realm first
-    RLMRealm *realm = cachedRealm(path);
+    __autoreleasing RLMRealm *realm = cachedRealm(path);
     if (realm) {
         // if already opened with different read permissions then throw
         if (realm.isReadOnly != readonly) {
@@ -349,9 +349,14 @@ static NSArray *s_objectDescriptors = nil;
 
     // apply schema
     [realm beginWriteTransaction];
-    RLMRealmSetSchema(realm, schema);
-    [realm commitWriteTransaction];
-    
+    @try {
+        RLMRealmSetSchema(realm, schema);
+    }
+    @finally {
+        // FIXME: should rollback on exceptions rather than commit once that's implemented
+        [realm commitWriteTransaction];
+    }
+
     // cache realm at this path if using a vanilla realm
     if (!dynamic && !customSchema) {
         cacheRealm(realm, path);
