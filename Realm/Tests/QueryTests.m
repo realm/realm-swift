@@ -428,8 +428,6 @@
     
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"invalid property/column");
-    
-    
 }
 
 - (void)testTwoColumnComparison
@@ -984,6 +982,30 @@
     XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred9].count, 2U, @"Count should be 2");
     NSPredicate *pred10 = [NSPredicate predicateWithFormat:@"array = %@", obj3];
     XCTAssertThrows([ArrayOfAllTypesObject objectsWithPredicate:pred10].count, @"Array query without ANY should throw");
+}
+
+- (void)testCompoundOrQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(2, [[PersonObject objectsWhere:@"name == 'Ari' or age < 30"] count]);
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' or age > 40"] count]);
+}
+
+- (void)testCompoundAndQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
+    XCTAssertEqual(0, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
 @end
