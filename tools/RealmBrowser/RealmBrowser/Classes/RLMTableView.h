@@ -46,12 +46,17 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
-- (void)rightClickedRow:(RLMTableLocation)location;
+- (void)rightClickedHeaderColumn:(NSUInteger)column;
 
-- (void)addRows;
+- (void)rightClickedLocation:(RLMTableLocation)location;
 
-- (void)deleteRows;
+- (void)addRows:(NSIndexSet *)rowIndexes;
 
+- (void)deleteRows:(NSIndexSet *)rowIndexes;
+
+- (void)addColumns:(NSIndexSet *)columnIndexes;
+
+- (void)deleteColumns:(NSIndexSet *)columnIndexes;
 
 @end
 

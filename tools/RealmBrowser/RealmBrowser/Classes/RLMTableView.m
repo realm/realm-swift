@@ -20,12 +20,29 @@
 
 #import "NSTableColumn+Resize.h"
 
+
+
+@interface RLMTableHeaderView : NSTableHeaderView
+
+@end
+
+
+@implementation RLMTableHeaderView
+
+-(void)rightMouseDown:(NSEvent *)theEvent
+{
+    [self.tableView rightMouseDown:theEvent];
+    [super rightMouseDown:theEvent];
+}
+
+@end
+
+
 @implementation RLMTableView {
     NSTrackingArea *trackingArea;
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
-    NSMenu *rightClickMenu;
 }
 
 #pragma mark - NSObject overrides
@@ -33,7 +50,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
+
     int options = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate);
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:options owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
@@ -48,19 +65,26 @@
 -(void)createContextMenu
 {
     unichar backspaceKey = NSBackspaceCharacter;
-    
-    rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:0];
-    addRowItem.tag = 5;
-    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
-    deleteRowItem.tag = 6;
-    
-    NSMenuItem *addColumnItem = [rightClickMenu insertItemWithTitle:@"Add column" action:@selector(addColumns) keyEquivalent:@"+" atIndex:2];
+
+    NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+
+    NSMenuItem *addColumnItem = [rightClickMenu insertItemWithTitle:@"Add column" action:@selector(addColumns) keyEquivalent:@"+" atIndex:0];
     addColumnItem.tag = 7;
     addColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
-    NSMenuItem *deleteColumnItem = [rightClickMenu insertItemWithTitle:@"Delete column" action:@selector(deleteColumns) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:3];
+    addColumnItem.target = self;
+    
+    NSMenuItem *deleteColumnItem = [rightClickMenu insertItemWithTitle:@"Delete column" action:@selector(deleteColumns) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
     deleteColumnItem.tag = 8;
     deleteColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
+    deleteColumnItem.target = self;
+    
+    self.headerView.menu = [rightClickMenu copy];
+    
+    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:2];
+    addRowItem.tag = 5;
+    
+    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:3];
+    deleteRowItem.tag = 6;
     
     [self setMenu:rightClickMenu];
 }
@@ -128,8 +152,14 @@
 -(void)rightMouseDown:(NSEvent *)theEvent
 {
     RLMTableLocation location = [self currentLocationAtPoint:[theEvent locationInWindow]];
-    [(id<RLMTableViewDelegate>)self.delegate rightClickedRow:location];
-
+    
+    if (location.row == -2 && location.column >= 0 && location.column < self.tableColumns.count) {
+        [(id<RLMTableViewDelegate>)self.delegate rightClickedHeaderColumn:location.column];
+        return;
+    }
+    
+    [(id<RLMTableViewDelegate>)self.delegate rightClickedLocation:location];
+    
     [super rightMouseDown:theEvent];
 }
 
@@ -167,8 +197,8 @@
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     BOOL canDeleteRows = self.selectedRowIndexes.count > 0;
-    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0;
     BOOL multipleRows = self.selectedRowIndexes.count > 1;
+    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0;
     BOOL multipleColumns = self.selectedColumnIndexes.count > 1;
     
     switch (menuItem.tag) {
@@ -184,7 +214,6 @@
 
         case 3: // Tools -> Add column
         case 7: // Context -> Add column
-            menuItem.title = multipleRows ? @"Add columns" : @"Add column";
             return YES;
         
         case 4: // Tools -> Delete column
@@ -221,26 +250,30 @@
 
 -(void)addRows
 {
-    if ([self.delegate respondsToSelector:@selector(addRows)]) {
-        [(id<RLMTableViewDelegate>)self.delegate addRows];
+    if ([self.delegate respondsToSelector:@selector(addRows:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate addRows:self.selectedRowIndexes];
     }
 }
 
 -(void)deleteRows
 {
-    if ([self.delegate respondsToSelector:@selector(deleteRows)]) {
-        [(id<RLMTableViewDelegate>)self.delegate deleteRows];
+    if ([self.delegate respondsToSelector:@selector(deleteRows:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate deleteRows:self.selectedRowIndexes];
     }
 }
 
 -(void)addColumns
 {
-    NSLog(@"TV: addColumn");
+    if ([self.delegate respondsToSelector:@selector(addColumns:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate addColumns:self.selectedColumnIndexes];
+    }
 }
 
 -(void)deleteColumns
 {
-    NSLog(@"TV: deleteColumn");
+    if ([self.delegate respondsToSelector:@selector(deleteColumns:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate deleteColumns:self.selectedColumnIndexes];
+    }
 }
 
 #pragma mark - NSView overrides
@@ -340,10 +373,16 @@
 
 - (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
 {
-    NSPoint localPoint = [self convertPoint:point fromView:nil];
+    NSPoint localPointInTable = [self convertPoint:point fromView:nil];
     
-    NSInteger row = [self rowAtPoint:localPoint];
-    NSInteger column = [self columnAtPoint:localPoint];
+    NSInteger row = [self rowAtPoint:localPointInTable];
+    NSInteger column = [self columnAtPoint:localPointInTable];
+    
+    NSPoint localPointInHeader = [self.headerView convertPoint:point fromView:nil];
+    if (NSPointInRect(localPointInHeader, self.headerView.bounds)) {
+        row = -2;
+        column = [self columnAtPoint:localPointInHeader];
+    }
     
     return RLMTableLocationMake(row, column);
 }

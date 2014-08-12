@@ -126,10 +126,31 @@
 
 #pragma mark - RLMTableViewDelegate implementation
 
-- (void)deleteRows
+- (void)addRows:(NSIndexSet *)rowIndexes
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMTypeNode *displayedType = self.displayedType;
+    Class rlmObjectClass = NSClassFromString(displayedType.name);
+    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
+    if (!defaultPropertyValues) {
+        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
+    }
+    
+    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < rowsToAdd; i++) {
+        [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+    }
+    [realm commitWriteTransaction];
+    
+    [self.tableView reloadData];
+}
+
+- (void)deleteRows:(NSIndexSet *)rowIndexes
 {
     NSMutableArray *objectsToDelete = [NSMutableArray array];
-    [self.tableView.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         RLMObject *object = [self.displayedType instanceAtIndex:idx];
         [objectsToDelete addObject:object];
     }];
@@ -141,26 +162,17 @@
     [self.tableView reloadData];
 }
 
-- (void)addRows
+-(void)addColumns:(NSIndexSet *)columnIndexes
 {
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMTypeNode *displayedType = self.displayedType;
-    Class rlmObjectClass = NSClassFromString(displayedType.name);
-    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
-    if (!defaultPropertyValues) {
-        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
-    }
-    
-    NSUInteger rowsToAdd = MAX(self.tableView.selectedRowIndexes.count, 1);
-
-    [realm beginWriteTransaction];
-    for (int i = 0; i < rowsToAdd; i++) {
-        [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
-    }
-    [realm commitWriteTransaction];
-    
-    [self.tableView reloadData];
+    NSLog(@"IT: addColumns: %@", columnIndexes);
 }
+
+-(void)deleteColumns:(NSIndexSet *)columnIndexes
+{
+    NSLog(@"IT: deleteColumns: %@", columnIndexes);
+}
+
+#pragma mark - Mouse movement
 
 -(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
 {
@@ -288,6 +300,8 @@
     
     return cellView;
 }
+
+#pragma mark - Datasource helper methods
 
 +(NSAttributedString *)linkStringWithString:(NSString *)string
 {
@@ -536,10 +550,19 @@
     [realm commitWriteTransaction];
 }
 
-- (void)rightClickedRow:(RLMTableLocation)location
+- (void)rightClickedHeaderColumn:(NSUInteger)column
+{
+    if ([self.tableView.selectedColumnIndexes containsIndex:column]) {
+        return;
+    }
+    
+    [self.tableView selectColumnIndexes:[NSIndexSet indexSetWithIndex:column] byExtendingSelection:NO];
+}
+
+- (void)rightClickedLocation:(RLMTableLocation)location
 {
     NSUInteger row = location.row;
-    
+
     if (row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
         [self clearSelection];
         return;
@@ -611,6 +634,10 @@
 - (void)userDoubleClicked:(NSTableView *)sender {
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
+    
+    if (row == -1 || column == -1) {
+        return;
+    }
     
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[column];

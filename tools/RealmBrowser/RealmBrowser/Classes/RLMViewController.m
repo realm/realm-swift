@@ -51,8 +51,7 @@
 {
     _navigationFromHistory = YES;
     
-    [self performUpdateUsingState:newState
-                         oldState:oldState];
+    [self performUpdateUsingState:newState oldState:oldState];
     
     _navigationFromHistory = NO;
 }
