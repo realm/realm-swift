@@ -210,6 +210,7 @@
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
 
+
 void VerifySort(id self, RLMRealm *realm, NSString *column, BOOL ascending, id expectedValue) {
     RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
     AllTypesObject *obj = results[0];
@@ -230,10 +231,7 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar arraySortedByProperty:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), expectedValue, accuracy, @"Array not sorted as expected");
-    
 }
-
-
 
 - (void)testQuerySorting
 {
@@ -426,8 +424,6 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     
     pred = [NSPredicate predicateWithFormat:@"height BETWEEN %@", @[@25, @35]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"invalid property/column");
-    
-    
 }
 
 - (void)testTwoColumnComparison
