@@ -55,7 +55,7 @@
  
     if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] ||
         [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        RLMClazzNode *parentNode = (RLMClazzNode *)oldState.selectedType;
+        RLMClassNode *parentNode = (RLMClassNode *)oldState.selectedType;
         [parentNode removeAllChildNodes];
         [self.tableView reloadData];
     }
@@ -70,7 +70,7 @@
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
-        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+        RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
         NSInteger selectionIndex = arrayState.selectedInstanceIndex;
         RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
         
@@ -87,7 +87,7 @@
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
         RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
 
-        RLMClazzNode *parentClassNode = (RLMClazzNode *)arrayState.selectedType;
+        RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
 
         RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromQuery:arrayState.searchText result:arrayState.results];
 
@@ -192,7 +192,7 @@
 
         // The arrays we get from link views are ephemeral, so we
         // remove them when any class node is selected
-        if ([selectedItem isKindOfClass:[RLMClazzNode class]]) {
+        if ([selectedItem isKindOfClass:[RLMClassNode class]]) {
             [self removeAllChildArrays];
         }
 
@@ -245,7 +245,7 @@
 
 - (void)removeAllChildArrays
 {
-    for (RLMClazzNode *node in self.parentWindowController.modelDocument.presentedRealm.topLevelClazzes) {
+    for (RLMClassNode *node in self.parentWindowController.modelDocument.presentedRealm.topLevelClasses) {
         [node removeAllChildNodes];
         [self.classesOutlineView reloadItem:node];
     }

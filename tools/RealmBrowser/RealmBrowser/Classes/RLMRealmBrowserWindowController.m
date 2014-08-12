@@ -42,7 +42,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     navigationStack = [[RLMNavigationStack alloc] init];
     [self updateNavigationButtons];
     
-    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    id firstItem = self.modelDocument.presentedRealm.topLevelClasses.firstObject;
     if (firstItem != nil) {
         RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
 
@@ -104,7 +104,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
     for (NSUInteger index = 0; index < columnCount; index++) {
 
-        RLMClazzProperty *property = columns[index];
+        RLMClassProperty *property = columns[index];
         NSString *columnName = property.name;
 
         switch (property.type) {

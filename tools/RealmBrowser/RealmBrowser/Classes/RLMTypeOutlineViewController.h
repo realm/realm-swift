@@ -19,7 +19,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "RLMViewController.h"
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 
 @class RLMRealmBrowserWindowController;
 

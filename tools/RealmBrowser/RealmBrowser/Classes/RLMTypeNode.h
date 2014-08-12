@@ -20,7 +20,7 @@
 #import <Realm/Realm.h>
 
 #import "RLMRealmOutlineNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMClassProperty.h"
 
 @interface RLMTypeNode : NSObject <RLMRealmOutlineNode>
 

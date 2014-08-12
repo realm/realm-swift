@@ -19,12 +19,12 @@
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
 
-@interface RLMClazzProperty : NSObject
+@interface RLMClassProperty : NSObject
 
 @property (nonatomic, readonly) RLMProperty *property;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) RLMPropertyType type;
-@property (nonatomic, readonly) Class clazz;
+@property (nonatomic, readonly) Class class;
 
 - (instancetype)initWithProperty:(RLMProperty *)property;
 

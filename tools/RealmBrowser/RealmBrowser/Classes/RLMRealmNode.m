@@ -52,14 +52,14 @@
         NSLog(@"Realm was opened with error: %@", *error);
     }
     else {
-        _topLevelClazzes = [self constructTopLevelClazzes];    
+        _topLevelClasses = [self constructTopLevelClasses];    
     }
     
     return error != nil;
 }
 
 
-- (void)addTable:(RLMClazzNode *)table
+- (void)addTable:(RLMClassNode *)table
 {
 
 }
@@ -73,17 +73,17 @@
 
 - (BOOL)isExpandable
 {
-    return [self topLevelClazzes].count != 0;
+    return self.topLevelClasses.count != 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    return [self topLevelClazzes].count;
+    return self.topLevelClasses.count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    return [self topLevelClazzes][index];
+    return self.topLevelClasses[index];
 }
 
 - (BOOL)hasToolTip
@@ -106,17 +106,17 @@
 
 #pragma mark - Private methods
 
-- (NSArray *)constructTopLevelClazzes
+- (NSArray *)constructTopLevelClasses
 {
     RLMSchema *realmSchema = _realm.schema;
     NSArray *allObjectSchemas = realmSchema.objectSchema;
     
-    NSUInteger clazzCount = allObjectSchemas.count;
-    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:clazzCount];
+    NSUInteger classCount = allObjectSchemas.count;
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:classCount];
     
-    for (NSUInteger index = 0; index < clazzCount; index++) {
+    for (NSUInteger index = 0; index < classCount; index++) {
         RLMObjectSchema *objectSchema = allObjectSchemas[index];        
-        RLMClazzNode *tableNode = [[RLMClazzNode alloc] initWithSchema:objectSchema
+        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema
                                                                inRealm:_realm];
         
         [result addObject:tableNode];

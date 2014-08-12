@@ -166,8 +166,8 @@
 
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    BOOL canDeleteRows = self.selectedRow >= 0 && self.selectedRow <= [self.dataSource numberOfRowsInTableView:self];
-    BOOL canDeleteColumns = NO;
+    BOOL canDeleteRows = self.selectedRowIndexes.count > 0;
+    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0;
     BOOL multipleRows = self.selectedRowIndexes.count > 1;
     BOOL multipleColumns = self.selectedColumnIndexes.count > 1;
     
@@ -259,7 +259,7 @@
 
 - (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
-    // How many properties does the clazz contains?
+    // How many properties does the class contains?
     NSArray *columns = typeNode.propertyColumns;
     NSUInteger columnCount = columns.count;
     
@@ -281,7 +281,7 @@
     for (NSUInteger index = 0; index < columns.count; index++) {
         NSTableColumn *tableColumn = self.tableColumns[index];
         
-        RLMClazzProperty *property = columns[index];
+        RLMClassProperty *property = columns[index];
         [[tableColumn headerCell] setStringValue:property.name];
 
         NSString *toolTip;

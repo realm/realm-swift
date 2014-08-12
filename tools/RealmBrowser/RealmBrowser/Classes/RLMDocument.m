@@ -18,9 +18,9 @@
 
 #import "RLMDocument.h"
 
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 #import "RLMArrayNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMClassProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
 #import "NSTableColumn+Resize.h"
