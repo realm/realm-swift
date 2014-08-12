@@ -330,6 +330,7 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     XCTAssertNoThrow([realm objects:className where:@"boolCol == false"], @"== false");
     XCTAssertNoThrow([realm objects:className where:@"boolCol == False"], @"== False");
     XCTAssertNoThrow([realm objects:className where:@"boolCol == FALSE"], @"== FALSE");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == 0"], @"== 0");
     
     // boolean true
     XCTAssertNoThrow([realm objects:className where:@"boolCol == yes"], @"== yes");
@@ -338,6 +339,7 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     XCTAssertNoThrow([realm objects:className where:@"boolCol == true"], @"== true");
     XCTAssertNoThrow([realm objects:className where:@"boolCol == True"], @"== True");
     XCTAssertNoThrow([realm objects:className where:@"boolCol == TRUE"], @"== TRUE");
+    XCTAssertNoThrow([realm objects:className where:@"boolCol == 1"], @"== 1");
     
     // inequality
     XCTAssertNoThrow([realm objects:className where:@"boolCol != YES"], @"!= YES");
@@ -391,6 +393,7 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     className = AllTypesObject.className;
     
     XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"boolCol == 2"], @"invalid type");
     XCTAssertThrows([realm objects:className where:@"dateCol == 7"], @"invalid type");
     XCTAssertThrows([realm objects:className where:@"doubleCol == The"], @"invalid type");
     XCTAssertThrows([realm objects:className where:@"floatCol == Bar"], @"invalid type");

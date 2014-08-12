@@ -20,6 +20,7 @@
 * Allow array and objection relation properties to be missing or null when
   creating a RLMObject from a NSDictionary.
 * Add support for literal ranges to BETWEEN predicates.
+* Allow 0 and 1 where bools are expected in queries.
 
 ### Bugfixes
 
