@@ -230,129 +230,74 @@
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    NSTableCellView *cellView;
     
-    if (tableView == self.tableView) {
-        NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
-        RLMTypeNode *displayedType = self.displayedType;
-
-        RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
-        RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
-        id propertyValue = selectedInstance[clazzProperty.name];
-        RLMPropertyType type = clazzProperty.type;
-        
-        if (type == RLMPropertyTypeArray) {
-            RLMBadgeTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BadgeCell" owner:self];
-            
-            badgeCellView.badge.hidden = NO;
-            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", (unsigned long)[(RLMArray *)propertyValue count]];
-            [badgeCellView.badge.cell setHighlightsBy:0];
-            
-            NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
-            badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
-            
-            cellView = badgeCellView;
-        }
-        else if (type == RLMPropertyTypeBool) {
-            RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
-            
-            BOOL boolValue;
-            if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                boolValue = [(NSNumber *)propertyValue boolValue];
-            }
-            boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
-            
-            cellView = boolCellView;
-        }
-        else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
-            RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
-            numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
-            
-            ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
-            
-            cellView = numberCellView;
-        }
-//        else if (type == RLMPropertyTypeData) {
-//            NSTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
-//            
-//            imageCellView.textField.stringValue = @"imagecell";
-//            
-//            if (tempImage) {
-//                NSLog(@"== Already had one ==");
-//                imageCellView.imageView.image = tempImage;
-//                return imageCellView;
-//            }
-//            
-//            NSData *data = propertyValue;
-//
-//            NSString *content = [self.class contentTypeForImageData:data];
-//            imageCellView.textField.stringValue = content;
-//            
-//            NSLog(@"=====%ld datacontent: %@", (long)rowIndex, content);
-//
-//            NSImage *image = [[NSImage alloc] initWithData:data];
-//            NSImage *thumbnail = RLMThumbnailImageFromImage(image);
-//            NSLog(@"======%ld image: %@", (long)rowIndex, thumbnail);
-//            
-//            tempImage = thumbnail;
-//            imageCellView.imageView.image = thumbnail;
-//            
-//            cellView = imageCellView;
-//        }
-        else {
-            RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
-            
-            NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
-            
-            if (type == RLMPropertyTypeObject) {
-                basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
-            }
-            else {
-                basicCellView.textField.stringValue = formattedText;
-            }
-            
-            cellView = basicCellView;
-        }
-        
-        cellView.toolTip = [self tooltipForPropertyValue:propertyValue ofType:type];
+    if (tableView != self.tableView) {
+        return nil;
     }
+    
+    NSTableCellView *cellView;
+
+    NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
+    RLMTypeNode *displayedType = self.displayedType;
+    
+    RLMClazzProperty *classProperty = displayedType.propertyColumns[columnIndex];
+    RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
+    id propertyValue = selectedInstance[classProperty.name];
+    RLMPropertyType type = classProperty.type;
+    
+    if (type == RLMPropertyTypeArray) {
+        RLMBadgeTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BadgeCell" owner:self];
+        
+        badgeCellView.badge.hidden = NO;
+        badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", (unsigned long)[(RLMArray *)propertyValue count]];
+        [badgeCellView.badge.cell setHighlightsBy:0];
+        
+        NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+        badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+        
+        [badgeCellView.textField setEditable:NO];
+        
+        cellView = badgeCellView;
+    }
+    else if (type == RLMPropertyTypeBool) {
+        RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
+        
+        BOOL boolValue;
+        if ([propertyValue isKindOfClass:[NSNumber class]]) {
+            boolValue = [(NSNumber *)propertyValue boolValue];
+        }
+        boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
+        
+        cellView = boolCellView;
+    }
+    else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
+        RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
+        numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+        
+        ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
+        
+        cellView = numberCellView;
+    }
+    else {
+        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+        
+        NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+        
+        if (type == RLMPropertyTypeObject) {
+            basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+            [basicCellView.textField setEditable:NO];
+        }
+        else {
+            basicCellView.textField.stringValue = formattedText;
+        }
+        
+        cellView = basicCellView;
+    }
+    
+    cellView.toolTip = [self tooltipForPropertyValue:propertyValue ofType:type];
     
     return cellView;
 }
-
-//+ (NSString *)contentTypeForImageData:(NSData *)data
-//{
-//    uint8_t c;
-//    [data getBytes:&c length:1];
-//    
-//    switch (c) {
-//        case 0xFF:
-//            return @"image/jpeg";
-//        case 0x89:
-//            return @"image/png";
-//        case 0x47:
-//            return @"image/gif";
-//        case 0x49:
-//        case 0x4D:
-//            return @"image/tiff";
-//    }
-//    
-//    return nil;
-//}
-
-//static NSImage *RLMThumbnailImageFromImage(NSImage *image) {
-//    NSSize imageSize = [image size];
-//    CGFloat imageAspectRatio = imageSize.width/imageSize.height;
-//    
-//    NSSize thumbnailSize = NSMakeSize(30.0 * imageAspectRatio, 30.0);
-//    NSImage *thumbnailImage = [[NSImage alloc] initWithSize:thumbnailSize];
-//    [thumbnailImage lockFocus];
-//    [image drawInRect:NSMakeRect(0, 0, thumbnailSize.width, thumbnailSize.height) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-//    [thumbnailImage unlockFocus];
-//    
-//    return thumbnailImage;
-//}
-
 
 +(NSAttributedString *)linkStringWithString:(NSString *)string
 {
@@ -474,11 +419,6 @@
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
                 RLMArray *referredArray = (RLMArray *)propertyValue;
                 
-                // In order to avoid that we procedure very long tooltips for arrays we have
-                // an upper limit on how many entries we will display. If the total item count
-                // of the array is within the limit we simply use the default description of
-                // the array, otherwise we construct the tooltip explicitly by concatenating the
-                // descriptions of the all the first array items within the limit + an ellipis.
                 if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
                     return referredArray.description;
                 }
