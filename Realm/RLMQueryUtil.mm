@@ -487,6 +487,43 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     }
 }
 
+void add_constraint_to_query(tightdb::Query &query,
+                             NSPredicateOperatorType operatorType,
+                             RLMPropertyType type,
+                             NSComparisonPredicateOptions options,
+                             NSUInteger index,
+                             id value) {
+    switch (type) {
+        case type_Bool:
+            add_bool_constraint_to_query(query, operatorType, index, bool([value boolValue]));
+            break;
+        case type_DateTime:
+            add_datetime_constraint_to_query(query, operatorType, index, [value timeIntervalSince1970]);
+            break;
+        case type_Double:
+            add_numeric_constraint_to_query(query, type, operatorType, index, [value doubleValue]);
+            break;
+        case type_Float:
+            add_numeric_constraint_to_query(query, type, operatorType, index, [value floatValue]);
+            break;
+        case type_Int:
+            add_numeric_constraint_to_query(query, type, operatorType, index, [value longLongValue]);
+            break;
+        case type_String:
+            add_string_constraint_to_query(query, operatorType, options, index, value);
+            break;
+        case type_Binary:
+            add_binary_constraint_to_query(query, operatorType, index, value);
+            break;
+        case type_Link:
+            add_link_constraint_to_query(query, operatorType, index, value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Unsupported predicate value type",
+                                         @"Object type %@ not supported", RLMTypeToString(type));
+    }
+}
+
 void update_query_with_value_expression(RLMSchema *schema,
                                         RLMObjectSchema *desc,
                                         tightdb::Query &query,
@@ -518,43 +555,35 @@ void update_query_with_value_expression(RLMSchema *schema,
     
     // get prop and index
     NSUInteger index = RLMValidatedColumnIndex(desc, keyPath);
-    
+
+    // turn IN into ored together ==
+    if (pred.predicateOperatorType == NSInPredicateOperatorType) {
+        query.group();
+
+        bool first = true;
+        for (id item in value) {
+            id normalized = value_for_expression(item);
+            if (!RLMIsObjectValidForProperty(normalized, prop)) {
+                @throw RLMPredicateException(@"Invalid value", @"object in IN clause must be of type %@", RLMTypeToString(prop.type));
+            }
+
+            if (!first) {
+                query.Or();
+            }
+            first = false;
+            add_constraint_to_query(query, NSEqualToPredicateOperatorType, prop.type, pred.options, index, normalized);
+        }
+        query.end_group();
+        return;
+    }
+
     // validate value
     if (!RLMIsObjectValidForProperty(value, prop)) {
         @throw RLMPredicateException(@"Invalid value", @"object must be of type %@", RLMTypeToString(prop.type));
     }
     
     // finally cast to native types and add query clause
-    RLMPropertyType type = prop.type;
-    switch (type) {
-        case type_Bool:
-            add_bool_constraint_to_query(query, pred.predicateOperatorType, index, bool([value boolValue]));
-            break;
-        case type_DateTime:
-            add_datetime_constraint_to_query(query, pred.predicateOperatorType, index, double([value timeIntervalSince1970]));
-            break;
-        case type_Double:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value doubleValue]);
-            break;
-        case type_Float:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value floatValue]);
-            break;
-        case type_Int:
-            add_numeric_constraint_to_query(query, type, pred.predicateOperatorType, index, [value longLongValue]);
-            break;
-        case type_String:
-            add_string_constraint_to_query(query, pred.predicateOperatorType, pred.options, index, value);
-            break;
-        case type_Binary:
-            add_binary_constraint_to_query(query, pred.predicateOperatorType, index, value);
-            break;
-        case type_Link:
-            add_link_constraint_to_query(query, pred.predicateOperatorType, index, value);
-            break;
-        default:
-            @throw RLMPredicateException(@"Unsupported predicate value type",
-                                         @"Object type %@ not supported", RLMTypeToString(type));
-    }
+    add_constraint_to_query(query, pred.predicateOperatorType, prop.type, pred.options, index, value);
 }
 
 template<typename T>
@@ -562,7 +591,6 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
                                             NSUInteger leftColumn,
                                             NSUInteger rightColumn,
                                             Table *table) {
-
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
             return table->column<T>(leftColumn) == table->column<T>(rightColumn);
@@ -679,9 +707,6 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
         NSComparisonPredicate *compp = (NSComparisonPredicate *)predicate;
         
         // check modifier
-        if (compp.predicateOperatorType == NSInPredicateOperatorType) {
-            @throw RLMPredicateException(@"Invalid operator type", @"Unsupported predicate operator 'IN'");
-        }
         if (compp.comparisonPredicateModifier == NSAllPredicateModifier) {
             // no support for ALL queries
             @throw RLMPredicateException(@"Invalid predicate",
@@ -720,12 +745,13 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
             return;
         }
 
-        if (compp.predicateOperatorType == NSBetweenPredicateOperatorType) {
+        if (compp.predicateOperatorType == NSBetweenPredicateOperatorType || compp.predicateOperatorType == NSInPredicateOperatorType) {
             // Inserting an array via %@ gives NSConstantValueExpressionType, but
             // including it directly gives NSAggregateExpressionType
             if (exp1Type != NSKeyPathExpressionType || (exp2Type != NSAggregateExpressionType && exp2Type != NSConstantValueExpressionType)) {
                 @throw RLMPredicateException(@"Invalid predicate",
-                                             @"Predicate with BETWEEN operator must compare a KeyPath with an aggregate with two values");
+                                             @"Predicate with %s operator must compare a KeyPath with an aggregate with two values",
+                                             compp.predicateOperatorType == NSBetweenPredicateOperatorType ? "BETWEEN" : "IN");
             }
             update_query_with_value_expression(schema, objectSchema, query, compp.leftExpression.keyPath,
                                                compp.rightExpression.constantValue, compp);

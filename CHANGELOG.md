@@ -1,3 +1,14 @@
+0.84.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+### Enhancements
+
+* Add support for the IN operator in predicates.
+
+### Bugfixes
+
 0.83.0 Release notes (2014-08-13)
 =============================================================
 
