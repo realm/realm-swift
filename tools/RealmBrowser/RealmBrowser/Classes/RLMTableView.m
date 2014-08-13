@@ -207,21 +207,22 @@
     switch (menuItem.tag) {
         case 1: // Tools -> Add row
         case 5: // Context -> Add row
-            menuItem.title = multipleRows ? @"Add rows" : @"Add row";
+            menuItem.title = multipleRows ? @"Add objects" : @"Add object";
             return canEditRows;
             
         case 2: // Tools -> Delete row
         case 6: // Context -> Delete row
-            menuItem.title = multipleRows ? @"Delete rows" : @"Delete row";
+            menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
             return canDeleteRows;
 
         case 3: // Tools -> Add column
         case 7: // Context -> Add column
+            menuItem.title = @"Add property";
             return canEditColumns;
         
         case 4: // Tools -> Delete column
         case 8: // Context -> Delete column
-            menuItem.title = multipleColumns ? @"Delete columns" : @"Delete column";
+            menuItem.title = multipleColumns ? @"Delete properties" : @"Delete property";
             return canDeleteColumns;
             
         default:

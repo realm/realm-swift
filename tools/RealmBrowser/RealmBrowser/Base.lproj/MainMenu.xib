@@ -105,12 +105,12 @@
                                     <action selector="generatedDemoDatabase:" target="-1" id="9cb-1W-suN"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add row" tag="1" keyEquivalent="+" id="QVH-nc-d7y">
+                            <menuItem title="Add object" tag="1" keyEquivalent="+" id="QVH-nc-d7y">
                                 <connections>
                                     <action selector="menuAddRow:" target="-1" id="yOH-eQ-4oJ"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Delete row" tag="2" id="Kvq-ch-tH8">
+                            <menuItem title="Delete object" tag="2" id="Kvq-ch-tH8">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
@@ -118,13 +118,13 @@ CA
                                     <action selector="menuDeleteRow:" target="-1" id="HwD-9j-TSF"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add column" tag="3" keyEquivalent="+" id="z5J-Kb-bop">
+                            <menuItem title="Add property" tag="3" keyEquivalent="+" id="z5J-Kb-bop">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
                                     <action selector="menuAddColumn:" target="-1" id="BJS-eR-PmC"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Delete column" tag="4" id="wdN-mn-k5Z">
+                            <menuItem title="Delete property" tag="4" id="wdN-mn-k5Z">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>

@@ -37,6 +37,7 @@
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsForTable = 30;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
+const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
 
 @implementation RLMInstanceTableViewController {
 
@@ -388,9 +389,17 @@ const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
                 id propertyValue = referredObject[property.name];
                 NSString *propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type linkFormat:YES];
                 
+                if (returnString.length > kMaxNumberOfObjectCharsForTable - 4) {
+                    returnString = [returnString stringByAppendingFormat:@"..."];
+                    break;
+                }
+
                 returnString = [returnString stringByAppendingFormat:@"%@, ", propertyDescription];
             }
-            returnString = [returnString substringToIndex:returnString.length - 2];
+            
+            if ([returnString hasSuffix:@", "]) {
+                returnString = [returnString substringToIndex:returnString.length - 2];
+            }
             
             return [returnString stringByAppendingString:@")"];
         }
@@ -427,7 +436,7 @@ const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
                 
                 NSString *toolTipString = @"";
                 for (RLMProperty *property in properties) {
-                    toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@", property.name, referredObject[property.name]];
+                    toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@\n", property.name, referredObject[property.name]];
                 }
                 
                 return toolTipString;
