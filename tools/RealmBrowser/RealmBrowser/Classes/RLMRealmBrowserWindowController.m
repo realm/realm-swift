@@ -20,6 +20,17 @@
 #import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
+NSString * const kRealmLockedImage = @"LockedRealmRed";
+NSString * const kRealmUnlockedImage = @"LockedRealmBlack";
+NSString * const kSchemaLockedImage = @"LockedSchemaRed";
+NSString * const kSchemaUnlockedImage = @"LockedSchemaBlack";
+
+NSString * const kRealmLockedLabel = @"Unlock realm";
+NSString * const kRealmUnlockedLabel = @"Lock realm";
+NSString * const kSchemaLockedLabel = @"Unlock Schema";
+NSString * const kSchemaUnlockedLabel = @"Lock schema";
+
+
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 @end
@@ -46,8 +57,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     if (firstItem != nil) {
         RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
 
-        [self addNavigationState:initState
-              fromViewController:nil];
+        [self addNavigationState:initState fromViewController:nil];
     }
 }
 
@@ -69,17 +79,71 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         [self updateNavigationButtons];
         
         if (controller == self.tableViewController || controller == nil) {
-            [self.outlineViewController updateUsingState:state
-                                                oldState:oldState];
+            [self.outlineViewController updateUsingState:state oldState:oldState];
         }
         
-        [self.tableViewController updateUsingState:state
-                                          oldState:oldState];
+        [self.tableViewController updateUsingState:state oldState:oldState];
     }
 
     // Searching is not implemented for link arrays yet
     BOOL isArray = [state isMemberOfClass:[RLMArrayNavigationState class]];
     [self.searchField setEnabled:!isArray];
+}
+
+- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
+{
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
+    switch (buttons.selectedSegment) {
+        case 0: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateBackward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        case 1: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateForward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    
+    [self updateNavigationButtons];
+}
+
+- (IBAction)userClickedLockRealm:(id)sender
+{
+    self.tableViewController.realmIsLocked = !self.tableViewController.realmIsLocked;
+    
+    if (self.tableViewController.realmIsLocked) {
+        self.lockRealmButton.image = [NSImage imageNamed:kRealmLockedImage];
+        self.lockRealmButton.label = kRealmLockedLabel;
+    }
+    else {
+        self.lockRealmButton.image = [NSImage imageNamed:kRealmUnlockedImage];
+        self.lockRealmButton.label = kRealmUnlockedLabel;
+    }
+}
+
+- (IBAction)userClickedLockSchema:(id)sender
+{
+    self.tableViewController.schemasLocked = !self.tableViewController.schemasLocked;
+    
+    if (self.tableViewController.schemasLocked) {
+        self.lockSchemaButton.image = [NSImage imageNamed:kSchemaLockedImage];
+        self.lockSchemaButton.label = kSchemaLockedLabel;
+    }
+    else {
+        self.lockSchemaButton.image = [NSImage imageNamed:kSchemaUnlockedImage];
+        self.lockSchemaButton.label = kSchemaUnlockedLabel;
+    }
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -187,46 +251,12 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     [self addNavigationState:state fromViewController:self.tableViewController];
 }
 
-- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
-{
-    RLMNavigationState *oldState = navigationStack.currentState;
-    
-    switch (buttons.selectedSegment) {
-        case 0: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateBackward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        case 1: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateForward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    
-    [self updateNavigationButtons];    
-}
-
 #pragma mark - Private methods
 
 - (void)updateNavigationButtons
 {
-    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward]
-                            forSegment:0];
-    [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
-                            forSegment:1];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward] forSegment:0];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateForward] forSegment:1];
 }
 
 @end

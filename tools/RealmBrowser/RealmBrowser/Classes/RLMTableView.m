@@ -58,7 +58,7 @@
     mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
-    
+        
     [self createContextMenu];
 }
 

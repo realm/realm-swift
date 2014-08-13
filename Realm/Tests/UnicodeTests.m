@@ -18,7 +18,7 @@
 
 #import "RLMTestCase.h"
 
-static const NSString *kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا";
+NSString * const kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا";
 
 @interface UnicodeTests : RLMTestCase
 @end

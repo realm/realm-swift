@@ -6,6 +6,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
             <connections>
+                <outlet property="lockRealmButton" destination="L8G-EJ-A1Z" id="UgQ-Tm-A3A"/>
+                <outlet property="lockSchemaButton" destination="232-fi-wd9" id="Rnx-sC-HXk"/>
                 <outlet property="navigationButtons" destination="2Ep-Z1-kHF" id="R6Y-2D-J2o"/>
                 <outlet property="outlineViewController" destination="hSp-0t-Gbg" id="wTv-NH-RZX"/>
                 <outlet property="searchField" destination="d5n-tM-xUt" id="8FS-BC-KyY"/>
@@ -369,7 +371,7 @@
                     <constraint firstAttribute="trailing" secondItem="IXc-8a-g01" secondAttribute="trailing" id="sFX-QX-Q7C"/>
                 </constraints>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="rfo-lS-fnD">
+            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="small" id="rfo-lS-fnD">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="6A2680B3-CB3F-4B46-943B-6DB55B89691A" label="" paletteLabel="Navigation" id="dAe-mG-eMX">
                         <nil key="toolTip"/>
@@ -408,10 +410,22 @@
                         </searchField>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="IBE-aS-65q"/>
+                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" label="Lock realm" paletteLabel="Lock realm" tag="1" image="LockedRealmRed" id="L8G-EJ-A1Z">
+                        <connections>
+                            <action selector="userClickedLockRealm:" target="-2" id="4PX-6Z-zko"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" label="Lock schema" paletteLabel="Lock schema" tag="2" image="LockedSchemaRed" id="232-fi-wd9">
+                        <connections>
+                            <action selector="userClickedLockSchema:" target="-2" id="ozS-J6-6yg"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="dAe-mG-eMX"/>
                     <toolbarItem reference="IBE-aS-65q"/>
+                    <toolbarItem reference="L8G-EJ-A1Z"/>
+                    <toolbarItem reference="232-fi-wd9"/>
                     <toolbarItem reference="iuT-AU-RcQ"/>
                 </defaultToolbarItems>
             </toolbar>
@@ -434,6 +448,8 @@
         </customObject>
     </objects>
     <resources>
+        <image name="LockedRealmRed" width="32" height="32"/>
+        <image name="LockedSchemaRed" width="32" height="32"/>
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
