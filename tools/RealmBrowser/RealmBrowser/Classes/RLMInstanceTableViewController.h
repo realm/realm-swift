@@ -28,6 +28,6 @@
 
 @property (nonatomic, readonly) RLMTableView *realmTableView;
 @property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL schemasLocked;
+@property (nonatomic) BOOL schemaIsLocked;
 
 @end

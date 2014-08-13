@@ -20,16 +20,13 @@
 #import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
+NSString * const kRealmLockId = @"RealmLockItem";
 NSString * const kRealmLockedImage = @"LockedRealmRed";
 NSString * const kRealmUnlockedImage = @"LockedRealmBlack";
+
+NSString * const kSchemaLockId = @"SchemaLockItem";
 NSString * const kSchemaLockedImage = @"LockedSchemaRed";
 NSString * const kSchemaUnlockedImage = @"LockedSchemaBlack";
-
-NSString * const kRealmLockedLabel = @"Unlock realm";
-NSString * const kRealmUnlockedLabel = @"Lock realm";
-NSString * const kSchemaLockedLabel = @"Unlock Schema";
-NSString * const kSchemaUnlockedLabel = @"Lock schema";
-
 
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
@@ -59,6 +56,8 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
         [self addNavigationState:initState fromViewController:nil];
     }
+    
+    [self setRealmLocked:YES];
 }
 
 #pragma mark - Public methods - Accessors
@@ -120,30 +119,32 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 - (IBAction)userClickedLockRealm:(id)sender
 {
-    self.tableViewController.realmIsLocked = !self.tableViewController.realmIsLocked;
-    
-    if (self.tableViewController.realmIsLocked) {
-        self.lockRealmButton.image = [NSImage imageNamed:kRealmLockedImage];
-        self.lockRealmButton.label = kRealmLockedLabel;
-    }
-    else {
-        self.lockRealmButton.image = [NSImage imageNamed:kRealmUnlockedImage];
-        self.lockRealmButton.label = kRealmUnlockedLabel;
-    }
+    [self setRealmLocked:!self.tableViewController.realmIsLocked];
 }
 
 - (IBAction)userClickedLockSchema:(id)sender
 {
-    self.tableViewController.schemasLocked = !self.tableViewController.schemasLocked;
-    
-    if (self.tableViewController.schemasLocked) {
-        self.lockSchemaButton.image = [NSImage imageNamed:kSchemaLockedImage];
-        self.lockSchemaButton.label = kSchemaLockedLabel;
+    [self setSchemaLocked:!self.tableViewController.schemaIsLocked];
+}
+
+-(void)setRealmLocked:(BOOL)locked
+{
+    NSLog(@"RB: setting realm to: %@", locked ? @"locked" : @"unlocked");
+
+    self.tableViewController.realmIsLocked = locked;
+    self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
+
+    if (locked) {
+        [self setSchemaLocked:YES];
     }
-    else {
-        self.lockSchemaButton.image = [NSImage imageNamed:kSchemaUnlockedImage];
-        self.lockSchemaButton.label = kSchemaUnlockedLabel;
-    }
+}
+
+-(void)setSchemaLocked:(BOOL)locked
+{
+    NSLog(@"RB: setting schema to: %@", locked ? @"locked" : @"unlocked");
+
+    self.tableViewController.schemaIsLocked = locked;
+    self.lockSchemaButton.image = [NSImage imageNamed:locked ? kSchemaLockedImage : kSchemaUnlockedImage];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -250,6 +251,18 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
     [self addNavigationState:state fromViewController:self.tableViewController];
 }
+
+#pragma mark - NSResponder overrides
+
+-(BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
+{
+    if ([[toolbarItem itemIdentifier] isEqual:kSchemaLockId]) {
+        return !self.tableViewController.realmIsLocked;
+    }
+
+    return YES;
+}
+
 
 #pragma mark - Private methods
 

@@ -36,6 +36,10 @@ typedef struct {
 
 @protocol RLMTableViewDelegate <NSTableViewDelegate>
 
+- (BOOL)realmIsLocked;
+
+- (BOOL)schemaIsLocked;
+
 @optional
 
 - (void)mouseDidEnterView:(RLMTableView *)view;

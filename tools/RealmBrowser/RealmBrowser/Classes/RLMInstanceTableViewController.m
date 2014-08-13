@@ -67,9 +67,6 @@
     
     linkCursorDisplaying = NO;
 
-    self.realmIsLocked = YES;
-    self.schemasLocked = YES;
-
     awake = YES;
 }
 

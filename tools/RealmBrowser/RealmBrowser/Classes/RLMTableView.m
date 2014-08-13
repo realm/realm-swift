@@ -58,7 +58,7 @@
     mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
-        
+    
     [self createContextMenu];
 }
 
@@ -196,16 +196,22 @@
 
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    BOOL canDeleteRows = self.selectedRowIndexes.count > 0;
+    NSLog(@"TV: realm is : %@", [(id<RLMTableViewDelegate>)self.delegate realmIsLocked] ? @"locked" : @"unlocked");
+    NSLog(@"TV: schema is : %@", [(id<RLMTableViewDelegate>)self.delegate schemaIsLocked] ? @"locked" : @"unlocked");
+    
+    BOOL canEditRows = ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked];
+    BOOL canEditColumns = ![(id<RLMTableViewDelegate>)self.delegate schemaIsLocked];
+    
+    BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
     BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0;
+    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0 && canEditColumns;
     BOOL multipleColumns = self.selectedColumnIndexes.count > 1;
     
     switch (menuItem.tag) {
         case 1: // Tools -> Add row
         case 5: // Context -> Add row
             menuItem.title = multipleRows ? @"Add rows" : @"Add row";
-            return YES;
+            return canEditRows;
             
         case 2: // Tools -> Delete row
         case 6: // Context -> Delete row
@@ -214,7 +220,7 @@
 
         case 3: // Tools -> Add column
         case 7: // Context -> Add column
-            return YES;
+            return canEditColumns;
         
         case 4: // Tools -> Delete column
         case 8: // Context -> Delete column
