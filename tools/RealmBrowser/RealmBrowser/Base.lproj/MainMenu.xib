@@ -118,21 +118,6 @@ CA
                                     <action selector="menuDeleteRow:" target="-1" id="HwD-9j-TSF"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add property" tag="3" keyEquivalent="+" id="z5J-Kb-bop">
-                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                <connections>
-                                    <action selector="menuAddColumn:" target="-1" id="BJS-eR-PmC"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Delete property" tag="4" id="wdN-mn-k5Z">
-                                <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
-                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                <connections>
-                                    <action selector="menuDeleteColumn:" target="-1" id="C5j-TS-9jr"/>
-                                </connections>
-                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

@@ -168,16 +168,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     [self.tableView reloadData];
 }
 
--(void)addColumns:(NSIndexSet *)columnIndexes
-{
-    NSLog(@"IT: addColumns: %@", columnIndexes);
-}
-
--(void)deleteColumns:(NSIndexSet *)columnIndexes
-{
-    NSLog(@"IT: deleteColumns: %@", columnIndexes);
-}
-
 #pragma mark - Mouse movement
 
 -(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
@@ -572,15 +562,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
     [realm commitWriteTransaction];
-}
-
-- (void)rightClickedHeaderColumn:(NSUInteger)column
-{
-    if ([self.tableView.selectedColumnIndexes containsIndex:column]) {
-        return;
-    }
-    
-    [self.tableView selectColumnIndexes:[NSIndexSet indexSetWithIndex:column] byExtendingSelection:NO];
 }
 
 - (void)rightClickedLocation:(RLMTableLocation)location

@@ -32,7 +32,6 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
 
 @property (weak) IBOutlet NSToolbarItem *lockRealmButton;
-@property (weak) IBOutlet NSToolbarItem *lockSchemaButton;
 
 @property (nonatomic, strong) IBOutlet NSSearchField *searchField;
 @property (nonatomic, readonly) RLMNavigationState *currentState;
@@ -41,6 +40,5 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
 - (IBAction)userClickedLockRealm:(id)sender;
-- (IBAction)userClickedLockSchema:(id)sender;
 
 @end

@@ -21,23 +21,6 @@
 #import "NSTableColumn+Resize.h"
 
 
-
-@interface RLMTableHeaderView : NSTableHeaderView
-
-@end
-
-
-@implementation RLMTableHeaderView
-
--(void)rightMouseDown:(NSEvent *)theEvent
-{
-    [self.tableView rightMouseDown:theEvent];
-    [super rightMouseDown:theEvent];
-}
-
-@end
-
-
 @implementation RLMTableView {
     NSTrackingArea *trackingArea;
     BOOL mouseOverView;
@@ -67,23 +50,11 @@
     unichar backspaceKey = NSBackspaceCharacter;
 
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-
-    NSMenuItem *addColumnItem = [rightClickMenu insertItemWithTitle:@"Add column" action:@selector(addColumns) keyEquivalent:@"+" atIndex:0];
-    addColumnItem.tag = 7;
-    addColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
-    addColumnItem.target = self;
     
-    NSMenuItem *deleteColumnItem = [rightClickMenu insertItemWithTitle:@"Delete column" action:@selector(deleteColumns) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
-    deleteColumnItem.tag = 8;
-    deleteColumnItem.keyEquivalentModifierMask = NSCommandKeyMask | NSAlternateKeyMask;
-    deleteColumnItem.target = self;
-    
-    self.headerView.menu = [rightClickMenu copy];
-    
-    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:2];
+    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:0];
     addRowItem.tag = 5;
     
-    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:3];
+    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
     deleteRowItem.tag = 6;
     
     [self setMenu:rightClickMenu];
@@ -153,11 +124,6 @@
 {
     RLMTableLocation location = [self currentLocationAtPoint:[theEvent locationInWindow]];
     
-    if (location.row == -2 && location.column >= 0 && location.column < self.tableColumns.count) {
-        [(id<RLMTableViewDelegate>)self.delegate rightClickedHeaderColumn:location.column];
-        return;
-    }
-    
     [(id<RLMTableViewDelegate>)self.delegate rightClickedLocation:location];
     
     [super rightMouseDown:theEvent];
@@ -197,12 +163,9 @@
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     BOOL canEditRows = ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked];
-    BOOL canEditColumns = ![(id<RLMTableViewDelegate>)self.delegate schemaIsLocked];
     
     BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
     BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    BOOL canDeleteColumns = self.selectedColumnIndexes.count > 0 && canEditColumns;
-    BOOL multipleColumns = self.selectedColumnIndexes.count > 1;
     
     switch (menuItem.tag) {
         case 1: // Tools -> Add row
@@ -214,16 +177,6 @@
         case 6: // Context -> Delete row
             menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
             return canDeleteRows;
-
-        case 3: // Tools -> Add column
-        case 7: // Context -> Add column
-            menuItem.title = @"Add property";
-            return canEditColumns;
-        
-        case 4: // Tools -> Delete column
-        case 8: // Context -> Delete column
-            menuItem.title = multipleColumns ? @"Delete properties" : @"Delete property";
-            return canDeleteColumns;
             
         default:
             return YES;
@@ -240,16 +193,6 @@
     [self deleteRows];
 }
 
-- (IBAction)menuAddColumn:(id)sender
-{
-    [self addColumns];
-}
-
-- (IBAction)menuDeleteColumn:(id)sender
-{
-    [self deleteColumns];
-}
-
 #pragma mark - Helper methods
 
 -(void)addRows
@@ -263,20 +206,6 @@
 {
     if ([self.delegate respondsToSelector:@selector(deleteRows:)]) {
         [(id<RLMTableViewDelegate>)self.delegate deleteRows:self.selectedRowIndexes];
-    }
-}
-
--(void)addColumns
-{
-    if ([self.delegate respondsToSelector:@selector(addColumns:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate addColumns:self.selectedColumnIndexes];
-    }
-}
-
--(void)deleteColumns
-{
-    if ([self.delegate respondsToSelector:@selector(deleteColumns:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate deleteColumns:self.selectedColumnIndexes];
     }
 }
 

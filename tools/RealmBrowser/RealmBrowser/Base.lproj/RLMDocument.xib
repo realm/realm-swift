@@ -22,7 +22,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="500" y="485" width="977" height="564"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
                 <rect key="frame" x="0.0" y="0.0" width="977" height="564"/>
@@ -344,7 +344,7 @@
                                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="PKq-wN-eoD">
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
-                                        <tableHeaderView key="headerView" id="cDp-e2-1cA" customClass="RLMTableHeaderView">
+                                        <tableHeaderView key="headerView" id="cDp-e2-1cA">
                                             <rect key="frame" x="0.0" y="0.0" width="712" height="17"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableHeaderView>
@@ -371,7 +371,7 @@
                     <constraint firstAttribute="trailing" secondItem="IXc-8a-g01" secondAttribute="trailing" id="sFX-QX-Q7C"/>
                 </constraints>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="small" id="rfo-lS-fnD">
+            <toolbar key="toolbar" implicitIdentifier="C65F63A5-F554-46B8-9926-9CAAAC19813C" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="small" id="rfo-lS-fnD">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="6A2680B3-CB3F-4B46-943B-6DB55B89691A" label="" paletteLabel="Navigation" id="dAe-mG-eMX">
                         <nil key="toolTip"/>
@@ -425,7 +425,6 @@
                     <toolbarItem reference="dAe-mG-eMX"/>
                     <toolbarItem reference="IBE-aS-65q"/>
                     <toolbarItem reference="L8G-EJ-A1Z"/>
-                    <toolbarItem reference="232-fi-wd9"/>
                     <toolbarItem reference="iuT-AU-RcQ"/>
                 </defaultToolbarItems>
             </toolbar>

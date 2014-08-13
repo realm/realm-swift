@@ -21,12 +21,8 @@
 #import "RLMNavigationStack.h"
 
 NSString * const kRealmLockId = @"RealmLockItem";
-NSString * const kRealmLockedImage = @"LockedRealmRed";
-NSString * const kRealmUnlockedImage = @"LockedRealmBlack";
-
-NSString * const kSchemasLockId = @"SchemasLockItem";
-NSString * const kSchemasLockedImage = @"LockedSchemasRed";
-NSString * const kSchemasUnlockedImage = @"LockedSchemasBlack";
+NSString * const kRealmLockedImage = @"RealmLocked";
+NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
@@ -120,25 +116,10 @@ NSString * const kSchemasUnlockedImage = @"LockedSchemasBlack";
     [self setRealmLocked:!self.tableViewController.realmIsLocked];
 }
 
-- (IBAction)userClickedLockSchema:(id)sender
-{
-    [self setSchemaLocked:!self.tableViewController.schemaIsLocked];
-}
-
 -(void)setRealmLocked:(BOOL)locked
 {
     self.tableViewController.realmIsLocked = locked;
     self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
-
-    if (locked) {
-        [self setSchemaLocked:YES];
-    }
-}
-
--(void)setSchemaLocked:(BOOL)locked
-{
-    self.tableViewController.schemaIsLocked = locked;
-    self.lockSchemaButton.image = [NSImage imageNamed:locked ? kSchemasLockedImage : kSchemasUnlockedImage];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -247,15 +228,6 @@ NSString * const kSchemasUnlockedImage = @"LockedSchemasBlack";
 }
 
 #pragma mark - NSResponder overrides
-
--(BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
-{
-    if ([[toolbarItem itemIdentifier] isEqual:kSchemasLockId]) {
-        return !self.tableViewController.realmIsLocked;
-    }
-
-    return YES;
-}
 
 #pragma mark - Private methods
 
