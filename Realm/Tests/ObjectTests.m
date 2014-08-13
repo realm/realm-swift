@@ -496,7 +496,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
+    NSDictionary *const dictValidAllTypes = @{@"boolCol" : @NO,
                                                @"intCol" : @54,
                                                @"floatCol" : @0.7f,
                                                @"doubleCol" : @0.8,
@@ -544,7 +544,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
     
     [realm beginWriteTransaction];
     

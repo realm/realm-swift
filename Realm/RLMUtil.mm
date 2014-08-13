@@ -179,7 +179,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjec
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    for (RLMProperty * prop in properties) {
+    for (RLMProperty *prop in properties) {
         // set out object to validated input or default value
         id obj = dict[prop.name];
         obj = obj ?: defaults[prop.name];
