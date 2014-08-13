@@ -27,9 +27,9 @@
 #endif
 
 
-NSString *RLMTestRealmPath();
-NSString *RLMDefaultRealmPath();
-NSString *RLMRealmPathForFile();
+NSString *RLMTestRealmPath(void);
+NSString *RLMDefaultRealmPath(void);
+NSString *RLMRealmPathForFile(NSString *);
 
 
 #if !defined(SWIFT)
