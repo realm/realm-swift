@@ -410,12 +410,12 @@
                         </searchField>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="IBE-aS-65q"/>
-                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm lock" paletteLabel="Realm lock" tag="1" image="LockedRealmRed" id="L8G-EJ-A1Z">
+                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm" paletteLabel="Realm" tag="1" image="LockedRealmRed" id="L8G-EJ-A1Z">
                         <connections>
                             <action selector="userClickedLockRealm:" target="-2" id="4PX-6Z-zko"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" explicitItemIdentifier="SchemaLockItem" label="Schema lock" paletteLabel="Schema lock" tag="2" image="LockedSchemaRed" id="232-fi-wd9">
+                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" explicitItemIdentifier="SchemasLockItem" label="Schemas" paletteLabel="Schemas" tag="2" image="LockedSchemaRed" id="232-fi-wd9">
                         <connections>
                             <action selector="userClickedLockSchema:" target="-2" id="ozS-J6-6yg"/>
                         </connections>

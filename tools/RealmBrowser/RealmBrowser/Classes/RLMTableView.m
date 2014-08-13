@@ -196,9 +196,6 @@
 
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    NSLog(@"TV: realm is : %@", [(id<RLMTableViewDelegate>)self.delegate realmIsLocked] ? @"locked" : @"unlocked");
-    NSLog(@"TV: schema is : %@", [(id<RLMTableViewDelegate>)self.delegate schemaIsLocked] ? @"locked" : @"unlocked");
-    
     BOOL canEditRows = ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked];
     BOOL canEditColumns = ![(id<RLMTableViewDelegate>)self.delegate schemaIsLocked];
     

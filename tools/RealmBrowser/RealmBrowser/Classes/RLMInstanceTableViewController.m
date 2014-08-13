@@ -34,6 +34,10 @@
 
 #import "objc/objc-class.h"
 
+const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+const NSUInteger kMaxNumberOfStringCharsForTable = 30;
+const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
+
 @implementation RLMInstanceTableViewController {
 
     BOOL awake;
@@ -335,7 +339,9 @@
             
         case RLMPropertyTypeString:
             if ([propertyValue isKindOfClass:[NSString class]]) {
-                return propertyValue;
+                NSUInteger chars = MIN(kMaxNumberOfStringCharsForTable, [(NSString *)propertyValue length]);
+                
+                return [(NSString *)propertyValue substringToIndex:chars];
             }
             break;
             
@@ -396,6 +402,14 @@
 -(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
     switch (propertyType) {
+        case RLMPropertyTypeString:
+            if ([propertyValue isKindOfClass:[NSString class]]) {
+                NSUInteger chars = MIN(kMaxNumberOfStringCharsForTooltip, [(NSString *)propertyValue length]);
+                
+                return [(NSString *)propertyValue substringToIndex:chars];
+            }
+            break;
+
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
             if ([propertyValue isKindOfClass:[NSNumber class]]) {

@@ -24,9 +24,9 @@ NSString * const kRealmLockId = @"RealmLockItem";
 NSString * const kRealmLockedImage = @"LockedRealmRed";
 NSString * const kRealmUnlockedImage = @"LockedRealmBlack";
 
-NSString * const kSchemaLockId = @"SchemaLockItem";
-NSString * const kSchemaLockedImage = @"LockedSchemaRed";
-NSString * const kSchemaUnlockedImage = @"LockedSchemaBlack";
+NSString * const kSchemasLockId = @"SchemasLockItem";
+NSString * const kSchemasLockedImage = @"LockedSchemasRed";
+NSString * const kSchemasUnlockedImage = @"LockedSchemasBlack";
 
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
@@ -35,8 +35,6 @@ NSString * const kSchemaUnlockedImage = @"LockedSchemaBlack";
 @interface RLMArray (Private)
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
-
-const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 @implementation RLMRealmBrowserWindowController {
 
@@ -129,8 +127,6 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 -(void)setRealmLocked:(BOOL)locked
 {
-    NSLog(@"RB: setting realm to: %@", locked ? @"locked" : @"unlocked");
-
     self.tableViewController.realmIsLocked = locked;
     self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
 
@@ -141,10 +137,8 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 -(void)setSchemaLocked:(BOOL)locked
 {
-    NSLog(@"RB: setting schema to: %@", locked ? @"locked" : @"unlocked");
-
     self.tableViewController.schemaIsLocked = locked;
-    self.lockSchemaButton.image = [NSImage imageNamed:locked ? kSchemaLockedImage : kSchemaUnlockedImage];
+    self.lockSchemaButton.image = [NSImage imageNamed:locked ? kSchemasLockedImage : kSchemasUnlockedImage];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -256,13 +250,12 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
 -(BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
 {
-    if ([[toolbarItem itemIdentifier] isEqual:kSchemaLockId]) {
+    if ([[toolbarItem itemIdentifier] isEqual:kSchemasLockId]) {
         return !self.tableViewController.realmIsLocked;
     }
 
     return YES;
 }
-
 
 #pragma mark - Private methods
 
