@@ -41,8 +41,7 @@
     RLMRealmNode *firstItem = self.parentWindowController.modelDocument.presentedRealm;
     if (firstItem != nil) {
         // We want the class outline to be expanded as default
-        [self.classesOutlineView expandItem:firstItem
-                             expandChildren:YES];
+        [self.classesOutlineView expandItem:firstItem expandChildren:YES];
     }
 }
 
@@ -53,8 +52,7 @@
     [super performUpdateUsingState:newState
                           oldState:oldState];
  
-    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] ||
-        [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
+    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] || [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
         RLMClassNode *parentNode = (RLMClassNode *)oldState.selectedType;
         [parentNode removeAllChildNodes];
         [self.tableView reloadData];

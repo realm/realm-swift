@@ -100,7 +100,7 @@
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;
-    result.imageView.image = nil;
+    result.imageView.image = [NSImage imageNamed:@"ArrayIcon"];
     
     return result;
 }
