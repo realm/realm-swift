@@ -21,12 +21,13 @@
 #import "RLMSidebarTableCellView.h"
 
 @implementation RLMArrayNode {
-
     RLMProperty *referringProperty;
     RLMObject *referringObject;
     RLMArray *displayedArray;
     NSString *name;
 }
+
+#pragma mark - Public Methods
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
@@ -55,7 +56,17 @@
     return self;
 }
 
-#pragma mark - RLMObjectNode overrides
+-(BOOL)removeInstanceAtIndex:(NSUInteger)index
+{
+    if (index >= [displayedArray count]) {
+        return NO;
+    }
+    
+    [displayedArray removeObjectAtIndex:index];
+    return YES;
+}
+
+#pragma mark - RLMObjectNode Overrides
 
 - (NSString *)name
 {
@@ -105,7 +116,7 @@
     return result;
 }
 
-#pragma mark - RLMRealmOutlineNode implementation
+#pragma mark - RLMRealmOutlineNode Implementation
 
 - (BOOL)hasToolTip
 {

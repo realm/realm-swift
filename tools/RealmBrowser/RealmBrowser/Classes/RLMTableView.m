@@ -20,15 +20,19 @@
 
 #import "NSTableColumn+Resize.h"
 
+@interface RLMTableView()<NSMenuDelegate>
+
+@end
 
 @implementation RLMTableView {
     NSTrackingArea *trackingArea;
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+    NSMenuItem *removeFromArrayItem;
 }
 
-#pragma mark - NSObject overrides
+#pragma mark - NSObject Overrides
 
 - (void)awakeFromNib
 {
@@ -45,6 +49,13 @@
     [self createContextMenu];
 }
 
+- (void)dealloc
+{
+    [self removeTrackingArea:trackingArea];
+}
+
+#pragma mark - Private Methods - NSObject Overrides
+
 -(void)createContextMenu
 {
     unichar backspaceKey = NSBackspaceCharacter;
@@ -57,15 +68,15 @@
     NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
     deleteRowItem.tag = 6;
     
-    [self setMenu:rightClickMenu];
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(removeRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1]];
+    removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
+    removeFromArrayItem.tag = 9;
+
+    self.menu = rightClickMenu;
+    self.menu.delegate = self;
 }
 
-- (void)dealloc
-{
-    [self removeTrackingArea:trackingArea];
-}
-
-#pragma mark - NSResponder overrides
+#pragma mark - NSResponder Overrides
 
 - (void)cursorUpdate:(NSEvent *)event
 {
@@ -146,7 +157,7 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask) {
+    if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
             [self addRows];
         }
@@ -154,34 +165,73 @@
             [self deleteRows];
         }
     }
+    else if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask) {
+        if (theEvent.keyCode == 51) {
+            [self removeRows];
+        }
+    }
     
     [self interpretKeyEvents:@[theEvent]];
 }
 
-#pragma mark - Menu handling
-
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     BOOL canEditRows = ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked];
-    
     BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
-    BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    
+    BOOL displaysArray = [(id<RLMTableViewDelegate>)self.delegate displaysArray];
+
     switch (menuItem.tag) {
         case 1: // Tools -> Add row
         case 5: // Context -> Add row
-            menuItem.title = multipleRows ? @"Add objects" : @"Add object";
-            return canEditRows;
+            return canEditRows && !displaysArray;
             
         case 2: // Tools -> Delete row
         case 6: // Context -> Delete row
-            menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
             return canDeleteRows;
+
+        case 9: // Context -> Remove row from array
+            return canDeleteRows && displaysArray;
             
         default:
             return YES;
     }
 }
+
+#pragma mark - NSMenu Delegate
+
+-(void)menuNeedsUpdate:(NSMenu *)menu
+{
+    BOOL displaysArray = [(id<RLMTableViewDelegate>)self.delegate displaysArray];
+    BOOL multipleRows = self.selectedRowIndexes.count > 1;
+    
+    for (NSMenuItem *menuItem in menu.itemArray) {
+        switch (menuItem.tag) {
+            case 1: // Tools -> Add row
+            case 5: // Context -> Add row
+                menuItem.title = multipleRows ? @"Add objects" : @"Add object";
+                break;
+                
+            case 2: // Tools -> Delete row
+            case 6: // Context -> Delete row
+                menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
+                break;
+                
+            case 9: // Context -> Delete row
+                menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
+                break;
+        }
+    }
+    
+    BOOL containsRemoveFromArrayItem = [menu.itemArray containsObject:removeFromArrayItem];
+
+    if (displaysArray && !containsRemoveFromArrayItem) {
+        [self.menu addItem:removeFromArrayItem];
+    } else if (!displaysArray && containsRemoveFromArrayItem) {
+        [self.menu removeItem:removeFromArrayItem];
+    }
+}
+
+#pragma mark - First Responder User Actions
 
 - (IBAction)menuAddRow:(id)sender
 {
@@ -193,23 +243,35 @@
     [self deleteRows];
 }
 
-#pragma mark - Helper methods
+- (IBAction)menuRemoveRow:(id)sender
+{
+    [self removeRows];
+}
+
+#pragma mark - Private Methods - User Actions
 
 -(void)addRows
 {
-    if ([self.delegate respondsToSelector:@selector(addRows:)]) {
+    if ([self.delegate respondsToSelector:@selector(addRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
         [(id<RLMTableViewDelegate>)self.delegate addRows:self.selectedRowIndexes];
     }
 }
 
 -(void)deleteRows
 {
-    if ([self.delegate respondsToSelector:@selector(deleteRows:)]) {
+    if ([self.delegate respondsToSelector:@selector(deleteRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
         [(id<RLMTableViewDelegate>)self.delegate deleteRows:self.selectedRowIndexes];
     }
 }
 
-#pragma mark - NSView overrides
+-(void)removeRows
+{
+    if ([self.delegate respondsToSelector:@selector(removeRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
+        [(id<RLMTableViewDelegate>)self.delegate removeRows:self.selectedRowIndexes];
+    }
+}
+
+#pragma mark - NSView Overrides
 
 - (void)updateTrackingAreas
 {
@@ -221,7 +283,7 @@
     [self addTrackingArea:trackingArea];
 }
 
-#pragma mark - Public methods
+#pragma mark - Public Methods
 
 - (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
@@ -302,7 +364,7 @@
     }
 }
 
-#pragma mark - Private methods - Cell geometry 
+#pragma mark - Private Methods - Cell geometry
 
 - (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
 {

@@ -33,11 +33,10 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 @end
 
 @implementation RLMRealmBrowserWindowController {
-
     RLMNavigationStack *navigationStack;
 }
 
-#pragma mark - NSViewController overrides
+#pragma mark - NSViewController Overrides
 
 - (void)windowDidLoad
 {
@@ -61,7 +60,7 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     return navigationStack.currentState;
 }
 
-#pragma mark - Public methods
+#pragma mark - Public methods - User Actions
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
@@ -190,8 +189,7 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
                 break;
             }
             //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
-            case RLMPropertyTypeDouble:
-            {
+            case RLMPropertyTypeDouble: {
                 double value;
 
                 if ([searchText isEqualToString:@"0"] ||
@@ -226,8 +224,6 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];
     [self addNavigationState:state fromViewController:self.tableViewController];
 }
-
-#pragma mark - NSResponder overrides
 
 #pragma mark - Private methods
 

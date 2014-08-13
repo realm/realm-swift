@@ -38,6 +38,7 @@ typedef struct {
 
 - (BOOL)realmIsLocked;
 
+- (BOOL)displaysArray;
 
 @optional
 
@@ -56,6 +57,8 @@ typedef struct {
 - (void)addRows:(NSIndexSet *)rowIndexes;
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes;
+
+- (void)removeRows:(NSIndexSet *)rowIndexes;
 
 @end
 

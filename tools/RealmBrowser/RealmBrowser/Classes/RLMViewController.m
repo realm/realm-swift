@@ -22,7 +22,6 @@
 #import "RLMArrayNavigationState.h"
 
 @implementation RLMViewController {
-
     id delegate;
 }
 

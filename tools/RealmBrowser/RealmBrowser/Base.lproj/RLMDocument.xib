@@ -7,7 +7,6 @@
         <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
             <connections>
                 <outlet property="lockRealmButton" destination="L8G-EJ-A1Z" id="UgQ-Tm-A3A"/>
-                <outlet property="lockSchemaButton" destination="232-fi-wd9" id="Rnx-sC-HXk"/>
                 <outlet property="navigationButtons" destination="2Ep-Z1-kHF" id="R6Y-2D-J2o"/>
                 <outlet property="outlineViewController" destination="hSp-0t-Gbg" id="wTv-NH-RZX"/>
                 <outlet property="searchField" destination="d5n-tM-xUt" id="8FS-BC-KyY"/>
@@ -410,14 +409,9 @@
                         </searchField>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="IBE-aS-65q"/>
-                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm" paletteLabel="Realm" tag="1" image="LockedRealmRed" id="L8G-EJ-A1Z">
+                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm" paletteLabel="Realm" tag="1" image="RealmLocked" id="L8G-EJ-A1Z">
                         <connections>
                             <action selector="userClickedLockRealm:" target="-2" id="4PX-6Z-zko"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" explicitItemIdentifier="SchemasLockItem" label="Schemas" paletteLabel="Schemas" tag="2" image="LockedSchemasRed" id="232-fi-wd9">
-                        <connections>
-                            <action selector="userClickedLockSchema:" target="-2" id="ozS-J6-6yg"/>
                         </connections>
                     </toolbarItem>
                 </allowedToolbarItems>
@@ -447,10 +441,9 @@
         </customObject>
     </objects>
     <resources>
-        <image name="LockedRealmRed" width="32" height="32"/>
-        <image name="LockedSchemasRed" width="32" height="32"/>
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
+        <image name="RealmLocked" width="32" height="32"/>
     </resources>
 </document>
