@@ -67,7 +67,7 @@ void throw_objc_exception(exception &ex) {
  
 // create NSError from c++ exception
 inline NSError *make_realm_error(RLMError code, exception &ex) {
-    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    NSMutableDictionary *details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
     [details setValue:@(code) forKey:@"Error Code"];
     return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];

@@ -230,7 +230,7 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
                                          NSComparisonPredicateOptions predicateOptions,
                                          NSUInteger firstIndex,
                                          NSUInteger secondIndex,
-                                         NSString* value) {
+                                         NSString *value) {
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     if (diacriticInsensitive) {
         @throw RLMPredicateException(@"Invalid predicate option",
