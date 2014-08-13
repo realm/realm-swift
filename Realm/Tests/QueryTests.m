@@ -399,7 +399,11 @@
     // abuse of BETWEEN
     XCTAssertThrows([realm objects:className where:@"age BETWEEN 25"], @"between with a scalar");
     XCTAssertThrows([realm objects:className where:@"age BETWEEN Foo"], @"between with a string");
-    
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, age}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, 0}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, age}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"between with nested arrays");
+
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 1 item");
     
@@ -407,7 +411,13 @@
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 3 items");
     
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 3 items");
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of strings");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of doubles");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with nested array");
     
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with dictionary");
