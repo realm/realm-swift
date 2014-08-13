@@ -11,6 +11,7 @@
 #          not strip away this feature. Also, this will fail if somebody forces the script
 #          to be run with zsh.
 set -o pipefail
+set -e
 
 # You can override the version of the core library
 # Otherwise, use the default value
@@ -66,12 +67,12 @@ if [ -z "$XCODE_VERSION" ]; then
 fi
 
 xcode5() {
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta5.app/Contents/Developer/usr/bin build/bin || exit 1
+    ln -s /Applications/Xcode6-Beta5.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
@@ -97,16 +98,15 @@ xcode() {
 xc() {
     echo "Building target \"$1\" with xcode${XCODE_VERSION}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode $1 || exit 1
+        xcode $1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
-        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS}
-        if [ "$?" -ne 0 ]; then
+        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
-        fi
+        }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool $1 || exit 1
+        xctool $1
     fi
 }
 
@@ -139,16 +139,16 @@ fi
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$(mktemp -dt "$0")"
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip" || exit 1
+    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
     (
         cd "${TMP_DIR}"
-        unzip "core-${REALM_CORE_VERSION}.zip" || exit 1
-        mv core core-${REALM_CORE_VERSION} || exit 1
-        rm -f "core-${REALM_CORE_VERSION}.zip" || exit 1
+        unzip "core-${REALM_CORE_VERSION}.zip"
+        mv core core-${REALM_CORE_VERSION}
+        rm -f "core-${REALM_CORE_VERSION}.zip"
     )
-    rm -rf core-${REALM_CORE_VERSION} core || exit 1
-    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} . || exit 1
-    ln -s core-${REALM_CORE_VERSION} core || exit 1
+    rm -rf core-${REALM_CORE_VERSION} core
+    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
+    ln -s core-${REALM_CORE_VERSION} core
 }
 
 COMMAND="$1"
@@ -162,10 +162,10 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean" || exit 1
-        xcrealm "-scheme OSX -configuration Debug clean" || exit 1
-        xcrealm "-scheme OSX -configuration Release clean" || exit 1
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean"
+        xcrealm "-scheme OSX -configuration Debug clean"
+        xcrealm "-scheme OSX -configuration Release clean"
         exit 0
         ;;
 
@@ -193,14 +193,14 @@ case "$COMMAND" in
     # Building
     ######################################
     "build")
-        sh build.sh ios "$XCMODE" || exit 1
-        sh build.sh osx "$XCMODE" || exit 1
+        sh build.sh ios "$XCMODE"
+        sh build.sh osx "$XCMODE"
         exit 0
         ;;
 
     "build-debug")
-        sh build.sh ios-debug "$XCMODE" || exit 1
-        sh build.sh osx-debug "$XCMODE" || exit 1
+        sh build.sh ios-debug "$XCMODE"
+        sh build.sh osx-debug "$XCMODE"
         exit 0
         ;;
 
@@ -209,11 +209,11 @@ case "$COMMAND" in
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
             xcrealm "-scheme iOS -configuration Release -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Release-iphone || exit 1
-            cp -R Release-iphoneos/Realm.framework Release-iphone || exit 1
-            lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm || exit 1
-            mv Realm Release-iphone/Realm.framework || exit 1
+            cd build/DerivedData/Realm-Xcode6/Build/Products
+            mkdir -p Release-iphone
+            cp -R Release-iphoneos/Realm.framework Release-iphone
+            lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm
+            mv Realm Release-iphone/Realm.framework
         else
             xcrealm "-scheme iOS -configuration Release"
         fi
@@ -230,11 +230,11 @@ case "$COMMAND" in
             # Build Universal Simulator/Device framework
             xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
             xcrealm "-scheme iOS -configuration Debug -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products || exit 1
-            mkdir -p Debug-iphone || exit 1
-            cp -R Debug-iphoneos/Realm.framework Debug-iphone || exit 1
-            lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm || exit 1
-            mv Realm Debug-iphone/Realm.framework || exit 1
+            cd build/DerivedData/Realm-Xcode6/Build/Products
+            mkdir -p Debug-iphone
+            cp -R Debug-iphoneos/Realm.framework Debug-iphone
+            lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm
+            mv Realm Debug-iphone/Realm.framework
         else
             xcrealm "-scheme iOS -configuration Debug"
         fi
@@ -247,7 +247,7 @@ case "$COMMAND" in
         ;;
 
     "docs")
-        sh scripts/build-docs.sh || exit 1
+        sh scripts/build-docs.sh
         exit 0
         ;;
 
@@ -255,22 +255,25 @@ case "$COMMAND" in
     # Testing
     ######################################
     "test")
+        set +e # Run both sets of tests even if the first fails
         sh build.sh test-ios "$XCMODE"
         sh build.sh test-osx "$XCMODE"
         exit 0
         ;;
 
     "test-debug")
+        set +e
         sh build.sh test-osx-debug "$XCMODE"
         sh build.sh test-ios-debug "$XCMODE"
         exit 0
         ;;
 
     "test-all")
-        sh build.sh test "$XCMODE" || exit 1
-        sh build.sh test-debug "$XCMODE" || exit 1
-        XCODE_VERSION=6 sh build.sh test "$XCMODE" || exit 1
-        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || exit 1
+        set +e
+        sh build.sh test "$XCMODE"
+        sh build.sh test-debug "$XCMODE"
+        XCODE_VERSION=6 sh build.sh test "$XCMODE"
+        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE"
         ;;
 
     "test-ios")
@@ -299,9 +302,9 @@ case "$COMMAND" in
         ;;
 
     "verify")
-        sh build.sh docs || exit 1
-        sh build.sh test-all "$XCMODE" || exit 1
-        sh build.sh examples "$XCMODE" || exit 1
+        sh build.sh docs
+        sh build.sh test-all "$XCMODE"
+        sh build.sh examples "$XCMODE"
         exit 0
         ;;
 
@@ -309,7 +312,7 @@ case "$COMMAND" in
     # Docs
     ######################################
     "docs")
-        sh scripts/build-docs.sh || exit 1
+        sh scripts/build-docs.sh
         exit 0
         ;;
 
@@ -382,7 +385,7 @@ case "$COMMAND" in
             echo "You must specify a version."
             exit 1
         fi
-        for version_file in $version_files; do 
+        for version_file in $version_files; do
             PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
             PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         done
@@ -393,24 +396,24 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        sh build.sh download-core || exit 1
+        sh build.sh download-core
 
         # CocoaPods seems to not like symlinks
-        mv core tmp || exit 1
-        mv $(readlink tmp) core || exit 1
-        rm tmp || exit 1
+        mv core tmp
+        mv $(readlink tmp) core
+        rm tmp
 
-        mkdir include-ios || exit 1
-        cp -R core/include/* include-ios || exit 1
-        mkdir include-ios/Realm || exit 1
-        cp Realm/*.{h,hpp} include-ios/Realm || exit 1
-        cp Realm/ios/*.h include-ios/Realm || exit 1
+        mkdir include-ios
+        cp -R core/include/* include-ios
+        mkdir include-ios/Realm
+        cp Realm/*.{h,hpp} include-ios/Realm
+        cp Realm/ios/*.h include-ios/Realm
 
-        mkdir include-osx || exit 1
-        cp -R core/include/* include-osx || exit 1
-        mkdir include-osx/Realm || exit 1
-        cp Realm/*.{h,hpp} include-osx/Realm || exit 1
-        cp Realm/osx/*.h include-osx/Realm || exit 1
+        mkdir include-osx
+        cp -R core/include/* include-osx
+        mkdir include-osx/Realm
+        cp Realm/*.{h,hpp} include-osx/Realm
+        cp Realm/osx/*.h include-osx/Realm
         ;;
 
     *)
