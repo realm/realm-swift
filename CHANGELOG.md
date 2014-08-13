@@ -10,7 +10,6 @@
 
 ### Enhancements
 
-* Add support for sorting RLMArray properties.
 * Add support for querying for nil object properties.
 * Improve error message when specifying invalid literals when creating or 
   initializing RLMObjects.
