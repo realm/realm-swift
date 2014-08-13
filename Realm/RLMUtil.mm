@@ -23,9 +23,9 @@
 #import "RLMArray_Private.hpp"
 #import "RLMProperty.h"
 
-static inline bool nsnumber_is_like_integer(id obj)
+static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
-    const char *data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
@@ -35,7 +35,7 @@ static inline bool nsnumber_is_like_integer(id obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-static inline bool nsnumber_is_like_bool(id obj)
+static inline bool nsnumber_is_like_bool(NSNumber *obj)
 {
     // @encode(BOOL) is 'B' on iOS 64 and 'c'
     // objcType is always 'c'. Therefore compare to "c".
@@ -51,9 +51,9 @@ static inline bool nsnumber_is_like_bool(id obj)
     return false;
 }
 
-static inline bool nsnumber_is_like_float(id obj)
+static inline bool nsnumber_is_like_float(NSNumber *obj)
 {
-    const char *data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(float)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
@@ -63,12 +63,12 @@ static inline bool nsnumber_is_like_float(id obj)
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0 ||
             // A double is like float if it fits within float bounds
-            (strcmp(data_type, @encode(double)) == 0 && ABS([(NSNumber *)obj doubleValue]) <= FLT_MAX));
+            (strcmp(data_type, @encode(double)) == 0 && ABS([obj doubleValue]) <= FLT_MAX));
 }
 
-static inline bool nsnumber_is_like_double(id obj)
+static inline bool nsnumber_is_like_double(NSNumber *obj)
 {
-    const char *data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(double)) == 0 ||
             strcmp(data_type, @encode(float)) == 0 ||
@@ -100,18 +100,18 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeDate:
             return [obj isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_integer(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_integer(number);
             }
             return NO;
         case RLMPropertyTypeFloat:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_float(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_float(number);
             }
             return NO;
         case RLMPropertyTypeDouble:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_double(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_double(number);
             }
             return NO;
         case RLMPropertyTypeData:
@@ -126,12 +126,12 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             return isValidObject || obj == nil || obj == NSNull.null;
         }
         case RLMPropertyTypeArray: {
-            if ([obj isKindOfClass:RLMArray.class]) {
-                return [[(RLMArray *)obj objectClassName] isEqualToString:property.objectClassName];
+            if (RLMArray *array = RLMDynamicCast<RLMArray>(obj)) {
+                return [array.objectClassName isEqualToString:property.objectClassName];
             }
-            if ([obj isKindOfClass:NSArray.class]) {
+            if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance
-                for (id el in obj) {
+                for (id el in array) {
                     Class cls = [el class];
                     if (!RLMIsKindOfclass(cls, RLMObject.class) ||
                         ![[cls className] isEqualToString:property.objectClassName]) {
@@ -159,10 +159,9 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
         }
         else if (prop.type == RLMPropertyTypeArray && [obj isKindOfClass:NSArray.class]) {
             // for arrays, create objects for each literal object and return new array
-            NSArray *arrayElements = obj;
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [RLMArray standaloneArrayWithObjectClassName:objSchema.className];
-            for (id el in arrayElements) {
+            for (id el in obj) {
                 [objects addObject:[[objSchema.objectClass alloc] initWithObject:el]];
             }
             return objects;

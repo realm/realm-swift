@@ -218,37 +218,35 @@ inline void RLMSetAnyProperty(__unsafe_unretained RLMObject *obj, NSUInteger col
     //        table.nullify_link(col_ndx, row_ndx);
     //        return;
     //    }
-    if ([val isKindOfClass:[NSString class]]) {
-        obj->_row.set_mixed(col_ndx, RLMStringDataWithNSString(val));
+    if (NSString *str = RLMDynamicCast<NSString>(val)) {
+        obj->_row.set_mixed(col_ndx, RLMStringDataWithNSString(str));
         return;
     }
-    if ([val isKindOfClass:[NSDate class]]) {
-        obj->_row.set_mixed(col_ndx, tightdb::DateTime(time_t([(NSDate *)val timeIntervalSince1970])));
+    if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
+        obj->_row.set_mixed(col_ndx, tightdb::DateTime(time_t([date timeIntervalSince1970])));
         return;
     }
-    if ([val isKindOfClass:[NSData class]]) {
-        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(val));
+    if (NSData *data = RLMDynamicCast<NSData>(val)) {
+        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(data));
         return;
     }
-    if ([val isKindOfClass:[NSNumber class]]) {
-        const char *data_type = [(NSNumber *)val objCType];
-        const char dt = data_type[0];
-        switch (dt) {
+    if (NSNumber *number = RLMDynamicCast<NSNumber>(val)) {
+        switch (number.objCType[0]) {
             case 'i':
             case 's':
             case 'l':
             case 'q':
-                obj->_row.set_mixed(col_ndx, (int64_t)[(NSNumber *)val longValue]);
+                obj->_row.set_mixed(col_ndx, number.longLongValue);
                 return;
             case 'f':
-                obj->_row.set_mixed(col_ndx, [(NSNumber *)val floatValue]);
+                obj->_row.set_mixed(col_ndx, number.floatValue);
                 return;
             case 'd':
-                obj->_row.set_mixed(col_ndx, [(NSNumber *)val doubleValue]);
+                obj->_row.set_mixed(col_ndx, number.doubleValue);
                 return;
             case 'B':
             case 'c':
-                obj->_row.set_mixed(col_ndx, [(NSNumber *)val boolValue] == YES);
+                obj->_row.set_mixed(col_ndx, (bool)number.boolValue);
                 return;
         }
     }

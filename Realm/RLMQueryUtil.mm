@@ -323,8 +323,8 @@ void add_datetime_constraint_to_link_query(tightdb::Query& query,
 }
 
 id value_for_expression(id value) {
-    if ([value isKindOfClass:[NSExpression class]]) {
-        return [value constantValue];
+    if (NSExpression *exp = RLMDynamicCast<NSExpression>(value)) {
+        return exp.constantValue;
     }
     return value;
 }
@@ -332,10 +332,10 @@ id value_for_expression(id value) {
 void add_between_constraint_to_query(tightdb::Query & query,
                                      RLMObjectSchema *desc,
                                      NSString *columnName,
-                                     NSArray *array) {
-
+                                     id value) {
     // validate value
-    if (![array isKindOfClass:[NSArray class]]) {
+    NSArray *array = RLMDynamicCast<NSArray>(value);
+    if (!array) {
         @throw RLMPredicateException(@"Invalid value", @"object must be of type NSArray for BETWEEN operations");
     }
     if (array.count != 2) {

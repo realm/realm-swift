@@ -556,17 +556,17 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)deleteObjects:(id)array {
-    if ([array isKindOfClass:NSArray.class]) {
+    if (NSArray *nsArray = RLMDynamicCast<NSArray>(array)) {
         // for arrays and standalone delete each individually
-        for (id obj in array) {
+        for (id obj in nsArray) {
             if ([obj isKindOfClass:RLMObject.class]) {
                 RLMDeleteObjectFromRealm(obj);
             }
         }
     }
-    else if ([array isKindOfClass:RLMArray.class]) {
+    else if (RLMArray *rlmArray = RLMDynamicCast<RLMArray>(array)) {
         // call deleteObjectsFromRealm for our RLMArray
-        [(RLMArray *)array deleteObjectsFromRealm];
+        [rlmArray deleteObjectsFromRealm];
     }
     else {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray or NSArray of RLMObjects" userInfo:nil];
