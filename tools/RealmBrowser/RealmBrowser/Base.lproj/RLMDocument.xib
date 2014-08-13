@@ -415,7 +415,7 @@
                             <action selector="userClickedLockRealm:" target="-2" id="4PX-6Z-zko"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" explicitItemIdentifier="SchemasLockItem" label="Schemas" paletteLabel="Schemas" tag="2" image="LockedSchemaRed" id="232-fi-wd9">
+                    <toolbarItem implicitItemIdentifier="3C562552-1F69-4D7F-84EC-25B55FF1C24B" explicitItemIdentifier="SchemasLockItem" label="Schemas" paletteLabel="Schemas" tag="2" image="LockedSchemasRed" id="232-fi-wd9">
                         <connections>
                             <action selector="userClickedLockSchema:" target="-2" id="ozS-J6-6yg"/>
                         </connections>
@@ -449,7 +449,7 @@
     </objects>
     <resources>
         <image name="LockedRealmRed" width="32" height="32"/>
-        <image name="LockedSchemaRed" width="32" height="32"/>
+        <image name="LockedSchemasRed" width="32" height="32"/>
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
