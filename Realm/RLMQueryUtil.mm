@@ -322,8 +322,11 @@ void add_datetime_constraint_to_link_query(tightdb::Query& query,
     }
 }
 
-id value_for_expression(id value) {
+id value_from_constant_expression_or_value(id value) {
     if (NSExpression *exp = RLMDynamicCast<NSExpression>(value)) {
+        if (exp.expressionType != NSConstantValueExpressionType) {
+            @throw RLMPredicateException(@"Invalid value", @"Expressions within predicate aggregates must be constant values");
+        }
         return exp.constantValue;
     }
     return value;
@@ -342,8 +345,8 @@ void add_between_constraint_to_query(tightdb::Query & query,
         @throw RLMPredicateException(@"Invalid value", @"NSArray object must contain exactly two objects for BETWEEN operations");
     }
 
-    id from = value_for_expression(array.firstObject);
-    id to = value_for_expression(array.lastObject);
+    id from = value_from_constant_expression_or_value(array.firstObject);
+    id to = value_from_constant_expression_or_value(array.lastObject);
     RLMProperty *prop = desc[columnName];
 
     if (!RLMIsObjectValidForProperty(from, prop) || !RLMIsObjectValidForProperty(to, prop)) {
@@ -562,7 +565,7 @@ void update_query_with_value_expression(RLMSchema *schema,
 
         bool first = true;
         for (id item in value) {
-            id normalized = value_for_expression(item);
+            id normalized = value_from_constant_expression_or_value(item);
             if (!RLMIsObjectValidForProperty(normalized, prop)) {
                 @throw RLMPredicateException(@"Invalid value", @"object in IN clause must be of type %@", RLMTypeToString(prop.type));
             }
