@@ -1011,23 +1011,23 @@
     [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(0, [[PersonObject objectsWhere:@"age IN {0, 1, 2}"] count]);
-    XCTAssertEqual(1, [[PersonObject objectsWhere:@"age IN {29}"] count]);
-    XCTAssertEqual(2, [[PersonObject objectsWhere:@"age IN {29, 33}"] count]);
-    XCTAssertEqual(2, [[PersonObject objectsWhere:@"age IN {29, 33, 45}"] count]);
+    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"age IN {0, 1, 2}"] count]);
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"age IN {29}"] count]);
+    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33}"] count]);
+    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33, 45}"] count]);
 
-    XCTAssertEqual(0, [[PersonObject objectsWhere:@"name IN {''}"] count]);
-    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name IN {'Tim'}"] count]);
-    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name IN {'a', 'Tim'}"] count]);
+    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name IN {''}"] count]);
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'Tim'}"] count]);
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'a', 'Tim'}"] count]);
 
-    XCTAssertEqual(0, ([[PersonObject objectsWhere:@"age IN %@", @[@0, @1, @2]] count]));
-    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"age IN %@", @[@29]] count]));
-    XCTAssertEqual(2, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33]] count]));
-    XCTAssertEqual(2, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33, @45]] count]));
+    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"age IN %@", @[@0, @1, @2]] count]));
+    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"age IN %@", @[@29]] count]));
+    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33]] count]));
+    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33, @45]] count]));
 
-    XCTAssertEqual(0, ([[PersonObject objectsWhere:@"name IN %@", @[@""]] count]));
-    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim"]] count]));
-    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim", @"a"]] count]));
+    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"name IN %@", @[@""]] count]));
+    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim"]] count]));
+    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim", @"a"]] count]));
 }
 
 @end
