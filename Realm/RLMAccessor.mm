@@ -182,30 +182,31 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObject *obj, NSUIntege
 
     tightdb::Mixed mixed = obj->_row.get_mixed(col_ndx);
     switch (mixed.get_type()) {
-        case RLMPropertyTypeString:
+        case tightdb::type_String:
             return RLMStringDataToNSString(mixed.get_string());
-        case RLMPropertyTypeInt: {
+        case tightdb::type_Int: {
             return @(mixed.get_int());
-        case RLMPropertyTypeFloat:
+        case tightdb::type_Float:
             return @(mixed.get_float());
-        case RLMPropertyTypeDouble:
+        case tightdb::type_Double:
             return @(mixed.get_double());
-        case RLMPropertyTypeBool:
+        case tightdb::type_Bool:
             return @(mixed.get_bool());
-        case RLMPropertyTypeDate:
+        case tightdb::type_DateTime:
             return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
-        case RLMPropertyTypeData: {
+        case tightdb::type_Binary: {
             tightdb::BinaryData bd = mixed.get_binary();
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
             return d;
         }
-        case RLMPropertyTypeArray:
+        case tightdb::type_LinkList:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"RLMArray not yet supported" userInfo:nil];
 
             // for links and other unsupported types throw
-        case RLMPropertyTypeObject:
-        default:
+        case tightdb::type_Link:
+        case tightdb::type_Mixed:
+        case tightdb::type_Table:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
         }
     }
