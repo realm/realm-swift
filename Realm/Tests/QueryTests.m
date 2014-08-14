@@ -84,26 +84,6 @@
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
-- (void)testInQuery
-{
-    RLMRealm *realm = self.realmWithTestPath;
-    [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:@[@"a"]];
-    [realm commitWriteTransaction];
-    
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol IN %@", @[@"a"]];
-    XCTAssertThrowsSpecificNamed([StringObject objectsWithPredicate:pred], NSException,
-                                 @"Invalid operator type",
-                                 @"%@ operator invalid in string comparison.",
-                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
-    
-    NSPredicate *keyPred = [NSPredicate predicateWithFormat:@"employees.name IN %@", @[@"a"]];
-    XCTAssertThrowsSpecificNamed([CompanyObject objectsWithPredicate:keyPred], NSException,
-                                 @"Invalid operator type",
-                                 @"%@ operator invalid in string comparison.",
-                                 [RLMPredicateUtil predicateOperatorTypeString:NSInPredicateOperatorType]);
-}
-
 -(void)testQueryBetween
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -388,7 +368,10 @@
     // wrong/invalid data types
     XCTAssertThrows([realm objects:className where:@"age != xyz"], @"invalid type");
     XCTAssertThrows([realm objects:className where:@"name == 3"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"age IN {'xyz'}"], @"invalid type");
+    XCTAssertThrows([realm objects:className where:@"name IN {3}"], @"invalid type");
     
+    XCTAssertThrows([realm objects:className where:@"age != xyz"], @"invalid type");
     className = AllTypesObject.className;
     
     XCTAssertThrows([realm objects:className where:@"boolCol == Foo"], @"invalid type");
@@ -416,7 +399,11 @@
     // abuse of BETWEEN
     XCTAssertThrows([realm objects:className where:@"age BETWEEN 25"], @"between with a scalar");
     XCTAssertThrows([realm objects:className where:@"age BETWEEN Foo"], @"between with a string");
-    
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, age}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {age, 0}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, age}"], @"between with array of keypaths");
+    XCTAssertThrows([realm objects:className where:@"age BETWEEN {0, {1, 10}}"], @"between with nested arrays");
+
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1]];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 1 item");
     
@@ -424,7 +411,13 @@
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 3 items");
     
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@"Foo", @"Bar"]];
-    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of 3 items");
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of strings");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1.5, @2.5]];
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with array of doubles");
+
+    pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @[@1, @[@2, @3]]];
+    XCTAssertThrows([realm objects:className withPredicate:pred], @"between with nested array");
     
     pred = [NSPredicate predicateWithFormat:@"age BETWEEN %@", @{@25 : @35}];
     XCTAssertThrows([realm objects:className withPredicate:pred], @"between with dictionary");
@@ -567,7 +560,6 @@
         NSLikePredicateOperatorType,
         NSBeginsWithPredicateOperatorType,
         NSEndsWithPredicateOperatorType,
-        NSInPredicateOperatorType,
         NSContainsPredicateOperatorType
     };
 
@@ -1009,6 +1001,33 @@
 
     XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 30"] count]);
     XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
+}
+
+- (void)testINPredicate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(0, [[PersonObject objectsWhere:@"age IN {0, 1, 2}"] count]);
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"age IN {29}"] count]);
+    XCTAssertEqual(2, [[PersonObject objectsWhere:@"age IN {29, 33}"] count]);
+    XCTAssertEqual(2, [[PersonObject objectsWhere:@"age IN {29, 33, 45}"] count]);
+
+    XCTAssertEqual(0, [[PersonObject objectsWhere:@"name IN {''}"] count]);
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name IN {'Tim'}"] count]);
+    XCTAssertEqual(1, [[PersonObject objectsWhere:@"name IN {'a', 'Tim'}"] count]);
+
+    XCTAssertEqual(0, ([[PersonObject objectsWhere:@"age IN %@", @[@0, @1, @2]] count]));
+    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"age IN %@", @[@29]] count]));
+    XCTAssertEqual(2, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33]] count]));
+    XCTAssertEqual(2, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33, @45]] count]));
+
+    XCTAssertEqual(0, ([[PersonObject objectsWhere:@"name IN %@", @[@""]] count]));
+    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim"]] count]));
+    XCTAssertEqual(1, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim", @"a"]] count]));
 }
 
 @end

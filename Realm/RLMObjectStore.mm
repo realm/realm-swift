@@ -273,8 +273,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     RLMObject *object = [[objectSchema.objectClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
 
     // validate values, create row, and populate
-    if ([value isKindOfClass:NSArray.class]) {
-        NSArray *array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
+    if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
+        array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
 
         // create row
         tightdb::Table &table = *objectSchema->_table;
@@ -287,8 +287,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
         }
     }
-    else if ([value isKindOfClass:NSDictionary.class]) {
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
+    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
+        dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
 
         // create row
         tightdb::Table &table = *objectSchema->_table;

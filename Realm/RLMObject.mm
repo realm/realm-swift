@@ -55,17 +55,17 @@
 
 - (instancetype)initWithObject:(id)value {
     self = [self init];
-    if ([value isKindOfClass:NSArray.class]) {
+    if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
-        NSArray *array = RLMValidatedArrayForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, RLMSchema.sharedSchema);
         NSArray *properties = _objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             [self setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }
-    else if ([value isKindOfClass:NSDictionary.class]) {
+    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
         // validate and populate
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        dict = RLMValidatedDictionaryForObjectSchema(dict, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
             [self setValue:dict[name] forKeyPath:name];
         }

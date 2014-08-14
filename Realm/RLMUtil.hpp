@@ -59,6 +59,14 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfclass(class1, class2);
 }
 
+template<typename T>
+inline T *RLMDynamicCast(__unsafe_unretained id obj) {
+    if ([obj isKindOfClass:[T class]]) {
+        return obj;
+    }
+    return nil;
+}
+
 // Translate an rlmtype to a string representation
 inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
