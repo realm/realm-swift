@@ -29,6 +29,9 @@
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+    NSMenuItem *clickLockItem;
+    NSMenuItem *addRowItem;
+    NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
     NSMenuItem *removeFromArrayItem;
 }
@@ -66,26 +69,29 @@
 
 -(void)createContextMenu
 {
-    unichar backspaceKey = NSBackspaceCharacter;
-
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
-    
-    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+" atIndex:0];
+    self.menu = rightClickMenu;
+    self.menu.delegate = self;
+
+    unichar backspaceKey = NSBackspaceCharacter;
+    NSString *backspaceString = [NSString stringWithCharacters:&backspaceKey length:1];
+
+    clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit" action:nil keyEquivalent:@""];
+    clickLockItem.tag = 99;
+
+    addRowItem = [[NSMenuItem alloc] initWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+"];
     addRowItem.tag = 5;
     
-    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
+    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:backspaceString];
     deleteRowItem.tag = 6;
     
     insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array" action:@selector(selectedInsertRow:) keyEquivalent:@"+"];
     insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     insertIntoArrayItem.tag = 9;
 
-    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(selectedRemoveRow:) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1]];
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(selectedRemoveRow:) keyEquivalent:backspaceString];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     removeFromArrayItem.tag = 10;
-
-    self.menu = rightClickMenu;
-    self.menu.delegate = self;
 }
 
 #pragma mark - NSResponder Overrides
@@ -217,6 +223,9 @@
             menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
             return canDeleteRows && displaysArray;
 
+        case 99: // Context -> Click lock icon to edit
+            return NO;
+
         default:
             return YES;
     }
@@ -226,15 +235,19 @@
 
 -(void)menuNeedsUpdate:(NSMenu *)menu
 {
-    BOOL displaysArray = self.realmDelegate.displaysArray;
-    BOOL containsRemoveFromArrayItem = [menu.itemArray containsObject:removeFromArrayItem];
-
-    if (displaysArray && !containsRemoveFromArrayItem) {
+    [self.menu removeAllItems];
+    
+    if (self.realmDelegate.realmIsLocked) {
+        [self.menu addItem:clickLockItem];
+        return;
+    }
+    
+    [self.menu addItem:addRowItem];
+    [self.menu addItem:deleteRowItem];
+    
+    if (self.realmDelegate.displaysArray) {
         [self.menu addItem:insertIntoArrayItem];
         [self.menu addItem:removeFromArrayItem];
-    } else if (!displaysArray && containsRemoveFromArrayItem) {
-        [self.menu removeItem:insertIntoArrayItem];
-        [self.menu removeItem:removeFromArrayItem];
     }
 }
 
