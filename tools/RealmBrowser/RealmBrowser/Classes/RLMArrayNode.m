@@ -61,10 +61,6 @@
         return NO;
     }
     
-    NSLog(@"displayedArray.objectClassName: %@ - inserting: %@", displayedArray.objectClassName, object.className);
-    
-//    return NO;
-    
     [displayedArray insertObject:object atIndex:index];
     return YES;
 }

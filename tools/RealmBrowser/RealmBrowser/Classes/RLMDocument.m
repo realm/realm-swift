@@ -50,11 +50,11 @@
                     
                     NSError *error;
                     
-                    RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
-                                                                         url:absoluteURL.path];
-                    self.presentedRealm = realm;
+                    RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
                     
-                    if ([realm connect:&error]) {
+                    self.presentedRealm  = realmNode;
+                    
+                    if ([realmNode connect:&error]) {
                         NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                         [documentController noteNewRecentDocumentURL:absoluteURL];                    
                     }

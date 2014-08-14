@@ -443,12 +443,16 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     NSArray *propertyValues = @[@45, @"John"];
     
     RLMRealm *realm0 = self.parentWindowController.modelDocument.presentedRealm.realm;
+    NSLog(@"path: %@", realm0.path);
+
     [realm0 beginWriteTransaction];
     RLMObject *testObject0 = [RealmTestClass0 createInRealm:realm0 withObject:propertyValues];
     NSLog(@"[testObject0 className]: %@", [testObject0 className]);
     [realm0 commitWriteTransaction];
 
     RLMRealm *realm1 = [RLMRealm defaultRealm];
+    NSLog(@"path: %@", realm1.path);
+
     [realm1 beginWriteTransaction];
     RLMObject *testObject1 = [RealmTestClass0 createInRealm:realm1 withObject:propertyValues];
     NSLog(@"[testObject1 className]: %@", [testObject1 className]);
@@ -616,20 +620,29 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     
     id result = nil;
     
-    if (propertyNode.type == RLMPropertyTypeString) {
-        result = sender.stringValue;
-    }
-    else if (propertyNode.type == RLMPropertyTypeInt) {
-        numberFormatter.allowsFloats = NO;
-        result = [numberFormatter numberFromString:sender.stringValue];
-    }
-    else if (propertyNode.type == RLMPropertyTypeFloat || propertyNode.type == RLMPropertyTypeDouble) {
-        numberFormatter.allowsFloats = YES;
-        numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-        result = [numberFormatter numberFromString:sender.stringValue];
-    }
-    else if (propertyNode.type == RLMPropertyTypeDate) {
-        result = [dateFormatter dateFromString:sender.stringValue];
+    switch (propertyNode.type) {
+        case RLMPropertyTypeInt:
+            numberFormatter.allowsFloats = NO;
+            result = [numberFormatter numberFromString:sender.stringValue];
+            break;
+            
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            numberFormatter.allowsFloats = YES;
+            numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+            result = [numberFormatter numberFromString:sender.stringValue];
+            break;
+            
+        case RLMPropertyTypeString:
+            result = sender.stringValue;
+            break;
+
+        case RLMPropertyTypeDate:
+            result = [dateFormatter dateFromString:sender.stringValue];
+            break;
+            
+        default:
+            break;
     }
     
     if (result) {
