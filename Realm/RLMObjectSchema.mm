@@ -26,7 +26,7 @@
 
 // private properties
 @interface RLMObjectSchema ()
-@property (nonatomic, readwrite) NSDictionary * propertiesByName;
+@property (nonatomic, readwrite) NSDictionary *propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
 @end
 
@@ -48,8 +48,8 @@
 
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
-    NSMutableDictionary * map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
-    for (RLMProperty * prop in properties) {
+    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
+    for (RLMProperty *prop in properties) {
         map[prop.name] = prop;
     }
     _propertiesByName = map;
@@ -79,7 +79,7 @@
     free(props);
     
     // create schema object and set properties
-    RLMObjectSchema * schema = [RLMObjectSchema new];
+    RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = [objectClass className];
     schema.objectClass = objectClass;
@@ -113,7 +113,7 @@
     }
     
     // create schema object and set properties
-    RLMObjectSchema * schema = [RLMObjectSchema new];
+    RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = className;
 

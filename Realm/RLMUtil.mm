@@ -25,7 +25,7 @@
 
 static inline bool nsnumber_is_like_integer(id obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
@@ -53,7 +53,7 @@ static inline bool nsnumber_is_like_bool(id obj)
 
 static inline bool nsnumber_is_like_float(id obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(float)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
@@ -68,7 +68,7 @@ static inline bool nsnumber_is_like_float(id obj)
 
 static inline bool nsnumber_is_like_double(id obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [(NSNumber *)obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(double)) == 0 ||
             strcmp(data_type, @encode(float)) == 0 ||
@@ -179,7 +179,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjec
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    for (RLMProperty * prop in properties) {
+    for (RLMProperty *prop in properties) {
         // set out object to validated input or default value
         id obj = dict[prop.name];
         obj = obj ?: defaults[prop.name];

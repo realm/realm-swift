@@ -127,7 +127,7 @@
             return YES;
         case '@':
         {
-            NSString *const arrayPrefix = @"@\"RLMArray<";
+            NSString * const arrayPrefix = @"@\"RLMArray<";
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
@@ -223,7 +223,7 @@
     
     // throw if there was no type
     if (!validType) {
-        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
+        NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }

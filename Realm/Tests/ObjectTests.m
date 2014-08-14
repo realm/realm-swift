@@ -292,8 +292,8 @@
     [realm beginWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
@@ -318,8 +318,8 @@
                                                      timeNow, @YES, @(-20), @2, NSNull.null]];
     [realm commitWriteTransaction];
     
-    AllTypesObject* row1 = [AllTypesObject allObjects][0];
-    AllTypesObject* row2 = [AllTypesObject allObjects][1];
+    AllTypesObject *row1 = [AllTypesObject allObjects][0];
+    AllTypesObject *row2 = [AllTypesObject allObjects][1];
 
     XCTAssertEqual(row1.boolCol, NO,                    @"row1.BoolCol");
     XCTAssertEqual(row2.boolCol, YES,                   @"row2.BoolCol");
@@ -377,14 +377,14 @@
 }
 
 - (NSDictionary *)defaultValuesDictionary {
-    return @{@"intCol" : @98,
-             @"floatCol" : @231.0f,
+    return @{@"intCol"    : @98,
+             @"floatCol"  : @231.0f,
              @"doubleCol" : @123732.9231,
-             @"boolCol" : @NO,
-             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:454321],
+             @"boolCol"   : @NO,
+             @"dateCol"   : [NSDate dateWithTimeIntervalSince1970:454321],
              @"stringCol" : @"Westeros",
              @"binaryCol" : [@"inputData" dataUsingEncoding:NSUTF8StringEncoding],
-             @"mixedCol" : @"Tyrion"};
+             @"mixedCol"  : @"Tyrion"};
 }
 
 - (void)testDefaultValuesFromNoValuePresent
@@ -494,19 +494,19 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
-                                               @"intCol" : @54,
-                                               @"floatCol" : @0.7f,
+    NSDictionary * const dictValidAllTypes = @{@"boolCol"   : @NO,
+                                               @"intCol"    : @54,
+                                               @"floatCol"  : @0.7f,
                                                @"doubleCol" : @0.8,
                                                @"stringCol" : @"foo",
                                                @"binaryCol" : bin1,
-                                               @"dateCol" : timeNow,
-                                               @"cBoolCol" : @NO,
-                                               @"longCol" : @(99),
-                                               @"mixedCol" : @"mixed",
-                                               @"objectCol": NSNull.null};
+                                               @"dateCol"   : timeNow,
+                                               @"cBoolCol"  : @NO,
+                                               @"longCol"   : @(99),
+                                               @"mixedCol"  : @"mixed",
+                                               @"objectCol" : NSNull.null};
     
     [realm beginWriteTransaction];
     
@@ -542,9 +542,9 @@
     [realm commitWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
     
     [realm beginWriteTransaction];
     

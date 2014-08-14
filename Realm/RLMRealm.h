@@ -303,7 +303,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 
 // Retrieve a persisted object with an NSString.
 // 
-// @usage RLMObject * object = RLMRealm.defaultRealm[@"name"];
+// @usage RLMObject *object = RLMRealm.defaultRealm[@"name"];
 // @param key The NSString used to identify an object
 // 
 // @return    RLMObject or nil if no object is stored for the given key.

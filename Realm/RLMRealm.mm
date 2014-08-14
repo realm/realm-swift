@@ -66,8 +66,8 @@ void throw_objc_exception(exception &ex) {
 }
  
 // create NSError from c++ exception
-inline NSError* make_realm_error(RLMError code, exception &ex) {
-    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+inline NSError *make_realm_error(RLMError code, exception &ex) {
+    NSMutableDictionary *details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
     [details setValue:@(code) forKey:@"Error Code"];
     return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
@@ -144,7 +144,7 @@ inline void clearRealmCache() {
 @end
 
 
-NSString *const c_defaultRealmFileName = @"default.realm";
+NSString * const c_defaultRealmFileName = @"default.realm";
 static BOOL s_useInMemoryDefaultRealm = NO;
 static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;

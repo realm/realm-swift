@@ -129,7 +129,7 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
 // Posted by RLMRealm when it changes, that is when a table is
 // added, removed, or changed in any way.
 
-extern NSString *const RLMRealmDidChangeNotification;
+extern NSString * const RLMRealmDidChangeNotification;
 
 typedef NS_ENUM(NSInteger, RLMError) {
     /** Retuned by RLMRealm if no other specific error is returned when a realm is opened. */

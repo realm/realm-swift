@@ -645,10 +645,10 @@
 
     NSUInteger (^count)(NSPredicateOperatorType, NSComparisonPredicateOptions) =
     ^(NSPredicateOperatorType type, NSComparisonPredicateOptions options) {
-        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
-                                                          expression: alpha
-                                                        operatorType: type
-                                                             options: options];
+        NSPredicate *pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
+                                                         expression: alpha
+                                                       operatorType: type
+                                                            options: options];
         return [StringObject objectsWithPredicate: pred].count;
     };
 
@@ -702,9 +702,9 @@
     NSExpression *binary = [NSExpression expressionForConstantValue:[[NSData alloc] init]];
 
     NSUInteger (^count)(NSPredicateOperatorType) = ^(NSPredicateOperatorType type) {
-        NSPredicate * pred = [RLMPredicateUtil comparisonWithKeyPath: @"binaryCol"
-                                                          expression: binary
-                                                        operatorType: type];
+        NSPredicate *pred = [RLMPredicateUtil comparisonWithKeyPath: @"binaryCol"
+                                                         expression: binary
+                                                       operatorType: type];
         return [BinaryObject objectsWithPredicate: pred].count;
     };
 

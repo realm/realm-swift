@@ -28,7 +28,7 @@
 
 #import <objc/runtime.h>
 
-NSString *const c_objectTableNamePrefix = @"class_";
+NSString * const c_objectTableNamePrefix = @"class_";
 const char *c_metadataTableName = "metadata";
 const char *c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
