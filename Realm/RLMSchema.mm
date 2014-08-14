@@ -169,7 +169,7 @@ static inline bool IsRLMObjectSubclass(Class cls) {
 
 
 inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
-    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    tightdb::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
     if (table->get_column_count() == 0) {
         // create columns
         table->add_column(tightdb::type_Int, c_versionColumnName);
@@ -183,7 +183,6 @@ inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
     return NSUInteger(RLMVersionTable(realm)->get(0).get_int(c_versionColumnIndex));
-
 }
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
