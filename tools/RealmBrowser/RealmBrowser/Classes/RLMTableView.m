@@ -29,6 +29,7 @@
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+    NSMenuItem *insertIntoArrayItem;
     NSMenuItem *removeFromArrayItem;
 }
 
@@ -54,6 +55,13 @@
     [self removeTrackingArea:trackingArea];
 }
 
+#pragma mark - Public methods - Accessors
+
+-(id<RLMTableViewDelegate>)realmDelegate
+{
+    return (id<RLMTableViewDelegate>)self.delegate;
+}
+
 #pragma mark - Private Methods - NSObject Overrides
 
 -(void)createContextMenu
@@ -62,15 +70,19 @@
 
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
     
-    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(addRows) keyEquivalent:@"+" atIndex:0];
+    NSMenuItem *addRowItem = [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+" atIndex:0];
     addRowItem.tag = 5;
     
-    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(deleteRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
+    NSMenuItem *deleteRowItem = [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1] atIndex:1];
     deleteRowItem.tag = 6;
     
-    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(removeRows) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1]];
+    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array" action:@selector(selectedInsertRow:) keyEquivalent:@"+"];
+    insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
+    insertIntoArrayItem.tag = 9;
+
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(selectedRemoveRow:) keyEquivalent:[NSString stringWithCharacters:&backspaceKey length:1]];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
-    removeFromArrayItem.tag = 9;
+    removeFromArrayItem.tag = 10;
 
     self.menu = rightClickMenu;
     self.menu.delegate = self;
@@ -92,7 +104,7 @@
 {
     mouseOverView = YES;
     
-    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterView:)]) {
+    if ([self.delegate respondsToSelector:@selector(mouseDidEnterView:)]) {
         [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterView:self];
     }
 }
@@ -112,7 +124,7 @@
             return;
         }
         else {
-            if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
+            if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
             }
 
@@ -121,7 +133,7 @@
 
             previousMouseLocation = currentMouseLocation;
 
-            if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
+            if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
                 [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
             }
         }
@@ -135,8 +147,9 @@
 {
     RLMTableLocation location = [self currentLocationAtPoint:[theEvent locationInWindow]];
     
-    [(id<RLMTableViewDelegate>)self.delegate rightClickedLocation:location];
-    
+    if ([self.delegate respondsToSelector:@selector(rightClickedLocation:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate rightClickedLocation:location];
+    }
     [super rightMouseDown:theEvent];
 }
 
@@ -150,7 +163,7 @@
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
     
-    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(mouseDidExitView:)]) {
+    if ([self.delegate respondsToSelector:@selector(mouseDidExitView:)]) {
         [(id<RLMTableViewDelegate>)self.delegate mouseDidExitView:self];
     }
 }
@@ -159,15 +172,19 @@
 {
     if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
-            [self addRows];
+            [self selectedAddRow:theEvent];
         }
         else if (theEvent.keyCode == 51) {
-            [self deleteRows];
+            [self selectedDeleteRow:theEvent];
         }
     }
     else if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask) {
-        if (theEvent.keyCode == 51) {
-            [self removeRows];
+
+        if (theEvent.keyCode == 27) {
+            [self selectedInsertRow:theEvent];
+        }
+        else if (theEvent.keyCode == 51) {
+            [self selectedRemoveRow:theEvent];
         }
     }
     
@@ -176,22 +193,30 @@
 
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    BOOL canEditRows = ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked];
+    BOOL multipleRows = self.selectedRowIndexes.count > 1;
+    BOOL canEditRows = !self.realmDelegate.realmIsLocked;
     BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
-    BOOL displaysArray = [(id<RLMTableViewDelegate>)self.delegate displaysArray];
+    BOOL displaysArray = self.realmDelegate.displaysArray;
 
     switch (menuItem.tag) {
         case 1: // Tools -> Add row
         case 5: // Context -> Add row
+            menuItem.title = multipleRows ? @"Add objects" : @"Add object";
             return canEditRows && !displaysArray;
             
         case 2: // Tools -> Delete row
         case 6: // Context -> Delete row
+            menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
             return canDeleteRows;
 
-        case 9: // Context -> Remove row from array
+        case 9: // Context -> Insert row into array
+            menuItem.title = multipleRows ? @"Insert objects into array" : @"Insert object into array";
+            return canEditRows && displaysArray;
+
+        case 10: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
             return canDeleteRows && displaysArray;
-            
+
         default:
             return YES;
     }
@@ -201,74 +226,38 @@
 
 -(void)menuNeedsUpdate:(NSMenu *)menu
 {
-    BOOL displaysArray = [(id<RLMTableViewDelegate>)self.delegate displaysArray];
-    BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    
-    for (NSMenuItem *menuItem in menu.itemArray) {
-        switch (menuItem.tag) {
-            case 1: // Tools -> Add row
-            case 5: // Context -> Add row
-                menuItem.title = multipleRows ? @"Add objects" : @"Add object";
-                break;
-                
-            case 2: // Tools -> Delete row
-            case 6: // Context -> Delete row
-                menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
-                break;
-                
-            case 9: // Context -> Delete row
-                menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
-                break;
-        }
-    }
-    
+    BOOL displaysArray = self.realmDelegate.displaysArray;
     BOOL containsRemoveFromArrayItem = [menu.itemArray containsObject:removeFromArrayItem];
 
     if (displaysArray && !containsRemoveFromArrayItem) {
+        [self.menu addItem:insertIntoArrayItem];
         [self.menu addItem:removeFromArrayItem];
     } else if (!displaysArray && containsRemoveFromArrayItem) {
+        [self.menu removeItem:insertIntoArrayItem];
         [self.menu removeItem:removeFromArrayItem];
     }
 }
 
 #pragma mark - First Responder User Actions
 
-- (IBAction)menuAddRow:(id)sender
+- (IBAction)selectedAddRow:(id)sender
 {
-    [self addRows];
+    [self.realmDelegate addRows:self.selectedRowIndexes];
 }
 
-- (IBAction)menuDeleteRow:(id)sender
+- (IBAction)selectedDeleteRow:(id)sender
 {
-    [self deleteRows];
+    [self.realmDelegate deleteRows:self.selectedRowIndexes];
 }
 
-- (IBAction)menuRemoveRow:(id)sender
+- (IBAction)selectedRemoveRow:(id)sender
 {
-    [self removeRows];
+    [self.realmDelegate removeRows:self.selectedRowIndexes];
 }
 
-#pragma mark - Private Methods - User Actions
-
--(void)addRows
+- (IBAction)selectedInsertRow:(id)sender
 {
-    if ([self.delegate respondsToSelector:@selector(addRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
-        [(id<RLMTableViewDelegate>)self.delegate addRows:self.selectedRowIndexes];
-    }
-}
-
--(void)deleteRows
-{
-    if ([self.delegate respondsToSelector:@selector(deleteRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
-        [(id<RLMTableViewDelegate>)self.delegate deleteRows:self.selectedRowIndexes];
-    }
-}
-
--(void)removeRows
-{
-    if ([self.delegate respondsToSelector:@selector(removeRows:)] && ![(id<RLMTableViewDelegate>)self.delegate realmIsLocked]) {
-        [(id<RLMTableViewDelegate>)self.delegate removeRows:self.selectedRowIndexes];
-    }
+    [self.realmDelegate insertRows:self.selectedRowIndexes];
 }
 
 #pragma mark - NSView Overrides

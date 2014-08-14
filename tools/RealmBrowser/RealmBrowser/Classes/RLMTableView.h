@@ -40,6 +40,14 @@ typedef struct {
 
 - (BOOL)displaysArray;
 
+- (void)addRows:(NSIndexSet *)rowIndexes;
+
+- (void)deleteRows:(NSIndexSet *)rowIndexes;
+
+- (void)removeRows:(NSIndexSet *)rowIndexes;
+
+- (void)insertRows:(NSIndexSet *)rowIndexes;
+
 @optional
 
 - (void)mouseDidEnterView:(RLMTableView *)view;
@@ -54,16 +62,17 @@ typedef struct {
 
 - (void)rightClickedLocation:(RLMTableLocation)location;
 
-- (void)addRows:(NSIndexSet *)rowIndexes;
-
-- (void)deleteRows:(NSIndexSet *)rowIndexes;
-
-- (void)removeRows:(NSIndexSet *)rowIndexes;
-
 @end
 
 @interface RLMTableView : NSTableView
 
 - (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
+@property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
+
 @end
+
+
+
+
+

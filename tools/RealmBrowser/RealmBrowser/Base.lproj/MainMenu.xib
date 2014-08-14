@@ -107,7 +107,7 @@
                             </menuItem>
                             <menuItem title="Add object" tag="1" keyEquivalent="+" id="QVH-nc-d7y">
                                 <connections>
-                                    <action selector="menuAddRow:" target="-1" id="yOH-eQ-4oJ"/>
+                                    <action selector="selectedAddRow:" target="-1" id="OPK-UL-OnK"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Delete object" tag="2" id="Kvq-ch-tH8">
@@ -115,16 +115,22 @@
 CA
 </string>
                                 <connections>
-                                    <action selector="menuDeleteRow:" target="-1" id="HwD-9j-TSF"/>
+                                    <action selector="selectedDeleteRow:" target="-1" id="2sn-kO-m78"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove object from array" tag="9" id="mH4-OZ-4Rv">
+                            <menuItem title="Insert object into array" tag="9" keyEquivalent="+" id="mH4-OZ-4Rv">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                <connections>
+                                    <action selector="selectedInsertRow:" target="-1" id="PBQ-ON-POa"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove object from array" tag="10" id="dEm-Cz-ggu">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
                                 <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
-                                    <action selector="menuRemoveRow:" target="-1" id="t8v-fC-zg2"/>
+                                    <action selector="selectedRemoveRow:" target="-1" id="RgR-56-sid"/>
                                 </connections>
                             </menuItem>
                         </items>

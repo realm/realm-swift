@@ -47,13 +47,26 @@
 
 - (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode
 {
-    if (self = [super initWithSchema:classNode.schema
-                             inRealm:classNode.realm]) {
+    if (self = [super initWithSchema:classNode.schema inRealm:classNode.realm]) {
         displayedArray = result;
         name = searchText;
     }
 
     return self;
+}
+
+-(BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index
+{
+    if (index >= [displayedArray count]) {
+        return NO;
+    }
+    
+    NSLog(@"displayedArray.objectClassName: %@ - inserting: %@", displayedArray.objectClassName, object.className);
+    
+//    return NO;
+    
+    [displayedArray insertObject:object atIndex:index];
+    return YES;
 }
 
 -(BOOL)removeInstanceAtIndex:(NSUInteger)index

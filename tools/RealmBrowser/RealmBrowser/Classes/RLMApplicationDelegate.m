@@ -122,14 +122,10 @@ const NSUInteger kTopTipDelay = 250;
     NSString *path = url.path;
     
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:path
-                                     readOnly:NO
-                                        error:&error];
+    RLMRealm *realm = [RLMRealm realmWithPath:path readOnly:NO error:&error];
     
     if (error == nil) {
         [realm beginWriteTransaction];
-        
-        
         //        NSURL *url1 = [[NSWorkspace sharedWorkspace] desktopImageURLForScreen:[NSScreen mainScreen]];
         //        NSData *data1 = [NSData dataWithContentsOfURL:url1];
         

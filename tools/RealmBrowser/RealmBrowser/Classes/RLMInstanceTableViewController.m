@@ -34,6 +34,8 @@
 
 #import "objc/objc-class.h"
 
+#import "TestClasses.h"
+
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsForTable = 30;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
@@ -70,6 +72,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     linkCursorDisplaying = NO;
 
     awake = YES;
+    
+    [self testCases];
 }
 
 #pragma mark - Public methods - Accessors
@@ -84,15 +88,19 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
-    
+    self.displaysArray = NO;
+
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        self.displaysArray = NO;
+        NSLog(@"base");
+
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
         [self.realmTableView formatColumnsToFitType:newState.selectedType withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
+        NSLog(@"array");
+
         self.displaysArray = YES;
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
@@ -107,7 +115,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        self.displaysArray = NO;
+        NSLog(@"query");
+
         RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
 
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText result:arrayState.results andParent:arrayState.selectedType];
@@ -117,6 +126,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
         [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
+    
+    NSLog(@"performUpdate: %@", newState.selectedType.name);
 }
 
 #pragma mark - NSTableView Data Source
@@ -384,6 +395,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
 
 - (void)addRows:(NSIndexSet *)rowIndexes
 {
+    if (self.realmIsLocked) {
+        return;
+    }
+    
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMTypeNode *displayedType = self.displayedType;
     Class rlmObjectClass = NSClassFromString(displayedType.name);
@@ -405,6 +420,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes
 {
+    if (self.realmIsLocked) {
+        return;
+    }
+
     NSMutableArray *objectsToDelete = [NSMutableArray array];
     [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         RLMObject *object = [self.displayedType instanceAtIndex:idx];
@@ -419,8 +438,61 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 30;
     [self reloadAfterEdit];
 }
 
+-(void)testCases
+{
+    NSArray *propertyValues = @[@45, @"John"];
+    
+    RLMRealm *realm0 = self.parentWindowController.modelDocument.presentedRealm.realm;
+    [realm0 beginWriteTransaction];
+    RLMObject *testObject0 = [RealmTestClass0 createInRealm:realm0 withObject:propertyValues];
+    NSLog(@"[testObject0 className]: %@", [testObject0 className]);
+    [realm0 commitWriteTransaction];
+
+    RLMRealm *realm1 = [RLMRealm defaultRealm];
+    [realm1 beginWriteTransaction];
+    RLMObject *testObject1 = [RealmTestClass0 createInRealm:realm1 withObject:propertyValues];
+    NSLog(@"[testObject1 className]: %@", [testObject1 className]);
+    [realm1 commitWriteTransaction];
+}
+
+-(void)insertRows:(NSIndexSet *)rowIndexes
+{
+    if (self.realmIsLocked || !self.displaysArray) {
+        return;
+    }
+
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMTypeNode *displayedType = self.displayedType;
+    RLMObjectSchema *objectSchema = displayedType.schema;
+    
+    Class rlmObjectClass = NSClassFromString(objectSchema.className);
+
+    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
+    if (!defaultPropertyValues) {
+        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
+    }
+    
+    NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
+    NSUInteger rowToInsertAt = rowIndexes.firstIndex;
+    if (rowToInsertAt == -1) {
+        rowToInsertAt = 0;
+    }
+    
+    [realm beginWriteTransaction];
+    for (int i = 0; i < rowsToInsert; i++) {
+        RLMObject *object = [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+        [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
+    }
+    [realm commitWriteTransaction];
+    [self reloadAfterEdit];
+}
+
 -(void)removeRows:(NSIndexSet *)rowIndexes
 {
+    if (self.realmIsLocked || !self.displaysArray) {
+        return;
+    }
+
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     [realm beginWriteTransaction];
     [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
