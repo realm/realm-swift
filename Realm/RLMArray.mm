@@ -104,7 +104,7 @@
 // Stanalone RLMArray implementation
 //
 
-void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
+static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     if (![array->_objectClassName isEqualToString:object.objectSchema.className]) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object type does not match RLMArray"

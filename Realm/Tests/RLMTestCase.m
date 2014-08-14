@@ -64,11 +64,11 @@ NSString *RLMTestRealmPath() {
     return RLMRealmPathForFile(@"test.realm");
 }
 
-NSString *RLMLockPath(NSString *path) {
+static NSString *RLMLockPath(NSString *path) {
     return [path stringByAppendingString:@".lock"];
 }
 
-void RLMDeleteRealmFilesAtPath(NSString *path) {
+static void RLMDeleteRealmFilesAtPath(NSString *path) {
     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];

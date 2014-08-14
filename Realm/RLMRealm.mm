@@ -81,6 +81,7 @@ inline NSError *make_realm_error(RLMError code, exception &ex) {
 + (instancetype)createWithRealm:(id)target;
 @property (nonatomic, weak) RLMRealm *realm;
 @end
+
 @implementation RLMWeakTarget
 + (instancetype)createWithRealm:(RLMRealm *)realm {
     RLMWeakTarget *wt = [RLMWeakTarget new];
@@ -107,14 +108,14 @@ static NSMutableDictionary *s_realmsPerPath;
 //  rather than by the path (since the path is not a reliable identifier). This requires additional support
 //  from the core library though, because the inode,device number pair needs to be taken from the open file
 //  (to avoid race conditions).
-inline RLMRealm *cachedRealm(NSString *path) {
+static inline RLMRealm *cachedRealm(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectForKey:@(threadID)];
     }
 }
 
-inline void cacheRealm(RLMRealm *realm, NSString *path) {
+static inline void cacheRealm(RLMRealm *realm, NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         if (!s_realmsPerPath[path]) {
@@ -124,13 +125,13 @@ inline void cacheRealm(RLMRealm *realm, NSString *path) {
     }
 }
 
-inline NSArray *realmsAtPath(NSString *path) {
+static inline NSArray *realmsAtPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].allObjects;
     }
 }
 
-inline void clearRealmCache() {
+static inline void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
         for (NSMapTable *map in s_realmsPerPath.allValues) {
             [map removeAllObjects];
