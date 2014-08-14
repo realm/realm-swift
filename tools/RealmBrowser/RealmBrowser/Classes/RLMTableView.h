@@ -71,8 +71,3 @@ typedef struct {
 @property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
 
 @end
-
-
-
-
-

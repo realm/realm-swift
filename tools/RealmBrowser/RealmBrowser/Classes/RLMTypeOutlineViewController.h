@@ -21,8 +21,6 @@
 #import "RLMViewController.h"
 #import "RLMClassNode.h"
 
-@class RLMRealmBrowserWindowController;
-
 @interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
 @end

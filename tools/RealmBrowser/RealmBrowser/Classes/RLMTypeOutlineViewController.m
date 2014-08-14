@@ -196,8 +196,7 @@
 
         RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
 
-        [self.parentWindowController addNavigationState:state
-                                     fromViewController:self];
+        [self.parentWindowController addNavigationState:state fromViewController:self];
     }
 }
 
