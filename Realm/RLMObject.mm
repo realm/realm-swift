@@ -23,7 +23,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
-#ifdef REALM_SWIFT
+#if REALM_SWIFT
 #import <Realm/Realm-Swift.h>
 #endif
 
@@ -187,7 +187,7 @@
 // overridden at runtime per-class for performance
 + (NSString *)className {
     NSString *className = NSStringFromClass(self);
-#ifdef REALM_SWIFT
+#if REALM_SWIFT
     if ([RLMSwiftSupport isSwiftClassName:className]) {
         className = [RLMSwiftSupport demangleClassName:className];
     }

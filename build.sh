@@ -389,6 +389,30 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    ######################################
+    # CocoaPods
+    ######################################
+    "cocoapods-setup")
+        sh build.sh download-core || exit 1
+
+        # CocoaPods seems to not like symlinks
+        mv core tmp || exit 1
+        mv $(readlink tmp) core || exit 1
+        rm tmp || exit 1
+
+        mkdir include-ios || exit 1
+        cp -R core/include/* include-ios || exit 1
+        mkdir include-ios/Realm || exit 1
+        cp Realm/*.{h,hpp} include-ios/Realm || exit 1
+        cp Realm/ios/*.h include-ios/Realm || exit 1
+
+        mkdir include-osx || exit 1
+        cp -R core/include/* include-osx || exit 1
+        mkdir include-osx/Realm || exit 1
+        cp Realm/*.{h,hpp} include-osx/Realm || exit 1
+        cp Realm/osx/*.h include-osx/Realm || exit 1
+        ;;
+
     *)
         usage
         exit 1
