@@ -128,9 +128,8 @@ RLM_ARRAY_TYPE(EmployeeObject)
 #pragma mark DogObject
 
 @interface DogObject : RLMObject
-
 @property NSString *dogName;
-
+@property int age;
 @end
 
 #pragma mark OwnerObject
