@@ -422,6 +422,41 @@ void add_link_constraint_to_query(tightdb::Query & query,
         query.and_query(query.get_table()->column<Link>(column).is_null());
     }
 }
+
+void add_constraint_to_link_query(tightdb::Query &query, RLMPropertyType type,
+                                  NSPredicateOperatorType operatorType,
+                                  NSComparisonPredicateOptions predicateOptions,
+                                  NSUInteger idx1, NSUInteger idx2, id value)
+{
+    switch (type) {
+        case type_Bool:
+            add_bool_constraint_to_link_query(query, operatorType, idx1, idx2, bool([value boolValue]));
+            break;
+        case type_DateTime:
+            add_datetime_constraint_to_link_query(query, operatorType, idx1, idx2, double([value timeIntervalSince1970]));
+            break;
+        case type_Double:
+            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Double([value doubleValue]));
+            break;
+        case type_Float:
+            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Float([value floatValue]));
+            break;
+        case type_Int:
+            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Int([value longLongValue]));
+            break;
+        case type_String:
+            add_string_constraint_to_link_query(query, operatorType, predicateOptions, idx1, idx2, value);
+            break;
+        case type_Binary:
+            @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+        case type_Link:
+            add_link_constraint_to_query(query, operatorType, idx1, value);
+            break;
+        default:
+            @throw RLMPredicateException(@"Unsupported predicate value type",
+                                         @"Object type %@ not supported", RLMTypeToString(type));
+    }
+}
  
 void update_link_query_with_value_expression(RLMSchema *schema,
                                              RLMObjectSchema *desc,
@@ -454,8 +489,28 @@ void update_link_query_with_value_expression(RLMSchema *schema,
         id from, to;
         validate_and_extract_between_range(value, secondProp, &from, &to);
         query.group();
-        update_link_query_with_value_expression(schema, desc, query, paths, from, NSGreaterThanOrEqualToPredicateOperatorType, 0);
-        update_link_query_with_value_expression(schema, desc, query, paths, to, NSLessThanOrEqualToPredicateOperatorType, 0);
+        add_constraint_to_link_query(query, secondProp.type, NSGreaterThanOrEqualToPredicateOperatorType, 0, idx1, idx2, from);
+        add_constraint_to_link_query(query, secondProp.type, NSLessThanOrEqualToPredicateOperatorType, 0, idx1, idx2, to);
+        query.end_group();
+        return;
+    }
+
+    if (operatorType == NSInPredicateOperatorType) {
+        query.group();
+
+        bool first = true;
+        for (id item in value) {
+            id normalized = value_from_constant_expression_or_value(item);
+            if (!RLMIsObjectValidForProperty(normalized, secondProp)) {
+                @throw RLMPredicateException(@"Invalid value", @"object in IN clause must be of type %@", RLMTypeToString(secondProp.type));
+            }
+
+            if (!first) {
+                query.Or();
+            }
+            first = false;
+            add_constraint_to_link_query(query, secondProp.type, NSEqualToPredicateOperatorType, 0, idx1, idx2, normalized);
+        }
         query.end_group();
         return;
     }
@@ -468,35 +523,7 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     }
 
     // finally cast to native types and add query clause
-    RLMPropertyType type = secondProp.type;
-    switch (type) {
-        case type_Bool:
-            add_bool_constraint_to_link_query(query, operatorType, idx1, idx2, bool([value boolValue]));
-            break;
-        case type_DateTime:
-            add_datetime_constraint_to_link_query(query, operatorType, idx1, idx2, double([value timeIntervalSince1970]));
-            break;
-        case type_Double:
-            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Double([value doubleValue]));
-            break;
-        case type_Float:
-            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Float([value floatValue]));
-            break;
-        case type_Int:
-            add_numeric_constraint_to_link_query(query, type, operatorType, idx1, idx2, Int([value longLongValue]));
-            break;
-        case type_String:
-            add_string_constraint_to_link_query(query, operatorType, predicateOptions, idx1, idx2, value);
-            break;
-        case type_Binary:
-            @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
-        case type_Link:
-            add_link_constraint_to_query(query, operatorType, idx1, value);
-            break;
-        default:
-            @throw RLMPredicateException(@"Unsupported predicate value type",
-                                         @"Object type %@ not supported", RLMTypeToString(type));
-    }
+    add_constraint_to_link_query(query, secondProp.type, operatorType, predicateOptions, idx1, idx2, value);
 }
 
 void add_constraint_to_query(tightdb::Query &query,
