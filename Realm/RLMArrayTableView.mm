@@ -53,12 +53,15 @@ static inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     if (!ar->_backingView.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
-    ar->_backingView.sync_if_needed();
+}
+static inline void RLMArrayTableViewValidate(RLMArrayTableView *ar) {
+    RLMArrayTableViewValidateAttached(ar);
     RLMCheckThread(ar->_realm);
+    ar->_backingView.sync_if_needed();
 }
 static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
     // first verify attached
-    RLMArrayTableViewValidateAttached(ar);
+    RLMArrayTableViewValidate(ar);
 
     if (!ar->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
@@ -71,14 +74,12 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 // public method implementations
 //
 - (NSUInteger)count {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
     return _backingView.size();
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
-    if (!_backingView.is_attached()) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
-    }
+    RLMArrayTableViewValidateAttached(self);
     RLMCheckThread(_realm);
 
     __autoreleasing RLMCArrayHolder *items;
@@ -117,7 +118,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
@@ -149,7 +150,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
     if (object->_realm && !object->_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
     }
@@ -191,7 +192,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 
 - (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
 {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     // copy array and apply new predicate creating a new query and view
     tightdb::Query query = _backingView.get_parent().where();
@@ -203,7 +204,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     tightdb::Query query = _backingView.get_parent().where();
     query.tableview(_backingView);
@@ -217,7 +218,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(id)minOfProperty:(NSString *)property {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -241,7 +242,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -265,7 +266,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -285,7 +286,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    RLMArrayTableViewValidateAttached(self);
+    RLMArrayTableViewValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
