@@ -458,7 +458,26 @@ void add_constraint_to_link_query(tightdb::Query &query, RLMPropertyType type,
                                          @"Object type %@ not supported", RLMTypeToString(type));
     }
 }
- 
+
+template<typename Func>
+void process_or_group(Query &query, id value, Func&& func) {
+    NSArray *array = RLMDynamicCast<NSArray>(value);
+    RLMPrecondition(array, @"Invalid value", @"IN clause requires an array of items");
+
+    query.group();
+
+    bool first = true;
+    for (id item in array) {
+        if (!first) {
+            query.Or();
+        }
+        first = false;
+
+        func(item);
+    }
+    query.end_group();
+}
+
 void update_link_query_with_value_expression(RLMSchema *schema,
                                              RLMObjectSchema *desc,
                                              tightdb::Query &query,
@@ -493,22 +512,15 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     }
 
     if (operatorType == NSInPredicateOperatorType) {
-        query.group();
-
-        bool first = true;
-        for (id item in value) {
+        process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
             RLMPrecondition(RLMIsObjectValidForProperty(normalized, secondProp),
                             @"Invalid value", @"object in IN clause must be of type %@",
                             RLMTypeToString(secondProp.type));
+            add_constraint_to_link_query(query, secondProp.type,
+                                         NSEqualToPredicateOperatorType, 0, idx1, idx2, normalized);
 
-            if (!first) {
-                query.Or();
-            }
-            first = false;
-            add_constraint_to_link_query(query, secondProp.type, NSEqualToPredicateOperatorType, 0, idx1, idx2, normalized);
-        }
-        query.end_group();
+        });
         return;
     }
 
@@ -591,22 +603,13 @@ void update_query_with_value_expression(RLMSchema *schema,
 
     // turn IN into ored together ==
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
-        query.group();
-
-        bool first = true;
-        for (id item in value) {
+        process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
             RLMPrecondition(RLMIsObjectValidForProperty(normalized, prop),
                             @"Invalid value", @"object in IN clause must be of type %@",
                             RLMTypeToString(prop.type));
-
-            if (!first) {
-                query.Or();
-            }
-            first = false;
             add_constraint_to_query(query, NSEqualToPredicateOperatorType, prop.type, pred.options, index, normalized);
-        }
-        query.end_group();
+        });
         return;
     }
 
@@ -707,17 +710,9 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                 
             case NSOrPredicateType: {
                 // Add all of the subpredicates with ors inbetween.
-                query.group();
-
-                bool first = true;
-                for (NSPredicate *subp in comp.subpredicates) {
-                    if (!first) {
-                        query.Or();
-                    }
-                    first = false;
+                process_or_group(query, comp.subpredicates, [&](NSPredicate *subp) {
                     update_query_with_predicate(subp, schema, objectSchema, query);
-                }
-                query.end_group();
+                });
                 break;
             }
                 
