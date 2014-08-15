@@ -392,34 +392,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - RLMTableView Delegate
 
-- (void)addRows:(NSIndexSet *)rowIndexes
-{
-    if (self.realmIsLocked) {
-        return;
-    }
-    
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMObjectSchema *schema = [realm.schema schemaForClassName:self.displayedType.name];
-
-    [realm beginWriteTransaction];
-    
-    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
-
-    for (int i = 0; i < rowsToAdd; i++) {
-        RLMObject *object = [[RLMObject alloc] initWithRealm:nil schema:schema defaultValues:NO];
-        [realm addObject:object];
-
-        for (RLMProperty *property in schema.properties) {
-            object[property.name] = [self defaultValueForPropertyType:property.type];
-        }
-
-    }
-    
-    [realm commitWriteTransaction];
-    
-    [self reloadAfterEdit];
-}
-
 - (void)deleteRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked) {
@@ -440,38 +412,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self reloadAfterEdit];
 }
 
--(void)insertRows:(NSIndexSet *)rowIndexes
-{
-    if (self.realmIsLocked || !self.displaysArray) {
-        return;
-    }
-
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMTypeNode *displayedType = self.displayedType;
-    RLMObjectSchema *objectSchema = displayedType.schema;
-    
-    Class rlmObjectClass = NSClassFromString(objectSchema.className);
-
-    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
-    if (!defaultPropertyValues) {
-//        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
-    }
-    
-    NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
-    NSUInteger rowToInsertAt = rowIndexes.firstIndex;
-    if (rowToInsertAt == -1) {
-        rowToInsertAt = 0;
-    }
-    
-    [realm beginWriteTransaction];
-    for (int i = 0; i < rowsToInsert; i++) {
-        RLMObject *object = [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
-        [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
-    }
-    [realm commitWriteTransaction];
-    [self reloadAfterEdit];
-}
-
 -(void)removeRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked || !self.displaysArray) {
@@ -488,6 +428,17 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - Private Methods - RLMTableView Delegate
+
+-(NSDictionary *)defaultValuesForProperties:(NSArray *)properties
+{
+    NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
+    
+    for (RLMProperty *property in properties) {
+        defaultValues[property.name] = [self defaultValueForPropertyType:property.type];
+    }
+    
+    return defaultValues;
+}
 
 -(id)defaultValueForPropertyType:(RLMPropertyType)propertyType
 {
