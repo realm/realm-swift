@@ -64,6 +64,8 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
+    NSLog(@"addNavigationState: %@", state);
+
     if (!controller.navigationFromHistory) {
         RLMNavigationState *oldState = navigationStack.currentState;
         

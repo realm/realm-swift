@@ -392,6 +392,32 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - RLMTableView Delegate
 
+- (void)addRows:(NSIndexSet *)rowIndexes
+{
+    if (self.realmIsLocked) {
+        return;
+    }
+    
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
+    
+    [realm beginWriteTransaction];
+    
+    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
+    
+    for (int i = 0; i < rowsToAdd; i++) {
+        RLMObject *object = [[RLMObject alloc] initWithRealm:nil schema:objectSchema defaultValues:NO];
+
+        [realm addObject:object];
+        for (RLMProperty *property in objectSchema.properties) {
+            object[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+    }
+    
+    [realm commitWriteTransaction];
+    [self reloadAfterEdit];
+}
+
 - (void)deleteRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked) {
@@ -409,6 +435,37 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [realm deleteObjects:objectsToDelete];
     [realm commitWriteTransaction];
     
+    [self reloadAfterEdit];
+}
+
+-(void)insertRows:(NSIndexSet *)rowIndexes
+{
+    if (self.realmIsLocked || !self.displaysArray) {
+        return;
+    }
+
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMTypeNode *displayedType = self.displayedType;
+    RLMObjectSchema *objectSchema = displayedType.schema;
+    
+    NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
+    NSUInteger rowToInsertAt = rowIndexes.firstIndex;
+    
+    if (rowToInsertAt == -1) {
+        rowToInsertAt = 0;
+    }
+    
+    [realm beginWriteTransaction];
+    
+    for (int i = 0; i < rowsToInsert; i++) {
+        RLMObject *object = [[RLMObject alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+        
+        for (RLMProperty *property in objectSchema.properties) {
+            object[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+        [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
+    }
+    [realm commitWriteTransaction];
     [self reloadAfterEdit];
 }
 
@@ -480,10 +537,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 -(void)reloadAfterEdit
 {
     [self.tableView reloadData];
-    NSIndexSet *indexSet = self.parentWindowController.outlineViewController.tableView.selectedRowIndexes;
-    [self.parentWindowController.outlineViewController.tableView reloadData];
-    [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
-    [self clearSelection];
+//    NSIndexSet *indexSet = self.parentWindowController.outlineViewController.tableView.selectedRowIndexes;
+//    [self.parentWindowController.outlineViewController.tableView reloadData];
+//    [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
+//    [self clearSelection];
 }
 
 #pragma mark - Mouse Handling
