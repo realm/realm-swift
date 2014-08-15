@@ -171,7 +171,12 @@
     return item != self.parentWindowController.modelDocument.presentedRealm;
 }
 
-- (NSString *)outlineView:(NSOutlineView *)outlineView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tc item:(id)item mouseLocation:(NSPoint)mouseLocation
+- (NSString *)outlineView:(NSOutlineView *)outlineView
+           toolTipForCell:(NSCell *)cell
+                     rect:(NSRectPointer)rect
+              tableColumn:(NSTableColumn *)tc
+                     item:(id)item
+            mouseLocation:(NSPoint)mouseLocation
 {
     if ([item respondsToSelector:@selector(hasToolTip)]) {
         if ([item respondsToSelector:@selector(toolTipString)]) {

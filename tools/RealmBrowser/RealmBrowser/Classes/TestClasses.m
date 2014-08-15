@@ -29,4 +29,3 @@
 @implementation RealmTestClass2
 
 @end
-

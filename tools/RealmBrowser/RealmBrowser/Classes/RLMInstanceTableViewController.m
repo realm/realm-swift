@@ -34,8 +34,6 @@
 
 #import "objc/objc-class.h"
 
-#import "TestClasses.h"
-
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
@@ -401,19 +399,22 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMTypeNode *displayedType = self.displayedType;
-    Class rlmObjectClass = NSClassFromString(displayedType.name);
-    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
-    if (!defaultPropertyValues) {
-        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
-    }
+    RLMObjectSchema *schema = [realm.schema schemaForClassName:self.displayedType.name];
+
+    [realm beginWriteTransaction];
     
     NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
 
-    [realm beginWriteTransaction];
     for (int i = 0; i < rowsToAdd; i++) {
-        [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+        RLMObject *object = [[RLMObject alloc] initWithRealm:nil schema:schema defaultValues:NO];
+        [realm addObject:object];
+
+        for (RLMProperty *property in schema.properties) {
+            object[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+
     }
+    
     [realm commitWriteTransaction];
     
     [self reloadAfterEdit];
@@ -453,7 +454,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
     NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
     if (!defaultPropertyValues) {
-        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
+//        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
     }
     
     NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
@@ -487,17 +488,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - Private Methods - RLMTableView Delegate
-
--(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
-{
-    NSMutableDictionary *defaultPropertyValues = [NSMutableDictionary dictionary];
-    
-    for (RLMProperty *property in typeNode.schema.properties) {
-        defaultPropertyValues[property.name] = [self defaultValueForPropertyType:property.type];
-    }
-    
-    return defaultPropertyValues;
-}
 
 -(id)defaultValueForPropertyType:(RLMPropertyType)propertyType
 {

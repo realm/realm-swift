@@ -47,4 +47,3 @@ RLM_ARRAY_TYPE(RealmTestClass0)
 @property RealmTestClass1 *objectReference;
 
 @end
-
