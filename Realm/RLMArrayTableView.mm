@@ -76,7 +76,10 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
-    RLMArrayTableViewValidateAttached(self);
+    if (!_backingView.is_attached()) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
+    }
+    RLMCheckThread(_realm);
 
     __autoreleasing RLMCArrayHolder *items;
     if (state->state == 0) {
