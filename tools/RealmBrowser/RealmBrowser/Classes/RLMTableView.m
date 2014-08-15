@@ -42,7 +42,8 @@
 {
     [super awakeFromNib];
 
-    int options = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate);
+    int options = NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited
+    | NSTrackingMouseMoved | NSTrackingCursorUpdate;
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:options owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
     
@@ -76,20 +77,30 @@
     unichar backspaceKey = NSBackspaceCharacter;
     NSString *backspaceString = [NSString stringWithCharacters:&backspaceKey length:1];
 
-    clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit" action:nil keyEquivalent:@""];
+    clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit"
+                                               action:nil
+                                        keyEquivalent:@""];
     clickLockItem.tag = 99;
 
-    addRowItem = [[NSMenuItem alloc] initWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+"];
+    addRowItem = [[NSMenuItem alloc] initWithTitle:@"Add row"
+                                            action:@selector(selectedAddRow:)
+                                     keyEquivalent:@"+"];
     addRowItem.tag = 5;
     
-    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:backspaceString];
+    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Delete row"
+                                               action:@selector(selectedDeleteRow:)
+                                        keyEquivalent:backspaceString];
     deleteRowItem.tag = 6;
     
-    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array" action:@selector(selectedInsertRow:) keyEquivalent:@"+"];
+    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array"
+                                                     action:@selector(selectedInsertRow:)
+                                              keyEquivalent:@"+"];
     insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     insertIntoArrayItem.tag = 9;
 
-    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array" action:@selector(selectedRemoveRow:) keyEquivalent:backspaceString];
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array"
+                                                     action:@selector(selectedRemoveRow:)
+                                              keyEquivalent:backspaceString];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     removeFromArrayItem.tag = 10;
 }
@@ -246,7 +257,7 @@
     [self.menu addItem:deleteRowItem];
     
     if (self.realmDelegate.displaysArray) {
-        [self.menu addItem:insertIntoArrayItem];
+        //        [self.menu addItem:insertIntoArrayItem];
         [self.menu addItem:removeFromArrayItem];
     }
 }
@@ -280,7 +291,7 @@
     [super updateTrackingAreas];
     
     [self removeTrackingArea:trackingArea];
-    int opts = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
+    int opts = NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved;
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:opts owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
 }
@@ -302,7 +313,8 @@
     
     // ... and add new columns matching the structure of the new realm table.
     for (NSUInteger index = 0; index < columnCount; index++) {
-        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index]];
+        NSString *title = [NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index];
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:title];
         
         [self addTableColumn:tableColumn];
     }

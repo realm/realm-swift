@@ -22,6 +22,7 @@
 @implementation NSTableColumn (Resize)
 
 const NSUInteger kMaxNumberOfRowsToConsider = 100;
+const CGFloat kMaxColumnWidth = 200.0;
 
 - (void)resizeToFitContents
 {
@@ -39,7 +40,7 @@ const NSUInteger kMaxNumberOfRowsToConsider = 100;
     NSSize headerSize = [headerCell cellSizeForBounds:rect];
     maxWidth = MAX(maxWidth, headerSize.width)*1.1;
     
-    self.width = maxWidth;
+    self.width = MIN(maxWidth, kMaxColumnWidth);
 }
 
 @end
