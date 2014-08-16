@@ -85,6 +85,16 @@
 }
 @end
 
+#pragma mark CycleObject
+@class CycleObject;
+RLM_ARRAY_TYPE(CycleObject)
+@interface CycleObject :RLMObject
+@property RLMArray<CycleObject> *objects;
+@end
+
+@implementation CycleObject
+@end
+
 #pragma mark - Private
 
 @interface RLMRealm ()
@@ -642,7 +652,7 @@
     [realm addObject:soInit];
     
     // description asserts block
-    void(^descriptionAsserts)(NSString *) = ^(NSString *description) {
+    void (^descriptionAsserts)(NSString *) = ^(NSString *description) {
         XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
         XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
         
@@ -661,6 +671,16 @@
     // Test description in read block
     NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
+}
+
+- (void)testObjectCycleDescription
+{
+    CycleObject *obj = [[CycleObject alloc] init];
+    [RLMRealm.defaultRealm transactionWithBlock:^{
+        [RLMRealm.defaultRealm addObject:obj];
+        [obj.objects addObject:obj];
+    }];
+    XCTAssertNoThrow(obj.description);
 }
 
 #pragma mark - Indexing Tests

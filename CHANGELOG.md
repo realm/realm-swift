@@ -14,6 +14,8 @@
 
 ### Bugfixes
 
+* Handle object cycles in -[RLMObject description] and -[RLMArray description].
+
 0.83.0 Release notes (2014-08-13)
 =============================================================
 
