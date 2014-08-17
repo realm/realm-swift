@@ -15,6 +15,8 @@
 ### Bugfixes
 
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].
+* Lowered the deployment target for the Xcode 6 projects and Swift examples to
+  iOS 7.0, as they didn't actually require 8.0.
 
 0.83.0 Release notes (2014-08-13)
 =============================================================
