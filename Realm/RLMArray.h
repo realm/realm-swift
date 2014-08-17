@@ -316,11 +316,11 @@
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Serializing an Arrat to NSArray
+ *  @name Serializing an Array to NSArray
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Returns this Array represented as a NSAray.
+ Returns this Array represented as a NSArray.
 
  @return    NSArray representation of this RLMArray.
  */
