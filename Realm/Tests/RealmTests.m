@@ -279,7 +279,6 @@
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         [notificationFired fulfill];
-        notificationFired = nil;
     }];
 
 

@@ -29,6 +29,7 @@
 * Lowered the deployment target for the Xcode 6 projects and Swift examples to
   iOS 7.0, as they didn't actually require 8.0.
 * Support setting model properties starting with the letter 'z'
+* Change notifications are no longer sent when -[RLMRealm refresh] is called manually.
 
 0.83.0 Release notes (2014-08-13)
 =============================================================
