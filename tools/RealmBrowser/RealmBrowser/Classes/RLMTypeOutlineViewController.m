@@ -33,10 +33,9 @@
 
 #pragma mark - RLMViewController overrides
 
-- (void)awakeFromNib
+-(void)realmDidLoad
 {
-    [super awakeFromNib];
-
+    [self.classesOutlineView reloadData];
     // Expand the root item representing the selected realm.
     RLMRealmNode *firstItem = self.parentWindowController.modelDocument.presentedRealm;
     if (firstItem != nil) {
@@ -45,12 +44,9 @@
     }
 }
 
-#pragma mark - RLMViewController overrides
-
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    [super performUpdateUsingState:newState
-                          oldState:oldState];
+    [super performUpdateUsingState:newState oldState:oldState];
  
     if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] || [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
         RLMClassNode *parentNode = (RLMClassNode *)oldState.selectedType;
@@ -191,7 +187,8 @@
 {
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
-        id selectedItem = [outlineView itemAtRow:[outlineView selectedRow]];
+        NSInteger row = [outlineView selectedRow];
+        id selectedItem = [outlineView itemAtRow:row];
 
         // The arrays we get from link views are ephemeral, so we
         // remove them when any class node is selected

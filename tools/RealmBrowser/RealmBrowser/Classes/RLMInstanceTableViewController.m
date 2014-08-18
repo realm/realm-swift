@@ -91,7 +91,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
-    self.displaysArray = NO;
 
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
@@ -101,7 +100,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
-        self.displaysArray = YES;
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
         RLMClassNode *referringType = (RLMClassNode *)arrayState.selectedType;
@@ -127,6 +125,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
+    
+    self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
 
 #pragma mark - NSTableView Data Source
@@ -537,10 +537,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 -(void)reloadAfterEdit
 {
     [self.tableView reloadData];
-//    NSIndexSet *indexSet = self.parentWindowController.outlineViewController.tableView.selectedRowIndexes;
-//    [self.parentWindowController.outlineViewController.tableView reloadData];
-//    [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
-//    [self clearSelection];
+    NSIndexSet *indexSet = self.parentWindowController.outlineViewController.tableView.selectedRowIndexes;
+    [self.parentWindowController.outlineViewController.tableView reloadData];
+    [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
+    [self clearSelection];
 }
 
 #pragma mark - Mouse Handling

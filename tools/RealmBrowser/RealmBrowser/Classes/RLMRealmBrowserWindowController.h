@@ -41,4 +41,6 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
 - (IBAction)userClickedLockRealm:(id)sender;
 
+- (void)realmDidLoad;
+
 @end
