@@ -161,13 +161,10 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     // we have two notifications, one for opening the realm, and a second when performing our transaction
-    __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (++noteCount == 2) {
-            [notificationFired fulfill];
-        }
+        [notificationFired fulfill];
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -194,13 +191,10 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     // we have two notifications, one for opening the realm, and a second when performing our transaction
-    __block NSUInteger noteCount = 0;
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (++noteCount == 2) {
-            [notificationFired fulfill];
-        }
+        [notificationFired fulfill];
      }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
@@ -236,21 +230,18 @@
     realm.autorefresh = NO;
     
     // we have two notifications, one for opening the realm, and a second when performing our transaction
-    __block NSUInteger noteCount = 0;
     __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (++noteCount == 2) {
-            [notificationFired fulfill];
-        }
+        [notificationFired fulfill];
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
-        RLMRealm *realm = [self realmWithTestPath];
-        [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"string"]];
-        [realm commitWriteTransaction];
+        RLMRealm *realm2 = [self realmWithTestPath];
+        [realm2 beginWriteTransaction];
+        [StringObject createInRealm:realm2 withObject:@[@"string"]];
+        [realm2 commitWriteTransaction];
     });
     
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -265,7 +256,6 @@
     XCTAssertEqual(objects.count, 1U, @"There should be 1 objects of type StringObject");
     
     // reset count and create new expectation
-    noteCount = 0;
     notificationFired = [self expectationWithDescription:@"notification fired"];
     
     // turn on autorefresh

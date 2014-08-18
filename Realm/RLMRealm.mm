@@ -336,32 +336,31 @@ static NSArray *s_objectDescriptors = nil;
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
     realm->_group = &group;
 
-    // determine schema
-    RLMSchema *schema;
+    // set the schema
     if (customSchema) {
-        schema = customSchema;
+        RLMRealmSetSchema(realm, customSchema);
     }
     else if (dynamic) {
-        schema = [RLMSchema dynamicSchemaFromRealm:realm];
+        RLMRealmSetSchema(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
     }
     else {
-        schema = [RLMSchema sharedSchema];
-    }
+        // check cache for existing cached realms with the same path
+        @synchronized(s_realmsPerPath) {
+            NSArray *realms = realmsAtPath(path);
+            if (realms.count) {
+                // if we have a cached realm on another thread, reuse its schema
+                realm.schema = [realms[0] schema];
+            }
+            else {
+                // if we are the first realm at this path, copy and align the shared schema
+                RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
+            }
+        }
 
-    // apply schema
-    [realm beginWriteTransaction];
-    @try {
-        RLMRealmSetSchema(realm, schema);
-    }
-    @finally {
-        // FIXME: should rollback on exceptions rather than commit once that's implemented
-        [realm commitWriteTransaction];
-    }
-
-    // cache realm at this path if using a vanilla realm
-    if (!dynamic && !customSchema) {
+        // cache only realms using a shared schema
         cacheRealm(realm, path);
     }
+
     
 #if !TARGET_OS_IPHONE
     // start update timer on osx

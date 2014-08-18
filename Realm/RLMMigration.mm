@@ -73,11 +73,11 @@
 }
 
 - (void)migrateWithBlock:(RLMMigrationBlock)block {
-    // start write transaction
-    [_realm beginWriteTransaction];
-
     // add new tables/columns for the current shared schema
     bool changed = RLMRealmSetSchema(_realm, [RLMSchema sharedSchema], true);
+
+    // start write transaction
+    [_realm beginWriteTransaction];
 
     // apply block and set new schema version
     NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);

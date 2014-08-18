@@ -179,34 +179,42 @@ static bool RLMRemoveExtraColumns(RLMRealm *realm) {
 }
 
 bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration) {
-    // set new schema
-    realm.schema = [targetSchema copy];
+    [realm beginWriteTransaction];
+    bool changed = false;
+    @try {
+        // set new schema
+        realm.schema = [targetSchema copy];
 
-    // first pass create missing tables and verify existing
-    bool changed = RLMCreateMissingTables(realm);
+        // first pass create missing tables and verify existing
+        changed = RLMCreateMissingTables(realm);
 
-    // if not migrating then verify all non-empty tables
-    if (!migration) {
-        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-            if (objectSchema->_table->get_column_count()) {
-                RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
-                                                                     className:objectSchema.className];
-                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+        // if not migrating then verify all non-empty tables
+        if (!migration) {
+            for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+                if (objectSchema->_table->get_column_count()) {
+                    RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
+                                                                         className:objectSchema.className];
+                    RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+                }
             }
         }
+
+        // second pass add columns to empty tables
+        changed = RLMAddMissingColumns(realm) || changed;
+        
+        // remove expired columns
+        changed = RLMRemoveExtraColumns(realm) || changed;
+        
+        // FIXME - remove deleted objects
+        
+        // align all tables
+        RLMVerifyAndAlignSchema(realm.schema);
+    }
+    @finally {
+        // FIXME: should rollback on exceptions rather than commit once that's implemented
+        [realm commitWriteTransaction];
     }
 
-    // second pass add columns to empty tables
-    changed = RLMAddMissingColumns(realm) || changed;
-    
-    // remove expired columns
-    changed = RLMRemoveExtraColumns(realm) || changed;
-    
-    // FIXME - remove deleted objects
-    
-    // align all tables
-    RLMVerifyAndAlignSchema(realm.schema);
-    
     return changed;
 }
 
