@@ -215,11 +215,8 @@
 }
 
 - (BOOL)isDeleted {
-    if (self.class == self.objectSchema.accessorClass && !_row.is_attached()) {
-        // if not standalone and our accessor has been detached, we have been deleted
-        return YES;
-    }
-    return NO;
+    // if not standalone and our accessor has been detached, we have been deleted
+    return self.class == self.objectSchema.accessorClass && !_row.is_attached();
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {
