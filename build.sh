@@ -177,7 +177,16 @@ case "$COMMAND" in
             echo "Using version of core already in core/ directory"
             exit 0
         fi
-        if ! [ -L core ]; then
+        if [ -d core -a -d ../tightdb ]; then
+          # Allow newer versions than expected for local builds as testing
+          # with unreleased versions is one of the reasons to use a local build
+          if ! $(grep "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
+              echo "Local build of core is out of date."
+              exit 1
+          else
+              echo "The core library seems to be up to date."
+          fi
+        elif ! [ -L core ]; then
             echo "core is not a symlink. Deleting..."
             rm -rf core
             download_core
