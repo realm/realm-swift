@@ -234,6 +234,7 @@
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
         [notificationFired fulfill];
+        notificationFired = nil;
     }];
     
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
