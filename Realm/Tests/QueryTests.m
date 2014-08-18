@@ -1089,6 +1089,60 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
 }
 
+- (void)testMultiLevelLinkQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"data = '4'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.data = '3'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.data = '2'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '1'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.next.data = '0'"].firstObject);
+    XCTAssertEqualObjects(circle.next, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '0'"].firstObject);
+    XCTAssertEqualObjects(circle.next.next, [CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject);
+
+    XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
+    XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
+    XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next.next = %@", circle]));
+}
+
+- (void)testArrayMultiLevelLinkQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    [CircleArrayObject createInRealm:realm withObject:@[[CircleObject allObjectsInRealm:realm]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '4'"].count);
+    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '4'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '3'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '3'"].count);
+
+    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '3'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '2'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '2'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '2'"].count);
+
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"circles.data = '2'"]);
+}
+
 - (void)testQueryWithObjects
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
