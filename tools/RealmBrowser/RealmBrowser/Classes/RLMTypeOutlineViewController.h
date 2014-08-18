@@ -23,6 +23,4 @@
 
 @interface RLMTypeOutlineViewController : RLMViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
--(void)realmDidLoad;
-
 @end

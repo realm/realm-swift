@@ -37,4 +37,8 @@
 
 - (void)setSelectionIndex:(NSUInteger)newIndex;
 
+-(void)realmDidLoad;
+
+-(void)realmDidChange;
+
 @end

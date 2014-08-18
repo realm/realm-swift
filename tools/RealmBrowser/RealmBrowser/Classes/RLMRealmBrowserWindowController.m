@@ -34,6 +34,15 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 
 @implementation RLMRealmBrowserWindowController {
     RLMNavigationStack *navigationStack;
+    RLMNotificationToken *token;
+}
+
+#pragma mark - NSObject Overrides
+
+- (void)dealloc
+{
+    RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+    [realm removeNotification:token];
 }
 
 #pragma mark - NSViewController Overrides
@@ -47,6 +56,7 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 -(void)realmDidLoad
 {
     [self.outlineViewController realmDidLoad];
+    [self.tableViewController realmDidLoad];
     
     [self updateNavigationButtons];
     
@@ -58,6 +68,14 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     }
 
     [self setRealmLocked:YES];
+
+    RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+    __weak typeof(self) weakSelf = self;
+    token = [realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        __typeof__(self) strongSelf = weakSelf;
+        [strongSelf.tableViewController realmDidChange];
+        [strongSelf.outlineViewController realmDidChange];
+    }];
 }
 
 #pragma mark - Public methods - Accessors

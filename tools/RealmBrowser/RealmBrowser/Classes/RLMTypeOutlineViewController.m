@@ -44,6 +44,12 @@
     }
 }
 
+- (void)realmDidChange
+{
+    NSLog(@"OUTLINE: realmDidChange");
+    [self.classesOutlineView reloadData];
+}
+
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];

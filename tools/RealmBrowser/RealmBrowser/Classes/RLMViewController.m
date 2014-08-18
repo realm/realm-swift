@@ -35,6 +35,16 @@
 
 #pragma mark - Public methods - Accessors
 
+-(void)realmDidLoad
+{
+    // No action - should be implemented by subclasses.
+}
+
+-(void)realmDidChange
+{
+    // No action - should be implemented by subclasses.
+}
+
 - (NSTableView *)tableView
 {
     if ([self.view isKindOfClass:[NSTableView class]]) {
