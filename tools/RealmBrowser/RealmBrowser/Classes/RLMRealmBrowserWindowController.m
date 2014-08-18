@@ -70,6 +70,9 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     [self setRealmLocked:YES];
 
     RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+
+    NSLog(@"BROWSER (realm = %@)", realm);
+
     __weak typeof(self) weakSelf = self;
     token = [realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
         __typeof__(self) strongSelf = weakSelf;
