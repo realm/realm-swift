@@ -29,53 +29,53 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
  Create an index for this property for improved search performance.
  */
     RLMPropertyAttributeIndexed = 1 << 2,
-    
+
 /**
  Store this property inline (de-normalization) which in some cases can improve performance. Setting this
  attribute will result in objects being copied (rather than linked) when setting this property.
  */
 //    RLMPropertyAttributeInlined = 1 << 3,
-    
+
 /**
  The value for a property with this attribute must be unique across all objects of this type. An exception
  will be thrown when setting a property with this attribute to a non-unique value.
  */
 //    RLMPropertyAttributeUnique = 1 << 4,
-    
+
 /**
  This property value must be set before the object can be added to a Realm. If not set an
  exception will be thrown if no default value for this property is specified. If a default
  value is specified it is set upon insertion into a Realm
- 
+
  @see [RLMObject defaultPropertyValues]
  */
 //    RLMPropertyAttributeRequired = 1 << 5,
-    
+
 /**
  When a parent object is deleted or a child property is nullified nothing is done.
  This is the default delete rule.
- 
+
  Set this attribute on RLMPropertyTypeObject or RLMPropertyTypeArray properties
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteIfOnlyOwner` and `RLMPropertyAttributeDeleteAlways`.
  */
 //    RLMPropertyAttributeDeleteNever = 0,
-    
+
 /**
  Delete a child object (or object in an RLMArray) when the parent is deleted or the object is
  nullified only if no other objects in the realm reference the object.
- 
+
  Set this attribute on RLMPropertyTypeObject or RLMPropertyTypeArray properties
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteAlways`.
  */
 //    RLMPropertyAttributeDeleteIfOnlyOwner = 1 << 0,
-    
+
 /**
  Always delete a child object or object in a child array when the parent is deleted or the
  reference in nullified. If other objects reference the same child object those references are
  nullified.
- 
+
  Set this attribute on RLMPropertyTypeObject or RLMPropertyTypeArray properties
  to customize the properties’ delete rule. This rule is mutually exclusive with
  `RLMPropertyAttributeDeleteNever` and `RLMPropertyAttributeDeleteIfOnlyOwner`.
@@ -85,7 +85,7 @@ typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
 
 /**
  Property types supported in Realm models.
- 
+
  See [Realm Models](http://realm.io/docs/cocoa/latest/#models)
  */
 // Make sure numbers match those in <tightdb/data_type.hpp>
@@ -126,10 +126,38 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeArray  = 13,
 };
 
-// Posted by RLMRealm when it changes, that is when a table is
-// added, removed, or changed in any way.
+// Appledoc doesn't support documenting externed globals, so document them as an
+// enum instead
+#ifdef APPLEDOC
+typedef NS_ENUM(NSString, RLMRealmNotification) {
+/**
+ Posted by RLMRealm when a write transaction has been committed to a RLMRealm on
+ a different thread for the same file. This is not posted if
+ [autorefresh]([RLMRealm autorefresh]) is enabled or if the RLMRealm is
+ refreshed before the notifcation has a chance to run.
 
+ Realms with autorefresh disabled should normally have a handler for this
+ notification which calls [refresh]([RLMRealm refresh]) after doing some work.
+ While not refreshing is allowed, it may lead to large Realm files as Realm has
+ to keep an extra copy of the data for the un-refreshed RLMRealm.
+ */
+     RLMRealmNeedsRefreshNotification,
+
+/**
+ Posted by RLMRealm when the data in the realm has changed.
+
+ DidChange are posted after a realm has been refreshed to reflect a write
+ transaction, i.e. when an autorefresh occurs, [refresh]([RLMRealm refresh]) is
+ called, after an implicit refresh from [beginWriteTransaction]([RLMRealm beginWriteTransaction]),
+ and after a local write transaction is committed.
+ */
+    RLMRealmDidChangeNotification,
+};
+#else
+// See comments above
+extern NSString * const RLMRealmNeedsRefreshNotification;
 extern NSString * const RLMRealmDidChangeNotification;
+#endif
 
 typedef NS_ENUM(NSInteger, RLMError) {
     /** Retuned by RLMRealm if no other specific error is returned when a realm is opened. */
