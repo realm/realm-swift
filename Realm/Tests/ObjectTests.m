@@ -756,4 +756,34 @@
     OSSpinLockLock(&spinlock);
 }
 
+- (void)testIsDeleted {
+    StringObject *obj1 = [[StringObject alloc] initWithObject:@[@"a"]];
+    XCTAssertEqual(obj1.isDeleted, NO);
+
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"b"]];
+
+    XCTAssertEqual(obj1.isDeleted, NO);
+    XCTAssertEqual(obj2.isDeleted, NO);
+
+    [realm commitWriteTransaction];
+
+    // delete
+    [realm beginWriteTransaction];
+    [realm deleteObject:obj1];
+    [realm deleteObject:obj2];
+
+    XCTAssertEqual(obj1.isDeleted, YES);
+    XCTAssertEqual(obj2.isDeleted, YES);
+
+    XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
+    
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(obj1.isDeleted, YES);
+    XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
+}
+
 @end

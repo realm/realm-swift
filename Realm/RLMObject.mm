@@ -214,6 +214,14 @@
     return [NSString stringWithString:mString];
 }
 
+- (BOOL)isDeleted {
+    if (self.class == self.objectSchema.accessorClass && !_row.is_attached()) {
+        // if not standalone and our accessor has been detached, we have been deleted
+        return YES;
+    }
+    return NO;
+}
+
 - (BOOL)isEqualToObject:(RLMObject *)object {
     // if identical object
     if (self == object) {

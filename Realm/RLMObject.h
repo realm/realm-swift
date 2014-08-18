@@ -149,6 +149,13 @@
  */
 @property (nonatomic, readonly) RLMObjectSchema *objectSchema;
 
+/**
+ Indicates if an object has been deleted from a Realm and can no longer be accessed.
+
+ @return    YES for objects which have been deleted, NO for valid objects.
+ */
+- (BOOL)isDeleted;
+
 
 /**---------------------------------------------------------------------------------------
  *  @name Customizing your Objects

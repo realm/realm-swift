@@ -228,7 +228,14 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 
     // verify writable
     RLMVerifyInWriteTransaction(realm);
-    
+
+    // verify object
+    if (object.isDeleted) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Adding a deleted object to a Realm is not permitted"
+                                     userInfo:nil];
+    }
+
     // set the realm and schema
     NSString *objectClassName = [object.class className];
     RLMObjectSchema *schema = realm.schema[objectClassName];
@@ -319,6 +326,9 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
 
     // move last row to row we are deleting
     object->_row.get_table()->move_last_over(object->_row.get_index());
+
+    // set realm to nil
+    object.realm = nil;
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order) {
