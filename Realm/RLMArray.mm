@@ -241,12 +241,28 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSString *)description
 {
+    return [self descriptionWithMaxDepth:5];
+}
+
+- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
+    if (depth == 0) {
+        return @"<Maximum depth exceeded>";
+    }
+
     const NSUInteger maxObjects = 100;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
     unsigned long index = 0, skipped = 0;
-    for (NSObject *obj in self) {
+    for (id obj in self) {
+        NSString *sub;
+        if ([obj respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
+            sub = [obj descriptionWithMaxDepth:depth - 1];
+        }
+        else {
+            sub = [obj description];
+        }
+
         // Indent child objects
-        NSString *objDescription = [obj.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
+        NSString *objDescription = [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
         [mString appendFormat:@"\t[%lu] %@,\n", index++, objDescription];
         if (index >= maxObjects) {
             skipped = self.count - maxObjects;
