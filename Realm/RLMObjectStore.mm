@@ -230,7 +230,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     RLMVerifyInWriteTransaction(realm);
 
     // verify object
-    if (object.isDeleted) {
+    if (object.deletedFromRealm) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Adding a deleted object to a Realm is not permitted"
                                      userInfo:nil];

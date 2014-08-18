@@ -758,15 +758,15 @@
 
 - (void)testIsDeleted {
     StringObject *obj1 = [[StringObject alloc] initWithObject:@[@"a"]];
-    XCTAssertEqual(obj1.isDeleted, NO);
+    XCTAssertEqual(obj1.deletedFromRealm, NO);
 
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
     [realm addObject:obj1];
     StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"b"]];
 
-    XCTAssertEqual(obj1.isDeleted, NO);
-    XCTAssertEqual(obj2.isDeleted, NO);
+    XCTAssertEqual([obj1 isDeletedFromRealm], NO);
+    XCTAssertEqual(obj2.deletedFromRealm, NO);
 
     [realm commitWriteTransaction];
 
@@ -775,14 +775,14 @@
     [realm deleteObject:obj1];
     [realm deleteObject:obj2];
 
-    XCTAssertEqual(obj1.isDeleted, YES);
-    XCTAssertEqual(obj2.isDeleted, YES);
+    XCTAssertEqual(obj1.deletedFromRealm, YES);
+    XCTAssertEqual(obj2.deletedFromRealm, YES);
 
     XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
     
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj1.isDeleted, YES);
+    XCTAssertEqual(obj1.deletedFromRealm, YES);
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 

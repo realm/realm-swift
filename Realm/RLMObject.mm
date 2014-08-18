@@ -214,7 +214,7 @@
     return [NSString stringWithString:mString];
 }
 
-- (BOOL)isDeleted {
+- (BOOL)isDeletedFromRealm {
     // if not standalone and our accessor has been detached, we have been deleted
     return self.class == self.objectSchema.accessorClass && !_row.is_attached();
 }
