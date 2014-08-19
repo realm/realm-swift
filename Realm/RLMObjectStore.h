@@ -24,8 +24,13 @@
 
 // update tables in realm to the targetSchema and set schema on realm
 // returns true if modifications were made
-// NOTE: must be called from within write transaction
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation = false, bool useTransaction = true);
+// NOTE: must be called from within write transaction if allowMutation is true
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation = false);
+
+// initialize a realm if needed with the given schema
+// for uninitialized dbs, the initial version is set and tables are created for the target schema
+// existing dbs are validated against the target schema
+bool RLMRealmIntializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
 
 
 //

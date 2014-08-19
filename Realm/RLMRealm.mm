@@ -314,10 +314,10 @@ static NSArray *s_objectDescriptors = nil;
 
     // set the schema
     if (customSchema) {
-        RLMRealmSetSchema(realm, customSchema);
+        RLMRealmIntializeWithSchema(realm, customSchema);
     }
     else if (dynamic) {
-        RLMRealmSetSchema(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
+        RLMRealmIntializeWithSchema(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
     }
     else {
         // check cache for existing cached realms with the same path
@@ -325,11 +325,11 @@ static NSArray *s_objectDescriptors = nil;
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // if we have a cached realm on another thread, copy and verify without a transaction
-                RLMRealmSetSchema(realm, [realms[0] schema], false, false);
+                RLMRealmSetSchema(realm, [realms[0] schema], false);
             }
             else {
                 // if we are the first realm at this path, copy and align the shared schema
-                RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
+                RLMRealmIntializeWithSchema(realm, [RLMSchema sharedSchema]);
             }
         }
 
