@@ -5,7 +5,8 @@
 
 * The timer used to trigger notifications has been removed. Notifications are now
   only triggered by commits made in other threads, and can not currently be triggered
-  by changes made by other processes.
+  by changes made by other processes. Interprocess notifications will be re-added in 
+  a future commit with an improved design.
 
 ### Enhancements
 
