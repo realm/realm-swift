@@ -230,6 +230,11 @@
     return [NSString stringWithString:mString];
 }
 
+- (BOOL)isDeletedFromRealm {
+    // if not standalone and our accessor has been detached, we have been deleted
+    return self.class == self.objectSchema.accessorClass && !_row.is_attached();
+}
+
 - (BOOL)isEqualToObject:(RLMObject *)object {
     // if identical object
     if (self == object) {

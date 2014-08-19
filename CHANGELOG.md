@@ -5,6 +5,7 @@
 
 ### Enhancements
 
+* Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
 * Switch to building the SDK from source when using CocoaPods and add a
   Realm.Headers subspec for use in targets that should not link a copy of Realm
