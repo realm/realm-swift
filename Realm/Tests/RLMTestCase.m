@@ -111,6 +111,10 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (void)invokeTest
 {
+#if !defined(SWIFT)
+    _expectations = [NSMutableArray new];
+#endif
+
     [RLMTestCase setUp];
     @autoreleasepool {
         [super invokeTest];
@@ -134,9 +138,9 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 #if !defined(SWIFT)
 - (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(__unused id)noop {
     NSDate *endDate = [NSDate dateWithTimeIntervalSinceNow:interval];
-    while (!_expectations.count && [endDate timeIntervalSinceNow] > 0) {
+    while (_expectations.count && [endDate timeIntervalSinceNow] > 0) {
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:endDate];
-        for (NSInteger i = (NSInteger)_expectations.count-1; i > 0; i--) {
+        for (NSInteger i = (NSInteger)_expectations.count-1; i >= 0; i--) {
             if (((XCTestExpectation *)_expectations[i])->_fulfilled) {
                 [_expectations removeObjectAtIndex:i];
             }

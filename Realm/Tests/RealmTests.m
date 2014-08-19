@@ -236,7 +236,12 @@
         [notificationFired fulfill];
         notificationFired = nil;
     }];
-    
+
+
+    // should have no objects
+    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    XCTAssertEqual(objects.count, 0U, @"There should be 0 objects of type StringObject");
+
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
         RLMRealm *realm2 = [self realmWithTestPath];
@@ -247,8 +252,8 @@
     
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     
-    // should have only one object
-    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+    // should have no visible objects
+    objects = [StringObject objectsInRealm:realm withPredicate:nil];
     XCTAssertEqual(objects.count, 0U, @"There should be 0 objects of type StringObject");
     
     // call refresh
