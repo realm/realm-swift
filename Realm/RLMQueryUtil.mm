@@ -358,21 +358,26 @@ void add_between_constraint_to_query(tightdb::Query & query,
 
     // add to query
     switch (prop.type) {
-        case type_DateTime:
+        case RLMPropertyTypeDate:
             query.between_datetime(index,
                                    [from timeIntervalSince1970],
                                    [to timeIntervalSince1970]);
             break;
-        case type_Double:
+        case RLMPropertyTypeDouble:
             query.between(index, [from doubleValue], [to doubleValue]);
             break;
-        case type_Float:
+        case RLMPropertyTypeFloat:
             query.between(index, [from floatValue], [to floatValue]);
             break;
-        case type_Int:
+        case RLMPropertyTypeInt:
             query.between(index, [from longLongValue], [to longLongValue]);
             break;
-        default:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported for BETWEEN operations", RLMTypeToString(prop.type));
     }
@@ -461,30 +466,31 @@ void update_link_query_with_value_expression(RLMSchema *schema,
     RLMPropertyType type = secondProp.type;
     NSPredicateOperatorType opType = pred.predicateOperatorType;
     switch (type) {
-        case type_Bool:
+        case RLMPropertyTypeBool:
             add_bool_constraint_to_link_query(query, opType, idx1, idx2, bool([value boolValue]));
             break;
-        case type_DateTime:
+        case RLMPropertyTypeDate:
             add_datetime_constraint_to_link_query(query, opType, idx1, idx2, double([value timeIntervalSince1970]));
             break;
-        case type_Double:
+        case RLMPropertyTypeDouble:
             add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Double([value doubleValue]));
             break;
-        case type_Float:
+        case RLMPropertyTypeFloat:
             add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Float([value floatValue]));
             break;
-        case type_Int:
+        case RLMPropertyTypeInt:
             add_numeric_constraint_to_link_query(query, type, opType, idx1, idx2, Int([value longLongValue]));
             break;
-        case type_String:
+        case RLMPropertyTypeString:
             add_string_constraint_to_link_query(query, opType, pred.options, idx1, idx2, value);
             break;
-        case type_Binary:
-            @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
-        case type_Link:
+        case RLMPropertyTypeObject:
             add_link_constraint_to_query(query, opType, idx1, value);
             break;
-        default:
+        case RLMPropertyTypeData:
+            @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeAny:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported", RLMTypeToString(type));
     }
@@ -497,31 +503,32 @@ void add_constraint_to_query(tightdb::Query &query,
                              NSUInteger index,
                              id value) {
     switch (type) {
-        case type_Bool:
+        case RLMPropertyTypeBool:
             add_bool_constraint_to_query(query, operatorType, index, bool([value boolValue]));
             break;
-        case type_DateTime:
+        case RLMPropertyTypeDate:
             add_datetime_constraint_to_query(query, operatorType, index, [value timeIntervalSince1970]);
             break;
-        case type_Double:
+        case RLMPropertyTypeDouble:
             add_numeric_constraint_to_query(query, type, operatorType, index, [value doubleValue]);
             break;
-        case type_Float:
+        case RLMPropertyTypeFloat:
             add_numeric_constraint_to_query(query, type, operatorType, index, [value floatValue]);
             break;
-        case type_Int:
+        case RLMPropertyTypeInt:
             add_numeric_constraint_to_query(query, type, operatorType, index, [value longLongValue]);
             break;
-        case type_String:
+        case RLMPropertyTypeString:
             add_string_constraint_to_query(query, operatorType, options, index, value);
             break;
-        case type_Binary:
+        case RLMPropertyTypeData:
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
-        case type_Link:
+        case RLMPropertyTypeObject:
             add_link_constraint_to_query(query, operatorType, index, value);
             break;
-        default:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeAny:
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported", RLMTypeToString(type));
     }
@@ -612,7 +619,8 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
     }
 }
     
-void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString *leftColumnName, NSString *rightColumnName, NSComparisonPredicateOptions predicateOptions)
+void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString *leftColumnName,
+                                         NSString *rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
     // Validate object types
     NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
@@ -628,40 +636,43 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
 
     // TODO: Should we handle special case where left row is the same as right row (tautology)
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
-    if (leftType == rightType) {
-        switch (leftType) {
-            case type_Bool:
-                query.and_query(column_expression<Bool>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            case type_Int:
-                query.and_query(column_expression<Int>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            case type_Float:
-                query.and_query(column_expression<Float>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            case type_Double:
-                query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            case type_DateTime:
-                // FIXME: int64_t should be DateTime but that doesn't work on 32 bit
-                // FIXME: as time_t(32bit) != time_t(64bit)
-                query.and_query(column_expression<int64_t>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
-                break;
-            default:
-                @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
-                                             RLMUnsupportedTypesFoundInPropertyComparisonReason,
-                                             RLMTypeToString(leftType),
-                                             RLMTypeToString(rightType));
-        }
-    }
-    else {
+    if (leftType != rightType) {
         @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
                                      RLMPropertiesComparisonTypeMismatchReason,
                                      RLMTypeToString(leftType),
                                      RLMTypeToString(rightType));
     }
+
+    switch (leftType) {
+        case RLMPropertyTypeBool:
+            query.and_query(column_expression<Bool>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            break;
+        case RLMPropertyTypeInt:
+            query.and_query(column_expression<Int>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            break;
+        case RLMPropertyTypeFloat:
+            query.and_query(column_expression<Float>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            break;
+        case RLMPropertyTypeDouble:
+            query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            break;
+        case RLMPropertyTypeDate:
+            // FIXME: int64_t should be DateTime but that doesn't work on 32 bit
+            // FIXME: as time_t(32bit) != time_t(64bit)
+            query.and_query(column_expression<int64_t>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            break;
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
+            @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
+                                         RLMUnsupportedTypesFoundInPropertyComparisonReason,
+                                         RLMTypeToString(leftType),
+                                         RLMTypeToString(rightType));
+    }
 }
-    
+
 void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema, tightdb::Query & query)
 {
@@ -838,8 +849,11 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, N
         case RLMPropertyTypeString:
             view.sort(prop.column, ascending);
             break;
-            
-        default:
+
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
             @throw RLMPredicateException(@"Invalid sort column type",
                                          @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
     }

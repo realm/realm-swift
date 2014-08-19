@@ -234,7 +234,12 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
             tightdb::DateTime dt = _backingView.minimum_datetime(colIndex);
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
-        default:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"minOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
@@ -258,7 +263,12 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
             tightdb::DateTime dt = _backingView.maximum_datetime(colIndex);
             return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
         }
-        default:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"maxOfProperty only supported for int, float, double and date properties."
                                          userInfo:nil];
@@ -278,7 +288,13 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
             return @(_backingView.sum_double(colIndex));
         case RLMPropertyTypeFloat:
             return @(_backingView.sum_float(colIndex));
-        default:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"sumOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
@@ -298,7 +314,13 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
             return @(_backingView.average_double(colIndex));
         case RLMPropertyTypeFloat:
             return @(_backingView.average_float(colIndex));
-        default:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeString:
             @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
                                            reason:@"averageOfProperty only supported for int, float and double properties."
                                          userInfo:nil];
