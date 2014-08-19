@@ -60,7 +60,7 @@ using namespace tightdb::util;
 namespace {
 
 // create NSException from c++ exception
-void throw_objc_exception(exception &ex) {
+__attribute__((noreturn)) void throw_objc_exception(exception &ex) {
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
     @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
 }
@@ -465,35 +465,13 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
-- (void)refreshWithNotification:(BOOL)notify {
-    RLMCheckThread(self);
-    try {
-        // no-op if writing
-        if (self.inWriteTransaction) {
-            return;
-        }
-
-        // advance transaction if database has changed
-        if (_sharedGroup->has_changed()) { // Throws
-            LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
-
-            if (notify) {
-                // send notification that someone else changed the realm
-                [self sendNotifications];
-            }
-        }
-    }
-    catch (exception &ex) {
-        throw_objc_exception(ex);
-    }
-
-}
-
 - (void)handleExternalCommit {
     RLMCheckThread(self);
 
     if (_autorefresh) {
-        [self refreshWithNotification:YES];
+        if ([self refresh]) {
+            [self sendNotifications];
+        }
     }
     else {
         try {
@@ -509,8 +487,25 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
-- (void)refresh {
-    [self refreshWithNotification:NO];
+- (BOOL)refresh {
+    RLMCheckThread(self);
+
+    // no-op if writing
+    if (self.inWriteTransaction) {
+        return NO;
+    }
+
+    try {
+        // advance transaction if database has changed
+        if (_sharedGroup->has_changed()) { // Throws
+            LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+            return YES;
+        }
+        return NO;
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
+    }
 }
 
 - (void)addObject:(RLMObject *)object {
