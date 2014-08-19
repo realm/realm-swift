@@ -380,6 +380,7 @@ static NSArray *s_objectDescriptors = nil;
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
+    NSCParameterAssert(block);
 
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
