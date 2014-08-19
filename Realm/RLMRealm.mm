@@ -324,8 +324,8 @@ static NSArray *s_objectDescriptors = nil;
         @synchronized(s_realmsPerPath) {
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
-                // if we have a cached realm on another thread, reuse its schema
-                realm.schema = [realms[0] schema];
+                // if we have a cached realm on another thread, copy and verify without a transaction
+                RLMRealmSetSchema(realm, [realms[0] schema], false, false);
             }
             else {
                 // if we are the first realm at this path, copy and align the shared schema

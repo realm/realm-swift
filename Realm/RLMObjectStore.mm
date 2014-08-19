@@ -200,7 +200,7 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutat
         }
 
         if (!allowMutation && initialized) {
-            // if not mutating then verify all tables match our schema
+            // if not mutating and already initialized then verify all tables match our schema
             for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
                 RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
                                                                      className:objectSchema.className];
@@ -208,7 +208,7 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutat
             }
         }
         else {
-            // second pass add columns to empty tables
+            // if mutating or not initialized, add columns
             changed = RLMAddMissingColumns(realm) || changed;
 
             // remove expired columns
