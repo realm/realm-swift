@@ -1110,8 +1110,8 @@
     XCTAssertEqualObjects(circle.next.next, [CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject);
 
     XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
-    XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
-    XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next.next = %@", circle]));
+    XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
+    XCTAssertEqualObjects(circle.next.next.next.next, [CircleObject objectsInRealm:realm where:@"next = nil"].firstObject);
 }
 
 - (void)testArrayMultiLevelLinkQuery
@@ -1187,19 +1187,6 @@
     // invalid object queries
     NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
-
-    NSPredicate *pred4 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj0];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred4].count, 2U, @"Count should be 2");
-    NSPredicate *pred5 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj1];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred5].count, 2U, @"Count should be 2");
-    NSPredicate *pred6 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj2];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred6].count, 1U, @"Count should be 1");
-
-    // invalid object keypath queries
-    NSPredicate *pred7 = [NSPredicate predicateWithFormat:@"array.objectCol != %@", stringObj2];
-    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred7], @"Operator other than = should throw");
-    NSPredicate *pred8 = [NSPredicate predicateWithFormat:@"array.objectCol == %@", obj0];
-    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred8], @"Wrong object type should throw");
 
     // check for ANY object in array
     NSPredicate *pred9 = [NSPredicate predicateWithFormat:@"ANY array = %@", obj0];

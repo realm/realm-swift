@@ -312,7 +312,7 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
 {
     tightdb::TableRef table = query.get_table();
     for (NSUInteger col : linkColumns) {
-        table.reset(&table->link(col));
+        table->link(col); // mutates table
     }
 
     switch (type) {
@@ -345,6 +345,7 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
                 break;
             }
             else {
+                table->column<Int>(idx); // clear m_link_chain on table
                 @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
             }
         case type_Link:
@@ -352,14 +353,13 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
             if (linkColumns.empty()) {
                 add_link_constraint_to_query(query, operatorType, idx, value);
             }
-            else if (linkColumns.size() == 1) {
-                add_link_constraint_to_query(query, operatorType, linkColumns[0], value);
-            }
             else {
+                table->column<Int>(idx); // clear m_link_chain on table
                 @throw RLMPredicateException(@"Unsupported operator", @"Multi-level object equality link queries are not supported.");
             }
             break;
         default:
+            table->column<Int>(idx); // clear m_link_chain on table
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported", RLMTypeToString(type));
     }
