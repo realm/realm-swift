@@ -160,7 +160,6 @@
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
-    // we have two notifications, one for opening the realm, and a second when performing our transaction
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
@@ -184,13 +183,60 @@
     XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
+- (void)testBackgroundRealmIsNotified {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    XCTestExpectation *backgroundCreated = [self expectationWithDescription:@"background queue created"];
+    __block XCTestExpectation *backgroundComplete;
+
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        __block bool fulfilled = false;
+        RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+            XCTAssertNotNil(realm, @"Realm should not be nil");
+            fulfilled = true;
+        }];
+
+        // notify main thread our bg realm is completed
+        [backgroundCreated fulfill];
+
+        // run for two seconds or until we recieve notification
+        NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
+        while (!fulfilled) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
+        }
+        XCTAssertEqual(fulfilled, true, @"Notification should have been received");
+
+        // verify object
+        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
+        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
+        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
+
+        [realm removeNotification:token];
+        [backgroundComplete fulfill];
+    });
+
+    // wait for background realm to be created
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // create bg completion expectation
+    backgroundComplete = [self expectationWithDescription:@"background queue completed"];
+
+    // write on main thread
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"string"]];
+    [realm commitWriteTransaction];
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 // FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
 // Asana: https://app.asana.com/0/861870036984/14552787865017
 #ifndef REALM_SWIFT
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
-    // we have two notifications, one for opening the realm, and a second when performing our transaction
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
@@ -228,8 +274,7 @@
     
     // turn autorefresh off
     realm.autorefresh = NO;
-    
-    // we have two notifications, one for opening the realm, and a second when performing our transaction
+
     __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
