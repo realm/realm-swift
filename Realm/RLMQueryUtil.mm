@@ -151,8 +151,63 @@ void add_string_constraint_to_query(tightdb::Query &query,
     }
 }
 
-// FIXME: beginsWith, endsWith, contains missing
-// FIXME: not case sensitive
+template<typename T, bool (T::*fn)(T) const>
+struct predicate_wrapper {
+    template<typename... Args>
+    auto operator()(T v1, T v2) {
+        return (v2.*fn)(v1);
+    }
+};
+
+
+NSString *fold_string(StringData data) {
+    return [[[NSString alloc] initWithBytesNoCopy:(void *)data.data()
+                                           length:data.size()
+                                         encoding:NSUTF8StringEncoding
+                                     freeWhenDone:NO]
+            stringByFoldingWithOptions:NSCaseInsensitiveSearch locale:nil];
+}
+
+template<typename Impl>
+struct case_insensitive_predicate {
+    NSString *folded = nil;
+    bool (*func)(id, SEL, NSString *) = nullptr;
+
+    bool operator()(StringData needle, StringData haystack) {
+        if (!folded) {
+            folded = fold_string(needle);
+            func = reinterpret_cast<bool (*)(id, SEL, NSString *)>([folded methodForSelector:Impl::sel()]);
+        }
+
+        return func(fold_string(haystack), Impl::sel(), folded);
+    }
+};
+
+// can't just template on the selector because @selector() isn't constexpr
+struct ibegins_with : case_insensitive_predicate<ibegins_with> {
+    static SEL sel() {
+        return @selector(hasPrefix:);
+    }
+};
+
+struct iends_with : case_insensitive_predicate<iends_with> {
+    static SEL sel() {
+        return @selector(hasSuffix:);
+    }
+};
+
+struct icontains : case_insensitive_predicate<icontains> {
+    static SEL sel() {
+        return @selector(containsString:);
+    }
+};
+
+struct iequals : case_insensitive_predicate<icontains> {
+    static SEL sel() {
+        return @selector(isEqualToString:);
+    }
+};
+
 void add_string_constraint_to_link_query(tightdb::Query& query,
                                          NSPredicateOperatorType operatorType,
                                          NSComparisonPredicateOptions predicateOptions,
@@ -162,22 +217,53 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
-    RLMPrecondition(caseSensitive, @"Invalid predicate option",
-                    @"NSCaseInsensitivePredicateOption not supported for queries on linked strings");
 
     tightdb::StringData sd = RLMStringDataWithNSString(value);
+    auto comparator = [&](auto pred) {
+        return new Compare<decltype(pred), StringData>(*new Value<StringData>(sd), column.clone(), true);
+    };
+
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'BEGINSWITH' is not supported");
+            if (caseSensitive) {
+                query.and_query(*comparator(predicate_wrapper<StringData, &StringData::begins_with>{}));
+            }
+            else {
+                query.and_query(*comparator(ibegins_with{}));
+            }
+            break;
         case NSEndsWithPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'ENDSWITH' is not supported");
+            if (caseSensitive) {
+                query.and_query(*comparator(predicate_wrapper<StringData, &StringData::ends_with>{}));
+            }
+            else {
+                query.and_query(*comparator(iends_with{}));
+            }
+            break;
         case NSContainsPredicateOperatorType:
-            @throw RLMPredicateException(@"Invalid type", @"Predicate 'CONTAINS' is not supported");
+            if (caseSensitive) {
+                query.and_query(*comparator(predicate_wrapper<StringData, &StringData::contains>{}));
+            }
+            else {
+                query.and_query(*comparator(icontains{}));
+            }
+            break;
         case NSEqualToPredicateOperatorType:
-            query.and_query(column == sd);
+            if (caseSensitive) {
+                query.and_query(column == sd);
+            }
+            else {
+                query.and_query(*comparator(iequals{}));
+            }
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.and_query(column != sd);
+            if (caseSensitive) {
+                query.and_query(column != sd);
+            }
+            else {
+                query.Not();
+                query.and_query(*comparator(iequals{}));
+            }
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
