@@ -25,7 +25,7 @@
 // update tables in realm to the targetSchema and set schema on realm
 // returns true if modifications were made
 // NOTE: must be called from within write transaction
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration = false);
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation = false, bool useTransaction = true);
 
 
 //

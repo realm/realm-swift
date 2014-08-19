@@ -176,14 +176,13 @@ static inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
         
         // set initial version
         table->add_empty_row();
-        table->get(0).set_int(c_versionColumnIndex, 0);
+        table->get(0).set_int(c_versionColumnIndex, NSNotFound);
     }
     return move(table);
 }
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
     return NSUInteger(RLMVersionTable(realm)->get(0).get_int(c_versionColumnIndex));
-
 }
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {

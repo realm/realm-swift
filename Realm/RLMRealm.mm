@@ -76,29 +76,6 @@ inline NSError *make_realm_error(RLMError code, exception &ex) {
 } // anonymous namespace
 
 
-// simple weak wrapper for a weak target timer
-@interface RLMWeakTarget : NSObject
-+ (instancetype)createWithRealm:(id)target;
-@property (nonatomic, weak) RLMRealm *realm;
-@end
-
-@implementation RLMWeakTarget
-+ (instancetype)createWithRealm:(RLMRealm *)realm {
-    RLMWeakTarget *wt = [RLMWeakTarget new];
-    wt.realm = realm;
-    return wt;
-}
-- (void)checkForUpdate {
-    if (_realm.autorefresh) {
-        [_realm refresh];
-    }
-    else {
-        [_realm notifyIfChanged];
-    }
-}
-@end
-
-
 //
 // Global RLMRealm instance cache
 //
@@ -152,7 +129,6 @@ static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
     NSThread *_thread;
-    NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
     
     LangBindHelper::TransactLogRegistry *_writeLogs;
@@ -361,15 +337,6 @@ static NSArray *s_objectDescriptors = nil;
         cacheRealm(realm, path);
     }
 
-    
-#if !TARGET_OS_IPHONE
-    // start update timer on osx
-    realm->_updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
-                                                           target:[RLMWeakTarget createWithRealm:realm]
-                                                         selector:@selector(checkForUpdate)
-                                                         userInfo:nil
-                                                          repeats:YES];
-#endif
     return realm;
 }
 
@@ -486,11 +453,7 @@ static NSArray *s_objectDescriptors = nil;
     }
 }*/
 
-- (void)dealloc
-{
-    [_updateTimer invalidate];
-    _updateTimer = nil;
-    
+- (void)dealloc {
     if (self.inWriteTransaction) {
         [self commitWriteTransaction];
         NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
