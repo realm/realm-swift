@@ -31,6 +31,7 @@ extern NSString * const c_objectTableNamePrefix;
 extern const char *c_metadataTableName;
 extern const char *c_versionColumnName;
 extern const size_t c_versionColumnIndex;
+extern const NSUInteger RLMNotVersioned;
 
 inline NSString *RLMTableNameForClassName(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];

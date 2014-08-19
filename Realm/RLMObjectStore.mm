@@ -193,7 +193,7 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutat
         changed = RLMCreateMissingTables(realm);
 
         // check to see if this is the first time loading this realm
-        bool initialized = (RLMRealmSchemaVersion(realm) != NSNotFound);
+        bool initialized = (RLMRealmSchemaVersion(realm) != RLMNotVersioned);
         if (!initialized) {
             // set initial version
             RLMRealmSetSchemaVersion(realm, 0);
