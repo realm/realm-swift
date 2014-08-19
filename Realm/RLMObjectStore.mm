@@ -34,7 +34,7 @@ static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                        NSString *className,
                                                        bool &created) {
     NSString *tableName = realm.schema.tableNamesForClass[className];
-    return realm.group->get_table(tableName.UTF8String, created);
+    return realm.group->get_or_add_table(tableName.UTF8String, &created);
 }
 static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                                        NSString *className) {
