@@ -401,7 +401,9 @@ static NSArray *s_objectDescriptors = nil;
 - (void)sendNotifications {
     // call this realms notification blocks
     for (RLMNotificationToken *token in [_notificationHandlers copy]) {
-        token.block(RLMRealmDidChangeNotification, self);
+        if (token.block) {
+            token.block(RLMRealmDidChangeNotification, self);
+        }
     }
 }
 
