@@ -12,6 +12,7 @@
   (such as test targets).
 * Allow unregistering from change notifications in the change notification
   handler block.
+* Support for Xcode6-Beta6
 
 ### Bugfixes
 
