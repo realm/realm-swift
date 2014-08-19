@@ -76,29 +76,6 @@ inline NSError *make_realm_error(RLMError code, exception &ex) {
 } // anonymous namespace
 
 
-// simple weak wrapper for a weak target timer
-@interface RLMWeakTarget : NSObject
-+ (instancetype)createWithRealm:(id)target;
-@property (nonatomic, weak) RLMRealm *realm;
-@end
-
-@implementation RLMWeakTarget
-+ (instancetype)createWithRealm:(RLMRealm *)realm {
-    RLMWeakTarget *wt = [RLMWeakTarget new];
-    wt.realm = realm;
-    return wt;
-}
-- (void)checkForUpdate {
-    if (_realm.autorefresh) {
-        [_realm refresh];
-    }
-    else {
-        [_realm notifyIfChanged];
-    }
-}
-@end
-
-
 //
 // Global RLMRealm instance cache
 //
@@ -152,7 +129,6 @@ static NSArray *s_objectDescriptors = nil;
 
 @implementation RLMRealm {
     NSThread *_thread;
-    NSTimer *_updateTimer;
     NSMapTable *_notificationHandlers;
     
     LangBindHelper::TransactLogRegistry *_writeLogs;
@@ -336,41 +312,31 @@ static NSArray *s_objectDescriptors = nil;
     Group &group = const_cast<Group&>(realm->_sharedGroup->begin_read());
     realm->_group = &group;
 
-    // determine schema
-    RLMSchema *schema;
+    // set the schema
     if (customSchema) {
-        schema = customSchema;
+        RLMRealmIntializeWithSchema(realm, customSchema);
     }
     else if (dynamic) {
-        schema = [RLMSchema dynamicSchemaFromRealm:realm];
+        RLMRealmIntializeWithSchema(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
     }
     else {
-        schema = [RLMSchema sharedSchema];
-    }
+        // check cache for existing cached realms with the same path
+        @synchronized(s_realmsPerPath) {
+            NSArray *realms = realmsAtPath(path);
+            if (realms.count) {
+                // if we have a cached realm on another thread, copy and verify without a transaction
+                RLMRealmSetSchema(realm, [realms[0] schema], false);
+            }
+            else {
+                // if we are the first realm at this path, copy and align the shared schema
+                RLMRealmIntializeWithSchema(realm, [RLMSchema sharedSchema]);
+            }
+        }
 
-    // apply schema
-    [realm beginWriteTransaction];
-    @try {
-        RLMRealmSetSchema(realm, schema);
-    }
-    @finally {
-        // FIXME: should rollback on exceptions rather than commit once that's implemented
-        [realm commitWriteTransaction];
-    }
-
-    // cache realm at this path if using a vanilla realm
-    if (!dynamic && !customSchema) {
+        // cache only realms using a shared schema
         cacheRealm(realm, path);
     }
-    
-#if !TARGET_OS_IPHONE
-    // start update timer on osx
-    realm->_updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
-                                                           target:[RLMWeakTarget createWithRealm:realm]
-                                                         selector:@selector(checkForUpdate)
-                                                         userInfo:nil
-                                                          repeats:YES];
-#endif
+
     return realm;
 }
 
@@ -487,11 +453,7 @@ static NSArray *s_objectDescriptors = nil;
     }
 }*/
 
-- (void)dealloc
-{
-    [_updateTimer invalidate];
-    _updateTimer = nil;
-    
+- (void)dealloc {
     if (self.inWriteTransaction) {
         [self commitWriteTransaction];
         NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");

@@ -71,13 +71,10 @@ class SwiftRealmTests: SwiftTestCase {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        var noteCount = 0
         let notificationFired = expectationWithDescription("notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
-            if ++noteCount == 2 {
-                notificationFired.fulfill()
-            }
+            notificationFired.fulfill()
         }
 
         dispatch_async(dispatch_queue_create("background", nil)) {
@@ -184,13 +181,10 @@ class SwiftRealmTests: SwiftTestCase {
         let realm = realmWithTestPath()
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
-        var noteCount = 0
         let notificationFired = expectationWithDescription("notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
-            if ++noteCount == 2 {
-                notificationFired.fulfill()
-            }
+            notificationFired.fulfill()
         }
 
         dispatch_async(dispatch_queue_create("background", nil)) {
