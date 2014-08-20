@@ -3,6 +3,11 @@
 
 ### API breaking changes
 
+* The timer used to trigger notifications has been removed. Notifications are now
+  only triggered by commits made in other threads, and can not currently be triggered
+  by changes made by other processes. Interprocess notifications will be re-added in 
+  a future commit with an improved design.
+
 ### Enhancements
 
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
@@ -16,6 +21,8 @@
 
 ### Bugfixes
 
+* Notifications are no longer sent when initializing new RLMRealm instances on background
+  threads.
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].
 * Lowered the deployment target for the Xcode 6 projects and Swift examples to
   iOS 7.0, as they didn't actually require 8.0.

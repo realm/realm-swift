@@ -178,35 +178,55 @@ static bool RLMRemoveExtraColumns(RLMRealm *realm) {
     return removed;
 }
 
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool migration) {
+bool RLMRealmIntializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema) {
+    @try {
+        // begin transaction
+        [realm beginWriteTransaction];
+
+        // check to see if this is the first time loading this realm
+        bool initializing = (RLMRealmSchemaVersion(realm) == RLMNotVersioned);
+        if (initializing) {
+            // set initial version
+            RLMRealmSetSchemaVersion(realm, 0);
+        }
+
+        // set the schema, mutating if we are initializing the db for the first time
+        RLMRealmSetSchema(realm, targetSchema, initializing);
+    }
+    @finally {
+        // FIXME: should rollback on exceptions rather than commit once that's implemented
+        [realm commitWriteTransaction];
+    }
+}
+
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation) {
     // set new schema
     realm.schema = [targetSchema copy];
 
-    // first pass create missing tables and verify existing
+    // create missing tables
     bool changed = RLMCreateMissingTables(realm);
 
-    // if not migrating then verify all non-empty tables
-    if (!migration) {
+    if (!allowMutation) {
+        // if not mutating then verify all tables match our schema
         for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-            if (objectSchema->_table->get_column_count()) {
-                RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
-                                                                     className:objectSchema.className];
-                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
-            }
+            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaForTable:objectSchema->_table.get()
+                                                                 className:objectSchema.className];
+            RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
     }
+    else {
+        // if mutating, add columns
+        changed = RLMAddMissingColumns(realm) || changed;
 
-    // second pass add columns to empty tables
-    changed = RLMAddMissingColumns(realm) || changed;
-    
-    // remove expired columns
-    changed = RLMRemoveExtraColumns(realm) || changed;
-    
-    // FIXME - remove deleted objects
+        // remove expired columns
+        changed = RLMRemoveExtraColumns(realm) || changed;
+        
+        // FIXME - remove deleted objects
+    }
     
     // align all tables
     RLMVerifyAndAlignSchema(realm.schema);
-    
+
     return changed;
 }
 

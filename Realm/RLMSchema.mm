@@ -32,6 +32,8 @@ NSString * const c_objectTableNamePrefix = @"class_";
 const char *c_metadataTableName = "metadata";
 const char *c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
+const NSUInteger RLMNotVersioned = (NSUInteger)-1;
+
 
 // RLMSchema private properties
 @interface RLMSchema ()
@@ -176,14 +178,13 @@ static inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
         
         // set initial version
         table->add_empty_row();
-        table->get(0).set_int(c_versionColumnIndex, 0);
+        table->get(0).set_int(c_versionColumnIndex, RLMNotVersioned);
     }
     return move(table);
 }
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
     return NSUInteger(RLMVersionTable(realm)->get(0).get_int(c_versionColumnIndex));
-
 }
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
