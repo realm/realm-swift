@@ -20,6 +20,9 @@
   (such as test targets).
 * Allow unregistering from change notifications in the change notification
   handler block.
+* Significant performance improvements when holding onto large numbers of RLMObjects.
+* Improved performance during RLMArray iteration, especially when mutating
+  contained objects.
 
 
 ### Bugfixes
