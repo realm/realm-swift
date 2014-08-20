@@ -72,7 +72,7 @@ xcode5() {
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta6.app/Contents/Developer/usr/bin build/bin
+    ln -s /Applications/Xcode6-Beta5.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
