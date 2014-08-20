@@ -128,9 +128,8 @@ RLM_ARRAY_TYPE(EmployeeObject)
 #pragma mark DogObject
 
 @interface DogObject : RLMObject
-
 @property NSString *dogName;
-
+@property int age;
 @end
 
 #pragma mark OwnerObject
@@ -185,6 +184,14 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @property NSString *data;
 @property CircleObject *next;
 
+@end
+
+RLM_ARRAY_TYPE(CircleObject);
+
+#pragma mark CircleArrayObject
+
+@interface CircleArrayObject : RLMObject
+@property RLMArray<CircleObject> *circles;
 @end
 
 #pragma mark ArrayPropertyObject
