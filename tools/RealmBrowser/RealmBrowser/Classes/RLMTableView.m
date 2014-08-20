@@ -306,12 +306,8 @@
 
 #pragma mark - Public Methods
 
-- (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
-    // How many properties does the class contains?
-    NSArray *columns = typeNode.propertyColumns;
-    NSUInteger columnCount = columns.count;
-    
     // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.numberOfColumns;
     for (NSUInteger index = 0; index < existingColumnsCount; index++) {
@@ -320,19 +316,14 @@
     }
     
     // ... and add new columns matching the structure of the new realm table.
-    for (NSUInteger index = 0; index < columnCount; index++) {
-        NSString *title = [NSString stringWithFormat:@"Column #%lu", existingColumnsCount + index];
-        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:title];
-        
-        [self addTableColumn:tableColumn];
-    }
-    
-    // Set the column names and cell type / formatting
+    NSArray *columns = typeNode.propertyColumns;
+
     for (NSUInteger index = 0; index < columns.count; index++) {
-        NSTableColumn *tableColumn = self.tableColumns[index];
-        
         RLMClassProperty *property = columns[index];
-        [[tableColumn headerCell] setStringValue:property.name];
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
+        [self addTableColumn:tableColumn];
+
+        [tableColumn.headerCell setStringValue:property.name];
 
         NSString *toolTip;
         switch (property.type) {
@@ -369,7 +360,7 @@
                 break;
                 
             case RLMPropertyTypeArray:
-                toolTip = [NSString stringWithFormat:@"%@[..]", property.property.objectClassName];
+                toolTip = [NSString stringWithFormat:@"%@[]", property.property.objectClassName];
                 break;
                 
             case RLMPropertyTypeObject:
@@ -381,6 +372,12 @@
     }
     
     [self reloadData];
+}
+
+#pragma mark - Private Methods - Column widths
+
+-(void)makeColumnsFitContents
+{
     for (NSTableColumn *column in self.tableColumns) {
         [column resizeToFitContents];
     }

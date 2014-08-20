@@ -51,6 +51,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     BOOL linkCursorDisplaying;
     NSDateFormatter *dateFormatter;
     NSNumberFormatter *numberFormatter;
+    NSMutableDictionary *autofittedColumns;
 }
 
 #pragma mark - NSObject Overrides
@@ -75,7 +76,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     
     linkCursorDisplaying = NO;
-
+    
+    autofittedColumns = [NSMutableDictionary dictionary];
+    
     awake = YES;
 }
 
@@ -91,11 +94,16 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
-
+    
+    [self.tableView setAutosaveTableColumns:NO];
+    
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:newState.selectedType
+
+        [self.realmTableView formatColumnsWithType:newState.selectedType
                                  withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
@@ -103,14 +111,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
         RLMClassNode *referringType = (RLMClassNode *)arrayState.selectedType;
-        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         RLMObject *referingInstance = [referringType instanceAtIndex:arrayState.selectedInstanceIndex];
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
                                                                          onObject:referingInstance
                                                                             realm:realm];
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+
+        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -122,10 +130,19 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+
+        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
+    self.tableView.autosaveName = [NSString stringWithFormat:@"%lu:%@", realm.hash, self.displayedType.name];
+    [self.tableView setAutosaveTableColumns:YES];
+    
+    if (![autofittedColumns[self.tableView.autosaveName] isEqual: @YES]) {
+        [self.realmTableView makeColumnsFitContents];
+        autofittedColumns[self.tableView.autosaveName] = @YES;
+    }
+
     self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
 
