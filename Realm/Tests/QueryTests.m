@@ -310,36 +310,27 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    NSString *className = AllTypesObject.className;
-
     // boolean false
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == no"], @"== no");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == No"], @"== No");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == NO"], @"== NO");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == false"], @"== false");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == False"], @"== False");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == FALSE"], @"== FALSE");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == 0"], @"== 0");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == no"], @"== no");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == No"], @"== No");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == NO"], @"== NO");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == false"], @"== false");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == False"], @"== False");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == FALSE"], @"== FALSE");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 0"], @"== 0");
 
     // boolean true
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == yes"], @"== yes");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == Yes"], @"== Yes");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == YES"], @"== YES");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == true"], @"== true");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == True"], @"== True");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == TRUE"], @"== TRUE");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol == 1"], @"== 1");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == yes"], @"== yes");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == Yes"], @"== Yes");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == YES"], @"== YES");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == true"], @"== true");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == True"], @"== True");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == TRUE"], @"== TRUE");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol == 1"], @"== 1");
 
     // inequality
-    XCTAssertNoThrow([realm objects:className where:@"boolCol != YES"], @"!= YES");
-    XCTAssertNoThrow([realm objects:className where:@"boolCol <> YES"], @"<> YES");
-
-    // string comparisons
-    XCTAssertNoThrow([realm objects:className where:@"stringCol BEGINSWITH 'test'"], @"BEGINSWITH");
-    XCTAssertNoThrow([realm objects:className where:@"stringCol CONTAINS 'test'"], @"CONTAINS");
-    XCTAssertNoThrow([realm objects:className where:@"stringCol ENDSWITH 'test'"], @"ENDSWITH");
-    XCTAssertNoThrow([realm objects:className where:@"stringCol == 'test'"], @"==");
-    XCTAssertNoThrow([realm objects:className where:@"stringCol != 'test'"], @"!=");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol != YES"], @"!= YES");
+    XCTAssertNoThrow([AllTypesObject objectsInRealm:realm where:@"boolCol <> YES"], @"<> YES");
 }
 
 - (void)testPredicateNotSupported
@@ -347,14 +338,6 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     NSString *className = PersonObject.className;
-
-    // LIKE
-    XCTAssertThrows([realm objects:className where:@"name LIKE 'Smith'"], @"LIKE");
-
-    // IN
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"stringCol IN %@",
-                              @[@"Moe", @"Larry", @"Curly"]];
-    XCTAssertThrows([realm objects:className withPredicate:predicate], @"IN array");
 
     // testing for null
     XCTAssertThrows([realm objects:className where:@"stringCol = nil"], @"test for nil");
@@ -639,70 +622,170 @@
                                  @"Invalid operator in bool predicate.");
 }
 
-- (void)testStringComparisonInPredicate
+- (void)testStringBeginsWith
 {
-    // First, supported operators and options.
-    // Make sure that case-sensitivity is handled the right way round.
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [StringObject createInRealm:realm withObject:(@[@"a"])];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
-    NSExpression *alpha = [NSExpression expressionForConstantValue:@"A"];
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'a'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'ab'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abcd'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'abd'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'c'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol BEGINSWITH 'A'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH[c] 'a'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol BEGINSWITH[c] 'A'"].count);
 
-    NSUInteger (^count)(NSPredicateOperatorType, NSComparisonPredicateOptions) =
-    ^(NSPredicateOperatorType type, NSComparisonPredicateOptions options) {
-        NSPredicate *pred = [RLMPredicateUtil comparisonWithKeyPath: @"stringCol"
-                                                         expression: alpha
-                                                       operatorType: type
-                                                            options: options];
-        return [StringObject objectsWithPredicate: pred].count;
-    };
+#if 0 // FIXME: enable when support is added
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'a'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'c'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'A'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH[c] 'a'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH[c] 'A'"].count);
+#else
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BEGINSWITH 'a'"]);
+#endif
+}
 
-    XCTAssertEqual(count(NSBeginsWithPredicateOperatorType, 0),
-                   0U, @"Case-sensitive BEGINSWITH operator in string comparison.");
-    XCTAssertEqual(count(NSBeginsWithPredicateOperatorType, NSCaseInsensitivePredicateOption),
-                   1U, @"Case-insensitive BEGINSWITH operator in string comparison.");
+- (void)testStringEndsWith
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
-    XCTAssertEqual(count(NSEndsWithPredicateOperatorType, 0),
-                   0U, @"Case-sensitive ENDSWITH operator in string comparison.");
-    XCTAssertEqual(count(NSEndsWithPredicateOperatorType, NSCaseInsensitivePredicateOption),
-                   1U, @"Case-insensitive ENDSWITH operator in string comparison.");
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    [realm commitWriteTransaction];
 
-    XCTAssertEqual(count(NSContainsPredicateOperatorType, 0),
-                   0U, @"Case-sensitive CONTAINS operator in string comparison.");
-    XCTAssertEqual(count(NSContainsPredicateOperatorType, NSCaseInsensitivePredicateOption),
-                   1U, @"Case-insensitive CONTAINS operator in string comparison.");
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'c'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'bc'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH 'abc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'aabc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'bbc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'a'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol ENDSWITH 'C'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH[c] 'c'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ENDSWITH[c] 'C'"].count);
 
-    XCTAssertEqual(count(NSEqualToPredicateOperatorType, 0),
-                   0U, @"Case-sensitive = or == operator in string comparison.");
-    XCTAssertEqual(count(NSEqualToPredicateOperatorType, NSCaseInsensitivePredicateOption),
-                   1U, @"Case-insensitive = or == operator in string comparison.");
+#if 0 // FIXME: enable when support is added
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'c'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'a'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'C'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'c'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'C'"].count);
+#else
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'c'"]);
+#endif
+}
 
-    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType, 0),
-                   1U, @"Case-sensitive != or <> operator in string comparison.");
-    XCTAssertEqual(count(NSNotEqualToPredicateOperatorType, NSCaseInsensitivePredicateOption),
-                   0U, @"Case-insensitive != or <> operator in string comparison.");
+- (void)testStringContains
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
-    // Unsupported (but valid) modifiers.
-    XCTAssertThrowsSpecificNamed(count(NSBeginsWithPredicateOperatorType,
-                                       NSDiacriticInsensitivePredicateOption), NSException,
-                                 @"Invalid predicate option",
-                                 @"Diachritic insensitivity is not supported.");
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    [realm commitWriteTransaction];
 
-    // Unsupported (but valid) operators.
-    XCTAssertThrowsSpecificNamed(count(NSLikePredicateOperatorType, 0), NSException,
-                                 @"Invalid operator type",
-                                 @"LIKE not supported for string comparison.");
-    XCTAssertThrowsSpecificNamed(count(NSMatchesPredicateOperatorType, 0), NSException,
-                                 @"Invalid operator type",
-                                 @"MATCHES not supported in string comparison.");
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'a'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'b'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'c'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'ab'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'bc'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS 'abc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'd'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'aabc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'bbc'"].count);
 
-    // Invalid operators.
-    XCTAssertThrowsSpecificNamed(count(NSLessThanPredicateOperatorType, 0), NSException,
-                                 @"Invalid operator type",
-                                 @"Invalid operator in string comparison.");
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol CONTAINS 'C'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS[c] 'c'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol CONTAINS[c] 'C'"].count);
+
+#if 0 // FIXME: enable when support is added
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'd'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'c'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'C'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS[c] 'c'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS[c] 'C'"].count);
+#else
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol CONTAINS 'c'"]);
+#endif
+}
+
+- (void)testStringEquality
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol == 'abc'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol != 'def'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ==[c] 'abc'"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol ==[c] 'ABC'"].count);
+
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol != 'abc'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol == 'def'"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol == 'ABC'"].count);
+
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'abc'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'def'"].count);
+
+#if 0 // FIXME: enable when support is added
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'abc'"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'ABC'"].count);
+#else
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'abc'"]);
+#endif
+
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'abc'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'def'"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'ABC'"].count);
+}
+
+- (void)testStringIN
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN {'abc'}"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'abc'}"].count);
+    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'def'}"].count);
+    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'ABC'}"].count);
+
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"].count);
+#if 0 // FIXME: enable when support is added
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"].count);
+    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"].count);
+#else
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol INc] {'abc'}"]);
+#endif
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"].count);
+    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"].count);
+}
+
+- (void)testStringUnsupportedOperations
+{
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
+    XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
+
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol LIKE 'abc'"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
 }
 
 - (void)testBinaryComparisonInPredicate
@@ -833,23 +916,23 @@
         [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
 
         RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
-        XCTAssertEqual((int)results.count, 1);
+        XCTAssertEqual(results.count, 1U);
 
         // Delete the (only) object in result set
         [realm deleteObject:[results lastObject]];
-        XCTAssertEqual((int)results.count, 0);
+        XCTAssertEqual(results.count, 0U);
 
         // Add an object that does not match query
         QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
-        XCTAssertEqual((int)results.count, 0);
+        XCTAssertEqual(results.count, 0U);
 
         // Change object to match query
         q1.bool1 = YES;
-        XCTAssertEqual((int)results.count, 1);
+        XCTAssertEqual(results.count, 1U);
 
         // Add another object that matches
         [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
-        XCTAssertEqual((int)results.count, 2);
+        XCTAssertEqual(results.count, 2U);
     }
     [realm commitWriteTransaction];
 }
@@ -863,31 +946,31 @@
     [realm commitWriteTransaction];
 
     RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
-    XCTAssertEqual((int)results.count, 1);
+    XCTAssertEqual(results.count, 1U);
 
     // Delete the (only) object in result set
     [realm beginWriteTransaction];
     [realm deleteObject:[results lastObject]];
     [realm commitWriteTransaction];
-    XCTAssertEqual((int)results.count, 0);
+    XCTAssertEqual(results.count, 0U);
 
     // Add an object that does not match query
     [realm beginWriteTransaction];
     QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
     [realm commitWriteTransaction];
-    XCTAssertEqual((int)results.count, 0);
+    XCTAssertEqual(results.count, 0U);
 
     // Change object to match query
     [realm beginWriteTransaction];
     q1.bool1 = YES;
     [realm commitWriteTransaction];
-    XCTAssertEqual((int)results.count, 1);
+    XCTAssertEqual(results.count, 1U);
 
     // Add another object that matches
     [realm beginWriteTransaction];
     [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
     [realm commitWriteTransaction];
-    XCTAssertEqual((int)results.count, 2);
+    XCTAssertEqual(results.count, 2U);
 }
 
 - (void)makeDogWithName:(NSString *)name owner:(NSString *)ownerName {
@@ -1089,6 +1172,60 @@
     XCTAssertEqual([[realm objects:[ArrayPropertyObject className] where:@"ANY intArray.intCol > 2"] count], 2U);
 }
 
+- (void)testMultiLevelLinkQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"data = '4'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.data = '3'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.data = '2'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '1'"].firstObject);
+    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.next.data = '0'"].firstObject);
+    XCTAssertEqualObjects(circle.next, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '0'"].firstObject);
+    XCTAssertEqualObjects(circle.next.next, [CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject);
+
+    XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
+    XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
+    XCTAssertEqualObjects(circle.next.next.next.next, [CircleObject objectsInRealm:realm where:@"next = nil"].firstObject);
+}
+
+- (void)testArrayMultiLevelLinkQuery
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withObject:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    [CircleArrayObject createInRealm:realm withObject:@[[CircleObject allObjectsInRealm:realm]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '4'"].count);
+    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '4'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '3'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '3'"].count);
+
+    XCTAssertEqual(0U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '3'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.next.data = '2'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.next.data = '2'"].count);
+    XCTAssertEqual(1U, [CircleArrayObject objectsInRealm:realm where:@"ANY circles.data = '2'"].count);
+
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
+    XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"circles.data = '2'"]);
+}
+
 - (void)testQueryWithObjects
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1133,19 +1270,6 @@
     // invalid object queries
     NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
     XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
-
-    NSPredicate *pred4 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj0];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred4].count, 2U, @"Count should be 2");
-    NSPredicate *pred5 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj1];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred5].count, 2U, @"Count should be 2");
-    NSPredicate *pred6 = [NSPredicate predicateWithFormat:@"ANY array.objectCol = %@", stringObj2];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred6].count, 1U, @"Count should be 1");
-
-    // invalid object keypath queries
-    NSPredicate *pred7 = [NSPredicate predicateWithFormat:@"array.objectCol != %@", stringObj2];
-    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred7], @"Operator other than = should throw");
-    NSPredicate *pred8 = [NSPredicate predicateWithFormat:@"array.objectCol == %@", obj0];
-    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred8], @"Wrong object type should throw");
 
     // check for ANY object in array
     NSPredicate *pred9 = [NSPredicate predicateWithFormat:@"ANY array = %@", obj0];

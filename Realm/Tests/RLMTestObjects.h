@@ -186,6 +186,14 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @end
 
+RLM_ARRAY_TYPE(CircleObject);
+
+#pragma mark CircleArrayObject
+
+@interface CircleArrayObject : RLMObject
+@property RLMArray<CircleObject> *circles;
+@end
+
 #pragma mark ArrayPropertyObject
 
 @interface ArrayPropertyObject : RLMObject
