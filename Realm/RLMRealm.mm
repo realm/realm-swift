@@ -373,11 +373,6 @@ static NSArray *s_objectDescriptors = nil;
     RLMCheckThread(self);
     if (!self.inWriteTransaction) {
         try {
-            // if we are moving the transaction forward, send local notifications
-            if (_sharedGroup->has_changed()) {
-                [self sendNotifications];
-            }
-
             // upgratde to write
             LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
 
