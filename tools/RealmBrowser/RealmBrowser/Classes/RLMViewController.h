@@ -39,6 +39,4 @@
 
 -(void)realmDidLoad;
 
--(void)realmDidChange;
-
 @end

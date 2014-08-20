@@ -19,11 +19,8 @@
 #import "RLMViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
-#import "RLMArrayNavigationState.h"
 
-@implementation RLMViewController {
-    id delegate;
-}
+@implementation RLMViewController
 
 #pragma mark - NSObject overrides
 
@@ -36,11 +33,6 @@
 #pragma mark - Public methods - Accessors
 
 -(void)realmDidLoad
-{
-    // No action - should be implemented by subclasses.
-}
-
--(void)realmDidChange
 {
     // No action - should be implemented by subclasses.
 }

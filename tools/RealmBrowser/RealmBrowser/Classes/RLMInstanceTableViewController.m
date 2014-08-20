@@ -88,12 +88,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - RLMViewController Overrides
 
-- (void)realmDidChange
-{
-    NSLog(@"INSTANCE (%@): realmDidChange", self);
-    [self.tableView reloadData];
-}
-
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
