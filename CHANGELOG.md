@@ -10,6 +10,7 @@
 
 ### Enhancements
 
+* Updating to core library version 0.82.0.
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
 * Add support for the BETWEEN operator in link queries.
