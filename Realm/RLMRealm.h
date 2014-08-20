@@ -29,8 +29,10 @@
 /**
  Obtains an instance of the default Realm.
 
- RLMRealm instances are reused when this is called multiple times from the same thread. The
- default RLMRealm is persisted as default.realm under the Documents directory of your Application.
+ RLMRealm instances are reused when this is called multiple times from the same
+ thread. The default RLMRealm is persisted as default.realm under the Documents
+ directory of your Application on iOS, and in your application's Application
+ Support directory on OS X.
 
  @warning   RLMRealm instances are not thread safe and can not be shared across threads or
             dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
@@ -61,14 +63,14 @@
 
  @param path        Path to the file you want the data saved in.
  @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
- @param error       Pass-by-reference for errors.
+ @param error       If an error occurs, upon returns contains an `NSError` object that describes the problem. If you are not interested in possible errors, pass in `NULL`.
 
  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Make the default Realm in-memory only
+ Make the default Realm in-memory only.
 
  By default, the default Realm is persisted to disk unless this method is called.
 
@@ -82,9 +84,7 @@
 @property (nonatomic, readonly) NSString *path;
 
 /**
- Indicates if this Realm is read only
-
- @return    Boolean value indicating if this RLMRealm instance is readonly.
+ Indicates if this Realm was opened in read-only mode.
  */
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
@@ -100,7 +100,7 @@
 /**
  Returns the location of the default Realm as a string.
 
- `~/Documents/default.realm` on OSX.
+ `~/Application Supprt/{bundle ID}/default.realm` on OSX.
 
  `default.realm` in your application's documents directory on iOS.
 
@@ -134,7 +134,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @param block   A block which is called to process RLMRealm notifications.
 
- @return A token object which can later be passed to removeNotification:.
+ @return A token object which can later be passed to -removeNotification:.
          to remove this notification.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
@@ -143,8 +143,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Remove a previously registered notification handler using the token returned
  from addNotificationBlock:
 
- @param notificationToken   The token returned from addNotificationBlock: corresponding
-                            to the notification block to remove.
+ @param notificationToken   The token returned from -addNotificationBlock:
+                            corresponding to the notification block to remove.
  */
 - (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
@@ -272,11 +272,10 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 /**
  Performs a migration on the default Realm.
 
- Must be called before the default Realm is accessed (otherwise throws). If the
- default Realm is at a version other than <code>version</code>, the migration is applied.
+ Must be called before the default Realm is accessed (otherwise throws).
 
  @param block       The block which migrates the Realm to the current version.
- @return            The error that occured while applying the migration if any.
+ @return            The error that occured while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -285,8 +284,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 /**
  Performs a migration on a Realm at a path.
 
- Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
- If the Realm is at a version other than <code>version</code>, the migration is applied.
+ Must be called before the Realm at `realmPath` is accessed (otherwise throws).
 
  @param realmPath   The path of the Realm to migrate.
  @param block       The block which migrates the Realm to the current version.
