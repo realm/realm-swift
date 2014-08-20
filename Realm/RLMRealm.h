@@ -187,9 +187,15 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Set to YES to automatically update this Realm when changes happen in other threads.
 
- If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
- Notifications are sent immediately when a change is available whether or not the Realm is automatically
- updated.
+ If set to YES (the default), changes made on other threads will be reflected in
+ this Realm on the next cycle of the run loop after the changes are committed.
+ If set to NO, you must manually call -refresh on the Realm to update it to get
+ the lastest version.
+
+ Even with this enabled, you can still call -refresh at any time to update the
+ Realm before the automatic refresh would occur.
+
+ Notifications are sent when a change is made whether or not this is enabled.
 
  Defaults to YES.
  */
