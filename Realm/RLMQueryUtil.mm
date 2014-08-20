@@ -286,6 +286,8 @@ void add_link_constraint_to_query(tightdb::Query & query,
     }
 }
 
+// iterate over an array of subpredicates, using @func to build a query from each
+// one and ORing them together
 template<typename Func>
 void process_or_group(Query &query, id value, Func&& func) {
     NSArray *array = RLMDynamicCast<NSArray>(value);
@@ -310,33 +312,36 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
                              NSComparisonPredicateOptions predicateOptions,
                              std::vector<NSUInteger> linkColumns, NSUInteger idx, id value)
 {
-    tightdb::TableRef table = query.get_table();
-    for (NSUInteger col : linkColumns) {
-        table->link(col); // mutates table
-    }
+    tightdb::Table *(^table)() = ^{
+        tightdb::TableRef& tbl = query.get_table();
+        for (NSUInteger col : linkColumns) {
+            tbl->link(col); // mutates m_link_chain on table
+        }
+        return tbl.get();
+    };
 
     switch (type) {
         case type_Bool:
-            add_bool_constraint_to_query(query, operatorType, table->column<bool>(idx), bool([value boolValue]));
+            add_bool_constraint_to_query(query, operatorType, table()->column<bool>(idx), bool([value boolValue]));
             break;
         case type_DateTime:
-            add_numeric_constraint_to_query(query, type, operatorType, table->column<Int>(idx), Int([value timeIntervalSince1970]));
+            add_numeric_constraint_to_query(query, type, operatorType, table()->column<Int>(idx), Int([value timeIntervalSince1970]));
             break;
         case type_Double:
-            add_numeric_constraint_to_query(query, type, operatorType, table->column<Double>(idx), [value doubleValue]);
+            add_numeric_constraint_to_query(query, type, operatorType, table()->column<Double>(idx), [value doubleValue]);
             break;
         case type_Float:
-            add_numeric_constraint_to_query(query, type, operatorType, table->column<Float>(idx), [value floatValue]);
+            add_numeric_constraint_to_query(query, type, operatorType, table()->column<Float>(idx), [value floatValue]);
             break;
         case type_Int:
-            add_numeric_constraint_to_query(query, type, operatorType, table->column<Int>(idx), [value longLongValue]);
+            add_numeric_constraint_to_query(query, type, operatorType, table()->column<Int>(idx), [value longLongValue]);
             break;
         case type_String:
             if (linkColumns.empty()) {
                 add_string_constraint_to_query(query, operatorType, predicateOptions, idx, value);
             }
             else {
-                add_string_constraint_to_link_query(query, operatorType, predicateOptions, table->column<String>(idx), value);
+                add_string_constraint_to_link_query(query, operatorType, predicateOptions, table()->column<String>(idx), value);
             }
             break;
         case type_Binary:
@@ -345,7 +350,6 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
                 break;
             }
             else {
-                table->column<Int>(idx); // clear m_link_chain on table
                 @throw RLMPredicateException(@"Unsupported operator", @"Binary data is not supported.");
             }
         case type_Link:
@@ -354,12 +358,10 @@ void add_constraint_to_query(tightdb::Query &query, RLMPropertyType type,
                 add_link_constraint_to_query(query, operatorType, idx, value);
             }
             else {
-                table->column<Int>(idx); // clear m_link_chain on table
                 @throw RLMPredicateException(@"Unsupported operator", @"Multi-level object equality link queries are not supported.");
             }
             break;
         default:
-            table->column<Int>(idx); // clear m_link_chain on table
             @throw RLMPredicateException(@"Unsupported predicate value type",
                                          @"Object type %@ not supported", RLMTypeToString(type));
     }
