@@ -63,7 +63,9 @@
 
  @param path        Path to the file you want the data saved in.
  @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
- @param error       If an error occurs, upon returns contains an `NSError` object that describes the problem. If you are not interested in possible errors, pass in `NULL`.
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
 
  @return An RLMRealm instance.
  */
@@ -249,30 +251,43 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Migration block used to migrate a Realm.
 
- You are required to supply a migration block when trying to open an RLMRealm which has an
- on disk schema different from the schema defined in your object interfaces. When supplying a migration
- block it is your responsibility to enumerate and update any objects which require alteration, and to
- return the new schema version from the migration block.
-
- @warning   Unsuccessful migrations will throw exceptions. This will happen in the following cases
-            - After applying a required migration, the schema version has not increased.
-            - A new property is added to an object and not initialized during the migration. You are
-              required to either supply a default value or to manually populate added properties during
-              a migration.
-
- @param migration   RLMMigration object used to perform the migration. The migration object allows
- you to enumerate and alter any existing objects which require migration.
+ @param migration   RLMMigration object used to perform the migration. The
+                    migration object allows you to enumerate and alter any
+                    existing objects which require migration.
 
  @param oldSchemaVersion    The schema version of the RLMRealm being migrated.
 
- @return    Schema version number for the RLMRealm after completing the migration.
+ @return    Schema version number for the RLMRealm after completing the
+            migration. Must be greater than `oldSchemaVersion`.
  */
 typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
 /**
  Performs a migration on the default Realm.
 
- Must be called before the default Realm is accessed (otherwise throws).
+ Before you can open an existing RLMRealm which has a different on-disk schema
+ from the schema defined in your object interfaces, you must supply a migration
+ block which converts from the disk schema to your current object schema. Your
+ migration block must enumerate and updateall objects which require alteration,
+ and return a new schema version which is higher than the version of the on-disk
+ schema.
+
+ You should always call this method on startup if you have any migrations that
+ may need to be run. Realm will not call your migration block if the schema of
+ the file on disk matches your currently defined object schema. Calling this
+ method after the defaultRealm has been created will throw an exception.
+
+ @warning Unsuccessful migrations will throw exceptions. This will happen in the
+ following cases:
+
+ - The migration block was run and returns a schema version which is not higher
+   than the previous schema version.
+ - A new property without a default was added to an object and not initialized
+   during the migration. You are required to either supply a default value or to
+   manually populate added properties during a migration.
+
+ Migrations which fail for other reasons (such as filesystem errors) will return
+ a NSError object which describes the error.
 
  @param block       The block which migrates the Realm to the current version.
  @return            The error that occured while applying the migration, if any.
@@ -284,7 +299,30 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 /**
  Performs a migration on a Realm at a path.
 
- Must be called before the Realm at `realmPath` is accessed (otherwise throws).
+ Before you can open an existing RLMRealm which has a different on-disk schema
+ from the schema defined in your object interfaces, you must supply a migration
+ block which converts from the disk schema to your current object schema. Your
+ migration block must enumerate and updateall objects which require alteration,
+ and return a new schema version which is higher than the version of the on-disk
+ schema.
+
+ You should always call this method on startup if you have any migrations that
+ may need to be run. Realm will not call your migration block if the schema of
+ the file on disk matches your currently defined object schema. Calling this
+ method after a RLMRealm instead has been created for the given path will
+ throw an exception.
+
+ @warning Unsuccessful migrations will throw exceptions. This will happen in the
+ following cases:
+
+ - The migration block was run and returns a schema version which is not higher
+   than the previous schema version.
+ - A new property without a default was added to an object and not initialized
+   during the migration. You are required to either supply a default value or to
+   manually populate added properties during a migration.
+
+ Migrations which fail for other reasons (such as filesystem errors) will return
+ a NSError object which describes the error.
 
  @param realmPath   The path of the Realm to migrate.
  @param block       The block which migrates the Realm to the current version.
