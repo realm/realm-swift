@@ -166,18 +166,9 @@ inline id RLMCreateAccessorForArrayIndex(RLMArrayLinkView *array, NSUInteger ind
     _backingLinkView->set(index, object->_row.get_index());
 }
 
-- (NSString *)JSONString { //FIXME: duplicate from RLMArray method's definition
+- (NSString *)JSONString {
     RLMLinkViewArrayValidateAttached(self);
-    NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[self JSONArray]
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-
-    if (error) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMArray specified" userInfo:nil];
-    } else {
-        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
+    return [super JSONString];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
