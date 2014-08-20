@@ -34,11 +34,11 @@
         XCTFail(@"No objects should have been added %@", row);
     }
     
-    NSArray *rowsArray = @[@[@"John", @20, @YES],
-                           @[@"Mary", @21, @NO],
-                           @[@"Lars", @21, @YES],
-                           @[@"Phil", @43, @NO],
-                           @[@"Anni", @54, @YES]];
+    NSArray *rowsArray = @[@{@"name": @"John", @"age": @20, @"hired": @YES},
+                           @{@"name": @"Mary", @"age": @21, @"hired": @NO},
+                           @{@"name": @"Lars", @"age": @21, @"hired": @YES},
+                           @{@"name": @"Phil", @"age": @43, @"hired": @NO},
+                           @{@"name": @"Anni", @"age": @54, @"hired": @YES}];
     
     
     // Add objects
@@ -54,35 +54,24 @@
     // Iterate using for...in
     NSUInteger index = 0;
     for (EmployeeObject *row in people) {
-        XCTAssertTrue([row.name isEqualToString:rowsArray[index][0]],
-                      @"Name in iteration should be equal to what was set.");
-        XCTAssertEqual(row.age, (int)[rowsArray[index][1] integerValue],
-                       @"Age in iteration should be equal to what was set.");
-        XCTAssertEqual(row.hired, (bool)[rowsArray[index][2] boolValue],
-                       @"Hired in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(row.name, rowsArray[index][@"name"], @"Name in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.age), rowsArray[index][@"age"], @"Age in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.hired), rowsArray[index][@"hired"], @"Hired in iteration should be equal to what was set.");
         index++;
     }
-    
-    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
-        XCTAssertNil(bindings, @"Parameter must be used");
-        return [evaluatedArray[2] boolValue] &&
-               [evaluatedArray[1] integerValue] >= 20 &&
-               [evaluatedArray[1] integerValue] <= 30;
-    }];
-    NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"hired = YES && age BETWEEN {20, 30}"];
+    NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:pred];
     
     // Do a query, and get all matches as RLMArray
-    RLMArray *res = [EmployeeObject objectsWhere:@"hired = YES && age >= 20 && age <= 30"];
+    RLMArray *res = [EmployeeObject objectsWithPredicate:pred];
     
     // Iterate over the resulting RLMArray
     index = 0;
     for (EmployeeObject *row in res) {
-        XCTAssertTrue([row.name isEqualToString:filteredArray[index][0]],
-                      @"Name in iteration should be equal to what was set.");
-        XCTAssertEqual(row.age, (int)[filteredArray[index][1] integerValue],
-                       @"Age in iteration should be equal to what was set.");
-        XCTAssertEqual(row.hired, (bool)[filteredArray[index][2] boolValue],
-                       @"Hired in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(row.name, filteredArray[index][0], @"Name in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.age), filteredArray[index][1], @"Age in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.hired), filteredArray[index][2], @"Hired in iteration should be equal to what was set.");
         index++;
     }
 }
