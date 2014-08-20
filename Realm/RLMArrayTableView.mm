@@ -225,6 +225,8 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                                   query:query
                                                                   realm:_realm];
+    // attach new table view
+    RLMArrayTableViewValidateAttached(ar);
     RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
     return ar;
 }
