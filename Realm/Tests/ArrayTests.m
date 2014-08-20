@@ -476,4 +476,33 @@ static vm_size_t get_resident_size() {
     OSSpinLockLock(&spinlock);
 }
 
+- (void)testRemoveLastObject
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    RLMArray *array = [IntObject allObjectsInRealm:realm];
+    [array removeLastObject];
+    XCTAssertEqual([array count], (NSUInteger)0, "Remove last object removes the last object.");
+    [array removeLastObject];
+    XCTAssertEqual([array count], (NSUInteger)0, "Remove one past last object has no effect.");
+}
+
+- (void)testRemoveAllObjects
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    [IntObject createInRealm:realm withObject:@[@0]];
+    [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    RLMArray *array = [IntObject allObjectsInRealm:realm];
+    [array removeAllObjects];
+    XCTAssertEqual([array count], (NSUInteger)0, "Remove all objects leaves nothing behind.");
+}
+
 @end
