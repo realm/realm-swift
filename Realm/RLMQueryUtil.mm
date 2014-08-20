@@ -158,9 +158,12 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
                                          NSComparisonPredicateOptions predicateOptions,
                                          Columns<String> &&column,
                                          NSString *value) {
+    bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
+    RLMPrecondition(caseSensitive, @"Invalid predicate option",
+                    @"NSCaseInsensitivePredicateOption not supported for queries on linked strings");
 
     tightdb::StringData sd = RLMStringDataWithNSString(value);
     switch (operatorType) {
