@@ -520,6 +520,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C4147F191DE49600F858D9 /* Build configuration list for PBXNativeTarget "OSX Tests" */;
 			buildPhases = (
+				5B143F1719A5EB4800820BA9 /* Clean for Coverage */,
 				02C4146A191DE49600F858D9 /* Sources */,
 				02C4146B191DE49600F858D9 /* Frameworks */,
 			);
@@ -557,6 +558,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 02C415241921B0C400F858D9 /* Build configuration list for PBXNativeTarget "iOS Tests" */;
 			buildPhases = (
+				5B45DF6219A5E98F00FD8955 /* Clean for Coverage */,
 				02C4150E1921B0C400F858D9 /* Sources */,
 				02C4150F1921B0C400F858D9 /* Frameworks */,
 			);
@@ -688,6 +690,34 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh scripts/build-framework.sh";
+		};
+		5B143F1719A5EB4800820BA9 /* Clean for Coverage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Clean for Coverage";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "find . -iname \"*.gcda\" -exec rm {} \\;";
+		};
+		5B45DF6219A5E98F00FD8955 /* Clean for Coverage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Clean for Coverage";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "find . -iname \"*.gcda\" -exec rm {} \\;";
 		};
 /* End PBXShellScriptBuildPhase section */
 
