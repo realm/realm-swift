@@ -151,4 +151,15 @@
     }];
 }
 
+- (void)testQueryConstruction {
+    RLMRealm *realm = self.realmWithTestPath;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and longCol != 7 and stringCol IN {'a', 'b', 'c'}"];
+
+    [self measureBlock:^{
+        for (int i = 0; i < 100; ++i) {
+            [AllTypesObject objectsInRealm:realm withPredicate:predicate];
+        }
+    }];
+}
+
 @end

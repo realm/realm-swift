@@ -13,6 +13,8 @@
 * Updating to core library version 0.82.0.
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
+* Add support for the BETWEEN operator in link queries.
+* Add support for multi-level link queries in predicates (e.g. `foo.bar.baz = 5`).
 * Switch to building the SDK from source when using CocoaPods and add a
   Realm.Headers subspec for use in targets that should not link a copy of Realm
   (such as test targets).
@@ -21,6 +23,7 @@
 * Significant performance improvements when holding onto large numbers of RLMObjects.
 * Improved performance during RLMArray iteration, especially when mutating
   contained objects.
+
 
 ### Bugfixes
 
