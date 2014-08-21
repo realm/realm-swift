@@ -262,11 +262,14 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     object.objectSchema = schema;
     object.realm = realm;
 
+    // _row may already be attached to a different table if the object was
+    // already in another realm, and setting it to the new table doesn't
+    // automatically detach it
+    object->_row.detach();
+
     // create row in table
     tightdb::Table &table = *schema->_table;
     size_t rowIndex = table.add_empty_row();
-    tightdb::Row r = table[rowIndex];
-    
     object->_row = table[rowIndex];
 
     // populate all properties
