@@ -30,14 +30,14 @@ const CGFloat kMaxColumnWidth = 200.0;
     
     switch (self.propertyType) {
         case RLMPropertyTypeBool:
-        case RLMPropertyTypeObject:
-        case RLMPropertyTypeDate:
         case RLMPropertyTypeData:
         case RLMPropertyTypeAny:
             rowsToConsider = 1;
             break;
             
         case RLMPropertyTypeArray:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeDate:
             rowsToConsider = 3;
             break;
 

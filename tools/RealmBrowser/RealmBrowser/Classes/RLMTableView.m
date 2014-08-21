@@ -252,11 +252,9 @@
         return;
     }
     
-    [self.menu addItem:addRowItem];
     [self.menu addItem:deleteRowItem];
     
     if (self.realmDelegate.displaysArray) {
-        [self.menu addItem:insertIntoArrayItem];
         [self.menu addItem:removeFromArrayItem];
     }
 }

@@ -205,6 +205,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
             
             boolCellView.checkBox.state = [(NSNumber *)propertyValue boolValue] ? NSOnState : NSOffState;
+            [boolCellView.checkBox setEnabled:!self.realmIsLocked];
             
             cellView = boolCellView;
         }
@@ -217,6 +218,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
+            [numberCellView.textField setEditable:!self.realmIsLocked];
             
             cellView = numberCellView;
         }
@@ -237,6 +239,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             }
             else {
                 basicCellView.textField.stringValue = formattedText;
+                [basicCellView.textField setEditable:!self.realmIsLocked];
             }
             
             cellView = basicCellView;
@@ -813,6 +816,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         linkCursorDisplaying = NO;
     }
+}
+
+#pragma mark - Private Methods - Setters/Getters
+
+-(void)setRealmIsLocked:(BOOL)realmIsLocked
+{
+    _realmIsLocked = realmIsLocked;
+    [self.tableView reloadData];
 }
 
 @end
