@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmBrowserWindowController.h"
-#import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
 NSString * const kRealmLockedImage = @"RealmLocked";

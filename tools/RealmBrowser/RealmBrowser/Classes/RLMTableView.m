@@ -17,8 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTableView.h"
-
-#import "NSTableColumn+Resize.h"
+#import "RLMTableColumn.h"
 
 @interface RLMTableView()<NSMenuDelegate>
 
@@ -320,7 +319,8 @@
 
     for (NSUInteger index = 0; index < columns.count; index++) {
         RLMClassProperty *property = columns[index];
-        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
+        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:property.name];
+        tableColumn.propertyType = property.type;
         [self addTableColumn:tableColumn];
 
         [tableColumn.headerCell setStringValue:property.name];
@@ -378,7 +378,7 @@
 
 -(void)makeColumnsFitContents
 {
-    for (NSTableColumn *column in self.tableColumns) {
+    for (RLMTableColumn *column in self.tableColumns) {
         [column resizeToFitContents];
     }
 }

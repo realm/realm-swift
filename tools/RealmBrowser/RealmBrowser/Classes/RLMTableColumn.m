@@ -16,28 +16,52 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSTableColumn+Resize.h"
+#import "RLMTableColumn.h"
 #import "RLMTableCellView.h"
 
-@implementation NSTableColumn (Resize)
+@implementation RLMTableColumn
 
-const NSUInteger kMaxNumberOfRowsToConsider = 100;
+const NSUInteger kMaxNumberOfRowsToConsider = 20;
 const CGFloat kMaxColumnWidth = 200.0;
 
 - (void)resizeToFitContents
 {
-    NSTableView *tableView = self.tableView;
-    NSRect rect = NSMakeRect(0,0, INFINITY, tableView.rowHeight);
-    NSInteger columnIndex = [tableView.tableColumns indexOfObject:self];
-    CGFloat maxWidth = 0.0;
+    int rowsToConsider;
     
-    for (NSInteger rowIndex = 0; rowIndex < MIN(kMaxNumberOfRowsToConsider, tableView.numberOfRows); rowIndex++) {
+    switch (self.propertyType) {
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeObject:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeAny:
+            rowsToConsider = 1;
+            break;
+            
+        case RLMPropertyTypeArray:
+            rowsToConsider = 3;
+            break;
+
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeString:
+            rowsToConsider = kMaxNumberOfRowsToConsider;
+            break;
+    }
+
+    NSInteger columnIndex = [self.tableView.tableColumns indexOfObject:self];
+
+    CGFloat maxWidth = 0.0;
+
+    for (NSInteger rowIndex = 0; rowIndex < MIN(kMaxNumberOfRowsToConsider, self.tableView.numberOfRows); rowIndex++) {
         RLMTableCellView *tableCellView = [self.tableView viewAtColumn:columnIndex row:rowIndex makeIfNecessary:YES];
         maxWidth = MAX(maxWidth, tableCellView.sizeThatFits.width);
     }
     
     NSCell *headerCell = self.headerCell;
+    NSRect rect = NSMakeRect(0,0, INFINITY, self.tableView.rowHeight);
     NSSize headerSize = [headerCell cellSizeForBounds:rect];
+
     maxWidth = MAX(maxWidth, headerSize.width)*1.1;
     
     self.width = MIN(maxWidth, kMaxColumnWidth);

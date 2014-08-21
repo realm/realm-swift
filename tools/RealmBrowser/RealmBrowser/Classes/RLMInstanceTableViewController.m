@@ -29,7 +29,6 @@
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
 
-#import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
 
 #import "objc/objc-class.h"
@@ -205,11 +204,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeBool: {
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
             
-            BOOL boolValue;
-            if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                boolValue = [(NSNumber *)propertyValue boolValue];
-            }
-            boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
+            boolCellView.checkBox.state = [(NSNumber *)propertyValue boolValue] ? NSOnState : NSOffState;
             
             cellView = boolCellView;
         }

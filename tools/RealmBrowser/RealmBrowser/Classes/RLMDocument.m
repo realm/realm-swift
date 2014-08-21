@@ -23,7 +23,6 @@
 #import "RLMClassProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
-#import "NSTableColumn+Resize.h"
 
 @implementation RLMDocument
 
@@ -99,6 +98,11 @@
 }
 
 #pragma mark - Public methods - NSDocument overrides - Loading Document Data
+
++(BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
+{
+    return YES;
+}
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {
