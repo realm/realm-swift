@@ -102,7 +102,7 @@
 /**
  Returns the location of the default Realm as a string.
 
- `~/Application Supprt/{bundle ID}/default.realm` on OSX.
+ `~/Application Supprt/{bundle ID}/default.realm` on OS X.
 
  `default.realm` in your application's documents directory on iOS.
 
@@ -197,7 +197,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Even with this enabled, you can still call -refresh at any time to update the
  Realm before the automatic refresh would occur.
 
- Notifications are sent when a change is made whether or not this is enabled.
+ Notifications are sent when a write transaction is committed whether or not
+ this is enabled.
 
  Defaults to YES.
  */
@@ -268,7 +269,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
  Before you can open an existing RLMRealm which has a different on-disk schema
  from the schema defined in your object interfaces, you must supply a migration
  block which converts from the disk schema to your current object schema. Your
- migration block must enumerate and updateall objects which require alteration,
+ migration block must enumerate and update all objects which require alteration,
  and return a new schema version which is higher than the version of the on-disk
  schema.
 
@@ -302,7 +303,7 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
  Before you can open an existing RLMRealm which has a different on-disk schema
  from the schema defined in your object interfaces, you must supply a migration
  block which converts from the disk schema to your current object schema. Your
- migration block must enumerate and updateall objects which require alteration,
+ migration block must enumerate and update all objects which require alteration,
  and return a new schema version which is higher than the version of the on-disk
  schema.
 
