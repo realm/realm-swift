@@ -28,7 +28,7 @@
 }
 
 // writable redecleration
-@property (nonatomic, readwrite, copy) NSArray * properties;
+@property (nonatomic, readwrite, copy) NSArray *properties;
 
 // class used for this object schema
 @property (nonatomic, readwrite, assign) Class objectClass;

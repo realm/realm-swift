@@ -20,20 +20,23 @@ import UIKit
 import Realm
 
 class DemoObject: RLMObject {
-    var title = ""
-    var date = NSDate()
+    dynamic var title = ""
+    dynamic var date = NSDate()
 }
 
 class Cell: UITableViewCell {
-    
-    init(style: UITableViewCellStyle, reuseIdentifier: String!) {
+    override init(style: UITableViewCellStyle, reuseIdentifier: String!) {
         super.init(style: .Subtitle, reuseIdentifier: reuseIdentifier)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("NSCoding not supported")
     }
 }
 
 class TableViewController: UITableViewController {
     
-    var array = RLMArray()
+    var array = RLMArray(objectClassName: DemoObject.className())
     var notificationToken: RLMNotificationToken?
 
     override func viewDidLoad() {

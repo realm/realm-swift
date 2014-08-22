@@ -64,9 +64,9 @@
         _getterName = _name;
     }
     if (!_setterName) {
-        // Objective-C setters only capitalize the first letter of the property name if it falls between 'A' and 'z'
+        // Objective-C setters only capitalize the first letter of the property name if it falls between 'a' and 'z'
         int asciiCode = [_name characterAtIndex:0];
-        BOOL shouldUppercase = asciiCode > 'A' && asciiCode < 'z';
+        BOOL shouldUppercase = asciiCode >= 'a' && asciiCode <= 'z';
         NSString *firstChar = [_name substringToIndex:1];
         firstChar = shouldUppercase ? firstChar.uppercaseString : firstChar;
         _setterName = [NSString stringWithFormat:@"set%@%@:", firstChar, [_name substringFromIndex:1]];
@@ -127,7 +127,7 @@
             return YES;
         case '@':
         {
-            NSString *const arrayPrefix = @"@\"RLMArray<";
+            NSString * const arrayPrefix = @"@\"RLMArray<";
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
@@ -223,7 +223,7 @@
     
     // throw if there was no type
     if (!validType) {
-        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
+        NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }

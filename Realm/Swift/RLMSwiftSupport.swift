@@ -21,31 +21,11 @@ import Foundation
 @objc public class RLMSwiftSupport {
 
     public class func isSwiftClassName(className: NSString) -> Bool {
-        return className.rangeOfString("^_T\\w{2}\\d+\\w+$", options: .RegularExpressionSearch).location != NSNotFound
+        return className.rangeOfString(".").location != NSNotFound
     }
 
     public class func demangleClassName(className: NSString) -> NSString {
-        // Swift mangling details found here: http://www.eswick.com/2014/06/inside-swift
-        // Swift class names look like _TFC9swifttest5Shape
-        // Format: _T{2 characters}{module length}{module}{class length}{class}
-
-        var cursor = 4
-        var substring = className.substringFromIndex(cursor) as NSString
-
-        // Module
-        let moduleLength = substring.integerValue
-        let moduleLengthLength = countElements("\(moduleLength)")
-        let moduleName = substring.substringWithRange(NSRange(location: moduleLengthLength, length: moduleLength))
-
-        // Update cursor and substring
-        cursor += moduleLengthLength + countElements(moduleName!)
-        substring = className.substringFromIndex(cursor)
-
-        // Class name
-        let classLength = substring.integerValue
-        let classLengthLength = countElements("\(classLength)")
-
-        return substring.substringWithRange(NSRange(location: classLengthLength, length: classLength))
+        return className.substringFromIndex(className.rangeOfString(".").location + 1)
     }
 
     public class func schemaForObjectClass(aClass: AnyClass) -> RLMObjectSchema {
@@ -61,63 +41,63 @@ import Foundation
         // super is an implicit property on Swift objects
         for i in 1..<reflection.count {
             let propertyName = reflection[i].0
-            if ignoredPropertiesForClass && ignoredPropertiesForClass!.containsObject(propertyName) {
+            if ignoredPropertiesForClass?.containsObject(propertyName) ?? false {
                 continue
             }
 
-            properties += createPropertyForClass(aClass,
+            properties.append(createPropertyForClass(aClass,
                 mirror: reflection[i].1,
                 name: propertyName,
-                attr: aClass.attributesForProperty(propertyName))
+                attr: aClass.attributesForProperty(propertyName)))
         }
 
         return RLMObjectSchema(className: className as NSString?, objectClass: aClass, properties: properties)
     }
 
     class func createPropertyForClass(aClass: AnyClass,
-        mirror: Mirror,
+        mirror: MirrorType,
         name: String,
         attr: RLMPropertyAttributes) -> RLMProperty {
-            var p: RLMProperty?
-            var t: String?
             let valueType = mirror.valueType
-            switch valueType {
-                // Detect basic types (including optional versions)
-            case is Bool.Type, is Bool?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Bool, objectClassName: nil, attributes: attr), "c")
-            case is Int.Type, is Int?.Type:
-                p = RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr)
+            let (p, t) = { () -> (RLMProperty, String) in
+                switch valueType {
+                    // Detect basic types (including optional versions)
+                case is Bool.Type, is Bool?.Type:
+                    return (RLMProperty(name: name, type: .Bool, objectClassName: nil, attributes: attr), "c")
+                case is Int.Type, is Int?.Type:
 #if arch(x86_64) || arch(arm64)
-                t = "l"
+                    let t = "l"
 #else
-                t = "i"
+                    let t = "i"
 #endif
-            case is Float.Type, is Float?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Float, objectClassName: nil, attributes: attr), "f")
-            case is Double.Type, is Double?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Double, objectClassName: nil, attributes: attr), "d")
-            case is String.Type, is String?.Type:
-                (p, t) = (RLMProperty(name: name, type: .String, objectClassName: nil, attributes: attr), "S")
-            case is NSData.Type, is NSData?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Data, objectClassName: nil, attributes: attr), "@\"NSData\"")
-            case is NSDate.Type, is NSDate?.Type:
-                (p, t) = (RLMProperty(name: name, type: .Date, objectClassName: nil, attributes: attr), "@\"NSDate\"")
-            case let objectType as RLMObject.Type:
-                let mangledClassName = NSStringFromClass(objectType.self)
-                let objectClassName = demangleClassName(mangledClassName)
-                let typeEncoding = "@\"\(mangledClassName))\""
-                (p, t) = (RLMProperty(name: name, type: .Object, objectClassName: objectClassName, attributes: attr), typeEncoding)
-            case let c as RLMArray.Type:
-                let objectClassName = (mirror.value as RLMArray).objectClassName
-                (p, t) = (RLMProperty(name: name, type: .Array, objectClassName: objectClassName, attributes: attr), "@\"RLMArray\"")
-            default:
-                println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
-                assert(false)
-            }
+                    return (RLMProperty(name: name, type: .Int, objectClassName: nil, attributes: attr), t)
+                case is Float.Type, is Float?.Type:
+                    return (RLMProperty(name: name, type: .Float, objectClassName: nil, attributes: attr), "f")
+                case is Double.Type, is Double?.Type:
+                    return (RLMProperty(name: name, type: .Double, objectClassName: nil, attributes: attr), "d")
+                case is String.Type, is String?.Type:
+                    return (RLMProperty(name: name, type: .String, objectClassName: nil, attributes: attr), "S")
+                case is NSData.Type, is NSData?.Type:
+                    return (RLMProperty(name: name, type: .Data, objectClassName: nil, attributes: attr), "@\"NSData\"")
+                case is NSDate.Type, is NSDate?.Type:
+                    return (RLMProperty(name: name, type: .Date, objectClassName: nil, attributes: attr), "@\"NSDate\"")
+                case let objectType as RLMObject.Type:
+                    let mangledClassName = NSStringFromClass(objectType.self)
+                    let objectClassName = self.demangleClassName(mangledClassName)
+                    let typeEncoding = "@\"\(mangledClassName))\""
+                    return (RLMProperty(name: name, type: .Object, objectClassName: objectClassName, attributes: attr), typeEncoding)
+                case let c as RLMArray.Type:
+                    let objectClassName = (mirror.value as RLMArray).objectClassName
+                    return (RLMProperty(name: name, type: .Array, objectClassName: objectClassName, attributes: attr), "@\"RLMArray\"")
+                default:
+                    println("Can't persist property '\(name)' with incompatible type.\nAdd to ignoredPropertyNames: method to ignore.")
+                    abort()
+                }
+            }()
 
             // create objc property
-            let attr = objc_property_attribute_t(name: "T", value: t!.bridgeToObjectiveC().UTF8String)
-            class_addProperty(aClass, p!.name.bridgeToObjectiveC().UTF8String, [attr], 1)
-            return p!
+            let attr = objc_property_attribute_t(name: "T", value: t)
+            class_addProperty(aClass, p.name, [attr], 1)
+            return p
     }
 }

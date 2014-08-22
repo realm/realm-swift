@@ -23,7 +23,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
-#ifdef REALM_SWIFT
+#if REALM_SWIFT
 #import <Realm/Realm-Swift.h>
 #endif
 
@@ -55,17 +55,17 @@
 
 - (instancetype)initWithObject:(id)value {
     self = [self init];
-    if ([value isKindOfClass:NSArray.class]) {
+    if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
-        NSArray *array = RLMValidatedArrayForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, RLMSchema.sharedSchema);
         NSArray *properties = _objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             [self setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }
-    else if ([value isKindOfClass:NSDictionary.class]) {
+    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
         // validate and populate
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        dict = RLMValidatedDictionaryForObjectSchema(dict, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
             [self setValue:dict[name] forKeyPath:name];
         }
@@ -124,15 +124,6 @@
 + (NSArray *)ignoredProperties {
     return nil;
 }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-+(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {
-    // parse with NSJSONSerialization
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-#pragma GCC diagnostic pop
 
 -(id)objectForKeyedSubscript:(NSString *)key {
     if (_realm) {
@@ -196,7 +187,7 @@
 // overridden at runtime per-class for performance
 + (NSString *)className {
     NSString *className = NSStringFromClass(self);
-#ifdef REALM_SWIFT
+#if REALM_SWIFT
     if ([RLMSwiftSupport isSwiftClassName:className]) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
@@ -211,16 +202,37 @@
 
 - (NSString *)description
 {
+    return [self descriptionWithMaxDepth:5];
+}
+
+- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
+    if (depth == 0) {
+        return @"<Maximum depth exceeded>";
+    }
+
     NSString *baseClassName = self.objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
     RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
     
     for (RLMProperty *property in objectSchema.properties) {
-        [mString appendFormat:@"\t%@ = %@;\n", property.name, [self[property.name] description]];
+        id object = self[property.name];
+        NSString *sub;
+        if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
+            sub = [object descriptionWithMaxDepth:depth - 1];
+        }
+        else {
+            sub = [object description];
+        }
+        [mString appendFormat:@"\t%@ = %@;\n", property.name, sub];
     }
     [mString appendString:@"}"];
     
     return [NSString stringWithString:mString];
+}
+
+- (BOOL)isDeletedFromRealm {
+    // if not standalone and our accessor has been detached, we have been deleted
+    return self.class == self.objectSchema.accessorClass && !_row.is_attached();
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {

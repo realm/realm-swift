@@ -59,6 +59,14 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfclass(class1, class2);
 }
 
+template<typename T>
+inline T *RLMDynamicCast(__unsafe_unretained id obj) {
+    if ([obj isKindOfClass:[T class]]) {
+        return obj;
+    }
+    return nil;
+}
+
 // Translate an rlmtype to a string representation
 inline NSString *RLMTypeToString(RLMPropertyType type) {
     switch (type) {
@@ -88,20 +96,16 @@ inline NSString *RLMTypeToString(RLMPropertyType type) {
 
 // String conversion utilities
 inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
-    if (tightdb::util::int_cast_has_overflow<NSUInteger>(stringData.size())) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"String size overflow" userInfo:nil];
-        
-    }
+    static_assert(sizeof(NSUInteger) >= sizeof(size_t),
+                  "Need runtime overflow check for size_t to NSUInteger conversion");
     return [[NSString alloc] initWithBytes:stringData.data()
                                     length:stringData.size()
                                   encoding:NSUTF8StringEncoding];
 }
 
 inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
-    if (tightdb::util::int_cast_has_overflow<size_t>(string.length)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"String size overflow" userInfo:nil];
-        
-    }
+    static_assert(sizeof(size_t) >= sizeof(NSUInteger),
+                  "Need runtime overflow check for NSUInteger to size_t conversion");
     return tightdb::StringData(string.UTF8String,
                                [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }

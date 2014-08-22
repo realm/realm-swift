@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import <libkern/OSAtomic.h>
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -248,6 +250,44 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
+}
+
+- (void)testCrossThreadAccess
+{
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+
+    EmployeeObject *eo = [[EmployeeObject alloc] init];
+    eo.name = @"Joe";
+    eo.age = 40;
+    eo.hired = YES;
+    [company.employees addObject:eo];
+    RLMArray *employees = company.employees;
+
+    // Standalone can be accessed from other threads
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    OSSpinLockLock(&spinlock);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertNoThrow(company.employees);
+        XCTAssertNoThrow([employees lastObject]);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
+
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    [RLMRealm.defaultRealm addObject:company];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    employees = company.employees;
+    XCTAssertNoThrow(company.employees);
+    XCTAssertNoThrow([employees lastObject]);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows(company.employees);
+        XCTAssertThrows([employees lastObject]);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
 }
 
 @end

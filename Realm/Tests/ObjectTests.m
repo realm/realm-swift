@@ -19,6 +19,8 @@
 #import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
+#import <libkern/OSAtomic.h>
+
 #pragma mark - Test Objects
 
 #pragma mark DefaultObject
@@ -81,6 +83,16 @@
     }
     return superAttributes;
 }
+@end
+
+#pragma mark CycleObject
+@class CycleObject;
+RLM_ARRAY_TYPE(CycleObject)
+@interface CycleObject :RLMObject
+@property RLMArray<CycleObject> *objects;
+@end
+
+@implementation CycleObject
 @end
 
 #pragma mark - Private
@@ -197,14 +209,40 @@
 
     NSArray *invalidArray = @[@"company", @[@[@"Alex", @29, @2]]];
     XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidArray], @"Invalid sub-literal should throw");
+    NSDictionary *invalidDict= @{@"employees": @[@[@"Alex", @29, @2]]};
+    XCTAssertThrows([[CompanyObject alloc] initWithObject:invalidDict], @"Dictionary missing properties should throw");
 
-    OwnerObject *owner = [[OwnerObject alloc] initWithObject:@[@"Brian", @{@"dogName": @"Brido"}]];
+    OwnerObject *owner = [[OwnerObject alloc] initWithObject:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
     XCTAssertEqualObjects(owner.dog.dogName, @"Brido");
 
-    OwnerObject *ownerArrayDog = [[OwnerObject alloc] initWithObject:@[@"JP", @[@"PJ"]]];
+    OwnerObject *ownerArrayDog = [[OwnerObject alloc] initWithObject:@[@"JP", @[@"PJ", @0]]];
     XCTAssertEqualObjects(ownerArrayDog.dog.dogName, @"PJ");
 }
 
+- (void)testInitFromDictionaryMissingPropertyKey {
+    CompanyObject *co = nil;
+    XCTAssertThrows([[CompanyObject alloc] initWithObject:@{}]);
+    XCTAssertNoThrow(co = [[CompanyObject alloc] initWithObject:@{@"name": @"a"}]);
+    XCTAssertEqualObjects(co.name, @"a");
+    XCTAssertEqual(co.employees.count, 0U);
+
+    OwnerObject *oo = nil;
+    XCTAssertNoThrow(oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a"}]);
+    XCTAssertEqualObjects(oo.name, @"a");
+    XCTAssertNil(oo.dog);
+}
+
+- (void)testInitFromDictionaryPropertyKey {
+    CompanyObject *co = nil;
+    XCTAssertNoThrow((co = [[CompanyObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
+    XCTAssertEqualObjects(co.name, @"a");
+    XCTAssertEqual(co.employees.count, 0U);
+
+    OwnerObject *oo = nil;
+    XCTAssertNoThrow((oo = [[OwnerObject alloc] initWithObject:@{@"name": @"a", @"employees": NSNull.null}]));
+    XCTAssertEqualObjects(oo.name, @"a");
+    XCTAssertNil(oo.dog);
+}
 
 -(void)testObjectInitWithObjectTypeOther
 {
@@ -264,8 +302,8 @@
     [realm beginWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 
@@ -290,8 +328,8 @@
                                                      timeNow, @YES, @(-20), @2, NSNull.null]];
     [realm commitWriteTransaction];
     
-    AllTypesObject* row1 = [AllTypesObject allObjects][0];
-    AllTypesObject* row2 = [AllTypesObject allObjects][1];
+    AllTypesObject *row1 = [AllTypesObject allObjects][0];
+    AllTypesObject *row2 = [AllTypesObject allObjects][1];
 
     XCTAssertEqual(row1.boolCol, NO,                    @"row1.BoolCol");
     XCTAssertEqual(row2.boolCol, YES,                   @"row2.BoolCol");
@@ -348,49 +386,81 @@
     [realm commitWriteTransaction];
 }
 
-- (void)testDefaultValues
+- (NSDictionary *)defaultValuesDictionary {
+    return @{@"intCol"    : @98,
+             @"floatCol"  : @231.0f,
+             @"doubleCol" : @123732.9231,
+             @"boolCol"   : @NO,
+             @"dateCol"   : [NSDate dateWithTimeIntervalSince1970:454321],
+             @"stringCol" : @"Westeros",
+             @"binaryCol" : [@"inputData" dataUsingEncoding:NSUTF8StringEncoding],
+             @"mixedCol"  : @"Tyrion"};
+}
+
+- (void)testDefaultValuesFromNoValuePresent
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     [realm beginWriteTransaction];
-    
-    const int inputInt = 98;
-    const float inputFloat = 231.0f;
-    const double inputDouble = 123732.9231;
-    const BOOL inputBool = NO;
-    NSDate * const inputDate = [NSDate dateWithTimeIntervalSince1970:454321];
-    NSString * const inputString = @"Westeros";
-    NSData * const inputData = [@"inputData" dataUsingEncoding:NSUTF8StringEncoding];
-    id inputMixed = @"Tyrion";
-    
-    NSDictionary * const inputKeyPathsAndValues = @{@"intCol" : @(inputInt), @"floatCol" : @(inputFloat), @"doubleCol" : @(inputDouble), @"boolCol" : @(inputBool), @"dateCol" : inputDate, @"stringCol" : inputString, @"binaryCol" : inputData, @"mixedCol" : inputMixed};
-    NSArray * const keyPaths = inputKeyPathsAndValues.allKeys;
-    
-    for (NSUInteger i = 0; i < keyPaths.count; i++) {
-        NSString *keyToDefault = keyPaths[i];
-        NSMutableDictionary *dict = [inputKeyPathsAndValues mutableCopy];
-        [dict removeObjectForKey:keyToDefault];
-        
+
+    NSDictionary *inputValues = [self defaultValuesDictionary];
+    NSArray *keys = [inputValues allKeys]; // To ensure iteration order is stable
+    for (NSString *key in keys) {
+        NSMutableDictionary *dict = [inputValues mutableCopy];
+        [dict removeObjectForKey:key];
         [DefaultObject createInRealm:realm withObject:dict];
     }
-    
+
     [realm commitWriteTransaction];
 
     // Test allObject for DefaultObject
-    NSDictionary * const defaultKeyPathsAndValues = [DefaultObject defaultPropertyValues];
-    for (NSUInteger i = 0; i < keyPaths.count; i++) {
-        NSString *keyToDefault = keyPaths[i];
-        DefaultObject *object = [DefaultObject allObjects][i];
-        
-        for (NSUInteger j = 0; j < keyPaths.count; j++) {
-            NSString *key = keyPaths[j];
-            if ([key isEqualToString:keyToDefault]) {
-                XCTAssertEqualObjects([object valueForKey:keyToDefault], defaultKeyPathsAndValues[keyToDefault], @"Value should match value in defaultPropertyValues method");
+    NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
+    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    for (NSUInteger i = 0; i < keys.count; ++i) {
+        DefaultObject *object = allObjects[i];
+        for (NSUInteger j = 0; j < keys.count; ++j) {
+            NSString *key = keys[j];
+            if (i == j) {
+                XCTAssertEqualObjects(object[key], defaultValues[key]);
             }
             else {
-                XCTAssertEqualObjects([object valueForKey:key], inputKeyPathsAndValues[key], @"Value should match value that object was initialized with");
+                XCTAssertEqualObjects(object[key], inputValues[key]);
             }
-        }        
+        }
+    }
+}
+
+- (void)testDefaultValuesFromNSNull
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+
+    NSDictionary *inputValues = [self defaultValuesDictionary];
+    NSArray *keys = [inputValues allKeys]; // To ensure iteration order is stable
+    for (NSString *key in keys) {
+        NSMutableDictionary *dict = [inputValues mutableCopy];
+        dict[key] = NSNull.null;
+        [dict removeObjectForKey:key];
+        [DefaultObject createInRealm:realm withObject:dict];
+    }
+
+    [realm commitWriteTransaction];
+
+    // Test allObject for DefaultObject
+    NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
+    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    for (NSUInteger i = 0; i < keys.count; ++i) {
+        DefaultObject *object = allObjects[i];
+        for (NSUInteger j = 0; j < keys.count; ++j) {
+            NSString *key = keys[j];
+            if (i == j) {
+                XCTAssertEqualObjects(object[key], defaultValues[key]);
+            }
+            else {
+                XCTAssertEqualObjects(object[key], inputValues[key]);
+            }
+        }
     }
 }
 
@@ -434,19 +504,19 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSDictionary * const dictValidAllTypes = @{@"boolCol" : @NO,
-                                               @"intCol" : @54,
-                                               @"floatCol" : @0.7f,
+    NSDictionary * const dictValidAllTypes = @{@"boolCol"   : @NO,
+                                               @"intCol"    : @54,
+                                               @"floatCol"  : @0.7f,
                                                @"doubleCol" : @0.8,
                                                @"stringCol" : @"foo",
                                                @"binaryCol" : bin1,
-                                               @"dateCol" : timeNow,
-                                               @"cBoolCol" : @NO,
-                                               @"longCol" : @(99),
-                                               @"mixedCol" : @"mixed",
-                                               @"objectCol": NSNull.null};
+                                               @"dateCol"   : timeNow,
+                                               @"cBoolCol"  : @NO,
+                                               @"longCol"   : @(99),
+                                               @"mixedCol"  : @"mixed",
+                                               @"objectCol" : NSNull.null};
     
     [realm beginWriteTransaction];
     
@@ -482,9 +552,9 @@
     [realm commitWriteTransaction];
     
     const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray * const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), @"mixed", to];
     
     [realm beginWriteTransaction];
     
@@ -541,8 +611,8 @@
     // create with object literals
     [realm beginWriteTransaction];
 
-    [OwnerObject createInDefaultRealmWithObject:@[@"Brian", @{@"dogName": @"Brido"}]];
-    [OwnerObject createInDefaultRealmWithObject:@[@"JP", @[@"PJ"]]];
+    [OwnerObject createInDefaultRealmWithObject:@[@"Brian", @{@"dogName": @"Brido", @"age": @0}]];
+    [OwnerObject createInDefaultRealmWithObject:@[@"JP", @[@"PJ", @0]]];
 
     [realm commitWriteTransaction];
 
@@ -582,7 +652,7 @@
     [realm addObject:soInit];
     
     // description asserts block
-    void(^descriptionAsserts)(NSString *) = ^(NSString *description) {
+    void (^descriptionAsserts)(NSString *) = ^(NSString *description) {
         XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMObject subclasses");
         XCTAssertTrue([description rangeOfString:@"Peter"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMObject subclasses");
         
@@ -601,6 +671,16 @@
     // Test description in read block
     NSString *objDescription = [[[EmployeeObject objectsWithPredicate:nil] firstObject] description];
     descriptionAsserts(objDescription);
+}
+
+- (void)testObjectCycleDescription
+{
+    CycleObject *obj = [[CycleObject alloc] init];
+    [RLMRealm.defaultRealm transactionWithBlock:^{
+        [RLMRealm.defaultRealm addObject:obj];
+        [obj.objects addObject:obj];
+    }];
+    XCTAssertNoThrow(obj.description);
 }
 
 #pragma mark - Indexing Tests
@@ -668,6 +748,62 @@
 
     XCTAssertFalse([obj isEqual:[IntObject allObjects][1]], @"Same table, different index.");
     XCTAssertFalse([obj isEqual:[BoolObject allObjects][0]], @"Different tables.");
+}
+
+- (void)testCrossThreadAccess
+{
+    IntObject *obj = [[IntObject alloc] init];
+
+    // Standalone can be accessed from other threads
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    OSSpinLockLock(&spinlock);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertNoThrow(obj.intCol = 5);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
+
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    [RLMRealm.defaultRealm addObject:obj];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    XCTAssertNoThrow(obj.intCol);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows(obj.intCol);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
+}
+
+- (void)testIsDeleted {
+    StringObject *obj1 = [[StringObject alloc] initWithObject:@[@"a"]];
+    XCTAssertEqual(obj1.deletedFromRealm, NO);
+
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"b"]];
+
+    XCTAssertEqual([obj1 isDeletedFromRealm], NO);
+    XCTAssertEqual(obj2.deletedFromRealm, NO);
+
+    [realm commitWriteTransaction];
+
+    // delete
+    [realm beginWriteTransaction];
+    [realm deleteObject:obj1];
+    [realm deleteObject:obj2];
+
+    XCTAssertEqual(obj1.deletedFromRealm, YES);
+    XCTAssertEqual(obj2.deletedFromRealm, YES);
+
+    XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
+    
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(obj1.deletedFromRealm, YES);
+    XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 
 @end

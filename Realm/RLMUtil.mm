@@ -23,19 +23,9 @@
 #import "RLMArray_Private.hpp"
 #import "RLMProperty.h"
 
-inline bool nsnumber_is_like_bool(NSObject *obj)
+static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
-    // @encode(BOOL) is 'B' on iOS 64 and 'c'
-    // objcType is always 'c'. Therefore compare to "c".
-    
-    // FIXME: Need to support @(false) which returns a data_type of 'i'
-    return data_type[0] == 'c';
-}
-
-inline bool nsnumber_is_like_integer(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
@@ -45,9 +35,25 @@ inline bool nsnumber_is_like_integer(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline bool nsnumber_is_like_float(NSObject *obj)
+static inline bool nsnumber_is_like_bool(NSNumber *obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
+    // @encode(BOOL) is 'B' on iOS 64 and 'c'
+    // objcType is always 'c'. Therefore compare to "c".
+    if ([obj objCType][0] == 'c') {
+        return true;
+    }
+
+    if (nsnumber_is_like_integer(obj)) {
+        int value = [obj intValue];
+        return value == 0 || value == 1;
+    }
+
+    return false;
+}
+
+static inline bool nsnumber_is_like_float(NSNumber *obj)
+{
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(float)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
@@ -57,12 +63,12 @@ inline bool nsnumber_is_like_float(NSObject *obj)
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0 ||
             // A double is like float if it fits within float bounds
-            (strcmp(data_type, @encode(double)) == 0 && ABS([(NSNumber *)obj doubleValue]) <= FLT_MAX));
+            (strcmp(data_type, @encode(double)) == 0 && ABS([obj doubleValue]) <= FLT_MAX));
 }
 
-inline bool nsnumber_is_like_double(NSObject *obj)
+static inline bool nsnumber_is_like_double(NSNumber *obj)
 {
-    const char* data_type = [(NSNumber *)obj objCType];
+    const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(double)) == 0 ||
             strcmp(data_type, @encode(float)) == 0 ||
@@ -74,7 +80,7 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline bool object_has_valid_type(id obj)
+static inline bool object_has_valid_type(id obj)
 {
     return ([obj isKindOfClass:[NSString class]] ||
             [obj isKindOfClass:[NSNumber class]] ||
@@ -94,18 +100,18 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeDate:
             return [obj isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_integer(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_integer(number);
             }
             return NO;
         case RLMPropertyTypeFloat:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_float(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_float(number);
             }
             return NO;
         case RLMPropertyTypeDouble:
-            if ([obj isKindOfClass:[NSNumber class]]) {
-                return nsnumber_is_like_double(obj);
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+                return nsnumber_is_like_double(number);
             }
             return NO;
         case RLMPropertyTypeData:
@@ -120,12 +126,12 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             return isValidObject || obj == nil || obj == NSNull.null;
         }
         case RLMPropertyTypeArray: {
-            if ([obj isKindOfClass:RLMArray.class]) {
-                return [[(RLMArray *)obj objectClassName] isEqualToString:property.objectClassName];
+            if (RLMArray *array = RLMDynamicCast<RLMArray>(obj)) {
+                return [array.objectClassName isEqualToString:property.objectClassName];
             }
-            if ([obj isKindOfClass:NSArray.class]) {
+            if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance
-                for (id el in obj) {
+                for (id el in array) {
                     Class cls = [el class];
                     if (!RLMIsKindOfclass(cls, RLMObject.class) ||
                         ![[cls className] isEqualToString:property.objectClassName]) {
@@ -134,7 +140,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
                 }
                 return YES;
             }
-            if (obj == NSNull.null) {
+            if (!obj || obj == NSNull.null) {
                 return YES;
             }
             return NO;
@@ -146,23 +152,23 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
 id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     if (!RLMIsObjectValidForProperty(obj, prop)) {
         // check for object or array literals
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
             return [[objSchema.objectClass alloc] initWithObject:obj];
         }
         else if (prop.type == RLMPropertyTypeArray && [obj isKindOfClass:NSArray.class]) {
             // for arrays, create objects for each literal object and return new array
-            NSArray *arrayElements = obj;
+            RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [RLMArray standaloneArrayWithObjectClassName:objSchema.className];
-            for (id el in arrayElements) {
+            for (id el in obj) {
                 [objects addObject:[[objSchema.objectClass alloc] initWithObject:el]];
             }
             return objects;
         }
 
         // if not a literal throw
-        NSString *message = [NSString stringWithFormat:@"Invalid value type '%@' for property '%@'", obj ?: @"nil", prop.name];
+        NSString *message = [NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj ?: @"nil", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
     }
     return obj;
@@ -172,11 +178,13 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjec
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    for (RLMProperty * prop in properties) {
+    for (RLMProperty *prop in properties) {
         // set out object to validated input or default value
         id obj = dict[prop.name];
         obj = obj ?: defaults[prop.name];
-        outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
+        obj = RLMValidatedObjectForProperty(obj, prop, schema);
+        if (obj && obj != NSNull.null)
+            outDict[prop.name] = obj;
     }
     return outDict;
 }

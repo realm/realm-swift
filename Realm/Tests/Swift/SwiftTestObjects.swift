@@ -19,88 +19,88 @@
 import Realm
 
 class SwiftStringObject: RLMObject {
-    var stringCol = ""
+    dynamic var stringCol = ""
 }
 
 class SwiftBoolObject: RLMObject {
-    var boolCol = false
+    dynamic var boolCol = false
 }
 
 class SwiftIntObject: RLMObject {
-    var intCol = 0
+    dynamic var intCol = 0
 }
 
 class SwiftObject: RLMObject {
-    var boolCol = false
-    var intCol = 123
-    var floatCol = 1.23 as Float
-    var doubleCol = 12.3
-    var stringCol = "a"
-    var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
-    var dateCol = NSDate(timeIntervalSince1970: 1)
-    var objectCol = SwiftBoolObject()
-    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    dynamic var boolCol = false
+    dynamic var intCol = 123
+    dynamic var floatCol = 1.23 as Float
+    dynamic var doubleCol = 12.3
+    dynamic var stringCol = "a"
+    dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
+    dynamic var objectCol = SwiftBoolObject()
+    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftOptionalObject: RLMObject {
     // FIXME: Support all optional property types
-//    var optBoolCol: Bool?
-//    var optIntCol: Int?
-//    var optFloatCol: Float?
-//    var optDoubleCol: Double?
-    var optStringCol: String?
-    var optBinaryCol: NSData?
-    var optDateCol: NSDate?
-//    var optObjectCol: SwiftBoolObject?
-//    var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+//    dynamic var optBoolCol: Bool?
+//    dynamic var optIntCol: Int?
+//    dynamic var optFloatCol: Float?
+//    dynamic var optDoubleCol: Double?
+    dynamic var optStringCol: String?
+    dynamic var optBinaryCol: NSData?
+    dynamic var optDateCol: NSDate?
+//    dynamic var optObjectCol: SwiftBoolObject?
+//    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftDogObject: RLMObject {
-    var dogName = ""
+    dynamic var dogName = ""
 }
 
 class SwiftOwnerObject: RLMObject {
-    var name = ""
-    var dog = SwiftDogObject()
+    dynamic var name = ""
+    dynamic var dog = SwiftDogObject()
 }
 
 class SwiftAggregateObject: RLMObject {
-    var intCol = 0
-    var floatCol = 0 as Float
-    var doubleCol = 0.0
-    var boolCol = false
-    var dateCol = NSDate()
+    dynamic var intCol = 0
+    dynamic var floatCol = 0 as Float
+    dynamic var doubleCol = 0.0
+    dynamic var boolCol = false
+    dynamic var dateCol = NSDate()
 }
 
 class SwiftEmployeeObject: RLMObject {
-    var name = ""
-    var age = 0
-    var hired = false
+    dynamic var name = ""
+    dynamic var age = 0
+    dynamic var hired = false
 }
 
 class SwiftCompanyObject: RLMObject {
-    var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
+    dynamic var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
 }
 
 class SwiftArrayPropertyObject: RLMObject {
-    var name = ""
-    var array = RLMArray(objectClassName: SwiftStringObject.className())
-    var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    dynamic var name = ""
+    dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())
+    dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())
 }
 
 class SwiftDynamicObject: RLMObject {
-    var stringCol = "a"
-    var intCol = 0
+    dynamic var stringCol = "a"
+    dynamic var intCol = 0
 }
 
 class SwiftUTF8Object: RLMObject {
-    var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+    dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
 class SwiftIgnoredPropertiesObject: RLMObject {
-    var name = ""
-    var age = 0
-    var runtimeProperty: AnyObject?
+    dynamic var name = ""
+    dynamic var age = 0
+    dynamic var runtimeProperty: AnyObject?
     
     override class func ignoredProperties() -> [AnyObject]! {
         return ["runtimeProperty"]

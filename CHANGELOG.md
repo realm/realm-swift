@@ -1,4 +1,63 @@
-0.82.0 Release notes (YYYY-MM-DD)
+0.84.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* The timer used to trigger notifications has been removed. Notifications are now
+  only triggered by commits made in other threads, and can not currently be triggered
+  by changes made by other processes. Interprocess notifications will be re-added in 
+  a future commit with an improved design.
+
+### Enhancements
+
+* Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
+* Add support for the IN operator in predicates.
+* Add support for the BETWEEN operator in link queries.
+* Add support for multi-level link queries in predicates (e.g. `foo.bar.baz = 5`).
+* Switch to building the SDK from source when using CocoaPods and add a
+  Realm.Headers subspec for use in targets that should not link a copy of Realm
+  (such as test targets).
+* Allow unregistering from change notifications in the change notification
+  handler block.
+
+
+### Bugfixes
+
+* Notifications are no longer sent when initializing new RLMRealm instances on background
+  threads.
+* Handle object cycles in -[RLMObject description] and -[RLMArray description].
+* Lowered the deployment target for the Xcode 6 projects and Swift examples to
+  iOS 7.0, as they didn't actually require 8.0.
+* Support setting model properties starting with the letter 'z'
+
+0.83.0 Release notes (2014-08-13)
+=============================================================
+
+### API breaking changes
+
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta5.
+* Properties to be persisted in Swift classes must be explicitly declared as `dynamic`.
+* Subclasses of RLMObject subclasses now throw an exception on startup, rather
+  than when added to a Realm.
+
+### Enhancements
+
+* Add support for querying for nil object properties.
+* Improve error message when specifying invalid literals when creating or 
+  initializing RLMObjects.
+* Throw an exception when an RLMObject is used from the incorrect thread rather
+  than crashing in confusing ways.
+* Speed up RLMRealm instantiation and array property iteration.
+* Allow array and objection relation properties to be missing or null when
+  creating a RLMObject from a NSDictionary.
+
+### Bugfixes
+
+* Fixed a memory leak when querying for objects.
+* Fixed initializing array properties on standalone Swift RLMObject subclasses.
+* Fix for queries on 64bit integers.
+
+0.82.0 Release notes (2014-08-05)
 =============================================================
 
 ### API breaking changes
@@ -7,6 +66,7 @@
 
 ### Enhancements
 
+* Updating to core library version 0.80.5.
 * Now support disabling the `autorefresh` property on RLMRealm instances.
 * Building Realm-Xcode6 for iOS now builds a universal framework for Simulator & Device.
 * Using NSNumber properties (unsupported) now throws a more informative exception.
@@ -18,6 +78,7 @@
 
 ### Bugfixes
 
+* Fixed rapid growth of the realm file size.
 * Fixed a bug which could cause a crash during RLMArray destruction after a query. 
 * Fixed bug related to querying on float properties: `floatProperty = 1.7` now works.
 * Fixed potential bug related to the handling of array properties (RLMArray).
@@ -28,6 +89,8 @@
 * Clarified exception messages when using unsupported NSPredicate operators.
 * Clarified exception messages when using unsupported property types on RLMObject subclasses.
 * Fixed a memory leak when breaking out of a for-in loop on RLMArray.
+* Fixed a memory leak when removing objects from a RLMArray property.
+* Fixed a memory leak when querying for objects.
 
 
 0.81.0 Release notes (2014-07-22)

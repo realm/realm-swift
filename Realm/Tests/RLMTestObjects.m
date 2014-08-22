@@ -104,6 +104,11 @@
 @implementation CircleObject
 @end
 
+#pragma mark CircleArrayObject
+
+@implementation CircleArrayObject
+@end
+
 #pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject

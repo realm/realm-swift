@@ -116,7 +116,8 @@
  object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
  an NSArray with one object for each persisted property. An exception will be
  thrown if all required properties are not present or no default is provided.
- When passing in an NSArray, all properties must be present and valid.
+
+ When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
  @see   defaultPropertyValues
  */
@@ -133,25 +134,12 @@
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if all required properties are not present or no default is provided.
-                When passing in an NSArray, all properties must be present and valid.
+                
+                When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  
  @see   defaultPropertyValues
  */
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
-
-/**
- Create an RLMObject within a Realm with a JSONString.
- 
- Creates an instance of this object and adds it to the given Realm populating
- the object with the data in the given JSONString.
- 
- @param realm       The Realm in which this object is persisted.
- @param JSONString  An NSString with valid JSON. An exception will be thrown if required properties are
- not present in the JSON for which defaults are not provided.
- 
- @see   defaultPropertyValues
- */
-// +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
@@ -162,6 +150,11 @@
  The ObjectSchema which lists the persisted properties for this object.
  */
 @property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+
+/**
+ Indicates if an object has been deleted from a Realm and can no longer be accessed.
+ */
+@property (nonatomic, readonly, getter = isDeletedFromRealm) BOOL deletedFromRealm;
 
 
 /**---------------------------------------------------------------------------------------

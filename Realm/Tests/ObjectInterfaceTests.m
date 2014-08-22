@@ -20,15 +20,6 @@
 
 #pragma mark - Test Objects
 
-#pragma mark InvalidSubclassObject
-
-@interface InvalidSubclassObject : StringObject
-@property NSString *invalid;
-@end
-
-@implementation InvalidSubclassObject
-@end
-
 #pragma mark - Tests
 
 @interface ObjectInterfaceTests : RLMTestCase
@@ -64,17 +55,6 @@
     
     CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];
     XCTAssertEqual((int)objectFromRealm.age, (int)99, @"age property should be 99");
-}
-
-- (void)testObjectSubclass
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    
-    [realm beginWriteTransaction];
-    NSArray *obj = @[@1, @"throw"];
-    XCTAssertThrows([InvalidSubclassObject createInRealm:realm withObject:obj],
-                    @"Adding invalid object should throw");
-    [realm commitWriteTransaction];
 }
 
 - (void)testClassExtension

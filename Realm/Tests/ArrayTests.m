@@ -18,6 +18,9 @@
 
 #import "RLMTestCase.h"
 
+#import <libkern/OSAtomic.h>
+#import <mach/mach.h>
+
 @interface ArrayTests : RLMTestCase
 @end
 
@@ -418,6 +421,59 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+}
+
+static vm_size_t get_resident_size() {
+    struct task_basic_info info;
+    mach_msg_type_number_t size = sizeof(info);
+    task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&info, &size);
+    return info.resident_size;
+}
+
+- (void)testQueryMemoryUsage {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringCol = @"a";
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"stringCol = 'a'"];
+
+    // Check for memory leaks when creating queries by comparing the memory usage
+    // before and after creating a very large number of queries. Anything less
+    // than doubling is allowed as there's going to be some natural fluctuation,
+    // and failing to clean up 10k queries resulted in far more than doubling.
+    vm_size_t size = get_resident_size();
+    for (int i = 0; i < 10000; ++i) {
+        @autoreleasepool {
+            RLMArray *matches = [StringObject objectsInRealm:realm withPredicate:pred];
+            XCTAssertEqualObjects([matches[0] stringCol], @"a");
+        }
+    }
+    XCTAssert(get_resident_size() < size * 2);
+}
+
+- (void)testCrossThreadAccess
+{
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"name1"]];
+    [StringObject createInRealm:realm withObject:@[@"name2"]];
+    [realm commitWriteTransaction];
+
+    RLMArray *array = [StringObject allObjects];
+    XCTAssertNoThrow([array lastObject]);
+
+    // Using dispatch_async to ensure it actually lands on another thread
+    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows([array lastObject]);
+        OSSpinLockUnlock(&spinlock);
+    });
+    OSSpinLockLock(&spinlock);
 }
 
 @end

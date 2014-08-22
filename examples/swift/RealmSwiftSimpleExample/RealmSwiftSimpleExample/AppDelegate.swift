@@ -20,13 +20,13 @@ import UIKit
 import Realm
 
 class Dog: RLMObject {
-    var name = ""
-    var age = 0
+    dynamic var name = ""
+    dynamic var age = 0
 }
 
 class Person: RLMObject {
-    var name = ""
-    var dogs = RLMArray(objectClassName: Dog.className())
+    dynamic var name = ""
+    dynamic var dogs = RLMArray(objectClassName: Dog.className())
 }
 
 @UIApplicationMain
