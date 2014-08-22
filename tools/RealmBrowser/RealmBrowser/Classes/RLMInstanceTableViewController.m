@@ -92,13 +92,28 @@ NSString * const kDraggableRow = @"RealmBrowserDraggableTableRow";
 
 #pragma mark - Private methods - Dragging
 
-- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
-    return nil;
-}
-
 -(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes
 {
+    NSLog(@"draggingSession:willBeginAtPoint");
+}
 
+-(NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row
+{
+    NSLog(@"rowViewForRow");
+
+    // Make the row view keep track of our main model object
+    NSTableRowView *result = [[NSTableRowView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
+    
+    return result;
+}
+
+-(BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+    return YES;
+}
+
+- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
+    return nil;
 }
 
 //- (NSDragOperation)tableView:(NSTableView *)tv
@@ -608,46 +623,46 @@ NSString * const kDraggableRow = @"RealmBrowserDraggableTableRow";
 
 #pragma mark - Mouse Handling
 
-- (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
-{
-    if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        RLMTypeNode *displayedType = self.displayedType;
-        
-        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
-            RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-            
-            if (propertyNode.type == RLMPropertyTypeObject) {
-                if (!linkCursorDisplaying) {
-                    RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
-                    NSObject *propertyValue = selectedInstance[propertyNode.name];
-                    
-                    if (propertyValue != nil) {
-                        [self enableLinkCursor];
-                    }
-                }
-                
-                return;
-            }
-            else if (propertyNode.type == RLMPropertyTypeArray) {
-                [self enableLinkCursor];
-                return;
-            }
-        }
-    }
-    
-    [self disableLinkCursor];
-}
-
-- (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
-{
-    [self disableLinkCursor];
-}
-
-- (void)mouseDidExitView:(RLMTableView *)view
-{
-    [self disableLinkCursor];
-}
+//- (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
+//{
+//    if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
+//        RLMTypeNode *displayedType = self.displayedType;
+//        
+//        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
+//            RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
+//            
+//            if (propertyNode.type == RLMPropertyTypeObject) {
+//                if (!linkCursorDisplaying) {
+//                    RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
+//                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
+//                    NSObject *propertyValue = selectedInstance[propertyNode.name];
+//                    
+//                    if (propertyValue != nil) {
+//                        [self enableLinkCursor];
+//                    }
+//                }
+//                
+//                return;
+//            }
+//            else if (propertyNode.type == RLMPropertyTypeArray) {
+//                [self enableLinkCursor];
+//                return;
+//            }
+//        }
+//    }
+//    
+//    [self disableLinkCursor];
+//}
+//
+//- (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
+//{
+//    [self disableLinkCursor];
+//}
+//
+//- (void)mouseDidExitView:(RLMTableView *)view
+//{
+//    [self disableLinkCursor];
+//}
 
 #pragma mark - Public Methods - NSTableView Event Handling
 

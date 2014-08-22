@@ -38,4 +38,15 @@
     return self.textField.bounds.size;
 }
 
+-(NSArray *)draggingImageComponents
+{
+    return @[];
+}
+
+- (NSUInteger)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
+{
+    return NSCellHitContentArea;
+}
+
+
 @end
