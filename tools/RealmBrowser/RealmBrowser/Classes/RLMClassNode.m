@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 
 #import "RLMSidebarTableCellView.h"
 
@@ -25,7 +25,7 @@
 - (RLMArray *)allObjects:(NSString *)className;
 @end
 
-@implementation RLMClazzNode {
+@implementation RLMClassNode {
 
     NSMutableArray *displayedArrays;
     RLMArray *allObjects;

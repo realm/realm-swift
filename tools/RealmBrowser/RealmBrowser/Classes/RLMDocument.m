@@ -18,9 +18,9 @@
 
 #import "RLMDocument.h"
 
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 #import "RLMArrayNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMClassProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
 #import "NSTableColumn+Resize.h"
@@ -50,11 +50,11 @@
                     
                     NSError *error;
                     
-                    RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
-                                                                         url:absoluteURL.path];
-                    self.presentedRealm = realm;
+                    RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
                     
-                    if ([realm connect:&error]) {
+                    self.presentedRealm  = realmNode;
+                    
+                    if ([realmNode connect:&error]) {
                         NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                         [documentController noteNewRecentDocumentURL:absoluteURL];                    
                     }

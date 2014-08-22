@@ -28,4 +28,7 @@
 
 @property (nonatomic, readonly) RLMTableView *realmTableView;
 
+@property (nonatomic) BOOL realmIsLocked;
+@property (nonatomic) BOOL displaysArray;
+
 @end

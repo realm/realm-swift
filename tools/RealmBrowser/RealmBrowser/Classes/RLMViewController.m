@@ -22,7 +22,6 @@
 #import "RLMArrayNavigationState.h"
 
 @implementation RLMViewController {
-
     id delegate;
 }
 
@@ -51,8 +50,7 @@
 {
     _navigationFromHistory = YES;
     
-    [self performUpdateUsingState:newState
-                         oldState:oldState];
+    [self performUpdateUsingState:newState oldState:oldState];
     
     _navigationFromHistory = NO;
 }
@@ -64,8 +62,7 @@
 
 - (void)clearSelection
 {
-    [self.tableView selectRowIndexes:nil
-                byExtendingSelection:NO];
+    [self.tableView selectRowIndexes:nil byExtendingSelection:NO];
 }
 
 - (void)setSelectionIndex:(NSUInteger)newIndex
@@ -79,3 +76,7 @@
 }
 
 @end
+
+
+
+

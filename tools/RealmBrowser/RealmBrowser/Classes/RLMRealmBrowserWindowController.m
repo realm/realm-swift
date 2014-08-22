@@ -20,6 +20,10 @@
 #import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
+NSString * const kRealmLockId = @"RealmLockItem";
+NSString * const kRealmLockedImage = @"RealmLocked";
+NSString * const kRealmUnlockedImage = @"RealmUnlocked";
+
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 @end
@@ -28,27 +32,25 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 
-const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
-
 @implementation RLMRealmBrowserWindowController {
-
     RLMNavigationStack *navigationStack;
 }
 
-#pragma mark - NSViewController overrides
+#pragma mark - NSViewController Overrides
 
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
     [self updateNavigationButtons];
     
-    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    id firstItem = self.modelDocument.presentedRealm.topLevelClasses.firstObject;
     if (firstItem != nil) {
         RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
 
-        [self addNavigationState:initState
-              fromViewController:nil];
+        [self addNavigationState:initState fromViewController:nil];
     }
+    
+    [self setRealmLocked:YES];
 }
 
 #pragma mark - Public methods - Accessors
@@ -58,7 +60,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     return navigationStack.currentState;
 }
 
-#pragma mark - Public methods
+#pragma mark - Public methods - User Actions
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
@@ -69,17 +71,54 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         [self updateNavigationButtons];
         
         if (controller == self.tableViewController || controller == nil) {
-            [self.outlineViewController updateUsingState:state
-                                                oldState:oldState];
+            [self.outlineViewController updateUsingState:state oldState:oldState];
         }
         
-        [self.tableViewController updateUsingState:state
-                                          oldState:oldState];
+        [self.tableViewController updateUsingState:state oldState:oldState];
     }
 
     // Searching is not implemented for link arrays yet
     BOOL isArray = [state isMemberOfClass:[RLMArrayNavigationState class]];
     [self.searchField setEnabled:!isArray];
+}
+
+- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
+{
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
+    switch (buttons.selectedSegment) {
+        case 0: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateBackward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        case 1: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateForward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    
+    [self updateNavigationButtons];
+}
+
+- (IBAction)userClickedLockRealm:(id)sender
+{
+    [self setRealmLocked:!self.tableViewController.realmIsLocked];
+}
+
+-(void)setRealmLocked:(BOOL)locked
+{
+    self.tableViewController.realmIsLocked = locked;
+    self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -104,7 +143,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
     for (NSUInteger index = 0; index < columnCount; index++) {
 
-        RLMClazzProperty *property = columns[index];
+        RLMClassProperty *property = columns[index];
         NSString *columnName = property.name;
 
         switch (property.type) {
@@ -150,8 +189,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 break;
             }
             //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
-            case RLMPropertyTypeDouble:
-            {
+            case RLMPropertyTypeDouble: {
                 double value;
 
                 if ([searchText isEqualToString:@"0"] ||
@@ -187,46 +225,12 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     [self addNavigationState:state fromViewController:self.tableViewController];
 }
 
-- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
-{
-    RLMNavigationState *oldState = navigationStack.currentState;
-    
-    switch (buttons.selectedSegment) {
-        case 0: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateBackward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        case 1: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateForward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    
-    [self updateNavigationButtons];    
-}
-
 #pragma mark - Private methods
 
 - (void)updateNavigationButtons
 {
-    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward]
-                            forSegment:0];
-    [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
-                            forSegment:1];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward] forSegment:0];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateForward] forSegment:1];
 }
 
 @end

@@ -16,11 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMClazzProperty.h"
+#import "RLMClassProperty.h"
 
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 
-@implementation RLMClazzProperty
+@implementation RLMClassProperty
 
 - (instancetype)initWithProperty:(RLMProperty *)property;
 {
@@ -40,7 +40,7 @@
     return _property.type;
 }
 
-- (Class)clazz
+- (Class)class
 {
     switch (self.type) {
         case RLMPropertyTypeBool:
@@ -56,7 +56,7 @@
         case RLMPropertyTypeObject:
         case RLMPropertyTypeArray:
         case RLMPropertyTypeAny:
-            return [RLMClazzNode class];
+            return [RLMClassNode class];
         default:
             return nil;
     }
