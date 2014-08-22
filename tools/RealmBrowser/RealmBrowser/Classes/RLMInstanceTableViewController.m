@@ -29,12 +29,13 @@
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
 
-#import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
+#import "NSFont+Standard.h"
 
 #import "objc/objc-class.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
@@ -51,6 +52,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     BOOL linkCursorDisplaying;
     NSDateFormatter *dateFormatter;
     NSNumberFormatter *numberFormatter;
+    NSMutableDictionary *autofittedColumns;
 }
 
 #pragma mark - NSObject Overrides
@@ -75,7 +77,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     
     linkCursorDisplaying = NO;
-
+    
+    autofittedColumns = [NSMutableDictionary dictionary];
+    
     awake = YES;
 }
 
@@ -91,11 +95,16 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
-
+    
+    [self.tableView setAutosaveTableColumns:NO];
+    
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:newState.selectedType
+
+        [self.realmTableView formatColumnsWithType:newState.selectedType
                                  withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
@@ -103,14 +112,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
         RLMClassNode *referringType = (RLMClassNode *)arrayState.selectedType;
-        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
         RLMObject *referingInstance = [referringType instanceAtIndex:arrayState.selectedInstanceIndex];
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
                                                                          onObject:referingInstance
                                                                             realm:realm];
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+
+        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -122,10 +131,19 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
         self.displayedType = arrayNode;
         [self.tableView reloadData];
-        [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
+
+        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
+    self.tableView.autosaveName = [NSString stringWithFormat:@"%lu:%@", realm.hash, self.displayedType.name];
+    [self.tableView setAutosaveTableColumns:YES];
+    
+    if (![autofittedColumns[self.tableView.autosaveName] isEqual: @YES]) {
+        [self.realmTableView makeColumnsFitContents];
+        autofittedColumns[self.tableView.autosaveName] = @YES;
+    }
+
     self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
 
@@ -176,23 +194,21 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [badgeCellView.badge.cell setHighlightsBy:0];
             
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
-            badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+            
+            badgeCellView.textField.stringValue = formattedText;
+            badgeCellView.textField.font = [NSFont linkFont];
             
             [badgeCellView.textField setEditable:NO];
             
             cellView = badgeCellView;
-
         }
             break;
             
         case RLMPropertyTypeBool: {
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
             
-            BOOL boolValue;
-            if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                boolValue = [(NSNumber *)propertyValue boolValue];
-            }
-            boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
+            boolCellView.checkBox.state = [(NSNumber *)propertyValue boolValue] ? NSOnState : NSOffState;
+            [boolCellView.checkBox setEnabled:!self.realmIsLocked];
             
             cellView = boolCellView;
         }
@@ -205,6 +221,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
+            [numberCellView.textField setEditable:!self.realmIsLocked];
             
             cellView = numberCellView;
         }
@@ -218,13 +235,15 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
             
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+            basicCellView.textField.stringValue = formattedText;
             
             if (type == RLMPropertyTypeObject) {
-                basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+                basicCellView.textField.font = [NSFont linkFont];
                 [basicCellView.textField setEditable:NO];
             }
             else {
-                basicCellView.textField.stringValue = formattedText;
+                basicCellView.textField.font = [NSFont textFont];
+                [basicCellView.textField setEditable:!self.realmIsLocked];
             }
             
             cellView = basicCellView;
@@ -238,13 +257,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - Private Methods - NSTableView Delegate
-
-+(NSAttributedString *)linkStringWithString:(NSString *)string
-{
-    NSColor *blue = [NSColor colorWithByteRed:26 green:66 blue:251 alpha:255];
-    NSDictionary *attributes = @{NSForegroundColorAttributeName: blue, NSUnderlineStyleAttributeName: @1};
-    return [[NSAttributedString alloc] initWithString:string attributes:attributes];
-}
 
 -(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
@@ -265,15 +277,20 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberFormatter.allowsFloats = propertyType != RLMPropertyTypeInt;
             
             return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
-            break;
             
-        case RLMPropertyTypeString:
-            return (NSString *)propertyValue;
-            break;
+        case RLMPropertyTypeString: {
+            NSString *stringValue = propertyValue;
+            
+            if (linkFormat && stringValue.length > kMaxNumberOfStringCharsInObjectLink) {
+                stringValue = [stringValue substringToIndex:kMaxNumberOfStringCharsInObjectLink - 3];
+                stringValue = [stringValue stringByAppendingString:@"..."];
+            }
+            
+            return stringValue;
+        }
             
         case RLMPropertyTypeBool:
                 return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
-            break;
             
         case RLMPropertyTypeArray: {
             RLMArray *referredArray = (RLMArray *)propertyValue;
@@ -286,7 +303,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
         case RLMPropertyTypeDate:
             return [dateFormatter stringFromDate:(NSDate *)propertyValue];
-            break;
             
         case RLMPropertyTypeData:
             return @"<Data>";
@@ -325,8 +341,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             return [returnString stringByAppendingString:@")"];
         }
     }
-    
-    return @"";
 }
 
 -(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
@@ -801,6 +815,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         linkCursorDisplaying = NO;
     }
+}
+
+#pragma mark - Private Methods - Setters/Getters
+
+-(void)setRealmIsLocked:(BOOL)realmIsLocked
+{
+    _realmIsLocked = realmIsLocked;
+    [self.tableView reloadData];
 }
 
 @end

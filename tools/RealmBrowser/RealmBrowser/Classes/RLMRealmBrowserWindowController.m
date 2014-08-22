@@ -17,12 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmBrowserWindowController.h"
-#import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
 
-NSString * const kRealmLockId = @"RealmLockItem";
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
+
+NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
+NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
@@ -30,6 +31,15 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 
 @interface RLMArray (Private)
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
+
+@interface RLMRealmBrowserWindowController()<NSWindowDelegate>
+
+@property (weak) IBOutlet NSSplitView *splitView;
+@property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
+@property (weak) IBOutlet NSToolbarItem *lockRealmButton;
+@property (nonatomic, strong) IBOutlet NSSearchField *searchField;
+
 @end
 
 @implementation RLMRealmBrowserWindowController {
@@ -41,8 +51,10 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
-    [self updateNavigationButtons];
+    [self loadWindowSize];
 }
+
+#pragma mark - RLMViewController Overrides
 
 -(void)realmDidLoad
 {
@@ -59,6 +71,16 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     }
 
     [self setRealmLocked:YES];
+    
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
+}
+
+#pragma mark - NSWindowDelegate Methods
+
+-(void)windowWillClose:(NSNotification *)notification
+{
+    [self saveWindowSize];
 }
 
 #pragma mark - Public methods - Accessors
@@ -240,5 +262,28 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
     [self.navigationButtons setEnabled:[navigationStack canNavigateBackward] forSegment:0];
     [self.navigationButtons setEnabled:[navigationStack canNavigateForward] forSegment:1];
 }
+
+#pragma mark - Private Methods - Window Size
+
+-(void)loadWindowSize
+{
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
+    NSString *frameString = [[NSUserDefaults standardUserDefaults] objectForKey:frameKey];
+    
+    if (frameString) {
+        [self.window setFrame:NSRectFromString(frameString) display:YES];
+    }
+}
+
+-(void)saveWindowSize
+{
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
+    NSString *frameString = NSStringFromRect(self.window.frame);
+    [[NSUserDefaults standardUserDefaults] setObject:frameString forKey:frameKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 
 @end

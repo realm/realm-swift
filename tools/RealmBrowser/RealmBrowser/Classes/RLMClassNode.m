@@ -25,19 +25,26 @@
 - (RLMArray *)allObjects:(NSString *)className;
 @end
 
+
+@interface RLMClassNode ()
+
+@property (nonatomic) RLMArray *allObjects;
+
+@end
+
+
 @implementation RLMClassNode {
 
     NSMutableArray *displayedArrays;
-    RLMArray *allObjects;
 }
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm
 {
-    if (self = [super initWithSchema:schema
-                             inRealm:realm]) {
-    
+    self = [super initWithSchema:schema inRealm:realm];
+    if (self) {
         displayedArrays = [[NSMutableArray alloc] initWithCapacity:10];
     }
+    
     return self;
 }
 
@@ -50,8 +57,7 @@
 
 - (NSUInteger)instanceCount
 {
-    RLMArray *objects = [self allObjects];
-    return objects.count;
+    return self.allObjects.count;
 }
 
 #pragma mark - RLMRealmOutlineNode implementation
@@ -75,8 +81,7 @@
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
-    RLMArray *objects = [self allObjects];
-    return objects[index];
+    return self.allObjects[index];
 }
 
 - (NSUInteger)indexOfInstance:(RLMObject *)instance
@@ -84,9 +89,8 @@
 // Note: The indexOfObject method of RLMArray is not yet implemented so we have to perform the
 //       lookup as a simple linear search;
     
-    RLMArray *objects = [self allObjects];
     NSUInteger index = 0;
-    for (RLMObject *classInstance in objects) {
+    for (RLMObject *classInstance in self.allObjects) {
         if (classInstance == instance) {
             return index;
         }
@@ -98,8 +102,7 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                                  owner:self];
+    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell" owner:self];
 
     result.textField.stringValue = self.name;
     result.button.title = [NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
@@ -137,8 +140,7 @@
         [displayedArrays addObject:arrayNode];
     }
     else {
-        [displayedArrays replaceObjectAtIndex:0
-                                   withObject:arrayNode];
+        [displayedArrays replaceObjectAtIndex:0 withObject:arrayNode];
     }
 
     return arrayNode;
@@ -163,10 +165,11 @@
 
 - (RLMArray *)allObjects
 {
-    if (allObjects == nil) {
-        allObjects = [self.realm allObjects:self.schema.className];
+    if (!_allObjects) {
+        _allObjects = [self.realm allObjects:self.schema.className];
     }
-    return allObjects;
+    
+    return _allObjects;
 }
 
 @end
