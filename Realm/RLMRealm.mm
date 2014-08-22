@@ -380,7 +380,9 @@ static NSArray *s_objectDescriptors = nil;
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
-    NSCParameterAssert(block);
+    if (!block) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"The notification block should not be nil" userInfo:nil];
+    }
 
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
