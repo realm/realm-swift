@@ -72,9 +72,9 @@ NSString * const kDraggableRow = @"RealmBrowserDraggableTableRow";
     [self.tableView setTarget:self];
     [self.tableView setAction:@selector(userClicked:)];
     [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
-    [self.tableView registerForDraggedTypes:@[kDraggableRow]];
+    [self.tableView registerForDraggedTypes:@[(id)kUTTypeURL]];
      
-    [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
 
     dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateStyle = NSDateFormatterMediumStyle;
