@@ -73,26 +73,50 @@ inline NSError *make_realm_error(RLMError code, exception &ex) {
     return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
 }
 
-} // anonymous namespace
+// create NSError from an in-flight C++ exception
+NSError *shared_group_error_to_realm_error() {
+    try {
+        throw;
+    }
+    catch (File::PermissionDenied &ex) {
+        return make_realm_error(RLMErrorFilePermissionDenied, ex);
+    }
+    catch (File::Exists &ex) {
+        return make_realm_error(RLMErrorFileExists, ex);
+    }
+    catch (File::AccessError &ex) {
+        return make_realm_error(RLMErrorFileAccessError, ex);
+    }
+    catch (SharedGroup::PresumablyStaleLockFile &ex) {
+        return make_realm_error(RLMErrorStaleLockFile, ex);
+    }
+    catch (SharedGroup::LockFileButNoData &ex) {
+        return make_realm_error(RLMErrorLockFileButNoData, ex);
+    }
+    catch (exception &ex) {
+        return make_realm_error(RLMErrorFail, ex);
+    }
 
+    return nil;
+}
 
 //
 // Global RLMRealm instance cache
 //
-static NSMutableDictionary *s_realmsPerPath;
+NSMutableDictionary *s_realmsPerPath;
 
 // FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
 //  rather than by the path (since the path is not a reliable identifier). This requires additional support
 //  from the core library though, because the inode,device number pair needs to be taken from the open file
 //  (to avoid race conditions).
-static inline RLMRealm *cachedRealm(NSString *path) {
+inline RLMRealm *cachedRealm(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectForKey:@(threadID)];
     }
 }
 
-static inline void cacheRealm(RLMRealm *realm, NSString *path) {
+inline void cacheRealm(RLMRealm *realm, NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         if (!s_realmsPerPath[path]) {
@@ -102,13 +126,13 @@ static inline void cacheRealm(RLMRealm *realm, NSString *path) {
     }
 }
 
-static inline NSArray *realmsAtPath(NSString *path) {
+inline NSArray *realmsAtPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].allObjects;
     }
 }
 
-static inline void clearRealmCache() {
+inline void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
         for (NSMapTable *map in s_realmsPerPath.allValues) {
             [map removeAllObjects];
@@ -117,15 +141,25 @@ static inline void clearRealmCache() {
     }
 }
 
-@interface RLMRealm ()
-@property (nonatomic) NSString *path;
-@end
-
+void checkRunLoop(SEL _cmd) {
+    if (![NSRunLoop currentRunLoop]) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:[NSString stringWithFormat:@"%@ \
+                                               can only be called from a thread with a runloop.",
+                                               NSStringFromSelector(_cmd)] userInfo:nil];
+    }
+}
 
 NSString * const c_defaultRealmFileName = @"default.realm";
-static BOOL s_useInMemoryDefaultRealm = NO;
-static NSString *s_defaultRealmPath = nil;
-static NSArray *s_objectDescriptors = nil;
+NSString *s_defaultRealmPath = nil;
+NSArray *s_objectDescriptors = nil;
+
+} // anonymous namespace
+
+@interface RLMRealm ()
+@property (nonatomic) NSString *path;
+@property (nonatomic) BOOL inMemory;
+@end
 
 @implementation RLMRealm {
     NSThread *_thread;
@@ -209,16 +243,6 @@ static NSArray *s_objectDescriptors = nil;
     return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
 }
 
-+ (void)useInMemoryDefaultRealm
-{
-    @synchronized(s_realmsPerPath) {
-        if (realmsAtPath([RLMRealm defaultRealmPath]).count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
-        }
-    }
-    s_useInMemoryDefaultRealm = YES;
-}
-
 + (instancetype)realmWithPath:(NSString *)path
 {
     return [self realmWithPath:path readOnly:NO error:nil];
@@ -242,15 +266,8 @@ static NSArray *s_objectDescriptors = nil;
                                        reason:@"Path is not valid"
                                      userInfo:@{@"path":(path ?: @"nil")}];
     }
-    
-    NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
-    if (!currentRunloop) {
-        @throw [NSException exceptionWithName:@"realm:runloop_exception"
-                                       reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from a thread with a runloop.",
-                                               NSStringFromSelector(_cmd)] userInfo:nil];
-    }
-    
+    checkRunLoop(_cmd);
+
     // try to reuse existing realm first
     __autoreleasing RLMRealm *realm = cachedRealm(path);
     if (realm) {
@@ -270,31 +287,12 @@ static NSArray *s_objectDescriptors = nil;
 
     NSError *error = nil;
     try {
-        if (s_useInMemoryDefaultRealm && [path isEqualToString:[RLMRealm defaultRealmPath]]) { // Only for default realm
-            realm->_sharedGroup = new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly);
-        } else {
-        	realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
-        	realm->_replication = tightdb::makeWriteLogCollector(path.UTF8String);
-        	realm->_sharedGroup = new SharedGroup(*realm->_replication);
-        }
+        realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
+        realm->_replication = tightdb::makeWriteLogCollector(path.UTF8String);
+        realm->_sharedGroup = new SharedGroup(*realm->_replication);
     }
-    catch (File::PermissionDenied &ex) {
-        error = make_realm_error(RLMErrorFilePermissionDenied, ex);
-    }
-    catch (File::Exists &ex) {
-        error = make_realm_error(RLMErrorFileExists, ex);
-    }
-    catch (File::AccessError &ex) {
-        error = make_realm_error(RLMErrorFileAccessError, ex);
-    }
-    catch (SharedGroup::PresumablyStaleLockFile &ex) {
-        error = make_realm_error(RLMErrorStaleLockFile, ex);
-    }
-    catch (SharedGroup::LockFileButNoData &ex) {
-        error = make_realm_error(RLMErrorLockFileButNoData, ex);
-    }
-    catch (exception &ex) {
-        error = make_realm_error(RLMErrorFail, ex);
+    catch (...) {
+        error = shared_group_error_to_realm_error();
     }
     if (error) {
         if (outError) {
@@ -340,8 +338,69 @@ static NSArray *s_objectDescriptors = nil;
     return realm;
 }
 
++ (instancetype)memoryRealm {
+    return [self memoryRealmWithError:nil];
+}
+
++ (instancetype)memoryRealmWithError:(NSError **)outError {
+    return [self memoryRealmWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo.processInfo globallyUniqueString] stringByAppendingString:@".realm"]]
+                               error:outError];
+}
+
++ (instancetype)memoryRealmWithPath:(NSString *)path error:(NSError **)outError {
+    checkRunLoop(_cmd);
+
+    RLMRealm *realm = [[RLMRealm alloc] initWithPath:path readOnly:NO];
+    if (!realm) {
+        return nil;
+    }
+
+    NSError *error = nil;
+    try {
+        realm->_sharedGroup = new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly);
+        realm->_group = &const_cast<Group&>(realm->_sharedGroup->begin_read());
+        realm->_inMemory = YES;
+    }
+    catch (...) {
+        error = shared_group_error_to_realm_error();
+    }
+    if (error) {
+        if (outError) {
+            *outError = error;
+            return nil;
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[error localizedDescription]
+                                         userInfo:nil];
+        }
+    }
+
+    RLMRealmIntializeWithSchema(realm, [RLMSchema sharedSchema]);
+
+    return realm;
+}
+
+- (instancetype)realmForCurrentThread {
+    checkRunLoop(_cmd);
+
+    if (_threadID == pthread_mach_thread_np(pthread_self())) {
+        return self;
+    }
+    else if (_inMemory) {
+        return [RLMRealm memoryRealmWithPath:_path error:nil];
+    }
+    else {
+        return [RLMRealm realmWithPath:_path readOnly:_readOnly dynamic:NO schema:_schema error:nil];
+    }
+}
+
 + (void)clearRealmCache {
     clearRealmCache();
+}
+
+- (NSString *)path {
+    return _inMemory ? nil : _path;
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {

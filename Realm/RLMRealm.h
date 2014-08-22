@@ -60,7 +60,8 @@
  dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
 
  @param path        Path to the file you want the data saved in.
- @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
+ @param readonly    Whether to open the file in read-only mode. Cannot be mixed
+                    with opening the same file in read-write mode at the same time.
  @param error       Pass-by-reference for errors.
 
  @return An RLMRealm instance.
@@ -68,23 +69,63 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Make the default Realm in-memory only
+ Create a new in-memory Realm.
 
- By default, the default Realm is persisted to disk unless this method is called.
+ Unlike regular Realms, in-memory Realms are not persisted to disk. As a result,
+ this method always returns an entirely new Realm each time it is called and you
+ must explicitly hold a reference to it.
 
- @warning This must be called before any Realm instances are obtained (otherwise throws).
+ In-memory Realms can be used for testing, efficiently querying data sets, or
+ for sharing state between threads.
+
+ This function throws an exception if an error occurs while creating the Realm.
+
+ @warning   RLMRealm instances can only be used on the thread on which they were
+            created. When using an in-memory Realm on multiple threads or on
+            dispatch queues, call -realmForCurrentThread on an existing RLMRealm
+            instance to get an instance which can be used on the current thread.
  */
-+ (void)useInMemoryDefaultRealm;
++ (instancetype)memoryRealm;
 
 /**
- Path to the file where this Realm is persisted.
+ Create a new in-memory Realm.
+
+ Unlike regular Realms, in-memory Realms are not persisted to disk. As a result,
+ this method always returns an entirely new Realm each time it is called and you
+ must explicitly hold a reference to it.
+
+ In-memory Realms can be used for testing, efficiently querying data sets, or
+ for sharing state between threads.
+
+ @warning   RLMRealm instances can only be used on the thread on which they were
+            created. When using an in-memory Realm on multiple threads or on
+            dispatch queues, call -realmForCurrentThread on an existing RLMRealm
+            instance to get an instance which can be used on the current thread.
+ */
++ (instancetype)memoryRealmWithError:(NSError **)error;
+
+/**
+ Obtains an RLMRealm instance which can be used on the current thread.
+
+ This method is the only method which can be called on RLMRealm instances from
+ threads other than the one on which they were created. If the receiver was
+ created on the current thread it simply returns the receiver; otherwise it
+ returns a different RLMRealm insteance for the same file or backing memory
+ store.
+
+ As with the other RLMRealm creation methods, this will return the same RLMRealm
+ instance each time it is called for persisted realms, and new instances each
+ time for in-memory realms.
+ */
+- (instancetype)realmForCurrentThread;
+
+/**
+ Path to the file where this Realm is persisted, or nil for in-memory realms.
  */
 @property (nonatomic, readonly) NSString *path;
 
 /**
  Indicates if this Realm is read only
-
- @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
