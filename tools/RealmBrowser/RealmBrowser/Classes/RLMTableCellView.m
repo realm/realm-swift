@@ -16,29 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSidebarTableCellView.h"
+#import "RLMTableCellView.h"
 
-@implementation RLMSidebarTableCellView
+@implementation RLMTableCellView
 
-- (void)awakeFromNib {
-    // We want it to appear "inline"
-    [[self.button cell] setBezelStyle:NSInlineBezelStyle];
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
 }
 
-// The standard rowSizeStyle does some specific layout for us. To customize layout for our button, we first call super and then modify things
-- (void)viewWillDraw {
+- (void)viewWillDraw
+{
     [super viewWillDraw];
+    self.textField.frame = self.bounds;
+}
+
+- (NSSize)sizeThatFits
+{
+    [self.textField sizeToFit];
     
-    if (![self.button isHidden]) {
-        [self.button sizeToFit];
-        
-        NSRect textFrame = self.textField.frame;
-        NSRect buttonFrame = self.button.frame;
-        buttonFrame.origin.x = NSWidth(self.frame) - NSWidth(buttonFrame) - 10.0f;
-        self.button.frame = buttonFrame;
-        textFrame.size.width = NSMinX(buttonFrame) - NSMinX(textFrame);
-        self.textField.frame = textFrame;
-    }
+    return self.textField.bounds.size;
 }
 
 @end

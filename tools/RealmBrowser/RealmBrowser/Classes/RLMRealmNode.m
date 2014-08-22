@@ -98,12 +98,10 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    NSTextField *result =  [tableView makeViewWithIdentifier:@"HeaderLabel"
-                                                       owner:self];
+    NSTextField *result = [tableView makeViewWithIdentifier:@"HeaderLabel" owner:self];
     [result setStringValue:@"CLASSES"];
     
     return result;
-
 }
 
 #pragma mark - Private methods

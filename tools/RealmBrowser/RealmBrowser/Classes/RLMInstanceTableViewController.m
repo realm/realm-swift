@@ -24,6 +24,11 @@
 #import "RLMArrayNode.h"
 #import "RLMRealmNode.h"
 
+#import "RLMBadgeTableCellView.h"
+#import "RLMBasicTableCellView.h"
+#import "RLMBoolTableCellView.h"
+#import "RLMNumberTableCellView.h"
+
 #import "NSTableColumn+Resize.h"
 #import "NSColor+ByteSizeFactory.h"
 
@@ -31,7 +36,10 @@
 
 @implementation RLMInstanceTableViewController {
 
+    BOOL awake;
     BOOL linkCursorDisplaying;
+    NSDateFormatter *dateFormatter;
+    NSNumberFormatter *numberFormatter;
 }
 
 #pragma mark - NSObject overrides
@@ -39,26 +47,43 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+
+    if (awake) {
+        return;
+    }
     
-    // Perform some extra inititialization on the tableview
     [self.tableView setTarget:self];
     [self.tableView setAction:@selector(userClicked:)];
+    [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
+    
+    dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+    dateFormatter.timeStyle = NSDateFormatterShortStyle;
+    
+    numberFormatter = [[NSNumberFormatter alloc] init];
+    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     
     linkCursorDisplaying = NO;
+    awake = YES;
+}
+
+#pragma mark - Public methods - Accessors
+
+- (RLMTableView *)realmTableView
+{
+    return (RLMTableView *)self.tableView;
 }
 
 #pragma mark - RLMViewController overrides
 
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-    [super performUpdateUsingState:newState
-                          oldState:oldState];
+    [super performUpdateUsingState:newState oldState:oldState];
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        [self setDisplayedType:newState.selectedType];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:newState.selectedType
-                                            withSelectionAtRow:newState.selectedInstanceIndex];
+        self.displayedType = newState.selectedType;
         [self.tableView reloadData];
+        [(RLMTableView *)self.tableView formatColumnsToFitType:newState.selectedType withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
@@ -69,10 +94,9 @@
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:arrayState.property
                                                                          onObject:referingInstance
                                                                             realm:self.parentWindowController.modelDocument.presentedRealm.realm];
-        [self setDisplayedType:arrayNode];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
-                                            withSelectionAtRow:0];
+        self.displayedType = arrayNode;
         [self.tableView reloadData];
+        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -80,69 +104,199 @@
 
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText result:arrayState.results andParent:arrayState.selectedType];
 
-        [self setDisplayedType:arrayNode];
-        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode
-                                            withSelectionAtRow:0];
+        self.displayedType = arrayNode;
         [self.tableView reloadData];
+        [(RLMTableView *)self.tableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
 }
 
-#pragma mark - NSTableViewDataSource implementation
+#pragma mark - NSTableViewDataSource
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
-        NSUInteger count = displayedType.instanceCount;
-        
-        return count;
+        RLMTypeNode *displayedType = self.displayedType;
+        return displayedType.instanceCount;
     }
     
     return 0;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+#pragma mark - RLMTableViewDelegate implementation
+
+- (void)menuSelectedAddRow:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMTypeNode *displayedType = self.displayedType;
+    Class rlmObjectClass = NSClassFromString(displayedType.name);
+    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
+    if (!defaultPropertyValues) {
+        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
+    }
+    
+    [realm beginWriteTransaction];
+    [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+    [realm commitWriteTransaction];
+    
+    [self.tableView reloadData];
+}
+
+-(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
+{
+    NSMutableDictionary *defaultPropertyValues = [NSMutableDictionary dictionary];
+    
+    for (RLMProperty *property in typeNode.schema.properties) {
+        defaultPropertyValues[property.name] = [self defaultValueForPropertyType:property.type];
+    }
+    
+    return defaultPropertyValues;
+}
+
+-(id)defaultValueForPropertyType:(RLMPropertyType)propertyType
+{
+    switch (propertyType) {
+        case RLMPropertyTypeInt:
+            return @0;
+        
+        case RLMPropertyTypeFloat:
+            return @(0.0f);
+
+        case RLMPropertyTypeDouble:
+            return @0.0;
+            
+        case RLMPropertyTypeString:
+            return @"===STRING===";
+            
+        case RLMPropertyTypeBool:
+            return @NO;
+            
+        case RLMPropertyTypeArray:
+            return @[];
+            
+        case RLMPropertyTypeDate:
+            return [NSDate date];
+            
+        case RLMPropertyTypeData:
+            return @"<Data>";
+            
+        case RLMPropertyTypeAny:
+            return @"<Any>";
+            
+        case RLMPropertyTypeObject: {
+            return [NSNull null];
+        }
+    }
+
+}
+
+- (void)menuSelectedDeleteRow:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMObject *selectedObject = [self.displayedType instanceAtIndex:location.row];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:selectedObject];
+    [realm commitWriteTransaction];
+    [self.tableView reloadData];
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    if (self.tableView == notification.object) {
+        
+        RLMNavigationState *currentState = self.parentWindowController.currentState;
+        NSInteger selectedIndex = self.tableView.selectedRow;
+        
+        [currentState updateSelectionToIndex:selectedIndex];
+    }
+}
+
+-(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
     if (tableView == self.tableView) {
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        
-        RLMTypeNode *displayedType = [self displayedType];
+        NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
+        RLMTypeNode *displayedType = self.displayedType;
         RLMClazzProperty *clazzProperty = displayedType.propertyColumns[columnIndex];
-        
-        NSString *propertyName = clazzProperty.name;
         RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
+        id propertyValue = selectedInstance[clazzProperty.name];
+        RLMPropertyType type = clazzProperty.type;
         
-        NSObject *propertyValue = selectedInstance[propertyName];
-
-        return [self.class printablePropertyValue:propertyValue ofType:clazzProperty.type];
+        if (type == RLMPropertyTypeArray) {
+            RLMBadgeTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BadgeCell" owner:self];
+            
+            badgeCellView.badge.hidden = NO;
+            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", (unsigned long)[(RLMArray *)propertyValue count]];
+            [badgeCellView.badge.cell setHighlightsBy:0];
+            
+            NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+            badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+            
+            return badgeCellView;
+        }
+        else if (type == RLMPropertyTypeBool) {
+            RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
+            
+            BOOL boolValue;
+            if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                boolValue = [(NSNumber *)propertyValue boolValue];
+            }
+            boolCellView.checkBox.state = boolValue ? NSOnState : NSOffState;
+            
+            return boolCellView;
+        }
+        else if (type == RLMPropertyTypeInt || type == RLMPropertyTypeFloat || type == RLMPropertyTypeDouble) {
+            RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
+            numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            
+            ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
+            
+            return numberCellView;
+        }
+        else {
+            RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            
+            NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+            
+            if (type == RLMPropertyTypeObject) {
+                basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+            }
+            else {
+                basicCellView.textField.stringValue = formattedText;
+            }
+            
+            return basicCellView;
+        }
     }
     
     return nil;
 }
 
-+(id)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
++(NSAttributedString *)linkStringWithString:(NSString *)string
+{
+    NSDictionary *attributes = @{NSForegroundColorAttributeName: [NSColor colorWithByteRed:26 green:66 blue:251 alpha:255], NSUnderlineStyleAttributeName: @1};
+    return [[NSAttributedString alloc] initWithString:string attributes:attributes];
+}
+
+-(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
     return [self printablePropertyValue:propertyValue ofType:propertyType linkFormat:NO];
 }
 
-+(id)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType linkFormat:(BOOL)linkFormat
+-(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType linkFormat:(BOOL)linkFormat
 {
     switch (propertyType) {
-        case RLMPropertyTypeBool:
-            if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                if (linkFormat) {
-                    return (BOOL)propertyValue ? @"TRUE" : @"FALSE";
-                }
-                return propertyValue;
-            }
-            break;
-
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
             if ([propertyValue isKindOfClass:[NSNumber class]]) {
-                return propertyValue;
+                if (propertyType == RLMPropertyTypeInt) {
+                    numberFormatter.allowsFloats = NO;
+                } else {
+                    numberFormatter.allowsFloats = YES;
+                }
+                
+                return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
             }
             break;
             
@@ -151,41 +305,33 @@
                 return propertyValue;
             }
             break;
-        
-        case RLMPropertyTypeData:
-            if (linkFormat) {
-                return @"<Data>";
-            }
             
-            // Will eventually return an image if present
+        case RLMPropertyTypeBool:
+            if ([propertyValue isKindOfClass:[NSNumber class]]) {
+                return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
+            }
+            break;
+
+        case RLMPropertyTypeArray: {
+            RLMArray *referredArray = (RLMArray *)propertyValue;
+            if (linkFormat) {
+                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, (unsigned long)referredArray.count];
+            }
+
+            return [NSString stringWithFormat:@"%@[]", referredArray.objectClassName];
+        }
+            
+        case RLMPropertyTypeDate:
+            if ([propertyValue isKindOfClass:[NSDate class]]) {
+                return [dateFormatter stringFromDate:(NSDate *)propertyValue];
+            }
+            break;
+            
+        case RLMPropertyTypeData:
             return @"<Data>";
             
         case RLMPropertyTypeAny:
             return @"<Any>";
-            
-        case RLMPropertyTypeDate:
-            if ([propertyValue isKindOfClass:[NSDate class]]) {
-                if (linkFormat) {
-                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                    formatter.dateStyle = NSDateFormatterMediumStyle;
-                    formatter.timeStyle = NSDateFormatterShortStyle;
-                
-                    return [formatter stringFromDate:(NSDate *)propertyValue];
-                }
-                
-                return propertyValue;
-            }
-            
-        case RLMPropertyTypeArray: {
-            RLMArray *referredArray = (RLMArray *)propertyValue;
-            
-            if (linkFormat) {
-                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, (unsigned long)referredArray.count];
-            }
-            
-            // Will show count as a badge instead
-            return [NSString stringWithFormat:@"List of %@", referredArray.objectClassName];
-        }
             
         case RLMPropertyTypeObject: {
             RLMObject *referredObject = (RLMObject *)propertyValue;
@@ -194,18 +340,17 @@
             }
             
             if (linkFormat) {
-                return referredObject.objectSchema.className;
+                return [NSString stringWithFormat:@"%@()", referredObject.objectSchema.className];
             }
             
             NSString *returnString = [NSString stringWithFormat:@"%@(", referredObject.objectSchema.className];
             
             for (RLMProperty *property in referredObject.objectSchema.properties) {
                 id propertyValue = referredObject[property.name];
-                id propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type linkFormat:YES];
+                NSString *propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type linkFormat:YES];
                 
                 returnString = [returnString stringByAppendingFormat:@"%@, ", propertyDescription];
             }
-            
             returnString = [returnString substringToIndex:returnString.length - 2];
             
             return [returnString stringByAppendingString:@")"];
@@ -215,139 +360,10 @@
     return nil;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-    RLMTypeNode *displayedType = [self displayedType];
-    
-    if (tableView == self.tableView) {
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        NSString *propertyName = propertyNode.name;
-        
-        RLMObject *selectedObject = [displayedType instanceAtIndex:rowIndex];
-        
-        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-        
-        [realm beginWriteTransaction];
-        
-        switch (propertyNode.type) {
-            case RLMPropertyTypeBool:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).boolValue);
-                }
-                break;
-                
-            case RLMPropertyTypeInt:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).integerValue);
-                }
-                break;
-                
-            case RLMPropertyTypeFloat:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).floatValue);
-                }
-                break;
-                
-            case RLMPropertyTypeDouble:
-                if ([object isKindOfClass:[NSNumber class]]) {
-                    selectedObject[propertyName] = @(((NSNumber *)object).doubleValue);
-                }
-                break;
-                
-            case RLMPropertyTypeString:
-                if ([object isKindOfClass:[NSString class]]) {
-                    selectedObject[propertyName] = object;
-                }
-                break;
-                
-            case RLMPropertyTypeDate:
-            case RLMPropertyTypeData:
-            case RLMPropertyTypeObject:
-            case RLMPropertyTypeArray:
-                break;
-                
-            default:
-                break;
-        }
-        
-        [realm commitWriteTransaction];
-    }
-}
-
-#pragma mark - NSTableViewDelegate implementation
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    if (self.tableView == notification.object) {
-        RLMNavigationState *currentState = self.parentWindowController.currentState;
-        NSInteger selectedIndex = self.tableView.selectedRow;
-        
-        [currentState updateSelectionToIndex:selectedIndex];
-    }
-}
-
-- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-    if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
-        
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        NSCell *displayingCell = (NSCell *)cell;
-        
-        switch (propertyNode.type) {
-            case RLMPropertyTypeBool:
-            case RLMPropertyTypeInt: {
-                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-                formatter.allowsFloats = NO;
-                displayingCell.formatter = formatter;
-                break;
-            }
-                
-            case RLMPropertyTypeFloat:
-            case RLMPropertyTypeDouble: {
-                NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-                formatter.allowsFloats = YES;
-                formatter.numberStyle = NSNumberFormatterDecimalStyle;
-                displayingCell.formatter = formatter;
-                break;
-            }
-                
-            case RLMPropertyTypeDate: {
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                formatter.dateStyle = NSDateFormatterMediumStyle;
-                formatter.timeStyle = NSDateFormatterShortStyle;
-                displayingCell.formatter = formatter;
-                break;
-            }
-                
-            case RLMPropertyTypeData: {
-                break;
-            }
-                
-            case RLMPropertyTypeString:
-                break;
-                
-            case RLMPropertyTypeObject:
-            case RLMPropertyTypeArray: {
-                NSString *rawText = displayingCell.stringValue;
-                NSDictionary *attributes = @{NSForegroundColorAttributeName: [NSColor colorWithByteRed:26 green:66 blue:251 alpha:255], NSUnderlineStyleAttributeName: @1};
-                NSAttributedString *formattedText = [[NSAttributedString alloc] initWithString:rawText
-                                                                                attributes:attributes];
-                displayingCell.attributedStringValue = formattedText;
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
-
 - (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
     if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         
         NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
         RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
@@ -358,13 +374,7 @@
         switch (propertyNode.type) {
             case RLMPropertyTypeDate: {
                 if ([propertyValue isKindOfClass:[NSDate class]]) {
-                    NSDate *dateValue = (NSDate *)propertyValue;
-                    
-                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                    formatter.dateStyle = NSDateFormatterFullStyle;
-                    formatter.timeStyle = NSDateFormatterFullStyle;
-                    
-                    return [formatter stringFromDate:dateValue];
+                    return [dateFormatter stringFromDate:(NSDate *)propertyValue];
                 }
                 break;
             }
@@ -418,7 +428,6 @@
             }
                 
             default:
-                
                 break;
         }
     }
@@ -426,95 +435,32 @@
     return nil;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    if (tableView == self.tableView) {
-        RLMTypeNode *displayedType = [self displayedType];
-        
-        NSUInteger columnIndex = [self.tableView.tableColumns indexOfObject:tableColumn];
-        RLMClazzProperty *propertyNode = displayedType.propertyColumns[columnIndex];
-        
-        if (propertyNode.type == RLMPropertyTypeDate) {
-            // Create a frame which covers the cell to be edited
-            NSRect frame = [tableView frameOfCellAtColumn:[[tableView tableColumns] indexOfObject:tableColumn]
-                                                      row:row];
-            
-            frame.origin.x -= [tableView intercellSpacing].width * 0.5;
-            frame.origin.y -= [tableView intercellSpacing].height * 0.5;
-            frame.size.width += [tableView intercellSpacing].width * 0.5;
-            frame.size.height = 23;
-            
-            // Set up a date picker with no border or background
-            NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
-            datepicker.bordered = NO;
-            datepicker.drawsBackground = NO;
-            datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
-            datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
-            
-            RLMObject *selectedObject = [displayedType instanceAtIndex:row];
-            NSString *propertyName = propertyNode.name;
-            
-            datepicker.dateValue = selectedObject[propertyName];
-            
-            // Create a menu with a single menu item, and set the date picker as the menu item's view
-            NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
-            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@""
-                                                          action:NULL
-                                                   keyEquivalent:@""];
-            item.view = datepicker;
-            [menu addItem:item];
-            
-            // Display the menu, and if the user pressed enter rather than clicking away or hitting escape then process our new timestamp
-            BOOL userAcceptedEdit = [menu popUpMenuPositioningItem:nil
-                                                        atLocation:frame.origin
-                                                            inView:tableView];
-            if (userAcceptedEdit) {
-                RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-                
-                [realm beginWriteTransaction];
-                selectedObject[propertyName] = datepicker.dateValue;
-                [realm commitWriteTransaction];
-            }
-        }
-        else {
-            return YES;
-        }
-    }
-    
-    return NO;
-}
+#pragma mark - Mouse movement
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
     if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        RLMTypeNode *displayedType = [self displayedType];
+        RLMTypeNode *displayedType = self.displayedType;
         
-        if (location.column < displayedType.propertyColumns.count) {
+        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
             RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
             
             if (propertyNode.type == RLMPropertyTypeObject) {
-                if (location.row < displayedType.instanceCount) {
-                    if (!linkCursorDisplaying) {
-                        RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
-                        RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
-                        NSObject *propertyValue = selectedInstance[propertyNode.name];
-                        
-                        if (propertyValue != nil) {
-                            [self enableLinkCursor];
-                        }
-                    }
+                if (!linkCursorDisplaying) {
+                    RLMClazzProperty *propertyNode = displayedType.propertyColumns[location.column];
+                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
+                    NSObject *propertyValue = selectedInstance[propertyNode.name];
                     
-                    return;
-                }
-            }
-            else if (propertyNode.type == RLMPropertyTypeArray) {
-                if (location.row < displayedType.instanceCount) {
-                    if (!linkCursorDisplaying) {
+                    if (propertyValue != nil) {
                         [self enableLinkCursor];
                     }
-                    
-                    return;
                 }
+                
+                return;
+            }
+            else if (propertyNode.type == RLMPropertyTypeArray) {
+                [self enableLinkCursor];
+                return;
             }
         }
     }
@@ -532,28 +478,73 @@
     [self disableLinkCursor];
 }
 
-#pragma mark - Public methods - Accessors
+#pragma mark - Public methods - NSTableView event handling
 
-- (RLMTableView *)realmTableView
-{
-    return (RLMTableView *)self.tableView;
+- (IBAction)editedTextField:(NSTextField *)sender {
+    NSInteger row = [self.tableView rowForView:sender];
+    NSInteger column = [self.tableView columnForView:sender];
+    
+    RLMTypeNode *displayedType = self.displayedType;
+    RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
+    
+    id result = nil;
+    
+    if (propertyNode.type == RLMPropertyTypeString) {
+        result = sender.stringValue;
+    }
+    else if (propertyNode.type == RLMPropertyTypeInt) {
+        numberFormatter.allowsFloats = NO;
+        result = [numberFormatter numberFromString:sender.stringValue];
+    }
+    else if (propertyNode.type == RLMPropertyTypeFloat || propertyNode.type == RLMPropertyTypeDouble) {
+        numberFormatter.allowsFloats = YES;
+        numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+        result = [numberFormatter numberFromString:sender.stringValue];
+    }
+    else if (propertyNode.type == RLMPropertyTypeDate) {
+        result = [dateFormatter dateFromString:sender.stringValue];
+    }
+    
+    if (result) {
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        [realm beginWriteTransaction];
+        selectedInstance[propertyNode.name] = result;
+        [realm commitWriteTransaction];
+    }
+    
+    [self.tableView reloadData];
 }
 
-#pragma mark - Public methods - NSTableView eventHandling
+- (IBAction)editedCheckBox:(NSButton *)sender
+{
+    NSInteger row = [self.tableView rowForView:sender];
+    NSInteger column = [self.tableView columnForView:sender];
+    
+    RLMTypeNode *displayedType = self.displayedType;
+    RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
 
-- (IBAction)userClicked:(id)sender
+    NSNumber *result = @((BOOL)(sender.state == NSOnState));
+
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    [realm beginWriteTransaction];
+    selectedInstance[propertyNode.name] = result;
+    [realm commitWriteTransaction];
+}
+
+- (void)userClicked:(NSTableView *)sender
 {
     NSInteger column = self.tableView.clickedColumn;
     NSInteger row = self.tableView.clickedRow;
     
     if (column != -1 && row != -1) {
-        RLMTypeNode *displayedType = [self displayedType];
-        
+        RLMTypeNode *displayedType = self.displayedType;
         RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
         
         if (propertyNode.type == RLMPropertyTypeObject) {
             RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
-            NSObject *propertyValue = selectedInstance[propertyNode.name];
+            id propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMObject class]]) {
                 RLMObject *linkedObject = (RLMObject *)propertyValue;
@@ -564,10 +555,8 @@
                         RLMArray *allInstances = [linkedObject.realm allObjects:linkedObjectSchema.className];
                         NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
                         
-                        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:clazzNode
-                                                                                               index:objectIndex];
-                        [self.parentWindowController addNavigationState:state
-                                                     fromViewController:self];
+                        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:clazzNode index:objectIndex];
+                        [self.parentWindowController addNavigationState:state fromViewController:self];
                         
                         break;
                     }
@@ -579,12 +568,8 @@
             NSObject *propertyValue = selectedInstance[propertyNode.name];
             
             if ([propertyValue isKindOfClass:[RLMArray class]]) {
-                RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:displayedType
-                                                                                             typeIndex:row
-                                                                                              property:propertyNode.property
-                                                                                            arrayIndex:0];
-                [self.parentWindowController addNavigationState:state
-                                             fromViewController:self];
+                RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:displayedType typeIndex:row property:propertyNode.property arrayIndex:0];
+                [self.parentWindowController addNavigationState:state fromViewController:self];
             }
         }
         else {
@@ -598,10 +583,56 @@
     }
 }
 
+- (void)userDoubleClicked:(NSTableView *)sender {
+    NSInteger column = self.tableView.clickedColumn;
+    NSInteger row = self.tableView.clickedRow;
+    
+    RLMTypeNode *displayedType = self.displayedType;
+    RLMClazzProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMObject *selectedObject = [displayedType instanceAtIndex:row];
+    id propertyValue = selectedObject[propertyNode.name];
+    
+    if (propertyNode.type == RLMPropertyTypeDate) {
+        // Create a menu with a single menu item, and later populate it with the propertyValue
+        NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
+        
+        NSRect frame = [self.tableView frameOfCellAtColumn:column row:row];
+        frame.origin.x -= [self.tableView intercellSpacing].width*0.5;
+        frame.origin.y -= [self.tableView intercellSpacing].height*0.5;
+        frame.size.width += [self.tableView intercellSpacing].width;
+        frame.size.height += [self.tableView intercellSpacing].height;
+        
+        frame.size.height = MAX(23.0, frame.size.height);
+        
+        // Set up a date picker with no border or background
+        NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
+        datepicker.bordered = NO;
+        datepicker.drawsBackground = NO;
+        datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
+        datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
+        datepicker.dateValue = propertyValue;
+        
+        item.view = datepicker;
+        [menu addItem:item];
+        
+        if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
+            RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+            [realm beginWriteTransaction];
+            selectedObject[propertyNode.name] = datepicker.dateValue;
+            [realm commitWriteTransaction];
+            [self.tableView reloadData];
+        }
+    }
+}
+
 #pragma mark - Public methods - Table view construction
 
 - (void)enableLinkCursor
 {
+    if (linkCursorDisplaying) {
+        return;
+    }
     NSCursor *currentCursor = [NSCursor currentCursor];
     [currentCursor push];
     

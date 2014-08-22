@@ -44,8 +44,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
     if (firstItem != nil) {
-        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem
-                                                                                   index:0];
+        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
 
         [self addNavigationState:initState
               fromViewController:nil];

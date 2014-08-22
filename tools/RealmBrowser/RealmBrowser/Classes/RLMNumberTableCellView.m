@@ -16,29 +16,43 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSidebarTableCellView.h"
+#import "RLMNumberTableCellView.h"
 
-@implementation RLMSidebarTableCellView
+@interface RLMNumberTextField()
+
+@property (nonatomic) NSNumberFormatter *numberFormatter;
+
+@end
+
+
+@implementation RLMNumberTextField
 
 - (void)awakeFromNib {
-    // We want it to appear "inline"
-    [[self.button cell] setBezelStyle:NSInlineBezelStyle];
+    [super awakeFromNib];
+    self.numberFormatter = [[NSNumberFormatter alloc] init];
+    [self.numberFormatter setHasThousandSeparators:NO];
+    [self.numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    [self.numberFormatter setMaximumFractionDigits:UINT16_MAX];
 }
 
-// The standard rowSizeStyle does some specific layout for us. To customize layout for our button, we first call super and then modify things
-- (void)viewWillDraw {
-    [super viewWillDraw];
-    
-    if (![self.button isHidden]) {
-        [self.button sizeToFit];
-        
-        NSRect textFrame = self.textField.frame;
-        NSRect buttonFrame = self.button.frame;
-        buttonFrame.origin.x = NSWidth(self.frame) - NSWidth(buttonFrame) - 10.0f;
-        self.button.frame = buttonFrame;
-        textFrame.size.width = NSMinX(buttonFrame) - NSMinX(textFrame);
-        self.textField.frame = textFrame;
+-(BOOL)becomeFirstResponder {
+    if (self.number) {
+        self.stringValue = [self.numberFormatter stringFromNumber:self.number];
     }
+    else {
+        self.stringValue = @"";
+    }
+    
+    return [super becomeFirstResponder];
 }
 
 @end
+
+
+@implementation RLMNumberTableCellView
+
+@end
+
+
+
+

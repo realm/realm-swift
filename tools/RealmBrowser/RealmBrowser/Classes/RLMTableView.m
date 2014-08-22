@@ -25,6 +25,7 @@
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+    NSMenu *rightClickMenu;
 }
 
 #pragma mark - NSObject overrides
@@ -34,15 +35,31 @@
     [super awakeFromNib];
     
     int opts = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate);
-    trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
-                                                options:opts
-                                                  owner:self
-                                               userInfo:nil];
+    trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:opts owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
     
     mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
+    
+    rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
+    [rightClickMenu insertItemWithTitle:@"Add row" action:@selector(selectedAddRow:) keyEquivalent:@"+" atIndex:0];
+    [rightClickMenu insertItemWithTitle:@"Delete row" action:@selector(selectedDeleteRow:) keyEquivalent:@"-" atIndex:1];
+    [self setMenu:rightClickMenu];
+}
+
+- (void)selectedAddRow:(NSMenuItem *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(menuSelectedAddRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedAddRow:currentMouseLocation];
+    }
+}
+
+- (void)selectedDeleteRow:(NSMenuItem *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(menuSelectedDeleteRow:)]) {
+        [(id<RLMTableViewDelegate>)self.delegate menuSelectedDeleteRow:currentMouseLocation];
+    }
 }
 
 - (void)dealloc
@@ -57,7 +74,7 @@
     // Note: This method is left empty intentionally. It avoids cursor events to be passed on up
     //       the responder chain where it potentially could reach a displayed tool-tip view, which
     //       will undo any modification to the cursor image dome by the application. This "fix" is
-    //       in order to cercumvent a bug in OS X version prior to 10.10 Yosemite not honouring
+    //       in order to circumvent a bug in OS X version prior to 10.10 Yosemite not honouring
     //       the NSTrackingActiveAlways option even when the cursorRect has been disabled.
     //       IMPORTANT: Must NOT be deleted!!!
 }
@@ -71,7 +88,7 @@
     }
 }
 
-- (void)mouseMoved:(NSEvent*)event
+- (void)mouseMoved:(NSEvent *)event
 {
     id myDelegate = [self delegate];
     
@@ -130,10 +147,7 @@
     
     [self removeTrackingArea:trackingArea];
     int opts = (NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
-    trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds]
-                                                options:opts
-                                                  owner:self
-                                               userInfo:nil];
+    trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:opts owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
 }
 
@@ -164,104 +178,52 @@
         NSTableColumn *tableColumn = self.tableColumns[index];
         
         RLMClazzProperty *property = columns[index];
-        NSString *columnName = property.name;
-        
+        [[tableColumn headerCell] setStringValue:property.name];
+
+        NSString *toolTip;
         switch (property.type) {
-            case RLMPropertyTypeBool: {
-                [self initializeSwitchButtonTableColumn:tableColumn
-                                               withName:columnName
-                                              alignment:NSRightTextAlignment
-                                               editable:YES
-                                                toolTip:@"Boolean"];
-                break;
-            }
-                
-            case RLMPropertyTypeInt: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSRightTextAlignment
-                                   editable:YES
-                                    toolTip:@"Integer"];
+            case RLMPropertyTypeBool:
+                toolTip = @"Boolean";
                 break;
                 
-            }
-                
-            case RLMPropertyTypeFloat: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSRightTextAlignment
-                                   editable:YES
-                                    toolTip:@"Float"];
+            case RLMPropertyTypeInt:
+                toolTip = @"Integer";
                 break;
-            }
                 
-            case RLMPropertyTypeDouble: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSRightTextAlignment
-                                   editable:YES
-                                    toolTip:@"Double"];
+            case RLMPropertyTypeFloat:
+                toolTip = @"Float";
                 break;
-            }
                 
-            case RLMPropertyTypeString: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:YES
-                                    toolTip:@"String"];
+            case RLMPropertyTypeDouble:
+                toolTip = @"Double";
                 break;
-            }
                 
-            case RLMPropertyTypeData: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:NO
-                                    toolTip:@"Data"];
+            case RLMPropertyTypeString:
+                toolTip = @"String";
                 break;
-            }
                 
-            case RLMPropertyTypeAny: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:NO
-                                    toolTip:@"Any"];
+            case RLMPropertyTypeData:
+                toolTip = @"Data";
                 break;
-            }
                 
-            case RLMPropertyTypeDate: {
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:YES
-                                    toolTip:@"Date"];
+            case RLMPropertyTypeAny:
+                toolTip = @"Any";
                 break;
-            }
                 
-            case RLMPropertyTypeArray: {
-                NSString *targetTypeName = property.property.objectClassName;
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:NO
-                                    toolTip:[NSString stringWithFormat:@"%@[..]", targetTypeName]];
+            case RLMPropertyTypeDate:
+                toolTip = @"Date";
                 break;
-            }
                 
-            case RLMPropertyTypeObject: {
-                NSString *targetTypeName = property.property.objectClassName;
-                [self initializeTableColumn:tableColumn
-                                   withName:columnName
-                                  alignment:NSLeftTextAlignment
-                                   editable:NO
-                                    toolTip:[NSString stringWithFormat:@"%@", targetTypeName]];
+            case RLMPropertyTypeArray:
+                toolTip = [NSString stringWithFormat:@"%@[..]", property.property.objectClassName];
                 break;
-            }
+                
+            case RLMPropertyTypeObject:
+                toolTip = [NSString stringWithFormat:@"%@", property.property.objectClassName];
+                break;
         }
         
-        
+        tableColumn.headerToolTip = toolTip;
     }
     
     [self reloadData];
@@ -274,8 +236,7 @@
 
 - (RLMTableLocation)currentLocationAtPoint:(NSPoint)point
 {
-    NSPoint localPoint = [self convertPoint:point
-                                   fromView:nil];
+    NSPoint localPoint = [self convertPoint:point fromView:nil];
     
     NSInteger row = [self rowAtPoint:localPoint];
     NSInteger column = [self columnAtPoint:localPoint];
@@ -291,53 +252,9 @@
     return CGRectIntersection(rowRect, columnRect);
 }
 
-#pragma mark - Private methods - Table view configuration
-
-- (NSCell *)initializeTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
-{
-    NSCell *cell = [[NSCell alloc] initTextCell:@""];
-    
-    [self initializeTabelColumn:column
-                       withCell:cell
-                           name:name
-                      alignment:alignment
-                       editable:editable
-                        toolTip:toolTip];
-    
-    return cell;
-}
-
-- (NSCell *)initializeSwitchButtonTableColumn:(NSTableColumn *)column withName:(NSString *)name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
-{
-    NSButtonCell *cell = [[NSButtonCell alloc] init];
-    
-    cell.title = nil;
-    cell.allowsMixedState = YES;
-    cell.buttonType =NSSwitchButton;
-    cell.alignment = NSCenterTextAlignment;
-    cell.imagePosition = NSImageOnly;
-    cell.controlSize = NSSmallControlSize;
-    
-    [self initializeTabelColumn:column
-                       withCell:cell
-                           name:name
-                      alignment:alignment
-                       editable:editable
-                        toolTip:toolTip];
-    
-    return cell;
-}
-
-- (void)initializeTabelColumn:(NSTableColumn *)column withCell:(NSCell *)cell name:(NSString *) name alignment:(NSTextAlignment)alignment editable:(BOOL)editable toolTip:(NSString *)toolTip
-{
-    cell.alignment = alignment;
-    cell.editable = editable;
-    
-    column.dataCell = cell;
-    column.headerToolTip = toolTip;
-    
-    NSTableHeaderCell *headerCell = column.headerCell;
-    headerCell.stringValue = name;
-}
-
 @end
+
+
+
+
+

@@ -111,6 +111,7 @@
     // ... and second level nodes are all classes.
     else if ([item conformsToProtocol:@protocol(RLMRealmOutlineNode)]) {
         id<RLMRealmOutlineNode> outlineItem = item;
+        
         return [outlineItem childNodeAtIndex:index];
     }
     

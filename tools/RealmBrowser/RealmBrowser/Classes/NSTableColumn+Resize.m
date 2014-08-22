@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "NSTableColumn+Resize.h"
+#import "RLMTableCellView.h"
 
 @implementation NSTableColumn (Resize)
 
@@ -27,20 +28,18 @@ const NSUInteger kMaxNumberOfRowsToConsider = 100;
     NSTableView *tableView = self.tableView;
     NSRect rect = NSMakeRect(0,0, INFINITY, tableView.rowHeight);
     NSInteger columnIndex = [tableView.tableColumns indexOfObject:self];
-    CGFloat maxSize = 0;
+    CGFloat maxWidth = 0.0;
     
-    for (NSInteger index = 0; index < MIN(kMaxNumberOfRowsToConsider, tableView.numberOfRows); index++) {
-        NSCell *cell = [tableView preparedCellAtColumn:columnIndex
-                                                   row:index];
-        NSSize size = [cell cellSizeForBounds:rect];
-        maxSize = MAX(maxSize, size.width);
+    for (NSInteger rowIndex = 0; rowIndex < MIN(kMaxNumberOfRowsToConsider, tableView.numberOfRows); rowIndex++) {
+        RLMTableCellView *tableCellView = [self.tableView viewAtColumn:columnIndex row:rowIndex makeIfNecessary:YES];
+        maxWidth = MAX(maxWidth, tableCellView.sizeThatFits.width);
     }
     
     NSCell *headerCell = self.headerCell;
     NSSize headerSize = [headerCell cellSizeForBounds:rect];
-    maxSize = MAX(maxSize, headerSize.width) * 1.25;
+    maxWidth = MAX(maxWidth, headerSize.width)*1.1;
     
-    self.width = maxSize;
+    self.width = maxWidth;
 }
 
 @end

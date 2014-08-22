@@ -16,29 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSidebarTableCellView.h"
+#import "RLMBoolTableCellView.h"
 
-@implementation RLMSidebarTableCellView
+@implementation RLMBoolTableCellView
 
-- (void)awakeFromNib {
-    // We want it to appear "inline"
-    [[self.button cell] setBezelStyle:NSInlineBezelStyle];
-}
-
-// The standard rowSizeStyle does some specific layout for us. To customize layout for our button, we first call super and then modify things
-- (void)viewWillDraw {
+- (void)viewWillDraw
+{
     [super viewWillDraw];
     
-    if (![self.button isHidden]) {
-        [self.button sizeToFit];
-        
-        NSRect textFrame = self.textField.frame;
-        NSRect buttonFrame = self.button.frame;
-        buttonFrame.origin.x = NSWidth(self.frame) - NSWidth(buttonFrame) - 10.0f;
-        self.button.frame = buttonFrame;
-        textFrame.size.width = NSMinX(buttonFrame) - NSMinX(textFrame);
-        self.textField.frame = textFrame;
-    }
+    CGRect frame = self.checkBox.frame;
+    CGRect bounds = self.bounds;
+    
+    frame.origin.x = (CGRectGetWidth(bounds) - CGRectGetWidth(frame))/2.0;
+    frame.origin.y = (CGRectGetHeight(bounds) - CGRectGetHeight(frame))/2.0;
+    
+    self.checkBox.frame = frame;
+}
+
+-(NSSize)sizeThatFits
+{
+    return self.checkBox.bounds.size;
 }
 
 @end
