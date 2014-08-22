@@ -289,20 +289,15 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (instancetype)initWithSize:(NSUInteger)arraySize {
     if ((self = [super init])) {
         size = arraySize;
-        array = new id[size];
+        array = std::make_unique<id[]>(size);
     }
     return self;
 }
 
 - (void)resize:(NSUInteger)newSize {
     if (newSize != size) {
-        delete [] array;
         size = newSize;
-        array = new id[size];
+        array = std::make_unique<id[]>(size);
     }
-}
-
-- (void)dealloc {
-    delete [] array;
 }
 @end

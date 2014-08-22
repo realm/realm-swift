@@ -130,10 +130,10 @@ static NSArray *s_objectDescriptors = nil;
     NSThread *_thread;
     NSMapTable *_notificationHandlers;
 
-    LangBindHelper::TransactLogRegistry *_writeLogs;
-    Replication *_replication;
-    SharedGroup *_sharedGroup;
-
+    std::unique_ptr<LangBindHelper::TransactLogRegistry> _writeLogs;
+    std::unique_ptr<Replication> _replication;
+    std::unique_ptr<SharedGroup> _sharedGroup;
+    
     Group *_group;
 }
 
@@ -270,11 +270,11 @@ static NSArray *s_objectDescriptors = nil;
     NSError *error = nil;
     try {
         if (s_useInMemoryDefaultRealm && [path isEqualToString:[RLMRealm defaultRealmPath]]) { // Only for default realm
-            realm->_sharedGroup = new SharedGroup(path.UTF8String, false, SharedGroup::durability_MemOnly);
+            realm->_sharedGroup = make_unique<SharedGroup>(path.UTF8String, false, SharedGroup::durability_MemOnly);
         } else {
-        	realm->_writeLogs = tightdb::getWriteLogs(path.UTF8String);
-        	realm->_replication = tightdb::makeWriteLogCollector(path.UTF8String);
-        	realm->_sharedGroup = new SharedGroup(*realm->_replication);
+            realm->_writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
+            realm->_replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
+            realm->_sharedGroup = make_unique<SharedGroup>(*realm->_replication);
         }
     }
     catch (File::PermissionDenied &ex) {
@@ -459,16 +459,6 @@ static NSArray *s_objectDescriptors = nil;
     if (self.inWriteTransaction) {
         [self commitWriteTransaction];
         NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
-    }
-
-    if (_sharedGroup) {
-        delete _sharedGroup;
-    }
-    if (_replication) {
-        delete _replication;
-    }
-    if (_writeLogs) {
-        delete _writeLogs;
     }
 }
 
