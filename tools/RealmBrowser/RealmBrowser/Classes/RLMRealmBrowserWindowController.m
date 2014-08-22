@@ -52,6 +52,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     navigationStack = [[RLMNavigationStack alloc] init];
     [self loadWindowSize];
+    [self realmDidLoad];
 }
 
 #pragma mark - RLMViewController Overrides
