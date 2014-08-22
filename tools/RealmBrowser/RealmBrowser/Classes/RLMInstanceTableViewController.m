@@ -30,10 +30,12 @@
 #import "RLMNumberTableCellView.h"
 
 #import "NSColor+ByteSizeFactory.h"
+#import "NSFont+Standard.h"
 
 #import "objc/objc-class.h"
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
@@ -192,12 +194,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [badgeCellView.badge.cell setHighlightsBy:0];
             
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
-            badgeCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+            
+            badgeCellView.textField.stringValue = formattedText;
+            badgeCellView.textField.font = [NSFont linkFont];
             
             [badgeCellView.textField setEditable:NO];
             
             cellView = badgeCellView;
-
         }
             break;
             
@@ -232,13 +235,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
             
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
+            basicCellView.textField.stringValue = formattedText;
             
             if (type == RLMPropertyTypeObject) {
-                basicCellView.textField.attributedStringValue = [self.class linkStringWithString:formattedText];
+                basicCellView.textField.font = [NSFont linkFont];
                 [basicCellView.textField setEditable:NO];
             }
             else {
-                basicCellView.textField.stringValue = formattedText;
+                basicCellView.textField.font = [NSFont textFont];
                 [basicCellView.textField setEditable:!self.realmIsLocked];
             }
             
@@ -253,13 +257,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - Private Methods - NSTableView Delegate
-
-+(NSAttributedString *)linkStringWithString:(NSString *)string
-{
-    NSColor *blue = [NSColor colorWithByteRed:26 green:66 blue:251 alpha:255];
-    NSDictionary *attributes = @{NSForegroundColorAttributeName: blue, NSUnderlineStyleAttributeName: @1};
-    return [[NSAttributedString alloc] initWithString:string attributes:attributes];
-}
 
 -(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
@@ -280,15 +277,20 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberFormatter.allowsFloats = propertyType != RLMPropertyTypeInt;
             
             return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
-            break;
             
-        case RLMPropertyTypeString:
-            return (NSString *)propertyValue;
-            break;
+        case RLMPropertyTypeString: {
+            NSString *stringValue = propertyValue;
+            
+            if (linkFormat && stringValue.length > kMaxNumberOfStringCharsInObjectLink) {
+                stringValue = [stringValue substringToIndex:kMaxNumberOfStringCharsInObjectLink - 3];
+                stringValue = [stringValue stringByAppendingString:@"..."];
+            }
+            
+            return stringValue;
+        }
             
         case RLMPropertyTypeBool:
                 return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
-            break;
             
         case RLMPropertyTypeArray: {
             RLMArray *referredArray = (RLMArray *)propertyValue;
@@ -301,7 +303,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
         case RLMPropertyTypeDate:
             return [dateFormatter stringFromDate:(NSDate *)propertyValue];
-            break;
             
         case RLMPropertyTypeData:
             return @"<Data>";
@@ -340,8 +341,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             return [returnString stringByAppendingString:@")"];
         }
     }
-    
-    return @"";
 }
 
 -(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
