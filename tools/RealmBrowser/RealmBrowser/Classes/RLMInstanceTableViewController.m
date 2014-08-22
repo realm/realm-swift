@@ -177,7 +177,18 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
     RLMTypeNode *displayedType = self.displayedType;
+
+    if ([displayedType isMemberOfClass:[RLMArrayNode class]]) {
+        columnIndex--;
+    }
     
+    if (columnIndex == -1) {
+        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+        basicCellView.textField.stringValue = [@(rowIndex) stringValue];
+        
+        return basicCellView;
+    }
+
     RLMClassProperty *classProperty = displayedType.propertyColumns[columnIndex];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];

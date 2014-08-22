@@ -18,6 +18,7 @@
 
 #import "RLMTableView.h"
 #import "RLMTableColumn.h"
+#import "RLMArrayNode.h"
 
 @interface RLMTableView()<NSMenuDelegate>
 
@@ -310,6 +311,15 @@
     for (NSUInteger index = 0; index < existingColumnsCount; index++) {
         NSTableColumn *column = [self.tableColumns lastObject];
         [self removeTableColumn:column];
+    }
+    
+    // If array, add extra first column with numbers
+    if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
+        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
+        tableColumn.headerToolTip = @"Position of object within array";
+        tableColumn.propertyType = RLMPropertyTypeInt;
+        [self addTableColumn:tableColumn];
+        [tableColumn.headerCell setStringValue:@"#"];
     }
     
     // ... and add new columns matching the structure of the new realm table.
