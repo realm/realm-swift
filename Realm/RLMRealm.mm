@@ -346,6 +346,9 @@ static NSArray *s_objectDescriptors = nil;
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
+    if (!block) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"The notification block should not be nil" userInfo:nil];
+    }
 
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
@@ -366,7 +369,9 @@ static NSArray *s_objectDescriptors = nil;
 - (void)sendNotifications {
     // call this realms notification blocks
     for (RLMNotificationToken *token in [_notificationHandlers copy]) {
-        token.block(RLMRealmDidChangeNotification, self);
+        if (token.block) {
+            token.block(RLMRealmDidChangeNotification, self);
+        }
     }
 }
 
