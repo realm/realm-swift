@@ -17,8 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmBrowserWindowController.h"
-#import "NSTableColumn+Resize.h"
 #import "RLMNavigationStack.h"
+
+NSString * const kRealmLockedImage = @"RealmLocked";
+NSString * const kRealmUnlockedImage = @"RealmUnlocked";
+
+NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
+NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 @interface RLMRealm (Dynamic)
 - (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
@@ -28,28 +33,55 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 
-const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
+@interface RLMRealmBrowserWindowController()<NSWindowDelegate>
+
+@property (weak) IBOutlet NSSplitView *splitView;
+@property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
+@property (weak) IBOutlet NSToolbarItem *lockRealmButton;
+@property (nonatomic, strong) IBOutlet NSSearchField *searchField;
+
+@end
 
 @implementation RLMRealmBrowserWindowController {
-
     RLMNavigationStack *navigationStack;
 }
 
-#pragma mark - NSViewController overrides
+#pragma mark - NSViewController Overrides
 
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
+    [self loadWindowSize];
+    [self realmDidLoad];
+}
+
+#pragma mark - RLMViewController Overrides
+
+-(void)realmDidLoad
+{
+    [self.outlineViewController realmDidLoad];
+    [self.tableViewController realmDidLoad];
+    
     [self updateNavigationButtons];
     
-    id firstItem = self.modelDocument.presentedRealm.topLevelClazzes.firstObject;
+    id firstItem = self.modelDocument.presentedRealm.topLevelClasses.firstObject;
     if (firstItem != nil) {
-        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem
-                                                                                   index:0];
-
-        [self addNavigationState:initState
-              fromViewController:nil];
+        RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
+        
+        [self addNavigationState:initState fromViewController:nil];
     }
+
+    [self setRealmLocked:YES];
+    
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
+}
+
+#pragma mark - NSWindowDelegate Methods
+
+-(void)windowWillClose:(NSNotification *)notification
+{
+    [self saveWindowSize];
 }
 
 #pragma mark - Public methods - Accessors
@@ -59,7 +91,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     return navigationStack.currentState;
 }
 
-#pragma mark - Public methods
+#pragma mark - Public methods - User Actions
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
@@ -70,17 +102,54 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
         [self updateNavigationButtons];
         
         if (controller == self.tableViewController || controller == nil) {
-            [self.outlineViewController updateUsingState:state
-                                                oldState:oldState];
+            [self.outlineViewController updateUsingState:state oldState:oldState];
         }
         
-        [self.tableViewController updateUsingState:state
-                                          oldState:oldState];
+        [self.tableViewController updateUsingState:state oldState:oldState];
     }
 
     // Searching is not implemented for link arrays yet
     BOOL isArray = [state isMemberOfClass:[RLMArrayNavigationState class]];
     [self.searchField setEnabled:!isArray];
+}
+
+- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
+{
+    RLMNavigationState *oldState = navigationStack.currentState;
+    
+    switch (buttons.selectedSegment) {
+        case 0: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateBackward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        case 1: { // Navigate backwards
+            RLMNavigationState *state = [navigationStack navigateForward];
+            if (state != nil) {
+                [self.outlineViewController updateUsingState:state oldState:oldState];
+                [self.tableViewController updateUsingState:state oldState:oldState];
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    
+    [self updateNavigationButtons];
+}
+
+- (IBAction)userClickedLockRealm:(id)sender
+{
+    [self setRealmLocked:!self.tableViewController.realmIsLocked];
+}
+
+-(void)setRealmLocked:(BOOL)locked
+{
+    self.tableViewController.realmIsLocked = locked;
+    self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
@@ -105,7 +174,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 
     for (NSUInteger index = 0; index < columnCount; index++) {
 
-        RLMClazzProperty *property = columns[index];
+        RLMClassProperty *property = columns[index];
         NSString *columnName = property.name;
 
         switch (property.type) {
@@ -151,8 +220,7 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
                 break;
             }
             //case RLMPropertyTypeFloat: // search on float columns disabled until bug is fixed in binding
-            case RLMPropertyTypeDouble:
-            {
+            case RLMPropertyTypeDouble: {
                 double value;
 
                 if ([searchText isEqualToString:@"0"] ||
@@ -188,46 +256,35 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
     [self addNavigationState:state fromViewController:self.tableViewController];
 }
 
-- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons
-{
-    RLMNavigationState *oldState = navigationStack.currentState;
-    
-    switch (buttons.selectedSegment) {
-        case 0: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateBackward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        case 1: { // Navigate backwards
-            RLMNavigationState *state = [navigationStack navigateForward];
-            if (state != nil) {
-                [self.outlineViewController updateUsingState:state
-                                                       oldState:oldState];
-                [self.tableViewController updateUsingState:state
-                                                     oldState:oldState];
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    
-    [self updateNavigationButtons];    
-}
-
 #pragma mark - Private methods
 
 - (void)updateNavigationButtons
 {
-    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward]
-                            forSegment:0];
-    [self.navigationButtons setEnabled:[navigationStack canNavigateForward]
-                            forSegment:1];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateBackward] forSegment:0];
+    [self.navigationButtons setEnabled:[navigationStack canNavigateForward] forSegment:1];
 }
+
+#pragma mark - Private Methods - Window Size
+
+-(void)loadWindowSize
+{
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
+    NSString *frameString = [[NSUserDefaults standardUserDefaults] objectForKey:frameKey];
+    
+    if (frameString) {
+        [self.window setFrame:NSRectFromString(frameString) display:YES];
+    }
+}
+
+-(void)saveWindowSize
+{
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
+    NSString *frameString = NSStringFromRect(self.window.frame);
+    [[NSUserDefaults standardUserDefaults] setObject:frameString forKey:frameKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 
 @end

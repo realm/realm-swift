@@ -12,12 +12,15 @@
 
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
+* Add support for the BETWEEN operator in link queries.
+* Add support for multi-level link queries in predicates (e.g. `foo.bar.baz = 5`).
 * Switch to building the SDK from source when using CocoaPods and add a
   Realm.Headers subspec for use in targets that should not link a copy of Realm
   (such as test targets).
 * Allow unregistering from change notifications in the change notification
   handler block.
 * Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta6.
+
 
 ### Bugfixes
 

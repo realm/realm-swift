@@ -16,14 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMNumberTextField : NSTextField
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
+@property (nonatomic) NSNumber *number;
 
-- (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
-- (BOOL)removeInstanceAtIndex:(NSUInteger)index;
+@end
+
+
+@interface RLMNumberTableCellView : RLMTableCellView
 
 @end

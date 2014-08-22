@@ -18,12 +18,11 @@
 
 #import "RLMDocument.h"
 
-#import "RLMClazzNode.h"
+#import "RLMClassNode.h"
 #import "RLMArrayNode.h"
-#import "RLMClazzProperty.h"
+#import "RLMClassProperty.h"
 #import "RLMRealmOutlineNode.h"
 #import "RLMRealmBrowserWindowController.h"
-#import "NSTableColumn+Resize.h"
 
 @implementation RLMDocument
 
@@ -38,35 +37,34 @@
 - (instancetype)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     if (self = [super init]) {
-        if ([[typeName lowercaseString] isEqualToString:@"documenttype"]) {
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            if ([fileManager fileExistsAtPath:absoluteURL.path]) {
-                NSString *lastComponent = [absoluteURL lastPathComponent];
-                NSString *extension = [absoluteURL pathExtension];
-
-                if ([[extension lowercaseString] isEqualToString:@"realm"]) {
-                    NSArray *fileNameComponents = [lastComponent componentsSeparatedByString:@"."];
-                    NSString *realmName = [fileNameComponents firstObject];
-                    
-                    NSError *error;
-                    
-                    RLMRealmNode *realm = [[RLMRealmNode alloc] initWithName:realmName
-                                                                         url:absoluteURL.path];
-                    self.presentedRealm = realm;
-                    
-                    if ([realm connect:&error]) {
-                        NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
-                        [documentController noteNewRecentDocumentURL:absoluteURL];                    
-                    }
-                }
-            }
-            else {
-                
-            }
+        if (![[typeName lowercaseString] isEqualToString:@"documenttype"]) {
+            return self;
         }
-        else {
-            
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if (![fileManager fileExistsAtPath:absoluteURL.path]) {
+            return self;
         }
+        NSString *lastComponent = [absoluteURL lastPathComponent];
+        NSString *extension = [absoluteURL pathExtension];
+        
+        if (![[extension lowercaseString] isEqualToString:@"realm"]) {
+            return self;
+        }
+        
+        NSArray *fileNameComponents = [lastComponent componentsSeparatedByString:@"."];
+        NSString *realmName = [fileNameComponents firstObject];
+        
+        RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
+        self.presentedRealm  = realmNode;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSError *error;
+            if ([realmNode connect:&error]) {
+                NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
+                [documentController noteNewRecentDocumentURL:absoluteURL];
+            }
+        });
     }
     
     return self;
@@ -93,6 +91,11 @@
 }
 
 #pragma mark - Public methods - NSDocument overrides - Loading Document Data
+
++(BOOL)canConcurrentlyReadDocumentsOfType:(NSString *)typeName
+{
+    return YES;
+}
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
 {

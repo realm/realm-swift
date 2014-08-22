@@ -265,6 +265,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // create row in table
     tightdb::Table &table = *schema->_table;
     size_t rowIndex = table.add_empty_row();
+    tightdb::Row r = table[rowIndex];
+    
     object->_row = table[rowIndex];
 
     // populate all properties

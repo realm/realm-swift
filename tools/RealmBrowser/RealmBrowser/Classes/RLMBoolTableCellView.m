@@ -16,16 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
+#import "RLMBoolTableCellView.h"
 
-@interface RLMClazzProperty : NSObject
+@implementation RLMBoolTableCellView
 
-@property (nonatomic, readonly) RLMProperty *property;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) RLMPropertyType type;
-@property (nonatomic, readonly) Class clazz;
+- (void)viewWillDraw
+{
+    [super viewWillDraw];
+    
+    CGRect frame = self.checkBox.frame;
+    CGRect bounds = self.bounds;
+    
+    frame.origin.x = (CGRectGetWidth(bounds) - CGRectGetWidth(frame))/2.0;
+    frame.origin.y = (CGRectGetHeight(bounds) - CGRectGetHeight(frame))/2.0;
+    
+    self.checkBox.frame = frame;
+}
 
-- (instancetype)initWithProperty:(RLMProperty *)property;
+-(NSSize)sizeThatFits
+{
+    return self.checkBox.bounds.size;
+}
 
 @end

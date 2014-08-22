@@ -24,31 +24,32 @@
 
 NSString *const kRealmFileExension = @"realm";
 
-const NSUInteger kTestDatabaseSizeMultiplicatorFactor = 1;
+const NSUInteger kTestDatabaseSizeMultiplicatorFactor = 2000;
 const NSUInteger kTopTipDelay = 250;
+
+@interface RLMApplicationDelegate ()
+
+@property (nonatomic) BOOL didLoadFile;
+
+@end
 
 @implementation RLMApplicationDelegate
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay)
-                                              forKey:@"NSInitialToolTipDelay"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     
-    NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
-    [self.fileMenu performActionForItemAtIndex:openFileIndex];    
+    if (!self.didLoadFile) {
+        NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
+        [self.fileMenu performActionForItemAtIndex:openFileIndex];
+    }
 }
 
 - (BOOL)application:(NSApplication *)application openFile:(NSString *)filename
 {
-    NSURL *fileUrl = [NSURL fileURLWithPath:filename];
-    
-    NSDocumentController *documentController = [[NSDocumentController alloc] init];
-    [documentController openDocumentWithContentsOfURL:fileUrl
-                                              display:YES
-                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
-                                        NSLog(@"Error %@", error);
-                                    }];
-    
+    [self openFileAtURL:[NSURL fileURLWithPath:filename]];
+    self.didLoadFile = YES;
+
     return YES;
 }
 
@@ -68,8 +69,7 @@ const NSUInteger kTopTipDelay = 250;
 {
     // Find the document directory using it as default location for realm file.
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSArray *directories = [fileManager URLsForDirectory:NSDocumentDirectory
-                                               inDomains:NSUserDomainMask];
+    NSArray *directories = [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
     NSURL *url = [directories firstObject];
     
     // Prompt the user for location af new realm file.
@@ -81,12 +81,10 @@ const NSUInteger kTopTipDelay = 250;
             NSString *path = selectedFile.path;
             BOOL isDirectory = NO;
             
-            if ([fileManager fileExistsAtPath:path
-                                  isDirectory:&isDirectory]) {
+            if ([fileManager fileExistsAtPath:path isDirectory:&isDirectory]) {
                 if (!isDirectory) {
                     NSError *error;
-                    [fileManager removeItemAtURL:selectedFile
-                                           error:&error];
+                    [fileManager removeItemAtURL:selectedFile error:&error];
                 }
             }
             
@@ -101,14 +99,10 @@ const NSUInteger kTopTipDelay = 250;
                 alert.messageText = @"Open demo database?";
                 [alert addButtonWithTitle:@"Ok"];
                 [alert addButtonWithTitle:@"Cancel"];
-
+                
                 NSUInteger response = [alert runModal];
                 if (response == NSAlertFirstButtonReturn) {
-                    NSDocumentController *documentController = [[NSDocumentController alloc] init];
-                    [documentController openDocumentWithContentsOfURL:selectedFile
-                                                              display:YES
-                                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
-                                                    }];
+                    [self openFileAtURL:selectedFile];
                 }
             }
         }
@@ -117,18 +111,22 @@ const NSUInteger kTopTipDelay = 250;
 
 #pragma mark - Private methods
 
+-(void)openFileAtURL:(NSURL *)url
+{
+    NSDocumentController *documentController = [[NSDocumentController alloc] init];
+    [documentController openDocumentWithContentsOfURL:url
+                                              display:YES
+                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
+                                    }];
+}
+
 - (BOOL)createAndPopulateDemoDatabaseAtUrl:(NSURL *)url
 {
-    NSString *path = url.path;
-
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:path
-                                     readOnly:NO
-                                        error:&error];
+    RLMRealm *realm = [RLMRealm realmWithPath:url.path readOnly:NO error:&error];
     
     if (error == nil) {
         [realm beginWriteTransaction];
-        
         for (NSUInteger index = 0; index < kTestDatabaseSizeMultiplicatorFactor; index++) {
             RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John"]];
             RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary"]];
@@ -167,7 +165,7 @@ const NSUInteger kTopTipDelay = 250;
             [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
             [RealmTestClass2 createInRealm:realm withObject:@[@003,  @YES, [NSNull null]]];
             [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];            
+            [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];
         }
         
         [realm commitWriteTransaction];
@@ -180,7 +178,7 @@ const NSUInteger kTopTipDelay = 250;
 
 - (void)showSavePanelStringFromDirectory:(NSURL *)directoryUrl completionHandler:(void(^)(BOOL userSelectesFile, NSURL *selectedFile))completion
 {
-    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
     
     // Restrict the file type to whatever you like
     savePanel.allowedFileTypes = @[kRealmFileExension];
@@ -211,3 +209,4 @@ const NSUInteger kTopTipDelay = 250;
 }
 
 @end
+

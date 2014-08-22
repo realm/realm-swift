@@ -19,12 +19,8 @@
 #import "RLMViewController.h"
 
 #import "RLMRealmBrowserWindowController.h"
-#import "RLMArrayNavigationState.h"
 
-@implementation RLMViewController {
-
-    id delegate;
-}
+@implementation RLMViewController
 
 #pragma mark - NSObject overrides
 
@@ -35,6 +31,11 @@
 }
 
 #pragma mark - Public methods - Accessors
+
+-(void)realmDidLoad
+{
+    // No action - should be implemented by subclasses.
+}
 
 - (NSTableView *)tableView
 {
@@ -51,8 +52,7 @@
 {
     _navigationFromHistory = YES;
     
-    [self performUpdateUsingState:newState
-                         oldState:oldState];
+    [self performUpdateUsingState:newState oldState:oldState];
     
     _navigationFromHistory = NO;
 }
@@ -64,21 +64,21 @@
 
 - (void)clearSelection
 {
-    [self.tableView selectRowIndexes:nil
-                byExtendingSelection:NO];
+    [self.tableView selectRowIndexes:nil byExtendingSelection:NO];
 }
 
 - (void)setSelectionIndex:(NSUInteger)newIndex
 {
     NSUInteger oldIndex = self.tableView.selectedRow;
     if (oldIndex != newIndex) {
-        NSTableView *tableView = self.tableView;
-
-        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex]
-                    byExtendingSelection:NO];
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:newIndex] byExtendingSelection:NO];
         
-        [tableView scrollRowToVisible:newIndex];
+        [self.tableView scrollRowToVisible:newIndex];
     }
 }
 
 @end
+
+
+
+

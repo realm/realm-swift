@@ -16,14 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Cocoa/Cocoa.h>
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMTableCellView : NSTableCellView
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
-
-- (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
-- (BOOL)removeInstanceAtIndex:(NSUInteger)index;
+-(NSSize)sizeThatFits;
 
 @end

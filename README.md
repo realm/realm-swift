@@ -13,9 +13,15 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 
 ## Setting up Realm in your app
 
+### Swift
+
+Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/latest/#swift).
+
+### Objective-C
+
 There are two ways to set up Realm in your app: manually or with CocoaPods.
 
-Manually:
+**Manually:**
 
 1. Download the [latest release of Realm](http://static.realm.io/downloads/ios/latest) and extract the zip (or [build it from source](#building-realm)).
 2. Drag Realm.framework from our release and into the Frameworks folder in your project in Xcode.
@@ -23,7 +29,7 @@ Manually:
 3. Click on the project in the Xcode file explorer.
    Select your target and go to the **Build Phases** tab. Under **Link Binary with Libraries** press + and add **libc++.dylib**.
 
-[CocoaPods](http://cocoapods.org/):
+**[CocoaPods](http://cocoapods.org/):**
 
 1. Add the following to your Podfile: `pod "Realm"`.
 2. From the command line, run `pod install`.
@@ -33,7 +39,7 @@ Once your app is set up with Realm, our [documentation](#documentation) will gui
 
 ## Documentation
 
-Documentation for Realm can be found at [realm.io/docs/ios](http://realm.io/docs/ios). The API reference is located at [realm.io/docs/ios/latest/api](http://realm.io/docs/ios/latest/api).
+Documentation for Realm can be found at [realm.io/docs/cocoa/latest](http://realm.io/docs/cocoa/latest). The API reference is located at [realm.io/docs/cocoa/latest/api](http://realm.io/docs/cocoa/latest/api).
 
 ## Building Realm
 

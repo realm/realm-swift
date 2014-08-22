@@ -21,7 +21,7 @@
 #import "RLMTypeNode.h"
 #import "RLMArrayNode.h"
 
-@interface RLMClazzNode : RLMTypeNode
+@interface RLMClassNode : RLMTypeNode
 
 - (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
 

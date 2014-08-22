@@ -36,6 +36,18 @@ typedef struct {
 
 @protocol RLMTableViewDelegate <NSTableViewDelegate>
 
+- (BOOL)realmIsLocked;
+
+- (BOOL)displaysArray;
+
+- (void)addRows:(NSIndexSet *)rowIndexes;
+
+- (void)deleteRows:(NSIndexSet *)rowIndexes;
+
+- (void)removeRows:(NSIndexSet *)rowIndexes;
+
+- (void)insertRows:(NSIndexSet *)rowIndexes;
+
 @optional
 
 - (void)mouseDidEnterView:(RLMTableView *)view;
@@ -46,10 +58,18 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
+- (void)rightClickedHeaderColumn:(NSUInteger)column;
+
+- (void)rightClickedLocation:(RLMTableLocation)location;
+
 @end
 
 @interface RLMTableView : NSTableView
 
-- (void)formatColumnsToFitType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+@property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
+
+- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+
+- (void)makeColumnsFitContents;
 
 @end

@@ -16,14 +16,43 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import "RLMNumberTableCellView.h"
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMNumberTextField()
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
-
-- (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
-- (BOOL)removeInstanceAtIndex:(NSUInteger)index;
+@property (nonatomic) NSNumberFormatter *numberFormatter;
 
 @end
+
+
+@implementation RLMNumberTextField
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    self.numberFormatter = [[NSNumberFormatter alloc] init];
+    self.numberFormatter.hasThousandSeparators = NO;
+    self.numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    self.numberFormatter.maximumFractionDigits = UINT16_MAX;
+}
+
+-(BOOL)becomeFirstResponder {
+    if (self.number) {
+        self.stringValue = [self.numberFormatter stringFromNumber:self.number];
+    }
+    else {
+        self.stringValue = @"";
+    }
+    
+    return [super becomeFirstResponder];
+}
+
+@end
+
+
+@implementation RLMNumberTableCellView
+
+@end
+
+
+
+

@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
-@interface NSTableColumn (Resize)
-
-- (void)resizeToFitContents;
+@interface RLMBasicTableCellView : RLMTableCellView
 
 @end

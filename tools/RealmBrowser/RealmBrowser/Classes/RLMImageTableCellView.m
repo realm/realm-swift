@@ -16,14 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import "RLMImageTableCellView.h"
 
-@interface RLMArrayNode : RLMTypeNode
+@implementation RLMImageTableCellView
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
-
-- (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
-- (BOOL)removeInstanceAtIndex:(NSUInteger)index;
+- (NSSize)sizeThatFits
+{
+    return NSMakeSize(30.0, 30.0);
+}
 
 @end

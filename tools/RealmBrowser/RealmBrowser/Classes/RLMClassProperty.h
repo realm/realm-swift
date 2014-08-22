@@ -16,14 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Foundation/Foundation.h>
+#import <Realm/Realm.h>
 
-@interface RLMArrayNode : RLMTypeNode
+@interface RLMClassProperty : NSObject
 
-- (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode;
+@property (nonatomic, readonly) RLMProperty *property;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) RLMPropertyType type;
+@property (nonatomic, readonly) Class class;
 
-- (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
-- (BOOL)removeInstanceAtIndex:(NSUInteger)index;
+- (instancetype)initWithProperty:(RLMProperty *)property;
 
 @end
