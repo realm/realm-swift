@@ -47,6 +47,7 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 -(void)realmDidLoad
 {
     [self.outlineViewController realmDidLoad];
+    [self.tableViewController realmDidLoad];
     
     [self updateNavigationButtons];
     
