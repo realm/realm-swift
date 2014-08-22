@@ -30,7 +30,6 @@
 NSString *clientID = @"YOUR CLIENT ID";
 NSString *clientSecret = @"YOUR CLIENT SECRET";
 
-
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -40,9 +39,6 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
     [self.window makeKeyAndVisible];
     UIViewController *rootVC = [[UIViewController alloc] init];
     [self.window setRootViewController:rootVC];
-    
-    // Ensure we start with an empty database
-    [self deleteRealmFile];
     
     // Query Foursquare API 
     NSDictionary *foursquareVenues = [self getFoursquareVenues];
@@ -73,37 +69,32 @@ NSString *clientSecret = @"YOUR CLIENT SECRET";
 
 - (void)persistToDefaultRealm:(NSDictionary*)foursquareVenues
 {
-   // Open the default Realm file
+    // Open the default Realm file
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
     
-    // Begin a write transaction to save to the default Realm
     [defaultRealm beginWriteTransaction];
     
     for (id venue in foursquareVenues) {
-        // Store the foursquare venue name and id in a Realm Object
-        Venue *newVenue = [[Venue alloc] init];
-        newVenue.foursquareID = venue[@"id"];
-        newVenue.name = venue[@"name"];
-
-        // Add the Venue object to the default Realm 
-        // (alternatively you could serialize the API response as an NSArray and call addObjectsFromArray)
-        [defaultRealm addObject:newVenue];
+        // Check if a Venue with the same ID already exists in the deafult Realm
+        RLMArray *existingVenue = [defaultRealm objects:[Venue className]
+                                          withPredicate:[NSPredicate predicateWithFormat:@"foursquareID==%@",venue[@"id"]]];
+        if ([existingVenue count] == 0) {
+            // Create the new Venue
+            Venue *newVenue = [[Venue alloc] init];
+            newVenue.name = venue[@"name"];
+            newVenue.foursquareID = venue[@"id"];
+            [defaultRealm addObject:newVenue];
+        } else if (![existingVenue[0][@"name"] isEqualToString:venue[@"name"]]) {
+            // Update the existing Venue properties
+            existingVenue[0][@"name"] = venue[@"name"];
+        }
     }
     
-    // Persist all the Venues with a single commit
     [defaultRealm commitWriteTransaction];
     
     // Show all the venues that were persisted
-    NSLog(@"Here are all the venues persisted to the default Realm: \n\n %@",
+    NSLog(@"Here are all the venues that have been persisted to the default Realm: \n\n %@",
           [[Venue allObjects] description]);
-}
-
-- (void)deleteRealmFile
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
 
 @end
