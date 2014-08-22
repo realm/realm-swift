@@ -268,10 +268,10 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 
  Before you can open an existing RLMRealm which has a different on-disk schema
  from the schema defined in your object interfaces, you must supply a migration
- block which converts from the disk schema to your current object schema. Your
- migration block must enumerate and update all objects which require alteration,
- and return a new schema version which is higher than the version of the on-disk
- schema.
+ block which converts from the disk schema to your current object schema. At the
+ minimum your migration block must initialize any properties which were added to
+ existing objects without defaults and return a new schema version which is
+ higher than the version of the on-disk schema.
 
  You should always call this method on startup if you have any migrations that
  may need to be run. Realm will not call your migration block if the schema of
@@ -300,36 +300,16 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 /**
  Performs a migration on a Realm at a path.
 
- Before you can open an existing RLMRealm which has a different on-disk schema
- from the schema defined in your object interfaces, you must supply a migration
- block which converts from the disk schema to your current object schema. Your
- migration block must enumerate and update all objects which require alteration,
- and return a new schema version which is higher than the version of the on-disk
- schema.
-
- You should always call this method on startup if you have any migrations that
- may need to be run. Realm will not call your migration block if the schema of
- the file on disk matches your currently defined object schema. Calling this
- method after a RLMRealm instead has been created for the given path will
- throw an exception.
-
- @warning Unsuccessful migrations will throw exceptions. This will happen in the
- following cases:
-
- - The migration block was run and returns a schema version which is not higher
-   than the previous schema version.
- - A new property without a default was added to an object and not initialized
-   during the migration. You are required to either supply a default value or to
-   manually populate added properties during a migration.
-
- Migrations which fail for other reasons (such as filesystem errors) will return
- a NSError object which describes the error.
+ Like migrateDefaultRealmWithBlock:, but for a Realm at a given path rather than
+ the default Realm. This must be called before you first open a Realm at the
+ given path, but you may open Realms at other paths first.
 
  @param realmPath   The path of the Realm to migrate.
  @param block       The block which migrates the Realm to the current version.
  @return            The error that occured while applying the migration if any.
 
  @see               RLMMigration
+ @see               migrateDefaultRealmWithBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block;
 
