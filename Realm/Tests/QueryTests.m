@@ -289,6 +289,35 @@
     XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"invalidProperty" ascending:YES]);
 }
 
+- (void) testSortMany
+{
+    const int N = 3000;
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < N; i++) {
+        PersonObject *pobj = [[PersonObject alloc] init];
+        pobj.age = i;
+        pobj.name = [NSString stringWithFormat:@"%10d", i];
+        [realm addObject:pobj];
+    }
+    [realm commitWriteTransaction];
+
+    RLMArray *parrAge = [[PersonObject allObjects] arraySortedByProperty:@"age" ascending:NO];
+    XCTAssertEqual([parrAge count], (unsigned long)N);
+    for (int i = N-1; i >= 0; i--) {
+        XCTAssertEqual((((PersonObject *)[parrAge objectAtIndex:i]).age), N-1-i);
+    }
+
+    RLMArray *parrName = [[PersonObject allObjects] arraySortedByProperty:@"name" ascending:NO];
+    XCTAssertEqual([parrName count], (unsigned long)N);
+    for (int i = N-1; i >= 0; i--) {
+        PersonObject *pobj = (PersonObject *)[parrName objectAtIndex:i];
+        NSString *str = [NSString stringWithFormat:@"%10d", N-1-i];
+        XCTAssertTrue([pobj.name isEqualToString:str]);
+    }
+}
+
 - (void)testClassMisuse
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
