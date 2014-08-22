@@ -13,6 +13,6 @@
 
 @property (nonatomic) RLMPropertyType propertyType;
 
-- (void)resizeToFitContents;
+- (CGFloat)sizeThatFitsWithLimit:(BOOL)limited;
 
 @end

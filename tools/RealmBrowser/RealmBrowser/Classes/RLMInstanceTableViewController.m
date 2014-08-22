@@ -29,6 +29,8 @@
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
 
+#import "RLMTableColumn.h"
+
 #import "NSColor+ByteSizeFactory.h"
 #import "NSFont+Standard.h"
 
@@ -38,6 +40,8 @@ const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
+
+NSString * const kDraggableRow = @"RealmBrowserDraggableTableRow";
 
 @interface RLMObject ()
 
@@ -68,7 +72,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self.tableView setTarget:self];
     [self.tableView setAction:@selector(userClicked:)];
     [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
-    
+    [self.tableView registerForDraggedTypes:@[kDraggableRow]];
+     
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
+
     dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateStyle = NSDateFormatterMediumStyle;
     dateFormatter.timeStyle = NSDateFormatterShortStyle;
@@ -82,6 +89,30 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     awake = YES;
 }
+
+#pragma mark - Private methods - Dragging
+
+- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
+    return nil;
+}
+
+-(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes
+{
+
+}
+
+//- (NSDragOperation)tableView:(NSTableView *)tv
+//                validateDrop:(id <NSDraggingInfo>)info
+//                 proposedRow:(int)row
+//       proposedDropOperation:(NSTableViewDropOperation)op
+//{
+//	// Only support internal drags (i.e. moves)
+//	if ([info draggingSource] != tableView)
+//		return NSDragOperationNone;
+//    
+//	[tv setDropRow:row dropOperation:NSTableViewDropAbove];
+//	return NSDragOperationMove;
+//}
 
 #pragma mark - Public methods - Accessors
 
@@ -159,6 +190,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - NSTableView Delegate
+
+-(CGFloat)tableView:(NSTableView *)tableView sizeToFitWidthOfColumn:(NSInteger)column
+{
+    RLMTableColumn *tableColumn = self.realmTableView.tableColumns[column];
+    
+    return [tableColumn sizeThatFitsWithLimit:NO];
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {

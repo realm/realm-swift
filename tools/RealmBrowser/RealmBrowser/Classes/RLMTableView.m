@@ -387,7 +387,7 @@
 -(void)makeColumnsFitContents
 {
     for (RLMTableColumn *column in self.tableColumns) {
-        [column resizeToFitContents];
+        column.width = [column sizeThatFitsWithLimit:YES];
     }
 }
 
