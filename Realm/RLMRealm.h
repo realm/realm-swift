@@ -163,7 +163,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm
  on which beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to
- the latest Realm version when this method is called (if this happens it will also trigger a notification).
+ the latest Realm version when this method is called.
  */
 - (void)beginWriteTransaction;
 
@@ -181,8 +181,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**
  Update an RLMRealm and outstanding objects to point to the most recent data for this RLMRealm.
+
+ @return    Whether the realm had any updates. Note that this may return YES even if no data has actually changed.
  */
-- (void)refresh;
+- (BOOL)refresh;
 
 /**
  Set to YES to automatically update this Realm when changes happen in other threads.
