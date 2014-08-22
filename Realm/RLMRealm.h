@@ -29,8 +29,10 @@
 /**
  Obtains an instance of the default Realm.
 
- RLMRealm instances are reused when this is called multiple times from the same thread. The
- default RLMRealm is persisted as default.realm under the Documents directory of your Application.
+ RLMRealm instances are reused when this is called multiple times from the same
+ thread. The default RLMRealm is persisted as default.realm under the Documents
+ directory of your Application on iOS, and in your application's Application
+ Support directory on OS X.
 
  @warning   RLMRealm instances are not thread safe and can not be shared across threads or
             dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
@@ -61,14 +63,16 @@
 
  @param path        Path to the file you want the data saved in.
  @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
- @param error       Pass-by-reference for errors.
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
 
  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Make the default Realm in-memory only
+ Make the default Realm in-memory only.
 
  By default, the default Realm is persisted to disk unless this method is called.
 
@@ -82,9 +86,7 @@
 @property (nonatomic, readonly) NSString *path;
 
 /**
- Indicates if this Realm is read only
-
- @return    Boolean value indicating if this RLMRealm instance is readonly.
+ Indicates if this Realm was opened in read-only mode.
  */
 @property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
@@ -100,7 +102,7 @@
 /**
  Returns the location of the default Realm as a string.
 
- `~/Documents/default.realm` on OSX.
+ `~/Application Supprt/{bundle ID}/default.realm` on OS X.
 
  `default.realm` in your application's documents directory on iOS.
 
@@ -134,7 +136,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @param block   A block which is called to process RLMRealm notifications.
 
- @return A token object which can later be passed to removeNotification:.
+ @return A token object which can later be passed to -removeNotification:.
          to remove this notification.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
@@ -143,8 +145,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Remove a previously registered notification handler using the token returned
  from addNotificationBlock:
 
- @param notificationToken   The token returned from addNotificationBlock: corresponding
-                            to the notification block to remove.
+ @param notificationToken   The token returned from -addNotificationBlock:
+                            corresponding to the notification block to remove.
  */
 - (void)removeNotification:(RLMNotificationToken *)notificationToken;
 
@@ -187,9 +189,16 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Set to YES to automatically update this Realm when changes happen in other threads.
 
- If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
- Notifications are sent immediately when a change is available whether or not the Realm is automatically
- updated.
+ If set to YES (the default), changes made on other threads will be reflected in
+ this Realm on the next cycle of the run loop after the changes are committed.
+ If set to NO, you must manually call -refresh on the Realm to update it to get
+ the lastest version.
+
+ Even with this enabled, you can still call -refresh at any time to update the
+ Realm before the automatic refresh would occur.
+
+ Notifications are sent when a write transaction is committed whether or not
+ this is enabled.
 
  Defaults to YES.
  */
@@ -243,34 +252,46 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Migration block used to migrate a Realm.
 
- You are required to supply a migration block when trying to open an RLMRealm which has an
- on disk schema different from the schema defined in your object interfaces. When supplying a migration
- block it is your responsibility to enumerate and update any objects which require alteration, and to
- return the new schema version from the migration block.
-
- @warning   Unsuccessful migrations will throw exceptions. This will happen in the following cases
-            - After applying a required migration, the schema version has not increased.
-            - A new property is added to an object and not initialized during the migration. You are
-              required to either supply a default value or to manually populate added properties during
-              a migration.
-
- @param migration   RLMMigration object used to perform the migration. The migration object allows
- you to enumerate and alter any existing objects which require migration.
+ @param migration   RLMMigration object used to perform the migration. The
+                    migration object allows you to enumerate and alter any
+                    existing objects which require migration.
 
  @param oldSchemaVersion    The schema version of the RLMRealm being migrated.
 
- @return    Schema version number for the RLMRealm after completing the migration.
+ @return    Schema version number for the RLMRealm after completing the
+            migration. Must be greater than `oldSchemaVersion`.
  */
 typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
 /**
  Performs a migration on the default Realm.
 
- Must be called before the default Realm is accessed (otherwise throws). If the
- default Realm is at a version other than <code>version</code>, the migration is applied.
+ Before you can open an existing RLMRealm which has a different on-disk schema
+ from the schema defined in your object interfaces, you must supply a migration
+ block which converts from the disk schema to your current object schema. At the
+ minimum your migration block must initialize any properties which were added to
+ existing objects without defaults and return a new schema version which is
+ higher than the version of the on-disk schema.
+
+ You should always call this method on startup if you have any migrations that
+ may need to be run. Realm will not call your migration block if the schema of
+ the file on disk matches your currently defined object schema. Calling this
+ method after the defaultRealm has been created will throw an exception.
+
+ @warning Unsuccessful migrations will throw exceptions. This will happen in the
+ following cases:
+
+ - The migration block was run and returns a schema version which is not higher
+   than the previous schema version.
+ - A new property without a default was added to an object and not initialized
+   during the migration. You are required to either supply a default value or to
+   manually populate added properties during a migration.
+
+ Migrations which fail for other reasons (such as filesystem errors) will return
+ a NSError object which describes the error.
 
  @param block       The block which migrates the Realm to the current version.
- @return            The error that occured while applying the migration if any.
+ @return            The error that occured while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -279,14 +300,16 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
 /**
  Performs a migration on a Realm at a path.
 
- Must be called before the Realm at <code>realmPath</code> is accessed (otherwise throws).
- If the Realm is at a version other than <code>version</code>, the migration is applied.
+ Like migrateDefaultRealmWithBlock:, but for a Realm at a given path rather than
+ the default Realm. This must be called before you first open a Realm at the
+ given path, but you may open Realms at other paths first.
 
  @param realmPath   The path of the Realm to migrate.
  @param block       The block which migrates the Realm to the current version.
  @return            The error that occured while applying the migration if any.
 
  @see               RLMMigration
+ @see               migrateDefaultRealmWithBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block;
 
