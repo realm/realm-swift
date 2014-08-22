@@ -187,6 +187,7 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
+    
     if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
             [self selectedAddRow:theEvent];
@@ -196,7 +197,6 @@
         }
     }
     else if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask) {
-
         if (theEvent.keyCode == 27) {
             [self selectedInsertRow:theEvent];
         }
@@ -257,7 +257,7 @@
     [self.menu addItem:deleteRowItem];
     
     if (self.realmDelegate.displaysArray) {
-        //        [self.menu addItem:insertIntoArrayItem];
+        [self.menu addItem:insertIntoArrayItem];
         [self.menu addItem:removeFromArrayItem];
     }
 }
@@ -266,22 +266,30 @@
 
 - (IBAction)selectedAddRow:(id)sender
 {
-    [self.realmDelegate addRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate addRows:self.selectedRowIndexes];
+    }
 }
 
 - (IBAction)selectedDeleteRow:(id)sender
 {
-    [self.realmDelegate deleteRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate deleteRows:self.selectedRowIndexes];
+    }
 }
 
 - (IBAction)selectedRemoveRow:(id)sender
 {
-    [self.realmDelegate removeRows:self.selectedRowIndexes];
+    if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeRows:self.selectedRowIndexes];
+    }
 }
 
 - (IBAction)selectedInsertRow:(id)sender
 {
-    [self.realmDelegate insertRows:self.selectedRowIndexes];
+    if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate insertRows:self.selectedRowIndexes];
+    }
 }
 
 #pragma mark - NSView Overrides

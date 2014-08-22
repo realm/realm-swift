@@ -34,8 +34,6 @@
 
 #import "objc/objc-class.h"
 
-#import "TestClasses.h"
-
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
@@ -93,7 +91,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
     [super performUpdateUsingState:newState oldState:oldState];
-    self.displaysArray = NO;
 
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
@@ -103,7 +100,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
-        self.displaysArray = YES;
         RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
         
         RLMClassNode *referringType = (RLMClassNode *)arrayState.selectedType;
@@ -129,6 +125,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [self.realmTableView formatColumnsToFitType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
+    
+    self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
 
 #pragma mark - NSTableView Data Source
@@ -401,21 +399,22 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMTypeNode *displayedType = self.displayedType;
-    Class rlmObjectClass = NSClassFromString(displayedType.name);
-    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
-    if (!defaultPropertyValues) {
-        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
-    }
+    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
+    
+    [realm beginWriteTransaction];
     
     NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
-
-    [realm beginWriteTransaction];
-    for (int i = 0; i < rowsToAdd; i++) {
-        [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
-    }
-    [realm commitWriteTransaction];
     
+    for (int i = 0; i < rowsToAdd; i++) {
+        RLMObject *object = [[RLMObject alloc] initWithRealm:nil schema:objectSchema defaultValues:NO];
+
+        [realm addObject:object];
+        for (RLMProperty *property in objectSchema.properties) {
+            object[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+    }
+    
+    [realm commitWriteTransaction];
     [self reloadAfterEdit];
 }
 
@@ -449,22 +448,21 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     RLMTypeNode *displayedType = self.displayedType;
     RLMObjectSchema *objectSchema = displayedType.schema;
     
-    Class rlmObjectClass = NSClassFromString(objectSchema.className);
-
-    NSDictionary *defaultPropertyValues = [rlmObjectClass defaultPropertyValues];
-    if (!defaultPropertyValues) {
-        defaultPropertyValues = [self defaultPropertyValuesForTypeNode:displayedType];
-    }
-    
     NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
     NSUInteger rowToInsertAt = rowIndexes.firstIndex;
+    
     if (rowToInsertAt == -1) {
         rowToInsertAt = 0;
     }
     
     [realm beginWriteTransaction];
+    
     for (int i = 0; i < rowsToInsert; i++) {
-        RLMObject *object = [rlmObjectClass createInRealm:realm withObject:defaultPropertyValues];
+        RLMObject *object = [[RLMObject alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+        
+        for (RLMProperty *property in objectSchema.properties) {
+            object[property.name] = [self defaultValueForPropertyType:property.type];
+        }
         [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
     }
     [realm commitWriteTransaction];
@@ -488,15 +486,15 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - Private Methods - RLMTableView Delegate
 
--(NSDictionary *)defaultPropertyValuesForTypeNode:(RLMTypeNode *)typeNode
+-(NSDictionary *)defaultValuesForProperties:(NSArray *)properties
 {
-    NSMutableDictionary *defaultPropertyValues = [NSMutableDictionary dictionary];
+    NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
     
-    for (RLMProperty *property in typeNode.schema.properties) {
-        defaultPropertyValues[property.name] = [self defaultValueForPropertyType:property.type];
+    for (RLMProperty *property in properties) {
+        defaultValues[property.name] = [self defaultValueForPropertyType:property.type];
     }
     
-    return defaultPropertyValues;
+    return defaultValues;
 }
 
 -(id)defaultValueForPropertyType:(RLMPropertyType)propertyType

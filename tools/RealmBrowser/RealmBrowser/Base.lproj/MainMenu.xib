@@ -105,23 +105,12 @@
                                     <action selector="generatedDemoDatabase:" target="-1" id="9cb-1W-suN"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Add object" tag="1" keyEquivalent="+" id="QVH-nc-d7y">
-                                <connections>
-                                    <action selector="selectedAddRow:" target="-1" id="OPK-UL-OnK"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Delete object" tag="2" id="Kvq-ch-tH8">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
                                 <connections>
                                     <action selector="selectedDeleteRow:" target="-1" id="2sn-kO-m78"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Insert object into array" tag="9" keyEquivalent="+" id="mH4-OZ-4Rv">
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
-                                <connections>
-                                    <action selector="selectedInsertRow:" target="-1" id="PBQ-ON-POa"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Remove object from array" tag="10" id="dEm-Cz-ggu">

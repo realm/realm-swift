@@ -42,14 +42,21 @@ NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 {
     navigationStack = [[RLMNavigationStack alloc] init];
     [self updateNavigationButtons];
+}
+
+-(void)realmDidLoad
+{
+    [self.outlineViewController realmDidLoad];
+    
+    [self updateNavigationButtons];
     
     id firstItem = self.modelDocument.presentedRealm.topLevelClasses.firstObject;
     if (firstItem != nil) {
         RLMNavigationState *initState = [[RLMNavigationState alloc] initWithSelectedType:firstItem index:0];
-
+        
         [self addNavigationState:initState fromViewController:nil];
     }
-    
+
     [self setRealmLocked:YES];
 }
 

@@ -22,8 +22,7 @@
 
 - (instancetype)initWithSelectedType:(RLMTypeNode *)type typeIndex:(NSInteger)typeIndex property:(RLMProperty *)property arrayIndex:(NSInteger)arrayIndex;
 {
-    if (self = [super initWithSelectedType:type
-                                      index:typeIndex]) {
+    if (self = [super initWithSelectedType:type index:typeIndex]) {
         _property = property;
         _arrayIndex = arrayIndex;
     }
