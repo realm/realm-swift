@@ -59,6 +59,9 @@ static inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
 static inline void RLMArrayTableViewValidate(RLMArrayTableView *ar) {
     RLMArrayTableViewValidateAttached(ar);
     RLMCheckThread(ar->_realm);
+    if (ar->_parent) {
+        RLMArrayTableViewValidate(ar->_parent);
+    }
     ar->_backingView.sync_if_needed();
 }
 static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
