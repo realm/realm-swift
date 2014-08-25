@@ -34,11 +34,13 @@
 @implementation RLMArrayTableView
 
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   view:(tightdb::TableView const &)view
-                                  realm:(RLMRealm *)realm {
+                                    view:(tightdb::TableView const &)view
+                                   realm:(RLMRealm *)realm
+                                  parent:(RLMArrayTableView *)parent {
     RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
     ar->_backingView = view;
     ar->_realm = realm;
+    ar->_parent = parent;
     return ar;
 }
 
@@ -195,24 +197,26 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     RLMArrayTableViewValidate(self);
 
     // copy array and apply new predicate creating a new query and view
-    tightdb::Query query = _backingView.get_parent().where();
-    query.tableview(_backingView);
+    tightdb::Query query = _backingView.get_parent().where(&_backingView);
 
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName view:query.find_all() realm:_realm];
+    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
+                                                  view:query.find_all()
+                                                 realm:_realm
+                                                parent:self];
 }
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
     RLMArrayTableViewValidate(self);
 
-    tightdb::Query query = _backingView.get_parent().where();
-    query.tableview(_backingView);
+    tightdb::Query query = _backingView.get_parent().where(&_backingView);
     
     // apply order
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                                    view:query.find_all()
-                                                                  realm:_realm];
+                                                                  realm:_realm
+                                                                 parent:self];
     RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
     return ar;
 }

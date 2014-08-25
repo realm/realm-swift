@@ -83,10 +83,12 @@
 //
 @interface RLMArrayTableView : RLMArray {
     tightdb::TableView _backingView;
+    RLMArrayTableView *_parent;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                     view:(tightdb::TableView const &)view
-                                   realm:(RLMRealm *)realm;
+                                   realm:(RLMRealm *)realm
+                                  parent:(RLMArrayTableView *)parent;
 
 @end
 

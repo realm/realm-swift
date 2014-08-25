@@ -421,6 +421,8 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+    XCTAssertEqual(3U, sortedAge.count);
+    XCTAssertEqual(3U, sortedName.count);
 }
 
 static vm_size_t get_resident_size() {
