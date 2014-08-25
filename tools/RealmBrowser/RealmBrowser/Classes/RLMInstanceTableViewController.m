@@ -106,7 +106,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:newState.selectedType
+        [self.realmTableView setuptColumnsWithType:newState.selectedType
                                  withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
@@ -121,7 +121,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setuptColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -134,7 +134,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setuptColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
@@ -191,9 +191,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         columnIndex--;
     }
     
+    // Array gutter
     if (columnIndex == -1) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
+        [basicCellView.textField setEditable:NO];
         
         return basicCellView;
     }

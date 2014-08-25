@@ -68,7 +68,7 @@ typedef struct {
 
 @property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
 
-- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)setuptColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 - (void)makeColumnsFitContents;
 
