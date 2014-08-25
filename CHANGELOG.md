@@ -34,6 +34,8 @@
 * Support setting model properties starting with the letter 'z'
 * Fixed crashes that could result from switching between Debug and Relase
   builds of Realm.
+* Fixing incorrect result when sorting a sorted RLMArray.
+
 
 0.83.0 Release notes (2014-08-13)
 =============================================================

@@ -290,4 +290,43 @@
     OSSpinLockLock(&spinlock);
 }
 
+void sortingSortedView(id self, BOOL asc1, BOOL asc2) {
+    int N = 5;
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    for(int i=0; i<N; i++) {
+        EmployeeObject *eo = [[EmployeeObject alloc] init];
+        eo.age = i;
+        eo.name = [NSString stringWithFormat:@"%10d", i];
+        [realm addObject:eo];
+    }
+    [realm commitWriteTransaction];
+
+    RLMArray *sortedAge = [[EmployeeObject allObjectsInRealm:realm] arraySortedByProperty:@"age" ascending:asc1];
+    RLMArray *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:asc2];
+    XCTAssertEqual(sortedAge.count, (unsigned long)N);
+    XCTAssertEqual(sortedName.count, (unsigned long)N);
+}
+
+- (void)testSortingSortedView1
+{
+    sortingSortedView(self, TRUE, TRUE);
+}
+
+-(void)testSortingSortedView2
+{
+    sortingSortedView(self, TRUE, FALSE);
+}
+
+-(void)testSortingSortedView3
+{
+    sortingSortedView(self, FALSE, TRUE);
+}
+
+-(void)testSortingSortedView4
+{
+    sortingSortedView(self, FALSE, TRUE);
+}
+
+
 @end
