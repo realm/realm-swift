@@ -58,19 +58,12 @@
         RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
         self.presentedRealm  = realmNode;
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        dispatch_async(dispatch_get_main_queue(), ^{
             NSError *error;
             if ([realmNode connect:&error]) {
                 NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                 [documentController noteNewRecentDocumentURL:absoluteURL];
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                for (id wc in self.windowControllers) {
-                    if ([wc isKindOfClass:[RLMRealmBrowserWindowController class]]) {
-                        [(RLMRealmBrowserWindowController *)wc realmDidLoad];
-                    }
-                }
-            });
         });
     }
     

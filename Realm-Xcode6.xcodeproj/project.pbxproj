@@ -21,7 +21,7 @@
 		024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		26F3CA6B1986CC9C004623E1 /* SwiftPropertyTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */; };
 		3F04EA2F1992BEE400C2CE2E /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
-		3F1A5E981992FDEB00F45F4C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3F3243C019A6C7ED0035E94B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		3F44109F19953F6B00223146 /* RLMTestObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F44109E19953F5900223146 /* RLMTestObjects.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F4410A019953F6C00223146 /* RLMTestObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F44109E19953F5900223146 /* RLMTestObjects.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F76104F1995408A00E5BD43 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
@@ -190,6 +190,13 @@
 			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
 			remoteInfo = TestHost;
 		};
+		3F3243C119A6C7F90035E94B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
 		3F8DCA6019930F580008BD7F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -282,19 +289,6 @@
 			remoteInfo = OSXTestFramework;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		3F1A5E971992FDE000F45F4C /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				3F1A5E981992FDEB00F45F4C /* Realm.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration_Private.h; sourceTree = "<group>"; };
@@ -393,6 +387,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F3243C019A6C7ED0035E94B /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -732,11 +727,11 @@
 			buildPhases = (
 				3F1A5E6E1992EB7400F45F4C /* Sources */,
 				3F1A5E6F1992EB7400F45F4C /* Frameworks */,
-				3F1A5E971992FDE000F45F4C /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3F3243C219A6C7F90035E94B /* PBXTargetDependency */,
 			);
 			name = TestHost;
 			productName = TestHost;
@@ -1175,6 +1170,11 @@
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
 			targetProxy = 3F1A5E951992FD4800F45F4C /* PBXContainerItemProxy */;
 		};
+		3F3243C219A6C7F90035E94B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E856D1D4195614A300FB2FCF /* iOS */;
+			targetProxy = 3F3243C119A6C7F90035E94B /* PBXContainerItemProxy */;
+		};
 		3F8DCA6119930F580008BD7F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -1501,7 +1501,6 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"TIGHTDB_MAX_LIST_SIZE=4",
 					"DEBUG=1",
 					TIGHTDB_DEBUG,
 					TIGHTDB_HAVE_CONFIG,

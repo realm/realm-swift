@@ -171,7 +171,7 @@ static inline bool IsRLMObjectSubclass(Class cls) {
 
 
 static inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
-    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    tightdb::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
     if (table->get_column_count() == 0) {
         // create columns
         table->add_column(tightdb::type_Int, c_versionColumnName);
