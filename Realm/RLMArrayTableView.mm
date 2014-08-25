@@ -207,7 +207,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     RLMArrayTableViewValidate(self);
 
     // copy array and apply new predicate creating a new query and view
-    tightdb::Query query = _backingView.get_parent().where(&_backingView);
+    tightdb::Query query(_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
     return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName query:query realm:_realm];
 }
@@ -216,9 +216,8 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 {
     RLMArrayTableViewValidate(self);
 
-    tightdb::Query query = _backingView.get_parent().where(&_backingView);
-
     // apply order
+    tightdb::Query query(_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                                   query:query
                                                                   realm:_realm];
