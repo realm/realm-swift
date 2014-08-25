@@ -69,9 +69,9 @@
     // Iterate over the resulting RLMArray
     index = 0;
     for (EmployeeObject *row in res) {
-        XCTAssertEqualObjects(row.name, filteredArray[index][0], @"Name in iteration should be equal to what was set.");
-        XCTAssertEqualObjects(@(row.age), filteredArray[index][1], @"Age in iteration should be equal to what was set.");
-        XCTAssertEqualObjects(@(row.hired), filteredArray[index][2], @"Hired in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(row.name, filteredArray[index][@"name"], @"Name in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.age), filteredArray[index][@"age"], @"Age in iteration should be equal to what was set.");
+        XCTAssertEqualObjects(@(row.hired), filteredArray[index][@"hired"], @"Hired in iteration should be equal to what was set.");
         index++;
     }
 }
