@@ -216,9 +216,8 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 {
     RLMArrayTableViewValidate(self);
 
-    tightdb::Query query = _backingView.get_parent().where();
-    query.tableview(_backingView);
-    
+    tightdb::Query query = _backingView.get_parent().where(&_backingView);
+
     // apply order
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                                   query:query
