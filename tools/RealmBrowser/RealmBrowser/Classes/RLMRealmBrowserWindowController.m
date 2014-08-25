@@ -51,7 +51,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
-    [self loadWindowSize];
+    [[self.window windowController] setShouldCascadeWindows:NO];
     [self realmDidLoad];
 }
 
@@ -74,14 +74,8 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self setRealmLocked:YES];
     
     NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName]];
     [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
-}
-
-#pragma mark - NSWindowDelegate Methods
-
--(void)windowWillClose:(NSNotification *)notification
-{
-    [self saveWindowSize];
 }
 
 #pragma mark - Public methods - Accessors
@@ -262,28 +256,6 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     [self.navigationButtons setEnabled:[navigationStack canNavigateBackward] forSegment:0];
     [self.navigationButtons setEnabled:[navigationStack canNavigateForward] forSegment:1];
-}
-
-#pragma mark - Private Methods - Window Size
-
--(void)loadWindowSize
-{
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
-    NSString *frameString = [[NSUserDefaults standardUserDefaults] objectForKey:frameKey];
-    
-    if (frameString) {
-        [self.window setFrame:NSRectFromString(frameString) display:YES];
-    }
-}
-
--(void)saveWindowSize
-{
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    NSString *frameKey = [NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName];
-    NSString *frameString = NSStringFromRect(self.window.frame);
-    [[NSUserDefaults standardUserDefaults] setObject:frameString forKey:frameKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 
