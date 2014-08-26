@@ -28,6 +28,7 @@
 #import "RLMBasicTableCellView.h"
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
+#import "RLMImageTableCellView.h"
 
 #import "RLMTableColumn.h"
 
@@ -211,20 +212,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     return toolTip;
 }
 
-#pragma mark - Private Methods - RLMTableView Data Source
--(NSNumber *)maxOfColumn:(RLMClassProperty *)propertyColumn
-{
-    RLMTypeNode *displayedType = self.displayedType;
-    
-    for (NSUInteger rowIndex = 0; rowIndex < self.displayedType.instanceCount; rowIndex++) {
-        RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
-        NSNumber *propertyValue = selectedInstance[propertyColumn.name];
-//        propertyColumn
-    }
-    
-    return @5.0;
-}
-
 #pragma mark - NSTableView Delegate
 
 -(CGFloat)tableView:(NSTableView *)tableView sizeToFitWidthOfColumn:(NSInteger)column
@@ -314,8 +301,17 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             break;
             
+        case RLMPropertyTypeData: {
+            RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
+            imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            
+            [imageCellView.textField setEditable:NO];
+            
+            cellView = imageCellView;
+        }
+            break;
+            
         case RLMPropertyTypeAny:
-        case RLMPropertyTypeData:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString: {

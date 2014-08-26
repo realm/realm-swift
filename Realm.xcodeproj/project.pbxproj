@@ -116,6 +116,8 @@
 		02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
 		02F4EAF6195DF0A6008743D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02F4EAF7195DF0B0008743D9 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
+		22F639E619ACAF4500DCDAEA /* RLMTestDataGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 22F639E419ACAF4500DCDAEA /* RLMTestDataGenerator.h */; };
+		22F639E719ACAF4500DCDAEA /* RLMTestDataGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F639E519ACAF4500DCDAEA /* RLMTestDataGenerator.m */; };
 		428D6F421947066E00ACEB74 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E395319409432001DC9C1 /* libc++.dylib */; };
 		428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		429E39571940B3DC001DC9C1 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E39551940B204001DC9C1 /* libc++.dylib */; };
@@ -221,6 +223,8 @@
 		02E4D6E8192E58250082808D /* MixedTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MixedTests.m; sourceTree = "<group>"; };
 		02E4D6EB192E58320082808D /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		02E4D6EE192E583A0082808D /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
+		22F639E419ACAF4500DCDAEA /* RLMTestDataGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestDataGenerator.h; path = tools/RealmBrowser/RealmBrowser/Classes/RLMTestDataGenerator.h; sourceTree = "<group>"; };
+		22F639E519ACAF4500DCDAEA /* RLMTestDataGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestDataGenerator.m; path = tools/RealmBrowser/RealmBrowser/Classes/RLMTestDataGenerator.m; sourceTree = "<group>"; };
 		429E395319409432001DC9C1 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		429E39551940B204001DC9C1 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -404,6 +408,8 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
+				22F639E419ACAF4500DCDAEA /* RLMTestDataGenerator.h */,
+				22F639E519ACAF4500DCDAEA /* RLMTestDataGenerator.m */,
 				02C41460191DE49600F858D9 /* Realm */,
 				02C41474191DE49600F858D9 /* RealmTests */,
 				02C41475191DE49600F858D9 /* Supporting Files */,
@@ -441,6 +447,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
+				22F639E619ACAF4500DCDAEA /* RLMTestDataGenerator.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6B0192E3DC40082808D /* RLMArray_Private.hpp in Headers */,
@@ -710,6 +717,7 @@
 				02E4D6DC192E3DC40082808D /* RLMRealm.mm in Sources */,
 				02E4D6E2192E3DC40082808D /* RLMSchema.mm in Sources */,
 				02E4D6E6192E3DC40082808D /* RLMUtil.mm in Sources */,
+				22F639E719ACAF4500DCDAEA /* RLMTestDataGenerator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
