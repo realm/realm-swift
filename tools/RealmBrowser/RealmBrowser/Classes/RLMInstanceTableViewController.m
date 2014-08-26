@@ -106,7 +106,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
 
-        [self.realmTableView setuptColumnsWithType:newState.selectedType
+        [self.realmTableView setupColumnsWithType:newState.selectedType
                                  withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
@@ -121,7 +121,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView setuptColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -134,7 +134,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView setuptColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
@@ -158,6 +158,71 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     return self.displayedType.instanceCount;
+}
+
+#pragma mark - RLMTableView Data Source
+
+-(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn
+{
+    NSString *toolTip;
+    
+    switch (propertyColumn.property.type) {
+        case RLMPropertyTypeBool:
+            toolTip = @"Boolean";
+            break;
+            
+        case RLMPropertyTypeInt:
+            toolTip = @"Integer";
+            break;
+            
+        case RLMPropertyTypeFloat:
+            toolTip = @"Float";
+            break;
+            
+        case RLMPropertyTypeDouble:
+            toolTip = @"Double";
+            break;
+            
+        case RLMPropertyTypeString:
+            toolTip = @"String";
+            break;
+            
+        case RLMPropertyTypeData:
+            toolTip = @"Data";
+            break;
+            
+        case RLMPropertyTypeAny:
+            toolTip = @"Any";
+            break;
+            
+        case RLMPropertyTypeDate:
+            toolTip = @"Date";
+            break;
+            
+        case RLMPropertyTypeArray:
+            toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
+            break;
+            
+        case RLMPropertyTypeObject:
+            toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
+            break;
+    }
+    
+    return toolTip;
+}
+
+#pragma mark - Private Methods - RLMTableView Data Source
+-(NSNumber *)maxOfColumn:(RLMClassProperty *)propertyColumn
+{
+    RLMTypeNode *displayedType = self.displayedType;
+    
+    for (NSUInteger rowIndex = 0; rowIndex < self.displayedType.instanceCount; rowIndex++) {
+        RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
+        NSNumber *propertyValue = selectedInstance[propertyColumn.name];
+//        propertyColumn
+    }
+    
+    return @5.0;
 }
 
 #pragma mark - NSTableView Delegate

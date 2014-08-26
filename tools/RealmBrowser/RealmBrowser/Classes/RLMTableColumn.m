@@ -53,7 +53,7 @@ const CGFloat kMaxColumnWidth = 200.0;
 
     CGFloat maxWidth = 0.0;
 
-    for (NSInteger rowIndex = 0; rowIndex < MIN(kMaxNumberOfRowsToConsider, self.tableView.numberOfRows); rowIndex++) {
+    for (NSInteger rowIndex = 0; rowIndex < MIN(rowsToConsider, self.tableView.numberOfRows); rowIndex++) {
         RLMTableCellView *tableCellView = [self.tableView viewAtColumn:columnIndex row:rowIndex makeIfNecessary:YES];
         maxWidth = MAX(maxWidth, tableCellView.sizeThatFits.width);
     }

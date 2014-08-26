@@ -66,6 +66,11 @@
     return (id<RLMTableViewDelegate>)self.delegate;
 }
 
+-(id<RLMTableViewDataSource>)realmDataSource
+{
+    return (id<RLMTableViewDataSource>)self.dataSource;
+}
+
 #pragma mark - Private Methods - NSObject Overrides
 
 -(void)createContextMenu
@@ -303,7 +308,7 @@
 
 #pragma mark - Public Methods
 
-- (void)setuptColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.numberOfColumns;
@@ -332,143 +337,13 @@
         [self addTableColumn:tableColumn];
 
         [tableColumn.headerCell setStringValue:propertyColumn.name];
-        tableColumn.headerToolTip = [self headerTooltipForColumn:propertyColumn];
+        tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
     }
-    
-    [self updateHeaderTooltipsForTypeNode:typeNode];
     
     [self reloadData];
 }
 
 #pragma mark - Private Methods - Table Columns
-
--(NSString *)headerTooltipForColumn:(RLMClassProperty *)propertyColumn
-{
-    NSString *toolTip;
-    
-    switch (propertyColumn.property.type) {
-        case RLMPropertyTypeBool:
-            toolTip = @"Boolean";
-            break;
-            
-        case RLMPropertyTypeInt:
-            toolTip = @"Integer";
-            break;
-            
-        case RLMPropertyTypeFloat:
-            toolTip = @"Float";
-            break;
-            
-        case RLMPropertyTypeDouble:
-            toolTip = @"Double";
-            break;
-            
-        case RLMPropertyTypeString:
-            toolTip = @"String";
-            break;
-            
-        case RLMPropertyTypeData:
-            toolTip = @"Data";
-            break;
-            
-        case RLMPropertyTypeAny:
-            toolTip = @"Any";
-            break;
-            
-        case RLMPropertyTypeDate:
-            toolTip = @"Date";
-            break;
-            
-        case RLMPropertyTypeArray:
-            toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
-            break;
-            
-        case RLMPropertyTypeObject:
-            toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
-            break;
-    }
-    
-    return toolTip;
-}
-
--(void)updateHeaderTooltipsForTypeNode:(RLMTypeNode *)typeNode
-{
-    NSArray *propertyColumns = typeNode.propertyColumns;
-    
-    NSUInteger tableColumnCount = self.tableColumns.count;
-
-    for (NSUInteger tableColumnIndex = 0; tableColumnIndex < tableColumnCount; tableColumnIndex++) {
-        NSString *toolTip;
-        
-        NSUInteger propertyColumnIndex = tableColumnIndex;
-        
-        if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
-            propertyColumnIndex = tableColumnIndex - 1;
-        }
-        
-        RLMTableColumn *tableColumn = self.tableColumns[tableColumnIndex];
-
-        if (propertyColumnIndex == -1) {
-            toolTip = @"Order of object within array";
-        }
-        else {
-            RLMClassProperty *propertyColumn = propertyColumns[propertyColumnIndex];
-            
-            switch (tableColumn.propertyType) {
-                case RLMPropertyTypeBool:
-                    toolTip = @"Boolean";
-                    break;
-                    
-                case RLMPropertyTypeInt:
-                    toolTip = @"Integer";
-                    break;
-                    
-                case RLMPropertyTypeFloat:
-                    toolTip = @"Float";
-                    break;
-                    
-                case RLMPropertyTypeDouble:
-                    toolTip = @"Double";
-                    break;
-                    
-                case RLMPropertyTypeString:
-                    toolTip = @"String";
-                    break;
-                    
-                case RLMPropertyTypeData:
-                    toolTip = @"Data";
-                    break;
-                    
-                case RLMPropertyTypeAny:
-                    toolTip = @"Any";
-                    break;
-                    
-                case RLMPropertyTypeDate:
-                    toolTip = @"Date";
-                    break;
-                    
-                case RLMPropertyTypeArray:
-                    toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
-                    break;
-                    
-                case RLMPropertyTypeObject:
-                    toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
-                    break;
-            }
-        }
-        
-        tableColumn.headerToolTip = toolTip;
-    }
-}
-
-//-(NSUInteger)countTruesInBooleanColumn:(RLMClassProperty *)propertyColumn
-//{
-//    RLMClassProperty *classProperty = displayedType.propertyColumns[columnIndex];
-//    RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
-//    id propertyValue = selectedInstance[propertyColumn.name];
-//
-//    return 0;
-//}
 
 -(void)makeColumnsFitContents
 {
