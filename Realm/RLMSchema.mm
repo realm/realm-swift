@@ -24,6 +24,8 @@
 
 #if REALM_SWIFT
 #import <Realm/Realm-Swift.h>
+#else
+#import "RLMSwiftSupportFallback.h"
 #endif
 
 #import <objc/runtime.h>
@@ -48,7 +50,7 @@ const NSUInteger RLMNotVersioned = (NSUInteger)-1;
 @end
 
 static RLMSchema *s_sharedSchema;
-static NSMutableDictionary *s_classNameToMangledName;
+static NSMutableDictionary *s_localNameToClass;
 
 @implementation RLMSchema
 
@@ -97,8 +99,7 @@ static inline bool IsRLMObjectSubclass(Class cls) {
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // initialize mangled name mapping
-        s_classNameToMangledName = [NSMutableDictionary dictionary];
+        s_localNameToClass = [NSMutableDictionary dictionary];
 
         NSMutableArray *schemaArray = [NSMutableArray array];
         RLMSchema *schema = [[RLMSchema alloc] init];
@@ -111,31 +112,21 @@ static inline bool IsRLMObjectSubclass(Class cls) {
                 continue;
             }
 
-            RLMObjectSchema *objectSchema = nil;
-#if REALM_SWIFT
+            // Delay init of Swift classes until after we know the names of all
+            // of them so that we can validate array types
             NSString *className = NSStringFromClass(cls);
             if ([RLMSwiftSupport isSwiftClassName:className]) {
-                objectSchema = [RLMSwiftSupport schemaForObjectClass:cls];
-                objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(cls, objectSchema);
-                s_classNameToMangledName[objectSchema.className] = objectSchema.objectClass;
+                s_localNameToClass[[RLMSwiftSupport demangleClassName:className]] = cls;
             }
             else {
-                objectSchema = [RLMObjectSchema schemaForObjectClass:cls];
+                [schemaArray addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
             }
-#else
-            objectSchema = [RLMObjectSchema schemaForObjectClass:cls];
-#endif
-
-            // set standalone class
-            objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(cls, objectSchema);
-
-            // add to list
-            [schemaArray addObject:objectSchema];
-            // implement sharedSchema and className for this class
-            RLMReplaceSharedSchemaMethod(cls, objectSchema);
-            RLMReplaceClassNameMethod(cls, objectSchema.className);
         }
         free(classes);
+
+        for (Class cls in s_localNameToClass.allValues) {
+            [schemaArray addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
+        }
 
         // set class array
         schema.objectSchema = schemaArray;
@@ -232,11 +223,9 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
 
 
 + (Class)classForString:(NSString *)className {
-#if REALM_SWIFT
-    if (s_classNameToMangledName[className]) {
-        className = s_classNameToMangledName[className];
+    if (Class cls = s_localNameToClass[className]) {
+        return cls;
     }
-#endif
     return NSClassFromString(className);
 }
 

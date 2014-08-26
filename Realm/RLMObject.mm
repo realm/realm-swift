@@ -25,6 +25,8 @@
 
 #if REALM_SWIFT
 #import <Realm/Realm-Swift.h>
+#else
+#import "RLMSwiftSupportFallback.h"
 #endif
 
 #import <objc/runtime.h>
@@ -191,11 +193,9 @@
 // overridden at runtime per-class for performance
 + (NSString *)className {
     NSString *className = NSStringFromClass(self);
-#if REALM_SWIFT
     if ([RLMSwiftSupport isSwiftClassName:className]) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
-#endif
     return className;
 }
 

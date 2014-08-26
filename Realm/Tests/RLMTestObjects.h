@@ -36,6 +36,15 @@
 
 @end
 
+@interface AllIntSizesObject : RLMObject
+// int8_t not supported due to being abiguous with BOOL
+
+@property int16_t int16;
+@property int32_t int32;
+@property int64_t int64;
+
+@end
+
 @interface FloatObject : RLMObject
 
 @property float floatCol;

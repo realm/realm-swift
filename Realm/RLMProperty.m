@@ -21,14 +21,6 @@
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
 
-// private properties
-@interface RLMProperty ()
-
-@property (nonatomic, assign) BOOL dynamic;
-@property (nonatomic, assign) BOOL nonatomic;
-
-@end
-
 @implementation RLMProperty
 
 - (instancetype)initWithName:(NSString *)name
@@ -41,21 +33,11 @@
         _type = type;
         _objectClassName = objectClassName;
         _attributes = attributes;
-        [self updateAccessorNames];
         [self setObjcCodeFromType];
+        [self updateAccessorNames];
     }
-    
-    return self;
-}
 
-+ (instancetype)propertyWithName:(NSString *)name type:(RLMPropertyType)type objectClassName:(NSString *)objectClassName {
-    RLMProperty *prop = [[RLMProperty alloc] init];
-    prop->_name = name;
-    prop->_type = type;
-    prop->_objectClassName = objectClassName;
-    [prop updateAccessorNames];
-    [prop setObjcCodeFromType];
-    return prop;
+    return self;
 }
 
 -(void)updateAccessorNames {
@@ -76,11 +58,7 @@
 -(void)setObjcCodeFromType {
     switch (_type) {
         case RLMPropertyTypeInt:
-#if defined(__LP64__) && __LP64__
-            _objcType = 'l';
-#else
-            _objcType = 'i';
-#endif
+            _objcType = 'q';
             break;
         case RLMPropertyTypeBool:
             _objcType = 'c';
@@ -104,15 +82,14 @@
 
 // determine RLMPropertyType from objc code - returns true if valid type was found/set
 -(BOOL)parsePropertyTypeString:(const char *)code {
-    _objcType = *(code);    // first char of type attr
-    if (self.objcType == 'q') {
-        _objcType = 'l';    // collapse these as they are the same
-    }
-    
+    _objcType = *code;    // first char of type attr
+
     // map to RLMPropertyType
     switch (self.objcType) {
+        case 's':   // short
         case 'i':   // int
         case 'l':   // long
+        case 'q':   // long long
             _type = RLMPropertyTypeInt;
             return YES;
         case 'f':
@@ -128,7 +105,7 @@
         case '@':
         {
             NSString * const arrayPrefix = @"@\"RLMArray<";
-            NSString *type = [NSString stringWithUTF8String:code];
+            NSString *type = @(code);
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
                 _type = RLMPropertyTypeAny;
@@ -144,16 +121,18 @@
             }
             else if ([type hasPrefix:arrayPrefix]) {
                 // get object class from type string - @"RLMArray<objectClassName>"
-                _objectClassName = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
-                _type = RLMPropertyTypeArray;
-                
+                NSString *className = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
+
                 // verify type
-                Class cls = [RLMSchema classForString:self.objectClassName];
+                Class cls = [RLMSchema classForString:className];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
                                                  userInfo:nil];
                 }
+
+                _type = RLMPropertyTypeArray;
+                _objectClassName = [cls className];
             }
             else if ([type isEqualToString:@"@\"NSNumber\""]) {
                 @throw [NSException exceptionWithName:@"RLMException"
@@ -161,12 +140,10 @@
                                              userInfo:nil];
             }
             else {
-                // get object class and set type
-                _objectClassName = [type substringWithRange:NSMakeRange(2, type.length-3)];
-                _type = RLMPropertyTypeObject;
-                
+                NSString *className = [type substringWithRange:NSMakeRange(2, type.length-3)];
+
                 // verify type
-                Class cls = [RLMSchema classForString:self.objectClassName];
+                Class cls = [RLMSchema classForString:className];
                 if (class_getSuperclass(cls) != RLMObject.class) {
                     if ([_objectClassName isEqualToString:@"RLMArray"]) {
                         @throw [NSException exceptionWithName:@"RLMException"
@@ -177,6 +154,9 @@
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];
                 }
+
+                _type = RLMPropertyTypeObject;
+                _objectClassName = [cls className];
             }
             return YES;
         }
@@ -185,53 +165,54 @@
     }
 }
 
-+(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
-                              attributes:(RLMPropertyAttributes)attributes
+- (instancetype)initWithName:(NSString *)name
+                  attributes:(RLMPropertyAttributes)attributes
+               attributeList:(objc_property_attribute_t *)attrs
+              attributeCount:(unsigned int)attrCount
 {
-    // create new property
-    NSString *name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
-    RLMProperty *prop = [RLMProperty new];
-    prop->_name = name;
-    prop->_attributes = attributes;
-    
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+
+    _name = name;
+    _attributes = attributes;
+
     // parse attributes
-    unsigned int attCount;
-    objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);
     BOOL validType = NO;
-    for (unsigned int a = 0; a < attCount; a++) {
-        switch (*(atts[a].name)) {
+    for (unsigned int a = 0; a < attrCount; a++) {
+        switch (*attrs[a].name) {
             case 'T':
-                validType = [prop parsePropertyTypeString:atts[a].value];
+                validType = [self parsePropertyTypeString:attrs[a].value];
                 break;
             case 'N':
-                prop.nonatomic = YES;
+                // nonatomic
                 break;
             case 'D':
-                prop.dynamic = YES;
+                // dynamic
                 break;
             case 'G':
-                prop.getterName = [NSString stringWithUTF8String:atts[a].value];
+                self.getterName = @(attrs[a].value);
                 break;
             case 'S':
-                prop.setterName = [NSString stringWithUTF8String:atts[a].value];
+                self.setterName = @(attrs[a].value);
                 break;
             default:
                 break;
         }
     }
-    free(atts);
-    
+
     // throw if there was no type
     if (!validType) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
-                             "Add to ignoredPropertyNames: method to ignore.", prop.name];
+                             "Add to ignoredPropertyNames: method to ignore.", self.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    
+
     // update getter/setter names
-    [prop updateAccessorNames];
-    
-    return prop;
+    [self updateAccessorNames];
+
+    return self;
 }
 
 

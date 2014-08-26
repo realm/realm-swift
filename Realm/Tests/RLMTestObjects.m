@@ -29,6 +29,9 @@
 @implementation IntObject
 @end
 
+@implementation AllIntSizesObject
+@end
+
 @implementation FloatObject
 @end
 
