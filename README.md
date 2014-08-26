@@ -68,8 +68,8 @@ The underlying core is available under the [Realm Core Binary License](https://g
 
 ## Feedback
 
-**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](http://twitter.com/realm), announce your app on [our mailing-list](https://groups.google.com/forum/#!forum/realm-users), or email [info@realm.io](mailto:info@realm.io) to let us know about it!
+**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](http://twitter.com/realm), announce your app on [our mailing-list](https://groups.google.com/forum/#!forum/realm-users), or email [info@realm.io](mailto:info@realm.io) to let us know about it!_**
 
-And if you don't like it, please let us know what you would like improved, so we can fix it!_**
+**_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
 ![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-cocoa/README?pixel)
