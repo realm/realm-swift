@@ -15,7 +15,7 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 
 ### Swift
 
-Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/latest/#swift).
+Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/latest/#swift). CocoaPods does not support Swift yet.
 
 ### Objective-C
 
