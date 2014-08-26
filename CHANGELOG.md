@@ -15,6 +15,7 @@
   there was anything to refresh.
 * Add the class name to the error message when an RLMObject is missing a value
   for a property without a default.
+* Add support for opening Realms in read-only mode.
 
 ### Bugfixes
 

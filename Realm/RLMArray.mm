@@ -19,7 +19,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 
 @implementation RLMArray
