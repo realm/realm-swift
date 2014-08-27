@@ -86,8 +86,14 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 // public method implementations
 //
 - (NSUInteger)count {
-    RLMArrayTableViewValidate(self);
-    return _backingView.size();
+    if (_viewCreated) {
+        RLMArrayTableViewValidate(self);
+        return _backingView.size();
+    }
+    else {
+        RLMCheckThread(_realm);
+        return _backingQuery.count();
+    }
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {

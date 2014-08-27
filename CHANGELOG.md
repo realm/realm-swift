@@ -1,3 +1,15 @@
+0.85.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+### Enhancements
+
+* Improve performance when getting the count of items matching a query but not
+  reading any of the objects in the results.
+
+### Bugfixes
+
 0.84.0 Release notes (2014-08-28)
 =============================================================
 
