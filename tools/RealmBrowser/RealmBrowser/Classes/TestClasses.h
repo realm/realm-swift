@@ -23,7 +23,6 @@
 
 @property NSInteger integerValue;
 @property NSString *stringValue;
-//@property NSData *dataValue;
 
 @end
 

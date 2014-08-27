@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMTestDataGenerator.m
-//  Realm
+// Copyright 2014 Realm Inc.
 //
-//  Created by Gustaf Kugelberg on 26/08/14.
-//  Copyright (c) 2014 Realm. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestDataGenerator.h"
 #import <Realm/Realm.h>
@@ -21,6 +31,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
 
 @implementation RLMTestDataGenerator
 
+// Creates a test realm at [url], filled with [objectCount] random objects of classes in [classNames]
 +(BOOL)createRealmAtUrl:(NSURL *)url withClassesNamed:(NSArray *)classNames objectCount:(NSUInteger)objectCount
 {
     NSError *error;
@@ -36,6 +47,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
     return YES;
 }
 
+// Initializes the testDataGenerator and saves the desired [classNames]
 -(instancetype)initWithClassesNamed:(NSArray *)classNames
 {
     self = [super init];
@@ -53,6 +65,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
     return self;
 }
 
+// Fills the supplied [realm] with [objectCount] objects of types in self.classNames
 -(void)populateRealm:(RLMRealm *)realm withObjectCount:(NSUInteger)objectCount
 {
     [realm beginWriteTransaction];
@@ -68,16 +81,19 @@ const NSUInteger kMaxItemsInTestArray = 12;
     [realm commitWriteTransaction];
 }
 
+// Creates a new random object of [class] and puts in realm
 -(RLMObject *)randomObjectOfClass:(Class)class inRealm:(RLMRealm *)realm
 {
     return [self randomObjectOfClass:class inRealm:realm tryToReuse:NO];
 }
 
+// Creates a random object of [class] and puts in realm, possibly through [reuse] of existing objects of same class
 -(RLMObject *)randomObjectOfClass:(Class)class inRealm:(RLMRealm *)realm tryToReuse:(BOOL)reuse
 {
     NSMutableArray *existingObjectsOfRequiredClass = self.existingObjects[class.className];
     NSUInteger existingCount = existingObjectsOfRequiredClass.count;
     
+    // If reuse is desired and there is something to reuse, return existing object
     if (reuse && existingCount > 0) {
         NSUInteger index = arc4random_uniform((u_int32_t)existingCount);
         
@@ -86,8 +102,10 @@ const NSUInteger kMaxItemsInTestArray = 12;
     
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:class.className];
     
+    // Make array to keep property values
     NSMutableArray *propertyValues = [NSMutableArray array];
     
+    // Go through properties and fill with random values
     for (RLMProperty *property in objectSchema.properties) {
         id propertyValue;
         
@@ -136,7 +154,10 @@ const NSUInteger kMaxItemsInTestArray = 12;
         [propertyValues addObject:propertyValue];
     }
     
+    // Create an object from [propertyValues] and put in [realm]
     RLMObject *newObject = [class createInRealm:realm withObject:propertyValues];
+    
+    // Add object to store of existing objects
     [existingObjectsOfRequiredClass addObject:newObject];
     
     return newObject;
