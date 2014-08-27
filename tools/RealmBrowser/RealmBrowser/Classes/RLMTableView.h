@@ -40,6 +40,10 @@ typedef struct {
 
 - (BOOL)displaysArray;
 
+- (BOOL)columnContainsObject:(NSInteger)column;
+
+- (BOOL)columnContainsArray:(NSInteger)column;
+
 - (void)addRows:(NSIndexSet *)rowIndexes;
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes;
@@ -47,6 +51,10 @@ typedef struct {
 - (void)removeRows:(NSIndexSet *)rowIndexes;
 
 - (void)insertRows:(NSIndexSet *)rowIndexes;
+
+- (void)removeObjectLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex;
+
+- (void)removeArrayLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex;
 
 @optional
 

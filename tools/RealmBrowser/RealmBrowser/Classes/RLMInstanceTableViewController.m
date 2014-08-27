@@ -518,6 +518,26 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self reloadAfterEdit];
 }
 
+-(BOOL)columnContainsObject:(NSInteger)column
+{
+    return [self propertyTypeForColumn:column] == RLMPropertyTypeObject;
+}
+
+-(void)removeObjectLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex
+{
+    NSLog(@"rm obj in col:%lu %@", columnIndex, rowIndexes);
+}
+
+-(BOOL)columnContainsArray:(NSInteger)column
+{
+    return [self propertyTypeForColumn:column] == RLMPropertyTypeArray;
+}
+
+-(void)removeArrayLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex
+{
+    NSLog(@"rm arr in col:%lu %@", columnIndex, rowIndexes);
+}
+
 #pragma mark - Private Methods - RLMTableView Delegate
 
 -(NSDictionary *)defaultValuesForProperties:(NSArray *)properties
@@ -574,6 +594,20 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self.parentWindowController.outlineViewController.tableView reloadData];
     [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
     [self clearSelection];
+}
+
+-(RLMPropertyType)propertyTypeForColumn:(NSInteger)column
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
+    
+    if (self.displaysArray) {
+        column--;
+    }
+    
+    RLMProperty *property = objectSchema.properties[column];
+    
+    return property.type;;
 }
 
 #pragma mark - Mouse Handling

@@ -34,6 +34,8 @@
     NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
     NSMenuItem *removeFromArrayItem;
+    NSMenuItem *removeLinkToObjectItem;
+    NSMenuItem *removeLinkToArrayItem;
 }
 
 #pragma mark - NSObject Overrides
@@ -103,6 +105,16 @@
                                               keyEquivalent:backspaceString];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     removeFromArrayItem.tag = 10;
+
+    removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
+                                                       action:@selector(selectedRemoveObjectLink:)
+                                              keyEquivalent:@""];
+    removeLinkToObjectItem.tag = 11;
+
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
+                                                     action:@selector(selectedRemoveArrayLink:)
+                                              keyEquivalent:@""];
+    removeLinkToArrayItem.tag = 12;
 }
 
 #pragma mark - NSResponder Overrides
@@ -187,7 +199,6 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    
     if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
             [self selectedAddRow:theEvent];
@@ -234,6 +245,14 @@
             menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
             return canDeleteRows && displaysArray;
 
+        case 11: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to object" : @"Remove link to object";
+            return YES;
+
+        case 12: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to array" : @"Remove link to array";
+            return YES;
+
         case 99: // Context -> Click lock icon to edit
             return NO;
 
@@ -253,10 +272,25 @@
         return;
     }
     
-    [self.menu addItem:deleteRowItem];
+    if (self.selectedRowIndexes.count == 0) {
+        return;
+    }
     
+    [self.menu addItem:deleteRowItem];
+
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:removeFromArrayItem];
+    }
+
+    if (self.clickedColumn == -1) {
+        return;
+    }
+    
+    if ([self.realmDelegate columnContainsObject:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToObjectItem];
+    }
+    else if ([self.realmDelegate columnContainsArray:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToArrayItem];
     }
 }
 
@@ -287,6 +321,20 @@
 {
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate insertRows:self.selectedRowIndexes];
+    }
+}
+
+- (IBAction)selectedRemoveObjectLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeArrayLinks:self.selectedRowIndexes inColumn:self.clickedColumn];
+    }
+}
+
+- (IBAction)selectedRemoveArrayLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeObjectLinks:self.selectedRowIndexes inColumn:self.clickedColumn];
     }
 }
 
