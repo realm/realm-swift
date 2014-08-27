@@ -390,8 +390,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
     [realm commitWriteTransaction];
 
     RLMArray *subarray = nil;
@@ -399,11 +399,37 @@
         __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
         subarray = [results objectsWhere:@"age = 40"];
     }
-    {
-        __unused __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = NO"];
-    }
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
 
     XCTAssertEqualObjects(@"Joe", subarray[0][@"name"]);
+}
+
+- (void)testMultiSortLifetime
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMArray *subarray = nil;
+    {
+        __attribute((objc_precise_lifetime)) RLMArray *results = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
+        subarray = [results arraySortedByProperty:@"age" ascending:NO];
+    }
+
+    [realm beginWriteTransaction];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(3U, subarray.count);
+    XCTAssertEqualObjects(@"Jill", subarray[0][@"name"]);
+    XCTAssertEqualObjects(@"Joe", subarray[1][@"name"]);
+    XCTAssertEqualObjects(@"John", subarray[2][@"name"]);
 }
 
 - (void)testSortingExistingQuery
@@ -421,6 +447,8 @@
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
+    XCTAssertEqual(3U, sortedAge.count);
+    XCTAssertEqual(3U, sortedName.count);
 }
 
 static vm_size_t get_resident_size() {
