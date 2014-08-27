@@ -88,8 +88,8 @@ const NSUInteger kTopTipDelay = 250;
                 }
             }
             
-            NSArray *testClassNames = @[[RealmTestClass0 className], [RealmTestClass1 className], [RealmTestClass2 className]];
-            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:testClassNames elementCount:1000];
+            NSArray *classNames = @[[RealmTestClass0 className], [RealmTestClass1 className], [RealmTestClass2 className]];
+            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:1000];
             
             if (success) {
                 NSAlert *alert = [[NSAlert alloc] init];
