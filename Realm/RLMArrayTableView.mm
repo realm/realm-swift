@@ -34,10 +34,11 @@
 @implementation RLMArrayTableView
 
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   view:(tightdb::TableView const &)view
+                                   query:(tightdb::Query &)query
                                   realm:(RLMRealm *)realm {
     RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
-    ar->_backingView = view;
+    ar->_viewCreated = NO;
+    ar->_backingQuery = query;
     ar->_realm = realm;
     return ar;
 }
@@ -50,9 +51,20 @@
 // validation helper
 //
 static inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
-    if (!ar->_backingView.is_attached()) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
+    if (!ar->_viewCreated) {
+        // create backing view if needed
+        ar->_backingView = ar->_backingQuery.find_all();
+        ar->_viewCreated = YES;
     }
+    else {
+        // otherwiser verify attached and sync
+        if (!ar->_backingView.is_attached()) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
+        }
+        ar->_backingView.sync_if_needed();
+    }
+    RLMCheckThread(ar->_realm);
+    ar->_backingView.sync_if_needed();
 }
 static inline void RLMArrayTableViewValidate(RLMArrayTableView *ar) {
     RLMArrayTableViewValidateAttached(ar);
@@ -195,24 +207,22 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     RLMArrayTableViewValidate(self);
 
     // copy array and apply new predicate creating a new query and view
-    tightdb::Query query = _backingView.get_parent().where();
-    query.tableview(_backingView);
-
+    tightdb::Query query(_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName view:query.find_all() realm:_realm];
+    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName query:query realm:_realm];
 }
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
     RLMArrayTableViewValidate(self);
 
-    tightdb::Query query = _backingView.get_parent().where();
-    query.tableview(_backingView);
-    
     // apply order
+    tightdb::Query query(_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
-                                                                   view:query.find_all()
+                                                                  query:query
                                                                   realm:_realm];
+    // attach new table view
+    RLMArrayTableViewValidateAttached(ar);
     RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
     return ar;
 }

@@ -183,6 +183,9 @@
     XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
 }
 
+// FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
+// Asana: https://app.asana.com/0/861870036984/14552787865017
+#ifndef REALM_SWIFT
 - (void)testBackgroundRealmIsNotified {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -231,9 +234,6 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-// FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
-// Asana: https://app.asana.com/0/861870036984/14552787865017
-#ifndef REALM_SWIFT
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 

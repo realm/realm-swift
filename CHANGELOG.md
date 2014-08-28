@@ -10,7 +10,7 @@
 
 ### Enhancements
 
-* Updating to core library version 0.82.1.
+* Updating to core library version 0.82.2.
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
 * Add support for the BETWEEN operator in link queries.
@@ -27,6 +27,8 @@
 
 ### Bugfixes
 
+* Fix crashes and assorted bugs when sorting or querying a RLMArray returned
+  from a query.
 * Notifications are no longer sent when initializing new RLMRealm instances on background
   threads.
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].
