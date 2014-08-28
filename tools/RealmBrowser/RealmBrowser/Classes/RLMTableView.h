@@ -40,9 +40,9 @@ typedef struct {
 
 - (BOOL)displaysArray;
 
-- (BOOL)columnContainsObject:(NSInteger)column;
+- (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 
-- (BOOL)columnContainsArray:(NSInteger)column;
+- (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 
 - (void)addRows:(NSIndexSet *)rowIndexes;
 

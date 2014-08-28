@@ -246,11 +246,11 @@
             return canDeleteRows && displaysArray;
 
         case 11: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to object" : @"Remove link to object";
+            menuItem.title = multipleRows ? @"Remove links to objects" : @"Remove link to object";
             return YES;
 
         case 12: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to array" : @"Remove link to array";
+            menuItem.title = multipleRows ? @"Remove links to arrays" : @"Remove link to array";
             return YES;
 
         case 99: // Context -> Click lock icon to edit
@@ -286,10 +286,10 @@
         return;
     }
     
-    if ([self.realmDelegate columnContainsObject:self.clickedColumn]) {
+    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
         [self.menu addItem:removeLinkToObjectItem];
     }
-    else if ([self.realmDelegate columnContainsArray:self.clickedColumn]) {
+    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
         [self.menu addItem:removeLinkToArrayItem];
     }
 }
