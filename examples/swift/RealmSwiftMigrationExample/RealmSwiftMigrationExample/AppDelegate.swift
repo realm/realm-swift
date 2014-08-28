@@ -95,7 +95,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let defaultPath = docsPath.stringByAppendingPathComponent("default.realm")
 
         // copy over old data file for v0 data model
-        let v0Path = NSBundle.mainBundle().resourcePath.stringByAppendingPathComponent("default-v0.realm")
+        let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
         NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
 
@@ -108,8 +108,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //
         // Migrate a realms at a custom paths
         //
-        let v1Path = NSBundle.mainBundle().resourcePath.stringByAppendingPathComponent("default-v1.realm")
-        let v2Path = NSBundle.mainBundle().resourcePath.stringByAppendingPathComponent("default-v2.realm")
+        let v1Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v1.realm")
+        let v2Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v2.realm")
         let realmv1Path = docsPath.stringByAppendingPathComponent("default-v1.realm")
         let realmv2Path = docsPath.stringByAppendingPathComponent("default-v2.realm")
 

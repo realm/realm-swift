@@ -21,6 +21,7 @@
 * Allow unregistering from change notifications in the change notification
   handler block.
 * Significant performance improvements when holding onto large numbers of RLMObjects.
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta6.
 * Improved performance during RLMArray iteration, especially when mutating
   contained objects.
 
