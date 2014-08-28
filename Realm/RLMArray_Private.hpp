@@ -82,10 +82,12 @@
 // TableView backed RLMArray subclass
 //
 @interface RLMArrayTableView : RLMArray {
+    tightdb::Query _backingQuery;
     tightdb::TableView _backingView;
+    BOOL _viewCreated;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::TableView const &)view
+                                   query:(tightdb::Query &)query
                                    realm:(RLMRealm *)realm;
 
 @end

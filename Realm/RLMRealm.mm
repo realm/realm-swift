@@ -542,7 +542,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (RLMArray *)allObjects:(NSString *)objectClassName {
-    return RLMGetObjects(self, objectClassName, nil, nil);
+    return RLMGetObjects(self, objectClassName, nil);
 }
 
 - (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
@@ -556,7 +556,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
-    return RLMGetObjects(self, objectClassName, predicate, nil);
+    return RLMGetObjects(self, objectClassName, predicate);
 }
 
 + (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block {

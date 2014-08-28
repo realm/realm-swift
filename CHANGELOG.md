@@ -26,6 +26,8 @@
 
 ### Bugfixes
 
+* Fix crashes and assorted bugs when sorting or querying a RLMArray returned
+  from a query.
 * Notifications are no longer sent when initializing new RLMRealm instances on background
   threads.
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].
