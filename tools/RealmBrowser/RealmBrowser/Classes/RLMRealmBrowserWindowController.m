@@ -51,7 +51,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
-    [[self.window windowController] setShouldCascadeWindows:NO];
+    [[self.window windowController] setShouldCascadeWindows:YES];
     [self realmDidLoad];
 }
 
@@ -87,6 +87,21 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 #pragma mark - Public methods - User Actions
 
+- (void)reloadAllWindows
+{
+    NSArray *windowControllers = [self.modelDocument windowControllers];
+    
+    for (RLMRealmBrowserWindowController *wc in windowControllers) {
+        [wc reloadAfterEdit];
+    }
+}
+
+- (void)reloadAfterEdit
+{
+    [self.tableViewController.tableView reloadData];
+    [self.outlineViewController.tableView reloadData];
+}
+
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {
     if (!controller.navigationFromHistory) {
@@ -105,6 +120,15 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     // Searching is not implemented for link arrays yet
     BOOL isArray = [state isMemberOfClass:[RLMArrayNavigationState class]];
     [self.searchField setEnabled:!isArray];
+}
+
+- (void)newWindowWithNavigationState:(RLMNavigationState *)state
+{
+    RLMRealmBrowserWindowController *wc = [[RLMRealmBrowserWindowController alloc] initWithWindowNibName:self.windowNibName];
+    wc.modelDocument = self.modelDocument;
+    [self.modelDocument addWindowController:wc];
+    [self.modelDocument showWindows];
+    [wc addNavigationState:state fromViewController:wc.tableViewController];
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons

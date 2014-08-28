@@ -36,6 +36,7 @@
     NSMenuItem *removeFromArrayItem;
     NSMenuItem *removeLinkToObjectItem;
     NSMenuItem *removeLinkToArrayItem;
+    NSMenuItem *openArrayInNewWindowItem;
 }
 
 #pragma mark - NSObject Overrides
@@ -115,6 +116,11 @@
                                                      action:@selector(selectedRemoveArrayLink:)
                                               keyEquivalent:@""];
     removeLinkToArrayItem.tag = 12;
+    
+    openArrayInNewWindowItem = [[NSMenuItem alloc] initWithTitle:@"Open array in new window"
+                                                          action:@selector(openArrayInNewWindow:)
+                                                   keyEquivalent:@""];
+    openArrayInNewWindowItem.tag = 20;
 }
 
 #pragma mark - NSResponder Overrides
@@ -267,15 +273,24 @@
 {
     [self.menu removeAllItems];
     
+    // Menu items that do not require editing
+    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:openArrayInNewWindowItem];
+    }
+
     if (self.realmDelegate.realmIsLocked) {
         [self.menu addItem:clickLockItem];
         return;
     }
     
+    // Menu items that do require editing
+    
+    // Menu items that make sense without a row selected
     if (self.selectedRowIndexes.count == 0) {
         return;
     }
     
+    // Menu items that make sense only with a row selected
     [self.menu addItem:deleteRowItem];
 
     if (self.realmDelegate.displaysArray) {
@@ -327,15 +342,20 @@
 - (IBAction)selectedRemoveObjectLink:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate removeArrayLinks:self.selectedRowIndexes inColumn:self.clickedColumn];
+        [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
 }
 
 - (IBAction)selectedRemoveArrayLink:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate removeObjectLinks:self.selectedRowIndexes inColumn:self.clickedColumn];
+        [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
+}
+
+- (IBAction)openArrayInNewWindow:(id)sender
+{
+    [self.realmDelegate openArrayInNewWindowAtRow:self.clickedRow column:self.clickedColumn];
 }
 
 #pragma mark - NSView Overrides

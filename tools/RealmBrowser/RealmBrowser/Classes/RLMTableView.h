@@ -52,9 +52,11 @@ typedef struct {
 
 - (void)insertRows:(NSIndexSet *)rowIndexes;
 
-- (void)removeObjectLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex;
+- (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
 
-- (void)removeArrayLinks:(NSIndexSet *)rowIndexes inColumn:(NSInteger)columnIndex;
+- (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
+
+- (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex;
 
 @optional
 
