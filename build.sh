@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.82.1
+    REALM_CORE_VERSION=0.82.2
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -265,24 +265,28 @@ case "$COMMAND" in
     ######################################
     "test")
         set +e # Run both sets of tests even if the first fails
-        sh build.sh test-ios "$XCMODE"
-        sh build.sh test-osx "$XCMODE"
-        exit 0
+        failed=0
+        sh build.sh test-ios "$XCMODE" || failed=1
+        sh build.sh test-osx "$XCMODE" || failed=1
+        exit $failed
         ;;
 
     "test-debug")
         set +e
-        sh build.sh test-osx-debug "$XCMODE"
-        sh build.sh test-ios-debug "$XCMODE"
-        exit 0
+        failed=0
+        sh build.sh test-ios-debug "$XCMODE" || failed=1
+        sh build.sh test-osx-debug "$XCMODE" || failed=1
+        exit $failed
         ;;
 
     "test-all")
         set +e
-        sh build.sh test "$XCMODE"
-        sh build.sh test-debug "$XCMODE"
-        XCODE_VERSION=6 sh build.sh test "$XCMODE"
-        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE"
+        failed=0
+        sh build.sh test "$XCMODE" || failed=1
+        sh build.sh test-debug "$XCMODE" || failed=1
+        XCODE_VERSION=6 sh build.sh test "$XCMODE" || failed=1
+        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || failed=1
+        exit $failed
         ;;
 
     "test-ios")
