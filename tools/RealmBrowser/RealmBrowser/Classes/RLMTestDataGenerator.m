@@ -170,17 +170,20 @@ const NSUInteger kMaxItemsInTestArray = 12;
 
 -(NSInteger)randomInteger
 {
-    return arc4random_uniform(9999999);
+    NSUInteger type = arc4random_uniform(20);
+    return type == 0 ? INTMAX_MIN : type == 1 ? INTMAX_MAX : type == 2 ? 0 : arc4random_uniform(9999999);
 }
 
 -(float)randomFloat
 {
-    return arc4random_uniform(9999999)/(1.0f + arc4random_uniform(9999));
+    NSUInteger type = arc4random_uniform(20);
+    return type == 0 ? FLT_MIN : type == 1 ? FLT_MAX : type == 2 ? 0 : arc4random_uniform(9999999)/9999.0f;
 }
 
 -(double)randomDouble
 {
-    return arc4random_uniform(9999999)/(1.0 + arc4random_uniform(9999));
+    NSUInteger type = arc4random_uniform(20);
+    return type == 0 ? DBL_MIN : type == 1 ? DBL_MAX : type == 2 ? 0 : arc4random_uniform(9999999)/9999.0f;
 }
 
 -(NSDate *)randomDate
@@ -191,12 +194,13 @@ const NSUInteger kMaxItemsInTestArray = 12;
 -(NSString *)randomString
 {
     NSArray *names = @[@"John", @"Jane", @"Tom", @"Dick", @"Harry", @"Jack", @"Jill"];
-    NSString *name = names[arc4random_uniform((u_int32_t)names.count)];
+    NSString *result = names[arc4random_uniform((u_int32_t)names.count)];
+
+    if (arc4random_uniform(100) == 0) {
+       result = [result stringByPaddingToLength:10000 withString: @" bla" startingAtIndex:0];
+    }
     
-    NSArray *surnames = @[@"Purple", @"Red", @"Brown", @"Pink", @"Black", @"Orange"];
-    NSString *surname = surnames[arc4random_uniform((u_int32_t)surnames.count)];
-    
-    return [NSString stringWithFormat:@"%@ %@", name, surname];
+    return result;
 }
 
 -(NSString *)randomData

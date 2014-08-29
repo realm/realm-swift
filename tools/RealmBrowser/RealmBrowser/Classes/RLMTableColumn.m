@@ -21,7 +21,7 @@
 
 @implementation RLMTableColumn
 
-const NSUInteger kMaxNumberOfRowsToConsider = 20;
+const NSUInteger kMaxNumberOfRowsToConsider = 50;
 const CGFloat kMaxColumnWidth = 200.0;
 
 - (CGFloat)sizeThatFitsWithLimit:(BOOL)limited
@@ -62,7 +62,7 @@ const CGFloat kMaxColumnWidth = 200.0;
     NSRect rect = NSMakeRect(0,0, INFINITY, self.tableView.rowHeight);
     NSSize headerSize = [headerCell cellSizeForBounds:rect];
 
-    maxWidth = MAX(maxWidth, headerSize.width)*1.1;
+    maxWidth = MAX(maxWidth + 10.0f, headerSize.width*1.1);
     
     if (limited) {
         maxWidth = MIN(maxWidth, kMaxColumnWidth);
