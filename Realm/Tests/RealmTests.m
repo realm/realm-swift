@@ -262,6 +262,8 @@
 
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
+    // Create an object in a background thread and wait for that to complete,
+    // without refreshing the main thread realm
     [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
@@ -271,15 +273,23 @@
         XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
     }];
 
+    // Verify that the main thread realm still doesn't have any objects
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
+    // Verify that the local notification sent by the beginWriteTransaction
+    // below when it advances the realm to the latest version occurs *after*
+    // the advance
+    __block bool notificationFired = false;
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        notificationFired = true;
     }];
 
     [realm beginWriteTransaction];
     [realm commitWriteTransaction];
+
     [realm removeNotification:token];
+    XCTAssertTrue(notificationFired);
 }
 
 - (void)testRealmInMemory
