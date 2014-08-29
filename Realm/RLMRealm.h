@@ -161,8 +161,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  It receives the following parameters:
 
- - `NSString` \***notification**:    The name of the incoming notification.
-    `RLMRealmDidChangeNotification` is the only notification currently supported.
+ - `NSString` \***notification**:    The name of the incoming notification. See
+                                     RLMRealmNotification for information on what
+                                     notifications are sent.
  - `RLMRealm` \***realm**:           The realm for which this notification occurred
 
  @param block   A block which is called to process RLMRealm notifications.
@@ -225,8 +226,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
+
+ @return    Whether the realm had any updates. Note that this may return YES even if no data has actually changed.
  */
-- (void)refresh;
+- (BOOL)refresh;
 
 /**
  Set to YES to automatically update this Realm when changes happen in other threads.

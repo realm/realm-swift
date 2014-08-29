@@ -32,8 +32,6 @@
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
-
-- (void)notifyIfChanged;
 @end
 
 // throw an exception if the realm is being used from the wrong thread

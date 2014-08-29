@@ -3,12 +3,21 @@
 
 ### API breaking changes
 
+* Notifications for a refresh being needed (when autorefresh is off) now send
+  the notification type RLMRealmRefreshRequiredNotification rather than
+  RLMRealmDidChangeNotification.
+
 ### Enhancements
 
 * Improve performance when getting the count of items matching a query but not
   reading any of the objects in the results.
+* Add a return value to `-[RLMRealm refresh]` that indicates whether or not
+  there was anything to refresh.
 
 ### Bugfixes
+
+* Realm change notifications when beginning a write transaction are now sent
+  after updating rather than before, to match refresh.
 
 0.84.0 Release notes (2014-08-28)
 =============================================================
@@ -17,7 +26,7 @@
 
 * The timer used to trigger notifications has been removed. Notifications are now
   only triggered by commits made in other threads, and can not currently be triggered
-  by changes made by other processes. Interprocess notifications will be re-added in 
+  by changes made by other processes. Interprocess notifications will be re-added in
   a future commit with an improved design.
 
 ### Enhancements
