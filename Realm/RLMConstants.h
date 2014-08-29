@@ -131,6 +131,15 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
 #ifdef APPLEDOC
 typedef NS_ENUM(NSString, RLMRealmNotification) {
 /**
+ Posted by RLMRealm when the data in the realm has changed.
+
+ DidChange are posted after a realm has been refreshed to reflect a write
+ transaction, i.e. when an autorefresh occurs, [refresh]([RLMRealm refresh]) is
+ called, after an implicit refresh from [beginWriteTransaction]([RLMRealm beginWriteTransaction]),
+ and after a local write transaction is committed.
+ */
+    RLMRealmDidChangeNotification,
+/**
  Posted by RLMRealm when a write transaction has been committed to a RLMRealm on
  a different thread for the same file. This is not posted if
  [autorefresh]([RLMRealm autorefresh]) is enabled or if the RLMRealm is
@@ -141,21 +150,11 @@ typedef NS_ENUM(NSString, RLMRealmNotification) {
  While not refreshing is allowed, it may lead to large Realm files as Realm has
  to keep an extra copy of the data for the un-refreshed RLMRealm.
  */
-     RLMRealmNeedsRefreshNotification,
-
-/**
- Posted by RLMRealm when the data in the realm has changed.
-
- DidChange are posted after a realm has been refreshed to reflect a write
- transaction, i.e. when an autorefresh occurs, [refresh]([RLMRealm refresh]) is
- called, after an implicit refresh from [beginWriteTransaction]([RLMRealm beginWriteTransaction]),
- and after a local write transaction is committed.
- */
-    RLMRealmDidChangeNotification,
+    RLMRealmRefreshRequiredNotification,
 };
 #else
 // See comments above
-extern NSString * const RLMRealmNeedsRefreshNotification;
+extern NSString * const RLMRealmRefreshRequiredNotification;
 extern NSString * const RLMRealmDidChangeNotification;
 #endif
 

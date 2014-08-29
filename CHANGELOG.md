@@ -4,7 +4,7 @@
 ### API breaking changes
 
 * Notifications for a refresh being needed (when autorefresh is off) now send
-  the notification type RLMRealmNeedsRefreshNotification rather than
+  the notification type RLMRealmRefreshRequiredNotification rather than
   RLMRealmDidChangeNotification.
 
 ### Enhancements

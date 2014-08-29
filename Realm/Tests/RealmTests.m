@@ -195,7 +195,7 @@
 
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
-    [self waitForNotification:RLMRealmNeedsRefreshNotification realm:realm block:^{
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withObject:@[@"string"]];
@@ -262,7 +262,7 @@
 
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
-    [self waitForNotification:RLMRealmNeedsRefreshNotification realm:realm block:^{
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withObject:@[@"string"]];

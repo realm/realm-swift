@@ -482,7 +482,7 @@ static NSArray *s_objectDescriptors = nil;
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
             else {
-                [self sendNotifications:RLMRealmNeedsRefreshNotification];
+                [self sendNotifications:RLMRealmRefreshRequiredNotification];
             }
         }
     }
