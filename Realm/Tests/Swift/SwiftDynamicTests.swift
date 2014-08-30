@@ -40,7 +40,7 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "SwiftDynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!!, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type
@@ -125,7 +125,7 @@ class SwiftDynamicTests: SwiftTestCase {
         let dynSchema = dyrealm.schema[DynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, 2, "DynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!!, "stringCol", "Invalid property name")
+        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
         XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
 
         // verify object type
@@ -154,12 +154,12 @@ class SwiftDynamicTests: SwiftTestCase {
 
     func testDynamicTypes_objc() {
         let date = NSDate(timeIntervalSince1970: 100000)
-        let obj1 = [true, 1, 1.1 as Float, 1.11, "string", "a".dataUsingEncoding(NSUTF8StringEncoding), date, true, 11, 0, NSNull()] as NSArray
+        let obj1 = [true, 1, 1.1 as Float, 1.11, "string", "a".dataUsingEncoding(NSUTF8StringEncoding)!, date, true, 11, 0, NSNull()] as NSArray
 
         let obj = StringObject()
         obj.stringCol = "string"
 
-        let obj2 = [false, 2, 2.2 as Float, 2.22, "string2", "b".dataUsingEncoding(NSUTF8StringEncoding), date, false, 22, date, obj] as NSArray
+        let obj2 = [false, 2, 2.2 as Float, 2.22, "string2", "b".dataUsingEncoding(NSUTF8StringEncoding)!, date, false, 22, date, obj] as NSArray
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose

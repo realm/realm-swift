@@ -207,7 +207,9 @@ class SwiftRealmTests: SwiftTestCase {
         let notificationFired = expectationWithDescription("notification fired")
         let token = realm.addNotificationBlock { note, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
-            notificationFired.fulfill()
+            if note == RLMRealmDidChangeNotification {
+                notificationFired.fulfill()
+            }
         }
 
         dispatch_async(dispatch_queue_create("background", nil)) {

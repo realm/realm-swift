@@ -915,24 +915,36 @@
     {
         [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
 
-        RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
-        XCTAssertEqual(results.count, 1U);
+        RLMArray *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
+        RLMArray *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
+
+        // Force resultsTableView to form the TableView to verify that it syncs
+        // correctly, and don't call anything but count on resultsQuery so that
+        // it always reruns the query count method
+        (void)[resultsTableView firstObject];
+
+        XCTAssertEqual(resultsQuery.count, 1U);
+        XCTAssertEqual(resultsTableView.count, 1U);
 
         // Delete the (only) object in result set
-        [realm deleteObject:[results lastObject]];
-        XCTAssertEqual(results.count, 0U);
+        [realm deleteObject:[resultsTableView lastObject]];
+        XCTAssertEqual(resultsQuery.count, 0U);
+        XCTAssertEqual(resultsTableView.count, 0U);
 
         // Add an object that does not match query
         QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
-        XCTAssertEqual(results.count, 0U);
+        XCTAssertEqual(resultsQuery.count, 0U);
+        XCTAssertEqual(resultsTableView.count, 0U);
 
         // Change object to match query
         q1.bool1 = YES;
-        XCTAssertEqual(results.count, 1U);
+        XCTAssertEqual(resultsQuery.count, 1U);
+        XCTAssertEqual(resultsTableView.count, 1U);
 
         // Add another object that matches
         [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
-        XCTAssertEqual(results.count, 2U);
+        XCTAssertEqual(resultsQuery.count, 2U);
+        XCTAssertEqual(resultsTableView.count, 2U);
     }
     [realm commitWriteTransaction];
 }
@@ -945,32 +957,48 @@
     [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
     [realm commitWriteTransaction];
 
-    RLMArray *results = [QueryObject objectsWhere:@"bool1 = YES"];
-    XCTAssertEqual(results.count, 1U);
+    RLMArray *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
+    RLMArray *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
+
+    // Force resultsTableView to form the TableView to verify that it syncs
+    // correctly, and don't call anything but count on resultsQuery so that
+    // it always reruns the query count method
+    (void)[resultsTableView firstObject];
+
+    XCTAssertEqual(resultsQuery.count, 1U);
+    XCTAssertEqual(resultsTableView.count, 1U);
 
     // Delete the (only) object in result set
     [realm beginWriteTransaction];
-    [realm deleteObject:[results lastObject]];
+    [realm deleteObject:[resultsTableView lastObject]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(results.count, 0U);
+
+    XCTAssertEqual(resultsQuery.count, 0U);
+    XCTAssertEqual(resultsTableView.count, 0U);
 
     // Add an object that does not match query
     [realm beginWriteTransaction];
     QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(results.count, 0U);
+
+    XCTAssertEqual(resultsQuery.count, 0U);
+    XCTAssertEqual(resultsTableView.count, 0U);
 
     // Change object to match query
     [realm beginWriteTransaction];
     q1.bool1 = YES;
     [realm commitWriteTransaction];
-    XCTAssertEqual(results.count, 1U);
+
+    XCTAssertEqual(resultsQuery.count, 1U);
+    XCTAssertEqual(resultsTableView.count, 1U);
 
     // Add another object that matches
     [realm beginWriteTransaction];
     [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(results.count, 2U);
+
+    XCTAssertEqual(resultsQuery.count, 2U);
+    XCTAssertEqual(resultsTableView.count, 2U);
 }
 
 - (void)makeDogWithName:(NSString *)name owner:(NSString *)ownerName {
