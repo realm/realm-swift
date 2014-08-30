@@ -381,6 +381,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                 return [numberFormatter stringFromNumber:propertyValue];
             
         case RLMPropertyTypeObject: {
+            return nil;
+
             RLMObject *referredObject = (RLMObject *)propertyValue;
             RLMObjectSchema *objectSchema = referredObject.objectSchema;
             NSArray *properties = objectSchema.properties;
@@ -393,6 +395,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeArray: {
+            return nil;
             RLMArray *referredArray = (RLMArray *)propertyValue;
             
             if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
