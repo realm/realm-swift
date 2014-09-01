@@ -66,6 +66,11 @@
     return (id<RLMTableViewDelegate>)self.delegate;
 }
 
+-(id<RLMTableViewDataSource>)realmDataSource
+{
+    return (id<RLMTableViewDataSource>)self.dataSource;
+}
+
 #pragma mark - Private Methods - NSObject Overrides
 
 -(void)createContextMenu
@@ -187,7 +192,6 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    
     if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
             [self selectedAddRow:theEvent];
@@ -304,7 +308,7 @@
 
 #pragma mark - Public Methods
 
-- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
     // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.numberOfColumns;
@@ -316,73 +320,30 @@
     // If array, add extra first column with numbers
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
-        tableColumn.headerToolTip = @"Position of object within array";
         tableColumn.propertyType = RLMPropertyTypeInt;
         [self addTableColumn:tableColumn];
         [tableColumn.headerCell setStringValue:@"#"];
+        tableColumn.headerToolTip = @"Order of object within array";
     }
     
     // ... and add new columns matching the structure of the new realm table.
-    NSArray *columns = typeNode.propertyColumns;
+    NSArray *propertyColumns = typeNode.propertyColumns;
 
-    for (NSUInteger index = 0; index < columns.count; index++) {
-        RLMClassProperty *property = columns[index];
-        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:property.name];
-        tableColumn.propertyType = property.type;
+    for (NSUInteger index = 0; index < propertyColumns.count; index++) {
+        RLMClassProperty *propertyColumn = propertyColumns[index];
+        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
+        
+        tableColumn.propertyType = propertyColumn.type;
         [self addTableColumn:tableColumn];
 
-        [tableColumn.headerCell setStringValue:property.name];
-
-        NSString *toolTip;
-        switch (property.type) {
-            case RLMPropertyTypeBool:
-                toolTip = @"Boolean";
-                break;
-                
-            case RLMPropertyTypeInt:
-                toolTip = @"Integer";
-                break;
-                
-            case RLMPropertyTypeFloat:
-                toolTip = @"Float";
-                break;
-                
-            case RLMPropertyTypeDouble:
-                toolTip = @"Double";
-                break;
-                
-            case RLMPropertyTypeString:
-                toolTip = @"String";
-                break;
-                
-            case RLMPropertyTypeData:
-                toolTip = @"Data";
-                break;
-                
-            case RLMPropertyTypeAny:
-                toolTip = @"Any";
-                break;
-                
-            case RLMPropertyTypeDate:
-                toolTip = @"Date";
-                break;
-                
-            case RLMPropertyTypeArray:
-                toolTip = [NSString stringWithFormat:@"%@[]", property.property.objectClassName];
-                break;
-                
-            case RLMPropertyTypeObject:
-                toolTip = [NSString stringWithFormat:@"%@", property.property.objectClassName];
-                break;
-        }
-        
-        tableColumn.headerToolTip = toolTip;
+        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
     }
     
     [self reloadData];
 }
 
-#pragma mark - Private Methods - Column widths
+#pragma mark - Private Methods - Table Columns
 
 -(void)makeColumnsFitContents
 {

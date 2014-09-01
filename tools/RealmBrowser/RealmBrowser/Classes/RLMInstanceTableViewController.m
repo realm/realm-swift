@@ -28,6 +28,7 @@
 #import "RLMBasicTableCellView.h"
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
+#import "RLMImageTableCellView.h"
 
 #import "RLMTableColumn.h"
 
@@ -106,7 +107,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = newState.selectedType;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:newState.selectedType
+        [self.realmTableView setupColumnsWithType:newState.selectedType
                                  withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
@@ -121,7 +122,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -134,7 +135,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         self.displayedType = arrayNode;
         [self.tableView reloadData];
 
-        [self.realmTableView formatColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
@@ -158,6 +159,57 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     return self.displayedType.instanceCount;
+}
+
+#pragma mark - RLMTableView Data Source
+
+-(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn
+{
+    NSString *toolTip;
+    
+    switch (propertyColumn.property.type) {
+        case RLMPropertyTypeBool:
+            toolTip = @"Boolean";
+            break;
+            
+        case RLMPropertyTypeInt:
+            toolTip = @"Integer";
+            break;
+            
+        case RLMPropertyTypeFloat:
+            toolTip = @"Float";
+            break;
+            
+        case RLMPropertyTypeDouble:
+            toolTip = @"Double";
+            break;
+            
+        case RLMPropertyTypeString:
+            toolTip = @"String";
+            break;
+            
+        case RLMPropertyTypeData:
+            toolTip = @"Data";
+            break;
+            
+        case RLMPropertyTypeAny:
+            toolTip = @"Any";
+            break;
+            
+        case RLMPropertyTypeDate:
+            toolTip = @"Date";
+            break;
+            
+        case RLMPropertyTypeArray:
+            toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
+            break;
+            
+        case RLMPropertyTypeObject:
+            toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
+            break;
+    }
+    
+    return toolTip;
 }
 
 #pragma mark - NSTableView Delegate
@@ -194,9 +246,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         NSLog(@"decreasing column index to %lu", columnIndex);
     }
     
+    // Array gutter
     if (columnIndex == -1) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
+        [basicCellView.textField setEditable:NO];
         
         return basicCellView;
     }
@@ -252,8 +306,17 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             break;
             
+        case RLMPropertyTypeData: {
+            RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
+            imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            
+            [imageCellView.textField setEditable:NO];
+            
+            cellView = imageCellView;
+        }
+            break;
+            
         case RLMPropertyTypeAny:
-        case RLMPropertyTypeData:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString: {
