@@ -180,15 +180,18 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    NSLog(@"====== viewForTableColumn:row: %ld (%lu) ======", rowIndex, self.displayedType.instanceCount);
+
     if (tableView != self.tableView) {
         return nil;
     }
     
     NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
-    RLMTypeNode *displayedType = self.displayedType;
+    NSLog(@"displayedType: %@", self.displayedType);
 
-    if ([displayedType isMemberOfClass:[RLMArrayNode class]]) {
+    if ([self.displayedType isMemberOfClass:[RLMArrayNode class]]) {
         columnIndex--;
+        NSLog(@"decreasing column index to %lu", columnIndex);
     }
     
     if (columnIndex == -1) {
@@ -198,8 +201,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return basicCellView;
     }
 
-    RLMClassProperty *classProperty = displayedType.propertyColumns[columnIndex];
-    RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
+    NSLog(@"accessing column %lu out of %lu", columnIndex, self.displayedType.propertyColumns.count);
+    
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[columnIndex];
+    RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];
     RLMPropertyType type = classProperty.type;
 
