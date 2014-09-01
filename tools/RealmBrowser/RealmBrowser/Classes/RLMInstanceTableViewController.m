@@ -97,14 +97,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
 {
-//    NSLog(@"=");
-//    NSLog(@"=");
-//    NSLog(@"=");
-    NSLog(@"=== performUpdate: %@ ===", newState.selectedType.schema.className);
-//    NSLog(@"=");
-//    NSLog(@"=");
-//    NSLog(@"=");
-
     [super performUpdateUsingState:newState oldState:oldState];
     
     [self.tableView setAutosaveTableColumns:NO];
@@ -113,7 +105,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
-        NSLog(@"=== performUpdate changed displayType: %@ ===", self.displayedType);
         [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:newState.selectedType
                                withSelectionAtRow:newState.selectedInstanceIndex];
@@ -128,7 +119,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                                                                          onObject:referingInstance
                                                                             realm:realm];
         self.displayedType = arrayNode;
-        NSLog(@"=== performUpdate changed displayType: %@ ===", self.displayedType);
         [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
@@ -141,19 +131,18 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                                                             andParent:arrayState.selectedType];
         
         self.displayedType = arrayNode;
-        NSLog(@"=== performUpdate changed displayType: %@ ===", self.displayedType);
         [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
     
-//    self.tableView.autosaveName = [NSString stringWithFormat:@"%lu:%@", realm.hash, self.displayedType.name];
-//    [self.tableView setAutosaveTableColumns:YES];
+    self.tableView.autosaveName = [NSString stringWithFormat:@"%lu:%@", realm.hash, self.displayedType.name];
+    [self.tableView setAutosaveTableColumns:YES];
     
-//    if (![autofittedColumns[self.tableView.autosaveName] isEqual:@YES]) {
+    if (![autofittedColumns[self.tableView.autosaveName] isEqual:@YES]) {
         [self.realmTableView makeColumnsFitContents];
-//        autofittedColumns[self.tableView.autosaveName] = @YES;
-//    }
+        autofittedColumns[self.tableView.autosaveName] = @YES;
+    }
     
     self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
@@ -257,28 +246,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [basicCellView.textField setEditable:NO];
         
         return basicCellView;
-    }
-
-//    NSLog(@"viewForTableColumn:row: %lu:%lu (%lu:%lu)", rowIndex, columnIndex, self.displayedType.instanceCount, self.displayedType.propertyColumns.count);
-
-    if (rowIndex >= self.displayedType.instanceCount
-        || self.displayedType.instanceCount != self.tableView.numberOfRows
-        || self.tableView.numberOfRows != [self numberOfRowsInTableView:self.tableView]) {
-        NSLog(@"======== ROW mismatch ========");
-        NSLog(@"========rowIndex: %lu =======", rowIndex);
-        NSLog(@"========instanceCount: %lu =======", self.displayedType.instanceCount);
-        NSLog(@"========numberOfRows: %lu =======", self.tableView.numberOfRows);
-    }
-    
-    if (columnIndex >= self.displayedType.propertyColumns.count
-        || self.displayedType.propertyColumns.count != self.tableView.numberOfColumns
-        || self.tableView.numberOfColumns != [self.tableView tableColumns].count
-        || [self.tableView tableColumns].count != self.displayedType.propertyColumns.count) {
-        NSLog(@"======== COLUMN mismatch ========");
-        NSLog(@"========columnIndex: %lu =======", columnIndex);
-        NSLog(@"========propertyColumns: %lu =======", self.displayedType.propertyColumns.count);
-        NSLog(@"========numberOfColumns: %lu =======", self.tableView.numberOfColumns);
-        NSLog(@"========tableColumns: %lu =======", [self.tableView tableColumns].count);
     }
 
     RLMClassProperty *classProperty = self.displayedType.propertyColumns[columnIndex];
