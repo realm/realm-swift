@@ -34,6 +34,9 @@
     NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
     NSMenuItem *removeFromArrayItem;
+    NSMenuItem *removeLinkToObjectItem;
+    NSMenuItem *removeLinkToArrayItem;
+    NSMenuItem *openArrayInNewWindowItem;
 }
 
 #pragma mark - NSObject Overrides
@@ -108,6 +111,21 @@
                                               keyEquivalent:backspaceString];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     removeFromArrayItem.tag = 10;
+
+    removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
+                                                       action:@selector(selectedRemoveObjectLink:)
+                                              keyEquivalent:@""];
+    removeLinkToObjectItem.tag = 11;
+
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
+                                                     action:@selector(selectedRemoveArrayLink:)
+                                              keyEquivalent:@""];
+    removeLinkToArrayItem.tag = 12;
+    
+    openArrayInNewWindowItem = [[NSMenuItem alloc] initWithTitle:@"Open array in new window"
+                                                          action:@selector(openArrayInNewWindow:)
+                                                   keyEquivalent:@""];
+    openArrayInNewWindowItem.tag = 20;
 }
 
 #pragma mark - NSResponder Overrides
@@ -238,6 +256,14 @@
             menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
             return canDeleteRows && displaysArray;
 
+        case 11: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to objects" : @"Remove link to object";
+            return YES;
+
+        case 12: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to arrays" : @"Remove link to array";
+            return YES;
+
         case 99: // Context -> Click lock icon to edit
             return NO;
 
@@ -252,15 +278,39 @@
 {
     [self.menu removeAllItems];
     
+    // Menu items that do not require editing
+    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:openArrayInNewWindowItem];
+    }
+
     if (self.realmDelegate.realmIsLocked) {
         [self.menu addItem:clickLockItem];
         return;
     }
     
-    [self.menu addItem:deleteRowItem];
+    // Menu items that do require editing
     
+    // Menu items that make sense without a row selected
+    if (self.selectedRowIndexes.count == 0) {
+        return;
+    }
+    
+    // Menu items that make sense only with a row selected
+    [self.menu addItem:deleteRowItem];
+
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:removeFromArrayItem];
+    }
+
+    if (self.clickedColumn == -1) {
+        return;
+    }
+    
+    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToObjectItem];
+    }
+    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToArrayItem];
     }
 }
 
@@ -292,6 +342,25 @@
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate insertRows:self.selectedRowIndexes];
     }
+}
+
+- (IBAction)selectedRemoveObjectLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
+    }
+}
+
+- (IBAction)selectedRemoveArrayLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
+    }
+}
+
+- (IBAction)openArrayInNewWindow:(id)sender
+{
+    [self.realmDelegate openArrayInNewWindowAtRow:self.clickedRow column:self.clickedColumn];
 }
 
 #pragma mark - NSView Overrides

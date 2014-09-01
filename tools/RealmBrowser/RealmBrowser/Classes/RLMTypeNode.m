@@ -67,7 +67,6 @@
     return nil; // Default implementation - should be overridden by subclasses.    
 }
 
-
 #pragma mark - Public methods - Accessors
 
 - (NSString *)name

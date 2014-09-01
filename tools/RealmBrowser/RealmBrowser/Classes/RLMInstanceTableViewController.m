@@ -520,7 +520,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     [realm commitWriteTransaction];
-    [self reloadAfterEdit];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes
@@ -540,10 +540,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [realm deleteObjects:objectsToDelete];
     [realm commitWriteTransaction];
     
-    [self reloadAfterEdit];
+    [self.parentWindowController reloadAllWindows];
 }
 
--(void)insertRows:(NSIndexSet *)rowIndexes
+- (void)insertRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked || !self.displaysArray) {
         return;
@@ -570,11 +570,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
         [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
     }
+
     [realm commitWriteTransaction];
-    [self reloadAfterEdit];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
--(void)removeRows:(NSIndexSet *)rowIndexes
+- (void)removeRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked || !self.displaysArray) {
         return;
@@ -586,12 +588,62 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [(RLMArrayNode *)self.displayedType removeInstanceAtIndex:idx];
     }];
     [realm commitWriteTransaction];
-    [self reloadAfterEdit];
+    [self.parentWindowController reloadAllWindows];
+}
+
+- (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
+{
+    if (column == -1) {
+        return NO;
+    }
+
+    if ([self propertyTypeForColumn:column] != RLMPropertyTypeObject) {
+        return NO;
+    }
+    
+    return [self cellsAreNonEmptyInRows:rowIndexes column:column];
+}
+
+- (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
+{
+    [self removeContentsAtRows:rowIndexes column:columnIndex];
+}
+
+- (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
+{
+    if (column == -1) {
+        return NO;
+    }
+    
+    if ([self propertyTypeForColumn:column] != RLMPropertyTypeArray) {
+        return NO;
+    }
+
+    return [self cellsAreNonEmptyInRows:rowIndexes column:column];
+}
+
+- (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
+{
+    [self removeContentsAtRows:rowIndexes column:columnIndex];
+}
+
+- (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex
+{
+    if (self.displaysArray) {
+        columnIndex--;
+    }
+    
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[columnIndex];
+    RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
+                                                                                 typeIndex:row
+                                                                                  property:propertyNode.property
+                                                                                arrayIndex:0];
+    [self.parentWindowController newWindowWithNavigationState:state];
 }
 
 #pragma mark - Private Methods - RLMTableView Delegate
 
--(NSDictionary *)defaultValuesForProperties:(NSArray *)properties
+- (NSDictionary *)defaultValuesForProperties:(NSArray *)properties
 {
     NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
     
@@ -602,7 +654,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     return defaultValues;
 }
 
--(id)defaultValueForPropertyType:(RLMPropertyType)propertyType
+- (id)defaultValueForPropertyType:(RLMPropertyType)propertyType
 {
     switch (propertyType) {
         case RLMPropertyTypeInt:
@@ -638,13 +690,64 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
 }
 
--(void)reloadAfterEdit
+- (RLMPropertyType)propertyTypeForColumn:(NSInteger)column
 {
-    [self.tableView reloadData];
-    NSIndexSet *indexSet = self.parentWindowController.outlineViewController.tableView.selectedRowIndexes;
-    [self.parentWindowController.outlineViewController.tableView reloadData];
-    [self.parentWindowController.outlineViewController.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
-    [self clearSelection];
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
+    
+    if (self.displaysArray) {
+        column--;
+    }
+    
+    RLMProperty *property = objectSchema.properties[column];
+    
+    return property.type;;
+}
+
+- (BOOL)cellsAreNonEmptyInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
+{
+    if (self.displaysArray) {
+        column--;
+    }
+    
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[column];
+    
+    __block BOOL returnValue = NO;
+    
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop) {
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
+        id propertyValue = selectedInstance[classProperty.name];
+        if (propertyValue) {
+            returnValue = YES;
+            *stop = YES;
+        }
+    }];
+    
+    return returnValue;
+}
+
+- (void)removeContentsAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
+{
+    if (self.displaysArray) {
+        column--;
+    }
+    
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[column];
+    
+    id newValue = [NSNull null];
+    if (classProperty.property.type == RLMPropertyTypeArray) {
+        newValue = @[];
+    }
+    
+    [realm beginWriteTransaction];
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop) {
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
+        selectedInstance[classProperty.name] = newValue;
+    }];
+    [realm commitWriteTransaction];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
 #pragma mark - Mouse Handling
@@ -787,11 +890,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return;
     }
     
-    RLMTypeNode *displayedType = self.displayedType;
-    RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[column];
     
     if (propertyNode.type == RLMPropertyTypeObject) {
-        RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:row];
         id propertyValue = selectedInstance[propertyNode.name];
         
         if ([propertyValue isKindOfClass:[RLMObject class]]) {
@@ -812,11 +914,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
     }
     else if (propertyNode.type == RLMPropertyTypeArray) {
-        RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:row];
         NSObject *propertyValue = selectedInstance[propertyNode.name];
         
         if ([propertyValue isKindOfClass:[RLMArray class]]) {
-            RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:displayedType
+            RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
                                                                                          typeIndex:row
                                                                                           property:propertyNode.property
                                                                                         arrayIndex:0];
@@ -909,7 +1011,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - Private Methods - Setters/Getters
 
--(void)setRealmIsLocked:(BOOL)realmIsLocked
+- (void)setRealmIsLocked:(BOOL)realmIsLocked
 {
     _realmIsLocked = realmIsLocked;
     [self.tableView reloadData];
