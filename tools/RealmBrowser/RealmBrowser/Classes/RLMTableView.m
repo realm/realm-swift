@@ -379,6 +379,10 @@
 
 - (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
+    NSLog(@"--setupColumnsWithType: %@", typeNode.schema.className);
+
+    [self beginUpdates];
+    
     // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.numberOfColumns;
     for (NSUInteger index = 0; index < existingColumnsCount; index++) {
@@ -390,6 +394,8 @@
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
         tableColumn.propertyType = RLMPropertyTypeInt;
+        NSLog(@"--setupColumnsWithType - adding gutter column");
+
         [self addTableColumn:tableColumn];
         [tableColumn.headerCell setStringValue:@"#"];
         tableColumn.headerToolTip = @"Order of object within array";
@@ -402,6 +408,8 @@
         RLMClassProperty *propertyColumn = propertyColumns[index];
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
         
+        NSLog(@"--setupColumnsWithType - adding column %@", propertyColumn.name);
+        
         tableColumn.propertyType = propertyColumn.type;
         [self addTableColumn:tableColumn];
 
@@ -409,13 +417,17 @@
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
     }
     
-    [self reloadData];
+    [self endUpdates];
+
+//    [self reloadData];
 }
 
 #pragma mark - Private Methods - Table Columns
 
 -(void)makeColumnsFitContents
 {
+    NSLog(@"--makeColumnsFitContents");
+
     for (RLMTableColumn *column in self.tableColumns) {
         column.width = [column sizeThatFitsWithLimit:YES];
     }

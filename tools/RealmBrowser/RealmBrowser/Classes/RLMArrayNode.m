@@ -31,6 +31,8 @@
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
+    NSLog(@"initArrayNode: %@", property);
+
     NSString *elementTypeName = property.objectClassName;
     RLMSchema *realmSchema = realm.schema;
     RLMObjectSchema *elementSchema = [realmSchema schemaForClassName:elementTypeName];
