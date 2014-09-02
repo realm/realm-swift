@@ -13,6 +13,8 @@
   reading any of the objects in the results.
 * Add a return value to `-[RLMRealm refresh]` that indicates whether or not
   there was anything to refresh.
+* Add the class name to the error message when an RLMObject is missing a value
+  for a property without a default.
 
 ### Bugfixes
 
