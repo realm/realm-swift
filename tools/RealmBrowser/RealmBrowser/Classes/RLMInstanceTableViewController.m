@@ -105,7 +105,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
-        [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:newState.selectedType
                                withSelectionAtRow:newState.selectedInstanceIndex];
         [self setSelectionIndex:newState.selectedInstanceIndex];
@@ -119,7 +118,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                                                                          onObject:referingInstance
                                                                             realm:realm];
         self.displayedType = arrayNode;
-        [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
@@ -131,7 +129,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                                                             andParent:arrayState.selectedType];
         
         self.displayedType = arrayNode;
-        [self.tableView reloadData];
         [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
     }
@@ -148,6 +145,23 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - NSTableView Data Source
+
+- (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+    NSString *myString = @"From RealmBrowser";
+    
+    return [pboard setString:myString forType:NSPasteboardTypeString];
+}
+
+- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id < NSDraggingInfo >)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
+{
+    return NSDragOperationEvery;
+}
+
+//- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
+//    // Support for us being a dragging source
+//    return [[NSPasteboardItem alloc] init];
+//}
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
@@ -222,7 +236,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 {
     if (self.tableView == notification.object) {
         NSInteger selectedIndex = self.tableView.selectedRow;
-        
         [self.parentWindowController.currentState updateSelectionToIndex:selectedIndex];
     }
 }
@@ -249,7 +262,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
 
     RLMClassProperty *classProperty = self.displayedType.propertyColumns[columnIndex];
-    
     RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];
     RLMPropertyType type = classProperty.type;
@@ -272,8 +284,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [badgeCellView.textField setEditable:NO];
             
             cellView = badgeCellView;
-        }
+            
             break;
+        }
             
         case RLMPropertyTypeBool: {
             RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
@@ -282,8 +295,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [boolCellView.checkBox setEnabled:!self.realmIsLocked];
             
             cellView = boolCellView;
-        }
+            
             break;
+        }
             
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
@@ -295,9 +309,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [numberCellView.textField setEditable:!self.realmIsLocked];
             
             cellView = numberCellView;
-        }
+
             break;
-            
+        }
+
         case RLMPropertyTypeData: {
             RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
             imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
@@ -305,9 +320,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [imageCellView.textField setEditable:NO];
             
             cellView = imageCellView;
-        }
+
             break;
-            
+        }
+
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
@@ -327,8 +343,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             }
             
             cellView = basicCellView;
-        }
+
             break;
+        }
     }
     
     cellView.toolTip = [self tooltipForPropertyValue:propertyValue ofType:type];

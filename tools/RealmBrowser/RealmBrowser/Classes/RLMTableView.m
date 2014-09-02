@@ -379,15 +379,15 @@
 
 - (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
-    [self beginUpdates];
-    
     // We clear the table view from all old columns
     NSUInteger existingColumnsCount = self.numberOfColumns;
     for (NSUInteger index = 0; index < existingColumnsCount; index++) {
         NSTableColumn *column = [self.tableColumns lastObject];
         [self removeTableColumn:column];
     }
-    
+    [self reloadData];
+
+    [self beginUpdates];
     // If array, add extra first column with numbers
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
@@ -406,7 +406,6 @@
         
         tableColumn.propertyType = propertyColumn.type;
         [self addTableColumn:tableColumn];
-
         [tableColumn.headerCell setStringValue:propertyColumn.name];
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
     }
