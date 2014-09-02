@@ -146,23 +146,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - NSTableView Data Source
 
-- (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
-{
-    NSString *myString = @"From RealmBrowser";
-    
-    return [pboard setString:myString forType:NSPasteboardTypeString];
-}
-
-- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id < NSDraggingInfo >)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
-{
-    return NSDragOperationEvery;
-}
-
-//- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
-//    // Support for us being a dragging source
-//    return [[NSPasteboardItem alloc] init];
-//}
-
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     if (tableView != self.tableView) {
