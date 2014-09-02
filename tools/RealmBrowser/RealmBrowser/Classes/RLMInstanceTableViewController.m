@@ -169,44 +169,25 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     switch (propertyColumn.property.type) {
         case RLMPropertyTypeBool:
-            toolTip = @"Boolean";
-            break;
-            
+            return @"Boolean";
         case RLMPropertyTypeInt:
-            toolTip = @"Integer";
-            break;
-            
+            return @"Integer";
         case RLMPropertyTypeFloat:
-            toolTip = @"Float";
-            break;
-            
+            return @"Float";
         case RLMPropertyTypeDouble:
-            toolTip = @"Double";
-            break;
-            
+            return @"Double";
         case RLMPropertyTypeString:
-            toolTip = @"String";
-            break;
-            
+            return @"String";
         case RLMPropertyTypeData:
-            toolTip = @"Data";
-            break;
-            
+            return @"Data";
         case RLMPropertyTypeAny:
-            toolTip = @"Any";
-            break;
-            
+            return @"Any";
         case RLMPropertyTypeDate:
-            toolTip = @"Date";
-            break;
-            
+            return @"Date";
         case RLMPropertyTypeArray:
-            toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
-            break;
-            
+            return [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
         case RLMPropertyTypeObject:
-            toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
-            break;
+            return [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
     }
     
     return toolTip;
@@ -247,7 +228,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     if (columnIndex == -1) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
-        [basicCellView.textField setEditable:NO];
+        basicCellView.textField.editable = NO;
         
         return basicCellView;
     }
@@ -273,6 +254,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             badgeCellView.textField.font = [NSFont linkFont];
             
             [badgeCellView.textField setEditable:NO];
+            badgeCellView.textField.editable = NO;
             
             cellView = badgeCellView;
         }
@@ -295,7 +277,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
-            [numberCellView.textField setEditable:!self.realmIsLocked];
+            numberCellView.textField.editable = !self.realmIsLocked;
             
             cellView = numberCellView;
         }
@@ -304,8 +286,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeData: {
             RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
             imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
-            
-            [imageCellView.textField setEditable:NO];
+            imageCellView.textField.editable = NO;
             
             cellView = imageCellView;
         }
@@ -322,11 +303,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
             if (type == RLMPropertyTypeObject) {
                 basicCellView.textField.font = [NSFont linkFont];
-                [basicCellView.textField setEditable:NO];
+                basicCellView.textField.editable = NO;
             }
             else {
                 basicCellView.textField.font = [NSFont textFont];
-                [basicCellView.textField setEditable:!self.realmIsLocked];
+                basicCellView.textField.editable = !self.realmIsLocked;
             }
             
             cellView = basicCellView;
