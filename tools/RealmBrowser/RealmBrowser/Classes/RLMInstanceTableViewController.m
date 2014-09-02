@@ -18,6 +18,8 @@
 
 #import "RLMInstanceTableViewController.h"
 
+#import <Foundation/Foundation.h>
+
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
@@ -36,6 +38,49 @@
 #import "NSFont+Standard.h"
 
 #import "objc/objc-class.h"
+
+
+@interface RLMObjectEntity : NSObject <NSPasteboardWriting, NSPasteboardReading>
+
+@property (nonatomic) NSString *rowNumber;
+
+@end
+
+
+@implementation RLMObjectEntity
+
+#pragma mark - NSPasteboardWriting
+
+-(NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
+{
+    return [self.rowNumber writableTypesForPasteboard:pasteboard];
+    
+    //    return @[@"RLMObject"];
+}
+
+-(NSPasteboardWritingOptions)writingOptionsForType:(NSString *)type pasteboard:(NSPasteboard *)pasteboard
+{
+    if ([type isEqualToString:@"RLMObject"]) {
+        return NSPasteboardWritingPromised;
+    }
+    
+    return 0;
+}
+
+-(id)pasteboardPropertyListForType:(NSString *)type
+{
+    return nil;
+}
+
+#pragma mark - NSPasteboardReading
+
++(NSArray *)readableTypesForPasteboard:(NSPasteboard *)pasteboard
+{
+    return nil;
+}
+
+@end
+
 
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
@@ -83,6 +128,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     autofittedColumns = [NSMutableDictionary dictionary];
     
+    [self.tableView registerForDraggedTypes:@[kRLMObjectType]];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
+
     awake = YES;
 }
 
@@ -146,22 +194,50 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - NSTableView Data Source
 
+NSString * const kRLMObjectType = @"RLMObjectType";
+
+
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    NSString *myString = @"From RealmBrowser";
-    
-    return [pboard setString:myString forType:NSPasteboardTypeString];
+    NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
+    [pboard declareTypes:@[kRLMObjectType] owner:self];
+    [pboard setData:indexSetData forType:kRLMObjectType];
+
+    return YES;
 }
 
-- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id < NSDraggingInfo >)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
+- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
-    return NSDragOperationEvery;
+    if (operation == NSTableViewDropAbove) {
+        return NSDragOperationMove;
+    }
+    
+    return NSDragOperationNone;
 }
 
-//- (id <NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row {
-//    // Support for us being a dragging source
-//    return [[NSPasteboardItem alloc] init];
-//}
+- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
+{
+    NSArray *supportedTypes = @[kRLMObjectType];
+    NSPasteboard *draggingPasteboard = [info draggingPasteboard];
+    NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
+    
+    if ([availableType compare:kRLMObjectType] == NSOrderedSame) {
+        
+        NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
+        NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
+
+        NSLog(@"dropping at %lu: %@", row, rowIndexes);
+        
+        return YES;
+
+    }
+    
+    return NO;
+}
+
+-(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
+    NSLog(@"dragging: %@", rowIndexes);
+}
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
