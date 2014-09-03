@@ -35,7 +35,7 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val);
 id RLMDynamicGet(RLMObject *obj, NSString *propName);
 
 // by property/column
-void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val, BOOL isPrimary);
+void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val, BOOL enforceUnique);
 
 //
 // Class modification

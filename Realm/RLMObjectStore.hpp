@@ -40,10 +40,8 @@ void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSche
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
-
-// upserts an object in the given realm
-void RLMAddOrUpdateObjectInRealm(RLMObject *object, RLMRealm *realm);
+// if tryUpdate is 'true', update an existing object with the same primary key value
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool tryUpdate = false);
 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObject *object);

@@ -624,12 +624,12 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
     RLMDynamicSet(obj, (RLMProperty *)prop, val, schema.primaryKeyProperty == prop);
 }
 
-void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val, BOOL isPrimary) {
+void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val, BOOL enforceUnique) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case 'i':
         case 'l':
-            if (isPrimary) {
+            if (enforceUnique) {
                 RLMSetLongUnique(obj, col, prop.name, [val longLongValue]);
             }
             else {
@@ -647,7 +647,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
             RLMSetBool(obj, col, (bool)[val boolValue]);
             break;
         case 's':
-            if (isPrimary) {
+            if (enforceUnique) {
                 RLMSetStringUnique(obj, col, prop.name, val);
             }
             else {

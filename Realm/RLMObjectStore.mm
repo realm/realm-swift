@@ -248,31 +248,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     RLMCheckThread(realm);
 }
 
-static inline void RLMPersistObjectProperties(RLMObject *object, RLMObjectSchema *schema) {
-
-    // populate all properties
-    for (RLMProperty *prop in schema.properties) {
-        // get object from ivar using key value coding
-        id value = nil;
-        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
-            value = [object valueForKey:prop.getterName];
-        }
-
-        // FIXME: Add condition to check for Mixed once it can support a nil value.
-        if (!value && prop.type != RLMPropertyTypeObject) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"No value or default value specified for property '%@' in '%@'",
-                                                   prop.name, schema.className]
-                                         userInfo:nil];
-        }
-
-        // set in table with out validation
-        RLMDynamicSet(object, prop, value, schema.primaryKeyProperty == prop);
-    }
-
-}
-
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
     // if already in the right realm then no-op
     if (object.realm == realm) {
         return;
@@ -299,64 +275,64 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // automatically detach it
     object->_row.detach();
 
-    // create row in table
     tightdb::Table &table = *schema->_table;
-    size_t rowIndex = table.add_empty_row();
+    size_t rowIndex = tightdb::not_found;
+
+    if (update) {
+        // verify primary key
+        RLMProperty *primaryProperty = object.objectSchema.primaryKeyProperty;
+        if (!primaryProperty) {
+            NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be upserted", object.objectSchema.className];
+            @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
+        }
+
+        // get primary value
+        id primaryValue = [object valueForKey:primaryProperty.getterName];
+
+        // search for existing object based on primary key type
+        if (primaryProperty.type == RLMPropertyTypeString) {
+            rowIndex = schema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(primaryValue));
+        }
+        else {
+            rowIndex = schema->_table->find_first_int(primaryProperty.column, [primaryValue longLongValue]);
+        }
+    }
+
+    // if not updating, create row
+    if (rowIndex == tightdb::not_found) {
+        rowIndex = table.add_empty_row();
+        update = false;
+    }
+
+    // get accessor
     object->_row = table[rowIndex];
 
-    // persist all properties
-    RLMPersistObjectProperties(object, schema);
+    // populate all properties
+    for (RLMProperty *prop in schema.properties) {
+        // get object from ivar using key value coding
+        id value = nil;
+        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
+            value = [object valueForKey:prop.getterName];
+        }
+
+        // FIXME: Add condition to check for Mixed once it can support a nil value.
+        if (!value && prop.type != RLMPropertyTypeObject) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"No value or default value specified for property '%@' in '%@'",
+                                                   prop.name, schema.className]
+                                         userInfo:nil];
+        }
+
+        // set in table with out validation
+        // skip primary key when updating since it doesn't change
+        bool isPrimary = schema.primaryKeyProperty == prop;
+        if (!isPrimary || !update) {
+            RLMDynamicSet(object, prop, value, isPrimary);
+        }
+    }
 
     // switch class to use table backed accessor
     object_setClass(object, schema.accessorClass);
-}
-
-void RLMAddOrUpdateObjectInRealm(RLMObject *object, RLMRealm *realm) {
-    // if already in the right realm then no-op
-    if (object.realm == realm) {
-        return;
-    }
-
-    // verify writable
-    RLMVerifyInWriteTransaction(realm);
-
-    // verify primary key
-    RLMProperty *primaryProperty = object.objectSchema.primaryKeyProperty;
-    if (!primaryProperty) {
-        NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be upserted", object.objectSchema.className];
-        @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
-    }
-
-    // get primary value
-    id primaryValue = [object valueForKey:primaryProperty.getterName];
-
-    // get the schema from the realm
-    NSString *objectClassName = [object.class className];
-    RLMObjectSchema *schema = realm.schema[objectClassName];
-
-    // search for existing object based on primary key type
-    size_t row = tightdb::not_found;
-    if (primaryProperty.type == RLMPropertyTypeString) {
-        row = schema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(primaryValue));
-    }
-    else {
-        row = schema->_table->find_first_int(primaryProperty.column, [primaryValue longLongValue]);
-    }
-
-    // if a new object insert, otherwise update
-    if (row == tightdb::not_found) {
-        RLMAddObjectToRealm(object, realm);
-    }
-    else {
-        // set row
-        object->_row = (*schema->_table)[row];
-
-        // persist all properties
-        RLMPersistObjectProperties(object, schema);
-
-        // switch class to use table backed accessor
-        object_setClass(object, schema.accessorClass);
-    }
 }
 
 

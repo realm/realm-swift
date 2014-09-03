@@ -884,7 +884,6 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
-
 }
 
 @end
