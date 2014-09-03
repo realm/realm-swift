@@ -140,8 +140,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [self.realmTableView makeColumnsFitContents];
         autofittedColumns[self.tableView.autosaveName] = @YES;
     }
-    
-    self.displaysArray = [newState isMemberOfClass:[RLMArrayNavigationState class]];
 }
 
 #pragma mark - NSTableView Data Source
@@ -230,8 +228,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
- 
-    if ([self.displayedType isMemberOfClass:[RLMArrayNode class]]) {
+
+    if (self.displaysArray) {
         columnIndex--;
     }
     
@@ -791,6 +789,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
     
+    if (self.displaysArray) {
+        column--;
+    }
+
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
@@ -841,6 +843,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
     
+    if (self.displaysArray) {
+        column--;
+    }
+
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
@@ -878,7 +884,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
     
-    if (row == -1 || column == -1) {
+    if (self.displaysArray) {
+        column--;
+    }
+
+    if (row == -1 || column < 0) {
         return;
     }
     
@@ -931,7 +941,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
     
-    if (row == -1 || column == -1) {
+    if (self.displaysArray) {
+        column--;
+    }
+
+    if (row == -1 || column < 0) {
         return;
     }
     
@@ -1007,6 +1021,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 {
     _realmIsLocked = realmIsLocked;
     [self.tableView reloadData];
+}
+
+- (BOOL)displaysArray
+{
+    return ([self.displayedType isMemberOfClass:[RLMArrayNode class]]);
 }
 
 @end
