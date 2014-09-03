@@ -75,6 +75,17 @@
     return YES;
 }
 
+-(BOOL)moveInstanceFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
+{
+    if (fromIndex >= [displayedArray count] || toIndex > [displayedArray count]) {
+        return NO;
+    }
+    
+    [displayedArray moveObjectFromIndex:fromIndex toIndex:toIndex];
+    
+    return YES;
+}
+
 #pragma mark - RLMObjectNode Overrides
 
 - (NSString *)name

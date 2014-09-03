@@ -198,15 +198,15 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    if (self.displaysArray) {
-        NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
-        [pboard declareTypes:@[kRLMObjectType] owner:self];
-        [pboard setData:indexSetData forType:kRLMObjectType];
-        
-        return YES;
+    if (self.realmIsLocked || !self.displaysArray) {
+        return NO;
     }
 
-    return NO;
+    NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
+    [pboard declareTypes:@[kRLMObjectType] owner:self];
+    [pboard setData:indexSetData forType:kRLMObjectType];
+    
+    return YES;
 }
 
 - (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
@@ -220,26 +220,30 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
 {
+    if (self.realmIsLocked || !self.displaysArray) {
+        return NO;
+    }
+
     NSArray *supportedTypes = @[kRLMObjectType];
     NSPasteboard *draggingPasteboard = [info draggingPasteboard];
     NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
     
     if ([availableType compare:kRLMObjectType] == NSOrderedSame) {
-        
         NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
-
-        NSLog(@"dropping at %lu: %@", row, rowIndexes);
         
-        return YES;
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        [realm beginWriteTransaction];
+        [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
+            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:idx toIndex:row];
+        }];
+        [realm commitWriteTransaction];
+        [self.parentWindowController reloadAllWindows];
 
+        return YES;
     }
     
     return NO;
-}
-
--(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
-    NSLog(@"dragging: %@", rowIndexes);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView

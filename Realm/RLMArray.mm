@@ -144,6 +144,19 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     [_backingArray replaceObjectAtIndex:index withObject:anObject];
 }
 
+- (void)moveObjectFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
+    if (toIndex == fromIndex || toIndex == fromIndex + 1) {
+        return;
+    }
+    
+    RLMObject *object = [_backingArray objectAtIndex:fromIndex];
+    [_backingArray removeObjectAtIndex:fromIndex];
+    if (toIndex > fromIndex) {
+        toIndex--;
+    }
+    [_backingArray insertObject:object atIndex:toIndex];
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMValidateMatchingObjectType(self, object);
     return [_backingArray indexOfObject:object];

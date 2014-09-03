@@ -156,29 +156,27 @@
     if (!myDelegate) {
         return; // No delegate, no need to track the mouse.
     }
-
+    
     if (mouseOverView) {
         currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 		
         if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
             return;
         }
-        else {
-            if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
-            }
-
-            CGRect cellRect = [self rectOfLocation:previousMouseLocation];
-            [self setNeedsDisplayInRect:cellRect];
-
-            previousMouseLocation = currentMouseLocation;
-
-            if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
-            }
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
         }
-
-        CGRect cellRect = [self rectOfLocation:currentMouseLocation];
+        
+        CGRect cellRect = [self rectOfLocation:previousMouseLocation];
+        [self setNeedsDisplayInRect:cellRect];
+        
+        previousMouseLocation = currentMouseLocation;
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
+        }
+        
         [self setNeedsDisplayInRect:cellRect];
     }
 }
