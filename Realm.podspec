@@ -25,6 +25,8 @@ Pod::Spec.new do |s|
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.private_header_files    = 'include-ios/**/*.hpp', 'include-osx/**/*.hpp', '**/*_Private.h'
   s.source_files            = 'Realm/*.{m,mm}', 'core/**/*.{h,hpp}'
+  s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
+                                'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
 
   s.ios.deployment_target   = '6.0'
   s.ios.vendored_library    = 'core/libtightdb-ios.a'
