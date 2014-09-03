@@ -28,6 +28,7 @@
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary *propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
+@property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 @end
 
 
@@ -60,7 +61,14 @@
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
-    
+    NSString *primaryKey = [objectClass primaryKey];
+
+    // initialize schema
+    // create schema object and set properties
+    RLMObjectSchema *schema = [RLMObjectSchema new];
+    schema.className = [objectClass className];
+    schema.objectClass = objectClass;
+
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
@@ -69,20 +77,38 @@
         
         if (!ignored) { // Don't process ignored properties
             RLMPropertyAttributes attr = [objectClass attributesForProperty:propertyName];
-            RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
-            if (prop) {
-                [propArray addObject:prop];
+            if ([primaryKey isEqualToString:propertyName]) {
+                attr = attr | RLMPropertyAttributeIndexed;
+                schema.primaryKeyProperty = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
+                schema.primaryKeyProperty.isPrimary = YES;
+                [propArray addObject:schema.primaryKeyProperty];
+            }
+            else {
+                [propArray addObject:[RLMProperty propertyForObjectProperty:props[i] attributes:attr]];
             }
         }
     }
     
     free(props);
-    
-    // create schema object and set properties
-    RLMObjectSchema *schema = [RLMObjectSchema new];
+
+    // set properties
     schema.properties = propArray;
-    schema.className = [objectClass className];
-    schema.objectClass = objectClass;
+
+    // validate primary property
+    if (primaryKey) {
+        if (!schema.primaryKeyProperty) {
+            NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
+                                 primaryKey, schema.className];
+            @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+        }
+        if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Only 'string' and 'int' properties can be designated the primary key"
+                                         userInfo:nil];
+        }
+    }
+
+    // set standalone class
     schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
 
     return schema;

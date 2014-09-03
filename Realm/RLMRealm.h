@@ -292,6 +292,26 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)addObjectsFromArray:(id)array;
 
 /**
+ Adds or updates an object to be persisted it in this Realm. The object provided must have a designated
+ primary key. If no objects exist in the RLMRealm instance with the same primary key value, the object is
+ inserted. Otherwise, the existing object is updated with any changed values.
+
+ @param object  Object to be added or updated.
+ */
+- (void)addOrUpdateObject:(RLMObject *)object;
+
+/**
+ Adds or updates objects in the given array to be persisted it in this Realm.
+
+ This is the equivalent of `addOrUpdateObject:` except for an array of objects.
+
+ @param array  `NSArray` or `RLMArray` of `RLMObject`s (or subclasses) to be added to this Realm.
+
+ @see   addOrUpdateObject:
+ */
+- (void)addOrUpdateObjectsFromArray:(id)array;
+
+/**
  Delete an object from this Realm.
 
  @param object  Object to be deleted from this Realm.

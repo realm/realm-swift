@@ -20,7 +20,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMObjectSchema.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.hpp"
 
 #import <objc/runtime.h>
@@ -311,13 +311,37 @@ static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(RLMObject *obj, int val) {
-                RLMSetLong(obj, colIndex, val);
-            });
+            if (prop.isPrimary) {
+                return imp_implementationWithBlock(^(RLMObject *obj, int val) {
+                    if (obj->_row.get_table()->find_first_int(0, val) != tightdb::not_found) {
+                        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%i' for property '%@'",
+                                            val, prop.name];
+                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    }
+                    RLMSetLong(obj, colIndex, val);
+                });
+            }
+            else {
+                return imp_implementationWithBlock(^(RLMObject *obj, int val) {
+                    RLMSetLong(obj, colIndex, val);
+                });
+            }
         case 'l':
-            return imp_implementationWithBlock(^(RLMObject *obj, long val) {
-                RLMSetLong(obj, colIndex, val);
-            });
+            if (prop.isPrimary) {
+                return imp_implementationWithBlock(^(RLMObject *obj, long val) {
+                    if (obj->_row.get_table()->find_first_int(0, val) != tightdb::not_found) {
+                        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%li' for property '%@'",
+                                            val, prop.name];
+                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    }
+                    RLMSetLong(obj, colIndex, val);
+                });
+            }
+            else {
+                return imp_implementationWithBlock(^(RLMObject *obj, long val) {
+                    RLMSetLong(obj, colIndex, val);
+                });
+            }
         case 'f':
             return imp_implementationWithBlock(^(RLMObject *obj, float val) {
                 RLMSetFloat(obj, colIndex, val);
@@ -335,9 +359,21 @@ static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
                 RLMSetBool(obj, colIndex, val);
             });
         case 's':
-            return imp_implementationWithBlock(^(RLMObject *obj, NSString *val) {
-                RLMSetString(obj, colIndex, val);
-            });
+            if (prop.isPrimary) {
+                return imp_implementationWithBlock(^(RLMObject *obj, NSString *val) {
+                    if (obj->_row.get_table()->find_first_string(0, RLMStringDataWithNSString(val)) != tightdb::not_found) {
+                        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%@' for property '%@'",
+                                            val, prop.name];
+                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    }
+                    RLMSetString(obj, colIndex, val);
+                });
+            }
+            else {
+                return imp_implementationWithBlock(^(RLMObject *obj, NSString *val) {
+                    RLMSetString(obj, colIndex, val);
+                });
+            }
         case 'a':
             return imp_implementationWithBlock(^(RLMObject *obj, NSDate *date) {
                 RLMSetDate(obj, colIndex, date);

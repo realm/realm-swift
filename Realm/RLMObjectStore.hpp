@@ -42,6 +42,9 @@ void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSche
 // add an object to the given realm
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
 
+// upserts an object in the given realm
+void RLMAddOrUpdateObjectInRealm(RLMObject *object, RLMRealm *realm);
+
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
@@ -50,6 +53,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
 
 // create object from array or dictionary
 RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value);
+
 
 //
 // Accessor Creation

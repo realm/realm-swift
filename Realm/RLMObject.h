@@ -178,6 +178,16 @@
 + (NSDictionary *)defaultPropertyValues;
 
 /**
+ Implement to designate a property as the primary key for a RLMObject subclass. Only properties of
+ type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
+ properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+ Indexes are created automatically for primary key properties.
+
+ @return    Name of the property designated as the primary key.
+ */
++ (NSString *)primaryKey;
+
+/**
  Implement to return an array of property names to ignore. These properties will not be persisted
  and are treated as transient.
  

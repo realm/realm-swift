@@ -121,6 +121,11 @@
     return nil;
 }
 
+// default primaryKey implementation
++ (NSString *)primaryKey {
+    return nil;
+}
+
 -(id)objectForKeyedSubscript:(NSString *)key {
     if (_realm) {
         return RLMDynamicGet(self, key);
