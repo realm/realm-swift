@@ -646,6 +646,23 @@ RLM_ARRAY_TYPE(CycleObject)
     OwnerObject *brian = OwnerObject.allObjects[0], *jp = OwnerObject.allObjects[1];
     XCTAssertEqualObjects(brian.dog.dogName, @"Brido");
     XCTAssertEqualObjects(jp.dog.dogName, @"PJ");
+
+    // verify with kvc objects
+    // create DogExtraObject
+    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithObject:@[@"Fido", @12, @"Poodle"]];
+
+    [realm beginWriteTransaction];
+
+    // create second object with DogExtraObject object
+    DogObject *dog = [DogObject createInDefaultRealmWithObject:dogExt];
+
+    // missing properties
+    XCTAssertThrows([DogExtraObject createInDefaultRealmWithObject:dog], @"Initialization with missing values should throw");
+
+    // nested objects should work
+    XCTAssertNoThrow([OwnerObject createInDefaultRealmWithObject:(@[@"Alex", dogExt])], @"Should not throw");
+
+    [realm commitWriteTransaction];
 }
 
 
