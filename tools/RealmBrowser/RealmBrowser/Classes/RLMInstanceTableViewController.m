@@ -39,6 +39,7 @@
 
 #import "objc/objc-class.h"
 
+NSString * const kRLMObjectType = @"RLMObjectType";
 
 @interface RLMObjectEntity : NSObject <NSPasteboardWriting, NSPasteboardReading>
 
@@ -194,8 +195,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - NSTableView Data Source
 
-NSString * const kRLMObjectType = @"RLMObjectType";
-
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
     if (self.realmIsLocked || !self.displaysArray) {
@@ -218,7 +217,11 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     return NSDragOperationNone;
 }
 
-- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)operation
+-(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
+    NSLog(@"dragging: %@", rowIndexes);
+}
+
+- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)destination dropOperation:(NSTableViewDropOperation)operation
 {
     if (self.realmIsLocked || !self.displaysArray) {
         return NO;
@@ -233,10 +236,33 @@ NSString * const kRLMObjectType = @"RLMObjectType";
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
         
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-        [realm beginWriteTransaction];
-        [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
-            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:idx toIndex:row];
+  
+        NSMutableArray *sources = [NSMutableArray array];
+        [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+            [sources addObject:@(idx)];
         }];
+        
+        [realm beginWriteTransaction];
+
+        for (NSUInteger i = 0; i < sources.count; i++) {
+            NSUInteger source = [sources[i] unsignedIntegerValue];
+            
+            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+            
+            for (NSUInteger j = source; j <= destination; j++) {
+                if (j > destination) {
+                    sources[j] = @([sources[i] unsignedIntegerValue] + 1);
+                }
+                if (j > source) {
+                    sources[j] = @([sources[i] unsignedIntegerValue] - 1);
+                }
+            }
+            
+            if (source > destination) {
+                destination++;
+            }
+        }
+        
         [realm commitWriteTransaction];
         [self.parentWindowController reloadAllWindows];
 
@@ -891,6 +917,10 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
     
+    if (self.displaysArray) {
+        column--;
+    }
+
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
@@ -1035,7 +1065,7 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
     
-    if (row == -1 || column == -1) {
+    if (row == -1 || column < 0) {
         return;
     }
     
