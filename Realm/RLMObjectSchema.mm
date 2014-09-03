@@ -78,9 +78,8 @@
         if (!ignored) { // Don't process ignored properties
             RLMPropertyAttributes attr = [objectClass attributesForProperty:propertyName];
             if ([primaryKey isEqualToString:propertyName]) {
-                attr = attr | RLMPropertyAttributeIndexed;
+                //attr = attr | RLMPropertyAttributeIndexed;
                 schema.primaryKeyProperty = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
-                schema.primaryKeyProperty.isPrimary = YES;
                 [propArray addObject:schema.primaryKeyProperty];
             }
             else {
@@ -155,6 +154,7 @@
     schema.properties = self.properties;
     schema.objectClass = self.objectClass;
     schema.className = self.className;
+    schema.primaryKeyProperty = schema[_primaryKeyProperty.name];
     return schema;
 }
 

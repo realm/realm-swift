@@ -23,8 +23,6 @@
 
 #pragma mark - Test Objects
 
-#pragma mark DefaultObject
-
 @interface DefaultObject : RLMObject
 @property int       intCol;
 @property float     floatCol;
@@ -53,7 +51,6 @@
 }
 @end
 
-#pragma mark IgnoredURLObject
 
 @interface IgnoredURLObject : RLMObject
 @property NSString *name;
@@ -67,7 +64,6 @@
 }
 @end
 
-#pragma mark IndexedObject
 
 @interface IndexedObject : RLMObject
 @property NSString *name;
@@ -85,7 +81,6 @@
 }
 @end
 
-#pragma mark CycleObject
 @class CycleObject;
 RLM_ARRAY_TYPE(CycleObject)
 @interface CycleObject :RLMObject
@@ -95,7 +90,6 @@ RLM_ARRAY_TYPE(CycleObject)
 @implementation CycleObject
 @end
 
-#pragma mark DogExtraObject
 @interface DogExtraObject : RLMObject
 @property NSString *dogName;
 @property int age;
@@ -104,6 +98,27 @@ RLM_ARRAY_TYPE(CycleObject)
 
 @implementation DogExtraObject
 @end
+
+@interface PrimaryIntObject : RLMObject
+@property int intCol;
+@end
+
+@implementation PrimaryIntObject
++ (NSString *)primaryKey {
+    return @"intCol";
+}
+@end
+
+@interface PrimaryInt64Object : RLMObject
+@property int64_t int64Col;
+@end
+
+@implementation PrimaryInt64Object
++ (NSString *)primaryKey {
+    return @"int64Col";
+}
+@end
+
 
 #pragma mark - Private
 
@@ -847,6 +862,29 @@ RLM_ARRAY_TYPE(CycleObject)
 
     XCTAssertEqual(obj1.deletedFromRealm, YES);
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
+}
+
+- (void)testPrimaryKey {
+    [[RLMRealm defaultRealm] beginWriteTransaction];
+
+    [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])];
+    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string2", @1])];
+    XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])], @"Duplicate primary key should throw");
+    XCTAssertThrows(obj.stringCol = @"string2", @"Setting primary key should throw");
+
+
+    [PrimaryIntObject createInDefaultRealmWithObject:(@[@1])];
+    PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithObject:(@[@2])];
+    XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithObject:(@[@1])], @"Duplicate primary key should throw");
+    XCTAssertThrows(obj1.intCol = 2, @"Setting primary key should throw");
+
+    [PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 40)])];
+    PrimaryInt64Object *obj2 = [PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 41)])];
+    XCTAssertThrows([PrimaryInt64Object createInDefaultRealmWithObject:(@[@(1LL << 40)])], @"Duplicate primary key should throw");
+    XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
+
+    [[RLMRealm defaultRealm] commitWriteTransaction];
+
 }
 
 @end

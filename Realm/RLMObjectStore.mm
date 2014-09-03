@@ -119,7 +119,13 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
         default: {
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
             if (prop.attributes & RLMPropertyAttributeIndexed) {
-                table.set_index(prop.column);
+                // FIXME - support other types
+                if (prop.type != RLMPropertyTypeString) {
+                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
+                }
+                else {
+                    table.set_index(prop.column);
+                }
             }
         }
     }
@@ -261,7 +267,7 @@ static inline void RLMPersistObjectProperties(RLMObject *object, RLMObjectSchema
         }
 
         // set in table with out validation
-        RLMDynamicSet(object, prop, value);
+        RLMDynamicSet(object, prop, value, schema.primaryKeyProperty == prop);
     }
 
 }
@@ -331,10 +337,10 @@ void RLMAddOrUpdateObjectInRealm(RLMObject *object, RLMRealm *realm) {
     // search for existing object based on primary key type
     size_t row = tightdb::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
-        row = schema->_table->find_first_string(0, RLMStringDataWithNSString(primaryValue));
+        row = schema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(primaryValue));
     }
     else {
-        row = schema->_table->find_first_int(0, [primaryValue longLongValue]);
+        row = schema->_table->find_first_int(primaryProperty.column, [primaryValue longLongValue]);
     }
 
     // if a new object insert, otherwise update
@@ -375,7 +381,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // populate
         NSArray *props = objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
-            RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
+            RLMProperty *prop = props[i];
+            RLMDynamicSet(object, (RLMProperty *)prop, array[i], objectSchema.primaryKeyProperty == prop);
         }
     }
     else {
@@ -390,7 +397,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // populate
         NSArray *props = objectSchema.properties;
         for (RLMProperty *prop in props) {
-            RLMDynamicSet(object, prop, dict[prop.name]);
+            RLMDynamicSet(object, prop, dict[prop.name], objectSchema.primaryKeyProperty == prop);
         }
     }
 

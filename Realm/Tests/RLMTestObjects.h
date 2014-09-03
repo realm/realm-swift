@@ -235,3 +235,11 @@ RLM_ARRAY_TYPE(CircleObject);
 @property NSDate *dateCol;
 
 @end
+
+
+@interface PrimaryStringObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
+@end
+
+

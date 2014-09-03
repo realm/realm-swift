@@ -42,7 +42,6 @@
 @property (nonatomic, copy) NSString *getterName;
 @property (nonatomic, copy) NSString *setterName;
 @property (nonatomic, copy) NSString *objectClassName;
-@property (nonatomic, assign) BOOL isPrimary;
 
 @end
 
