@@ -196,14 +196,17 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 
-
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
-    [pboard declareTypes:@[kRLMObjectType] owner:self];
-    [pboard setData:indexSetData forType:kRLMObjectType];
+    if (self.displaysArray) {
+        NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
+        [pboard declareTypes:@[kRLMObjectType] owner:self];
+        [pboard setData:indexSetData forType:kRLMObjectType];
+        
+        return YES;
+    }
 
-    return YES;
+    return NO;
 }
 
 - (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
@@ -971,10 +974,14 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
     
-    if (row == -1 || column == -1) {
+    if (self.displaysArray) {
+        column--;
+    }
+
+    if (row == -1 || column < 0) {
         return;
     }
-    
+
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[column];
     
     if (propertyNode.type == RLMPropertyTypeObject) {
