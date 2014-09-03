@@ -174,13 +174,14 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
-NSDictionary *RLMValidatedDictionaryForObjectSchema(NSDictionary *dict, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+NSDictionary *RLMValidatedDictionaryForObjectSchema(id dict, RLMObjectSchema *objectSchema, RLMSchema *schema) {
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
+    BOOL isDict = [dict isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
         // set out object to validated input or default value
-        id obj = dict[prop.name];
+        id obj = !isDict && ![dict respondsToSelector:NSSelectorFromString(prop.name)] ? nil : [dict valueForKey:prop.name];
         obj = obj ?: defaults[prop.name];
         obj = RLMValidatedObjectForProperty(obj, prop, schema);
         if (obj && obj != NSNull.null)

@@ -63,17 +63,12 @@
             [self setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }
-    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
-        // validate and populate
-        dict = RLMValidatedDictionaryForObjectSchema(dict, _objectSchema, RLMSchema.sharedSchema);
+    else {
+        // assume our object is an NSDictionary or a an object with kvc properties
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
             [self setValue:dict[name] forKeyPath:name];
         }
-    }
-    else {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Values must be provided either as an array or dictionary"
-                                     userInfo:nil];
     }
 
     return self;

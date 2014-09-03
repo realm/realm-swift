@@ -95,6 +95,16 @@ RLM_ARRAY_TYPE(CycleObject)
 @implementation CycleObject
 @end
 
+#pragma mark DogExtraObject
+@interface DogExtraObject : RLMObject
+@property NSString *dogName;
+@property int age;
+@property NSString *breed;
+@end
+
+@implementation DogExtraObject
+@end
+
 #pragma mark - Private
 
 @interface RLMRealm ()
@@ -194,6 +204,22 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertThrows([[EmployeeObject alloc] initWithObject:@{}], @"Initialization with missing values should throw");
     XCTAssertNoThrow([[DefaultObject alloc] initWithObject:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
+}
+
+-(void)testObjectInitWithObjectTypeObject
+{
+    DogExtraObject *dogExt = [[DogExtraObject alloc] initWithObject:@[@"Fido", @12, @"Poodle"]];
+
+    // initialize second object with first object
+    DogObject *dog = [[DogObject alloc] initWithObject:dogExt];
+    XCTAssertEqualObjects(dog.dogName, @"Fido", @"Names should be equal");
+    XCTAssertEqual(dog.age, 12, @"Age should be equal");
+
+    // missing properties should throw
+    XCTAssertThrows([[DogExtraObject alloc] initWithObject:dog], @"Initialization with missing values should throw");
+
+    // nested objects should work
+    XCTAssertNoThrow([[OwnerObject alloc] initWithObject:(@[@"Alex", dogExt])], @"Should not throw");
 }
 
 -(void)testObjectInitWithObjectLiterals {

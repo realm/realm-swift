@@ -321,8 +321,9 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMDynamicSet(object, (RLMProperty *)props[i], array[i]);
         }
     }
-    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
-        dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
+    else {
+        // assume dictionary or object with kvc properties
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
 
         // create row
         tightdb::Table &table = *objectSchema->_table;
@@ -334,11 +335,6 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         for (RLMProperty *prop in props) {
             RLMDynamicSet(object, prop, dict[prop.name]);
         }
-    }
-    else {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Values must be provided either as an array or dictionary"
-                                     userInfo:nil];
     }
 
     // switch class to use table backed accessor
