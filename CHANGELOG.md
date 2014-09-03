@@ -9,6 +9,8 @@
 
 ### Enhancements
 
+* `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
+  any object type with kvc properties.
 * Improve performance when getting the count of items matching a query but not
   reading any of the objects in the results.
 * Add a return value to `-[RLMRealm refresh]` that indicates whether or not
