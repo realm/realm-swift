@@ -19,7 +19,7 @@
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
@@ -30,10 +30,6 @@
 #import <objc/runtime.h>
 
 @implementation RLMObject
-
-@synthesize realm = _realm;
-@synthesize objectSchema = _objectSchema;
-
 
 // standalone init
 - (instancetype)init

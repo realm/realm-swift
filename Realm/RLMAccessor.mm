@@ -21,7 +21,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 
 #import <objc/runtime.h>
 

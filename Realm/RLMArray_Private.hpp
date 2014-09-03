@@ -98,7 +98,7 @@
 //
 @interface RLMCArrayHolder : NSObject {
 @public
-    __strong id *array;
+    std::unique_ptr<id[]> array;
     NSUInteger size;
 }
 
