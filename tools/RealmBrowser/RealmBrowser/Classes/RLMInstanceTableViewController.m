@@ -225,6 +225,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return NO;
     }
 
+    // Check that the dragged item is of correct type
     NSArray *supportedTypes = @[kRLMObjectType];
     NSPasteboard *draggingPasteboard = [info draggingPasteboard];
     NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
@@ -235,6 +236,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
   
+        // Move indexset into mutable array
         NSMutableArray *sources = [NSMutableArray array];
         [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
             [sources addObject:@(idx)];
@@ -242,20 +244,26 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         [realm beginWriteTransaction];
 
+        // Iterate through the array, representing source row indices
         for (NSUInteger i = 0; i < sources.count; i++) {
             NSUInteger source = [sources[i] unsignedIntegerValue];
             
+            // Perform the move
             [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
             
-            for (NSUInteger j = source; j <= destination; j++) {
-                if (j > destination) {
-                    sources[j] = @([sources[i] unsignedIntegerValue] + 1);
+            //Iterate through the remaining source row indices in the array
+            for (NSUInteger j = i + 1; j < sources.count; j++) {
+                NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
+                // Everything right of the destination is shifted right
+                if (sourceIndexToModify > destination) {
+                    sources[j] = @([sources[j] unsignedIntegerValue] + 1);
                 }
-                if (j > source) {
-                    sources[j] = @([sources[i] unsignedIntegerValue] - 1);
+                // Everything right of the current source is shifted left
+                if (sourceIndexToModify > source) {
+                    sources[j] = @([sources[j] unsignedIntegerValue] - 1);
                 }
             }
-            
+            // If the move was from lower index to higher, shift destination right
             if (source > destination) {
                 destination++;
             }
@@ -1067,6 +1075,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
     
+    if (self.displaysArray) {
+        column--;
+    }
+
     if (row == -1 || column < 0) {
         return;
     }
