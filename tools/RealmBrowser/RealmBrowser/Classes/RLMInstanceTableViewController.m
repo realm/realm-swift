@@ -878,33 +878,36 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        RLMTypeNode *displayedType = self.displayedType;
+    NSInteger row = location.row;
+    NSInteger column = location.column;
+    
+    if (self.displaysArray) {
+        column--;
+    }
+
+    if (row == -1 || row >= self.tableView.numberOfRows || column < 0 || column >= self.tableView.numberOfColumns) {
+        [self disableLinkCursor];
         
-        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
-            RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-            
-            if (propertyNode.type == RLMPropertyTypeObject) {
-                if (!linkCursorDisplaying) {
-                    RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
-                    NSObject *propertyValue = selectedInstance[propertyNode.name];
-                    
-                    if (propertyValue != nil) {
-                        [self enableLinkCursor];
-                    }
-                }
-                
-                return;
-            }
-            else if (propertyNode.type == RLMPropertyTypeArray) {
-                [self enableLinkCursor];
-                return;
-            }
-        }
+        return;
     }
     
-    [self disableLinkCursor];
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[column];
+    
+    if (propertyNode.type == RLMPropertyTypeObject) {
+        RLMClassProperty *propertyNode = self.displayedType.propertyColumns[column];
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:row];
+        NSObject *propertyValue = selectedInstance[propertyNode.name];
+        
+        if (!propertyValue) {
+            [self disableLinkCursor];
+        }
+        else {
+            [self enableLinkCursor];
+        }
+    }
+    else if (propertyNode.type == RLMPropertyTypeArray) {
+        [self enableLinkCursor];
+    }
 }
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
