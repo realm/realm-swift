@@ -915,8 +915,15 @@ RLM_ARRAY_TYPE(CycleObject)
     NSMutableSet *dict = [NSMutableSet set];
     [dict addObject:obj];
     [dict addObject:strObj];
+
+    // primary key objects should match even with duplicate instances of the same object
     XCTAssertTrue([dict containsObject:obj]);
+    XCTAssertTrue([dict containsObject:[[PrimaryStringObject allObjects] firstObject]]);
+
+    // non-primary key objects should only match when comparing identical instances
     XCTAssertTrue([dict containsObject:strObj]);
+    XCTAssertFalse([dict containsObject:[[StringObject allObjects] firstObject]]);
+
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }

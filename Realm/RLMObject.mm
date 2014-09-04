@@ -268,6 +268,8 @@
 - (NSUInteger)hash {
     if (_objectSchema.primaryKeyProperty) {
         id primaryProperty = [self valueForKey:_objectSchema.primaryKeyProperty.name];
+
+        // modify the hash of our primary key value to avoid potential (although unlikely) collisions
         return [primaryProperty hash] ^ 1;
     }
     else {

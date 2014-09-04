@@ -146,10 +146,12 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMValidateMatchingObjectType(self, object);
-    for (NSUInteger i = 0; i < _backingArray.count; i++) {
-        if ([object isEqualToObject:_backingArray[i]]) {
-            return i;
+    NSUInteger index = 0;
+    for (RLMObject *cmp in _backingArray) {
+        if ([object isEqualToObject:cmp]) {
+            return index;
         }
+        index++;
     }
     return NSNotFound;
 }
