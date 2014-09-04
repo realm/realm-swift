@@ -624,18 +624,9 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
 } // namespace
 
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMSchema *schema,
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema)
 {
-    // parse and apply predicate tree
-    if (!predicate) {
-        return;
-    }
-
-    if ([predicate isKindOfClass:[NSString class]]) {
-        predicate = [NSPredicate predicateWithFormat:predicate];
-    }
-
     RLMPrecondition([predicate isKindOfClass:NSPredicate.class], @"Invalid argument",
                     @"Condition should be predicate as string or NSPredicate object");
 
