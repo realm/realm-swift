@@ -328,6 +328,9 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         @synchronized(s_realmsPerPath) {
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
+                // advance read in case another instance initialized the schema
+                LangBindHelper::advance_read(*realm->_sharedGroup, *realm->_writeLogs);
+
                 // if we have a cached realm on another thread, copy and verify without a transaction
                 RLMRealmSetSchema(realm, [realms[0] schema], false);
             }
