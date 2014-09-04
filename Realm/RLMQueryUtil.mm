@@ -633,7 +633,7 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, 
     }
 
     RLMPrecondition([predicate isKindOfClass:NSPredicate.class], @"Invalid argument",
-                    @"Condition should be predicate as string or NSPredicate object");
+                    @"predicate must be an NSPredicate object");
 
     update_query_with_predicate(predicate, schema, objectSchema, *query);
 
