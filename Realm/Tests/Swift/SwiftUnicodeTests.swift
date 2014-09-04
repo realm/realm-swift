@@ -36,7 +36,7 @@ class SwiftUnicodeTests: SwiftTestCase {
         XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
 
         let obj2 = SwiftStringObject.objectsInRealm(realm, "stringCol == %@", utf8TestString).firstObject() as SwiftStringObject
-        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+        XCTAssertTrue(obj1.isEqualToObject(obj2), "Querying a realm searching for a string with UTF8 content should work")
     }
 
     func testUTF8PropertyWithUTF8StringContents() {
