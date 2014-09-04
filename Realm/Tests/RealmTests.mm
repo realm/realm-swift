@@ -18,12 +18,23 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.hpp"
+
 #import <libkern/OSAtomic.h>
 
 @interface RLMRealm ()
-
 + (BOOL)isCoreDebug;
+@end
 
+@interface RLMObjectSchema (Private)
++ (instancetype)schemaForObjectClass:(Class)objectClass;
+
+@property (nonatomic, readwrite, assign) Class objectClass;
+@end
+
+@interface RLMSchema (Private)
+@property (nonatomic, readwrite, copy) NSArray *objectSchema;
 @end
 
 @interface RealmTests : RLMTestCase
@@ -39,12 +50,6 @@
 #else
     XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
 #endif
-}
-
-- (void)testRealmExists {
-    RLMRealm *realm = [self realmWithTestPath];
-    XCTAssertNotNil(realm, @"realm should not be nil");
-    XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
 - (void)testRealmFailure
@@ -73,7 +78,7 @@
     [StringObject createInRealm:realm withObject:@[@"c"]];
     XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
-    
+
     // test again after write transaction
     RLMArray *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
@@ -84,7 +89,7 @@
     [realm deleteObject:objects[0]];
     XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
-    
+
     objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
@@ -124,20 +129,20 @@
 
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
-    
+
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
     XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
-    
+
     // add objects to linkView
     [realm beginWriteTransaction];
     [obj.array addObject:[StringObject createInRealm:realm withObject:@[@"a"]]];
     [obj.array addObject:[[StringObject alloc] initWithObject:@[@"b"]]];
     [realm commitWriteTransaction];
-    
+
     // remove objects from realm
     XCTAssertEqual(obj.array.count, (NSUInteger)2, @"Expecting 2 objects");
     [realm beginWriteTransaction];
@@ -169,6 +174,10 @@
     dispatch_async(queue, block);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
+
     [realm removeNotification:token];
 }
 
@@ -182,8 +191,6 @@
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
-
-        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
     }];
 
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
@@ -253,6 +260,9 @@
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
 }
 #endif
 
@@ -304,7 +314,7 @@
 - (void)testRealmInMemory2
 {
     [RLMRealm useInMemoryDefaultRealm];
-    
+
     RLMRealm *realmInMemory = [RLMRealm defaultRealm];
     [realmInMemory beginWriteTransaction];
     [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
@@ -317,13 +327,13 @@
 - (void)testRealmFileAccess
 {
     XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
-    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");    
-    
+    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
+
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSString *filePath = RLMRealmPathForFile(@"filename.realm");
     [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
-    
+
     NSError *error;
     XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
@@ -343,6 +353,99 @@
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
+}
+
+- (void)testReadOnlyFile
+{
+    @autoreleasepool {
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmPath() error:nil];
+
+    // Should not be able to open read-write
+    XCTAssertThrows([self realmWithTestPath]);
+
+    RLMRealm *realm;
+    XCTAssertNoThrow(realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
+}
+
+- (void)testReadOnlyRealmMustExist
+{
+   XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+}
+
+- (void)testReadOnlyRealmIsImmutable
+{
+    @autoreleasepool { [self realmWithTestPath]; }
+
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertThrows([realm beginWriteTransaction]);
+    XCTAssertThrows([realm refresh]);
+}
+
+- (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime
+{
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPath]);
+        XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+    }
+
+    @autoreleasepool {
+        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+        XCTAssertThrows([self realmWithTestPath]);
+    }
+}
+
+- (void)testReadOnlyRealmWithMissingTables
+{
+    // create a realm with only a StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[@"a"]);
+        [realm commitWriteTransaction];
+    }
+
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    // verify that reading a missing table gives an empty array rather than
+    // crashing
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testReadOnlyRealmWithMissingColumns
+{
+    // create a realm with only a zero-column StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+        objectSchema.properties = @[];
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[]);
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil],
+                    @"should reject table missing column");
 }
 
 @end

@@ -43,12 +43,12 @@
 		02889106198AE108007D8FB2 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 02889105198AE108007D8FB2 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02889109198AE111007D8FB2 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 02889108198AE111007D8FB2 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
-		02C4147B191DE49600F858D9 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.m */; };
+		02C4147B191DE49600F858D9 /* RealmTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.mm */; };
 		02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
 		02C414D81921939D00F858D9 /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C414D71921939D00F858D9 /* QueryTests.m */; };
 		02C415131921B0C400F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		02C4153E1921B25000F858D9 /* QueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C414D71921939D00F858D9 /* QueryTests.m */; };
-		02C4153F1921B25000F858D9 /* RealmTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.m */; };
+		02C4153F1921B25000F858D9 /* RealmTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C4147A191DE49600F858D9 /* RealmTests.mm */; };
 		02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 02C4148F191DE68900F858D9 /* RLMTestCase.m */; };
 		02DCBE8D195A22C000F1CBE6 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02DCBE8C195A22C000F1CBE6 /* MigrationTests.mm */; };
 		02DCBE8E195A22C000F1CBE6 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02DCBE8C195A22C000F1CBE6 /* MigrationTests.mm */; };
@@ -80,8 +80,8 @@
 		02E4D6C7192E3DC40082808D /* RLMObjectSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D699192E3DC40082808D /* RLMObjectSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02E4D6C8192E3DC40082808D /* RLMObjectSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69A192E3DC40082808D /* RLMObjectSchema.mm */; };
 		02E4D6C9192E3DC40082808D /* RLMObjectSchema.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69A192E3DC40082808D /* RLMObjectSchema.mm */; };
-		02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69B192E3DC40082808D /* RLMObjectStore.h */; };
-		02E4D6CB192E3DC40082808D /* RLMObjectStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69B192E3DC40082808D /* RLMObjectStore.h */; };
+		02E4D6CA192E3DC40082808D /* RLMObjectStore.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69B192E3DC40082808D /* RLMObjectStore.hpp */; };
+		02E4D6CB192E3DC40082808D /* RLMObjectStore.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69B192E3DC40082808D /* RLMObjectStore.hpp */; };
 		02E4D6CC192E3DC40082808D /* RLMObjectStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69C192E3DC40082808D /* RLMObjectStore.mm */; };
 		02E4D6CD192E3DC40082808D /* RLMObjectStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D69C192E3DC40082808D /* RLMObjectStore.mm */; };
 		02E4D6CE192E3DC40082808D /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02E4D69D192E3DC40082808D /* RLMProperty_Private.h */; };
@@ -180,7 +180,7 @@
 		02C41462191DE49600F858D9 /* Realm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		02C4146E191DE49600F858D9 /* OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C41476191DE49600F858D9 /* RealmTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmTests-Info.plist"; sourceTree = "<group>"; };
-		02C4147A191DE49600F858D9 /* RealmTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RealmTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		02C4147A191DE49600F858D9 /* RealmTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RealmTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		02C4148E191DE68900F858D9 /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestCase.h; sourceTree = "<group>"; };
 		02C4148F191DE68900F858D9 /* RLMTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestCase.m; sourceTree = "<group>"; };
 		02C414D71921939D00F858D9 /* QueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueryTests.m; sourceTree = "<group>"; };
@@ -203,7 +203,7 @@
 		02E4D698192E3DC40082808D /* RLMObjectSchema_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObjectSchema_Private.hpp; sourceTree = "<group>"; };
 		02E4D699192E3DC40082808D /* RLMObjectSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectSchema.h; sourceTree = "<group>"; };
 		02E4D69A192E3DC40082808D /* RLMObjectSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectSchema.mm; sourceTree = "<group>"; };
-		02E4D69B192E3DC40082808D /* RLMObjectStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectStore.h; sourceTree = "<group>"; };
+		02E4D69B192E3DC40082808D /* RLMObjectStore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectStore.hpp; sourceTree = "<group>"; };
 		02E4D69C192E3DC40082808D /* RLMObjectStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMObjectStore.mm; sourceTree = "<group>"; };
 		02E4D69D192E3DC40082808D /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty_Private.h; sourceTree = "<group>"; };
 		02E4D69E192E3DC40082808D /* RLMProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty.h; sourceTree = "<group>"; };
@@ -317,7 +317,7 @@
 				02E4D699192E3DC40082808D /* RLMObjectSchema.h */,
 				02E4D69A192E3DC40082808D /* RLMObjectSchema.mm */,
 				02E4D698192E3DC40082808D /* RLMObjectSchema_Private.hpp */,
-				02E4D69B192E3DC40082808D /* RLMObjectStore.h */,
+				02E4D69B192E3DC40082808D /* RLMObjectStore.hpp */,
 				02E4D69C192E3DC40082808D /* RLMObjectStore.mm */,
 				02E4D69E192E3DC40082808D /* RLMProperty.h */,
 				02E4D69F192E3DC40082808D /* RLMProperty.m */,
@@ -359,7 +359,7 @@
 				4D3F564E1923667700240A75 /* ObjectTests.m */,
 				4DE0B175194855E30092154B /* PropertyTypeTest.mm */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
-				02C4147A191DE49600F858D9 /* RealmTests.m */,
+				02C4147A191DE49600F858D9 /* RealmTests.mm */,
 				5BDDB6EB195777E400D43452 /* RLMPredicateUtil.h */,
 				5BDDB6EC195777E400D43452 /* RLMPredicateUtil.m */,
 				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
@@ -451,7 +451,7 @@
 				02E4D6BE192E3DC40082808D /* RLMObject_Private.h in Headers */,
 				02E4D6C6192E3DC40082808D /* RLMObjectSchema.h in Headers */,
 				02E4D6C4192E3DC40082808D /* RLMObjectSchema_Private.hpp in Headers */,
-				02E4D6CA192E3DC40082808D /* RLMObjectStore.h in Headers */,
+				02E4D6CA192E3DC40082808D /* RLMObjectStore.hpp in Headers */,
 				02889109198AE111007D8FB2 /* RLMPlatform.h in Headers */,
 				02E4D6D0192E3DC40082808D /* RLMProperty.h in Headers */,
 				02E4D6CE192E3DC40082808D /* RLMProperty_Private.h in Headers */,
@@ -480,7 +480,7 @@
 				02E4D6BF192E3DC40082808D /* RLMObject_Private.h in Headers */,
 				02E4D6C7192E3DC40082808D /* RLMObjectSchema.h in Headers */,
 				02E4D6C5192E3DC40082808D /* RLMObjectSchema_Private.hpp in Headers */,
-				02E4D6CB192E3DC40082808D /* RLMObjectStore.h in Headers */,
+				02E4D6CB192E3DC40082808D /* RLMObjectStore.hpp in Headers */,
 				02889106198AE108007D8FB2 /* RLMPlatform.h in Headers */,
 				02E4D6D1192E3DC40082808D /* RLMProperty.h in Headers */,
 				02E4D6CF192E3DC40082808D /* RLMProperty_Private.h in Headers */,
@@ -728,7 +728,7 @@
 				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
 				4DE0B176194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
-				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
+				02C4147B191DE49600F858D9 /* RealmTests.mm in Sources */,
 				5BDDB6ED195777E400D43452 /* RLMPredicateUtil.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
 				02E4D6EC192E58320082808D /* RLMTestObjects.m in Sources */,
@@ -774,7 +774,7 @@
 				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				4DE0B177194855E30092154B /* PropertyTypeTest.mm in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
-				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
+				02C4153F1921B25000F858D9 /* RealmTests.mm in Sources */,
 				5BDDB6EE195777E400D43452 /* RLMPredicateUtil.m in Sources */,
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
 				02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */,
@@ -808,7 +808,7 @@
 		02C4147D191DE49600F858D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -848,7 +848,7 @@
 		02C4147E191DE49600F858D9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -889,7 +889,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -930,7 +930,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -967,7 +967,7 @@
 		02C415221921B0C400F858D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1002,7 +1002,7 @@
 		02C415231921B0C400F858D9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1035,7 +1035,7 @@
 		02C415251921B0C400F858D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1075,7 +1075,7 @@
 		02C415261921B0C400F858D9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1170,7 +1170,10 @@
 					"-Wextra",
 					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-std=c++1y",
+				);
 				OTHER_LDFLAGS = "";
 				REALM_CORE_LIB = "";
 				SDKROOT = "";
@@ -1180,7 +1183,7 @@
 		B10CDE941948667D001F68C3 /* Coverage */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1220,7 +1223,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1260,7 +1263,7 @@
 		B10CDE961948667D001F68C3 /* Coverage */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1303,7 +1306,7 @@
 		B10CDE981948667D001F68C3 /* Coverage */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1382,7 +1385,10 @@
 					"-Wextra",
 					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-std=c++1y",
+				);
 				OTHER_LDFLAGS = "";
 				REALM_CORE_LIB = "";
 				SDKROOT = "";
@@ -1425,7 +1431,10 @@
 					"-Wextra",
 					"-DTIGHTDB_ENABLE_REPLICATION=1",
 				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-std=c++1y",
+				);
 				OTHER_LDFLAGS = "";
 				REALM_CORE_LIB = "";
 				SDKROOT = "";
