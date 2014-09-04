@@ -174,6 +174,10 @@
     dispatch_async(queue, block);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
+
     [realm removeNotification:token];
 }
 
@@ -256,6 +260,9 @@
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
 }
 #endif
 
