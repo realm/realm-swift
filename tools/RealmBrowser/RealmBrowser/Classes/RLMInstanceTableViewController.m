@@ -381,7 +381,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
         case RLMPropertyTypeObject: {
             // RLMObject -description seems to sometimes recurse endlessly. Disabling object tooltips until fixed
-            return nil;
+//            return nil;
 
             RLMObject *referredObject = (RLMObject *)propertyValue;
             RLMObjectSchema *objectSchema = referredObject.objectSchema;
@@ -396,7 +396,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
         case RLMPropertyTypeArray: {
             // RLMArray -description seems to sometimes recurse endlessly. Disabling array tooltips until fixed
-            return nil;
+//            return nil;
             RLMArray *referredArray = (RLMArray *)propertyValue;
             
             if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
