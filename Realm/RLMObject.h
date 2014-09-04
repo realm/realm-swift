@@ -300,13 +300,13 @@
 + (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
 
 /**
- Returns TRUE if another RLMObject points to the same object in a RLMRealm. For RLMObject types
+ Returns YES if another RLMObject points to the same object in a RLMRealm. For RLMObject types
  with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
 
  @param object  The object to compare to.
 
- @return    TRUE if the object represents the same object in the same RLMRealm.
+ @return    YES if the object represents the same object in the same RLMRealm.
  */
 - (BOOL)isEqualToObject:(RLMObject *)object;
 

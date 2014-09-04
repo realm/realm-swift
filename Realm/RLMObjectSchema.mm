@@ -74,17 +74,19 @@
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
         BOOL ignored = [[objectClass ignoredProperties] containsObject:propertyName];
-        
-        if (!ignored) { // Don't process ignored properties
+
+        // skip ignored properties
+        if (!ignored) {
             RLMPropertyAttributes attr = [objectClass attributesForProperty:propertyName];
+            RLMProperty *property = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
+            [propArray addObject:property];
+
+            // if primary, set flag and store in objectSchema
             if ([primaryKey isEqualToString:propertyName]) {
+                // FIXME - re-enable when we have core suppport
                 //attr = attr | RLMPropertyAttributeIndexed;
-                schema.primaryKeyProperty = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
+                schema.primaryKeyProperty = property;
                 schema.primaryKeyProperty.isPrimary = YES;
-                [propArray addObject:schema.primaryKeyProperty];
-            }
-            else {
-                [propArray addObject:[RLMProperty propertyForObjectProperty:props[i] attributes:attr]];
             }
         }
     }
