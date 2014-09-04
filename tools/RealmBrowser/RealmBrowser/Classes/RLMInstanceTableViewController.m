@@ -41,48 +41,6 @@
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 
-@interface RLMObjectEntity : NSObject <NSPasteboardWriting, NSPasteboardReading>
-
-@property (nonatomic) NSString *rowNumber;
-
-@end
-
-
-@implementation RLMObjectEntity
-
-#pragma mark - NSPasteboardWriting
-
--(NSArray *)writableTypesForPasteboard:(NSPasteboard *)pasteboard
-{
-    return [self.rowNumber writableTypesForPasteboard:pasteboard];
-    
-    //    return @[@"RLMObject"];
-}
-
--(NSPasteboardWritingOptions)writingOptionsForType:(NSString *)type pasteboard:(NSPasteboard *)pasteboard
-{
-    if ([type isEqualToString:@"RLMObject"]) {
-        return NSPasteboardWritingPromised;
-    }
-    
-    return 0;
-}
-
--(id)pasteboardPropertyListForType:(NSString *)type
-{
-    return nil;
-}
-
-#pragma mark - NSPasteboardReading
-
-+(NSArray *)readableTypesForPasteboard:(NSPasteboard *)pasteboard
-{
-    return nil;
-}
-
-@end
-
-
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
@@ -216,7 +174,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 -(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
-    NSLog(@"dragging: %@", rowIndexes);
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)destination dropOperation:(NSTableViewDropOperation)operation
@@ -243,6 +200,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }];
         
         [realm beginWriteTransaction];
+        [self.tableView beginUpdates];
 
         // Iterate through the array, representing source row indices
         for (NSUInteger i = 0; i < sources.count; i++) {
@@ -250,6 +208,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
             // Perform the move
             [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
+            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
             
             //Iterate through the remaining source row indices in the array
             for (NSUInteger j = i + 1; j < sources.count; j++) {
@@ -269,8 +229,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             }
         }
         
+        [self.tableView endUpdates];
         [realm commitWriteTransaction];
-        [self.parentWindowController reloadAllWindows];
+        [self.parentWindowController performSelector:@selector(reloadAllWindows) withObject:nil afterDelay:0.4];
 
         return YES;
     }
