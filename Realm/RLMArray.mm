@@ -146,7 +146,12 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMValidateMatchingObjectType(self, object);
-    return [_backingArray indexOfObject:object];
+    for (NSUInteger i = 0; i < _backingArray.count; i++) {
+        if ([object isEqualToObject:_backingArray[i]]) {
+            return i;
+        }
+    }
+    return NSNotFound;
 }
 
 - (void)deleteObjectsFromRealm {

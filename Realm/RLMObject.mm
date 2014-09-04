@@ -249,7 +249,22 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    return [self isEqualToObject:object];
+    if (_objectSchema.primaryKeyProperty) {
+        return [self isEqualToObject:object];
+    }
+    else {
+        return [super isEqual:object];
+    }
+}
+
+- (NSUInteger)hash {
+    if (_objectSchema.primaryKeyProperty) {
+        id primaryProperty = [self valueForKey:_objectSchema.primaryKeyProperty.name];
+        return [primaryProperty hash] ^ 1;
+    }
+    else {
+        return [super hash];
+    }
 }
 
 @end

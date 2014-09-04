@@ -791,7 +791,7 @@ RLM_ARRAY_TYPE(CycleObject)
     [realm commitWriteTransaction];
 
     XCTAssertFalse([obj isEqual:otherObj], @"One in realm, the other is not.");
-    XCTAssertTrue([obj isEqual:[IntObject allObjects][0]], @"Same table and index.");
+    XCTAssertTrue([obj isEqualToObject:[IntObject allObjects][0]], @"Same table and index.");
 
     [otherRealm beginWriteTransaction];
     [otherRealm addObject: otherObj];
@@ -885,5 +885,22 @@ RLM_ARRAY_TYPE(CycleObject)
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }
+
+
+- (void)testObjectInSet {
+    [[RLMRealm defaultRealm] beginWriteTransaction];
+
+    // set object with primary and non primary keys as they both override isEqual and hash
+    PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithObject:(@[@"string2", @1])];
+    StringObject *strObj = [StringObject createInDefaultRealmWithObject:@[@"string"]];
+    NSMutableSet *dict = [NSMutableSet set];
+    [dict addObject:obj];
+    [dict addObject:strObj];
+    XCTAssertTrue([dict containsObject:obj]);
+    XCTAssertTrue([dict containsObject:strObj]);
+
+    [[RLMRealm defaultRealm] commitWriteTransaction];
+}
+
 
 @end
