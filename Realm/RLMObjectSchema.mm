@@ -80,6 +80,7 @@
             if ([primaryKey isEqualToString:propertyName]) {
                 //attr = attr | RLMPropertyAttributeIndexed;
                 schema.primaryKeyProperty = [RLMProperty propertyForObjectProperty:props[i] attributes:attr];
+                schema.primaryKeyProperty.isPrimary = YES;
                 [propArray addObject:schema.primaryKeyProperty];
             }
             else {

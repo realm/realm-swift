@@ -97,6 +97,14 @@
     return RLMCreateObjectInRealmWithValue(realm, [self className], value);
 }
 
++(instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
+    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, true);
+}
+
++(instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
+    return RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
+}
+
 // default attributes for property implementation
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"

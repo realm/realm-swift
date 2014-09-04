@@ -341,21 +341,21 @@ static IMP RLMMakeSetter(NSUInteger colIndex, bool isPrimary) {
 }
 
 // dynamic setter with column closure
-static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode, BOOL isPrimary) {
+static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
-        case 'i': return RLMMakeSetter<int, long long>(colIndex, isPrimary);
-        case 'l': return RLMMakeSetter<long, long long>(colIndex, isPrimary);
-        case 'f': return RLMMakeSetter<float>(colIndex, isPrimary);
-        case 'd': return RLMMakeSetter<double>(colIndex, isPrimary);
-        case 'B': return RLMMakeSetter<bool>(colIndex, isPrimary);
-        case 'c': return RLMMakeSetter<BOOL, bool>(colIndex, isPrimary);
-        case 's': return RLMMakeSetter<NSString *>(colIndex, isPrimary);
-        case 'a': return RLMMakeSetter<NSDate *>(colIndex, isPrimary);
-        case 'e': return RLMMakeSetter<NSData *>(colIndex, isPrimary);
-        case 'k': return RLMMakeSetter<RLMObject *>(colIndex, isPrimary);
-        case 't': return RLMMakeSetter<RLMArray *>(colIndex, isPrimary);
-        case '@': return RLMMakeSetter<id>(colIndex, isPrimary);
+        case 'i': return RLMMakeSetter<int, long long>(colIndex, prop.isPrimary);
+        case 'l': return RLMMakeSetter<long, long long>(colIndex, prop.isPrimary);
+        case 'f': return RLMMakeSetter<float>(colIndex, prop.isPrimary);
+        case 'd': return RLMMakeSetter<double>(colIndex, prop.isPrimary);
+        case 'B': return RLMMakeSetter<bool>(colIndex, prop.isPrimary);
+        case 'c': return RLMMakeSetter<BOOL, bool>(colIndex, prop.isPrimary);
+        case 's': return RLMMakeSetter<NSString *>(colIndex, prop.isPrimary);
+        case 'a': return RLMMakeSetter<NSDate *>(colIndex, prop.isPrimary);
+        case 'e': return RLMMakeSetter<NSData *>(colIndex, prop.isPrimary);
+        case 'k': return RLMMakeSetter<RLMObject *>(colIndex, prop.isPrimary);
+        case 't': return RLMMakeSetter<RLMArray *>(colIndex, prop.isPrimary);
+        case '@': return RLMMakeSetter<id>(colIndex, prop.isPrimary);
         default:
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Invalid accessor code"
@@ -399,7 +399,7 @@ static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, char accessorCode, NSS
     }
     return nil;
 }
-static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode, __unused BOOL isPrimary) {
+static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
     // only override getters for RLMArray properties
     if (accessorCode == 't') {
         NSString *propName = prop.name;
@@ -494,7 +494,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
                                     RLMObjectSchema *schema,
                                     NSString *accessorClassPrefix,
                                     IMP (*getterGetter)(RLMProperty *, char, NSString *),
-                                    IMP (*setterGetter)(RLMProperty *, char, BOOL)) {
+                                    IMP (*setterGetter)(RLMProperty *, char)) {
 
     // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
     if (objectClass == RLMObject.class) {
@@ -533,7 +533,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
         }
         if (setterGetter) {
             SEL setterSel = NSSelectorFromString(prop.setterName);
-            IMP setterImp = setterGetter(prop, accessorCode, schema.primaryKeyProperty == prop);
+            IMP setterImp = setterGetter(prop, accessorCode);
             if (setterImp) {
                 class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
             }
@@ -571,7 +571,7 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
-    RLMDynamicSet(obj, (RLMProperty *)prop, val, schema.primaryKeyProperty == prop);
+    RLMDynamicSet(obj, (RLMProperty *)prop, val, prop.isPrimary);
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val, BOOL enforceUnique) {

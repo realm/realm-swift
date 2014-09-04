@@ -50,7 +50,8 @@ void RLMDeleteObjectFromRealm(RLMObject *object);
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
 
 // create object from array or dictionary
-RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value);
+// if tryUpdate is 'true', update an existing object with the same primary key value
+RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool tryUpdate = false);
 
 
 //

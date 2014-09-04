@@ -872,9 +872,8 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertThrows([PrimaryStringObject createInDefaultRealmWithObject:(@[@"string", @1])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj.stringCol = @"string2", @"Setting primary key should throw");
 
-
     [PrimaryIntObject createInDefaultRealmWithObject:(@[@1])];
-    PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithObject:(@[@2])];
+    PrimaryIntObject *obj1 = [PrimaryIntObject createInDefaultRealmWithObject:(@{@"intCol": @2})];
     XCTAssertThrows([PrimaryIntObject createInDefaultRealmWithObject:(@[@1])], @"Duplicate primary key should throw");
     XCTAssertThrows(obj1.intCol = 2, @"Setting primary key should throw");
 
@@ -884,6 +883,26 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertThrows(obj2.int64Col = 1LL << 41, @"Setting primary key should throw");
 
     [[RLMRealm defaultRealm] commitWriteTransaction];
+}
+
+- (void)testCreateOrUpdate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    [PrimaryStringObject createOrUpdateInDefaultRealmWithObject:@[@"string", @1]];
+    RLMArray *objects = [PrimaryStringObject allObjects];
+    XCTAssertEqual([objects count], 1U, @"Should have 1 object");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
+
+    [PrimaryStringObject createOrUpdateInRealm:realm withObject:@{@"stringCol": @"string2", @"intCol": @2}];
+    XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
+
+    // upsert with new secondary property
+    [PrimaryStringObject createOrUpdateInDefaultRealmWithObject:@[@"string", @3]];
+    XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
+    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
+
+    [realm commitWriteTransaction];
 }
 
 
