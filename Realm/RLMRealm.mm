@@ -335,10 +335,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 // if we are the first realm at this path, copy and align the shared schema
                 RLMRealmInitializeWithSchema(realm, [RLMSchema sharedSchema]);
             }
-        }
 
-        // cache only realms using a shared schema
-        cacheRealm(realm, path);
+            // cache only realms using a shared schema
+            cacheRealm(realm, path);
+        }
     }
 
     return realm;
