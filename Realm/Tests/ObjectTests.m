@@ -102,6 +102,7 @@ RLM_ARRAY_TYPE(CycleObject)
 @interface PrimaryIntObject : RLMObject
 @property int intCol;
 @end
+RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @implementation PrimaryIntObject
 + (NSString *)primaryKey {
@@ -123,6 +124,7 @@ RLM_ARRAY_TYPE(CycleObject)
 @property int primaryCol;
 @property PrimaryStringObject *primaryStringObject;
 @property StringObject *stringObject;
+@property RLMArray<PrimaryIntObject> *primaryIntArray;
 @end
 
 @implementation PrimaryNestedObject
@@ -920,9 +922,10 @@ RLM_ARRAY_TYPE(CycleObject)
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@0, @[@"string", @1], @[@"string"]]];
+    [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@0, @[@"string", @1], @[@"string"], @[@[@1]]]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
+    XCTAssertEqual([[PrimaryIntObject allObjects] count], 1U, @"Should have 1 object");
 
     // update parent and nested object
     [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@{@"primaryCol": @0,
@@ -934,17 +937,18 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertEqual([[StringObject allObjects] count], 2U, @"Should have 2 objects");
 
     // inserting new object should update nested
-    PrimaryNestedObject *obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@1, @[@"string", @3], @[@"string"]]];
+    PrimaryNestedObject *obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithObject:@[@1, @[@"string", @3], @[@"string"], @[]]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 3, @"intCol should be 3");
 
     // set addOrUpdate
     obj.primaryStringObject = [PrimaryStringObject createInDefaultRealmWithObject:@[@"string2", @1]];
-    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithObject:@[@1, @[@"string2", @4], @[@"string"]]];
+    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithObject:@[@1, @[@"string2", @4], @[@"string"], @[@[@1], @[@2]]]];
     [realm addOrUpdateObject:obj1];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 2U, @"Should have 2 objects");
+    XCTAssertEqual([[PrimaryIntObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 4, @"intCol should be 4");
 
     // creating new object with same primary key should throw
