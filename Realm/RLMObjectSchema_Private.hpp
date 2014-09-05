@@ -39,6 +39,6 @@
 +(instancetype)schemaForObjectClass:(Class)objectClass;
 
 // generate a schema from a table
-+(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className;
++(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
 
 @end

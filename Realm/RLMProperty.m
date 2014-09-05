@@ -236,7 +236,7 @@
 
 
 -(BOOL)isEqualToProperty:(RLMProperty *)prop {
-    return [_name isEqualToString:prop.name] && _type == prop.type &&
+    return [_name isEqualToString:prop.name] && _type == prop.type && prop.isPrimary == _isPrimary &&
            (_objectClassName == nil || [_objectClassName isEqualToString:prop.objectClassName]);
 }
 

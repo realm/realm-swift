@@ -57,6 +57,11 @@
     _properties = properties;
 }
 
+- (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
+    primaryKeyProperty.isPrimary = YES;
+    _primaryKeyProperty = primaryKeyProperty;
+}
+
 +(instancetype)schemaForObjectClass:(Class)objectClass {
     // get object properties
     unsigned int count;
@@ -86,7 +91,6 @@
                 // FIXME - re-enable when we have core suppport
                 //attr = attr | RLMPropertyAttributeIndexed;
                 schema.primaryKeyProperty = property;
-                schema.primaryKeyProperty.isPrimary = YES;
             }
         }
     }
@@ -119,7 +123,12 @@
 
 // generate a schema from a table - specify the custom class name for the dynamic
 // class and the name to be used in the schema - used for migrations and dynamic interface
-+(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className {
++(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm {
+    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
+    if (!table) {
+        return nil;
+    }
+    
     // create array of RLMProperties
     size_t count = table->get_column_count();
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
@@ -144,6 +153,16 @@
     RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.properties = propArray;
     schema.className = className;
+
+    // set primary key
+    NSString *primaryKey = RLMRealmPrimaryKeyForObjectClass(realm, className);
+    if (primaryKey) {
+        schema.primaryKeyProperty = schema[primaryKey];
+        if (!schema.primaryKeyProperty) {
+            NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKey];
+            @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        }
+    }
 
     // for dynamic interface use vanilla RLMObject
     schema.objectClass = RLMObject.class;
