@@ -16,17 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMSchema_Private.h"
 #import "RLMObject.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
-
-#if REALM_SWIFT
-#import <Realm/Realm-Swift.h>
-#else
-#import "RLMSwiftSupportFallback.h"
-#endif
 
 #import <objc/runtime.h>
 

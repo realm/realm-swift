@@ -22,12 +22,7 @@
 #import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
-
-#if REALM_SWIFT
-#import <Realm/Realm-Swift.h>
-#else
-#import "RLMSwiftSupportFallback.h"
-#endif
+#import "RLMSwiftSupport.h"
 
 #import <objc/runtime.h>
 

@@ -18,6 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
+#if REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#else
+
 // A dummy implementation of RLMSwiftSupport for Xcode 5 to avoid ifdef sea
 @interface RLMSwiftSupport : NSObject
 
@@ -26,3 +30,5 @@
 + (NSString *)demangleClassName:(NSString *)className;
 
 @end
+
+#endif

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSwiftSupportFallback.h"
+#import "RLMSwiftSupport.h"
 
 @implementation RLMSwiftSupport
 

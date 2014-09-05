@@ -17,16 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import "RLMObject_Private.h"
+#import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
-
-#if REALM_SWIFT
-#import <Realm/Realm-Swift.h>
-#else
-#import "RLMSwiftSupportFallback.h"
-#endif
 
 #import <tightdb/table.hpp>
 
