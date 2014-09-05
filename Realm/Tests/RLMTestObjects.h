@@ -37,7 +37,7 @@
 @end
 
 @interface AllIntSizesObject : RLMObject
-// int8_t not supported due to being abiguous with BOOL
+// int8_t not supported due to being ambiguous with BOOL
 
 @property int16_t int16;
 @property int32_t int32;
