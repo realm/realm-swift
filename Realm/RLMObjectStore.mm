@@ -308,7 +308,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, prop.isPrimary);
+            RLMDynamicSet(object, prop, value, prop.isPrimary, update);
         }
     }
 
@@ -341,7 +341,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary);
+                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary, update);
             }
         }
     }
@@ -358,7 +358,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         for (RLMProperty *prop in objectSchema.properties) {
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary);
+                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary, update);
             }
         }
     }
