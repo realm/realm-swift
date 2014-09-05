@@ -18,6 +18,9 @@
 * Add the class name to the error message when an RLMObject is missing a value
   for a property without a default.
 * Add support for opening Realms in read-only mode.
+* Add an automatic check for updates when using Realm in a simulator (the
+  checker code is not compiled into device builds). This can be disabled by
+  setting the REALM_DISABLE_UPDATE_CHECKER environment variable to any value.
 
 ### Bugfixes
 
