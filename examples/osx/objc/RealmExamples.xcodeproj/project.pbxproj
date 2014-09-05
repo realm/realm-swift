@@ -30,6 +30,16 @@
 		E85A517319BA770B006C63CB /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E85A516B19BA7643006C63CB;
+			remoteInfo = Realm;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		E823C33A19BA4A5F00D2FF5F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -114,7 +124,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E823C34719BA4A5F00D2FF5F /* Build configuration list for PBXNativeTarget "JSONImport" */;
 			buildPhases = (
-				E823C34F19BA4AD000D2FF5F /* Build Realm */,
 				E823C33819BA4A5F00D2FF5F /* Sources */,
 				E823C33919BA4A5F00D2FF5F /* Frameworks */,
 				E823C33A19BA4A5F00D2FF5F /* CopyFiles */,
@@ -122,6 +131,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */,
 			);
 			name = JSONImport;
 			productName = JSONImport;
@@ -156,20 +166,6 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E823C34F19BA4AD000D2FF5F /* Build Realm */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Build Realm";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"build/DerivedData/Realm/Build/Products/Release\" ]]; then\n    sh build.sh osx\nfi\n";
-		};
 		E85A516F19BA7649006C63CB /* Build Realm */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -197,6 +193,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E85A516B19BA7643006C63CB /* Realm */;
+			targetProxy = E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E823C34519BA4A5F00D2FF5F /* Debug */ = {
@@ -336,6 +340,7 @@
 				E85A516E19BA7643006C63CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8F1E81819BA4A3800FAD64E /* Build configuration list for PBXProject "RealmExamples" */ = {
 			isa = XCConfigurationList;
