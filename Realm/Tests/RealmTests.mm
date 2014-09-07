@@ -217,8 +217,6 @@
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 }
 
-// FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
-// Asana: https://app.asana.com/0/861870036984/14552787865017
 - (void)testBackgroundRealmIsNotified {
     RLMRealm *realm = [self realmWithTestPath];
 
