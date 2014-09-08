@@ -14,6 +14,7 @@
         <customObject id="PLw-ns-0qo" customClass="RLMApplicationDelegate">
             <connections>
                 <outlet property="fileMenu" destination="bib-Uj-vzu" id="xMk-IQ-flg"/>
+                <outlet property="openAnyRealmMenu" destination="ZOZ-6y-KFJ" id="vHm-DP-i8r"/>
                 <outlet property="openMenuItem" destination="IAo-SY-fd9" id="U7H-mk-W2m"/>
             </connections>
         </customObject>
@@ -84,6 +85,14 @@
                                             </connections>
                                         </menuItem>
                                     </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Open Common Location" id="vgP-2m-quz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Open Common Location" id="ZOZ-6y-KFJ">
+                                    <connections>
+                                        <outlet property="delegate" destination="-3" id="3ZU-ac-l5O"/>
+                                    </connections>
                                 </menu>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>

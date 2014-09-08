@@ -22,18 +22,26 @@
 
 #import "TestClasses.h"
 
-NSString *const kRealmFileExension = @"realm";
-
 const NSUInteger kTestDatabaseSizeMultiplicatorFactor = 2000;
 const NSUInteger kTopTipDelay = 250;
+const NSUInteger kMaxFilesPerCategory = 7;
+const CGFloat kMenuImageSize = 16;
+
+NSString *const kRealmFileExension = @"realm";
+
 
 @interface RLMApplicationDelegate ()
+
+@property (nonatomic, weak) IBOutlet NSMenu *fileMenu;
+@property (nonatomic, weak) IBOutlet NSMenuItem *openMenuItem;
+@property (weak) IBOutlet NSMenu *openAnyRealmMenu;
+
+@property (nonatomic) NSDateFormatter *dateFormatter;
 
 @property (nonatomic) BOOL didLoadFile;
 
 @property (nonatomic) NSMetadataQuery *query;
-
-@property (nonatomic) NSDateFormatter *dateFormatter;
+@property (nonatomic) NSArray *groupedFileItems;
 
 @end
 
