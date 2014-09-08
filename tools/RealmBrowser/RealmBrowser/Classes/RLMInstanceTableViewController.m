@@ -28,7 +28,6 @@
 #import "RLMBasicTableCellView.h"
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
-
 #import "RLMTableColumn.h"
 
 #import "NSColor+ByteSizeFactory.h"
@@ -381,6 +380,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                 return [numberFormatter stringFromNumber:propertyValue];
             
         case RLMPropertyTypeObject: {
+            // RLMObject -description seems to sometimes recurse endlessly. Disabling object tooltips until fixed
+            return nil;
+
             RLMObject *referredObject = (RLMObject *)propertyValue;
             RLMObjectSchema *objectSchema = referredObject.objectSchema;
             NSArray *properties = objectSchema.properties;
@@ -393,6 +395,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeArray: {
+            // RLMArray -description seems to sometimes recurse endlessly. Disabling array tooltips until fixed
+            return nil;
             RLMArray *referredArray = (RLMArray *)propertyValue;
             
             if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
@@ -711,8 +715,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
+
+    if (self.displaysArray) {
+        column--;
+    }
     
-    if (row == -1 || column == -1) {
+    if (row == -1 || column < 0) {
         return;
     }
     
