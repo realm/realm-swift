@@ -296,13 +296,21 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
 static IMP RLMAccessorGetter(RLMProperty *prop, char accessorCode, NSString *objectClassName) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
+        case 's':
+            return imp_implementationWithBlock(^(RLMObject *obj) {
+                return (short)RLMGetLong(obj, colIndex);
+            });
         case 'i':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 return (int)RLMGetLong(obj, colIndex);
             });
-        case 'l':
+        case 'q':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMGetLong(obj, colIndex);
+            });
+        case 'l':
+            return imp_implementationWithBlock(^(RLMObject *obj) {
+                return (long)RLMGetLong(obj, colIndex);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMObject *obj) {
@@ -317,7 +325,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, char accessorCode, NSString *obj
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMGetBool(obj, colIndex);
             });
-        case 's':
+        case 'S':
             return imp_implementationWithBlock(^(RLMObject *obj) {
                 return RLMGetString(obj, colIndex);
             });
@@ -364,13 +372,15 @@ static IMP RLMMakeSetter(NSUInteger colIndex, bool isPrimary) {
 static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
     NSUInteger colIndex = prop.column;
     switch (accessorCode) {
+        case 's': return RLMMakeSetter<short, long long>(colIndex, prop.isPrimary);
         case 'i': return RLMMakeSetter<int, long long>(colIndex, prop.isPrimary);
         case 'l': return RLMMakeSetter<long, long long>(colIndex, prop.isPrimary);
+        case 'q': return RLMMakeSetter<long long>(colIndex, prop.isPrimary);
         case 'f': return RLMMakeSetter<float>(colIndex, prop.isPrimary);
         case 'd': return RLMMakeSetter<double>(colIndex, prop.isPrimary);
         case 'B': return RLMMakeSetter<bool>(colIndex, prop.isPrimary);
         case 'c': return RLMMakeSetter<BOOL, bool>(colIndex, prop.isPrimary);
-        case 's': return RLMMakeSetter<NSString *>(colIndex, prop.isPrimary);
+        case 'S': return RLMMakeSetter<NSString *>(colIndex, prop.isPrimary);
         case 'a': return RLMMakeSetter<NSDate *>(colIndex, prop.isPrimary);
         case 'e': return RLMMakeSetter<NSData *>(colIndex, prop.isPrimary);
         case 'k': return RLMMakeSetter<RLMObject *>(colIndex, prop.isPrimary);
@@ -443,8 +453,10 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
 //       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
 static const char *getterTypeStringForObjcCode(char code) {
     switch (code) {
+        case 's': return GETTER_TYPES("s");
         case 'i': return GETTER_TYPES("i");
         case 'l': return GETTER_TYPES("l");
+        case 'q': return GETTER_TYPES("q");
         case 'f': return GETTER_TYPES("f");
         case 'd': return GETTER_TYPES("d");
         case 'B': return GETTER_TYPES("B");
@@ -459,8 +471,10 @@ static const char *getterTypeStringForObjcCode(char code) {
 //       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
 static const char *setterTypeStringForObjcCode(char code) {
     switch (code) {
+        case 's': return SETTER_TYPES("s");
         case 'i': return SETTER_TYPES("i");
         case 'l': return SETTER_TYPES("l");
+        case 'q': return SETTER_TYPES("q");
         case 'f': return SETTER_TYPES("f");
         case 'd': return SETTER_TYPES("d");
         case 'B': return SETTER_TYPES("B");
@@ -473,11 +487,10 @@ static const char *setterTypeStringForObjcCode(char code) {
 // get accessor lookup code based on objc type and rlm type
 static char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     switch (objcTypeCode) {
-        case 'q': return 'l';   // long long same as long
         case '@':               // custom accessors for strings and subtables
             switch (rlmType) {  // custom accessor codes for types that map to objc objects
                 case RLMPropertyTypeObject: return 'k';
-                case RLMPropertyTypeString: return 's';
+                case RLMPropertyTypeString: return 'S';
                 case RLMPropertyTypeArray: return 't';
                 case RLMPropertyTypeDate: return 'a';
                 case RLMPropertyTypeData: return 'e';
@@ -598,8 +611,10 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
                    bool enforceUnique, bool tryUpdate) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
+        case 's':
         case 'i':
         case 'l':
+        case 'q':
             if (enforceUnique) {
                 RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
             }
@@ -617,7 +632,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
         case 'c':
             RLMSetValue(obj, col, (bool)[val boolValue]);
             break;
-        case 's':
+        case 'S':
             if (enforceUnique) {
                 RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
             }
@@ -657,13 +672,15 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
+        case 's': return @((short)RLMGetLong(obj, col));
         case 'i': return @((int)RLMGetLong(obj, col));
-        case 'l': return @(RLMGetLong(obj, col));
+        case 'l': return @((long)RLMGetLong(obj, col));
+        case 'q': return @(RLMGetLong(obj, col));
         case 'f': return @(RLMGetFloat(obj, col));
         case 'd': return @(RLMGetDouble(obj, col));
         case 'B': return @(RLMGetBool(obj, col));
         case 'c': return @(RLMGetBool(obj, col));
-        case 's': return RLMGetString(obj, col);
+        case 'S': return RLMGetString(obj, col);
         case 'a': return RLMGetDate(obj, col);
         case 'e': return RLMGetData(obj, col);
         case 'k': return RLMGetLink(obj, col, prop.objectClassName);

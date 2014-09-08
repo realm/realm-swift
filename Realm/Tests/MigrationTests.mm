@@ -20,10 +20,11 @@ extern "C" {
 #import "RLMTestCase.h"
 }
 #import "RLMMigration.h"
-#import "RLMProperty_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMObjectStore.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.hpp"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
+#import "RLMSchema_Private.h"
 
 @interface MigrationObject : RLMObject
 @property int intCol;
