@@ -9,6 +9,9 @@
 
 ### Enhancements
 
+* Support for primary key properties (for int and string columns). Declaring a property
+  to be the primary key ensures uniqueness for that property for all objects of a given type.
+* Added methods to update or insert (upsert) for objects with primary keys defined.
 * `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
   any object type with kvc properties.
 * Improve performance when getting the count of items matching a query but not
