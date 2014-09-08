@@ -219,7 +219,6 @@
 
 // FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
 // Asana: https://app.asana.com/0/861870036984/14552787865017
-#ifndef REALM_SWIFT
 - (void)testBackgroundRealmIsNotified {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -264,7 +263,6 @@
     // wait for queue to finish
     dispatch_sync(queue, ^{});
 }
-#endif
 
 - (void)testBeginWriteTransactionsNotifiesWithUpdatedObjects {
     RLMRealm *realm = [self realmWithTestPath];
