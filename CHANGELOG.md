@@ -18,6 +18,7 @@
 * Add the class name to the error message when an RLMObject is missing a value
   for a property without a default.
 * Add support for opening Realms in read-only mode.
+* Add support for Int16 and Int64 properties in Swift classes.
 
 ### Bugfixes
 
