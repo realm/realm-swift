@@ -125,6 +125,10 @@ static inline bool IsRLMObjectSubclass(Class cls) {
 #else
             objectSchema = [RLMObjectSchema schemaForObjectClass:cls];
 #endif
+
+            // set standalone class
+            objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(cls, objectSchema);
+
             // add to list
             [schemaArray addObject:objectSchema];
             // implement sharedSchema and className for this class

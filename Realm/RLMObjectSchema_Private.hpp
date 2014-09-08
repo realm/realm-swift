@@ -35,6 +35,8 @@
 @property (nonatomic, readwrite, assign) Class accessorClass;
 @property (nonatomic, readwrite, assign) Class standaloneClass;
 
+@property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
+
 // returns a cached or new schema for a given object class
 +(instancetype)schemaForObjectClass:(Class)objectClass;
 

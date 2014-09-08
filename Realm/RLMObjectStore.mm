@@ -127,14 +127,14 @@ void RLMRealmInitializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema) {
 
     @try {
         // check to see if this is the first time loading this realm
-        bool initializing = (RLMRealmSchemaVersion(realm) == RLMNotVersioned);
-        if (initializing) {
+        bool firstInitialization = RLMRealmSchemaVersion(realm) == RLMNotVersioned;
+        if (firstInitialization) {
             // set initial version
             RLMRealmSetSchemaVersion(realm, 0);
         }
 
         // set the schema, mutating if we are initializing the db for the first time
-        RLMRealmSetSchema(realm, targetSchema, initializing);
+        RLMRealmSetSchema(realm, targetSchema, firstInitialization);
     }
     @finally {
         // FIXME: should rollback on exceptions rather than commit once that's implemented
@@ -142,11 +142,11 @@ void RLMRealmInitializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema) {
     }
 }
 
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation) {
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initializeSchema) {
     realm.schema = [targetSchema copy];
 
     bool changed = false;
-    if (allowMutation) {
+    if (initializeSchema) {
         // first pass to create missing tables
         for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
             bool created = false;

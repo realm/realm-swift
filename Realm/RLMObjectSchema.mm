@@ -28,7 +28,6 @@
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary *propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
-@property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 @end
 
 
@@ -58,6 +57,7 @@
 }
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
+    _primaryKeyProperty.isPrimary = NO;
     primaryKeyProperty.isPrimary = YES;
     _primaryKeyProperty = primaryKeyProperty;
 }
@@ -113,9 +113,6 @@
                                          userInfo:nil];
         }
     }
-
-    // set standalone class
-    schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
 
     return schema;
 }

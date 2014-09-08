@@ -33,6 +33,16 @@ extern "C" {
 @implementation MigrationObject
 @end
 
+@interface MigrationPrimaryKeyObject : RLMObject
+@property int intCol;
+@end
+
+@implementation MigrationPrimaryKeyObject
++ (NSString *)primaryKey {
+    return @"intCol";
+}
+@end
+
 @interface MigrationTests : RLMTestCase
 @end
 
@@ -182,6 +192,36 @@ extern "C" {
     realm = [self realmWithTestPath];
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"stringCol should be string after migration.");
+}
+
+- (void)testPrimaryKeyMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    RLMCreateObjectInRealmWithValue(realm, MigrationPrimaryKeyObject.className, @[@1]);
+    RLMCreateObjectInRealmWithValue(realm, MigrationPrimaryKeyObject.className, @[@1]);
+    [realm commitWriteTransaction];
+
+    // apply migration
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()
+                                       withBlock:^NSUInteger(__unused RLMMigration *migration,
+                                                             __unused NSUInteger oldSchemaVersion) { return 1; }],
+                    @"Migration should throw due to duplicate primary keys)");
+
+
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()
+                       withBlock:^NSUInteger(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        __block int objectID = 0;
+       [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+           newObject[@"intCol"] = @(objectID++);
+       }];
+       return 1;
+   }];
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
