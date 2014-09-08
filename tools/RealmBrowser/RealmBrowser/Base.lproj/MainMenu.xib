@@ -91,7 +91,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Open Common Location" id="ZOZ-6y-KFJ">
                                     <connections>
-                                        <outlet property="delegate" destination="-3" id="3ZU-ac-l5O"/>
+                                        <outlet property="delegate" destination="PLw-ns-0qo" id="12y-1Y-2Xp"/>
                                     </connections>
                                 </menu>
                             </menuItem>
