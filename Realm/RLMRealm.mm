@@ -21,9 +21,10 @@
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
-#import "RLMObjectStore.hpp"
 #import "RLMConstants.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
 #include <exception>
@@ -154,6 +155,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // set up global realm cache
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        RLMCheckForUpdates();
+
         // initilize realm cache
         clearRealmCache();
     });
