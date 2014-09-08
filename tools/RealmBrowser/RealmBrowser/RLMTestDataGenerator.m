@@ -235,15 +235,19 @@ const NSUInteger kMaxItemsInTestArray = 12;
 
 -(NSData *)randomData
 {
-    return [@"Random data" dataUsingEncoding:NSUTF8StringEncoding];
+    return [[self randomString] dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 -(id)randomAny
 {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"'Any' type not yet supported in the Cocoa/Cocoa Touch bindings."
-                                 userInfo:nil];
-    return nil;
+    switch (arc4random() % 3) {
+        case 0:
+            return [self randomString];
+        case 1:
+            return [self randomData];
+        default:
+            return [self randomDate];
+    }
 }
 
 -(NSArray *)randomArrayWithObjectsOfClass:(Class)testClass inRealm:(RLMRealm *)realm
