@@ -143,7 +143,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
                 break;
                 
             case RLMPropertyTypeAny:
-                propertyValue = @"<Any>";
+                propertyValue = [self randomAny];
                 break;
                 
             case RLMPropertyTypeObject:
@@ -233,9 +233,17 @@ const NSUInteger kMaxItemsInTestArray = 12;
     return result;
 }
 
--(NSString *)randomData
+-(NSData *)randomData
 {
-    return @"<Data>";
+    return [@"Random data" dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+-(id)randomAny
+{
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"'Any' type not yet supported in the Cocoa/Cocoa Touch bindings."
+                                 userInfo:nil];
+    return nil;
 }
 
 -(NSArray *)randomArrayWithObjectsOfClass:(Class)testClass inRealm:(RLMRealm *)realm

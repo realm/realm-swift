@@ -283,15 +283,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             break;
             
-        case RLMPropertyTypeData: {
-            RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
-            imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
-            imageCellView.textField.editable = NO;
-            
-            cellView = imageCellView;
-        }
-            break;
-            
+        case RLMPropertyTypeData:
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
@@ -307,7 +299,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             }
             else {
                 basicCellView.textField.font = [NSFont textFont];
-                basicCellView.textField.editable = !self.realmIsLocked;
+                BOOL isOfEditableType = type != RLMPropertyTypeData && type != RLMPropertyTypeObject;
+                basicCellView.textField.editable = !self.realmIsLocked && isOfEditableType;
             }
             
             cellView = basicCellView;
