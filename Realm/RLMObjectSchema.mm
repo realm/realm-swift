@@ -63,18 +63,16 @@
 }
 
 +(instancetype)schemaForObjectClass:(Class)objectClass {
-    // get object properties
+    // get objc properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSString *primaryKey = [objectClass primaryKey];
 
-    // initialize schema
-    // create schema object and set properties
     RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.className = [objectClass className];
     schema.objectClass = objectClass;
 
-    // create array of RLMProperties
+    // validate and convert to RLMProperties, and store in objectSchema
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = [NSString stringWithUTF8String:property_getName(props[i])];
@@ -94,13 +92,10 @@
             }
         }
     }
-    
     free(props);
-
-    // set properties
     schema.properties = propArray;
 
-    // validate primary property
+    // validate primary property if defined
     if (primaryKey) {
         if (!schema.primaryKeyProperty) {
             NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
@@ -151,7 +146,7 @@
     schema.properties = propArray;
     schema.className = className;
 
-    // set primary key
+    // get primary key from realm metadata
     NSString *primaryKey = RLMRealmPrimaryKeyForObjectClass(realm, className);
     if (primaryKey) {
         schema.primaryKeyProperty = schema[primaryKey];
@@ -161,7 +156,7 @@
         }
     }
 
-    // for dynamic interface use vanilla RLMObject
+    // for dynamic schema use vanilla RLMObject accessor classes
     schema.objectClass = RLMObject.class;
     schema.standaloneClass = RLMObject.class;
 
