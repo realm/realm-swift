@@ -449,6 +449,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
+				22F639E619ACAF4500DCDAEA /* RLMTestDataGenerator.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6B0192E3DC40082808D /* RLMArray_Private.hpp in Headers */,

@@ -51,6 +51,10 @@ const CGFloat kMaxColumnWidth = 200.0;
 
     NSInteger columnIndex = [self.tableView.tableColumns indexOfObject:self];
 
+    if (self.tableView.numberOfRows == 0) {
+        [self.tableView reloadData];
+    }
+    
     CGFloat maxWidth = 0.0;
 
     for (NSInteger rowIndex = 0; rowIndex < MIN(rowsToConsider, self.tableView.numberOfRows); rowIndex++) {
