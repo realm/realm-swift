@@ -34,6 +34,13 @@ typedef struct {
 
 @class RLMTableView;
 
+@protocol RLMTableViewDataSource <NSTableViewDataSource>
+
+-(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn;
+
+@end
+
+
 @protocol RLMTableViewDelegate <NSTableViewDelegate>
 
 - (BOOL)realmIsLocked;
@@ -64,11 +71,13 @@ typedef struct {
 
 @end
 
+
 @interface RLMTableView : NSTableView
 
 @property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
+@property (nonatomic, readonly) id<RLMTableViewDataSource> realmDataSource;
 
-- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 - (void)makeColumnsFitContents;
 

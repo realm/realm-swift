@@ -113,12 +113,14 @@
 
 #pragma mark - Public methods - NSDocument overrides - Managing Document Windows
 
-- (NSString *)displayName {
+- (NSString *)displayName
+{
     if (self.presentedRealm.name != nil) {
         return self.presentedRealm.name;
     }
     
     return [super displayName];
 }
+
 
 @end
