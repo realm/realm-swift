@@ -51,7 +51,6 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
-    [[self.window windowController] setShouldCascadeWindows:YES];
     [self realmDidLoad];
 }
 

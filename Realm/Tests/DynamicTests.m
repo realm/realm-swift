@@ -40,7 +40,6 @@
     
     RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
     XCTAssertNotNil(dyrealm, @"realm should not be nil");
-    XCTAssertEqual([dyrealm class], [RLMRealm class], @"realm should be of class RLMDynamicRealm");
     
     // verify schema
     RLMObjectSchema *dynSchema = dyrealm.schema[@"DynamicObject"];

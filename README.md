@@ -48,7 +48,8 @@ In case you don't want to use the precompiled version, you can build Realm yours
 Prerequisites:
 
 * Building Realm requires Xcode 5 or above
-* Building Realm with Swift support requires Xcode6-Beta6 specifically
+* Building Realm with Swift support requires Xcode6-Beta6 or Xcode6-Beta7
+* Building the Swift examples requires Xcode6-Beta7
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh ios`. You'll need an internet connection the first time you build Realm to download the core binary.

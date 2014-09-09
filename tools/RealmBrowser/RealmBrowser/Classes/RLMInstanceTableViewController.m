@@ -28,8 +28,6 @@
 #import "RLMBasicTableCellView.h"
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
-#import "RLMImageTableCellView.h"
-
 #import "RLMTableColumn.h"
 
 #import "NSColor+ByteSizeFactory.h"
@@ -161,44 +159,25 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     switch (propertyColumn.property.type) {
         case RLMPropertyTypeBool:
-            toolTip = @"Boolean";
-            break;
-            
+            return @"Boolean";
         case RLMPropertyTypeInt:
-            toolTip = @"Integer";
-            break;
-            
+            return @"Integer";
         case RLMPropertyTypeFloat:
-            toolTip = @"Float";
-            break;
-            
+            return @"Float";
         case RLMPropertyTypeDouble:
-            toolTip = @"Double";
-            break;
-            
+            return @"Double";
         case RLMPropertyTypeString:
-            toolTip = @"String";
-            break;
-            
+            return @"String";
         case RLMPropertyTypeData:
-            toolTip = @"Data";
-            break;
-            
+            return @"Data";
         case RLMPropertyTypeAny:
-            toolTip = @"Any";
-            break;
-            
+            return @"Any";
         case RLMPropertyTypeDate:
-            toolTip = @"Date";
-            break;
-            
+            return @"Date";
         case RLMPropertyTypeArray:
-            toolTip = [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
-            break;
-            
+            return [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
         case RLMPropertyTypeObject:
-            toolTip = [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
-            break;
+            return [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
     }
     
     return toolTip;
@@ -237,7 +216,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     if (columnIndex == -1) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
-        [basicCellView.textField setEditable:NO];
+        basicCellView.textField.editable = NO;
         
         return basicCellView;
     }
@@ -263,6 +242,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             badgeCellView.textField.font = [NSFont linkFont];
             
             [badgeCellView.textField setEditable:NO];
+            badgeCellView.textField.editable = NO;
             
             cellView = badgeCellView;
             
@@ -287,7 +267,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
-            [numberCellView.textField setEditable:!self.realmIsLocked];
+            numberCellView.textField.editable = !self.realmIsLocked;
             
             cellView = numberCellView;
 
@@ -316,11 +296,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
             if (type == RLMPropertyTypeObject) {
                 basicCellView.textField.font = [NSFont linkFont];
-                [basicCellView.textField setEditable:NO];
+                basicCellView.textField.editable = NO;
             }
             else {
                 basicCellView.textField.font = [NSFont textFont];
-                [basicCellView.textField setEditable:!self.realmIsLocked];
+                BOOL isOfEditableType = type != RLMPropertyTypeData && type != RLMPropertyTypeObject;
+                basicCellView.textField.editable = !self.realmIsLocked && isOfEditableType;
             }
             
             cellView = basicCellView;
@@ -439,6 +420,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                 return [numberFormatter stringFromNumber:propertyValue];
             
         case RLMPropertyTypeObject: {
+            // RLMObject -description seems to sometimes recurse endlessly. Disabling object tooltips until fixed
             return nil;
 
             RLMObject *referredObject = (RLMObject *)propertyValue;
@@ -453,6 +435,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeArray: {
+            // RLMArray -description seems to sometimes recurse endlessly. Disabling array tooltips until fixed
             return nil;
             RLMArray *referredArray = (RLMArray *)propertyValue;
             
@@ -883,6 +866,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
+
+    if (self.displaysArray) {
+        column--;
+    }
     
     if (self.displaysArray) {
         column--;
