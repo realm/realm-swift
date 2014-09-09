@@ -28,6 +28,8 @@
 #import "RLMBasicTableCellView.h"
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
+#import "RLMImageTableCellView.h"
+
 #import "RLMTableColumn.h"
 
 #import "NSColor+ByteSizeFactory.h"
@@ -125,7 +127,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText
                                                                result:arrayState.results
                                                             andParent:arrayState.selectedType];
-        
         self.displayedType = arrayNode;
         [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
         [self setSelectionIndex:0];
@@ -207,7 +208,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
-
+    
     if (self.displaysArray) {
         columnIndex--;
     }
@@ -220,12 +221,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         return basicCellView;
     }
-
+    
     RLMClassProperty *classProperty = self.displayedType.propertyColumns[columnIndex];
     RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];
     RLMPropertyType type = classProperty.type;
-
+    
     NSTableCellView *cellView;
     
     switch (classProperty.type) {
@@ -270,21 +271,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberCellView.textField.editable = !self.realmIsLocked;
             
             cellView = numberCellView;
-
+            
             break;
         }
 
-        case RLMPropertyTypeData: {
-            RLMImageTableCellView *imageCellView = [tableView makeViewWithIdentifier:@"ImageCell" owner:self];
-            imageCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
-            
-            [imageCellView.textField setEditable:NO];
-            
-            cellView = imageCellView;
-
-            break;
-        }
-
+        case RLMPropertyTypeData:
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeObject:
