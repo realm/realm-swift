@@ -141,12 +141,12 @@ static inline bool IsRLMObjectSubclass(Class cls) {
 }
 
 // schema based on runtime objects
-+(instancetype)sharedSchema {
++ (instancetype)sharedSchema {
     return s_sharedSchema;
 }
 
 // schema based on tables in a realm
-+(instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
++ (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm
     unsigned long numTables = realm.group->size();
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:numTables];
@@ -154,8 +154,7 @@ static inline bool IsRLMObjectSubclass(Class cls) {
     // cache descriptors for all subclasses of RLMObject
     RLMSchema *schema = [[RLMSchema alloc] init];
     for (unsigned long i = 0; i < numTables; i++) {
-        NSString *tableName = [NSString stringWithUTF8String:realm.group->get_table_name(i).data()];
-        NSString *className = RLMClassForTableName(tableName);
+        NSString *className = RLMClassForTableName(@(realm.group->get_table_name(i).data()));
         if (className) {
             tightdb::TableRef table = realm.group->get_table(i);
             RLMObjectSchema *object = [RLMObjectSchema schemaForTable:table.get() className:className];
@@ -184,7 +183,11 @@ static inline tightdb::TableRef RLMVersionTable(RLMRealm *realm) {
 }
 
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
-    return NSUInteger(RLMVersionTable(realm)->get(0).get_int(c_versionColumnIndex));
+    tightdb::TableRef table = realm.group->get_table(c_metadataTableName);
+    if (!table || table->get_column_count() == 0) {
+        return RLMNotVersioned;
+    }
+    return NSUInteger(table->get(0).get_int(c_versionColumnIndex));
 }
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {

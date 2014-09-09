@@ -20,8 +20,26 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMObject_Private.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMArray.h"
+
+// The source realm for a migration has to use a SharedGroup to be able to share
+// the file with the destination realm, but we don't want to let the user call
+// beginWriteTransaction on it as that would make no sense.
+@interface RLMMigrationRealm : RLMRealm
+@end
+
+@implementation RLMMigrationRealm
+- (BOOL)readonly {
+    return YES;
+}
+
+- (void)beginWriteTransaction {
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Cannot modify the source Realm in a migration"
+                                 userInfo:nil];
+}
+@end
 
 @implementation RLMMigration
 
@@ -35,7 +53,10 @@
     }
     
     // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [RLMRealm realmWithPath:path readOnly:YES dynamic:YES schema:nil error:error];
+    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO error:error];
+    if (migration->_oldRealm) {
+        RLMRealmInitializeReadOnlyWithSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
+    }
     if (error && *error) {
         return nil;
     }
