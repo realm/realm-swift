@@ -122,5 +122,4 @@
     return [super displayName];
 }
 
-
 @end
