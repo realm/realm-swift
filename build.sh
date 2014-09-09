@@ -332,32 +332,32 @@ case "$COMMAND" in
     "examples")
         sh build.sh clean
         cd examples
-        XCODE_VERSION=6
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release clean build ${CODESIGN_PARAMS}"
         XCODE_VERSION=5
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        XCODE_VERSION=6
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-debug")
         sh build.sh clean
         cd examples
-        XCODE_VERSION=6
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug clean build ${CODESIGN_PARAMS}"
         XCODE_VERSION=5
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug build ${CODESIGN_PARAMS}"
+        XCODE_VERSION=6
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
