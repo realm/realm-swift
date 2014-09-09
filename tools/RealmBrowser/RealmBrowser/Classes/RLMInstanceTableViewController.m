@@ -323,6 +323,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
+            numberFormatter.minimumFractionDigits = 3;
             numberFormatter.maximumFractionDigits = 3;
             numberFormatter.allowsFloats = propertyType != RLMPropertyTypeInt;
             
@@ -407,8 +408,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
-                numberFormatter.maximumFractionDigits = UINT16_MAX;
-                return [numberFormatter stringFromNumber:propertyValue];
+            numberFormatter.minimumFractionDigits = 0;
+            numberFormatter.maximumFractionDigits = UINT16_MAX;
+            return [numberFormatter stringFromNumber:propertyValue];
             
         case RLMPropertyTypeObject: {
             // RLMObject -description seems to sometimes recurse endlessly. Disabling object tooltips until fixed
