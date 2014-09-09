@@ -1,16 +1,45 @@
-0.84.0 Release notes (YYYY-MM-DD)
+0.85.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* Notifications for a refresh being needed (when autorefresh is off) now send
+  the notification type RLMRealmRefreshRequiredNotification rather than
+  RLMRealmDidChangeNotification.
+
+### Enhancements
+
+* `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
+  any object type with kvc properties.
+* Improve performance when getting the count of items matching a query but not
+  reading any of the objects in the results.
+* Add a return value to `-[RLMRealm refresh]` that indicates whether or not
+  there was anything to refresh.
+* Add the class name to the error message when an RLMObject is missing a value
+  for a property without a default.
+* Add support for opening Realms in read-only mode.
+* Add an automatic check for updates when using Realm in a simulator (the
+  checker code is not compiled into device builds). This can be disabled by
+  setting the REALM_DISABLE_UPDATE_CHECKER environment variable to any value.
+
+### Bugfixes
+
+* Realm change notifications when beginning a write transaction are now sent
+  after updating rather than before, to match refresh.
+
+0.84.0 Release notes (2014-08-28)
 =============================================================
 
 ### API breaking changes
 
 * The timer used to trigger notifications has been removed. Notifications are now
   only triggered by commits made in other threads, and can not currently be triggered
-  by changes made by other processes. Interprocess notifications will be re-added in 
+  by changes made by other processes. Interprocess notifications will be re-added in
   a future commit with an improved design.
 
 ### Enhancements
 
-* Updating to core library version 0.82.1.
+* Updating to core library version 0.82.2.
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
 * Add support for the BETWEEN operator in link queries.
@@ -21,11 +50,14 @@
 * Allow unregistering from change notifications in the change notification
   handler block.
 * Significant performance improvements when holding onto large numbers of RLMObjects.
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta6.
 * Improved performance during RLMArray iteration, especially when mutating
   contained objects.
 
 ### Bugfixes
 
+* Fix crashes and assorted bugs when sorting or querying a RLMArray returned
+  from a query.
 * Notifications are no longer sent when initializing new RLMRealm instances on background
   threads.
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].

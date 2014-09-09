@@ -30,8 +30,10 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutat
 // initialize a realm if needed with the given schema
 // for uninitialized dbs, the initial version is set and tables are created for the target schema
 // existing dbs are validated against the target schema
-bool RLMRealmIntializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
+void RLMRealmInitializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
 
+// initialize a read-only realm with the given schema
+void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
 
 //
 // Adding, Removing, Getting Objects
@@ -44,7 +46,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
 // get objects of a given class
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate, NSString *order);
+RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
 
 // create object from array or dictionary
 RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value);

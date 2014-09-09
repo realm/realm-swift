@@ -26,11 +26,15 @@
 #import "RLMTestObjects.h"
 #endif
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 NSString *RLMTestRealmPath(void);
 NSString *RLMDefaultRealmPath(void);
 NSString *RLMRealmPathForFile(NSString *);
-
+#ifdef __cplusplus
+}
+#endif
 
 #if !defined(SWIFT)
 @interface XCTestExpectation : NSObject

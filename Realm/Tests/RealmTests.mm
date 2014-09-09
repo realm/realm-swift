@@ -18,12 +18,23 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.hpp"
+
 #import <libkern/OSAtomic.h>
 
 @interface RLMRealm ()
-
 + (BOOL)isCoreDebug;
+@end
 
+@interface RLMObjectSchema (Private)
++ (instancetype)schemaForObjectClass:(Class)objectClass;
+
+@property (nonatomic, readwrite, assign) Class objectClass;
+@end
+
+@interface RLMSchema (Private)
+@property (nonatomic, readwrite, copy) NSArray *objectSchema;
 @end
 
 @interface RealmTests : RLMTestCase
@@ -39,12 +50,6 @@
 #else
     XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
 #endif
-}
-
-- (void)testRealmExists {
-    RLMRealm *realm = [self realmWithTestPath];
-    XCTAssertNotNil(realm, @"realm should not be nil");
-    XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
 - (void)testRealmFailure
@@ -73,7 +78,7 @@
     [StringObject createInRealm:realm withObject:@[@"c"]];
     XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
     [realm commitWriteTransaction];
-    
+
     // test again after write transaction
     RLMArray *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
@@ -84,7 +89,7 @@
     [realm deleteObject:objects[0]];
     XCTAssertEqual([StringObject objectsInRealm:realm withPredicate:nil].count, (NSUInteger)1, @"Expecting 1 object");
     [realm commitWriteTransaction];
-    
+
     objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
@@ -124,20 +129,20 @@
 
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
-    
+
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
     XCTAssertEqual(objects.count, (NSUInteger)0, @"Expecting 0 objects");
-    
+
     // add objects to linkView
     [realm beginWriteTransaction];
     [obj.array addObject:[StringObject createInRealm:realm withObject:@[@"a"]]];
     [obj.array addObject:[[StringObject alloc] initWithObject:@[@"b"]]];
     [realm commitWriteTransaction];
-    
+
     // remove objects from realm
     XCTAssertEqual(obj.array.count, (NSUInteger)2, @"Expecting 2 objects");
     [realm beginWriteTransaction];
@@ -156,216 +161,142 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
-
-- (void)testRealmIsUpdatedAfterBackgroundUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-
+- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(realm, @"Realm should not be nil");
-        [notificationFired fulfill];
+        if (note == expectedNote) {
+            [notificationFired fulfill];
+        }
     }];
-    
+
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
+    dispatch_async(queue, block);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
+
+    [realm removeNotification:token];
+}
+
+- (void)testAutorefreshAfterBackgroundUpdate {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
-    });
-    
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [realm removeNotification:token];
+    }];
 
-    // get object
-    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-    XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+}
+
+- (void)testBackgroundUpdateWithoutAutorefresh {
+    RLMRealm *realm = [self realmWithTestPath];
+    realm.autorefresh = NO;
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [realm commitWriteTransaction];
+
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    }];
+
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    [realm refresh];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 }
 
 - (void)testBackgroundRealmIsNotified {
     RLMRealm *realm = [self realmWithTestPath];
 
-    XCTestExpectation *backgroundCreated = [self expectationWithDescription:@"background queue created"];
-    __block XCTestExpectation *backgroundComplete;
+    XCTestExpectation *bgReady = [self expectationWithDescription:@"background queue waiting for commit"];
+    __block XCTestExpectation *bgDone = nil;
 
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         __block bool fulfilled = false;
-        RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
             XCTAssertNotNil(realm, @"Realm should not be nil");
+            XCTAssertEqual(note, RLMRealmDidChangeNotification);
+            XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
             fulfilled = true;
         }];
 
-        // notify main thread our bg realm is completed
-        [backgroundCreated fulfill];
+        // notify main thread that we're ready for it to commit
+        [bgReady fulfill];
 
         // run for two seconds or until we recieve notification
         NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
         while (!fulfilled) {
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
         }
-        XCTAssertEqual(fulfilled, true, @"Notification should have been received");
-
-        // verify object
-        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
+        XCTAssertTrue(fulfilled, @"Notification should have been received");
 
         [realm removeNotification:token];
-        [backgroundComplete fulfill];
+        [bgDone fulfill];
     });
 
     // wait for background realm to be created
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    bgDone = [self expectationWithDescription:@"background queue done"];;
 
-    // create bg completion expectation
-    backgroundComplete = [self expectationWithDescription:@"background queue completed"];
-
-    // write on main thread
     [realm beginWriteTransaction];
     [StringObject createInRealm:realm withObject:@[@"string"]];
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // wait for queue to finish
+    dispatch_sync(queue, ^{});
 }
 
-// FIXME: Re-enable once we find out why this fails intermittently on iOS in Xcode6
-// Asana: https://app.asana.com/0/861870036984/14552787865017
-#ifndef REALM_SWIFT
-- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
+- (void)testBeginWriteTransactionsNotifiesWithUpdatedObjects {
     RLMRealm *realm = [self realmWithTestPath];
-
-    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        [notificationFired fulfill];
-     }];
-    
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        RLMRealm *realm = [self realmWithTestPath];
-        StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
-        [realm beginWriteTransaction];
-        [realm addObject:obj];
-        [realm commitWriteTransaction];
-
-        RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-        XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-        XCTAssertEqualObjects([objects[0] stringCol], @"string", @"Value of first column should be 'string'");
-    });
-    
-    // this should complete very fast before the timer
-    [self waitForExpectationsWithTimeout:0.01 handler:nil];
-    [realm removeNotification:token];
-        
-    // get object
-    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertTrue(objects.count == 1, @"There should be 1 object of type StringObject");
-    StringObject *obj = objects.firstObject;
-    XCTAssertEqualObjects(obj.stringCol, @"string", @"Value of first column should be 'string'");
-}
-#endif
-
-
-- (void)testAutoUpdate {
-    RLMRealm *realm = [self realmWithTestPath];
-    
-    // turn autorefresh off
     realm.autorefresh = NO;
 
-    __block XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        [notificationFired fulfill];
-        notificationFired = nil;
-    }];
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 
-
-    // should have no objects
-    RLMArray *objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertEqual(objects.count, 0U, @"There should be 0 objects of type StringObject");
-
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, ^{
-        RLMRealm *realm2 = [self realmWithTestPath];
-        [realm2 beginWriteTransaction];
-        [StringObject createInRealm:realm2 withObject:@[@"string"]];
-        [realm2 commitWriteTransaction];
-    });
-    
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
-    // should have no visible objects
-    objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertEqual(objects.count, 0U, @"There should be 0 objects of type StringObject");
-    
-    // call refresh
-    [realm refresh];
-    objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertEqual(objects.count, 1U, @"There should be 1 objects of type StringObject");
-    
-    // reset count and create new expectation
-    notificationFired = [self expectationWithDescription:@"notification fired"];
-    
-    // turn on autorefresh
-    realm.autorefresh = YES;
-    dispatch_async(queue, ^{
+    // Create an object in a background thread and wait for that to complete,
+    // without refreshing the main thread realm
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
-        [StringObject createInRealm:realm withObject:@[@"another string"]];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
-    });
-    
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
-    // refresh should have been called automatically
-    objects = [StringObject objectsInRealm:realm withPredicate:nil];
-    XCTAssertEqual(objects.count, 2U, @"There should be 2 objects of type StringObject");
-    
+
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    }];
+
+    // Verify that the main thread realm still doesn't have any objects
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
+
+    // Verify that the local notification sent by the beginWriteTransaction
+    // below when it advances the realm to the latest version occurs *after*
+    // the advance
+    __block bool notificationFired = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        notificationFired = true;
+    }];
+
+    [realm beginWriteTransaction];
+    [realm commitWriteTransaction];
+
     [realm removeNotification:token];
+    XCTAssertTrue(notificationFired);
 }
-
-
-/* FIXME: disabled until we have per file compile options
- - (void)testRealmWriteImplicitCommit
- {
- RLMRealm *realm = [self realmWithTestPath];
- [realm beginWriteTransaction];
- RLMTable *table = [realm createTableWithName:@"table"];
- [table addColumnWithName:@"col0" type:RLMPropertyTypeInt];
- [realm commitWriteTransaction];
- 
- @autoreleasepool {
- [realm beginWriteTransaction];
- [table addRow:@[@10]];
- 
- // make sure we can see the new row on the write thread
- XCTAssertTrue([table rowCount] == 1, @"Rows were added");
- 
- // make sure we can't see the new row in another thread
- dispatch_async(dispatch_get_global_queue(0, 0), ^{
- RLMRealm *bgrealm = [self realmWithTestPath];
- RLMTable *table = [bgrealm tableWithName:@"table"];
- XCTAssertTrue([table rowCount] == 0, @"Don't see the new row");
- [self notify:XCTAsyncTestCaseStatusSucceeded];
- });
- 
- [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
- }
- 
- // make sure implicit commit took place
- dispatch_async(dispatch_get_global_queue(0, 0), ^{
- RLMRealm *bgrealm = [self realmWithTestPath];
- RLMTable *table = [bgrealm tableWithName:@"table"];
- XCTAssertTrue([table rowCount] == 1, @"See the new row");
- [self notify:XCTAsyncTestCaseStatusSucceeded];
- });
- 
- [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
- }
- */
 
 - (void)testRealmInMemory
 {
@@ -379,7 +310,7 @@
 - (void)testRealmInMemory2
 {
     [RLMRealm useInMemoryDefaultRealm];
-    
+
     RLMRealm *realmInMemory = [RLMRealm defaultRealm];
     [realmInMemory beginWriteTransaction];
     [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
@@ -392,13 +323,13 @@
 - (void)testRealmFileAccess
 {
     XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
-    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");    
-    
+    XCTAssertThrows([RLMRealm realmWithPath:@""], @"empty path");
+
     NSString *content = @"Some content";
     NSData *fileContents = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSString *filePath = RLMRealmPathForFile(@"filename.realm");
     [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
-    
+
     NSError *error;
     XCTAssertNil([RLMRealm realmWithPath:filePath readOnly:NO error:&error], @"Invalid database");
     XCTAssertNotNil(error, @"Should populate error object");
@@ -418,6 +349,99 @@
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
+}
+
+- (void)testReadOnlyFile
+{
+    @autoreleasepool {
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [realm commitWriteTransaction];
+    }
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:RLMTestRealmPath() error:nil];
+
+    // Should not be able to open read-write
+    XCTAssertThrows([self realmWithTestPath]);
+
+    RLMRealm *realm;
+    XCTAssertNoThrow(realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmPath() error:nil];
+}
+
+- (void)testReadOnlyRealmMustExist
+{
+   XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+}
+
+- (void)testReadOnlyRealmIsImmutable
+{
+    @autoreleasepool { [self realmWithTestPath]; }
+
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertThrows([realm beginWriteTransaction]);
+    XCTAssertThrows([realm refresh]);
+}
+
+- (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime
+{
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPath]);
+        XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+    }
+
+    @autoreleasepool {
+        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]);
+        XCTAssertThrows([self realmWithTestPath]);
+    }
+}
+
+- (void)testReadOnlyRealmWithMissingTables
+{
+    // create a realm with only a StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[@"a"]);
+        [realm commitWriteTransaction];
+    }
+
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    // verify that reading a missing table gives an empty array rather than
+    // crashing
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testReadOnlyRealmWithMissingColumns
+{
+    // create a realm with only a zero-column StringObject table
+    @autoreleasepool {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+        objectSchema.objectClass = RLMObject.class;
+        objectSchema.properties = @[];
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = @[objectSchema];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+
+        [realm beginWriteTransaction];
+        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[]);
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil],
+                    @"should reject table missing column");
 }
 
 @end

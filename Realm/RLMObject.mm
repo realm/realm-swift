@@ -19,7 +19,7 @@
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
@@ -30,10 +30,6 @@
 #import <objc/runtime.h>
 
 @implementation RLMObject
-
-@synthesize realm = _realm;
-@synthesize objectSchema = _objectSchema;
-
 
 // standalone init
 - (instancetype)init
@@ -63,17 +59,12 @@
             [self setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }
-    else if (NSDictionary *dict = RLMDynamicCast<NSDictionary>(value)) {
-        // validate and populate
-        dict = RLMValidatedDictionaryForObjectSchema(dict, _objectSchema, RLMSchema.sharedSchema);
+    else {
+        // assume our object is an NSDictionary or a an object with kvc properties
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
             [self setValue:dict[name] forKeyPath:name];
         }
-    }
-    else {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Values must be provided either as an array or dictionary"
-                                     userInfo:nil];
     }
 
     return self;
@@ -144,11 +135,11 @@
 }
 
 + (RLMArray *)allObjects {
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil, nil);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil);
 }
 
 + (RLMArray *)allObjectsInRealm:(RLMRealm *)realm {
-    return RLMGetObjects(realm, self.className, nil, nil);
+    return RLMGetObjects(realm, self.className, nil);
 }
 
 + (RLMArray *)objectsWhere:(NSString *)predicateFormat, ... {
@@ -172,11 +163,11 @@
 }
 
 + (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate {
-    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate, nil);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate);
 }
 
 +(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate {
-    return RLMGetObjects(realm, self.className, predicate, nil);
+    return RLMGetObjects(realm, self.className, predicate);
 }
 
 - (NSString *)JSONString {
