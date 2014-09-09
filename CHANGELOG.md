@@ -29,6 +29,10 @@
 
 * Realm change notifications when beginning a write transaction are now sent
   after updating rather than before, to match refresh.
+* `-isEqual:` now uses the default `NSObject` implementation unless a primary key
+  is specified for an RLMObject. In the case a primary key is specified `-isEqual:` calls
+  a new method `-isEqualToObject:` and a corresponding implementation for `-hash` is also
+  implemented. 
 
 0.84.0 Release notes (2014-08-28)
 =============================================================
