@@ -248,27 +248,27 @@
  */
 
 /**
- Returns the minimum (lowest) value of the given property 
- 
+ Returns the minimum (lowest) value of the given property
+
  NSNumber *min = [array minOfProperty:@"age"];
- 
+
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to look for a minimum on. Only properties of type int, float and double are supported.
- 
+
+ @param property The property to look for a minimum on. Only properties of type int, float, double and NSDate are supported.
+
  @return The minimum value for the property amongst objects in an RLMArray.
  */
 -(id)minOfProperty:(NSString *)property;
 
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMArray
- 
+
  NSNumber *max = [array maxOfProperty:@"age"];
- 
+
  @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
- 
+
+ @param property The property to look for a maximum on. Only properties of type int, float, double and NSDate are supported.
+
  @return The maximum value for the property amongst objects in an RLMArray
  */
 -(id)maxOfProperty:(NSString *)property;
