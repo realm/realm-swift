@@ -604,7 +604,7 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
-    RLMDynamicSet(obj, (RLMProperty *)prop, val, prop.isPrimary, false);
+    RLMDynamicSet(obj, prop, val, prop.isPrimary, false);
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val,
