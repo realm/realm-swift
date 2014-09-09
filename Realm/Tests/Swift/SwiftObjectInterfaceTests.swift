@@ -137,4 +137,22 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqual(objectFromRealm.stringCol!, "stringVal", "Should be stringVal")
     }
+
+    func testCreateOrUpdate() {
+        let realm = RLMRealm.defaultRealm()
+        realm.beginWriteTransaction()
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 1])
+        let objects = SwiftPrimaryStringObject.allObjects();
+        XCTAssertEqual(objects.count, 1, "Should have 1 object");
+        XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 1, "Value should be 1");
+
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["stringCol": "string2", "intCol": 2])
+        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 3])
+        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+        XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
+
+        realm.commitWriteTransaction()
+    }
 }

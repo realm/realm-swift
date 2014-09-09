@@ -502,19 +502,6 @@
 			name = "Objective-C";
 			sourceTree = "<group>";
 		};
-		E81A20071955FE2200FDED82 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */,
-				E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */,
-				E81A1FC41955FE0100FDED82 /* RLMTestCase.h */,
-				E81A1FC51955FE0100FDED82 /* RLMTestCase.m */,
-				E8F8D90A196CB8DD00475368 /* SwiftTestCase.swift */,
-				E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */,
-			);
-			name = Helpers;
-			sourceTree = "<group>";
-		};
 		E88C36FE19745E3200C9963D /* Swift */ = {
 			isa = PBXGroup;
 			children = (
@@ -610,7 +597,6 @@
 		E8D89BA71955FC6D00CF2B9A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				E81A20071955FE2200FDED82 /* Helpers */,
 				E81A20061955FE1600FDED82 /* Objective-C */,
 				E8D89BA81955FC6D00CF2B9A /* Supporting Files */,
 				E81A1FC81955FE0100FDED82 /* Swift */,
@@ -634,6 +620,12 @@
 			children = (
 				3F44109E19953F5900223146 /* RLMTestObjects.h */,
 				E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */,
+				E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */,
+				E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */,
+				E81A1FC41955FE0100FDED82 /* RLMTestCase.h */,
+				E81A1FC51955FE0100FDED82 /* RLMTestCase.m */,
+				E8F8D90A196CB8DD00475368 /* SwiftTestCase.swift */,
+				E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */,
 				E8FE4159196DBA7C00073FBB /* TestFramework.h */,
 			);
 			name = "Test Framework";
