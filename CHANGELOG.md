@@ -35,6 +35,7 @@
 * `-isEqual:` now uses the default `NSObject` implementation unless a primary key
   is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls 
   `-isEqualToObject:` and a corresponding implementation for `-hash` is also implemented.
+* Fix adding RLMObjects persisted in one Realm to another Realm
 
 0.84.0 Release notes (2014-08-28)
 =============================================================

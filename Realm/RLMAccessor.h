@@ -16,8 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import "RLMRealm.h"
+
+#import <Foundation/Foundation.h>
+#import <tightdb/row.hpp>
 
 //
 // Accessors Class Creation/Caching
@@ -35,7 +37,7 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val);
 id RLMDynamicGet(RLMObject *obj, NSString *propName);
 
 // by property/column
-void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val, bool enforceUnique, bool tryUpdate);
+void RLMDynamicSet(RLMRealm *realm, tightdb::Row &row, RLMProperty *prop, id val, bool enforceUnique, bool tryUpdate);
 
 //
 // Class modification
