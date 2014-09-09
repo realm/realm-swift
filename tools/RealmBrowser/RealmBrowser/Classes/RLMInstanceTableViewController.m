@@ -215,7 +215,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     // Array gutter
     if (columnIndex == -1) {
-        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"IndexCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
         basicCellView.textField.editable = NO;
         
