@@ -16,19 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-#import "RLMTypeNode.h"
-#import "RLMViewController.h"
-#import "RLMTableView.h"
+@class RLMRealm;
 
-@class RLMRealmBrowserWindowController;
+@interface RLMTestDataGenerator : NSObject
 
-@interface RLMInstanceTableViewController : RLMViewController <RLMTableViewDelegate, RLMTableViewDataSource>
-
-@property (nonatomic, readonly) RLMTableView *realmTableView;
-
-@property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL displaysArray;
++(BOOL)createRealmAtUrl:(NSURL *)url withClassesNamed:(NSArray *)classNames objectCount:(NSUInteger)objectCount;
 
 @end

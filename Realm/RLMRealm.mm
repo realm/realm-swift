@@ -21,9 +21,10 @@
 #import "RLMObject_Private.h"
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
-#import "RLMObjectStore.hpp"
 #import "RLMConstants.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
 #include <exception>
@@ -49,6 +50,15 @@
               removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
+@end
+
+// A weak holder for a RLMRealm to allow calling performSelector:onThread: without
+// a strong reference to the realm
+@interface RLMWeakNotifier : NSObject
+@property (nonatomic, weak) RLMRealm *realm;
+
+- (instancetype)initWithRealm:(RLMRealm *)realm;
+- (void)notify;
 @end
 
 using namespace std;
@@ -145,6 +155,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // set up global realm cache
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        RLMCheckForUpdates();
+
         // initilize realm cache
         clearRealmCache();
     });
@@ -438,8 +450,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             NSArray *realms = realmsAtPath(_path);
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
-                    [realm performSelector:@selector(handleExternalCommit)
-                                  onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+                    [notifier performSelector:@selector(notify)
+                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
                 }
             }
 
@@ -593,4 +606,20 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return nil;
 }
 
+@end
+
+@implementation RLMWeakNotifier
+- (instancetype)initWithRealm:(RLMRealm *)realm
+{
+    self = [super init];
+    if (self) {
+        _realm = realm;
+    }
+    return self;
+}
+
+- (void)notify
+{
+    [_realm handleExternalCommit];
+}
 @end

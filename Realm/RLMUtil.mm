@@ -17,10 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectSchema_Private.hpp"
+
 #import "RLMUtil.hpp"
-#import "RLMObject.h"
+
 #import "RLMArray_Private.hpp"
+#import "RLMObject.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
@@ -205,4 +207,3 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     }
     return outArray;
 };
-

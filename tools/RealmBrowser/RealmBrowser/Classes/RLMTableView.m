@@ -34,6 +34,9 @@
     NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
     NSMenuItem *removeFromArrayItem;
+    NSMenuItem *removeLinkToObjectItem;
+    NSMenuItem *removeLinkToArrayItem;
+    NSMenuItem *openArrayInNewWindowItem;
 }
 
 #pragma mark - NSObject Overrides
@@ -64,6 +67,11 @@
 -(id<RLMTableViewDelegate>)realmDelegate
 {
     return (id<RLMTableViewDelegate>)self.delegate;
+}
+
+-(id<RLMTableViewDataSource>)realmDataSource
+{
+    return (id<RLMTableViewDataSource>)self.dataSource;
 }
 
 #pragma mark - Private Methods - NSObject Overrides
@@ -103,6 +111,21 @@
                                               keyEquivalent:backspaceString];
     removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
     removeFromArrayItem.tag = 10;
+
+    removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
+                                                       action:@selector(selectedRemoveObjectLink:)
+                                              keyEquivalent:@""];
+    removeLinkToObjectItem.tag = 11;
+
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
+                                                     action:@selector(selectedRemoveArrayLink:)
+                                              keyEquivalent:@""];
+    removeLinkToArrayItem.tag = 12;
+    
+    openArrayInNewWindowItem = [[NSMenuItem alloc] initWithTitle:@"Open array in new window"
+                                                          action:@selector(openArrayInNewWindow:)
+                                                   keyEquivalent:@""];
+    openArrayInNewWindowItem.tag = 20;
 }
 
 #pragma mark - NSResponder Overrides
@@ -187,7 +210,6 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    
     if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
         if (theEvent.keyCode == 27) {
             [self selectedAddRow:theEvent];
@@ -234,6 +256,14 @@
             menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
             return canDeleteRows && displaysArray;
 
+        case 11: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to objects" : @"Remove link to object";
+            return YES;
+
+        case 12: // Context -> Remove row from array
+            menuItem.title = multipleRows ? @"Remove links to arrays" : @"Remove link to array";
+            return YES;
+
         case 99: // Context -> Click lock icon to edit
             return NO;
 
@@ -248,15 +278,39 @@
 {
     [self.menu removeAllItems];
     
+    // Menu items that do not require editing
+    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:openArrayInNewWindowItem];
+    }
+
     if (self.realmDelegate.realmIsLocked) {
         [self.menu addItem:clickLockItem];
         return;
     }
     
-    [self.menu addItem:deleteRowItem];
+    // Menu items that do require editing
     
+    // Menu items that make sense without a row selected
+    if (self.selectedRowIndexes.count == 0) {
+        return;
+    }
+    
+    // Menu items that make sense only with a row selected
+    [self.menu addItem:deleteRowItem];
+
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:removeFromArrayItem];
+    }
+
+    if (self.clickedColumn == -1) {
+        return;
+    }
+    
+    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToObjectItem];
+    }
+    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToArrayItem];
     }
 }
 
@@ -290,6 +344,25 @@
     }
 }
 
+- (IBAction)selectedRemoveObjectLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
+    }
+}
+
+- (IBAction)selectedRemoveArrayLink:(id)sender
+{
+    if (!self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
+    }
+}
+
+- (IBAction)openArrayInNewWindow:(id)sender
+{
+    [self.realmDelegate openArrayInNewWindowAtRow:self.clickedRow column:self.clickedColumn];
+}
+
 #pragma mark - NSView Overrides
 
 - (void)updateTrackingAreas
@@ -304,85 +377,41 @@
 
 #pragma mark - Public Methods
 
-- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
 {
-    // We clear the table view from all old columns
-    NSUInteger existingColumnsCount = self.numberOfColumns;
-    for (NSUInteger index = 0; index < existingColumnsCount; index++) {
-        NSTableColumn *column = [self.tableColumns lastObject];
-        [self removeTableColumn:column];
-    }
-    
-    // If array, add extra first column with numbers
-    if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
-        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
-        tableColumn.headerToolTip = @"Position of object within array";
-        tableColumn.propertyType = RLMPropertyTypeInt;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:@"#"];
-    }
-    
-    // ... and add new columns matching the structure of the new realm table.
-    NSArray *columns = typeNode.propertyColumns;
-
-    for (NSUInteger index = 0; index < columns.count; index++) {
-        RLMClassProperty *property = columns[index];
-        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:property.name];
-        tableColumn.propertyType = property.type;
-        [self addTableColumn:tableColumn];
-
-        [tableColumn.headerCell setStringValue:property.name];
-
-        NSString *toolTip;
-        switch (property.type) {
-            case RLMPropertyTypeBool:
-                toolTip = @"Boolean";
-                break;
-                
-            case RLMPropertyTypeInt:
-                toolTip = @"Integer";
-                break;
-                
-            case RLMPropertyTypeFloat:
-                toolTip = @"Float";
-                break;
-                
-            case RLMPropertyTypeDouble:
-                toolTip = @"Double";
-                break;
-                
-            case RLMPropertyTypeString:
-                toolTip = @"String";
-                break;
-                
-            case RLMPropertyTypeData:
-                toolTip = @"Data";
-                break;
-                
-            case RLMPropertyTypeAny:
-                toolTip = @"Any";
-                break;
-                
-            case RLMPropertyTypeDate:
-                toolTip = @"Date";
-                break;
-                
-            case RLMPropertyTypeArray:
-                toolTip = [NSString stringWithFormat:@"%@[]", property.property.objectClassName];
-                break;
-                
-            case RLMPropertyTypeObject:
-                toolTip = [NSString stringWithFormat:@"%@", property.property.objectClassName];
-                break;
-        }
-        
-        tableColumn.headerToolTip = toolTip;
+    while (self.numberOfColumns > 0) {
+        [self removeTableColumn:[self.tableColumns lastObject]];
     }
     
     [self reloadData];
+
+    [self beginUpdates];
+    // If array, add extra first column with numbers
+    if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
+        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
+        tableColumn.propertyType = RLMPropertyTypeInt;
+        [self addTableColumn:tableColumn];
+        [tableColumn.headerCell setStringValue:@"#"];
+        tableColumn.headerToolTip = @"Order of object within array";
+    }
+    
+    // ... and add new columns matching the structure of the new realm table.
+    NSArray *propertyColumns = typeNode.propertyColumns;
+
+    for (NSUInteger index = 0; index < propertyColumns.count; index++) {
+        RLMClassProperty *propertyColumn = propertyColumns[index];
+        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
+        
+        tableColumn.propertyType = propertyColumn.type;
+        [self addTableColumn:tableColumn];
+        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
+    }
+    
+    [self endUpdates];
 }
 
-#pragma mark - Private Methods - Column widths
+#pragma mark - Private Methods - Table Columns
 
 -(void)makeColumnsFitContents
 {

@@ -16,19 +16,5 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-#import "RLMTypeNode.h"
-#import "RLMViewController.h"
-#import "RLMTableView.h"
-
-@class RLMRealmBrowserWindowController;
-
-@interface RLMInstanceTableViewController : RLMViewController <RLMTableViewDelegate, RLMTableViewDataSource>
-
-@property (nonatomic, readonly) RLMTableView *realmTableView;
-
-@property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL displaysArray;
-
-@end
+// Asynchronously check for updates to Realm if running on a simulator
+void RLMCheckForUpdates();

@@ -34,11 +34,22 @@ typedef struct {
 
 @class RLMTableView;
 
+@protocol RLMTableViewDataSource <NSTableViewDataSource>
+
+-(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn;
+
+@end
+
+
 @protocol RLMTableViewDelegate <NSTableViewDelegate>
 
 - (BOOL)realmIsLocked;
 
 - (BOOL)displaysArray;
+
+- (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
+
+- (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 
 - (void)addRows:(NSIndexSet *)rowIndexes;
 
@@ -47,6 +58,12 @@ typedef struct {
 - (void)removeRows:(NSIndexSet *)rowIndexes;
 
 - (void)insertRows:(NSIndexSet *)rowIndexes;
+
+- (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
+
+- (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
+
+- (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex;
 
 @optional
 
@@ -64,11 +81,13 @@ typedef struct {
 
 @end
 
+
 @interface RLMTableView : NSTableView
 
 @property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
+@property (nonatomic, readonly) id<RLMTableViewDataSource> realmDataSource;
 
-- (void)formatColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
 
 - (void)makeColumnsFitContents;
 
