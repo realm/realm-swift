@@ -24,8 +24,8 @@
 
 // update tables in realm to the targetSchema and set schema on realm
 // returns true if modifications were made
-// NOTE: must be called from within write transaction if allowMutation is true
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool allowMutation = false);
+// NOTE: must be called from within write transaction if initializeSchema is true
+bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initializeSchema = false);
 
 // initialize a realm if needed with the given schema
 // for uninitialized dbs, the initial version is set and tables are created for the target schema
@@ -40,7 +40,8 @@ void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSche
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
+// if tryUpdate is 'true', update an existing object with the same primary key value
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool tryUpdate = false);
 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObject *object);
@@ -49,7 +50,9 @@ void RLMDeleteObjectFromRealm(RLMObject *object);
 RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
 
 // create object from array or dictionary
-RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value);
+// if tryUpdate is 'true', update an existing object with the same primary key value
+RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool tryUpdate = false);
+
 
 //
 // Accessor Creation

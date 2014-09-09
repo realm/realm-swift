@@ -24,7 +24,7 @@
  Attributes which can be returned when implementing attributesForProperty:
  */
 
-typedef NS_ENUM(NSUInteger, RLMPropertyAttributes) {
+typedef NS_OPTIONS(NSUInteger, RLMPropertyAttributes) {
 /**
  Create an index for this property for improved search performance.
  */
