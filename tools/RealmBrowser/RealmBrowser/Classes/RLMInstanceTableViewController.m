@@ -29,6 +29,8 @@
 #import "RLMBoolTableCellView.h"
 #import "RLMNumberTableCellView.h"
 
+#import "RLMTableColumn.h"
+
 #import "NSColor+ByteSizeFactory.h"
 #import "NSFont+Standard.h"
 
@@ -68,7 +70,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self.tableView setTarget:self];
     [self.tableView setAction:@selector(userClicked:)];
     [self.tableView setDoubleAction:@selector(userDoubleClicked:)];
-    
+
     dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateStyle = NSDateFormatterMediumStyle;
     dateFormatter.timeStyle = NSDateFormatterShortStyle;
@@ -160,6 +162,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - NSTableView Delegate
 
+-(CGFloat)tableView:(NSTableView *)tableView sizeToFitWidthOfColumn:(NSInteger)column
+{
+    RLMTableColumn *tableColumn = self.realmTableView.tableColumns[column];
+    
+    return [tableColumn sizeThatFitsWithLimit:NO];
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     if (self.tableView == notification.object) {
@@ -177,7 +186,18 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
     RLMTypeNode *displayedType = self.displayedType;
+
+    if ([displayedType isMemberOfClass:[RLMArrayNode class]]) {
+        columnIndex--;
+    }
     
+    if (columnIndex == -1) {
+        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+        basicCellView.textField.stringValue = [@(rowIndex) stringValue];
+        
+        return basicCellView;
+    }
+
     RLMClassProperty *classProperty = displayedType.propertyColumns[columnIndex];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];
@@ -545,7 +565,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             return [NSNull null];
         }
     }
-
 }
 
 -(void)reloadAfterEdit
