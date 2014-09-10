@@ -560,6 +560,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+
     if (column == -1) {
         return NO;
     }
@@ -568,7 +570,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return NO;
     }
     
-    return [self cellsAreNonEmptyInRows:rowIndexes column:column];
+    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
 }
 
 - (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
@@ -578,6 +580,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+
     if (column == -1) {
         return NO;
     }
@@ -586,7 +590,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return NO;
     }
 
-    return [self cellsAreNonEmptyInRows:rowIndexes column:column];
+    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
 }
 
 - (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
@@ -596,11 +600,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex
 {
-    if (self.displaysArray) {
-        columnIndex--;
-    }
-    
-    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[columnIndex];
+    NSInteger propertyIndex = self.displaysArray ? columnIndex - 1 : columnIndex;
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
                                                                                  typeIndex:row
                                                                                   property:propertyNode.property
@@ -659,25 +660,19 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (RLMPropertyType)propertyTypeForColumn:(NSInteger)column
 {
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
     
-    if (self.displaysArray) {
-        column--;
-    }
+    RLMProperty *property = objectSchema.properties[propertyIndex];
     
-    RLMProperty *property = objectSchema.properties[column];
-    
-    return property.type;;
+    return property.type;
 }
 
-- (BOOL)cellsAreNonEmptyInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
+- (BOOL)cellsAreNonEmptyInRows:(NSIndexSet *)rowIndexes propertyColumn:(NSInteger)propertyColumn
 {
-    if (self.displaysArray) {
-        column--;
-    }
-    
-    RLMClassProperty *classProperty = self.displayedType.propertyColumns[column];
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[propertyColumn];
     
     __block BOOL returnValue = NO;
     
@@ -695,12 +690,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)removeContentsAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
 {
-    if (self.displaysArray) {
-        column--;
-    }
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMClassProperty *classProperty = self.displayedType.propertyColumns[column];
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[propertyIndex];
     
     id newValue = [NSNull null];
     if (classProperty.property.type == RLMPropertyTypeArray) {
@@ -721,30 +714,27 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    if (!(RLMTableLocationColumnIsUndefined(location) || RLMTableLocationRowIsUndefined(location))) {
-        RLMTypeNode *displayedType = self.displayedType;
+    NSInteger propertyIndex = self.displaysArray ? location.column - 1 : location.column;
+    
+    if (propertyIndex >= self.displayedType.propertyColumns.count || location.row >= self.displayedType.instanceCount) {
+        [self disableLinkCursor];
+        return;
+    }
         
-        if (location.column < displayedType.propertyColumns.count && location.row < displayedType.instanceCount) {
-            RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-            
-            if (propertyNode.type == RLMPropertyTypeObject) {
-                if (!linkCursorDisplaying) {
-                    RLMClassProperty *propertyNode = displayedType.propertyColumns[location.column];
-                    RLMObject *selectedInstance = [displayedType instanceAtIndex:location.row];
-                    NSObject *propertyValue = selectedInstance[propertyNode.name];
-                    
-                    if (propertyValue != nil) {
-                        [self enableLinkCursor];
-                    }
-                }
-                
-                return;
-            }
-            else if (propertyNode.type == RLMPropertyTypeArray) {
-                [self enableLinkCursor];
-                return;
-            }
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
+        
+    if (propertyNode.type == RLMPropertyTypeObject) {
+        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:location.row];
+        NSObject *propertyValue = selectedInstance[propertyNode.name];
+        
+        if (propertyValue) {
+            [self enableLinkCursor];
+            return;
         }
+    }
+    else if (propertyNode.type == RLMPropertyTypeArray) {
+        [self enableLinkCursor];
+        return;
     }
     
     [self disableLinkCursor];
@@ -762,18 +752,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 #pragma mark - Public Methods - NSTableView Event Handling
 
-
-
 - (IBAction)editedTextField:(NSTextField *)sender {
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
-    
-    if (self.displaysArray) {
-        column--;
-    }
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
 
     RLMTypeNode *displayedType = self.displayedType;
-    RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMClassProperty *propertyNode = displayedType.propertyColumns[propertyIndex];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
     
     id result = nil;
@@ -821,13 +806,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 {
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
-    
-    if (self.displaysArray) {
-        column--;
-    }
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
 
     RLMTypeNode *displayedType = self.displayedType;
-    RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMClassProperty *propertyNode = displayedType.propertyColumns[propertyIndex];
     RLMObject *selectedInstance = [displayedType instanceAtIndex:row];
 
     NSNumber *result = @((BOOL)(sender.state == NSOnState));
@@ -862,20 +844,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
-
-    if (self.displaysArray) {
-        column--;
-    }
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
     
-    if (self.displaysArray) {
-        column--;
-    }
-
-    if (row == -1 || column < 0) {
+    if (row == -1 || propertyIndex < 0) {
         return;
     }
     
-    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[column];
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
     
     if (propertyNode.type == RLMPropertyTypeObject) {
         RLMObject *selectedInstance = [self.displayedType instanceAtIndex:row];
@@ -911,65 +886,77 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
     }
     else {
-        if (row != -1) {
-            [self setSelectionIndex:row];
-        }
-        else {
-            [self clearSelection];
-        }
+        [self setSelectionIndex:row];
     }
 }
 
 - (void)userDoubleClicked:(NSTableView *)sender {
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
+    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
     
-    if (self.displaysArray) {
-        column--;
-    }
-
-    if (row == -1 || column < 0) {
+    if (row == -1 || propertyIndex < 0 || self.realmIsLocked) {
         return;
     }
     
     RLMTypeNode *displayedType = self.displayedType;
-    RLMClassProperty *propertyNode = displayedType.propertyColumns[column];
+    RLMClassProperty *propertyNode = displayedType.propertyColumns[propertyIndex];
     RLMObject *selectedObject = [displayedType instanceAtIndex:row];
     id propertyValue = selectedObject[propertyNode.name];
     
-    if (propertyNode.type == RLMPropertyTypeDate) {
-        // Create a menu with a single menu item, and later populate it with the propertyValue
-        NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
-        
-        NSRect frame = [self.tableView frameOfCellAtColumn:column row:row];
-        frame.origin.x -= [self.tableView intercellSpacing].width*0.5;
-        frame.origin.y -= [self.tableView intercellSpacing].height*0.5;
-        frame.size.width += [self.tableView intercellSpacing].width;
-        frame.size.height += [self.tableView intercellSpacing].height;
-        
-        frame.size.height = MAX(23.0, frame.size.height);
-        
-        // Set up a date picker with no border or background
-        NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
-        datepicker.bordered = NO;
-        datepicker.drawsBackground = NO;
-        datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
-        datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag
-        | NSYearMonthDayDatePickerElementFlag
-        | NSTimeZoneDatePickerElementFlag;
-        datepicker.dateValue = propertyValue;
-        
-        item.view = datepicker;
-        [menu addItem:item];
-        
-        if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
-            RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-            [realm beginWriteTransaction];
-            selectedObject[propertyNode.name] = datepicker.dateValue;
-            [realm commitWriteTransaction];
-            [self.tableView reloadData];
+    switch (propertyNode.type) {
+        case RLMPropertyTypeDate: {
+            // Create a menu with a single menu item, and later populate it with the propertyValue
+            NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+            NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
+            
+            NSRect frame = [self.tableView frameOfCellAtColumn:column row:row];
+            frame.origin.x -= [self.tableView intercellSpacing].width*0.5;
+            frame.origin.y -= [self.tableView intercellSpacing].height*0.5;
+            frame.size.width += [self.tableView intercellSpacing].width;
+            frame.size.height += [self.tableView intercellSpacing].height;
+            
+            frame.size.height = MAX(23.0, frame.size.height);
+            
+            // Set up a date picker with no border or background
+            NSDatePicker *datepicker = [[NSDatePicker alloc] initWithFrame:frame];
+            datepicker.bordered = NO;
+            datepicker.drawsBackground = NO;
+            datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
+            datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag
+            | NSYearMonthDayDatePickerElementFlag
+            | NSTimeZoneDatePickerElementFlag;
+            datepicker.dateValue = propertyValue;
+            
+            item.view = datepicker;
+            [menu addItem:item];
+            
+            if ([menu popUpMenuPositioningItem:nil atLocation:frame.origin inView:self.tableView]) {
+                RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+                [realm beginWriteTransaction];
+                selectedObject[propertyNode.name] = datepicker.dateValue;
+                [realm commitWriteTransaction];
+                [self.tableView reloadData];
+            }
+            break;
         }
+            
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeString: {
+            // Start editing the textfield
+            NSTableCellView *cellView = [self.tableView viewAtColumn:column row:row makeIfNecessary:NO];
+            [[cellView.textField window] makeFirstResponder:cellView.textField];
+            break;
+        }
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeArray:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeObject:
+            // Do nothing
+            break;
     }
 }
 
