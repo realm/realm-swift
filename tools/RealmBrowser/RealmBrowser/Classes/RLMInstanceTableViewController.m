@@ -412,7 +412,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                 return [numberFormatter stringFromNumber:propertyValue];
             
         case RLMPropertyTypeObject:
-            return [self tooltipForObject:(RLMObject *)propertyValue withMaxDepth:1];
+            return [self tooltipForObject:(RLMObject *)propertyValue withMaxDepth:2];
             
         case RLMPropertyTypeArray:
             return [self tooltipForArray:(RLMArray *)propertyValue withMaxDepth:2];
@@ -432,7 +432,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return [object.objectSchema.className stringByAppendingString:@"(...)"];
     }
     
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@\n", object.objectSchema.className];
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@:\n", object.objectSchema.className];
     
     for (RLMProperty *property in object.objectSchema.properties) {
         id obj = object[property.name];
@@ -442,18 +442,22 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             case RLMPropertyTypeArray:
                 sub = [self tooltipForArray:obj withMaxDepth:0];
                 break;
-            case RLMPropertyTypeObject:
-                sub = [self tooltipForObject:obj withMaxDepth:depth - 1];
+            case RLMPropertyTypeObject: {
+                NSString *description = [self tooltipForObject:obj withMaxDepth:depth - 1];
+                sub = [description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
+                
                 break;
+            }
             default:
                 sub = [self printablePropertyValue:obj ofType:property.type];
+
                 if (property.type == RLMPropertyTypeString && sub.length > kMaxNumberOfInlineStringCharsForTooltip) {
                     sub = [sub substringToIndex:kMaxNumberOfInlineStringCharsForTooltip];
                     sub = [sub stringByAppendingString:@"..."];
                 }
                 break;
         }
-        
+
         [string appendFormat:@"\t%@ = %@\n", property.name, sub];
     }
     
@@ -480,8 +484,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         NSString *sub = [self tooltipForObject:obj withMaxDepth:depth - 1];
         
         // Indent child objects
-        NSString *objDescription = [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
-        [string appendFormat:@"\t[%lu] %@\n", index++, objDescription];
+        NSString *description = [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
+        [string appendFormat:@"\t[%lu] %@\n", index++, description];
         if (index >= maxObjects) {
             skipped = array.count - maxObjects;
             break;
