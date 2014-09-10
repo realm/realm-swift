@@ -36,6 +36,15 @@
 
 @end
 
+@interface AllIntSizesObject : RLMObject
+// int8_t not supported due to being ambiguous with BOOL
+
+@property int16_t int16;
+@property int32_t int32;
+@property int64_t int64;
+
+@end
+
 @interface FloatObject : RLMObject
 
 @property float floatCol;
@@ -235,3 +244,11 @@ RLM_ARRAY_TYPE(CircleObject);
 @property NSDate *dateCol;
 
 @end
+
+
+@interface PrimaryStringObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
+@end
+
+

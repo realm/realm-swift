@@ -130,9 +130,9 @@
 
     [realm beginWriteTransaction];
     [array.array replaceObjectAtIndex:0 withObject:obj3];
-    XCTAssertEqualObjects([array.array objectAtIndex:0], obj3, @"Objects should be replaced");
+    XCTAssertTrue([[array.array objectAtIndex:0] isEqualToObject:obj3], @"Objects should be replaced");
     array.array[0] = obj1;
-    XCTAssertEqualObjects([array.array objectAtIndex:0], obj1, @"Objects should be replaced");
+    XCTAssertTrue([obj1 isEqualToObject:[array.array objectAtIndex:0]], @"Objects should be replaced");
     [array.array removeLastObject];
     XCTAssertEqual(array.array.count, (NSUInteger)2, @"2 objects left");
     [array.array addObject:obj1];

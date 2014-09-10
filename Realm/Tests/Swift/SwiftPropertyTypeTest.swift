@@ -48,4 +48,56 @@ class SwiftPropertyTypeTest: SwiftTestCase {
         
         XCTAssertEqual((objects[0] as SwiftIntObject).intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
+
+    func testIntSizes() {
+        let realm = realmWithTestPath()
+
+        let v16 = Int16(1) << 12
+        let v32 = Int32(1) << 30
+        // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
+        let v64 = Int64(1) << 40
+        realm.transactionWithBlock() {
+            let obj = SwiftAllIntSizesObject()
+
+            obj.int16 = v16
+            XCTAssertEqual(obj.int16, v16)
+            obj.int32 = v32
+            XCTAssertEqual(obj.int32, v32)
+            obj.int64 = v64
+            XCTAssertEqual(obj.int64, v64)
+
+            realm.addObject(obj)
+        }
+
+        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0]! as SwiftAllIntSizesObject
+        XCTAssertEqual(obj.int16, v16)
+        XCTAssertEqual(obj.int32, v32)
+        XCTAssertEqual(obj.int64, v64)
+    }
+
+    func testIntSizes_objc() {
+        let realm = realmWithTestPath()
+
+        let v16 = Int16(1) << 12
+        let v32 = Int32(1) << 30
+        // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
+        let v64 = Int64(1) << 40
+        realm.transactionWithBlock() {
+            let obj = AllIntSizesObject()
+
+            obj.int16 = v16
+            XCTAssertEqual(obj.int16, v16)
+            obj.int32 = v32
+            XCTAssertEqual(obj.int32, v32)
+            obj.int64 = v64
+            XCTAssertEqual(obj.int64, v64)
+
+            realm.addObject(obj)
+        }
+
+        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0]! as AllIntSizesObject
+        XCTAssertEqual(obj.int16, v16)
+        XCTAssertEqual(obj.int32, v32)
+        XCTAssertEqual(obj.int64, v64)
+    }
 }

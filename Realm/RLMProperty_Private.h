@@ -22,14 +22,10 @@
 // private property interface
 @interface RLMProperty ()
 
-// creates an RLMProperty object from a runtime property
-+(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
-                              attributes:(RLMPropertyAttributes)attributes;
-
 - (instancetype)initWithName:(NSString *)name
-                        type:(RLMPropertyType)type
-             objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
+                  attributes:(RLMPropertyAttributes)attributes
+               attributeList:(objc_property_attribute_t *)attrs
+              attributeCount:(unsigned int)attrCount;
 
 // private setters
 @property (nonatomic, assign) NSUInteger column;
@@ -42,6 +38,7 @@
 @property (nonatomic, copy) NSString *getterName;
 @property (nonatomic, copy) NSString *setterName;
 @property (nonatomic, copy) NSString *objectClassName;
+@property (nonatomic, assign) BOOL isPrimary;
 
 @end
 

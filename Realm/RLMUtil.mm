@@ -29,9 +29,11 @@ static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
     const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
-    return (strcmp(data_type, @encode(int)) == 0 ||
+    return (strcmp(data_type, @encode(short)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned short)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0);
@@ -58,9 +60,11 @@ static inline bool nsnumber_is_like_float(NSNumber *obj)
     const char *data_type = [obj objCType];
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(short)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned short)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0 ||
@@ -74,9 +78,11 @@ static inline bool nsnumber_is_like_double(NSNumber *obj)
     // FIXME: Performance optimization - don't use strcmp, use first char in data_type.
     return (strcmp(data_type, @encode(double)) == 0 ||
             strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(short)) == 0 ||
             strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned short)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0);

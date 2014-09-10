@@ -9,6 +9,11 @@
 
 ### Enhancements
 
+* Support for primary key properties (for int and string columns). Declaring a property
+  to be the primary key ensures uniqueness for that property for all objects of a given type.
+  At the moment indexes on primary keys are not yet supported but this will be added in a future
+  release.
+* Added methods to update or insert (upsert) for objects with primary keys defined.
 * `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
   any object type with kvc properties.
 * Improve performance when getting the count of items matching a query but not
@@ -21,11 +26,15 @@
 * Add an automatic check for updates when using Realm in a simulator (the
   checker code is not compiled into device builds). This can be disabled by
   setting the REALM_DISABLE_UPDATE_CHECKER environment variable to any value.
+* Add support for Int16 and Int64 properties in Swift classes.
 
 ### Bugfixes
 
 * Realm change notifications when beginning a write transaction are now sent
   after updating rather than before, to match refresh.
+* `-isEqual:` now uses the default `NSObject` implementation unless a primary key
+  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls 
+  `-isEqualToObject:` and a corresponding implementation for `-hash` is also implemented.
 
 0.84.0 Release notes (2014-08-28)
 =============================================================
