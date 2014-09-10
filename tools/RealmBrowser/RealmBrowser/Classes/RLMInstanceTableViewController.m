@@ -432,26 +432,28 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return [object.objectSchema.className stringByAppendingString:@"(...)"];
     }
     
-    NSString *baseClassName = object.objectSchema.className;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@\n", baseClassName];
-    RLMObjectSchema *objectSchema = object.realm.schema[baseClassName];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@\n", object.objectSchema.className];
     
-    for (RLMProperty *property in objectSchema.properties) {
+    for (RLMProperty *property in object.objectSchema.properties) {
         id obj = object[property.name];
         NSString *sub;
-        if ([obj isKindOfClass:[RLMArray class]]) {
-            sub = [self tooltipForArray:obj withMaxDepth:0];
+        
+        switch (property.type) {
+            case RLMPropertyTypeArray:
+                sub = [self tooltipForArray:obj withMaxDepth:0];
+                break;
+            case RLMPropertyTypeObject:
+                sub = [self tooltipForObject:obj withMaxDepth:depth - 1];
+                break;
+            default:
+                sub = [self printablePropertyValue:obj ofType:property.type];
+                if (property.type == RLMPropertyTypeString && sub.length > kMaxNumberOfInlineStringCharsForTooltip) {
+                    sub = [sub substringToIndex:kMaxNumberOfInlineStringCharsForTooltip];
+                    sub = [sub stringByAppendingString:@"..."];
+                }
+                break;
         }
-        else if ([obj isKindOfClass:[RLMObject class]]) {
-            sub = [self tooltipForObject:obj withMaxDepth:depth - 1];
-        }
-        else {
-            sub = [self printablePropertyValue:obj ofType:property.type];
-            if (property.type == RLMPropertyTypeString && sub.length > kMaxNumberOfInlineStringCharsForTooltip) {
-                sub = [sub substringToIndex:kMaxNumberOfInlineStringCharsForTooltip];
-                sub = [sub stringByAppendingString:@"..."];
-            }
-        }
+        
         [mString appendFormat:@"\t%@ = %@\n", property.name, sub];
     }
     
@@ -491,11 +493,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [mString deleteCharactersInRange:NSMakeRange(mString.length - 1, 1)];
     }
     if (skipped) {
-        [mString appendFormat:@"\n\t\t+%lu more", skipped];
+        [mString appendFormat:@"\n\t+%lu more", skipped];
     }
     [mString appendFormat:@"\n"];
     
-    return [NSString stringWithString:mString];
+    return mString;
 }
 
 
