@@ -432,7 +432,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return [object.objectSchema.className stringByAppendingString:@"(...)"];
     }
     
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@\n", object.objectSchema.className];
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@\n", object.objectSchema.className];
     
     for (RLMProperty *property in object.objectSchema.properties) {
         id obj = object[property.name];
@@ -454,10 +454,10 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
                 break;
         }
         
-        [mString appendFormat:@"\t%@ = %@\n", property.name, sub];
+        [string appendFormat:@"\t%@ = %@\n", property.name, sub];
     }
     
-    return [NSString stringWithString:mString];
+    return string;
 }
 
 - (NSString *)tooltipForArray:(RLMArray *)array withMaxDepth:(NSUInteger)depth
@@ -467,12 +467,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
     
     const NSUInteger maxObjects = 3;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@[%lu]", array.objectClassName, array.count];
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@[%lu]", array.objectClassName, array.count];
     
     if (array.count == 0) {
-        return mString;
+        return string;
     }
-    [mString appendString:@":\n"];
+    [string appendString:@":\n"];
     
     NSUInteger index = 0;
     NSUInteger skipped = 0;
@@ -481,7 +481,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         
         // Indent child objects
         NSString *objDescription = [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"];
-        [mString appendFormat:@"\t[%lu] %@\n", index++, objDescription];
+        [string appendFormat:@"\t[%lu] %@\n", index++, objDescription];
         if (index >= maxObjects) {
             skipped = array.count - maxObjects;
             break;
@@ -490,14 +490,14 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     // Remove last comma and newline characters
     if (array.count > 0) {
-        [mString deleteCharactersInRange:NSMakeRange(mString.length - 1, 1)];
+        [string deleteCharactersInRange:NSMakeRange(string.length - 1, 1)];
     }
     if (skipped) {
-        [mString appendFormat:@"\n\t+%lu more", skipped];
+        [string appendFormat:@"\n\t+%lu more", skipped];
     }
-    [mString appendFormat:@"\n"];
+    [string appendFormat:@"\n"];
     
-    return mString;
+    return string;
 }
 
 
