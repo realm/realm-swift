@@ -12,6 +12,7 @@
 		221322FA19954AB100D25737 /* RLMImageTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 221322F919954AB100D25737 /* RLMImageTableCellView.m */; };
 		221322FD19954B0A00D25737 /* RLMTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 221322FC19954B0A00D25737 /* RLMTableCellView.m */; };
 		2249D9B219A62EBD00A31104 /* RLMTableColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 2249D9B119A62EBD00A31104 /* RLMTableColumn.m */; };
+		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
 		22976CD819A73E5600B81D13 /* NSFont+Standard.m in Sources */ = {isa = PBXBuildFile; fileRef = 22976CD719A73E5600B81D13 /* NSFont+Standard.m */; };
 		22D28EA71993AAAB00497FD3 /* RLMNumberTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */; };
 		22E4737219924CF700EEF7C9 /* RLMBasicTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E4737119924CF700EEF7C9 /* RLMBasicTableCellView.m */; };
@@ -122,6 +123,8 @@
 		221322FC19954B0A00D25737 /* RLMTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTableCellView.m; path = Classes/RLMTableCellView.m; sourceTree = "<group>"; };
 		2249D9B019A62EBD00A31104 /* RLMTableColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTableColumn.h; path = Classes/RLMTableColumn.h; sourceTree = "<group>"; };
 		2249D9B119A62EBD00A31104 /* RLMTableColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTableColumn.m; path = Classes/RLMTableColumn.m; sourceTree = "<group>"; };
+		225AAFEA19C09E520023B595 /* RLMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTextField.h; path = Classes/RLMTextField.h; sourceTree = "<group>"; };
+		225AAFEB19C09E520023B595 /* RLMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTextField.m; path = Classes/RLMTextField.m; sourceTree = "<group>"; };
 		22976CD619A73E5600B81D13 /* NSFont+Standard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSFont+Standard.h"; path = "Classes/NSFont+Standard.h"; sourceTree = "<group>"; };
 		22976CD719A73E5600B81D13 /* NSFont+Standard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSFont+Standard.m"; path = "Classes/NSFont+Standard.m"; sourceTree = "<group>"; };
 		22D28EA51993AAAB00497FD3 /* RLMNumberTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNumberTableCellView.h; path = Classes/RLMNumberTableCellView.h; sourceTree = "<group>"; };
@@ -343,6 +346,8 @@
 				22E473781992562400EEF7C9 /* RLMBoolTableCellView.m */,
 				221322F819954AB100D25737 /* RLMImageTableCellView.h */,
 				221322F919954AB100D25737 /* RLMImageTableCellView.m */,
+				225AAFEA19C09E520023B595 /* RLMTextField.h */,
+				225AAFEB19C09E520023B595 /* RLMTextField.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -616,6 +621,7 @@
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
 				84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */,
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
+				225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClassProperty.m in Sources */,
 				22976CD819A73E5600B81D13 /* NSFont+Standard.m in Sources */,
 				221322FD19954B0A00D25737 /* RLMTableCellView.m in Sources */,

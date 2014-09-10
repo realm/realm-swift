@@ -141,6 +141,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     }
 }
 
+#pragma mark - RLMTextField Delegate
+
+-(void)textFieldCancelledEditing:(RLMTextField *)textField
+{
+    NSLog(@"resignFirstResponder: %@", textField.stringValue);
+}
+
 #pragma mark - NSTableView Data Source
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -282,7 +289,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeObject:
         case RLMPropertyTypeString: {
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
-            
+            basicCellView.textField.delegate = self;
+
             NSString *formattedText = [self printablePropertyValue:propertyValue ofType:type];
             basicCellView.textField.stringValue = formattedText;
             
@@ -978,11 +986,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)disableLinkCursor
 {
-    if (linkCursorDisplaying) {
-        [NSCursor pop];
-        
-        linkCursorDisplaying = NO;
+    if (!linkCursorDisplaying) {
+        return;
     }
+    
+    [NSCursor pop];
+    linkCursorDisplaying = NO;
 }
 
 #pragma mark - Private Methods - Setters/Getters

@@ -238,7 +238,7 @@
                                                                     <rect key="frame" x="248" y="1" width="100" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93e-Tp-EKj">
+                                                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="93e-Tp-EKj" customClass="RLMTextField">
                                                                             <rect key="frame" x="3" y="3" width="86" height="17"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="left" title="basic" id="qpt-2p-N69">
                                                                                 <font key="font" metaFont="system"/>
