@@ -275,13 +275,10 @@
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lDM-i2-eT3">
                                                                             <rect key="frame" x="3" y="3" width="86" height="17"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" title="index" id="Iwz-HM-iW2">
-                                                                                <font key="font" metaFont="system"/>
+                                                                            <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" title="index" usesSingleLineMode="YES" id="Iwz-HM-iW2">
+                                                                                <font key="font" metaFont="smallSystem"/>
                                                                                 <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                                <connections>
-                                                                                    <action selector="editedTextField:" target="X01-Pz-1Ve" id="YtJ-4k-SQn"/>
-                                                                                </connections>
                                                                             </textFieldCell>
                                                                         </textField>
                                                                     </subviews>

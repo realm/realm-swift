@@ -266,6 +266,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeDouble: {
             RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
             numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            numberCellView.textField.delegate = self;
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
             numberCellView.textField.editable = !self.realmIsLocked;
@@ -323,7 +324,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
-            numberFormatter.minimumFractionDigits = 3;
+            numberFormatter.minimumFractionDigits = propertyType == RLMPropertyTypeInt ? 0 : 3;
             numberFormatter.maximumFractionDigits = 3;
             numberFormatter.allowsFloats = propertyType != RLMPropertyTypeInt;
             
@@ -760,6 +761,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 }
 
 #pragma mark - Public Methods - NSTableView Event Handling
+
+
 
 - (IBAction)editedTextField:(NSTextField *)sender {
     NSInteger row = [self.tableView rowForView:sender];
