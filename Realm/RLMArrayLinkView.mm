@@ -38,6 +38,7 @@
     RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initViewWithObjectClassName:objectClassName];
     ar->_backingLinkView = view;
     ar->_realm = realm;
+
     return ar;
 }
 

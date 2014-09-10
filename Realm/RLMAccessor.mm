@@ -52,22 +52,20 @@ static inline long long RLMGetLong(__unsafe_unretained RLMObject *obj, NSUIntege
     RLMVerifyAttached(obj);
     return obj->_row.get_int(colIndex);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, long long val) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_int(colIndex, val);
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, long long val) {
+    row.set_int(colIndex, val);
 }
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *propName, long long val) {
-    RLMVerifyInWriteTransaction(obj);
-    size_t row = obj->_row.get_table()->find_first_int(colIndex, val);
-    if (row == obj->_row.get_index()) {
+static inline void RLMSetValueUnique(tightdb::Row &row, NSUInteger colIndex, NSString *propName, long long val) {
+    size_t index = row.get_table()->find_first_int(colIndex, val);
+    if (index == row.get_index()) {
         return;
     }
-    if (row != tightdb::not_found) {
+    if (index != tightdb::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%lld' for property '%@'",
                             val, propName];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    obj->_row.set_int(colIndex, val);
+    row.set_int(colIndex, val);
 }
 
 // float getter/setter
@@ -75,9 +73,8 @@ static inline float RLMGetFloat(__unsafe_unretained RLMObject *obj, NSUInteger c
     RLMVerifyAttached(obj);
     return obj->_row.get_float(colIndex);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, float val) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_float(colIndex, val);
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, float val) {
+    row.set_float(colIndex, val);
 }
 
 // double getter/setter
@@ -85,9 +82,8 @@ static inline double RLMGetDouble(__unsafe_unretained RLMObject *obj, NSUInteger
     RLMVerifyAttached(obj);
     return obj->_row.get_double(colIndex);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, double val) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_double(colIndex, val);
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, double val) {
+    row.set_double(colIndex, val);
 }
 
 // bool getter/setter
@@ -95,9 +91,8 @@ static inline bool RLMGetBool(__unsafe_unretained RLMObject *obj, NSUInteger col
     RLMVerifyAttached(obj);
     return obj->_row.get_bool(colIndex);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, bool val) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_bool(colIndex, val);
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, bool val) {
+    row.set_bool(colIndex, val);
 }
 
 // string getter/setter
@@ -105,24 +100,22 @@ static inline NSString *RLMGetString(__unsafe_unretained RLMObject *obj, NSUInte
     RLMVerifyAttached(obj);
     return RLMStringDataToNSString(obj->_row.get_string(colIndex));
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSString *val) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, __unsafe_unretained NSString *val) {
+    row.set_string(colIndex, RLMStringDataWithNSString(val));
 }
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *propName,
+static inline void RLMSetValueUnique(tightdb::Row &row, NSUInteger colIndex, NSString *propName,
                                       __unsafe_unretained NSString *val) {
-    RLMVerifyInWriteTransaction(obj);
     tightdb::StringData str = RLMStringDataWithNSString(val);
-    size_t row = obj->_row.get_table()->find_first_string(colIndex, str);
-    if (row == obj->_row.get_index()) {
+    size_t index = row.get_table()->find_first_string(colIndex, str);
+    if (index == row.get_index()) {
         return;
     }
-    if (row != tightdb::not_found) {
+    if (index != tightdb::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'",
                             val, propName];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    obj->_row.set_string(colIndex, str);
+    row.set_string(colIndex, str);
 }
 
 // date getter/setter
@@ -131,10 +124,9 @@ static inline NSDate *RLMGetDate(__unsafe_unretained RLMObject *obj, NSUInteger 
     tightdb::DateTime dt = obj->_row.get_datetime(colIndex);
     return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSDate *date) {
-    RLMVerifyInWriteTransaction(obj);
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, __unsafe_unretained NSDate *date) {
     std::time_t time = date.timeIntervalSince1970;
-    obj->_row.set_datetime(colIndex, tightdb::DateTime(time));
+    row.set_datetime(colIndex, tightdb::DateTime(time));
 }
 
 // data getter/setter
@@ -143,9 +135,8 @@ static inline NSData *RLMGetData(__unsafe_unretained RLMObject *obj, NSUInteger 
     tightdb::BinaryData data = obj->_row.get_binary(colIndex);
     return [NSData dataWithBytes:data.data() length:data.size()];
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSData *data) {
-    RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger colIndex, __unsafe_unretained NSData *data) {
+    row.set_binary(colIndex, RLMBinaryDataForNSData(data));
 }
 
 // link getter/setter
@@ -158,27 +149,24 @@ static inline RLMObject *RLMGetLink(__unsafe_unretained RLMObject *obj, NSUInteg
     NSUInteger index = obj->_row.get_link(colIndex);
     return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained RLMObject *val, bool tryUpdate = false) {
-    RLMVerifyInWriteTransaction(obj);
-
+static inline void RLMSetValue(RLMRealm *realm, tightdb::Row &row, NSUInteger colIndex, __unsafe_unretained RLMObject *val, bool tryUpdate = false) {
     if (!val || (id)val == NSNull.null) {
         // if null
-        obj->_row.nullify_link(colIndex);
+        row.nullify_link(colIndex);
     }
     else {
         // add to Realm if not in it.
-        RLMObject *link = val;
-        if (link.realm != obj.realm) {
+        if (val.realm != realm) {
             // only try to update if link object has primary key
-            if (tryUpdate && link.objectSchema.primaryKeyProperty) {
-                [obj.realm addOrUpdateObject:link];
+            if (tryUpdate && val.objectSchema.primaryKeyProperty) {
+                [realm addOrUpdateObject:val];
             }
             else {
-                [obj.realm addObject:link];
+                [realm addObject:val];
             }
         }
         // set link
-        obj->_row.set_link(colIndex, link->_row.get_index());
+        row.set_link(colIndex, val->_row.get_index());
     }
 }
 
@@ -187,27 +175,24 @@ static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObject *obj, NSUInteg
     RLMVerifyAttached(obj);
 
     tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
-    RLMArrayLinkView *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
-                                                                 view:linkView
-                                                                realm:obj.realm];
-    return ar;
+    return [RLMArrayLinkView arrayWithObjectClassName:objectClassName
+                                                 view:linkView
+                                                realm:obj.realm];
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained id<NSFastEnumeration> val, bool tryUpdate = false) {
-    RLMVerifyInWriteTransaction(obj);
-
-    tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
+static inline void RLMSetValue(RLMRealm *realm, tightdb::Row &row, NSUInteger colIndex, __unsafe_unretained id<NSFastEnumeration> val, bool tryUpdate = false) {
+    tightdb::LinkViewRef linkView = row.get_linklist(colIndex);
     // remove all old
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
     for (RLMObject *link in val) {
         // add to realm if needed
-        if (link.realm != obj.realm) {
+        if (link.realm != realm) {
             // only try to update if link object has primary key
             if (tryUpdate && link.objectSchema.primaryKeyProperty) {
-                [obj.realm addOrUpdateObject:link];
+                [realm addOrUpdateObject:link];
             }
             else {
-                [obj.realm addObject:link];
+                [realm addObject:link];
             }
         }
         // set in link view
@@ -235,8 +220,7 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObject *obj, NSUIntege
             return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
         case RLMPropertyTypeData: {
             tightdb::BinaryData bd = mixed.get_binary();
-            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
-            return d;
+            return [NSData dataWithBytes:bd.data() length:bd.size()];
         }
         case RLMPropertyTypeArray:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
@@ -249,24 +233,22 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObject *obj, NSUIntege
         }
     }
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger col_ndx, __unsafe_unretained id val) {
-    RLMVerifyInWriteTransaction(obj);
-
+static inline void RLMSetValue(RLMRealm *, tightdb::Row &row, NSUInteger col_ndx, __unsafe_unretained id val) {
     // FIXME - enable when Any supports links
     //    if (obj == nil) {
     //        table.nullify_link(col_ndx, row_ndx);
     //        return;
     //    }
     if (NSString *str = RLMDynamicCast<NSString>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMStringDataWithNSString(str));
+        row.set_mixed(col_ndx, RLMStringDataWithNSString(str));
         return;
     }
     if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, tightdb::DateTime(time_t([date timeIntervalSince1970])));
+        row.set_mixed(col_ndx, tightdb::DateTime(time_t([date timeIntervalSince1970])));
         return;
     }
     if (NSData *data = RLMDynamicCast<NSData>(val)) {
-        obj->_row.set_mixed(col_ndx, RLMBinaryDataForNSData(data));
+        row.set_mixed(col_ndx, RLMBinaryDataForNSData(data));
         return;
     }
     if (NSNumber *number = RLMDynamicCast<NSNumber>(val)) {
@@ -275,17 +257,17 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
             case 's':
             case 'l':
             case 'q':
-                obj->_row.set_mixed(col_ndx, number.longLongValue);
+                row.set_mixed(col_ndx, number.longLongValue);
                 return;
             case 'f':
-                obj->_row.set_mixed(col_ndx, number.floatValue);
+                row.set_mixed(col_ndx, number.floatValue);
                 return;
             case 'd':
-                obj->_row.set_mixed(col_ndx, number.doubleValue);
+                row.set_mixed(col_ndx, number.doubleValue);
                 return;
             case 'B':
             case 'c':
-                obj->_row.set_mixed(col_ndx, (bool)number.boolValue);
+                row.set_mixed(col_ndx, (bool)number.boolValue);
                 return;
         }
     }
@@ -364,7 +346,8 @@ static IMP RLMMakeSetter(NSUInteger colIndex, bool isPrimary) {
         });
     }
     return imp_implementationWithBlock(^(RLMObject *obj, ArgType val) {
-        RLMSetValue(obj, colIndex, static_cast<StorageType>(val));
+        RLMVerifyInWriteTransaction(obj);
+        RLMSetValue(obj->_realm, obj->_row, colIndex, static_cast<StorageType>(val));
     });
 }
 
@@ -604,11 +587,11 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
-    RLMDynamicSet(obj, prop, val, prop.isPrimary, false);
+    RLMDynamicSet(obj->_realm, obj->_row, prop, val, prop.isPrimary, false);
 }
 
-void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val,
-                   bool enforceUnique, bool tryUpdate) {
+void RLMDynamicSet(RLMRealm *realm, tightdb::Row &row, __unsafe_unretained RLMProperty *prop,
+                   __unsafe_unretained id val, bool enforceUnique, bool tryUpdate) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case 's':
@@ -616,44 +599,44 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
         case 'l':
         case 'q':
             if (enforceUnique) {
-                RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
+                RLMSetValueUnique(row, col, prop.name, [val longLongValue]);
             }
             else {
-                RLMSetValue(obj, col, [val longLongValue]);
+                RLMSetValue(realm, row, col, [val longLongValue]);
             }
             break;
         case 'f':
-            RLMSetValue(obj, col, [val floatValue]);
+            RLMSetValue(realm, row, col, [val floatValue]);
             break;
         case 'd':
-            RLMSetValue(obj, col, [val doubleValue]);
+            RLMSetValue(realm, row, col, [val doubleValue]);
             break;
         case 'B':
         case 'c':
-            RLMSetValue(obj, col, (bool)[val boolValue]);
+            RLMSetValue(realm, row, col, (bool)[val boolValue]);
             break;
         case 'S':
             if (enforceUnique) {
-                RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
+                RLMSetValueUnique(row, col, prop.name, (NSString *)val);
             }
             else {
-                RLMSetValue(obj, col, (NSString *)val);
+                RLMSetValue(realm, row, col, (NSString *)val);
             }
             break;
         case 'a':
-            RLMSetValue(obj, col, (NSDate *)val);
+            RLMSetValue(realm, row, col, (NSDate *)val);
             break;
         case 'e':
-            RLMSetValue(obj, col, (NSData *)val);
+            RLMSetValue(realm, row, col, (NSData *)val);
             break;
         case 'k':
-            RLMSetValue(obj, col, (RLMObject *)val, tryUpdate);
+            RLMSetValue(realm, row, col, (RLMObject *)val, tryUpdate);
             break;
         case 't':
-            RLMSetValue(obj, col, (RLMArray *)val, tryUpdate);
+            RLMSetValue(realm, row, col, (RLMArray *)val, tryUpdate);
             break;
         case '@':
-            RLMSetValue(obj, col, val);
+            RLMSetValue(realm, row, col, val);
             break;
         default:
             @throw [NSException exceptionWithName:@"RLMException"

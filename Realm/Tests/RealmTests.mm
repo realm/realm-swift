@@ -151,6 +151,112 @@
     XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
 }
 
+- (void)testCopyObjectsBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"value";
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:so];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(realm1, so.realm);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm2].count);
+    XCTAssertEqualObjects(so.stringCol, @"value");
+
+    [realm2 beginWriteTransaction];
+    [realm2 addObject:so];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(realm2, so.realm);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm2].count);
+    XCTAssertEqualObjects(so.stringCol, @"value");
+}
+
+- (void)testCopyArrayPropertyBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    EmployeeObject *eo = [[EmployeeObject alloc] init];
+    eo.name = @"name";
+    eo.age = 50;
+    eo.hired = YES;
+
+    CompanyObject *co = [[CompanyObject alloc] init];
+    co.name = @"company name";
+    [co.employees addObject:eo];
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:co];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(realm1, eo.realm);
+    XCTAssertEqual(realm1, co.realm);
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
+
+    [realm2 beginWriteTransaction];
+    [realm2 addObject:co];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(realm1, eo.realm);
+    XCTAssertEqual(realm2, co.realm);
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm2].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm2].count);
+
+    XCTAssertEqualObjects(@"name", [co.employees.firstObject name]);
+
+    [realm2 beginWriteTransaction];
+    [co.employees addObject:eo];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(realm2, eo.realm);
+    XCTAssertEqual(realm2, co.realm);
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(2U, [EmployeeObject allObjectsInRealm:realm2].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm2].count);
+
+    XCTAssertEqualObjects(@"name", [co.employees.firstObject name]);
+    XCTAssertEqualObjects(@"name", [co.employees.lastObject name]);
+}
+
+- (void)testCopyLinksBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    CircleObject *c = [[CircleObject alloc] init];
+    c.data = @"1";
+    c.next = [[CircleObject alloc] init];
+    c.next.data = @"2";
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:c];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(realm1, c.realm);
+    XCTAssertEqual(realm1, c.next.realm);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm1].count);
+
+    [realm2 beginWriteTransaction];
+    [realm2 addObject:c];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqualObjects(c.data, @"1");
+    XCTAssertEqualObjects(c.next.data, @"2");
+
+    XCTAssertEqual(realm2, c.realm);
+    XCTAssertEqual(realm2, c.next.realm);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm2].count);
+}
+
 - (void)testRealmTransactionBlock {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{

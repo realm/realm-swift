@@ -276,18 +276,12 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
     // set the realm and schema
     NSString *objectClassName = [object.class className];
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    object.objectSchema = schema;
-    object.realm = realm;
-
-    // _row may already be attached to a different table if the object was
-    // already in another realm, and setting it to the new table doesn't
-    // automatically detach it
-    object->_row.detach();
 
     // get or create row
     bool created;
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, update, created)];
+    size_t rowIndex = RLMCreateOrGetRowForObject(schema, primaryGetter, update, created);
+    tightdb::Row row = (*schema->_table)[rowIndex];
 
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
@@ -308,9 +302,20 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, prop.isPrimary, update);
+            RLMDynamicSet(realm, row, prop, value, prop.isPrimary, update);
         }
     }
+
+    // FIXME: once we update to the next core release detaching will be done
+    // automatically when new row accessor is assigned
+    object->_row.detach();
+
+    // set object properties now that we're done reading the old values
+    object.objectSchema = schema;
+    object.realm = realm;
+
+    // FIXME: not just assigning from `row` to work around https://github.com/Tightdb/tightdb/pull/534
+    object->_row = (*schema->_table)[rowIndex];
 
     // switch class to use table backed accessor
     object_setClass(object, schema.accessorClass);
@@ -341,7 +346,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary, update);
+                RLMDynamicSet(object->_realm, object->_row, (RLMProperty *)prop, array[i], prop.isPrimary, update);
             }
         }
     }
@@ -358,7 +363,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         for (RLMProperty *prop in objectSchema.properties) {
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary, update);
+                RLMDynamicSet(object->_realm, object->_row, prop, dict[prop.name], prop.isPrimary, update);
             }
         }
     }
