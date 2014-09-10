@@ -145,7 +145,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 -(void)textFieldCancelledEditing:(RLMTextField *)textField
 {
-    NSLog(@"resignFirstResponder: %@", textField.stringValue);
+    [self.tableView reloadData];
 }
 
 #pragma mark - NSTableView Data Source

@@ -15,11 +15,10 @@
     [super awakeFromNib];
 }
 
--(BOOL)resignFirstResponder
+-(void)cancelOperation:(id)sender
 {
+    [self abortEditing];
     [self.realmDelegate textFieldCancelledEditing:self];
-    
-    return YES;
 }
 
 -(id<RLMTextFieldDelegate>)realmDelegate
