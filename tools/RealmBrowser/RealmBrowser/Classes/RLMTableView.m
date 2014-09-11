@@ -156,7 +156,7 @@
     if (!myDelegate) {
         return; // No delegate, no need to track the mouse.
     }
-    
+
     if (mouseOverView) {
         currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 		
