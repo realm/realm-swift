@@ -185,9 +185,9 @@ NSString *const kRealmFileExension = @"realm";
     // Create array of dictionaries, each corresponding to search folders
     self.groupedFileItems = @[simDict, devDict, desktopDict, documentsdDict, downloadDict, otherDict];
     
-    // Iterate through the all
+    // Iterate through all search results
     for (NSMetadataItem *fileItem in self.query.results) {
-        //Iterate through the different prefixes and add item to corresponding array within dictionary
+        // Iterate through the different prefixes and add item to corresponding array within dictionary
         for (NSDictionary *dict in self.groupedFileItems) {
             if ([[fileItem valueForAttribute:NSMetadataItemPathKey] hasPrefix:dict[kPrefix]]) {
                 NSMutableArray *items = dict[kItems];
