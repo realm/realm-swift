@@ -94,9 +94,9 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Make the default Realm in-memory only.
-
- The default Realm is persisted to disk unless this method is called.
+ Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
+ used to create this instance can be used to access the same in-memory Realm from
+ multiple threads.
 
  Because in-memory Realms are not persisted, you must be sure to hold on to a
  reference to the `RLMRealm` object returned from this for as long as you want
@@ -106,10 +106,11 @@
  `RLMObject`s, `RLMArray`s, and `RLMResults` that refer to objects persisted in a Realm have a
  strong reference to the relevant `RLMRealm`, as do `RLMNotifcationToken`s.
 
- @warning This must be called before any Realm instances are obtained. An
- exception will be thrown if a persisted default Realm already exists.
+ @param identifier  A string used to identify a particular in-memory Realm.
+
+ @return An `RLMRealm` instance.
  */
-+ (void)useInMemoryDefaultRealm;
++ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier;
 
 /**
  Path to the file where this Realm is persisted.

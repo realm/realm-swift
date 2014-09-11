@@ -122,7 +122,6 @@ inline void clearRealmCache() {
     }
 }
 
-BOOL s_useInMemoryDefaultRealm = NO;
 NSString *s_defaultRealmPath = nil;
 NSArray *s_objectDescriptors = nil;
 
@@ -145,6 +144,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // Used for both
     Group *_group;
     BOOL _readOnly;
+    BOOL _inMemory;
 }
 
 + (BOOL)isCoreDebug {
@@ -162,7 +162,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     });
 }
 
-- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error {
+- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error {
     self = [super init];
     if (self) {
         _path = path;
@@ -170,6 +170,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         _threadID = pthread_mach_thread_np(pthread_self());
         _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
+        _inMemory = inMemory;
         _autorefresh = YES;
 
         try {
@@ -177,7 +178,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 _readGroup = make_unique<Group>(path.UTF8String);
                 _group = _readGroup.get();
             }
-            else if (s_useInMemoryDefaultRealm && [path isEqualToString:[RLMRealm defaultRealmPath]]) { // Only for default realm
+            else if (inMemory) {
                 _sharedGroup = make_unique<SharedGroup>(path.UTF8String, false, SharedGroup::durability_MemOnly);
                 _group = &const_cast<Group&>(_sharedGroup->begin_read());
             }
@@ -215,13 +216,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
-
-#if !TARGET_OS_IPHONE
-        [[NSFileManager defaultManager] createDirectoryAtPath:[s_defaultRealmPath stringByDeletingLastPathComponent]
-                                  withIntermediateDirectories:YES
-                                                   attributes:nil
-                                                        error:nil];
-#endif
     });
     return s_defaultRealmPath;
 }
@@ -242,6 +236,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             identifier = [[[NSBundle mainBundle] executablePath] lastPathComponent];
         }
         path = [path stringByAppendingPathComponent:identifier];
+
+        // create directory
+        [[NSFileManager defaultManager] createDirectoryAtPath:[path stringByDeletingLastPathComponent]
+                                  withIntermediateDirectories:YES
+                                                   attributes:nil
+                                                        error:nil];
     }
 #endif
     return [path stringByAppendingPathComponent:fileName];
@@ -250,16 +250,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 + (instancetype)defaultRealm
 {
     return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
-}
-
-+ (void)useInMemoryDefaultRealm
-{
-    @synchronized(s_realmsPerPath) {
-        if (realmsAtPath([RLMRealm defaultRealmPath]).count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
-        }
-    }
-    s_useInMemoryDefaultRealm = YES;
 }
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -271,11 +261,16 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                      readOnly:(BOOL)readonly
                         error:(NSError **)outError
 {
-    return [self realmWithPath:path readOnly:readonly dynamic:NO schema:nil error:outError];
+    return [self realmWithPath:path readOnly:readonly inMemory:NO dynamic:NO schema:nil error:outError];
+}
+
++ (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier {
+    return [self realmWithPath:[RLMRealm writeablePathForFile:identifier] readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError
@@ -297,16 +292,21 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     __autoreleasing RLMRealm *realm = cachedRealm(path);
     if (realm) {
         // if already opened with different read permissions then throw
-        if (realm.isReadOnly != readonly) {
+        if (realm->_readOnly != readonly) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Realm at path already opened with different read permissions"
+                                         userInfo:@{@"path":realm.path}];
+        }
+        if (realm->_inMemory != inMemory) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Realm at path already opened with different inMemory settings"
                                          userInfo:@{@"path":realm.path}];
         }
         return realm;
     }
 
     NSError *error = nil;
-    realm = [[RLMRealm alloc] initWithPath:path readOnly:readonly error:&error];
+    realm = [[RLMRealm alloc] initWithPath:path readOnly:readonly inMemory:inMemory error:&error];
 
     if (error) {
         if (outError) {

@@ -49,13 +49,13 @@
     RLMMigration *migration = [RLMMigration new];
     
     // create rw realm to migrate with current on disk table
-    migration->_realm = [RLMRealm realmWithPath:path readOnly:NO dynamic:YES schema:nil error:error];
+    migration->_realm = [RLMRealm realmWithPath:path readOnly:NO inMemory:NO dynamic:YES schema:nil error:error];
     if (error && *error) {
         return nil;
     }
     
     // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO error:error];
+    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO inMemory:NO error:error];
     if (migration->_oldRealm) {
         RLMRealmInitializeReadOnlyWithSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
     }

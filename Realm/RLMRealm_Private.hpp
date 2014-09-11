@@ -34,7 +34,7 @@
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
-- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
+- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
