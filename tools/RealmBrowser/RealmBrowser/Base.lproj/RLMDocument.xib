@@ -22,7 +22,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="500" y="485" width="977" height="564"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
                 <rect key="frame" x="0.0" y="0.0" width="977" height="564"/>
@@ -410,7 +410,7 @@
                         </searchField>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="IBE-aS-65q"/>
-                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm" paletteLabel="Realm" tag="1" image="RealmLocked" id="L8G-EJ-A1Z">
+                    <toolbarItem implicitItemIdentifier="B1EB8F69-D4C8-4B21-B606-A54812FDD83C" explicitItemIdentifier="RealmLockItem" label="Realm" paletteLabel="Realm" toolTip="Lock realm from editing" tag="1" image="RealmUnlocked" id="L8G-EJ-A1Z">
                         <connections>
                             <action selector="userClickedLockRealm:" target="-2" id="4PX-6Z-zko"/>
                         </connections>
@@ -445,6 +445,6 @@
         <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
-        <image name="RealmLocked" width="32" height="32"/>
+        <image name="RealmUnlocked" width="32" height="32"/>
     </resources>
 </document>
