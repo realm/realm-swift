@@ -50,7 +50,7 @@
     [self.badge sizeToFit];
     CGFloat badgeWidth = self.badge.bounds.size.width;
     
-    return NSMakeSize(textWidth + badgeWidth, 20.0);
+    return NSMakeSize(textWidth + badgeWidth + 10.0f, 20.0);
 }
 
 @end

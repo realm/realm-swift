@@ -16,19 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMSwiftSupport.h"
 
-#import "RLMTypeNode.h"
-#import "RLMViewController.h"
-#import "RLMTableView.h"
+@implementation RLMSwiftSupport
 
-@class RLMRealmBrowserWindowController;
++ (BOOL)isSwiftClassName:(__unused NSString *)className {
+    return NO;
+}
 
-@interface RLMInstanceTableViewController : RLMViewController <RLMTableViewDelegate, RLMTableViewDataSource>
++ (NSArray *)propertiesForClass:(__unused Class)cls {
+    return nil;
+}
 
-@property (nonatomic, readonly) RLMTableView *realmTableView;
-
-@property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL displaysArray;
++ (NSString *)demangleClassName:(NSString *)className {
+    return className;
+}
 
 @end

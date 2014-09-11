@@ -16,19 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-#import "RLMTypeNode.h"
-#import "RLMViewController.h"
-#import "RLMTableView.h"
+#if REALM_SWIFT
+#import <Realm/Realm-Swift.h>
+#else
 
-@class RLMRealmBrowserWindowController;
+// A dummy implementation of RLMSwiftSupport for Xcode 5 to avoid ifdef sea
+@interface RLMSwiftSupport : NSObject
 
-@interface RLMInstanceTableViewController : RLMViewController <RLMTableViewDelegate, RLMTableViewDataSource>
-
-@property (nonatomic, readonly) RLMTableView *realmTableView;
-
-@property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL displaysArray;
++ (BOOL)isSwiftClassName:(NSString *)className;
++ (NSArray *)propertiesForClass:(Class)cls;
++ (NSString *)demangleClassName:(NSString *)className;
 
 @end
+
+#endif

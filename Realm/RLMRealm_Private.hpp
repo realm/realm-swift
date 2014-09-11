@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema.h"
+#import "RLMSchema_Private.h"
 #import "RLMAccessor.h"
 
 #import <tightdb/group.hpp>
@@ -32,6 +32,8 @@
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
+
+- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
@@ -42,3 +44,17 @@ inline void RLMCheckThread(RLMRealm *realm) {
                                      userInfo:nil];
     }
 }
+
+// get the table used to store object of objectClass
+static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                                       NSString *className,
+                                                       bool &created) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_or_add_table(tableName.UTF8String, &created);
+}
+static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                                       NSString *className) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_table(tableName.UTF8String);
+}
+

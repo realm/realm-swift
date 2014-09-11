@@ -72,7 +72,7 @@ xcode5() {
 }
 
 xcode6() {
-    ln -s /Applications/Xcode6-Beta6.app/Contents/Developer/usr/bin build/bin
+    ln -s /Applications/Xcode6-Beta7.app/Contents/Developer/usr/bin build/bin
     PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
@@ -177,10 +177,10 @@ case "$COMMAND" in
             echo "Using version of core already in core/ directory"
             exit 0
         fi
-        if [ -d core -a -d ../tightdb ]; then
+        if [ -d core -a -d ../tightdb -a ! -L core ]; then
           # Allow newer versions than expected for local builds as testing
           # with unreleased versions is one of the reasons to use a local build
-          if ! $(grep "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
+          if ! $(grep -i "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
               echo "Local build of core is out of date."
               exit 1
           else
@@ -190,7 +190,7 @@ case "$COMMAND" in
             echo "core is not a symlink. Deleting..."
             rm -rf core
             download_core
-        elif ! $(head -n 1 core/release_notes.txt | grep ${REALM_CORE_VERSION} >/dev/null); then
+        elif ! $(head -n 1 core/release_notes.txt | grep -i ${REALM_CORE_VERSION} >/dev/null); then
             download_core
         else
             echo "The core library seems to be up to date."
@@ -334,37 +334,33 @@ case "$COMMAND" in
     ######################################
     "examples")
         cd examples
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-            xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        fi
+        XCODE_VERSION=6
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftEncryptionExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        XCODE_VERSION=5
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        #xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
-
-        # Not all examples can be built using Xcode 6
-        if [[ "$XCODE_VERSION" != "6" ]]; then
-            xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        fi
+        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-debug")
         cd examples
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            xc "-project swift/RealmSwiftSimpleExample/RealmSwiftSimpleExample.xcodeproj -scheme RealmSwiftSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-            xc "-project swift/RealmSwiftTableViewExample/RealmSwiftTableViewExample.xcodeproj -scheme RealmSwiftTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        fi
+        XCODE_VERSION=6
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftEncryptionExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        XCODE_VERSION=5
         xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        #xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-
-        # Not all examples can be built using Xcode 6
-        if [[ "$XCODE_VERSION" != "6" ]]; then
-            xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        fi 
+        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
