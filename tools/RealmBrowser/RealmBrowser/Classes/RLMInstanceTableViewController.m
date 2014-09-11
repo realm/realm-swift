@@ -857,10 +857,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
-
-    if (self.displaysArray) {
-        column--;
-    }
     
     if (self.displaysArray) {
         column--;
