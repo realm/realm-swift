@@ -35,14 +35,14 @@ NSString *const kRealmFileExension = @"realm";
 
 @property (nonatomic, weak) IBOutlet NSMenu *fileMenu;
 @property (nonatomic, weak) IBOutlet NSMenuItem *openMenuItem;
-@property (weak) IBOutlet NSMenu *openAnyRealmMenu;
+@property (nonatomic, weak) IBOutlet NSMenu *openAnyRealmMenu;
 
-@property (nonatomic) NSDateFormatter *dateFormatter;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 
-@property (nonatomic) BOOL didLoadFile;
+@property (nonatomic, assign) BOOL didLoadFile;
 
-@property (nonatomic) NSMetadataQuery *query;
-@property (nonatomic) NSArray *groupedFileItems;
+@property (nonatomic, strong) NSMetadataQuery *query;
+@property (nonatomic, strong) NSArray *groupedFileItems;
 
 @end
 
@@ -59,7 +59,7 @@ NSString *const kRealmFileExension = @"realm";
         self.query = [[NSMetadataQuery alloc] init];
         [self.query setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemContentModificationDate ascending:NO]]];
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(kMDItemFSName like[c] %@)", @"*.realm"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.realm'"];
         [self.query setPredicate:predicate];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(queryNote:) name:nil object:self.query];
@@ -92,10 +92,11 @@ NSString *const kRealmFileExension = @"realm";
 
 #pragma mark - Event handling
 
-- (void)queryNote:(NSNotification *)note {
-    if ([[note name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
+- (void)queryNote:(NSNotification *)notification {
+    if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
         [self updateFileItems];
-    } else if ([[note name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
+    }
+    else if ([[notification name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
         [self updateFileItems];
     }
 }
