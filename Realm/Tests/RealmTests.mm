@@ -445,12 +445,11 @@
     XCTAssertTrue(notificationFired);
 }
 
-
 - (void)testInMemoryRealm
 {
     RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
 
-    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:inMemoryRealm block:^{
+    [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
         RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
         [inMemoryRealm beginWriteTransaction];
         [StringObject createInRealm:inMemoryRealm withObject:@[@"a"]];
@@ -468,7 +467,6 @@
 
     // make sure we can't open disk-realm at same path
     XCTAssertThrows([RLMRealm realmWithPath:anotherInMemoryRealm.path], @"Should throw");
-
 }
 
 - (void)testRealmFileAccess
