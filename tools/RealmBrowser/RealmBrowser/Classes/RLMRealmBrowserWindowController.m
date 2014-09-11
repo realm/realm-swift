@@ -21,8 +21,9 @@
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
-NSString * const kRealmLockedTooltip = @"Click to enable editing";
+NSString * const kRealmLockedTooltip = @"Unlock to enable editing";
 NSString * const kRealmUnlockedTooltip = @"Click to lock Realm from editing";
+NSString * const kRealmKeyLocked = @"RealmKeyLocked";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
@@ -99,8 +100,14 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (void)reloadAfterEdit
 {
-    [self.tableViewController.tableView reloadData];
     [self.outlineViewController.tableView reloadData];
+    
+    BOOL realmIsLocked = [[NSUserDefaults standardUserDefaults] boolForKey:kRealmKeyLocked];
+    self.tableViewController.realmIsLocked = realmIsLocked;
+    self.lockRealmButton.image = [NSImage imageNamed:realmIsLocked ? kRealmLockedImage : kRealmUnlockedImage];
+    self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
+
+    [self.tableViewController.tableView reloadData];
 }
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
@@ -162,14 +169,16 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (IBAction)userClickedLockRealm:(id)sender
 {
-    [self setRealmLocked:!self.tableViewController.realmIsLocked];
+    BOOL currentlyLocked = [[NSUserDefaults standardUserDefaults] boolForKey:kRealmKeyLocked];
+    [self setRealmLocked:!currentlyLocked];
 }
 
 -(void)setRealmLocked:(BOOL)locked
 {
-    self.tableViewController.realmIsLocked = locked;
-    self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
-    self.lockRealmButton.toolTip = locked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
+    [[NSUserDefaults standardUserDefaults] setBool:locked forKey:kRealmKeyLocked];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self reloadAllWindows];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
