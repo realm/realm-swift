@@ -33,7 +33,6 @@
 #import "RLMTableColumn.h"
 
 #import "NSColor+ByteSizeFactory.h"
-#import "NSFont+Standard.h"
 
 #import "objc/objc-class.h"
 
