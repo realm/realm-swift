@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if !defined(REALM_SWIFT) && (defined(__IPHONE_8_0) || defined(__MAC_10_10))
+#if !defined(REALM_SWIFT) && defined(__IPHONE_8_0) && TARGET_OS_IPHONE
 #define REALM_SWIFT 1
 #endif
 
