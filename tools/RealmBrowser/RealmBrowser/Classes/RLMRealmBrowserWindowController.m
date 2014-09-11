@@ -21,8 +21,8 @@
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
-NSString * const kRealmLockedTooltip = @"Click to unlock Realm for editing";
-NSString * const kRealmUnlockedTooltip = @"Click to enable editing";
+NSString * const kRealmLockedTooltip = @"Click to enable editing";
+NSString * const kRealmUnlockedTooltip = @"Click to lock Realm from editing";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
