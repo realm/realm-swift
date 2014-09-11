@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMLinkTableCellView.h"
+#import "NSColor+ByteSizeFactory.h"
 
-@interface NSColor (ByteSizeFactory)
+@implementation RLMLinkTableCellView
 
-+ (NSColor *)linkColor;
-
-+ (NSColor *)colorWithByteRed:(NSUInteger)red green:(NSUInteger)green blue:(NSUInteger)blue alpha:(NSUInteger)alpha;
-
-+ (NSColor *)colorWithByteWhite:(NSUInteger)white alpha:(NSUInteger)alpha;
+- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle {
+    [super setBackgroundStyle:backgroundStyle];
+    self.textField.textColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor linkColor] : [NSColor whiteColor]);
+}
 
 @end
