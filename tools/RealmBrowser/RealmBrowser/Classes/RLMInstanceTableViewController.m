@@ -809,7 +809,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         [realm commitWriteTransaction];
     }
     
-    [self.tableView reloadData];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (IBAction)editedCheckBox:(NSButton *)sender
@@ -831,6 +831,8 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
     [realm commitWriteTransaction];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)rightClickedLocation:(RLMTableLocation)location
@@ -862,10 +864,6 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         column--;
     }
     
-    if (self.displaysArray) {
-        column--;
-    }
-
     if (row == -1 || column < 0) {
         return;
     }
@@ -963,7 +961,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             [realm beginWriteTransaction];
             selectedObject[propertyNode.name] = datepicker.dateValue;
             [realm commitWriteTransaction];
-            [self.tableView reloadData];
+            [self.parentWindowController reloadAllWindows];
         }
     }
 }
@@ -998,7 +996,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)setRealmIsLocked:(BOOL)realmIsLocked
 {
     _realmIsLocked = realmIsLocked;
-    [self.tableView reloadData];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (BOOL)displaysArray
