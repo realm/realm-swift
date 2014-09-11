@@ -23,7 +23,7 @@ NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 NSString * const kRealmLockedTooltip = @"Unlock to enable editing";
 NSString * const kRealmUnlockedTooltip = @"Click to lock Realm from editing";
-NSString * const kRealmKeyLocked = @"RealmKeyLocked";
+NSString * const kRealmKeyIsLockedForRealm = @"LockedRealm:%@";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
@@ -73,11 +73,11 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         [self addNavigationState:initState fromViewController:nil];
     }
 
-    [self setRealmLocked:NO];
-    
     NSString *realmName = self.modelDocument.presentedRealm.realm.path;
     [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName]];
     [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
+    
+    [self reloadAfterEdit];
 }
 
 #pragma mark - Public methods - Accessors
@@ -102,7 +102,10 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     [self.outlineViewController.tableView reloadData];
     
-    BOOL realmIsLocked = [[NSUserDefaults standardUserDefaults] boolForKey:kRealmKeyLocked];
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+    
+    BOOL realmIsLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
     self.tableViewController.realmIsLocked = realmIsLocked;
     self.lockRealmButton.image = [NSImage imageNamed:realmIsLocked ? kRealmLockedImage : kRealmUnlockedImage];
     self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
@@ -169,13 +172,18 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (IBAction)userClickedLockRealm:(id)sender
 {
-    BOOL currentlyLocked = [[NSUserDefaults standardUserDefaults] boolForKey:kRealmKeyLocked];
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+
+    BOOL currentlyLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
     [self setRealmLocked:!currentlyLocked];
 }
 
 -(void)setRealmLocked:(BOOL)locked
 {
-    [[NSUserDefaults standardUserDefaults] setBool:locked forKey:kRealmKeyLocked];
+    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+    [[NSUserDefaults standardUserDefaults] setBool:locked forKey:key];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self reloadAllWindows];
