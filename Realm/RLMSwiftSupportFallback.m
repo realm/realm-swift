@@ -16,35 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
+#import "RLMSwiftSupport.h"
 
-@interface RealmTestClass0 : RLMObject
+@implementation RLMSwiftSupport
 
-@property NSInteger integerValue;
-@property NSString *stringValue;
-@property NSData *dataValue;
++ (BOOL)isSwiftClassName:(__unused NSString *)className {
+    return NO;
+}
 
-@end
++ (NSArray *)propertiesForClass:(__unused Class)cls {
+    return nil;
+}
 
-RLM_ARRAY_TYPE(RealmTestClass0)
-
-@interface RealmTestClass1 : RLMObject
-
-@property NSInteger integerValue;
-@property BOOL boolValue;
-@property float floatValue;
-@property double doubleValue;
-@property NSString *stringValue;
-@property NSDate *dateValue;
-@property RLMArray<RealmTestClass0> *arrayReference;
-
-@end
-
-@interface RealmTestClass2 : RLMObject
-
-@property NSInteger integerValue;
-@property BOOL boolValue;
-@property RealmTestClass1 *objectReference;
++ (NSString *)demangleClassName:(NSString *)className {
+    return className;
+}
 
 @end

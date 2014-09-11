@@ -1212,17 +1212,17 @@
     }
     [realm commitWriteTransaction];
 
-    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"data = '4'"].firstObject);
-    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.data = '3'"].firstObject);
-    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.data = '2'"].firstObject);
-    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '1'"].firstObject);
-    XCTAssertEqualObjects(circle, [CircleObject objectsInRealm:realm where:@"next.next.next.next.data = '0'"].firstObject);
-    XCTAssertEqualObjects(circle.next, [CircleObject objectsInRealm:realm where:@"next.next.next.data = '0'"].firstObject);
-    XCTAssertEqualObjects(circle.next.next, [CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject);
+    XCTAssertTrue([circle isEqualToObject:[CircleObject objectsInRealm:realm where:@"data = '4'"].firstObject]);
+    XCTAssertTrue([circle isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.data = '3'"].firstObject]);
+    XCTAssertTrue([circle isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.data = '2'"].firstObject]);
+    XCTAssertTrue([circle isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.next.data = '1'"].firstObject]);
+    XCTAssertTrue([circle isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.next.next.data = '0'"].firstObject]);
+    XCTAssertTrue([circle.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.next.data = '0'"].firstObject]);
+    XCTAssertTrue([circle.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next.data = '0'"].firstObject]);
 
     XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
     XCTAssertThrows(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
-    XCTAssertEqualObjects(circle.next.next.next.next, [CircleObject objectsInRealm:realm where:@"next = nil"].firstObject);
+    XCTAssertTrue([circle.next.next.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next = nil"].firstObject]);
 }
 
 - (void)testArrayMultiLevelLinkQuery

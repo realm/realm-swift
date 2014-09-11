@@ -68,17 +68,17 @@ class TableViewController: UITableViewController {
         return Int(array.count)
     }
 
-    override func tableView(tableView: UITableView?, cellForRowAtIndexPath indexPath: NSIndexPath?) -> UITableViewCell? {
-        let cell = tableView!.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
         
-        let object = array[UInt(indexPath!.row)] as DemoObject
-        cell.textLabel.text = object.title
-        cell.detailTextLabel.text = object.date.description
+        let object = array[UInt(indexPath.row)] as DemoObject
+        cell.textLabel?.text = object.title
+        cell.detailTextLabel?.text = object.date.description
         
         return cell
     }
     
-    override func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath!) {
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let realm = RLMRealm.defaultRealm()
             realm.beginWriteTransaction()

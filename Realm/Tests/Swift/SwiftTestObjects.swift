@@ -72,6 +72,12 @@ class SwiftAggregateObject: RLMObject {
     dynamic var dateCol = NSDate()
 }
 
+class SwiftAllIntSizesObject: RLMObject {
+    dynamic var int16 : Int16 = 0
+    dynamic var int32 : Int32 = 0
+    dynamic var int64 : Int64 = 0
+}
+
 class SwiftEmployeeObject: RLMObject {
     dynamic var name = ""
     dynamic var age = 0
@@ -106,4 +112,13 @@ class SwiftIgnoredPropertiesObject: RLMObject {
         return ["runtimeProperty"]
     }
 
+}
+
+class SwiftPrimaryStringObject: RLMObject {
+    dynamic var stringCol = ""
+    dynamic var intCol = 0
+
+    override class func primaryKey() -> String {
+        return "stringCol"
+    }
 }

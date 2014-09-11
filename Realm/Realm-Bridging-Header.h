@@ -20,6 +20,7 @@
 #import "RLMObjectSchema.h"
 #import "RLMProperty.h"
 #import "RLMObject.h"
+#import <objc/runtime.h>
 
 @interface RLMRealm ()
 + (void)clearRealmCache;
@@ -28,9 +29,9 @@
 @interface RLMProperty ()
 
 - (instancetype)initWithName:(NSString *)name
-                        type:(RLMPropertyType)type
-             objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
+                  attributes:(RLMPropertyAttributes)attributes
+               attributeList:(objc_property_attribute_t *)attrs
+              attributeCount:(unsigned int)attrCount;
 
 @end
 

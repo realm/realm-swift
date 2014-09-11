@@ -29,6 +29,9 @@
 @implementation IntObject
 @end
 
+@implementation AllIntSizesObject
+@end
+
 @implementation FloatObject
 @end
 
@@ -122,4 +125,11 @@
 #pragma mark AggregateObject
 
 @implementation AggregateObject
+@end
+
+
+@implementation PrimaryStringObject
++ (NSString *)primaryKey {
+    return @"stringCol";
+}
 @end

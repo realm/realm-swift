@@ -37,7 +37,7 @@ NSString * const kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐
     XCTAssertEqualObjects(obj1.stringCol, kUTF8TestString, @"Storing and retrieving a string with UTF8 content should work");
 
     StringObject *obj2 = [[StringObject objectsInRealm:realm where:@"stringCol == %@", kUTF8TestString] firstObject];
-    XCTAssertEqualObjects(obj1, obj2, @"Querying a realm searching for a string with UTF8 content should work");
+    XCTAssertTrue([obj1 isEqualToObject:obj2], @"Querying a realm searching for a string with UTF8 content should work");
 }
 
 - (void)testUTF8PropertyWithUTF8StringContents

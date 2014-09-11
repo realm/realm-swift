@@ -1,6 +1,6 @@
 # Swift Examples
 
-This directory contains our Swift sample apps using Realm. Xcode6-Beta6 is required.
+This directory contains our Swift sample apps using Realm. Xcode6-Beta7 is required.
 
 ## RealmSwiftTableViewExample
 

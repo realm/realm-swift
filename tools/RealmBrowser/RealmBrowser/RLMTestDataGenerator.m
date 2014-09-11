@@ -143,7 +143,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
                 break;
                 
             case RLMPropertyTypeAny:
-                propertyValue = @"<Any>";
+                propertyValue = [self randomAny];
                 break;
                 
             case RLMPropertyTypeObject:
@@ -171,19 +171,49 @@ const NSUInteger kMaxItemsInTestArray = 12;
 -(NSInteger)randomInteger
 {
     NSUInteger type = arc4random_uniform(20);
-    return type == 0 ? INTMAX_MIN : type == 1 ? INTMAX_MAX : type == 2 ? 0 : arc4random_uniform(9999999);
+    
+    switch (type) {
+        case 0:
+            return INTMAX_MIN;
+        case 1:
+            return INTMAX_MAX;
+        case 2:
+            return 0;
+        default:
+            return arc4random_uniform(9999999);
+    }
 }
 
 -(float)randomFloat
 {
     NSUInteger type = arc4random_uniform(20);
-    return type == 0 ? FLT_MIN : type == 1 ? FLT_MAX : type == 2 ? 0 : arc4random_uniform(9999999)/9999.0f;
+    
+    switch (type) {
+        case 0:
+            return FLT_MIN;
+        case 1:
+            return FLT_MAX;
+        case 2:
+            return 0;
+        default:
+            return arc4random_uniform(9999999)/9999.0f;
+    }
 }
 
 -(double)randomDouble
 {
     NSUInteger type = arc4random_uniform(20);
-    return type == 0 ? DBL_MIN : type == 1 ? DBL_MAX : type == 2 ? 0 : arc4random_uniform(9999999)/9999.0f;
+    
+    switch (type) {
+        case 0:
+            return DBL_MIN;
+        case 1:
+            return DBL_MAX;
+        case 2:
+            return 0;
+        default:
+            return arc4random_uniform(9999999)/9999.0;
+    }
 }
 
 -(NSDate *)randomDate
@@ -203,9 +233,21 @@ const NSUInteger kMaxItemsInTestArray = 12;
     return result;
 }
 
--(NSString *)randomData
+-(NSData *)randomData
 {
-    return @"<Data>";
+    return [[self randomString] dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+-(id)randomAny
+{
+    switch (arc4random() % 3) {
+        case 0:
+            return [self randomString];
+        case 1:
+            return [self randomData];
+        default:
+            return [self randomDate];
+    }
 }
 
 -(NSArray *)randomArrayWithObjectsOfClass:(Class)testClass inRealm:(RLMRealm *)realm
