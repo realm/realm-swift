@@ -16,13 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMTableCellView.h"
 
-@class RLMTextField;
-@interface RLMTableCellView : NSTableCellView
-
--(NSSize)sizeThatFits;
-
-@property (nonatomic, readonly) RLMTextField *realmTextField;
+@interface RLMLinkTableCellView : RLMTableCellView
 
 @end
