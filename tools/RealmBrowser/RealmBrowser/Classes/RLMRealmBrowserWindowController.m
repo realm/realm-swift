@@ -22,7 +22,7 @@
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
 NSString * const kRealmLockedTooltip = @"Unlock to enable editing";
-NSString * const kRealmUnlockedTooltip = @"Click to lock Realm from editing";
+NSString * const kRealmUnlockedTooltip = @"Lock to prevent editing";
 NSString * const kRealmKeyIsLockedForRealm = @"LockedRealm:%@";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
@@ -73,9 +73,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         [self addNavigationState:initState fromViewController:nil];
     }
 
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName]];
-    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmPath]];
+    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmPath]];
     
     [self reloadAfterEdit];
 }
@@ -102,8 +102,8 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     [self.outlineViewController.tableView reloadData];
     
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
     
     BOOL realmIsLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
     self.tableViewController.realmIsLocked = realmIsLocked;
@@ -172,8 +172,8 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (IBAction)userClickedLockRealm:(id)sender
 {
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
 
     BOOL currentlyLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
     [self setRealmLocked:!currentlyLocked];
@@ -181,8 +181,8 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 -(void)setRealmLocked:(BOOL)locked
 {
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmName];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
     [[NSUserDefaults standardUserDefaults] setBool:locked forKey:key];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
