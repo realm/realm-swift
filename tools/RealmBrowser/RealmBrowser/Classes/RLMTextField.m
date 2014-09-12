@@ -16,13 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMTextField.h"
 
-@class RLMTextField;
-@interface RLMTableCellView : NSTableCellView
+@implementation RLMTextField
 
--(NSSize)sizeThatFits;
+-(void)cancelOperation:(id)sender
+{
+    [self abortEditing];
+    [self.realmDelegate textFieldCancelledEditing:self];
+}
 
-@property (nonatomic, readonly) RLMTextField *realmTextField;
+-(id<RLMTextFieldDelegate>)realmDelegate
+{
+    return (id<RLMTextFieldDelegate>)self.delegate;
+}
 
 @end

@@ -38,4 +38,9 @@
     return self.textField.bounds.size;
 }
 
+- (RLMTextField *)realmTextField
+{
+    return (RLMTextField *)self.textField;
+}
+
 @end
