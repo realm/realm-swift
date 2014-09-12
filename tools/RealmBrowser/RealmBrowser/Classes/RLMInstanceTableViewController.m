@@ -39,7 +39,9 @@
 const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
 const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
 const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
+const NSUInteger kMaxNumberOfInlineStringCharsForTooltip = 20;
 const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
+const NSUInteger kMaxDepthForTooltips = 2;
 
 @interface RLMObject ()
 
@@ -348,7 +350,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeBool:
-                return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
+            return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
             
         case RLMPropertyTypeArray: {
             RLMArray *referredArray = (RLMArray *)propertyValue;
@@ -375,7 +377,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             }
             
             if (linkFormat) {
-                return [NSString stringWithFormat:@"%@()", referredObject.objectSchema.className];
+                return [NSString stringWithFormat:@"%@(...)", referredObject.objectSchema.className];
             }
             
             NSString *returnString = [NSString stringWithFormat:@"%@(", referredObject.objectSchema.className];
@@ -419,45 +421,11 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             numberFormatter.maximumFractionDigits = UINT16_MAX;
             return [numberFormatter stringFromNumber:propertyValue];
             
-        case RLMPropertyTypeObject: {
-            // RLMObject -description seems to sometimes recurse endlessly. Disabling object tooltips until fixed
-            return nil;
-
-            RLMObject *referredObject = (RLMObject *)propertyValue;
-            RLMObjectSchema *objectSchema = referredObject.objectSchema;
-            NSArray *properties = objectSchema.properties;
+        case RLMPropertyTypeObject:
+            return [self tooltipForObject:(RLMObject *)propertyValue];
             
-            NSString *toolTipString = @"";
-            for (RLMProperty *property in properties) {
-                toolTipString = [toolTipString stringByAppendingFormat:@" %@:%@\n", property.name, referredObject[property.name]];
-            }
-            return toolTipString;
-        }
-            
-        case RLMPropertyTypeArray: {
-            // RLMArray -description seems to sometimes recurse endlessly. Disabling array tooltips until fixed
-            return nil;
-            RLMArray *referredArray = (RLMArray *)propertyValue;
-            
-            if (referredArray.count <= kMaxNumberOfArrayEntriesInToolTip) {
-                return referredArray.description;
-            }
-            else {
-                NSString *result = @"";
-                for (NSUInteger index = 0; index < kMaxNumberOfArrayEntriesInToolTip; index++) {
-                    RLMObject *arrayItem = referredArray[index];
-                    NSString *description = [arrayItem.description stringByReplacingOccurrencesOfString:@"\n"
-                                                                                             withString:@"\n\t"];
-                    description = [NSString stringWithFormat:@"\t[%lu] %@", index, description];
-                    if (index < kMaxNumberOfArrayEntriesInToolTip - 1) {
-                        description = [description stringByAppendingString:@","];
-                    }
-                    result = [[result stringByAppendingString:description] stringByAppendingString:@"\n"];
-                }
-                result = [@"RLMArray (\n" stringByAppendingString:[result stringByAppendingString:@"\t...\n)"]];
-                return result;
-            }
-        }
+        case RLMPropertyTypeArray:
+            return [self tooltipForArray:(RLMArray *)propertyValue];
             
         case RLMPropertyTypeAny:
         case RLMPropertyTypeBool:
@@ -467,6 +435,92 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             return nil;
     }
 }
+
+- (NSString *)tooltipForObject:(RLMObject *)object
+{
+    return [self tooltipForObject:object withDepth:0];
+}
+
+- (NSString *)tooltipForObject:(RLMObject *)object withDepth:(NSUInteger)depth
+{
+    if (depth == kMaxDepthForTooltips) {
+        return [object.objectSchema.className stringByAppendingString:@"(...)"];
+    }
+    
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@:\n", object.objectSchema.className];
+    NSString *tabs = [@"" stringByPaddingToLength:depth + 1 withString:@"\t" startingAtIndex:0];
+    
+    for (RLMProperty *property in object.objectSchema.properties) {
+        id obj = object[property.name];
+        
+        NSString *sub;
+        switch (property.type) {
+            case RLMPropertyTypeArray:
+                sub = [self tooltipForArray:obj withDepth:kMaxDepthForTooltips];
+                break;
+            case RLMPropertyTypeObject: {
+                sub = [self tooltipForObject:obj withDepth:depth + 1];
+                break;
+            }
+            default:
+                sub = [self printablePropertyValue:obj ofType:property.type];
+
+                if (property.type == RLMPropertyTypeString && sub.length > kMaxNumberOfInlineStringCharsForTooltip) {
+                    sub = [sub substringToIndex:kMaxNumberOfInlineStringCharsForTooltip];
+                    sub = [sub stringByAppendingString:@"..."];
+                }
+                break;
+        }
+
+        [string appendFormat:@"%@%@ = %@\n", tabs, property.name, sub];
+    }
+    
+    return string;
+}
+
+- (NSString *)tooltipForArray:(RLMArray *)array
+{
+    return [self tooltipForArray:array withDepth:0];
+}
+
+- (NSString *)tooltipForArray:(RLMArray *)array withDepth:(NSUInteger)depth
+{
+    if (depth == kMaxDepthForTooltips) {
+        return [array.objectClassName stringByAppendingFormat:@"[%lu]", array.count];
+    }
+    
+    const NSUInteger maxObjects = 3;
+    NSString *tabs = [@"" stringByPaddingToLength:depth withString:@"\t" startingAtIndex:0];
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@%@[%lu]", tabs, array.objectClassName, array.count];
+    
+    if (array.count == 0) {
+        return string;
+    }
+    [string appendString:@":\n"];
+    
+    NSUInteger index = 0;
+    NSUInteger skipped = 0;
+    for (id obj in array) {
+        NSString *sub = [self tooltipForObject:obj withDepth:depth + 1];
+        [string appendFormat:@"%@\t[%lu] %@\n", tabs, index++, sub];
+        if (index >= maxObjects) {
+            skipped = array.count - maxObjects;
+            break;
+        }
+    }
+    
+    // Remove last comma and newline characters
+    if (array.count > 0) {
+        [string deleteCharactersInRange:NSMakeRange(string.length - 1, 1)];
+    }
+    if (skipped) {
+        [string appendFormat:@"\n\t%@+%lu more", tabs, skipped];
+    }
+    [string appendFormat:@"\n"];
+    
+    return string;
+}
+
 
 #pragma mark - RLMTableView Delegate
 

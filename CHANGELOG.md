@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+* Updating to core library version 0.83.0.
 * Support for primary key properties (for int and string columns). Declaring a property
   to be the primary key ensures uniqueness for that property for all objects of a given type.
   At the moment indexes on primary keys are not yet supported but this will be added in a future
