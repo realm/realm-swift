@@ -16,10 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProperty.h"
 #import "RLMProperty_Private.h"
+
+#import "RLMArray.h"
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
+#import "RLMSwiftSupport.h"
 
 @implementation RLMProperty
 
@@ -81,7 +83,7 @@
 }
 
 // determine RLMPropertyType from objc code - returns true if valid type was found/set
--(BOOL)parsePropertyTypeString:(const char *)code {
+-(BOOL)parsePropertyTypeString:(const char *)code instance:(RLMObject *)obj {
     _objcType = *code;    // first char of type attr
 
     // map to RLMPropertyType
@@ -102,42 +104,52 @@
         case 'B':
             _type = RLMPropertyTypeBool;
             return YES;
-        case '@':
-        {
-            NSString * const arrayPrefix = @"@\"RLMArray<";
-            NSString *type = @(code);
-            // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
-            if (type.length == 1) {
-                _type = RLMPropertyTypeAny;
+        case '@': {
+            if (!code[1]) {
+                // type is just "@", which means it's either `id` or a Swift
+                // `String`, so check the type of the value from the instance
+                if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
+                    _type = RLMPropertyTypeString;
+                }
+                else {
+                    _type = RLMPropertyTypeAny;
+                }
+                return YES;
             }
-            else if ([type isEqualToString:@"@\"NSString\""]) {
+
+            static const char arrayPrefix[] = "@\"RLMArray<";
+            static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
+
+            NSString *type = @(code);
+            if (strcmp(code, "@\"NSString\"") == 0) {
                 _type = RLMPropertyTypeString;
             }
-            else if ([type isEqualToString:@"@\"NSDate\""]) {
+            else if (strcmp(code, "@\"NSDate\"") == 0) {
                 _type = RLMPropertyTypeDate;
             }
-            else if ([type isEqualToString:@"@\"NSData\""]) {
+            else if (strcmp(code, "@\"NSData\"") == 0) {
                 _type = RLMPropertyTypeData;
             }
-            else if ([type hasPrefix:arrayPrefix]) {
+            else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
                 // get object class from type string - @"RLMArray<objectClassName>"
-                NSString *className = [type substringWithRange:NSMakeRange(arrayPrefix.length, type.length-arrayPrefix.length-2)];
-
-                // verify type
-                Class cls = [RLMSchema classForString:className];
-                if (class_getSuperclass(cls) != RLMObject.class) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
-                                                 userInfo:nil];
-                }
-
-                _type = RLMPropertyTypeArray;
-                _objectClassName = [cls className];
+                [self setArrayObjectClassName:[[NSString alloc] initWithBytes:code + arrayPrefixLen
+                                                                       length:strlen(code + arrayPrefixLen) - 2 // drop trailing >"
+                                                                     encoding:NSUTF8StringEncoding]];
             }
             else if ([type isEqualToString:@"@\"NSNumber\""]) {
                 @throw [NSException exceptionWithName:@"RLMException"
                                                reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/latest/api/Constants/RLMPropertyType.html for all supported types."]
                                              userInfo:nil];
+            }
+            else if ([type isEqualToString:@"@\"RLMArray\""]) {
+                if (!obj) { // obj-c case
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>"
+                                                 userInfo:nil];
+                }
+
+                // swift case
+                [self setArrayObjectClassName:[[obj valueForKey:_name] objectClassName]];
             }
             else {
                 NSString *className = [type substringWithRange:NSMakeRange(2, type.length-3)];
@@ -145,11 +157,6 @@
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (class_getSuperclass(cls) != RLMObject.class) {
-                    if ([_objectClassName isEqualToString:@"RLMArray"]) {
-                        @throw [NSException exceptionWithName:@"RLMException"
-                                                       reason:@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>"
-                                                     userInfo:nil];
-                    }
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];
@@ -165,10 +172,21 @@
     }
 }
 
+- (void)setArrayObjectClassName:(NSString *)objectClassName {
+    Class cls = [RLMSchema classForString:objectClassName];
+    if (class_getSuperclass(cls) != RLMObject.class) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:[NSString stringWithFormat:@"RLMArray sub-type '%@' must descend from RLMObject", self.objectClassName]
+                                     userInfo:nil];
+    }
+
+    _type = RLMPropertyTypeArray;
+    _objectClassName = [cls className];
+}
+
 - (instancetype)initWithName:(NSString *)name
-                  attributes:(RLMPropertyAttributes)attributes
-               attributeList:(objc_property_attribute_t *)attrs
-              attributeCount:(unsigned int)attrCount
+                      parent:(Class)cls
+                    property:(objc_property_t)property
 {
     self = [super init];
     if (!self) {
@@ -176,14 +194,24 @@
     }
 
     _name = name;
-    _attributes = attributes;
+    _attributes = [cls attributesForProperty:name];
+
+    RLMObject *obj = nil;
+    // For Swift classes we need to inspect the values of an object for String
+    // and RLMArray properties
+    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(cls)]) {
+        obj = [[cls alloc] init];
+    }
+
+    unsigned int count;
+    objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
     // parse attributes
     BOOL validType = NO;
-    for (unsigned int a = 0; a < attrCount; a++) {
-        switch (*attrs[a].name) {
+    for (objc_property_attribute_t *attr = attrs; attr != attrs + count; ++attr) {
+        switch (*attr->name) {
             case 'T':
-                validType = [self parsePropertyTypeString:attrs[a].value];
+                validType = [self parsePropertyTypeString:attr->value instance:obj];
                 break;
             case 'N':
                 // nonatomic
@@ -192,15 +220,16 @@
                 // dynamic
                 break;
             case 'G':
-                self.getterName = @(attrs[a].value);
+                self.getterName = @(attr->value);
                 break;
             case 'S':
-                self.setterName = @(attrs[a].value);
+                self.setterName = @(attr->value);
                 break;
             default:
                 break;
         }
     }
+    free(attrs);
 
     // throw if there was no type
     if (!validType) {

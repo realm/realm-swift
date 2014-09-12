@@ -16,10 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import Realm
+
+extension RLMObject {
+    // Swift query convenience functions
+    public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+        return objectsWhere(predicateFormat, args: getVaList(args))
+    }
+
+    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+        return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
+    }
+}
+
 extension RLMArray: SequenceType {
-
     // Support Sequence-style enumeration
-
     public func generate() -> GeneratorOf<RLMObject> {
         var i: UInt  = 0
 
@@ -33,7 +44,6 @@ extension RLMArray: SequenceType {
     }
 
     // Swift query convenience functions
-
     public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArgType...) -> UInt {
         return indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }

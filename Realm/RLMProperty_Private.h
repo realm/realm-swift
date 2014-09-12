@@ -23,9 +23,8 @@
 @interface RLMProperty ()
 
 - (instancetype)initWithName:(NSString *)name
-                  attributes:(RLMPropertyAttributes)attributes
-               attributeList:(objc_property_attribute_t *)attrs
-              attributeCount:(unsigned int)attrCount;
+                      parent:(Class)cls
+                    property:(objc_property_t)property;
 
 // private setters
 @property (nonatomic, assign) NSUInteger column;

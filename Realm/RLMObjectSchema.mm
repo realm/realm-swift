@@ -72,12 +72,7 @@
     schema.objectClass = objectClass;
 
     // create array of RLMProperties
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)]) {
-        schema.properties = [RLMSwiftSupport propertiesForClass:objectClass];
-    }
-    else {
-        schema.properties = [self propertiesForClass:objectClass];
-    }
+    schema.properties = [self propertiesForClass:objectClass];
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -123,13 +118,9 @@
             continue;
         }
 
-        unsigned int attCount;
-        objc_property_attribute_t *atts = property_copyAttributeList(props[i], &attCount);
-        RLMProperty *prop = [[RLMProperty alloc]  initWithName:propertyName
-                                                    attributes:[objectClass attributesForProperty:propertyName]
-                                                 attributeList:atts
-                                                attributeCount:attCount];
-        free(atts);
+        RLMProperty *prop = [[RLMProperty alloc] initWithName:propertyName
+                                                        parent:objectClass
+                                                      property:props[i]];
         [propArray addObject:prop];
     }
 
