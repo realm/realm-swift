@@ -213,14 +213,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return nil;
     }
     
-    NSUInteger columnIndex = [tableView.tableColumns indexOfObject:tableColumn];
+    NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
     
-    if (self.displaysArray) {
-        columnIndex--;
-    }
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     // Array gutter
-    if (columnIndex == -1) {
+    if (propertyIndex == -1) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"IndexCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
         basicCellView.textField.editable = NO;
@@ -228,7 +226,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
         return basicCellView;
     }
     
-    RLMClassProperty *classProperty = self.displayedType.propertyColumns[columnIndex];
+    RLMClassProperty *classProperty = self.displayedType.propertyColumns[propertyIndex];
     RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
     id propertyValue = selectedInstance[classProperty.name];
     RLMPropertyType type = classProperty.type;
@@ -326,11 +324,15 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     switch (propertyType) {
         case RLMPropertyTypeInt:
+            numberFormatter.minimumFractionDigits = 0;
+            
+            return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
+
+            // Intentional fallthrough
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
-            numberFormatter.minimumFractionDigits = propertyType == RLMPropertyTypeInt ? 0 : 3;
+            numberFormatter.minimumFractionDigits = 3;
             numberFormatter.maximumFractionDigits = 3;
-            numberFormatter.allowsFloats = propertyType != RLMPropertyTypeInt;
             
             return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
             
@@ -564,7 +566,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
 
     if (column == -1) {
         return NO;
@@ -584,7 +586,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
 
     if (column == -1) {
         return NO;
@@ -602,9 +604,9 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     [self removeContentsAtRows:rowIndexes column:columnIndex];
 }
 
-- (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex
+- (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)column
 {
-    NSInteger propertyIndex = self.displaysArray ? columnIndex - 1 : columnIndex;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
                                                                                  typeIndex:row
@@ -664,7 +666,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (RLMPropertyType)propertyTypeForColumn:(NSInteger)column
 {
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
 
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
@@ -694,7 +696,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)removeContentsAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
 {
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMClassProperty *classProperty = self.displayedType.propertyColumns[propertyIndex];
@@ -718,7 +720,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
-    NSInteger propertyIndex = self.displaysArray ? location.column - 1 : location.column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:location.column];
     
     if (propertyIndex >= self.displayedType.propertyColumns.count || location.row >= self.displayedType.instanceCount) {
         [self disableLinkCursor];
@@ -759,7 +761,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (IBAction)editedTextField:(NSTextField *)sender {
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
 
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[propertyIndex];
@@ -810,7 +812,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 {
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
 
     RLMTypeNode *displayedType = self.displayedType;
     RLMClassProperty *propertyNode = displayedType.propertyColumns[propertyIndex];
@@ -848,7 +850,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
     
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     if (row == -1 || propertyIndex < 0) {
         return;
@@ -897,7 +899,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 - (void)userDoubleClicked:(NSTableView *)sender {
     NSInteger row = self.tableView.clickedRow;
     NSInteger column = self.tableView.clickedColumn;
-    NSInteger propertyIndex = self.displaysArray ? column - 1 : column;
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     if (row == -1 || propertyIndex < 0 || self.realmIsLocked) {
         return;
@@ -914,11 +916,12 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
             NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
             
+            NSSize intercellSpacing = [self.tableView intercellSpacing];
             NSRect frame = [self.tableView frameOfCellAtColumn:column row:row];
-            frame.origin.x -= [self.tableView intercellSpacing].width*0.5;
-            frame.origin.y -= [self.tableView intercellSpacing].height*0.5;
-            frame.size.width += [self.tableView intercellSpacing].width;
-            frame.size.height += [self.tableView intercellSpacing].height;
+            frame.origin.x -= 0.5*intercellSpacing.width;
+            frame.origin.y -= 0.5*intercellSpacing.height;
+            frame.size.width += intercellSpacing.width;
+            frame.size.height += intercellSpacing.height;
             
             frame.size.height = MAX(23.0, frame.size.height);
             
@@ -928,8 +931,7 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
             datepicker.drawsBackground = NO;
             datepicker.datePickerStyle = NSTextFieldAndStepperDatePickerStyle;
             datepicker.datePickerElements = NSHourMinuteSecondDatePickerElementFlag
-            | NSYearMonthDayDatePickerElementFlag
-            | NSTimeZoneDatePickerElementFlag;
+              | NSYearMonthDayDatePickerElementFlag | NSTimeZoneDatePickerElementFlag;
             datepicker.dateValue = propertyValue;
             
             item.view = datepicker;
@@ -1002,5 +1004,13 @@ const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
 {
     return ([self.displayedType isMemberOfClass:[RLMArrayNode class]]);
 }
+
+#pragma mark - Private Methods - Convenience
+
+-(NSInteger)propertyIndexForColumn:(NSInteger)column
+{
+    return self.displaysArray ? column - 1 : column;
+}
+
 
 @end

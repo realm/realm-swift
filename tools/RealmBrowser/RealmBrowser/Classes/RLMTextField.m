@@ -20,11 +20,6 @@
 
 @implementation RLMTextField
 
--(void)awakeFromNib
-{
-    [super awakeFromNib];
-}
-
 -(void)cancelOperation:(id)sender
 {
     [self abortEditing];
