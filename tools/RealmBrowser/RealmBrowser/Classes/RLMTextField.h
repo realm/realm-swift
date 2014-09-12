@@ -19,10 +19,15 @@
 #import <Cocoa/Cocoa.h>
 
 @class RLMTextField;
-@interface RLMTableCellView : NSTableCellView
+@protocol RLMTextFieldDelegate <NSTextFieldDelegate>
 
--(NSSize)sizeThatFits;
+-(void)textFieldCancelledEditing:(RLMTextField *)textField;
 
-@property (nonatomic, readonly) RLMTextField *realmTextField;
+@end
+
+
+@interface RLMTextField : NSTextField
+
+@property (nonatomic, readonly) id<RLMTextFieldDelegate> realmDelegate;
 
 @end
