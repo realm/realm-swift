@@ -41,7 +41,8 @@ NSString *const kRealmFileExension = @"realm";
 
 @property (nonatomic, assign) BOOL didLoadFile;
 
-@property (nonatomic, strong) NSMetadataQuery *query;
+@property (nonatomic, strong) NSMetadataQuery *realmQuery;
+@property (nonatomic, strong) NSMetadataQuery *appQuery;
 @property (nonatomic, strong) NSArray *groupedFileItems;
 
 @end
@@ -56,15 +57,17 @@ NSString *const kRealmFileExension = @"realm";
         NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
         [self.fileMenu performActionForItemAtIndex:openFileIndex];
         
-        self.query = [[NSMetadataQuery alloc] init];
-        [self.query setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemContentModificationDate ascending:NO]]];
+        self.realmQuery = [[NSMetadataQuery alloc] init];
+        [self.realmQuery setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemContentModificationDate ascending:NO]]];
+        NSPredicate *realmPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.realm'"];
+        [self.realmQuery setPredicate:realmPredicate];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(realmQueryNote:) name:nil object:self.realmQuery];
+        [self.realmQuery startQuery];
         
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.realm'"];
-        [self.query setPredicate:predicate];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(queryNote:) name:nil object:self.query];
-        
-        [self.query startQuery];
+        self.appQuery = [[NSMetadataQuery alloc] init];
+        NSPredicate *appPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.xcodeproj'"];
+        [self.appQuery setPredicate:appPredicate];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appQueryNote:) name:nil object:self.appQuery];
         
         self.dateFormatter = [[NSDateFormatter alloc] init];
         self.dateFormatter.dateStyle = NSDateFormatterMediumStyle;
@@ -92,7 +95,18 @@ NSString *const kRealmFileExension = @"realm";
 
 #pragma mark - Event handling
 
-- (void)queryNote:(NSNotification *)notification {
+- (void)realmQueryNote:(NSNotification *)notification {
+    if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
+        [self updateFileItems];
+        [self.appQuery startQuery];
+    }
+    else if ([[notification name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
+        [self updateFileItems];
+        [self.appQuery startQuery];
+    }
+}
+
+- (void)appQueryNote:(NSNotification *)notification {
     if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
         [self updateFileItems];
     }
@@ -139,9 +153,20 @@ NSString *const kRealmFileExension = @"realm";
         else if ([item isMemberOfClass:[NSMetadataItem class]]) {
             NSMetadataItem *metadataItem = (NSMetadataItem *)item;
             
-            NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-            menuItem.title = [metadataItem valueForAttribute:NSMetadataItemFSNameKey];
             NSString *filePath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+            NSString *title = [filePath lastPathComponent];
+            
+            NSString *devPrefix = [NSHomeDirectory() stringByAppendingString:@"/Developer/"];
+            if ([filePath hasPrefix:devPrefix]) {
+                NSString *appName = [self appNameForRealmWithPath:filePath];
+                
+                if (appName) {
+                    title = [NSString stringWithFormat:@"%@ (%@)", title, appName];
+                }
+            }
+            
+            NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+            menuItem.title = title;
             menuItem.representedObject = [NSURL fileURLWithPath:filePath];
             
             menuItem.target = self;
@@ -156,6 +181,29 @@ NSString *const kRealmFileExension = @"realm";
             [menu addItem:menuItem];
         }
     }
+}
+
+-(NSString *)appNameForRealmWithPath:(NSString *)realmPath
+{
+    NSArray *appPaths = [self.appQuery results];
+    
+    for (NSUInteger i = 0; i < 4; i++) {
+        realmPath = [[realmPath stringByDeletingLastPathComponent] copy];
+        if ([realmPath hasSuffix:@"/Developer"]) {
+            return nil;
+        }
+        
+        for (NSString *appPathItem in appPaths) {
+            NSMetadataItem *metadataItem = (NSMetadataItem *)appPathItem;
+            NSString *appPath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+            
+            if ([[appPath stringByDeletingLastPathComponent] isEqualToString:realmPath]) {
+                return [[[appPath pathComponents] lastObject] stringByDeletingPathExtension];
+            }
+        }
+    }
+    
+    return nil;
 }
 
 -(void)updateFileItems
@@ -187,7 +235,7 @@ NSString *const kRealmFileExension = @"realm";
     self.groupedFileItems = @[simDict, devDict, desktopDict, documentsdDict, downloadDict, otherDict];
     
     // Iterate through all search results
-    for (NSMetadataItem *fileItem in self.query.results) {
+    for (NSMetadataItem *fileItem in self.realmQuery.results) {
         // Iterate through the different prefixes and add item to corresponding array within dictionary
         for (NSDictionary *dict in self.groupedFileItems) {
             if ([[fileItem valueForAttribute:NSMetadataItemPathKey] hasPrefix:dict[kPrefix]]) {
