@@ -178,7 +178,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"build/DerivedData/Realm/Build/Products/Release\" ]]; then\n    sh build.sh osx\nfi\n";
+			shellScript = "cd ../../../\nif [[ ! -d \"build/DerivedData/Realm/Build/Products/Release/Realm.framework\" ]]; then\n    sh build.sh osx\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -206,10 +206,6 @@
 		E823C34519BA4A5F00D2FF5F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					../../../build/DerivedData/Realm/Build/Products/Release,
-					"/Users/jp/realm/code/realm-cocoa/build/DerivedData/Realm/Build/Products/Release",
-				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -225,10 +221,6 @@
 		E823C34619BA4A5F00D2FF5F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					../../../build/DerivedData/Realm/Build/Products/Release,
-					"/Users/jp/realm/code/realm-cocoa/build/DerivedData/Realm/Build/Products/Release",
-				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				MACOSX_DEPLOYMENT_TARGET = "";
@@ -268,6 +260,10 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					../../../build/DerivedData/Realm/Build/Products/Release,
+					../../../osx,
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -308,6 +304,10 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					../../../build/DerivedData/Realm/Build/Products/Release,
+					../../../osx,
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
