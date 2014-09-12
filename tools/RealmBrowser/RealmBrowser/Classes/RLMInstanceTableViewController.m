@@ -1048,12 +1048,6 @@ const NSUInteger kMaxDepthForTooltips = 2;
 
 #pragma mark - Private Methods - Setters/Getters
 
-- (void)setRealmIsLocked:(BOOL)realmIsLocked
-{
-    _realmIsLocked = realmIsLocked;
-    [self.tableView reloadData];
-}
-
 - (BOOL)displaysArray
 {
     return ([self.displayedType isMemberOfClass:[RLMArrayNode class]]);

@@ -21,6 +21,9 @@
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
+NSString * const kRealmLockedTooltip = @"Unlock to enable editing";
+NSString * const kRealmUnlockedTooltip = @"Lock to prevent editing";
+NSString * const kRealmKeyIsLockedForRealm = @"LockedRealm:%@";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
@@ -70,11 +73,11 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         [self addNavigationState:initState fromViewController:nil];
     }
 
-    [self setRealmLocked:YES];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmPath]];
+    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmPath]];
     
-    NSString *realmName = self.modelDocument.presentedRealm.realm.path;
-    [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmName]];
-    [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmName]];
+    [self reloadAfterEdit];
 }
 
 #pragma mark - Public methods - Accessors
@@ -97,8 +100,17 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (void)reloadAfterEdit
 {
-    [self.tableViewController.tableView reloadData];
     [self.outlineViewController.tableView reloadData];
+    
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
+    
+    BOOL realmIsLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
+    self.tableViewController.realmIsLocked = realmIsLocked;
+    self.lockRealmButton.image = [NSImage imageNamed:realmIsLocked ? kRealmLockedImage : kRealmUnlockedImage];
+    self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
+
+    [self.tableViewController.tableView reloadData];
 }
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
@@ -143,7 +155,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
             }
             break;
         }
-        case 1: { // Navigate backwards
+        case 1: { // Navigate forwards
             RLMNavigationState *state = [navigationStack navigateForward];
             if (state != nil) {
                 [self.outlineViewController updateUsingState:state oldState:oldState];
@@ -160,13 +172,21 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 - (IBAction)userClickedLockRealm:(id)sender
 {
-    [self setRealmLocked:!self.tableViewController.realmIsLocked];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
+
+    BOOL currentlyLocked = [[NSUserDefaults standardUserDefaults] boolForKey:key];
+    [self setRealmLocked:!currentlyLocked];
 }
 
 -(void)setRealmLocked:(BOOL)locked
 {
-    self.tableViewController.realmIsLocked = locked;
-    self.lockRealmButton.image = [NSImage imageNamed:locked ? kRealmLockedImage : kRealmUnlockedImage];
+    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    NSString *key = [NSString stringWithFormat:kRealmKeyIsLockedForRealm, realmPath];
+    [[NSUserDefaults standardUserDefaults] setBool:locked forKey:key];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self reloadAllWindows];
 }
 
 - (IBAction)searchAction:(NSSearchFieldCell *)searchCell
