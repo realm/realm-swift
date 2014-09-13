@@ -109,6 +109,13 @@
 + (NSArray *)propertiesForClass:(Class)objectClass {
     NSArray *ignoredProperties = [objectClass ignoredProperties];
 
+    RLMObject *obj = nil;
+    // For Swift classes we need to inspect the values of an object for String
+    // and RLMArray properties
+    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)]) {
+        obj = [[objectClass alloc] init];
+    }
+
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
@@ -119,8 +126,9 @@
         }
 
         RLMProperty *prop = [[RLMProperty alloc] initWithName:propertyName
-                                                        parent:objectClass
-                                                      property:props[i]];
+                                                   attributes:[objectClass attributesForProperty:propertyName]
+                                                     property:props[i]
+                                                     instance:obj];
         [propArray addObject:prop];
     }
 

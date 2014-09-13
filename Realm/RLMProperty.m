@@ -105,7 +105,7 @@
             _type = RLMPropertyTypeBool;
             return YES;
         case '@': {
-            if (!code[1]) {
+            if (code[1] == '\0') {
                 // type is just "@", which means it's either `id` or a Swift
                 // `String`, so check the type of the value from the instance
                 if ([[obj valueForKey:_name] isKindOfClass:[NSString class]]) {
@@ -185,8 +185,9 @@
 }
 
 - (instancetype)initWithName:(NSString *)name
-                      parent:(Class)cls
+                  attributes:(RLMPropertyAttributes)attributes
                     property:(objc_property_t)property
+                    instance:(RLMObject *)objectInstance
 {
     self = [super init];
     if (!self) {
@@ -194,24 +195,17 @@
     }
 
     _name = name;
-    _attributes = [cls attributesForProperty:name];
-
-    RLMObject *obj = nil;
-    // For Swift classes we need to inspect the values of an object for String
-    // and RLMArray properties
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(cls)]) {
-        obj = [[cls alloc] init];
-    }
+    _attributes = attributes;
 
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
     // parse attributes
     BOOL validType = NO;
-    for (objc_property_attribute_t *attr = attrs; attr != attrs + count; ++attr) {
-        switch (*attr->name) {
+    for (size_t i = 0; i < count; ++i) {
+        switch (*attrs[i].name) {
             case 'T':
-                validType = [self parsePropertyTypeString:attr->value instance:obj];
+                validType = [self parsePropertyTypeString:attrs[i].value instance:objectInstance];
                 break;
             case 'N':
                 // nonatomic
@@ -220,10 +214,10 @@
                 // dynamic
                 break;
             case 'G':
-                self.getterName = @(attr->value);
+                self.getterName = @(attrs[i].value);
                 break;
             case 'S':
-                self.setterName = @(attr->value);
+                self.setterName = @(attrs[i].value);
                 break;
             default:
                 break;
