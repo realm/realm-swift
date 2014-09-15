@@ -198,52 +198,88 @@ const NSUInteger kMaxDepthForTooltips = 2;
         NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
         
-        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-  
-        // Move indexset into mutable array
-        NSMutableArray *sources = [NSMutableArray array];
-        [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-            [sources addObject:@(idx)];
-        }];
+        [self.parentWindowController moveRowsInArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
+        [self moveRowsInRealmFrom:rowIndexes to:destination];
         
-        [realm beginWriteTransaction];
-        [self.tableView beginUpdates];
-
-        // Iterate through the array, representing source row indices
-        for (NSUInteger i = 0; i < sources.count; i++) {
-            NSUInteger source = [sources[i] unsignedIntegerValue];
-            
-            // Perform the move
-            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
-            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
-            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
-            
-            //Iterate through the remaining source row indices in the array
-            for (NSUInteger j = i + 1; j < sources.count; j++) {
-                NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
-                // Everything right of the destination is shifted right
-                if (sourceIndexToModify > destination) {
-                    sources[j] = @([sources[j] unsignedIntegerValue] + 1);
-                }
-                // Everything right of the current source is shifted left
-                if (sourceIndexToModify > source) {
-                    sources[j] = @([sources[j] unsignedIntegerValue] - 1);
-                }
-            }
-            // If the move was from lower index to higher, shift destination right
-            if (source > destination) {
-                destination++;
-            }
-        }
-        
-        [self.tableView endUpdates];
-        [realm commitWriteTransaction];
-        [self.parentWindowController performSelector:@selector(reloadAllWindows) withObject:nil afterDelay:0.4];
-
         return YES;
     }
     
     return NO;
+}
+
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    if (self.displaysArray && [self.displayedType isEqualTo:arrayNode]) {
+        [self moveRowsFrom:sourceIndexes to:destination inRealm:NO];
+    }
+}
+
+- (void)moveRowsInRealmFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    [self moveRowsFrom:sourceIndexes to:destination inRealm:YES];
+}
+
+- (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination inRealm:(BOOL)inRealm
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    // Move indexset into mutable array
+    NSMutableArray *sources = [NSMutableArray array];
+    [sourceIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [sources addObject:@(idx)];
+    }];
+    
+    if (inRealm) {
+        [realm beginWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+    }
+    
+    // Iterate through the array, representing source row indices
+    for (NSUInteger i = 0; i < sources.count; i++) {
+        NSUInteger source = [sources[i] unsignedIntegerValue];
+        
+        // Perform the move
+        if (inRealm) {
+            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+        }
+        else {
+            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
+            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
+        }
+        
+        //Iterate through the remaining source row indices in the array
+        for (NSUInteger j = i + 1; j < sources.count; j++) {
+            NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
+            // Everything right of the destination is shifted right
+            if (sourceIndexToModify > destination) {
+                sources[j] = @([sources[j] unsignedIntegerValue] + 1);
+            }
+            // Everything right of the current source is shifted left
+            if (sourceIndexToModify > source) {
+                sources[j] = @([sources[j] unsignedIntegerValue] - 1);
+            }
+        }
+        // If the move was from higher index to lower, shift destination right
+        if (source > destination) {
+            destination++;
+        }
+    }
+    
+    if (inRealm) {
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView endUpdates];
+        
+        // Recalculate the row indices in the zeroth column
+        for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
+            NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
+            RLMTableCellView *cell = [rowView viewAtColumn:0];
+            cell.textField.stringValue = [@(k) stringValue];
+        }
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView

@@ -177,7 +177,7 @@
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
 
 /**
- Moves an object at from a given index to another given index.
+ Moves an object at fromIndex to toIndex, from the perspective of the original array.
  
  Throws an exception when called with a source index greater than or equal to,
  or a destination index greater than, the number of objects in this RLMArray

@@ -38,10 +38,12 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 @interface RLMRealmBrowserWindowController()<NSWindowDelegate>
 
-@property (weak) IBOutlet NSSplitView *splitView;
+@property (atomic, weak) IBOutlet NSSplitView *splitView;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
-@property (weak) IBOutlet NSToolbarItem *lockRealmButton;
+@property (atomic, weak) IBOutlet NSToolbarItem *lockRealmButton;
 @property (nonatomic, strong) IBOutlet NSSearchField *searchField;
+
+@property (nonatomic, strong) RLMNotificationToken *notificationToken;
 
 @end
 
@@ -55,6 +57,11 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     navigationStack = [[RLMNavigationStack alloc] init];
     [self realmDidLoad];
+}
+
+- (void)dealloc
+{
+    [self.modelDocument.presentedRealm.realm removeNotification:self.notificationToken];
 }
 
 #pragma mark - RLMViewController Overrides
@@ -73,7 +80,13 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         [self addNavigationState:initState fromViewController:nil];
     }
 
-    NSString *realmPath = self.modelDocument.presentedRealm.realm.path;
+    RLMRealm *realm = self.modelDocument.presentedRealm.realm;
+    
+    self.notificationToken = [realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+//        [self reloadAllWindows];
+    }];
+    
+    NSString *realmPath = realm.path;
     [self setWindowFrameAutosaveName:[NSString stringWithFormat:kRealmKeyWindowFrameForRealm, realmPath]];
     [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmPath]];
     
@@ -111,6 +124,13 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
 
     [self.tableViewController.tableView reloadData];
+}
+
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController moveRowsInArrayNode:arrayNode from:sourceIndexes to:destination];
+    }
 }
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller

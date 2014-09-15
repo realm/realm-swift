@@ -86,6 +86,26 @@
     return YES;
 }
 
+-(BOOL)isEqualTo:(id)object
+{
+    if (self == object) {
+        return YES;
+    }
+    
+    RLMArrayNode *otherArrayNode = object;
+    if (self.instanceCount != otherArrayNode.instanceCount) {
+        return NO;
+    }
+    
+    for (int i = 0; i < self.instanceCount; i++) {
+        if (![displayedArray[i] isEqualToObject:[otherArrayNode instanceAtIndex:i]]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 #pragma mark - RLMObjectNode Overrides
 
 - (NSString *)name
