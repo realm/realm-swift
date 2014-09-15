@@ -144,11 +144,6 @@
 
 #pragma mark - NSOutlineViewDelegate implementation
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
-{
-    return [item isKindOfClass:[RLMRealmNode class]];
-}
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
     // Group headers should not be selectable

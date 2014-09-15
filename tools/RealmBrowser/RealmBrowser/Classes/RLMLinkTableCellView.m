@@ -16,13 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "RLMLinkTableCellView.h"
+#import "NSColor+ByteSizeFactory.h"
 
-@class RLMTextField;
-@interface RLMTableCellView : NSTableCellView
+@implementation RLMLinkTableCellView
 
--(NSSize)sizeThatFits;
-
-@property (nonatomic, readonly) RLMTextField *realmTextField;
+- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle {
+    [super setBackgroundStyle:backgroundStyle];
+    self.textField.textColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor linkColor] : [NSColor whiteColor]);
+}
 
 @end
