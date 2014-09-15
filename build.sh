@@ -442,22 +442,9 @@ case "$COMMAND" in
         ;;
 
     "package-examples")
-        cd tightdb_objc/examples/objc
-        dirlist=$(find . -mindepth 1 -maxdepth 1 -type d \! -name RealmJSONImportExample \! -name RealmRestExample)
-        for i in $dirlist; do
-            pushd ${i}/${i}.xcodeproj
-            sed -i.bak -e 's/\${SRCROOT}\/\.\.\/\.\.\/\.\.\/build\/\${CONFIGURATION}/\${SRCROOT}\/\.\.\/\.\./' project.pbxproj
-            diff project.pbxproj.bak project.pbxproj || true
-            rm project.pbxproj.bak
-            popd
-        done
-
-        mkdir examples
-        mv $dirlist examples
-
-        unzip *.zip
-        rm *.zip
-        zip --symlinks -r realm-obj-examples.zip Realm.framework README.md examples
+        cd tightdb_objc
+        ./scripts/package_examples.rb
+        zip --symlinks -r realm-obj-examples.zip examples
         ;;
 
     "package-ios")
@@ -495,13 +482,17 @@ case "$COMMAND" in
 
         (
             cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios
-            unzip ${WORKSPACE}/realm-obj-examples.zip
-            mv README.md examples/README.txt
+            unzip ${WORKSPACE}/realm-framework-ios.zip
         )
 
         (
             cd ${TEMPDIR}/realm-cocoa-${VERSION}/browser
             unzip ${WORKSPACE}/realm-browser.zip
+        )
+
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}
+            unzip ${WORKSPACE}/realm-obj-examples.zip
         )
 
         cp -R ${WORKSPACE}/tightdb_objc/plugin ${TEMPDIR}/realm-cocoa-${VERSION}
@@ -559,9 +550,8 @@ EOF
         git clean -xfd
         cd ../..
 
-        cp realm-framework-ios.zip tightdb_objc/examples/objc
         sh tightdb_objc/build.sh package-examples
-        cp tightdb_objc/examples/objc/realm-obj-examples.zip .
+        cp tightdb_objc/realm-obj-examples.zip .
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
