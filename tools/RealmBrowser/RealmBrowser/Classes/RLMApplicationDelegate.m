@@ -23,7 +23,6 @@
 
 #import "TestClasses.h"
 
-const NSUInteger kTestDatabaseSizeMultiplicatorFactor = 2000;
 const NSUInteger kTopTipDelay = 250;
 const NSUInteger kMaxFilesPerCategory = 7;
 const CGFloat kMenuImageSize = 16;
@@ -193,8 +192,8 @@ NSString *const kDocumentsFolder = @"/Documents";
     NSArray *searchPaths;
     NSString *searchEndPath;
     
-    NSString *developerPrefix = [NSHomeDirectory() stringByAppendingString:kDeveloperFolder];
-    NSString *simulatorPrefix = [NSHomeDirectory() stringByAppendingString:kSimulatorFolder];
+    NSString *developerPrefix = [NSHomeDirectory() stringByAppendingPathComponent:kDeveloperFolder];
+    NSString *simulatorPrefix = [NSHomeDirectory() stringByAppendingPathComponent:kSimulatorFolder];
     
     if ([realmPath hasPrefix:developerPrefix]) {
         // The realm file is in the simulator, so we are looking for *.xcodeproj files
@@ -243,19 +242,19 @@ NSString *const kDocumentsFolder = @"/Documents";
     NSString *kPrefix = @"Prefix";
     NSString *kItems = @"Items";
     
-    NSString *simPrefix = [homeDir stringByAppendingString:kSimulatorFolder];
+    NSString *simPrefix = [homeDir stringByAppendingPathComponent:kSimulatorFolder];
     NSDictionary *simDict = @{kPrefix : simPrefix, kItems : [NSMutableArray arrayWithObject:@"iPhone Simulator"]};
     
-    NSString *devPrefix = [homeDir stringByAppendingString:kDeveloperFolder];
+    NSString *devPrefix = [homeDir stringByAppendingPathComponent:kDeveloperFolder];
     NSDictionary *devDict = @{kPrefix : devPrefix, kItems : [NSMutableArray arrayWithObject:@"Developer"]};
     
-    NSString *desktopPrefix = [homeDir stringByAppendingString:kDesktopFolder];
+    NSString *desktopPrefix = [homeDir stringByAppendingPathComponent:kDesktopFolder];
     NSDictionary *desktopDict = @{kPrefix : desktopPrefix, kItems : [NSMutableArray arrayWithObject:@"Desktop"]};
     
-    NSString *downloadPrefix = [homeDir stringByAppendingString:kDownloadFolder];
+    NSString *downloadPrefix = [homeDir stringByAppendingPathComponent:kDownloadFolder];
     NSDictionary *downloadDict = @{kPrefix : downloadPrefix, kItems : [NSMutableArray arrayWithObject:@"Download"]};
     
-    NSString *documentsPrefix = [homeDir stringByAppendingString:kDocumentsFolder];
+    NSString *documentsPrefix = [homeDir stringByAppendingPathComponent:kDocumentsFolder];
     NSDictionary *documentsdDict = @{kPrefix : documentsPrefix, kItems : [NSMutableArray arrayWithObject:@"Documents"]};
     
     NSString *allPrefix = @"/";
