@@ -567,7 +567,7 @@ EOF
 
         echo 'Packaging docs'
         sh tightdb_objc/build.sh package-docs
-        cp tightdb_objc/docs/output/0.84.0/realm-docs.tgz .
+        cp tightdb_objc/docs/output/*/realm-docs.tgz .
 
         echo 'Packaging examples'
         cd tightdb_objc/examples
