@@ -398,9 +398,8 @@ static id RLMSuperGet(RLMObject *obj, NSString *propName) {
     typedef id (*getter_type)(RLMObject *, SEL);
     RLMProperty *prop = obj.objectSchema[propName];
     Class superClass = class_getSuperclass(obj.class);
-    SEL selector = NSSelectorFromString(prop.getterName);
-    getter_type superGetter = (getter_type)[superClass instanceMethodForSelector:selector];
-    return superGetter(obj, selector);
+    getter_type superGetter = (getter_type)[superClass instanceMethodForSelector:prop.getterSel];
+    return superGetter(obj, prop.getterSel);
 }
 
 // call setter for superclass for property at colIndex
@@ -408,9 +407,8 @@ static void RLMSuperSet(RLMObject *obj, NSString *propName, id val) {
     typedef id (*setter_type)(RLMObject *, SEL, RLMArray *ar);
     RLMProperty *prop = obj.objectSchema[propName];
     Class superClass = class_getSuperclass(obj.class);
-    SEL selector = NSSelectorFromString(prop.setterName);
-    setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:selector];
-    superSetter(obj, selector, val);
+    setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:prop.setterSel];
+    superSetter(obj, prop.setterSel, val);
 }
 
 // getter/setter for standalone
@@ -558,17 +556,15 @@ static Class RLMCreateAccessorClass(Class objectClass,
         RLMProperty *prop = schema.properties[propNum];
         char accessorCode = accessorCodeForType(prop.objcType, prop.type);
         if (getterGetter) {
-            SEL getterSel = NSSelectorFromString(prop.getterName);
             IMP getterImp = getterGetter(prop, accessorCode, prop.objectClassName);
             if (getterImp) {
-                class_replaceMethod(accClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+                class_replaceMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
             }
         }
         if (setterGetter) {
-            SEL setterSel = NSSelectorFromString(prop.setterName);
             IMP setterImp = setterGetter(prop, accessorCode);
             if (setterImp) {
-                class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+                class_replaceMethod(accClass, prop.setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
             }
         }
     }

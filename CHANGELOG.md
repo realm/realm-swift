@@ -1,3 +1,14 @@
+0.86.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+### Enhancements
+
+* Speed up inserting objects with `addObject:` by ~20%.
+
+### Bugfixes
+
 0.85.0 Release notes (2014-09-15)
 =============================================================
 
