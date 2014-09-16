@@ -24,14 +24,19 @@
 
 - (instancetype)initWithName:(NSString *)name
                   attributes:(RLMPropertyAttributes)attributes
-               attributeList:(objc_property_attribute_t *)attrs
-              attributeCount:(unsigned int)attrCount;
+                    property:(objc_property_t)property;
+
+- (instancetype)initSwiftPropertyWithName:(NSString *)name
+                               attributes:(RLMPropertyAttributes)attributes
+                                 property:(objc_property_t)property
+                                 instance:(RLMObject *)objectInstance;
 
 // private setters
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
 
 // private properties
+@property (nonatomic, copy) NSString *objcRawType;
 @property (nonatomic, assign) char objcType;
 
 // getter and setter names
