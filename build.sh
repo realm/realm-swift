@@ -449,8 +449,8 @@ case "$COMMAND" in
 
     "package-ios")
         cd tightdb_objc
-        sh build.sh test-ios xcpretty
-        sh build.sh examples xcpretty
+        sh build.sh test-ios "$XCMODE"
+        sh build.sh examples "$XCMODE"
 
         cd build/Release
         zip --symlinks -r realm-framework-ios.zip Realm.framework
@@ -458,7 +458,7 @@ case "$COMMAND" in
 
     "package-osx")
         cd tightdb_objc
-        sh build.sh test-osx xcpretty
+        sh build.sh test-osx "$XCMODE"
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
@@ -468,7 +468,7 @@ case "$COMMAND" in
         TEMPDIR=$(mktemp -d /tmp/realm-release-package.XXXX)
 
         cd tightdb_objc
-        VERSION=$(bash build.sh get-version)
+        VERSION=$(sh build.sh get-version)
         cd ..
 
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx
