@@ -72,12 +72,7 @@
     schema.objectClass = objectClass;
 
     // create array of RLMProperties
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)]) {
-        schema.properties = [RLMSwiftSupport propertiesForClass:objectClass];
-    }
-    else {
-        schema.properties = [self propertiesForClass:objectClass];
-    }
+    schema.properties = [self propertiesForClass:objectClass];
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -114,6 +109,13 @@
 + (NSArray *)propertiesForClass:(Class)objectClass {
     NSArray *ignoredProperties = [objectClass ignoredProperties];
 
+    // For Swift classes we need an instance of the object when parsing properties
+    id swiftObjectInstance = nil;
+    BOOL isSwiftClass = [RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)];
+    if (isSwiftClass) {
+        swiftObjectInstance = [[objectClass alloc] init];
+    }
+
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
@@ -123,16 +125,17 @@
             continue;
         }
 
-        unsigned int attCount;
-        objc_property_attribute_t *atts = property_copyAttributeList(props[i], &attCount);
-        RLMProperty *prop = [[RLMProperty alloc]  initWithName:propertyName
-                                                    attributes:[objectClass attributesForProperty:propertyName]
-                                                 attributeList:atts
-                                                attributeCount:attCount];
-        free(atts);
-        [propArray addObject:prop];
+        RLMPropertyAttributes atts = [objectClass attributesForProperty:propertyName];
+        if (isSwiftClass) {
+            [propArray addObject:[[RLMProperty alloc] initSwiftPropertyWithName:propertyName
+                                                                     attributes:atts
+                                                                       property:props[i]
+                                                                       instance:swiftObjectInstance]];
+        }
+        else {
+            [propArray addObject:[[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]]];
+        }
     }
-
     free(props);
 
     return propArray;

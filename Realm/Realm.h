@@ -18,15 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMObject.h>
 #import <Realm/RLMArray.h>
-#import <Realm/RLMSchema.h>
 #import <Realm/RLMMigration.h>
+#import <Realm/RLMObject.h>
 #import <Realm/RLMPlatform.h>
+#import <Realm/RLMRealm.h>
+#import <Realm/RLMSchema.h>
 
-// WARNING: For private use only (imported for Swift support)
-// TODO: Move header from Public to Project once rdar://17633863 is fixed
-#if REALM_SWIFT
-#import <Realm/Realm-Bridging-Header.h>
+#if defined(__IPHONE_8_0) && TARGET_OS_IPHONE
+#import <Realm/RLMSwiftHelpers.h>
 #endif

@@ -17,6 +17,8 @@
 * Added methods to update or insert (upsert) for objects with primary keys defined.
 * `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
   any object type with kvc properties.
+* The Swift support has been reworked to work around Swift not being supported
+  in Frameworks on iOS 7.
 * Improve performance when getting the count of items matching a query but not
   reading any of the objects in the results.
 * Add a return value to `-[RLMRealm refresh]` that indicates whether or not

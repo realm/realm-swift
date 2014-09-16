@@ -16,15 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extension RLMObject {
+#import "RLMSwiftSupport.h"
 
-    // Swift query convenience functions
+#import "RLMObject.h"
+#import "RLMProperty.h"
 
-    public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
-        return objectsWhere(predicateFormat, args: getVaList(args))
-    }
+#import <objc/runtime.h>
 
-    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
-        return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
-    }
+@implementation RLMSwiftSupport
+
++ (BOOL)isSwiftClassName:(NSString *)className {
+    return [className rangeOfString:@"."].location != NSNotFound;
 }
+
++ (NSString *)demangleClassName:(NSString *)className {
+    return [className substringFromIndex:[className rangeOfString:@"."].location + 1];
+}
+@end
