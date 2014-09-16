@@ -1,4 +1,4 @@
-0.85.0 Release notes (YYYY-MM-DD)
+0.85.0 Release notes (2014-09-15)
 =============================================================
 
 ### API breaking changes
