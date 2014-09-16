@@ -65,18 +65,18 @@ NSString *const kDocumentsFolder = @"/Documents";
         self.realmQuery = [[NSMetadataQuery alloc] init];
         [self.realmQuery setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemContentModificationDate ascending:NO]]];
         NSPredicate *realmPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.realm'"];
-        [self.realmQuery setPredicate:realmPredicate];
+        self.realmQuery.predicate = realmPredicate;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(realmQueryNote:) name:nil object:self.realmQuery];
         [self.realmQuery startQuery];
         
         self.appQuery = [[NSMetadataQuery alloc] init];
         NSPredicate *appPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.app'"];
-        [self.appQuery setPredicate:appPredicate];
+        self.appQuery.predicate = appPredicate;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.appQuery];
 
         self.projQuery = [[NSMetadataQuery alloc] init];
         NSPredicate *projPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.xcodeproj'"];
-        [self.projQuery setPredicate:projPredicate];
+        self.projQuery.predicate = projPredicate;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.projQuery];
 
         self.dateFormatter = [[NSDateFormatter alloc] init];
@@ -145,7 +145,7 @@ NSString *const kDocumentsFolder = @"/Documents";
         if ([item isKindOfClass:[NSString class]]) {
             NSMenuItem *categoryItem = [[NSMenuItem alloc] init];
             categoryItem.title = (NSString *)item;
-            [categoryItem setEnabled:NO];
+            categoryItem.enabled = NO;
             [menu addItem:categoryItem];
         }
         // Array of items, create cubmenu and set them up there by calling this method recursively
