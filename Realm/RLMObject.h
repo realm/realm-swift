@@ -201,7 +201,26 @@
 
 /**
  Implement to set custom attributes for each property.
- 
+
+ The default attributes for each property should be obtained by calling
+ `[super attributesForProperty:propertyName]`, and then ORed together with
+ the attributes you wish to add. For example, to index a single property:
+
+     @interface Model : RLMObject
+     @property NSString *indexedProperty;
+     @property NSString *unindexedProperty;
+     @end
+
+     @implementation Model
+     + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
+        RLMPropertyAttributes attributes = [super attributesForProperty:propertyName];
+        if ([propertyName isEqualToString:@"indexedProperty"]) {
+            attributes |= RLMPropertyAttributeIndexed;
+        }
+        return attributes;
+     }
+     @end
+
  @param propertyName    Name of property for which attributes have been requested.
  @return                Bitmask of property attributes for the given property.
  */
