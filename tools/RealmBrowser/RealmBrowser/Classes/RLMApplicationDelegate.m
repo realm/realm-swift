@@ -29,7 +29,11 @@ const NSUInteger kMaxFilesPerCategory = 7;
 const CGFloat kMenuImageSize = 16;
 
 NSString *const kRealmFileExension = @"realm";
-
+NSString *const kDeveloperFolder = @"/Developer";
+NSString *const kSimulatorFolder = @"/Library/Application Support/iPhone Simulator";
+NSString *const kDesktopFolder = @"/Desktop";
+NSString *const kDownloadFolder = @"/Download";
+NSString *const kDocumentsFolder = @"/Documents";
 
 @interface RLMApplicationDelegate ()
 
@@ -43,6 +47,7 @@ NSString *const kRealmFileExension = @"realm";
 
 @property (nonatomic, strong) NSMetadataQuery *realmQuery;
 @property (nonatomic, strong) NSMetadataQuery *appQuery;
+@property (nonatomic, strong) NSMetadataQuery *projQuery;
 @property (nonatomic, strong) NSArray *groupedFileItems;
 
 @end
@@ -65,10 +70,15 @@ NSString *const kRealmFileExension = @"realm";
         [self.realmQuery startQuery];
         
         self.appQuery = [[NSMetadataQuery alloc] init];
-        NSPredicate *appPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.xcodeproj'"];
+        NSPredicate *appPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.app'"];
         [self.appQuery setPredicate:appPredicate];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appQueryNote:) name:nil object:self.appQuery];
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.appQuery];
+
+        self.projQuery = [[NSMetadataQuery alloc] init];
+        NSPredicate *projPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.xcodeproj'"];
+        [self.projQuery setPredicate:projPredicate];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.projQuery];
+
         self.dateFormatter = [[NSDateFormatter alloc] init];
         self.dateFormatter.dateStyle = NSDateFormatterMediumStyle;
         self.dateFormatter.timeStyle = NSDateFormatterShortStyle;
@@ -99,6 +109,7 @@ NSString *const kRealmFileExension = @"realm";
     if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
         [self updateFileItems];
         [self.appQuery startQuery];
+        [self.projQuery startQuery];
     }
     else if ([[notification name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
         [self updateFileItems];
@@ -106,7 +117,7 @@ NSString *const kRealmFileExension = @"realm";
     }
 }
 
-- (void)appQueryNote:(NSNotification *)notification {
+- (void)otherQueryNote:(NSNotification *)notification {
     if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
         [self updateFileItems];
     }
@@ -153,57 +164,76 @@ NSString *const kRealmFileExension = @"realm";
         else if ([item isMemberOfClass:[NSMetadataItem class]]) {
             NSMetadataItem *metadataItem = (NSMetadataItem *)item;
             
-            NSString *filePath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
-            NSString *title = [filePath lastPathComponent];
-            
-            NSString *devPrefix = [NSHomeDirectory() stringByAppendingString:@"/Developer/"];
-            if ([filePath hasPrefix:devPrefix]) {
-                NSString *appName = [self appNameForRealmWithPath:filePath];
-                
-                if (appName) {
-                    title = [NSString stringWithFormat:@"%@ (%@)", title, appName];
-                }
-            }
-            
+            // Get the path to the realm and see if there is additional info for it, such as app name
+            NSString *path = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+            NSString *title = [[path lastPathComponent] stringByAppendingString:[self extraInfoForRealmWithPath:path]];
+
+            // Create a menu item using the title and link it with opening the file
             NSMenuItem *menuItem = [[NSMenuItem alloc] init];
             menuItem.title = title;
-            menuItem.representedObject = [NSURL fileURLWithPath:filePath];
+            menuItem.representedObject = [NSURL fileURLWithPath:path];
             
             menuItem.target = self;
             menuItem.action = @selector(openFileWithMenuItem:);
             menuItem.image = image;
             menuItem.indentationLevel = indented ? 1 : 0;
             
+            // Give the menu item a tooltip with modification date and full path
             NSDate *date = [metadataItem valueForAttribute:NSMetadataItemFSContentChangeDateKey];
             NSString *dateString = [self.dateFormatter stringFromDate:date];
-            menuItem.toolTip = [NSString stringWithFormat:@"%@\n\nModified: %@", filePath, dateString];
+            menuItem.toolTip = [NSString stringWithFormat:@"%@\n\nModified: %@", path, dateString];
             
             [menu addItem:menuItem];
         }
     }
 }
 
--(NSString *)appNameForRealmWithPath:(NSString *)realmPath
+-(NSString *)extraInfoForRealmWithPath:(NSString *)realmPath
 {
-    NSArray *appPaths = [self.appQuery results];
+    NSArray *searchPaths;
+    NSString *searchEndPath;
     
+    NSString *developerPrefix = [NSHomeDirectory() stringByAppendingString:kDeveloperFolder];
+    NSString *simulatorPrefix = [NSHomeDirectory() stringByAppendingString:kSimulatorFolder];
+    
+    if ([realmPath hasPrefix:developerPrefix]) {
+        // The realm file is in the simulator, so we are looking for *.xcodeproj files
+        searchPaths = [self.projQuery results];
+        searchEndPath = developerPrefix;
+    }
+    else if ([realmPath hasPrefix:simulatorPrefix]) {
+        // The realm file is in the simulator, so we are looking for *.app files
+        searchPaths = [self.appQuery results];
+        searchEndPath = simulatorPrefix;
+    }
+    else {
+        // We have no extra info for this containing folder
+        return @"";
+    }
+    
+    // Search at most four levels up for a corresponding app/project file
     for (NSUInteger i = 0; i < 4; i++) {
+        // Go up one level in the file hierachy by deleting last path component
         realmPath = [[realmPath stringByDeletingLastPathComponent] copy];
-        if ([realmPath hasSuffix:@"/Developer"]) {
-            return nil;
+        if ([realmPath isEqualToString:searchEndPath]) {
+            // Reached end of iteration, the respective folder we are searching within
+            return @"";
         }
         
-        for (NSString *appPathItem in appPaths) {
-            NSMetadataItem *metadataItem = (NSMetadataItem *)appPathItem;
-            NSString *appPath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+        for (NSString *pathItem in searchPaths) {
+            NSMetadataItem *metadataItem = (NSMetadataItem *)pathItem;
+            NSString *foundPath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
             
-            if ([[appPath stringByDeletingLastPathComponent] isEqualToString:realmPath]) {
-                return [[[appPath pathComponents] lastObject] stringByDeletingPathExtension];
+            if ([[foundPath stringByDeletingLastPathComponent] isEqualToString:realmPath]) {
+                // Found a project/app file, returning it in formatted form
+                NSString *extraInfo = [[[foundPath pathComponents] lastObject] stringByDeletingPathExtension];
+                return [NSString stringWithFormat: @" - %@", extraInfo];
             }
         }
     }
     
-    return nil;
+    // Tried four levels up and still found nothing, nor reached containing folder. Giving up
+    return @"";
 }
 
 -(void)updateFileItems
@@ -213,19 +243,19 @@ NSString *const kRealmFileExension = @"realm";
     NSString *kPrefix = @"Prefix";
     NSString *kItems = @"Items";
     
-    NSString *simPrefix = [homeDir stringByAppendingString:@"/Library/Application Support/iPhone Simulator/"];
+    NSString *simPrefix = [homeDir stringByAppendingString:kSimulatorFolder];
     NSDictionary *simDict = @{kPrefix : simPrefix, kItems : [NSMutableArray arrayWithObject:@"iPhone Simulator"]};
     
-    NSString *devPrefix = [homeDir stringByAppendingString:@"/Developer/"];
+    NSString *devPrefix = [homeDir stringByAppendingString:kDeveloperFolder];
     NSDictionary *devDict = @{kPrefix : devPrefix, kItems : [NSMutableArray arrayWithObject:@"Developer"]};
     
-    NSString *desktopPrefix = [homeDir stringByAppendingString:@"/Desktop/"];
+    NSString *desktopPrefix = [homeDir stringByAppendingString:kDesktopFolder];
     NSDictionary *desktopDict = @{kPrefix : desktopPrefix, kItems : [NSMutableArray arrayWithObject:@"Desktop"]};
     
-    NSString *downloadPrefix = [homeDir stringByAppendingString:@"/Download/"];
+    NSString *downloadPrefix = [homeDir stringByAppendingString:kDownloadFolder];
     NSDictionary *downloadDict = @{kPrefix : downloadPrefix, kItems : [NSMutableArray arrayWithObject:@"Download"]};
     
-    NSString *documentsPrefix = [homeDir stringByAppendingString:@"/Documents/"];
+    NSString *documentsPrefix = [homeDir stringByAppendingString:kDocumentsFolder];
     NSDictionary *documentsdDict = @{kPrefix : documentsPrefix, kItems : [NSMutableArray arrayWithObject:@"Documents"]};
     
     NSString *allPrefix = @"/";
