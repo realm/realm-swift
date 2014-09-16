@@ -329,6 +329,7 @@ case "$COMMAND" in
     ######################################
     "examples")
         sh build.sh clean
+
         cd examples
         XCODE_VERSION=5
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
@@ -447,6 +448,29 @@ case "$COMMAND" in
         zip --symlinks -r realm-obj-examples.zip examples
         ;;
 
+    "package-test-examples")
+        ( mkdir ios; cd ios; unzip ../realm-framework-ios.zip )
+        ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
+        unzip realm-obj-examples.zip
+
+        rm *.zip
+        cd examples
+
+        XCODE_VERSION=5
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+
+        rm -r build
+
+        XCODE_VERSION=6
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        ;;
+
     "package-ios")
         cd tightdb_objc
         sh build.sh test-ios "$XCMODE"
@@ -552,6 +576,18 @@ EOF
 
         sh tightdb_objc/build.sh package-examples
         cp tightdb_objc/realm-obj-examples.zip .
+
+        echo 'Testing packaged examples'
+        (
+            mkdir -p examples-test
+            cd examples-test
+            cp ../realm-framework-ios.zip .
+            cp ../realm-framework-osx.zip .
+            cp ../realm-obj-examples.zip .
+            ln -s $WORKSPACE/tightdb_objc .
+
+            sh ../tightdb_objc/build.sh package-test-examples
+        )
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
