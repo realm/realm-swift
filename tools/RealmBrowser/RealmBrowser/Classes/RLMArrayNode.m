@@ -95,6 +95,26 @@
     return displayedArray[index];
 }
 
+- (id)minimumOfPropertyNamed:(NSString *)propertyName
+{
+    return [displayedArray minOfProperty:propertyName];
+}
+
+- (NSNumber *)averageOfPropertyNamed:(NSString *)propertyName
+{
+    return [displayedArray averageOfProperty:propertyName];
+}
+
+- (id)maximumOfPropertyNamed:(NSString *)propertyName
+{
+    return [displayedArray maxOfProperty:propertyName];
+}
+
+- (NSNumber *)sumOfPropertyNamed:(NSString *)propertyName
+{
+    return [displayedArray sumOfProperty:propertyName];
+}
+
 - (id)nodeElementForColumnWithIndex:(NSInteger)index
 {
     switch (index) {

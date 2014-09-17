@@ -79,6 +79,26 @@
 
 #pragma mark - RLMObjectNode overrides
 
+- (id)minimumOfPropertyNamed:(NSString *)propertyName
+{
+    return [self.allObjects minOfProperty:propertyName];
+}
+
+- (NSNumber *)averageOfPropertyNamed:(NSString *)propertyName
+{
+    return [self.allObjects averageOfProperty:propertyName];
+}
+
+- (id)maximumOfPropertyNamed:(NSString *)propertyName
+{
+    return [self.allObjects maxOfProperty:propertyName];
+}
+
+- (NSNumber *)sumOfPropertyNamed:(NSString *)propertyName
+{
+    return [self.allObjects sumOfProperty:propertyName];
+}
+
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
     return self.allObjects[index];

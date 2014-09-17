@@ -164,32 +164,67 @@ const NSUInteger kMaxDepthForTooltips = 2;
 
 -(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn
 {
-    NSString *toolTip;
-    
+    numberFormatter.maximumFractionDigits = 3;
+
+    NSString *propertyName = propertyColumn.property.name;
+
     switch (propertyColumn.property.type) {
+        case RLMPropertyTypeInt: {
+            numberFormatter.minimumFractionDigits = 0;
+            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
+            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
+            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
+            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
+            
+            NSUInteger totalChars = MAX(MAX(min.length, max.length), sum.length) + 1;
+            NSString *minPadding = [@"" stringByPaddingToLength:totalChars - min.length withString:@" " startingAtIndex:0];
+            min = [minPadding stringByAppendingString:min];
+            NSString *avgPadding = [@"" stringByPaddingToLength:totalChars - avg.length withString:@" " startingAtIndex:0];
+            avg = [avgPadding stringByAppendingString:avg];
+            NSString *maxPadding = [@"" stringByPaddingToLength:totalChars - max.length withString:@" " startingAtIndex:0];
+            max = [maxPadding stringByAppendingString:max];
+            NSString *sumPadding = [@"" stringByPaddingToLength:totalChars - sum.length withString:@" " startingAtIndex:0];
+            sum = [sumPadding stringByAppendingString:sum];
+            
+            return [NSString stringWithFormat:@"Int\nMinimum:%@\nAverage:%@\nMaximum:%@\nSum:****%@", min, avg, max, sum];
+        }
+        case RLMPropertyTypeFloat: {
+            numberFormatter.minimumFractionDigits = 3;
+            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
+            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
+            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
+            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
+            
+            return [NSString stringWithFormat:@"Float\nMinimum:\t %@\nAverage:\t %@\nMaximum:\t %@\nSum:\t\t %@", min, avg, max, sum];
+        }
+        case RLMPropertyTypeDouble: {
+            numberFormatter.minimumFractionDigits = 3;
+            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
+            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
+            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
+            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
+            
+            return [NSString stringWithFormat:@"Double\nMinimum:\t %@\nAverage:\t %@\nMaximum:\t %@\nSum:\t\t %@", min, avg, max, sum];
+        }
+        case RLMPropertyTypeDate: {
+            NSString *min = [dateFormatter stringFromDate:[self.displayedType minimumOfPropertyNamed:propertyName]];
+            NSString *max = [dateFormatter stringFromDate:[self.displayedType maximumOfPropertyNamed:propertyName]];
+            
+            return [NSString stringWithFormat:@"Date\nMinimum:\t %@\nMaximum:\t %@", min, max];
+        }
         case RLMPropertyTypeBool:
             return @"Boolean";
-        case RLMPropertyTypeInt:
-            return @"Integer";
-        case RLMPropertyTypeFloat:
-            return @"Float";
-        case RLMPropertyTypeDouble:
-            return @"Double";
         case RLMPropertyTypeString:
             return @"String";
         case RLMPropertyTypeData:
             return @"Data";
         case RLMPropertyTypeAny:
             return @"Any";
-        case RLMPropertyTypeDate:
-            return @"Date";
         case RLMPropertyTypeArray:
             return [NSString stringWithFormat:@"%@[]", propertyColumn.property.objectClassName];
         case RLMPropertyTypeObject:
             return [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
     }
-    
-    return toolTip;
 }
 
 #pragma mark - NSTableView Delegate
