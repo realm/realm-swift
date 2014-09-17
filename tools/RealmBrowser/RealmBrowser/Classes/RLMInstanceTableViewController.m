@@ -166,42 +166,47 @@ const NSUInteger kMaxDepthForTooltips = 2;
 {
     numberFormatter.maximumFractionDigits = 3;
 
+    // For certain types we want to add some statistics
+    RLMPropertyType type = propertyColumn.property.type;
     NSString *propertyName = propertyColumn.property.name;
-
-    switch (propertyColumn.property.type) {
-        case RLMPropertyTypeInt: {
-            numberFormatter.minimumFractionDigits = 0;
-            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
-            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
-            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
-            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
-            
-            return [NSString stringWithFormat:@"Int\nMinimum: %@ Average: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
-        }
-        case RLMPropertyTypeFloat: {
-            numberFormatter.minimumFractionDigits = 3;
-            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
-            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
-            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
-            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
-            
-            return [NSString stringWithFormat:@"Float\nMinimum:\t %@\nAverage:\t %@\nMaximum:\t %@\nSum:\t\t %@", min, avg, max, sum];
-        }
+    NSString *statsString;
+    
+    switch (type) {
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
-            numberFormatter.minimumFractionDigits = 3;
+            numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
             NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
             NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
             NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
             NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
             
-            return [NSString stringWithFormat:@"Double\nMinimum:\t %@\nAverage:\t %@\nMaximum:\t %@\nSum:\t\t %@", min, avg, max, sum];
+            statsString = [NSString stringWithFormat:@"Minimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
+            break;
         }
         case RLMPropertyTypeDate: {
             NSString *min = [dateFormatter stringFromDate:[self.displayedType minimumOfPropertyNamed:propertyName]];
             NSString *max = [dateFormatter stringFromDate:[self.displayedType maximumOfPropertyNamed:propertyName]];
             
-            return [NSString stringWithFormat:@"Date\nMinimum:\t %@\nMaximum:\t %@", min, max];
+            statsString = [NSString stringWithFormat:@"Earliest: %@\nLatest: %@", min, max];
+            break;
         }
+        default: {
+            statsString = nil;
+            break;
+        }
+    }
+    
+    // Return the final tooltip string with the type name, and possibly some statistics
+    switch (type) {
+        case RLMPropertyTypeInt:
+            return [@"Int\n\n" stringByAppendingString:statsString];
+        case RLMPropertyTypeFloat:
+            return [@"Float\n\n" stringByAppendingString:statsString];
+        case RLMPropertyTypeDouble:
+            return [@"Float\n\n" stringByAppendingString:statsString];
+        case RLMPropertyTypeDate:
+            return [@"Date\n\n" stringByAppendingString:statsString];
         case RLMPropertyTypeBool:
             return @"Boolean";
         case RLMPropertyTypeString:

@@ -24,8 +24,6 @@
 #import "TestClasses.h"
 
 NSString *const kRealmFileExension = @"realm";
-NSString *const kToolTipFont = @"LucidaGrande";
-
 const NSUInteger kTopTipDelay = 250;
 
 @interface RLMApplicationDelegate ()
@@ -39,7 +37,6 @@ const NSUInteger kTopTipDelay = 250;
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
-    [[NSUserDefaults standardUserDefaults] setObject:kToolTipFont forKey:@"NSToolTipsFont"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     if (!self.didLoadFile) {
