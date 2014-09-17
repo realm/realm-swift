@@ -6,8 +6,13 @@
 ### Enhancements
 
 * Speed up inserting objects with `addObject:` by ~20%.
+* `readonly` properties are automatically ignored rather than having to be
+  added to `ignoredProperties`.
 
 ### Bugfixes
+
+* Fix error about not being able to persist property 'hash' with incompatible
+  type when building for devices with Xcode 6.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================

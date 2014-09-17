@@ -133,3 +133,13 @@
     return @"stringCol";
 }
 @end
+
+@interface ReadOnlyPropertyObject ()
+@property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+@implementation ReadOnlyPropertyObject
+- (NSNumber *)readOnlyUnsupportedProperty {
+    return nil;
+}
+@end

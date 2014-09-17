@@ -126,15 +126,20 @@
         }
 
         RLMPropertyAttributes atts = [objectClass attributesForProperty:propertyName];
+        RLMProperty *prop = nil;
         if (isSwiftClass) {
-            [propArray addObject:[[RLMProperty alloc] initSwiftPropertyWithName:propertyName
-                                                                     attributes:atts
-                                                                       property:props[i]
-                                                                       instance:swiftObjectInstance]];
+            prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
+                                                       attributes:atts
+                                                         property:props[i]
+                                                         instance:swiftObjectInstance];
         }
         else {
-            [propArray addObject:[[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]]];
+            prop = [[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]];
         }
+
+        if (prop) {
+            [propArray addObject:prop];
+         }
     }
     free(props);
 

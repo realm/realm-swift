@@ -245,10 +245,14 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
-
 @interface PrimaryStringObject : RLMObject
 @property NSString *stringCol;
 @property int intCol;
+@end
+
+@interface ReadOnlyPropertyObject : RLMObject
+@property (readonly) NSNumber *readOnlyUnsupportedProperty;
+@property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
 
