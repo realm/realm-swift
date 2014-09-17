@@ -27,7 +27,7 @@
 + (void)clearRealmCache;
 @end
 
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
 @implementation XCTestExpectation{
 @public
     BOOL _fulfilled;
@@ -82,7 +82,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 
 @implementation RLMTestCase
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
 {
     NSMutableArray *_expectations;
 }
@@ -111,7 +111,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (void)invokeTest
 {
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
     _expectations = [NSMutableArray new];
 #endif
 
@@ -135,7 +135,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:schema error:nil];
 }
 
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
 - (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(__unused id)noop {
     NSDate *endDate = [NSDate dateWithTimeIntervalSinceNow:interval];
     while (_expectations.count && [endDate timeIntervalSinceNow] > 0) {

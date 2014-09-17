@@ -246,7 +246,6 @@ const NSUInteger kMaxDepthForTooltips = 2;
     }
     
     NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
-    
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     // Array gutter
@@ -292,7 +291,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
             
             break;
         }
-            
+            // Intentional fallthrough
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
@@ -320,7 +319,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
 
             break;
         }
-            
+            // Intentional fallthrough
         case RLMPropertyTypeData:
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:

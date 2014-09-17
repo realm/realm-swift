@@ -16,10 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if !defined(REALM_SWIFT) && (defined(__IPHONE_8_0) || defined(__MAC_10_10))
-#define REALM_SWIFT 1
-#endif
-
 /**
  Attributes which can be returned when implementing attributesForProperty:
  */

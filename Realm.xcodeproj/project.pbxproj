@@ -116,13 +116,15 @@
 		02E4D6ED192E58320082808D /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 02E4D6EB192E58320082808D /* RLMTestObjects.m */; };
 		02F4EAF6195DF0A6008743D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA119354DDF00E4EEF8 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02F4EAF7195DF0B0008743D9 /* RLMMigration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 02026CA7193562B400E4EEF8 /* RLMMigration_Private.h */; };
-		3FF51A2819BA25A100F2E9B7 /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FF51A2619BA25A100F2E9B7 /* RLMSwiftSupport.h */; };
-		3FF51A2919BA25A100F2E9B7 /* RLMSwiftSupportFallback.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupportFallback.m */; };
-		3FF51A2A19BA277800F2E9B7 /* RLMSwiftSupportFallback.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupportFallback.m */; };
+		3F7A873719C89B9600EEE13E /* RLMSwiftHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F7A873619C89B9600EEE13E /* RLMSwiftHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3F7A873819C89BB200EEE13E /* RLMSwiftHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F7A873619C89B9600EEE13E /* RLMSwiftHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F80E10119BE2A9400907B21 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F80E10019BE2A9400907B21 /* RLMUpdateChecker.mm */; };
 		3F80E10219BE2A9400907B21 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F80E10019BE2A9400907B21 /* RLMUpdateChecker.mm */; };
 		3F80E10419BE2AAA00907B21 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F80E10319BE2AAA00907B21 /* RLMUpdateChecker.hpp */; };
 		3F80E10519BE2AAA00907B21 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F80E10319BE2AAA00907B21 /* RLMUpdateChecker.hpp */; };
+		3FF51A2819BA25A100F2E9B7 /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FF51A2619BA25A100F2E9B7 /* RLMSwiftSupport.h */; };
+		3FF51A2919BA25A100F2E9B7 /* RLMSwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupport.m */; };
+		3FF51A2A19BA277800F2E9B7 /* RLMSwiftSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupport.m */; };
 		428D6F421947066E00ACEB74 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E395319409432001DC9C1 /* libc++.dylib */; };
 		428D6F431947067E00ACEB74 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C4145E191DE49600F858D9 /* Realm.framework */; };
 		429E39571940B3DC001DC9C1 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 429E39551940B204001DC9C1 /* libc++.dylib */; };
@@ -228,10 +230,11 @@
 		02E4D6E8192E58250082808D /* MixedTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MixedTests.m; sourceTree = "<group>"; };
 		02E4D6EB192E58320082808D /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		02E4D6EE192E583A0082808D /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
-		3FF51A2619BA25A100F2E9B7 /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
-		3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupportFallback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMSwiftSupportFallback.m; sourceTree = "<group>"; };
+		3F7A873619C89B9600EEE13E /* RLMSwiftHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftHelpers.h; sourceTree = "<group>"; };
 		3F80E10019BE2A9400907B21 /* RLMUpdateChecker.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUpdateChecker.mm; sourceTree = "<group>"; };
 		3F80E10319BE2AAA00907B21 /* RLMUpdateChecker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateChecker.hpp; sourceTree = "<group>"; };
+		3FF51A2619BA25A100F2E9B7 /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
+		3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMSwiftSupport.m; sourceTree = "<group>"; };
 		429E395319409432001DC9C1 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		429E39551940B204001DC9C1 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -342,8 +345,9 @@
 				02E4D6A6192E3DC40082808D /* RLMSchema.h */,
 				02E4D6A7192E3DC40082808D /* RLMSchema.mm */,
 				02E4D6A5192E3DC40082808D /* RLMSchema_Private.h */,
+				3F7A873619C89B9600EEE13E /* RLMSwiftHelpers.h */,
 				3FF51A2619BA25A100F2E9B7 /* RLMSwiftSupport.h */,
-				3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupportFallback.m */,
+				3FF51A2719BA25A100F2E9B7 /* RLMSwiftSupport.m */,
 				3F80E10319BE2AAA00907B21 /* RLMUpdateChecker.hpp */,
 				3F80E10019BE2A9400907B21 /* RLMUpdateChecker.mm */,
 				02E4D6A8192E3DC40082808D /* RLMUtil.hpp */,
@@ -456,7 +460,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				02E4D6AA192E3DC40082808D /* Realm.h in Headers */,
-				22F639E619ACAF4500DCDAEA /* RLMTestDataGenerator.h in Headers */,
 				02E4D6AC192E3DC40082808D /* RLMAccessor.h in Headers */,
 				02E4D6B2192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6B0192E3DC40082808D /* RLMArray_Private.hpp in Headers */,
@@ -470,6 +473,7 @@
 				02E4D6C4192E3DC40082808D /* RLMObjectSchema_Private.hpp in Headers */,
 				02E4D6CA192E3DC40082808D /* RLMObjectStore.hpp in Headers */,
 				02889109198AE111007D8FB2 /* RLMPlatform.h in Headers */,
+				3F7A873719C89B9600EEE13E /* RLMSwiftHelpers.h in Headers */,
 				02E4D6D0192E3DC40082808D /* RLMProperty.h in Headers */,
 				02E4D6CE192E3DC40082808D /* RLMProperty_Private.h in Headers */,
 				3F80E10419BE2AAA00907B21 /* RLMUpdateChecker.hpp in Headers */,
@@ -489,6 +493,7 @@
 			files = (
 				02E4D6AB192E3DC40082808D /* Realm.h in Headers */,
 				02E4D6AD192E3DC40082808D /* RLMAccessor.h in Headers */,
+				3F7A873819C89BB200EEE13E /* RLMSwiftHelpers.h in Headers */,
 				02E4D6B3192E3DC40082808D /* RLMArray.h in Headers */,
 				02E4D6B1192E3DC40082808D /* RLMArray_Private.hpp in Headers */,
 				02E4D6BB192E3DC40082808D /* RLMConstants.h in Headers */,
@@ -718,7 +723,7 @@
 				02E4D6AE192E3DC40082808D /* RLMAccessor.mm in Sources */,
 				022C8BE9194237BE00BCDB9D /* RLMArray.mm in Sources */,
 				022C8BEA194237BE00BCDB9D /* RLMArrayLinkView.mm in Sources */,
-				3FF51A2919BA25A100F2E9B7 /* RLMSwiftSupportFallback.m in Sources */,
+				3FF51A2919BA25A100F2E9B7 /* RLMSwiftSupport.m in Sources */,
 				02E4D6B4192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6BC192E3DC40082808D /* RLMConstants.m in Sources */,
 				02026CA519354DDF00E4EEF8 /* RLMMigration.mm in Sources */,
@@ -766,7 +771,7 @@
 				02E4D6AF192E3DC40082808D /* RLMAccessor.mm in Sources */,
 				022C8BEB194237C400BCDB9D /* RLMArray.mm in Sources */,
 				022C8BEC194237C400BCDB9D /* RLMArrayLinkView.mm in Sources */,
-				3FF51A2A19BA277800F2E9B7 /* RLMSwiftSupportFallback.m in Sources */,
+				3FF51A2A19BA277800F2E9B7 /* RLMSwiftSupport.m in Sources */,
 				02E4D6B5192E3DC40082808D /* RLMArrayTableView.mm in Sources */,
 				02E4D6BD192E3DC40082808D /* RLMConstants.m in Sources */,
 				02026CA619354DDF00E4EEF8 /* RLMMigration.mm in Sources */,
@@ -1176,6 +1181,7 @@
 					"DEBUG=1",
 					TIGHTDB_DEBUG,
 					TIGHTDB_HAVE_CONFIG,
+					REALM_XCODE5,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1391,6 +1397,7 @@
 					"DEBUG=1",
 					TIGHTDB_DEBUG,
 					TIGHTDB_HAVE_CONFIG,
+					REALM_XCODE5,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1438,7 +1445,10 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = TIGHTDB_HAVE_CONFIG;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					TIGHTDB_HAVE_CONFIG,
+					REALM_XCODE5,
+				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
