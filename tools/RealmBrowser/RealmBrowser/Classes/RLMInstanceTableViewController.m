@@ -176,17 +176,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
             NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
             NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
             
-            NSUInteger totalChars = MAX(MAX(min.length, max.length), sum.length) + 1;
-            NSString *minPadding = [@"" stringByPaddingToLength:totalChars - min.length withString:@" " startingAtIndex:0];
-            min = [minPadding stringByAppendingString:min];
-            NSString *avgPadding = [@"" stringByPaddingToLength:totalChars - avg.length withString:@" " startingAtIndex:0];
-            avg = [avgPadding stringByAppendingString:avg];
-            NSString *maxPadding = [@"" stringByPaddingToLength:totalChars - max.length withString:@" " startingAtIndex:0];
-            max = [maxPadding stringByAppendingString:max];
-            NSString *sumPadding = [@"" stringByPaddingToLength:totalChars - sum.length withString:@" " startingAtIndex:0];
-            sum = [sumPadding stringByAppendingString:sum];
-            
-            return [NSString stringWithFormat:@"Int\nMinimum:%@\nAverage:%@\nMaximum:%@\nSum:****%@", min, avg, max, sum];
+            return [NSString stringWithFormat:@"Int\nMinimum: %@ Average: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
         }
         case RLMPropertyTypeFloat: {
             numberFormatter.minimumFractionDigits = 3;

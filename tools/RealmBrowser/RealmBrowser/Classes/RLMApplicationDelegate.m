@@ -24,7 +24,7 @@
 #import "TestClasses.h"
 
 NSString *const kRealmFileExension = @"realm";
-NSString *const kToolTipFont = @"Futura";
+NSString *const kToolTipFont = @"LucidaGrande";
 
 const NSUInteger kTopTipDelay = 250;
 
@@ -40,6 +40,7 @@ const NSUInteger kTopTipDelay = 250;
 {
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     [[NSUserDefaults standardUserDefaults] setObject:kToolTipFont forKey:@"NSToolTipsFont"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     if (!self.didLoadFile) {
         NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
