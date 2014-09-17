@@ -133,6 +133,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
+@interface ReadOnlyPropertyObject ()
+@property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
 #pragma mark - Private
 
 @interface RLMRealm ()
@@ -551,6 +555,20 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     
     XCTAssertEqualObjects(obj2.name, obj.name, @"persisted property should be the same");
     XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
+}
+
+- (void)testReadOnlyPropertiesImplicitlyIgnored
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    ReadOnlyPropertyObject *obj = [[ReadOnlyPropertyObject alloc] init];
+    obj.readOnlyPropertyMadeReadWriteInClassExtension = 5;
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    obj = [[ReadOnlyPropertyObject allObjectsInRealm:realm] firstObject];
+    XCTAssertEqual(5, obj.readOnlyPropertyMadeReadWriteInClassExtension);
 }
 
 - (void)testCreateInRealmValidationForDictionary
