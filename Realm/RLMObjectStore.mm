@@ -293,7 +293,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
         id value = nil;
-        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
+        if ([object respondsToSelector:prop.getterSel]) {
             value = [object valueForKey:prop.getterName];
         }
 

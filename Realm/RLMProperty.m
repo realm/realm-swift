@@ -55,6 +55,9 @@
         firstChar = shouldUppercase ? firstChar.uppercaseString : firstChar;
         _setterName = [NSString stringWithFormat:@"set%@%@:", firstChar, [_name substringFromIndex:1]];
     }
+
+    _getterSel = NSSelectorFromString(_getterName);
+    _setterSel = NSSelectorFromString(_setterName);
 }
 
 -(void)setObjcCodeFromType {
