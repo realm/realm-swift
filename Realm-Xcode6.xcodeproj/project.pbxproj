@@ -773,6 +773,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E856D1E8195614A400FB2FCF /* Build configuration list for PBXNativeTarget "iOS" */;
 			buildPhases = (
+				3F69DF9E19CA0DF900607109 /* Get Version Number */,
 				E856D1EE1956151D00FB2FCF /* Download Core */,
 				E856D1D0195614A300FB2FCF /* Sources */,
 				E856D1D2195614A300FB2FCF /* Headers */,
@@ -956,6 +957,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3F69DF9E19CA0DF900607109 /* Get Version Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Realm/Realm-Info.plist",
+			);
+			name = "Get Version Number";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/RLMVersion.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+		};
 		E81A1FB71955FCE700FDED82 /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1315,8 +1332,8 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
+					"$(DERIVED_FILE_DIR)",
 				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1342,8 +1359,8 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
+					"$(DERIVED_FILE_DIR)",
 				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

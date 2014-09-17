@@ -20,6 +20,10 @@
 
 #import "RLMRealm.h"
 
+#if TARGET_IPHONE_SIMULATOR && !defined(REALM_VERSION)
+#import "RLMVersion.h"
+#endif
+
 void RLMCheckForUpdates() {
 #if TARGET_IPHONE_SIMULATOR
     if (getenv("REALM_DISABLE_UPDATE_CHECKER")) {
@@ -33,13 +37,6 @@ void RLMCheckForUpdates() {
         return;
     }
 
-#ifdef REALM_VERSION
-    NSString *version = @REALM_VERSION;
-#else
-    NSBundle *bundle = [NSBundle bundleForClass:[RLMRealm class]];
-    NSString *version = [bundle objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
-#endif
-
     auto handler = ^(NSData *data, __unused NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Failed to check for updates to Realm: %@", error);
@@ -47,14 +44,14 @@ void RLMCheckForUpdates() {
         }
 
         NSString *latestVersion = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (![version isEqualToString:latestVersion]) {
+        if (![REALM_VERSION isEqualToString:latestVersion]) {
             NSLog(@"Version %@ of Realm is now available: http://static.realm.io/downloads/cocoa/latest", latestVersion);
         }
 
         [settings setDouble:NSDate.timeIntervalSinceReferenceDate forKey:@"Last Update Check"];
     };
 
-    NSString *url = [NSString stringWithFormat:@"http://static.realm.io/update/cocoa?%@", version];
+    NSString *url = [NSString stringWithFormat:@"http://static.realm.io/update/cocoa?%@", REALM_VERSION];
     [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:url] completionHandler:handler] resume];
 #endif
 }
