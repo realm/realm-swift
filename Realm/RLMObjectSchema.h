@@ -42,6 +42,11 @@
 @property (nonatomic, readonly) NSString *className;
 
 /**
+ The property which is the primary key for this object (if any).
+ */
+@property (nonatomic, readonly) RLMProperty *primaryKeyProperty;
+
+/**
  Retrieve an RLMProperty object by name.
  
  @param propertyName The property's name.

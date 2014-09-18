@@ -57,4 +57,78 @@
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyType(-1)),    @"Unknown",   @"Unknown type");
 }
 
+- (void)testIntSizes
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    int16_t v16 = 1 << 12;
+    int32_t v32 = 1 << 30;
+    int64_t v64 = 1LL << 40;
+
+    AllIntSizesObject *obj = [AllIntSizesObject new];
+
+    // Test standalone
+    obj[@"int16"] = @(v16);
+    XCTAssertEqual([obj[@"int16"] shortValue], v16);
+    obj[@"int16"] = @(v32);
+    XCTAssertNotEqual([obj[@"int16"] intValue], v32, @"should truncate");
+
+    obj.int16 = 0;
+    obj.int16 = v16;
+    XCTAssertEqual(obj.int16, v16);
+
+    obj[@"int32"] = @(v32);
+    XCTAssertEqual([obj[@"int32"] intValue], v32);
+    obj[@"int32"] = @(v64);
+    XCTAssertNotEqual([obj[@"int32"] longLongValue], v64, @"should truncate");
+
+    obj.int32 = 0;
+    obj.int32 = v32;
+    XCTAssertEqual(obj.int32, v32);
+
+    obj[@"int64"] = @(v64);
+    XCTAssertEqual([obj[@"int64"] longLongValue], v64);
+    obj.int64 = 0;
+    obj.int64 = v64;
+    XCTAssertEqual(obj.int64, v64);
+
+    // Test in realm
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+
+    XCTAssertEqual(obj.int16, v16);
+    XCTAssertEqual(obj.int32, v32);
+    XCTAssertEqual(obj.int64, v64);
+
+    obj.int16 = 0;
+    obj.int32 = 0;
+    obj.int64 = 0;
+
+    obj[@"int16"] = @(v16);
+    XCTAssertEqual([obj[@"int16"] shortValue], v16);
+    obj[@"int16"] = @(v32);
+    XCTAssertNotEqual([obj[@"int16"] intValue], v32, @"should truncate");
+
+    obj.int16 = 0;
+    obj.int16 = v16;
+    XCTAssertEqual(obj.int16, v16);
+
+    obj[@"int32"] = @(v32);
+    XCTAssertEqual([obj[@"int32"] intValue], v32);
+    obj[@"int32"] = @(v64);
+    XCTAssertNotEqual([obj[@"int32"] longLongValue], v64, @"should truncate");
+
+    obj.int32 = 0;
+    obj.int32 = v32;
+    XCTAssertEqual(obj.int32, v32);
+
+    obj[@"int64"] = @(v64);
+    XCTAssertEqual([obj[@"int64"] longLongValue], v64);
+    obj.int64 = 0;
+    obj.int64 = v64;
+    XCTAssertEqual(obj.int64, v64);
+
+    [realm commitWriteTransaction];
+}
+
 @end

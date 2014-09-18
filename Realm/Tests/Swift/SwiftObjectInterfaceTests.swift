@@ -76,33 +76,16 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
     func testOptionalSwiftProperties() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-
-        let obj = SwiftOptionalObject()
-//        obj.optBoolCol = true
-//        obj.optIntCol = 1234
-//        obj.optFloatCol = 1.1
-//        obj.optDoubleCol = 2.2
-        obj.optStringCol = "abcd"
-        obj.optBinaryCol = "abcd".dataUsingEncoding(NSUTF8StringEncoding)
-        obj.optDateCol = NSDate(timeIntervalSince1970: 123)
-//        obj.optObjectCol = SwiftBoolObject()
-//        obj.optObjectCol!.boolCol = true
-        realm.addObject(obj)
-
-        realm.commitWriteTransaction()
+        realm.transactionWithBlock { realm.addObject(SwiftOptionalObject()) }
 
         let firstObj = SwiftOptionalObject.allObjectsInRealm(realm).firstObject() as SwiftOptionalObject
-//        XCTAssertEqual(firstObj.optBoolCol!, true, "should be true")
-//        XCTAssertEqual(firstObj.optIntCol!, 1234, "should be 1234")
-//        XCTAssertEqual(firstObj.optFloatCol!, 1.1, "should be 1.1")
-//        XCTAssertEqual(firstObj.optDoubleCol!, 2.2, "should be 2.2")
-        XCTAssertEqual(firstObj.optStringCol!, "abcd", "should be abcd")
-        XCTAssertEqual(firstObj.optBinaryCol!, "abcd".dataUsingEncoding(NSUTF8StringEncoding)!, "should be abcd data")
-        XCTAssertEqual(firstObj.optDateCol!, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
-//        XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
-//        XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
-//        XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
+        XCTAssertNil(firstObj.optObjectCol)
+
+        realm.transactionWithBlock {
+            firstObj.optObjectCol = SwiftBoolObject()
+            firstObj.optObjectCol!.boolCol = true
+        }
+        XCTAssertTrue(firstObj.optObjectCol!.boolCol)
     }
 
     func testSwiftClassNameIsDemangled() {
@@ -136,5 +119,23 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as BaseClassStringObject
         XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
         XCTAssertEqual(objectFromRealm.stringCol!, "stringVal", "Should be stringVal")
+    }
+
+    func testCreateOrUpdate() {
+        let realm = RLMRealm.defaultRealm()
+        realm.beginWriteTransaction()
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 1])
+        let objects = SwiftPrimaryStringObject.allObjects();
+        XCTAssertEqual(objects.count, 1, "Should have 1 object");
+        XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 1, "Value should be 1");
+
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["stringCol": "string2", "intCol": 2])
+        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+
+        SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 3])
+        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+        XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
+
+        realm.commitWriteTransaction()
     }
 }

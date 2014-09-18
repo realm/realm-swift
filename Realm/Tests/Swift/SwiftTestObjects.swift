@@ -48,10 +48,10 @@ class SwiftOptionalObject: RLMObject {
 //    dynamic var optIntCol: Int?
 //    dynamic var optFloatCol: Float?
 //    dynamic var optDoubleCol: Double?
-    dynamic var optStringCol: String?
-    dynamic var optBinaryCol: NSData?
-    dynamic var optDateCol: NSDate?
-//    dynamic var optObjectCol: SwiftBoolObject?
+//    dynamic var optStringCol: String?
+//    dynamic var optBinaryCol: NSData?
+//    dynamic var optDateCol: NSDate?
+    dynamic var optObjectCol: SwiftBoolObject?
 //    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
 }
 
@@ -70,6 +70,12 @@ class SwiftAggregateObject: RLMObject {
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
     dynamic var dateCol = NSDate()
+}
+
+class SwiftAllIntSizesObject: RLMObject {
+    dynamic var int16 : Int16 = 0
+    dynamic var int32 : Int32 = 0
+    dynamic var int64 : Int64 = 0
 }
 
 class SwiftEmployeeObject: RLMObject {
@@ -106,4 +112,13 @@ class SwiftIgnoredPropertiesObject: RLMObject {
         return ["runtimeProperty"]
     }
 
+}
+
+class SwiftPrimaryStringObject: RLMObject {
+    dynamic var stringCol = ""
+    dynamic var intCol = 0
+
+    override class func primaryKey() -> String {
+        return "stringCol"
+    }
 }

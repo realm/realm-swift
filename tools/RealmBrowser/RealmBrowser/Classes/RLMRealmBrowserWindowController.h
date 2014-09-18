@@ -26,15 +26,20 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 @interface RLMRealmBrowserWindowController : NSWindowController
 
+@property (nonatomic, readonly) RLMNavigationState *currentState;
 @property (nonatomic, weak) RLMDocument *modelDocument;
+
 @property (nonatomic, strong) IBOutlet RLMTypeOutlineViewController *outlineViewController;
 @property (nonatomic, strong) IBOutlet RLMInstanceTableViewController *tableViewController;
-@property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
-@property (nonatomic, strong) IBOutlet NSSearchField *searchField;
-@property (nonatomic, readonly) RLMNavigationState *currentState;
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller;
 
-- (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons;
+- (void)newWindowWithNavigationState:(RLMNavigationState *)state;
+
+- (void)realmDidLoad;
+
+- (void)reloadAllWindows;
+
+- (void)reloadAfterEdit;
 
 @end

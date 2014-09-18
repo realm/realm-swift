@@ -19,7 +19,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 
 @implementation RLMArray
@@ -146,7 +146,14 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMValidateMatchingObjectType(self, object);
-    return [_backingArray indexOfObject:object];
+    NSUInteger index = 0;
+    for (RLMObject *cmp in _backingArray) {
+        if ([object isEqualToObject:cmp]) {
+            return index;
+        }
+        index++;
+    }
+    return NSNotFound;
 }
 
 - (void)deleteObjectsFromRealm {
@@ -289,20 +296,15 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (instancetype)initWithSize:(NSUInteger)arraySize {
     if ((self = [super init])) {
         size = arraySize;
-        array = new id[size];
+        array = std::make_unique<id[]>(size);
     }
     return self;
 }
 
 - (void)resize:(NSUInteger)newSize {
     if (newSize != size) {
-        delete [] array;
         size = newSize;
-        array = new id[size];
+        array = std::make_unique<id[]>(size);
     }
-}
-
-- (void)dealloc {
-    delete [] array;
 }
 @end

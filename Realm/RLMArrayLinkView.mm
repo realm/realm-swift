@@ -22,7 +22,7 @@
 #import "RLMObject_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMConstants.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema.h"
 
