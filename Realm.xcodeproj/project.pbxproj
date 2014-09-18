@@ -562,6 +562,7 @@
 			buildConfigurationList = 02C415211921B0C400F858D9 /* Build configuration list for PBXNativeTarget "iOS Library" */;
 			buildPhases = (
 				022C8BF719428A8F00BCDB9D /* Download Core */,
+				3F2DB62C19CA1083000AF071 /* Get Version Number */,
 				02C415011921B0C300F858D9 /* Sources */,
 				02C415021921B0C300F858D9 /* Frameworks */,
 				02C4154A1921BE3F00F858D9 /* Headers */,
@@ -696,6 +697,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh download-core";
+		};
+		3F2DB62C19CA1083000AF071 /* Get Version Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Realm/Realm-Info.plist",
+			);
+			name = "Get Version Number";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/RLMVersion.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
 		421A994E1933648E00F5E4D4 /* Build Framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1014,7 +1031,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/core/include",
+					"$(DERIVED_FILE_DIR)",
+				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
@@ -1046,7 +1066,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/core/include",
+					"$(DERIVED_FILE_DIR)",
+				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
@@ -1311,7 +1334,10 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/core/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/core/include",
+					"$(DERIVED_FILE_DIR)",
+				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/core";
