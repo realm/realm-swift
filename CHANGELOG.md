@@ -5,6 +5,7 @@
 
 ### Enhancements
 
+* Add support for sorting RLMArray properties.
 * Speed up inserting objects with `addObject:` by ~20%.
 * `readonly` properties are automatically ignored rather than having to be
   added to `ignoredProperties`.
@@ -108,7 +109,6 @@
 
 ### Enhancements
 
-* Add support for sorting RLMArray properties.
 * Add support for querying for nil object properties.
 * Improve error message when specifying invalid literals when creating or 
   initializing RLMObjects.
