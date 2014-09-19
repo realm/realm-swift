@@ -36,6 +36,15 @@
 
 @end
 
+@interface AllIntSizesObject : RLMObject
+// int8_t not supported due to being ambiguous with BOOL
+
+@property int16_t int16;
+@property int32_t int32;
+@property int64_t int64;
+
+@end
+
 @interface FloatObject : RLMObject
 
 @property float floatCol;
@@ -128,9 +137,8 @@ RLM_ARRAY_TYPE(EmployeeObject)
 #pragma mark DogObject
 
 @interface DogObject : RLMObject
-
 @property NSString *dogName;
-
+@property int age;
 @end
 
 #pragma mark OwnerObject
@@ -187,6 +195,14 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @end
 
+RLM_ARRAY_TYPE(CircleObject);
+
+#pragma mark CircleArrayObject
+
+@interface CircleArrayObject : RLMObject
+@property RLMArray<CircleObject> *circles;
+@end
+
 #pragma mark ArrayPropertyObject
 
 @interface ArrayPropertyObject : RLMObject
@@ -228,3 +244,15 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @property NSDate *dateCol;
 
 @end
+
+@interface PrimaryStringObject : RLMObject
+@property NSString *stringCol;
+@property int intCol;
+@end
+
+@interface ReadOnlyPropertyObject : RLMObject
+@property (readonly) NSNumber *readOnlyUnsupportedProperty;
+@property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+

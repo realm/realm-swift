@@ -13,9 +13,15 @@ This repository holds the source code for the iOS & OSX versions of Realm, for b
 
 ## Setting up Realm in your app
 
+### Swift
+
+Please see the [detailed instructions in our docs](http://realm.io/docs/cocoa/latest/#swift). CocoaPods does not support Swift yet.
+
+### Objective-C
+
 There are two ways to set up Realm in your app: manually or with CocoaPods.
 
-Manually:
+**Manually:**
 
 1. Download the [latest release of Realm](http://static.realm.io/downloads/ios/latest) and extract the zip (or [build it from source](#building-realm)).
 2. Drag Realm.framework from our release and into the Frameworks folder in your project in Xcode.
@@ -23,7 +29,7 @@ Manually:
 3. Click on the project in the Xcode file explorer.
    Select your target and go to the **Build Phases** tab. Under **Link Binary with Libraries** press + and add **libc++.dylib**.
 
-[CocoaPods](http://cocoapods.org/):
+**[CocoaPods](http://cocoapods.org/):**
 
 1. Add the following to your Podfile: `pod "Realm"`.
 2. From the command line, run `pod install`.
@@ -33,7 +39,7 @@ Once your app is set up with Realm, our [documentation](#documentation) will gui
 
 ## Documentation
 
-Documentation for Realm can be found at [realm.io/docs/ios](http://realm.io/docs/ios). The API reference is located at [realm.io/docs/ios/latest/api](http://realm.io/docs/ios/latest/api).
+Documentation for Realm can be found at [realm.io/docs/cocoa/latest](http://realm.io/docs/cocoa/latest). The API reference is located at [realm.io/docs/cocoa/latest/api](http://realm.io/docs/cocoa/latest/api).
 
 ## Building Realm
 
@@ -42,7 +48,8 @@ In case you don't want to use the precompiled version, you can build Realm yours
 Prerequisites:
 
 * Building Realm requires Xcode 5 or above
-* Building Realm with Swift support requires Xcode6-Beta5 specifically
+* Building Realm with Swift support for iOS requires Xcode 6 Beta 6, Beta 7, or GM. 6.1 is not supported.
+* Building the Swift examples requires Xcode6-Beta7 or GM.
 * Building Realm documentation requires [appledoc](https://github.com/tomaz/appledoc)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh ios`. You'll need an internet connection the first time you build Realm to download the core binary.
@@ -57,6 +64,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details!
 
 ## License
 
-Realm Cocoa is published under the Apache 2.0 license.
+Realm Cocoa is published under the Apache 2.0 license.  
+The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](http://realm.io/docs/cocoa/latest/#faq).
+
+## Feedback
+
+**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](http://twitter.com/realm), announce your app on [our mailing-list](https://groups.google.com/forum/#!forum/realm-users), or email [info@realm.io](mailto:info@realm.io) to let us know about it!_**
+
+**_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
 ![analytics](https://ga-beacon.appspot.com/UA-50247013-2/realm-cocoa/README?pixel)

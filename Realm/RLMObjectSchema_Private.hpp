@@ -35,10 +35,14 @@
 @property (nonatomic, readwrite, assign) Class accessorClass;
 @property (nonatomic, readwrite, assign) Class standaloneClass;
 
+@property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
+
 // returns a cached or new schema for a given object class
+// creates standalone accessor classes for the object schema if create is YES
 +(instancetype)schemaForObjectClass:(Class)objectClass;
++(instancetype)schemaForObjectClass:(Class)objectClass createAccessors:(BOOL)create;
 
 // generate a schema from a table
-+(instancetype)schemaForTable:(tightdb::Table *)table className:(NSString *)className;
++(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
 
 @end

@@ -20,8 +20,6 @@
 
 @implementation RLMSidebarTableCellView
 
-@synthesize button = _button;
-
 - (void)awakeFromNib {
     // We want it to appear "inline"
     [[self.button cell] setBezelStyle:NSInlineBezelStyle];

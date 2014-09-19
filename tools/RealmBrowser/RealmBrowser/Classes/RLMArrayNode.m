@@ -21,12 +21,13 @@
 #import "RLMSidebarTableCellView.h"
 
 @implementation RLMArrayNode {
-
     RLMProperty *referringProperty;
     RLMObject *referringObject;
     RLMArray *displayedArray;
     NSString *name;
 }
+
+#pragma mark - Public Methods
 
 - (instancetype)initWithReferringProperty:(RLMProperty *)property onObject:(RLMObject *)object realm:(RLMRealm *)realm
 {
@@ -46,8 +47,7 @@
 
 - (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode
 {
-    if (self = [super initWithSchema:classNode.schema
-                             inRealm:classNode.realm]) {
+    if (self = [super initWithSchema:classNode.schema inRealm:classNode.realm]) {
         displayedArray = result;
         name = searchText;
     }
@@ -55,7 +55,27 @@
     return self;
 }
 
-#pragma mark - RLMObjectNode overrides
+-(BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index
+{
+    if (index >= [displayedArray count]) {
+        return NO;
+    }
+    
+    [displayedArray insertObject:object atIndex:index];
+    return YES;
+}
+
+-(BOOL)removeInstanceAtIndex:(NSUInteger)index
+{
+    if (index >= [displayedArray count]) {
+        return NO;
+    }
+    
+    [displayedArray removeObjectAtIndex:index];
+    return YES;
+}
+
+#pragma mark - RLMObjectNode Overrides
 
 - (NSString *)name
 {
@@ -100,12 +120,12 @@
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;
-    result.imageView.image = nil;
+    result.imageView.image = [NSImage imageNamed:@"ArrayIcon"];
     
     return result;
 }
 
-#pragma mark - RLMRealmOutlineNode implementation
+#pragma mark - RLMRealmOutlineNode Implementation
 
 - (BOOL)hasToolTip
 {

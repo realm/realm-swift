@@ -18,14 +18,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "RLMTypeNode.h"
 #import "RLMViewController.h"
 #import "RLMTableView.h"
+#import "RLMTextField.h"
 
 @class RLMRealmBrowserWindowController;
 
-@interface RLMInstanceTableViewController : RLMViewController <NSTableViewDataSource, RLMTableViewDelegate>
+@interface RLMInstanceTableViewController : RLMViewController <RLMTextFieldDelegate, RLMTableViewDelegate, RLMTableViewDataSource>
 
 @property (nonatomic, readonly) RLMTableView *realmTableView;
+
+@property (nonatomic) BOOL realmIsLocked;
+@property (nonatomic) BOOL displaysArray;
 
 @end

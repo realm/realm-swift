@@ -73,8 +73,8 @@
     tightdb::LinkViewRef _backingLinkView;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                          view:(tightdb::LinkViewRef)view
-                                         realm:(RLMRealm *)realm;
+                                    view:(tightdb::LinkViewRef)view
+                                   realm:(RLMRealm *)realm;
 @end
 
 
@@ -82,10 +82,16 @@
 // TableView backed RLMArray subclass
 //
 @interface RLMArrayTableView : RLMArray {
+    tightdb::Query _backingQuery;
     tightdb::TableView _backingView;
+    BOOL _viewCreated;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::TableView const &)view
+                                   query:(tightdb::Query &)query
+                                   realm:(RLMRealm *)realm;
+
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                    view:(tightdb::TableView)view
                                    realm:(RLMRealm *)realm;
 
 @end
@@ -96,7 +102,7 @@
 //
 @interface RLMCArrayHolder : NSObject {
 @public
-    __strong id *array;
+    std::unique_ptr<id[]> array;
     NSUInteger size;
 }
 

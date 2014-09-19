@@ -14,6 +14,7 @@
         <customObject id="PLw-ns-0qo" customClass="RLMApplicationDelegate">
             <connections>
                 <outlet property="fileMenu" destination="bib-Uj-vzu" id="xMk-IQ-flg"/>
+                <outlet property="openAnyRealmMenu" destination="ZOZ-6y-KFJ" id="vHm-DP-i8r"/>
                 <outlet property="openMenuItem" destination="IAo-SY-fd9" id="U7H-mk-W2m"/>
             </connections>
         </customObject>
@@ -86,6 +87,14 @@
                                     </items>
                                 </menu>
                             </menuItem>
+                            <menuItem title="Open Common Location" id="vgP-2m-quz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Open Common Location" id="ZOZ-6y-KFJ">
+                                    <connections>
+                                        <outlet property="delegate" destination="PLw-ns-0qo" id="12y-1Y-2Xp"/>
+                                    </connections>
+                                </menu>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                             <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
                                 <connections>
@@ -103,6 +112,23 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="generatedDemoDatabase:" target="-1" id="9cb-1W-suN"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Delete object" tag="2" id="Kvq-ch-tH8">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <connections>
+                                    <action selector="selectedDeleteRow:" target="-1" id="2sn-kO-m78"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove object from array" tag="10" id="dEm-Cz-ggu">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                <connections>
+                                    <action selector="selectedRemoveRow:" target="-1" id="RgR-56-sid"/>
                                 </connections>
                             </menuItem>
                         </items>
