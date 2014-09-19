@@ -288,6 +288,47 @@
                     @"Sort on invalid col not supported");
 }
 
+- (void)testSortedLinkViewWithDeletion {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    NSDate *date3 = [date2 dateByAddingTimeInterval:1];
+    NSDate *date33 = [date3 dateByAddingTimeInterval:1];
+
+    [realm beginWriteTransaction];
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withObject:@{}];
+
+    StringObject *stringObj = [StringObject new];
+    stringObj.stringCol = @"string";
+
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]]];
+
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
+    XCTAssertEqualObjects([results[0] stringCol], @"cc");
+
+    // delete cc, results should not change
+    AllTypesObject *lastObject = [arrayOfAll.array lastObject];
+    [realm transactionWithBlock:^{
+        [arrayOfAll.array removeObjectAtIndex:3];
+        
+        // create extra alltypesobject
+        [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+    }];
+    XCTAssertEqualObjects([results[0] stringCol], @"cc");
+
+    // delete from realm should be removed from results
+    [realm transactionWithBlock:^{
+        [realm deleteObject:lastObject];
+    }];
+    XCTAssertEqualObjects([results[0] stringCol], @"c");
+}
+
 - (void)testDynamicQueryInvalidClass
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
