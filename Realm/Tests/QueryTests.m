@@ -195,27 +195,26 @@
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
 
-void VerifySort(id self, RLMRealm *realm, NSString *column, BOOL ascending, id expectedValue) {
+- (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
     RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
     AllTypesObject *obj = results[0];
-    XCTAssertEqualObjects(obj[column], expectedValue, @"Array not sorted as expected - %@ != %@", obj[column], expectedValue);
+    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
     
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar arraySortedByProperty:column ascending:ascending];
     obj = results[0];
-    XCTAssertEqualObjects(obj[column], expectedValue, @"Array not sorted as expected - %@ != %@", obj[column], expectedValue);
+    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
 }
 
-void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL ascending, double (^getter)(id), double expectedValue, double accuracy) {
+- (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
     RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
-    XCTAssertEqualWithAccuracy(getter(results[0][column]), expectedValue, accuracy, @"Array not sorted as expected");
+    XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
     
     // test LinkView query
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar arraySortedByProperty:column ascending:ascending];
-    XCTAssertEqualWithAccuracy(getter(results[0][column]), expectedValue, accuracy, @"Array not sorted as expected");
-    
+    XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 }
 
 
@@ -244,30 +243,30 @@ void VerifySortWithAccuracy(id self, RLMRealm *realm, NSString *column, BOOL asc
     
     
     //////////// sort by boolCol
-    VerifySort(self, realm, @"boolCol", YES, @NO);
-    VerifySort(self, realm, @"boolCol", NO, @YES);
-    
+    [self verifySort:realm column:@"boolCol" ascending:YES expected:@NO];
+    [self verifySort:realm column:@"boolCol" ascending:NO expected:@YES];
+
     //////////// sort by intCol
-    VerifySort(self, realm, @"intCol", YES, @1);
-    VerifySort(self, realm, @"intCol", NO, @33);
+    [self verifySort:realm column:@"intCol" ascending:YES expected:@1];
+    [self verifySort:realm column:@"intCol" ascending:NO expected:@33];
     
     //////////// sort by dateCol
     double (^dateGetter)(id) = ^(NSDate *d) { return d.timeIntervalSince1970; };
-    VerifySortWithAccuracy(self, realm, @"dateCol", YES, dateGetter, date1.timeIntervalSince1970, 1);
-    VerifySortWithAccuracy(self, realm, @"dateCol", NO, dateGetter, date33.timeIntervalSince1970, 1);
+    [self verifySortWithAccuracy:realm column:@"dateCol" ascending:YES getter:dateGetter expected:date1.timeIntervalSince1970 accuracy:1];
+    [self verifySortWithAccuracy:realm column:@"dateCol" ascending:NO getter:dateGetter expected:date33.timeIntervalSince1970 accuracy:1];
     
     //////////// sort by doubleCol
     double (^doubleGetter)(id) = ^(NSNumber *n) { return n.doubleValue; };
-    VerifySort(self, realm, @"doubleCol", YES, @1.0);
-    VerifySortWithAccuracy(self, realm, @"doubleCol", NO, doubleGetter, 3.3, 0.0000001);
+    [self verifySortWithAccuracy:realm column:@"doubleCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
+    [self verifySortWithAccuracy:realm column:@"doubleCol" ascending:NO getter:doubleGetter expected:3.3 accuracy:0.0000001];
 
     //////////// sort by floatCol
-    VerifySort(self, realm, @"floatCol", YES, @1.0);
-    VerifySortWithAccuracy(self, realm, @"floatCol", NO, doubleGetter, 3.3, 0.0000001);
+    [self verifySortWithAccuracy:realm column:@"floatCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
+    [self verifySortWithAccuracy:realm column:@"floatCol" ascending:NO getter:doubleGetter expected:3.3 accuracy:0.0000001];
     
     //////////// sort by stringCol
-    VerifySort(self, realm, @"stringCol", YES, @"a");
-    VerifySort(self, realm, @"stringCol", NO, @"cc");
+    [self verifySort:realm column:@"stringCol" ascending:YES expected:@"a"];
+    [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
     
     // sort by mixed column
     XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"mixedCol" ascending:YES],
