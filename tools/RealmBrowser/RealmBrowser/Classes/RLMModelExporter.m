@@ -30,7 +30,7 @@
         [string appendFormat:@"    private %@ %@;\n", [self javaNameForProperty:property], property.name];
     }
     
-    [string appendFormat:@"}"];
+    [string appendFormat:@"}\n"];
     
     return string;
 }

@@ -15,6 +15,8 @@
 		22565D6719C1BCF400C8C8EC /* RLMLinkTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */; };
 		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
 		22D28EA71993AAAB00497FD3 /* RLMNumberTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */; };
+		22D3122219CC6D2300E1B9EE /* ModelViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22D3122019CC6D2300E1B9EE /* ModelViewer.xib */; };
+		22D3122919CC70C800E1B9EE /* RLMModelViewerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D3122819CC70C800E1B9EE /* RLMModelViewerWindowController.m */; };
 		22D3AC8A19CC5D710042C1B2 /* RLMModelExporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D3AC8919CC5D710042C1B2 /* RLMModelExporter.m */; };
 		22E4737219924CF700EEF7C9 /* RLMBasicTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E4737119924CF700EEF7C9 /* RLMBasicTableCellView.m */; };
 		22E473791992562400EEF7C9 /* RLMBoolTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E473781992562400EEF7C9 /* RLMBoolTableCellView.m */; };
@@ -130,6 +132,9 @@
 		225AAFEB19C09E520023B595 /* RLMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTextField.m; path = Classes/RLMTextField.m; sourceTree = "<group>"; };
 		22D28EA51993AAAB00497FD3 /* RLMNumberTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNumberTableCellView.h; path = Classes/RLMNumberTableCellView.h; sourceTree = "<group>"; };
 		22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNumberTableCellView.m; path = Classes/RLMNumberTableCellView.m; sourceTree = "<group>"; };
+		22D3122119CC6D2300E1B9EE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ModelViewer.xib; sourceTree = "<group>"; };
+		22D3122719CC70C800E1B9EE /* RLMModelViewerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMModelViewerWindowController.h; path = Classes/RLMModelViewerWindowController.h; sourceTree = "<group>"; };
+		22D3122819CC70C800E1B9EE /* RLMModelViewerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMModelViewerWindowController.m; path = Classes/RLMModelViewerWindowController.m; sourceTree = "<group>"; };
 		22D3AC8819CC5D710042C1B2 /* RLMModelExporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMModelExporter.h; path = Classes/RLMModelExporter.h; sourceTree = "<group>"; };
 		22D3AC8919CC5D710042C1B2 /* RLMModelExporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMModelExporter.m; path = Classes/RLMModelExporter.m; sourceTree = "<group>"; };
 		22E4737019924CF700EEF7C9 /* RLMBasicTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBasicTableCellView.h; path = Classes/RLMBasicTableCellView.h; sourceTree = "<group>"; };
@@ -265,6 +270,8 @@
 				8474E2BC195452BE00BCA755 /* RLMInstanceTableViewController.m */,
 				84446532195891AA00CEEA5B /* RLMViewController.h */,
 				84446533195891AA00CEEA5B /* RLMViewController.m */,
+				22D3122719CC70C800E1B9EE /* RLMModelViewerWindowController.h */,
+				22D3122819CC70C800E1B9EE /* RLMModelViewerWindowController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -427,6 +434,7 @@
 				840F97C1192B7DD4006B591E /* Classes */,
 				84E0F9641921F3B900D6CA14 /* RLMDocument.xib */,
 				84E0F9671921F3B900D6CA14 /* MainMenu.xib */,
+				22D3122019CC6D2300E1B9EE /* ModelViewer.xib */,
 				84E0F96A1921F3B900D6CA14 /* Images.xcassets */,
 				84BCA5FE1951BC99008FC850 /* Resources */,
 				84E0F9561921F3B900D6CA14 /* Supporting Files */,
@@ -594,6 +602,7 @@
 				84E0F95A1921F3B900D6CA14 /* InfoPlist.strings in Resources */,
 				84E0F96B1921F3B900D6CA14 /* Images.xcassets in Resources */,
 				84BCA6041951BD07008FC850 /* realm.icns in Resources */,
+				22D3122219CC6D2300E1B9EE /* ModelViewer.xib in Resources */,
 				84E0F9601921F3B900D6CA14 /* Credits.rtf in Resources */,
 				84E0F9661921F3B900D6CA14 /* RLMDocument.xib in Resources */,
 				84E0F9691921F3B900D6CA14 /* MainMenu.xib in Resources */,
@@ -625,6 +634,7 @@
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				84925C61195AD5B000EE27B1 /* NSColor+ByteSizeFactory.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
+				22D3122919CC70C800E1B9EE /* RLMModelViewerWindowController.m in Sources */,
 				84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */,
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */,
@@ -673,6 +683,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		22D3122019CC6D2300E1B9EE /* ModelViewer.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				22D3122119CC6D2300E1B9EE /* Base */,
+			);
+			name = ModelViewer.xib;
+			sourceTree = "<group>";
+		};
 		84E0F9581921F3B900D6CA14 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
