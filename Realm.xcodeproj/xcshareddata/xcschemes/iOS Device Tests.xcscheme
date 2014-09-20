@@ -9,15 +9,15 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
-               BuildableName = "TestFramework.framework"
-               BlueprintName = "OSXTestFramework"
-               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+               BuildableName = "iOS Device Tests.xctest"
+               BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,26 +26,26 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      buildConfiguration = "Release">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8018EB5196DCB87008F63C4"
-               BuildableName = "OSXTestFrameworkTests.xctest"
-               BlueprintName = "OSXTestFrameworkTests"
-               ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+               BuildableName = "iOS Device Tests.xctest"
+               BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
-            BuildableName = "TestFramework.framework"
-            BlueprintName = "OSXTestFramework"
-            ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -61,10 +61,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
-            BuildableName = "TestFramework.framework"
-            BlueprintName = "OSXTestFramework"
-            ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -79,10 +79,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8018EAB196DCB86008F63C4"
-            BuildableName = "TestFramework.framework"
-            BlueprintName = "OSXTestFramework"
-            ReferencedContainer = "container:Realm-Xcode6.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

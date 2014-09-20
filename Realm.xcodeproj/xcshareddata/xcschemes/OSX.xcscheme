@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0510"
+   LastUpgradeVersion = "0600"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4145D191DE49600F858D9"
+               BlueprintIdentifier = "E8D89B971955FC6D00CF2B9A"
                BuildableName = "Realm.framework"
-               BlueprintName = "OSX Framework"
+               BlueprintName = "OSX"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C4146D191DE49600F858D9"
+               BlueprintIdentifier = "E8D89BA21955FC6D00CF2B9A"
                BuildableName = "OSX Tests.xctest"
                BlueprintName = "OSX Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
@@ -49,6 +49,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E8D89B971955FC6D00CF2B9A"
+            BuildableName = "Realm.framework"
+            BlueprintName = "OSX"
+            ReferencedContainer = "container:Realm.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
