@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8D89B971955FC6D00CF2B9A"
-               BuildableName = "Realm.framework"
-               BlueprintName = "OSX"
+               BlueprintIdentifier = "0217D7B919CD0DA200DE5C32"
+               BuildableName = "iOS Release"
+               BlueprintName = "iOS Release"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,18 +26,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      buildConfiguration = "Release">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8D89BA21955FC6D00CF2B9A"
-               BuildableName = "OSX Tests.xctest"
-               BlueprintName = "OSX Tests"
-               ReferencedContainer = "container:Realm.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -52,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8D89B971955FC6D00CF2B9A"
-            BuildableName = "Realm.framework"
-            BlueprintName = "OSX"
+            BlueprintIdentifier = "0217D7B919CD0DA200DE5C32"
+            BuildableName = "iOS Release"
+            BlueprintName = "iOS Release"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -67,6 +57,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0217D7B919CD0DA200DE5C32"
+            BuildableName = "iOS Release"
+            BlueprintName = "iOS Release"
+            ReferencedContainer = "container:Realm.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

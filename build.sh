@@ -43,7 +43,7 @@ command:
   test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
   test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
-  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
+  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
   browser [xcmode]:        builds the RealmBrowser OSX app
@@ -63,7 +63,7 @@ EOF
 ######################################
 
 if [ -z "$XCODE_VERSION" ]; then
-    XCODE_VERSION=5
+    XCODE_VERSION=6
 fi
 
 xcode() {
@@ -76,9 +76,6 @@ xcode() {
     local xc_path="$XCODE_PATH"
     if [ -z "$xc_path" ]; then
         case "$XCODE_VERSION" in
-            5)
-                xc_path="/Applications/Xcode.app"
-                ;;
             6)
                 xc_path="/Applications/Xcode6-Beta7.app"
                 ;;
@@ -110,9 +107,6 @@ xc() {
 
 xcrealm() {
     PROJECT=Realm.xcodeproj
-    if [[ "$XCODE_VERSION" == "6" ]]; then
-        PROJECT=Realm-Xcode6.xcodeproj
-    fi
     xc "-project $PROJECT $1"
 }
 
@@ -209,18 +203,7 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            # Build Universal Simulator/Device framework
-            xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Release -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products
-            mkdir -p Release-iphone
-            cp -R Release-iphoneos/Realm.framework Release-iphone
-            lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm
-            mv Realm Release-iphone/Realm.framework
-        else
-            xcrealm "-scheme iOS -configuration Release"
-        fi
+        xcrealm "-scheme iOS-Release -configuration Release"
         exit 0
         ;;
 
@@ -230,18 +213,7 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            # Build Universal Simulator/Device framework
-            xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Debug -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products
-            mkdir -p Debug-iphone
-            cp -R Debug-iphoneos/Realm.framework Debug-iphone
-            lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm
-            mv Realm Debug-iphone/Realm.framework
-        else
-            xcrealm "-scheme iOS -configuration Debug"
-        fi
+        xcrealm "-scheme iOS -configuration Debug"
         exit 0
         ;;
 
@@ -279,13 +251,11 @@ case "$COMMAND" in
         failed=0
         sh build.sh test "$XCMODE" || failed=1
         sh build.sh test-debug "$XCMODE" || failed=1
-        XCODE_VERSION=6 sh build.sh test "$XCMODE" || failed=1
-        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || failed=1
         exit $failed
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
+        xcrealm "-scheme iOS\ Release -configuration Release -sdk iphonesimulator test"
         exit 0
         ;;
 
@@ -331,12 +301,10 @@ case "$COMMAND" in
         sh build.sh clean
 
         cd examples
-        XCODE_VERSION=5
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
-        XCODE_VERSION=6
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
@@ -347,12 +315,10 @@ case "$COMMAND" in
     "examples-debug")
         sh build.sh clean
         cd examples
-        XCODE_VERSION=5
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug build ${CODESIGN_PARAMS}"
-        XCODE_VERSION=6
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
@@ -364,12 +330,7 @@ case "$COMMAND" in
     # Browser
     ######################################
     "browser")
-        if [[ "$XCODE_VERSION" != "6" ]]; then
-            xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
-        else
-            echo "Realm Browser can only be built with Xcode 5."
-            exit 1
-        fi
+        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -456,15 +417,6 @@ case "$COMMAND" in
         rm *.zip
         cd examples
 
-        XCODE_VERSION=5
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
-
-        rm -r build
-
-        XCODE_VERSION=6
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
