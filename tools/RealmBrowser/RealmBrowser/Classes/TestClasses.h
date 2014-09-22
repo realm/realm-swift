@@ -16,63 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-//#import <Foundation/Foundation.h>
-//#import <Realm/Realm.h>
-//
-//@interface RealmTestClass0 : RLMObject
-//
-//@property NSInteger integerValue;
-//@property NSString *stringValue;
-//@property NSData *dataValue;
-//
-//@end
-//
-//RLM_ARRAY_TYPE(RealmTestClass0)
-//
-//@interface RealmTestClass1 : RLMObject
-//
-//@property NSInteger integerValue;
-//@property BOOL boolValue;
-//@property float floatValue;
-//@property double doubleValue;
-//@property NSString *stringValue;
-//@property NSDate *dateValue;
-//@property RLMArray<RealmTestClass0> *arrayReference;
-//
-//@end
-//
-//@interface RealmTestClass2 : RLMObject
-//
-//@property NSInteger integerValue;
-//@property BOOL boolValue;
-//@property RealmTestClass1 *objectReference;
-//
-//@end
-//
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
 
-@class RealmTestClass2;
-@class RealmTestClass1;
-@class RealmTestClass0;
+@interface RealmTestClass0 : RLMObject
 
-RLM_ARRAY_TYPE(RealmTestClass2)
-RLM_ARRAY_TYPE(RealmTestClass1)
-RLM_ARRAY_TYPE(RealmTestClass0)
-
-
-@interface RealmTestClass2 : RLMObject
-
-@property int integerValue;
-@property BOOL boolValue;
-@property RealmTestClass1 *objectReference;
+@property NSInteger integerValue;
+@property NSString *stringValue;
+@property NSData *dataValue;
 
 @end
 
+RLM_ARRAY_TYPE(RealmTestClass0)
 
 @interface RealmTestClass1 : RLMObject
 
-@property int integerValue;
+@property NSInteger integerValue;
 @property BOOL boolValue;
 @property float floatValue;
 @property double doubleValue;
@@ -82,12 +41,10 @@ RLM_ARRAY_TYPE(RealmTestClass0)
 
 @end
 
+@interface RealmTestClass2 : RLMObject
 
-@interface RealmTestClass0 : RLMObject
-
-@property int integerValue;
-@property NSString *stringValue;
-@property NSData *dataValue;
+@property NSInteger integerValue;
+@property BOOL boolValue;
+@property RealmTestClass1 *objectReference;
 
 @end
-

@@ -183,7 +183,7 @@ NSString * const kLanguageObjC = @"Objective C";
         case RLMPropertyTypeBool:
             return @"BOOL ";
         case RLMPropertyTypeInt:
-            return @"int ";
+            return @"NSInteger ";
         case RLMPropertyTypeFloat:
             return @"float ";
         case RLMPropertyTypeDouble:
