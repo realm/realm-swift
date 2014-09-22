@@ -24,7 +24,6 @@
 #import "RLMArrayNode.h"
 #import "RLMRealmNode.h"
 #import "RLMModelExporter.h"
-#import "RLMModelViewerWindowController.h"
 
 #import "RLMBadgeTableCellView.h"
 #import "RLMBasicTableCellView.h"

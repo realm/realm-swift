@@ -67,6 +67,7 @@ NSString * const kLanguageObjC = @"Objective C";
 
 +(void)saveModels:(NSArray *)models toFolder:(NSURL *)url
 {
+    // A 'model' is an array with two strings, a filename plus the contents of that file
     for (NSArray *model in models) {
         NSURL *fileURL = [url URLByAppendingPathComponent:model[0]];
         NSString *fileContents = model[1];
@@ -132,8 +133,10 @@ NSString * const kLanguageObjC = @"Objective C";
 
 +(NSArray *)objcModelsOfSchemas:(NSArray *)schemas withFileName:(NSString *)fileName
 {
+    // Filename for h-file
     NSString *hFilename = [fileName stringByAppendingString:@".h"];
     
+    // Contents of h-file
     NSMutableString *hContents= [NSMutableString string];
     [hContents appendFormat:@"#import <Foundation/Foundation.h>\n#import <Realm/Realm.h>\n\n"];
     
@@ -154,18 +157,23 @@ NSString * const kLanguageObjC = @"Objective C";
         }
         [hContents appendString:@"\n@end\n\n\n"];
     }
+    // An array with filename and contents, i.e. the h-file model
     NSArray *hModel = @[hFilename, hContents];
     
+    // Filename for m-file
     NSString *mFilename = [fileName stringByAppendingString:@".m"];
     
+    // Contents of m-file
     NSMutableString *mContents= [NSMutableString string];
     [mContents appendFormat:@"#import \"%@\"\n\n", hFilename];
     for (RLMObjectSchema *schema in schemas) {
-        [mContents appendFormat:@"@implementation %@\n\n@end\n\n", schema.className];
+        [mContents appendFormat:@"@implementation %@\n\n@end\n\n\n", schema.className];
     }
 
+    // An array with filename and contents, i.e. the m-file model
     NSArray *mModel = @[mFilename, mContents];
 
+    // An aray with models for both files
     return @[hModel, mModel];
 }
 
