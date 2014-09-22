@@ -151,6 +151,127 @@
     XCTAssertEqual(obj.array.count, (NSUInteger)0, @"Expecting 0 objects");
 }
 
+- (void)testAddPersistedObjectToOtherRealm {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    CircleObject *co1 = [[CircleObject alloc] init];
+    co1.data = @"1";
+
+    CircleObject *co2 = [[CircleObject alloc] init];
+    co2.data = @"2";
+    co2.next = co1;
+
+    CircleArrayObject *cao = [[CircleArrayObject alloc] init];
+    [cao.circles addObject:co1];
+
+    [realm1 transactionWithBlock:^{ [realm1 addObject:co1]; }];
+
+    [realm2 beginWriteTransaction];
+    XCTAssertThrows([realm2 addObject:co1], @"should reject already-persisted object");
+    XCTAssertThrows([realm2 addObject:co2], @"should reject linked persisted object");
+    XCTAssertThrows([realm2 addObject:cao], @"should reject array containing persisted object");
+    [realm2 commitWriteTransaction];
+
+    // The objects are left in an odd state if validation fails (since the
+    // exception isn't supposed to be recoverable), so make new objects
+    co2 = [[CircleObject alloc] init];
+    co2.data = @"2";
+    co2.next = co1;
+
+    cao = [[CircleArrayObject alloc] init];
+    [cao.circles addObject:co1];
+
+    [realm1 beginWriteTransaction];
+    XCTAssertNoThrow([realm1 addObject:co2], @"should be able to add object which links to object persisted in target realm");
+    XCTAssertNoThrow([realm1 addObject:cao], @"should be able to add object with an array containing an object persisted in target realm");
+    [realm1 commitWriteTransaction];
+}
+
+- (void)testCopyObjectsBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    StringObject *so = [[StringObject alloc] init];
+    so.stringCol = @"value";
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:so];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm2].count);
+    XCTAssertEqualObjects(so.stringCol, @"value");
+
+    [realm2 beginWriteTransaction];
+    StringObject *so2 = [StringObject createInRealm:realm2 withObject:so];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm2].count);
+    XCTAssertEqualObjects(so2.stringCol, @"value");
+}
+
+- (void)testCopyArrayPropertyBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    EmployeeObject *eo = [[EmployeeObject alloc] init];
+    eo.name = @"name";
+    eo.age = 50;
+    eo.hired = YES;
+
+    CompanyObject *co = [[CompanyObject alloc] init];
+    co.name = @"company name";
+    [co.employees addObject:eo];
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:co];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
+
+    [realm2 beginWriteTransaction];
+    CompanyObject *co2 = [CompanyObject createInRealm:realm2 withObject:co];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(1U, [EmployeeObject allObjectsInRealm:realm2].count);
+    XCTAssertEqual(1U, [CompanyObject allObjectsInRealm:realm2].count);
+
+    XCTAssertEqualObjects(@"name", [co2.employees.firstObject name]);
+}
+
+- (void)testCopyLinksBetweenRealms {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    CircleObject *c = [[CircleObject alloc] init];
+    c.data = @"1";
+    c.next = [[CircleObject alloc] init];
+    c.next.data = @"2";
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:c];
+    [realm1 commitWriteTransaction];
+
+    XCTAssertEqual(realm1, c.realm);
+    XCTAssertEqual(realm1, c.next.realm);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm1].count);
+
+    [realm2 beginWriteTransaction];
+    CircleObject *c2 = [CircleObject createInRealm:realm2 withObject:c];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqualObjects(c2.data, @"1");
+    XCTAssertEqualObjects(c2.next.data, @"2");
+
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm2].count);
+}
+
 - (void)testRealmTransactionBlock {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{

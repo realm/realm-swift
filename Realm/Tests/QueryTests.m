@@ -1301,11 +1301,11 @@
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
     NSDate *date3 = [date2 dateByAddingTimeInterval:1];
 
-    StringObject *stringObj0 = [[StringObject alloc] initWithObject:@[@"string0"]];
-    StringObject *stringObj1 = [[StringObject alloc] initWithObject:@[@"string1"]];
-    StringObject *stringObj2 = [[StringObject alloc] initWithObject:@[@"string2"]];
-
     [realm beginWriteTransaction];
+
+    StringObject *stringObj0 = [StringObject createInRealm:realm withObject:@[@"string0"]];
+    StringObject *stringObj1 = [StringObject createInRealm:realm withObject:@[@"string1"]];
+    StringObject *stringObj2 = [StringObject createInRealm:realm withObject:@[@"string2"]];
 
     AllTypesObject *obj0 = [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1LL, @1, stringObj0]];
     AllTypesObject *obj1 = [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2LL, @"mixed", stringObj1]];

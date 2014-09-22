@@ -252,18 +252,17 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
 }
 
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
-    // if already in the right realm then no-op
-    if (object.realm == realm) {
-        return;
-    }
-
-    // verify writable
     RLMVerifyInWriteTransaction(realm);
 
-    // verify object
+    // verify that object is standalone
     if (object.deletedFromRealm) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Adding a deleted object to a Realm is not permitted"
+                                     userInfo:nil];
+    }
+    if (object.realm) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object is already persisted in a Realm"
                                      userInfo:nil];
     }
 
@@ -272,11 +271,6 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
     RLMObjectSchema *schema = realm.schema[objectClassName];
     object.objectSchema = schema;
     object.realm = realm;
-
-    // _row may already be attached to a different table if the object was
-    // already in another realm, and setting it to the new table doesn't
-    // automatically detach it
-    object->_row.detach();
 
     // get or create row
     bool created;
@@ -302,7 +296,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, prop.isPrimary, update);
+            RLMDynamicSet(object, prop, value, prop.isPrimary, update, false);
         }
     }
 
@@ -335,7 +329,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary, update);
+                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary, update, true);
             }
         }
     }
@@ -352,7 +346,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         for (RLMProperty *prop in objectSchema.properties) {
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary, update);
+                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary, update, true);
             }
         }
     }
