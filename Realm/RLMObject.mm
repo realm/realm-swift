@@ -95,6 +95,13 @@
 }
 
 +(instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
+    // verify primary key
+    RLMObjectSchema *schema = [self sharedSchema];
+    if (!schema.primaryKeyProperty) {
+        NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
+        @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
+    }
+
     return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, true);
 }
 
