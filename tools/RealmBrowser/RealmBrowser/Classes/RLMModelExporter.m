@@ -19,20 +19,87 @@
 #import "RLMModelExporter.h"
 #import <Realm/Realm.h>
 
+NSString * const kLanguageJava = @"Java";
+NSString * const kLanguageObjC = @"Objective C";
+
 @implementation RLMModelExporter
 
-+(NSString *)stringWithJavaModelOfSchema:(RLMObjectSchema *)schema
+#pragma mark - Public methods
+
++(void)saveModelsForSchemas:(NSArray *)objectSchemas inLanguage:(NSString *)language
 {
-    NSMutableString *string = [NSMutableString string];
-    [string appendFormat:@"public class %@ extends RealmObject {\n", schema.className];
+    NSString *dialogTitle = [NSString stringWithFormat:@"Save %@ model definitions", language];
     
-    for (RLMProperty *property in schema.properties) {
-        [string appendFormat:@"    private %@ %@;\n", [self javaNameForProperty:property], property.name];
+    if ([language isEqualToString:kLanguageJava]) {
+        NSOpenPanel *fileDialog = [NSOpenPanel openPanel];
+        
+        fileDialog.prompt = @"Select folder";
+        fileDialog.canChooseDirectories = YES;
+        fileDialog.canChooseFiles = NO;
+        fileDialog.canCreateDirectories = YES;
+        fileDialog.title = dialogTitle;
+        [fileDialog beginWithCompletionHandler:^(NSInteger result) {
+            if (result == NSFileHandlingPanelOKButton) {
+                [fileDialog orderOut:self];
+                NSArray *models = [self javaModelsOfSchemas:objectSchemas];
+                [self saveModels:models toFolder:fileDialog.URL];
+            }
+        }];
+    }
+    else if ([language isEqualToString:kLanguageObjC]) {
+        NSSavePanel *fileDialog = [NSSavePanel savePanel];
+        fileDialog.prompt = @"Save as filename";
+        fileDialog.nameFieldStringValue = @"MyClasses";
+        fileDialog.canCreateDirectories = YES;
+        fileDialog.title = dialogTitle;
+        [fileDialog beginWithCompletionHandler:^(NSInteger result) {
+            if (result == NSFileHandlingPanelOKButton) {
+                [fileDialog orderOut:self];
+                NSString *fileName = [[fileDialog.URL lastPathComponent] stringByDeletingPathExtension];
+                NSArray *models = [self objcModelsOfSchemas:objectSchemas withFileName:fileName];
+                [self saveModels:models toFolder:[fileDialog.URL URLByDeletingLastPathComponent]];
+            }
+        }];
+    }
+}
+
+#pragma mark - Private methods - Helpers
+
++(void)saveModels:(NSArray *)models toFolder:(NSURL *)url
+{
+    for (NSArray *model in models) {
+        NSURL *fileURL = [url URLByAppendingPathComponent:model[0]];
+        NSString *fileContents = model[1];
+        
+        NSError *error;
+        BOOL success = [fileContents writeToURL:fileURL atomically:YES encoding:NSUnicodeStringEncoding error:&error];
+        
+        if (!success) {
+            NSLog(@"Error writing file at %@\n%@", url, [error localizedFailureReason]);
+        }
+    }
+}
+
+#pragma mark - Private methods - Java helpers
+
++(NSArray *)javaModelsOfSchemas:(NSArray *)schemas
+{
+    NSMutableArray *models = [NSMutableArray array];
+    
+    for (RLMObjectSchema *schema in schemas) {
+        NSString *fileName = [schema.className stringByAppendingString:@".java"];
+        
+        NSMutableString *model = [NSMutableString string];
+        [model appendFormat:@"import io.realm.RealmObject\n\npublic class %@ extends RealmObject {\n", schema.className];
+        for (RLMProperty *property in schema.properties) {
+            [model appendFormat:@"    private %@ %@;\n", [self javaNameForProperty:property], property.name];
+        }
+        [model appendFormat:@"}\n"];
+        
+        [models addObject:@[fileName, model]];
     }
     
-    [string appendFormat:@"}\n"];
-    
-    return string;
+    return models;
 }
 
 +(NSString *)javaNameForProperty:(RLMProperty *)property
@@ -61,12 +128,71 @@
     }
 }
 
-@end
+#pragma mark - Private methods - Objective C helpers
 
-/*
- 
- private byte aByte;
- private short aShort;
- private long aLong;
- 
- */
++(NSArray *)objcModelsOfSchemas:(NSArray *)schemas withFileName:(NSString *)fileName
+{
+    NSString *hFilename = [fileName stringByAppendingString:@".h"];
+    
+    NSMutableString *hContents= [NSMutableString string];
+    [hContents appendFormat:@"#import <Foundation/Foundation.h>\n#import <Realm/Realm.h>\n\n"];
+    
+    for (RLMObjectSchema *schema in schemas) {
+        [hContents appendFormat:@"@class %@;\n", schema.className];
+    }
+    [hContents appendString: @"\n"];
+    
+    for (RLMObjectSchema *schema in schemas) {
+        [hContents appendFormat:@"RLM_ARRAY_TYPE(%@)\n", schema.className];
+    }
+    [hContents appendString: @"\n\n"];
+    
+    for (RLMObjectSchema *schema in schemas) {
+        [hContents appendFormat:@"@interface %@ : RLMObject\n\n", schema.className];
+        for (RLMProperty *property in schema.properties) {
+            [hContents appendFormat:@"@property %@%@;\n", [self objcNameForProperty:property], property.name];
+        }
+        [hContents appendString:@"\n@end\n\n\n"];
+    }
+    NSArray *hModel = @[hFilename, hContents];
+    
+    NSString *mFilename = [fileName stringByAppendingString:@".m"];
+    
+    NSMutableString *mContents= [NSMutableString string];
+    [mContents appendFormat:@"#import \"%@\"\n\n", hFilename];
+    for (RLMObjectSchema *schema in schemas) {
+        [mContents appendFormat:@"@implementation %@\n\n@end\n\n", schema.className];
+    }
+
+    NSArray *mModel = @[mFilename, mContents];
+
+    return @[hModel, mModel];
+}
+
++(NSString *)objcNameForProperty:(RLMProperty *)property
+{
+    switch (property.type) {
+        case RLMPropertyTypeBool:
+            return @"BOOL ";
+        case RLMPropertyTypeInt:
+            return @"int ";
+        case RLMPropertyTypeFloat:
+            return @"float ";
+        case RLMPropertyTypeDouble:
+            return @"double ";
+        case RLMPropertyTypeString:
+            return @"NSString *";
+        case RLMPropertyTypeData:
+            return @"NSData *";
+        case RLMPropertyTypeAny:
+            return @"id ";
+        case RLMPropertyTypeDate:
+            return @"NSDate *";
+        case RLMPropertyTypeArray:
+            return [NSString stringWithFormat:@"RLMArray<%@> *", property.objectClassName];
+        case RLMPropertyTypeObject:
+            return [NSString stringWithFormat:@"%@ *", property.objectClassName];
+    }
+}
+
+@end

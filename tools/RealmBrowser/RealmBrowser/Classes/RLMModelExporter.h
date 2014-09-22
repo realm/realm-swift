@@ -18,11 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObjectSchema;
+extern NSString * const kLanguageJava;
+extern NSString * const kLanguageObjC;
 
 @interface RLMModelExporter : NSObject
 
-+(NSString *)stringWithJavaModelOfSchema:(RLMObjectSchema *)schema;
-
++(void)saveModelsForSchemas:(NSArray *)objectSchemas inLanguage:(NSString *)language;
 
 @end

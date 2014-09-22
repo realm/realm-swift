@@ -142,8 +142,6 @@ const NSUInteger kMaxDepthForTooltips = 2;
         [self.realmTableView makeColumnsFitContents];
         autofittedColumns[self.tableView.autosaveName] = @YES;
     }
-    
-    [self showModel];
 }
 
 #pragma mark - RLMTextField Delegate
@@ -162,19 +160,6 @@ const NSUInteger kMaxDepthForTooltips = 2;
     }
     
     return self.displayedType.instanceCount;
-}
-
--(void)showModel
-{
-    RLMModelViewerWindowController *modelWC = [[RLMModelViewerWindowController alloc] initWithWindowNibName:@"ModelViewer"];
-
-    NSString *javaModel = [RLMModelExporter stringWithJavaModelOfSchema:self.displayedType.schema];
-    
-    modelWC.modelText = javaModel;
-    modelWC.windowTitle = self.displayedType.schema.className;
-    
-    [self.parentWindowController.modelDocument addWindowController:modelWC];
-    [self.parentWindowController.modelDocument showWindows];
 }
 
 #pragma mark - RLMTableView Data Source
