@@ -203,7 +203,7 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        xcrealm "-scheme iOS-Release -configuration Release"
+        xcrealm "-scheme iOS -configuration Release-Combined"
         exit 0
         ;;
 
@@ -255,7 +255,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS\ Release -configuration Release -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator test"
         exit 0
         ;;
 

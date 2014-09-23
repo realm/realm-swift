@@ -2,36 +2,39 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 set -e
-set +u
+set -u
 
-if [[ "$SDK_NAME" =~ ([A-Za-z]+) ]]; then
-    SF_SDK_PLATFORM=${BASH_REMATCH[1]}
+# Only run for release
+if [[ "$CONFIGURATION" != "Release-Combined" ]]; then
+    exit 0
+fi
+
+
+# The following conditionals come from
+# https://github.com/kstenerud/iOS-Universal-Framework
+
+if [[ "$SDK_NAME" =~ ([0-9]+.*$) ]]; then
+    SF_SDK_VERSION=${BASH_REMATCH[1]}
 else
-    echo "Could not find platform name from SDK_NAME: $SDK_NAME"
+    echo "Could not find sdk version from SDK_NAME: $SDK_NAME"
     exit 1
 fi
 
-# debug vs release
-if [[ "$CONFIGURATION" = "Debug" ]]; then
-    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios-dbg.a"
-else
-    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios.a"
+# Step 1 - build platform
+xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphoneos${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
+xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphonesimulator${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
+
+# Step 2 - make fat binary
+SF_FRAMEWORK_PATH="${BUILT_PRODUCTS_DIR}/Realm.framework"
+SF_RELEASE_IOS_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphoneos/Realm.framework/Realm"
+SF_RELEASE_SIM_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/Realm.framework/Realm"
+xcrun rm "${SF_FRAMEWORK_PATH}/Realm"
+xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${SF_FRAMEWORK_PATH}/Realm" 
+
+# Step 3 - copy out
+SF_OUT_DIR="${SRCROOT}/build/ios"
+if [[ ! -d "${SF_OUT_DIR}" ]]; then
+    xcrun mkir -p "${SF_OUT_DIR}"
 fi
-
-# We have to build the other platform and combine with it and the core libraries
-REALM_TARGET_NAME="iOS"
-SF_OUT_DIR="${SRCROOT}/build/iOS"
-XC_OUT_DIR="${BUILT_PRODUCTS_DIR}/.."
-SF_REALM_BIN="Realm.framework/Realm"
-SF_OUT_BIN="${SF_OUT_DIR}/${SF_REALM_BIN}"
-
-# Step 1 - build other platform
-xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk "iphoneos${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
-xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk "iphonesimulator${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
-
-# Step 2 - move files and make fat
-mkdir -p "${SF_OUT_DIR}"
-cp -R "${XC_OUT_DIR}/${CONFIGURATION}-iphoneos/Realm.framework" "${SF_OUT_DIR}" 
-rm "${SF_OUT_BIN}"
-xcrun lipo -create "${XC_OUT_DIR}/${CONFIGURATION}-iphoneos/${SF_REALM_BIN}" "${XC_OUT_DIR}/${CONFIGURATION}-iphonesimulator/${SF_REALM_BIN}" -output "${SF_OUT_BIN}"
+xcrun cp -R "${SF_FRAMEWORK_PATH}" "${SF_OUT_DIR}"
 
