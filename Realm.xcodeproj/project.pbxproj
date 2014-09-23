@@ -703,7 +703,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "find . -iname \"*.gcda\" -exec rm {} \\;";
+			shellScript = "find . -iname '*.gcda' -delete";
 		};
 		5B45DF6219A5E98F00FD8955 /* Clean for Coverage */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -717,7 +717,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "find . -iname \"*.gcda\" -exec rm {} \\;";
+			shellScript = "find . -iname '*.gcda' -delete";
 		};
 /* End PBXShellScriptBuildPhase section */
 
