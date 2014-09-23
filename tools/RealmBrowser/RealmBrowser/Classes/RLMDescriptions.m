@@ -147,9 +147,11 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
             
             for (RLMProperty *property in referredObject.objectSchema.properties) {
                 id propertyValue = referredObject[property.name];
-                NSString *propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type format:format];
+                NSString *propertyDescription = [self printablePropertyValue:propertyValue
+                                                                      ofType:property.type
+                                                                      format:RLMDescriptionFormatEllipsis];
                 
-                if (returnString.length > kMaxNumberOfObjectCharsForTable - 4) {
+                if (returnString.length > kMaxNumberOfObjectCharsForTaSCNGeometryPrimitiveTypeLineble - 4) {
                     returnString = [returnString stringByAppendingFormat:@"..."];
                     break;
                 }

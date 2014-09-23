@@ -33,6 +33,7 @@ RLM_ARRAY_TYPE(RealmTestClass0)
 
 @property NSInteger integerValue;
 @property BOOL boolValue;
+@property RealmTestClass0 *objectReference;
 @property float floatValue;
 @property double doubleValue;
 @property NSString *stringValue;
