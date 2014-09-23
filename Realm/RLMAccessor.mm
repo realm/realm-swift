@@ -149,17 +149,17 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
 
 static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObject *link,
                                         __unsafe_unretained RLMRealm *realm,
-                                        bool tryUpdate, bool create) {
+                                        RLMSetFlag options) {
     if (link.realm != realm) {
         // only try to update if link object has primary key
-        if (tryUpdate && link.objectSchema.primaryKeyProperty) {
+        if ((options & RLMSetFlagUpdateOrCreate) && link.objectSchema.primaryKeyProperty) {
             link = [link.class createOrUpdateInRealm:realm withObject:link];
         }
-        else if (create) {
+        else if (options & RLMSetFlagAllowCopy) {
             link = [link.class createInRealm:realm withObject:link];
         }
         else {
-            RLMAddObjectToRealm(link, realm, tryUpdate);
+            RLMAddObjectToRealm(link, realm, options);
         }
     }
     return link->_row.get_index();
@@ -176,8 +176,7 @@ static inline RLMObject *RLMGetLink(__unsafe_unretained RLMObject *obj, NSUInteg
     return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex,
-                               __unsafe_unretained RLMObject *val, bool tryUpdate = false,
-                               bool create = false) {
+                               __unsafe_unretained RLMObject *val, RLMSetFlag options=0) {
     RLMVerifyInWriteTransaction(obj);
 
     if (!val || (id)val == NSNull.null) {
@@ -192,7 +191,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
             @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
         }
 
-        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj.realm, tryUpdate, create));
+        obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj.realm, options));
     }
 }
 
@@ -208,7 +207,7 @@ static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObject *obj, NSUInteg
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex,
                                __unsafe_unretained id<NSFastEnumeration> val,
-                               bool tryUpdate = false, bool create = false) {
+                               RLMSetFlag options=0) {
     RLMVerifyInWriteTransaction(obj);
 
     tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
@@ -216,7 +215,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
     for (RLMObject *link in val) {
-        linkView->add(RLMAddLinkedObject(link, obj.realm, tryUpdate, create));
+        linkView->add(RLMAddLinkedObject(link, obj.realm, options));
     }
 }
 
@@ -603,18 +602,18 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
-    RLMDynamicSet(obj, prop, val, prop.isPrimary, false, false);
+    RLMDynamicSet(obj, prop, val, prop.isPrimary ? RLMSetFlagEnforceUnique : 0);
 }
 
-void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop, __unsafe_unretained id val,
-                   bool enforceUnique, bool tryUpdate, bool create) {
+void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop,
+                   __unsafe_unretained id val, RLMSetFlag options) {
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
         case 's':
         case 'i':
         case 'l':
         case 'q':
-            if (enforceUnique) {
+            if (options & RLMSetFlagEnforceUnique) {
                 RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
             }
             else {
@@ -632,7 +631,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
             RLMSetValue(obj, col, (bool)[val boolValue]);
             break;
         case 'S':
-            if (enforceUnique) {
+            if (options & RLMSetFlagEnforceUnique) {
                 RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
             }
             else {
@@ -646,10 +645,10 @@ void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMPr
             RLMSetValue(obj, col, (NSData *)val);
             break;
         case 'k':
-            RLMSetValue(obj, col, (RLMObject *)val, tryUpdate, create);
+            RLMSetValue(obj, col, (RLMObject *)val, options);
             break;
         case 't':
-            RLMSetValue(obj, col, (RLMArray *)val, tryUpdate, create);
+            RLMSetValue(obj, col, (RLMArray *)val, options);
             break;
         case '@':
             RLMSetValue(obj, col, val);
