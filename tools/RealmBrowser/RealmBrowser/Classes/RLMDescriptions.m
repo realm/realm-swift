@@ -151,7 +151,7 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
                                                                       ofType:property.type
                                                                       format:RLMDescriptionFormatEllipsis];
                 
-                if (returnString.length > kMaxNumberOfObjectCharsForTaSCNGeometryPrimitiveTypeLineble - 4) {
+                if (returnString.length > kMaxNumberOfObjectCharsForTable - 4) {
                     returnString = [returnString stringByAppendingFormat:@"..."];
                     break;
                 }
