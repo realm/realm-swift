@@ -114,13 +114,12 @@
         result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
-        result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+        result.textField.stringValue = [NSString stringWithFormat:@"%@: %@[]", referringProperty.name, referringProperty.objectClassName];
     }
 
     result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
     [[result.button cell] setHighlightsBy:0];
     result.button.hidden = NO;
-    result.imageView.image = [NSImage imageNamed:@"ArrayIcon"];
     
     return result;
 }

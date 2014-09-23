@@ -9,10 +9,12 @@
 #import "RLMObjectNode.h"
 #import "RLMSidebarTableCellView.h"
 #import "RLMArrayNode.h"
+#import "RLMDescriptions.h"
 
 @interface RLMObjectNode ()
 
 @property (nonatomic) RLMObject *object;
+@property (nonatomic) RLMDescriptions *realmDescriptions;
 
 @end
 
@@ -29,7 +31,8 @@
     
     if (self = [super initWithSchema:elementSchema inRealm:realm]) {
         displayedArrays = [[NSMutableArray alloc] initWithCapacity:10];
-
+        self.realmDescriptions = [[RLMDescriptions alloc] init];
+        
         self.object = object;
     }
     
@@ -72,7 +75,7 @@
 {
     RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell" owner:self];
     
-    result.textField.stringValue = [NSString stringWithFormat:@"[OBJ: %@]", self.object.className];
+    result.textField.stringValue = [self.realmDescriptions descriptionOfObject:self.object];
     result.button.hidden = YES;
     
     return result;

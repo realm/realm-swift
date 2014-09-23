@@ -161,17 +161,9 @@
     return ![item isKindOfClass:[RLMRealmNode class]];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
-{
-    [self selectOrCollapsItem:item];
-    [self removeAllChildArrays];
-    return YES;
-}
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowOutlineCellForItem:(id)item
 {
-    // The top level node should not display the toggle triangle.
-    return item != self.parentWindowController.modelDocument.presentedRealm;
+    return NO;
 }
 
 - (NSString *)outlineView:(NSOutlineView *)outlineView
@@ -199,12 +191,12 @@
         // The arrays we get from link views are ephemeral, so we
         // remove them when any class node is selected
         if (row != -1) {
-            [self selectOrCollapsItem:[outlineView itemAtRow:row]];
+            [self selectedItem:[outlineView itemAtRow:row]];
         }
     }
 }
 
--(void)selectOrCollapsItem:(id<RLMRealmOutlineNode>)item
+-(void)selectedItem:(id<RLMRealmOutlineNode>)item
 {
     id<RLMRealmOutlineNode> theItem = item;
     
@@ -213,7 +205,7 @@
         [self removeAllChildArrays];
     }
     
-    // If we didn't select an array, we should flatten the outline view
+    // If we clicked an object, collapse and then select its parent
     if ([item isKindOfClass:[RLMObjectNode class]]) {
         theItem = ((RLMObjectNode *)item).parentNode;
     }

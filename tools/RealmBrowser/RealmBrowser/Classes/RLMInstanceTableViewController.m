@@ -36,12 +36,7 @@
 
 #import "objc/objc-class.h"
 
-const NSUInteger kMaxNumberOfArrayEntriesInToolTip = 5;
-const NSUInteger kMaxNumberOfStringCharsInObjectLink = 20;
-const NSUInteger kMaxNumberOfStringCharsForTooltip = 300;
-const NSUInteger kMaxNumberOfInlineStringCharsForTooltip = 20;
-const NSUInteger kMaxNumberOfObjectCharsForTable = 200;
-const NSUInteger kMaxDepthForTooltips = 2;
+#import "RLMDescriptions.h"
 
 @interface RLMObject ()
 
@@ -57,6 +52,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
     NSDateFormatter *dateFormatter;
     NSNumberFormatter *numberFormatter;
     NSMutableDictionary *autofittedColumns;
+    RLMDescriptions *realmDescriptions;
 }
 
 #pragma mark - NSObject Overrides
@@ -83,6 +79,8 @@ const NSUInteger kMaxDepthForTooltips = 2;
     linkCursorDisplaying = NO;
     
     autofittedColumns = [NSMutableDictionary dictionary];
+    
+    realmDescriptions = [[RLMDescriptions alloc] init];
     
     awake = YES;
 }
@@ -237,7 +235,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
     switch (type) {
         case RLMPropertyTypeArray: {
             RLMBadgeTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BadgeCell" owner:self];
-            NSString *string = [self printablePropertyValue:propertyValue ofType:type];
+            NSString *string = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
             
@@ -266,7 +264,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
             RLMNumberTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"NumberCell" owner:self];
-            numberCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            numberCellView.textField.stringValue = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             numberCellView.textField.delegate = self;
             
             ((RLMNumberTextField *)numberCellView.textField).number = propertyValue;
@@ -279,7 +277,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
 
         case RLMPropertyTypeObject: {
             RLMLinkTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"LinkCell" owner:self];
-            NSString *string = [self printablePropertyValue:propertyValue ofType:type];
+            NSString *string = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             linkCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
             
@@ -295,7 +293,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
         case RLMPropertyTypeDate:
         case RLMPropertyTypeString: {
             RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
-            basicCellView.textField.stringValue = [self printablePropertyValue:propertyValue ofType:type];
+            basicCellView.textField.stringValue = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             basicCellView.textField.delegate = self;
             basicCellView.textField.editable = !self.realmIsLocked && type != RLMPropertyTypeData;
             
@@ -305,221 +303,10 @@ const NSUInteger kMaxDepthForTooltips = 2;
         }
     }
     
-    cellView.toolTip = [self tooltipForPropertyValue:propertyValue ofType:type];
+    cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
     
     return cellView;
 }
-
-#pragma mark - Private Methods - NSTableView Delegate
-
--(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
-{
-    return [self printablePropertyValue:propertyValue ofType:propertyType linkFormat:NO];
-}
-
--(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType linkFormat:(BOOL)linkFormat
-{
-    if (!propertyValue) {
-        return @"";
-    }
-    
-    switch (propertyType) {
-        case RLMPropertyTypeInt:
-            numberFormatter.minimumFractionDigits = 0;
-            
-            return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
-
-            // Intentional fallthrough
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-            numberFormatter.minimumFractionDigits = 3;
-            numberFormatter.maximumFractionDigits = 3;
-            
-            return [numberFormatter stringFromNumber:(NSNumber *)propertyValue];
-            
-        case RLMPropertyTypeString: {
-            NSString *stringValue = propertyValue;
-            
-            if (linkFormat && stringValue.length > kMaxNumberOfStringCharsInObjectLink) {
-                stringValue = [stringValue substringToIndex:kMaxNumberOfStringCharsInObjectLink - 3];
-                stringValue = [stringValue stringByAppendingString:@"..."];
-            }
-            
-            return stringValue;
-        }
-            
-        case RLMPropertyTypeBool:
-            return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
-            
-        case RLMPropertyTypeArray: {
-            RLMArray *referredArray = (RLMArray *)propertyValue;
-            if (linkFormat) {
-                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, referredArray.count];
-            }
-            
-            return [NSString stringWithFormat:@"%@[]", referredArray.objectClassName];
-        }
-            
-        case RLMPropertyTypeDate:
-            return [dateFormatter stringFromDate:(NSDate *)propertyValue];
-            
-        case RLMPropertyTypeData:
-            return @"<Data>";
-            
-        case RLMPropertyTypeAny:
-            return @"<Any>";
-            
-        case RLMPropertyTypeObject: {
-            RLMObject *referredObject = (RLMObject *)propertyValue;
-            if (referredObject == nil) {
-                return @"";
-            }
-            
-            if (linkFormat) {
-                return [NSString stringWithFormat:@"%@(...)", referredObject.objectSchema.className];
-            }
-            
-            NSString *returnString = [NSString stringWithFormat:@"%@(", referredObject.objectSchema.className];
-            
-            for (RLMProperty *property in referredObject.objectSchema.properties) {
-                id propertyValue = referredObject[property.name];
-                NSString *propertyDescription = [self printablePropertyValue:propertyValue ofType:property.type linkFormat:YES];
-                
-                if (returnString.length > kMaxNumberOfObjectCharsForTable - 4) {
-                    returnString = [returnString stringByAppendingFormat:@"..."];
-                    break;
-                }
-                
-                returnString = [returnString stringByAppendingFormat:@"%@, ", propertyDescription];
-            }
-            
-            if ([returnString hasSuffix:@", "]) {
-                returnString = [returnString substringToIndex:returnString.length - 2];
-            }
-            
-            return [returnString stringByAppendingString:@")"];
-        }
-    }
-}
-
--(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
-{
-    if (!propertyValue) {
-        return nil;
-    }
-
-    switch (propertyType) {
-        case RLMPropertyTypeString: {
-            NSUInteger chars = MIN(kMaxNumberOfStringCharsForTooltip, [(NSString *)propertyValue length]);
-            return [(NSString *)propertyValue substringToIndex:chars];
-        }
-            
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-            numberFormatter.minimumFractionDigits = 0;
-            numberFormatter.maximumFractionDigits = UINT16_MAX;
-            return [numberFormatter stringFromNumber:propertyValue];
-            
-        case RLMPropertyTypeObject:
-            return [self tooltipForObject:(RLMObject *)propertyValue];
-            
-        case RLMPropertyTypeArray:
-            return [self tooltipForArray:(RLMArray *)propertyValue];
-            
-        case RLMPropertyTypeAny:
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeData:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeInt:
-            return nil;
-    }
-}
-
-- (NSString *)tooltipForObject:(RLMObject *)object
-{
-    return [self tooltipForObject:object withDepth:0];
-}
-
-- (NSString *)tooltipForObject:(RLMObject *)object withDepth:(NSUInteger)depth
-{
-    if (depth == kMaxDepthForTooltips) {
-        return [object.objectSchema.className stringByAppendingString:@"(...)"];
-    }
-    
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@:\n", object.objectSchema.className];
-    NSString *tabs = [@"" stringByPaddingToLength:depth + 1 withString:@"\t" startingAtIndex:0];
-    
-    for (RLMProperty *property in object.objectSchema.properties) {
-        id obj = object[property.name];
-        
-        NSString *sub;
-        switch (property.type) {
-            case RLMPropertyTypeArray:
-                sub = [self tooltipForArray:obj withDepth:kMaxDepthForTooltips];
-                break;
-            case RLMPropertyTypeObject: {
-                sub = [self tooltipForObject:obj withDepth:depth + 1];
-                break;
-            }
-            default:
-                sub = [self printablePropertyValue:obj ofType:property.type];
-
-                if (property.type == RLMPropertyTypeString && sub.length > kMaxNumberOfInlineStringCharsForTooltip) {
-                    sub = [sub substringToIndex:kMaxNumberOfInlineStringCharsForTooltip];
-                    sub = [sub stringByAppendingString:@"..."];
-                }
-                break;
-        }
-
-        [string appendFormat:@"%@%@ = %@\n", tabs, property.name, sub];
-    }
-    
-    return string;
-}
-
-- (NSString *)tooltipForArray:(RLMArray *)array
-{
-    return [self tooltipForArray:array withDepth:0];
-}
-
-- (NSString *)tooltipForArray:(RLMArray *)array withDepth:(NSUInteger)depth
-{
-    if (depth == kMaxDepthForTooltips) {
-        return [array.objectClassName stringByAppendingFormat:@"[%lu]", array.count];
-    }
-    
-    const NSUInteger maxObjects = 3;
-    NSString *tabs = [@"" stringByPaddingToLength:depth withString:@"\t" startingAtIndex:0];
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@%@[%lu]", tabs, array.objectClassName, array.count];
-    
-    if (array.count == 0) {
-        return string;
-    }
-    [string appendString:@":\n"];
-    
-    NSUInteger index = 0;
-    NSUInteger skipped = 0;
-    for (id obj in array) {
-        NSString *sub = [self tooltipForObject:obj withDepth:depth + 1];
-        [string appendFormat:@"%@\t[%lu] %@\n", tabs, index++, sub];
-        if (index >= maxObjects) {
-            skipped = array.count - maxObjects;
-            break;
-        }
-    }
-    
-    // Remove last comma and newline characters
-    if (array.count > 0) {
-        [string deleteCharactersInRange:NSMakeRange(string.length - 1, 1)];
-    }
-    if (skipped) {
-        [string appendFormat:@"\n\t%@+%lu more", tabs, skipped];
-    }
-    [string appendFormat:@"\n"];
-    
-    return string;
-}
-
 
 #pragma mark - RLMTableView Delegate
 
