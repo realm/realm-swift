@@ -2,6 +2,8 @@
 =============================================================
 
 ### API breaking changes
+* XCode6 is now supported from the main XCode project Realm.xcodeproj. XCode5 is no
+  longer supported. 
 
 ### Enhancements
 
