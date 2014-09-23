@@ -21,9 +21,10 @@
 #import "RLMTypeNode.h"
 #import "RLMArrayNode.h"
 
+@class RLMObjectNode;
 @interface RLMClassNode : RLMTypeNode
 
-- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
+- (RLMObjectNode *)displayChildObject:(RLMObject *)object;
 
 - (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
 
