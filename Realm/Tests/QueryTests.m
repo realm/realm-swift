@@ -312,19 +312,19 @@
     RLMArray *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
     XCTAssertEqualObjects([results[0] stringCol], @"cc");
 
-    // delete cc, results should not change
-    AllTypesObject *lastObject = [arrayOfAll.array lastObject];
+    // delete cc, add d results should update
     [realm transactionWithBlock:^{
         [arrayOfAll.array removeObjectAtIndex:3];
         
         // create extra alltypesobject
-        [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
+        [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
     }];
-    XCTAssertEqualObjects([results[0] stringCol], @"cc");
+    XCTAssertEqualObjects([results[0] stringCol], @"d");
+    XCTAssertEqualObjects([results[1] stringCol], @"c");
 
     // delete from realm should be removed from results
     [realm transactionWithBlock:^{
-        [realm deleteObject:lastObject];
+        [realm deleteObject:arrayOfAll.array.lastObject];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"c");
 }
