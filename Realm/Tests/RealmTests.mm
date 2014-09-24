@@ -272,6 +272,32 @@
     XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm2].count);
 }
 
+- (void)testCopyObjectsInArrayLiteral {
+    RLMRealm *realm1 = [self realmWithTestPath];
+    RLMRealm *realm2 = [RLMRealm defaultRealm];
+
+    CircleObject *c = [[CircleObject alloc] init];
+    c.data = @"1";
+
+    [realm1 beginWriteTransaction];
+    [realm1 addObject:c];
+    [realm1 commitWriteTransaction];
+
+    [realm2 beginWriteTransaction];
+    CircleObject *c2 = [CircleObject createInRealm:realm2 withObject:@[@"3", @[@"2", c]]];
+    [realm2 commitWriteTransaction];
+
+    XCTAssertEqual(1U, [CircleObject allObjectsInRealm:realm1].count);
+    XCTAssertEqual(3U, [CircleObject allObjectsInRealm:realm2].count);
+    XCTAssertEqual(realm1, c.realm);
+    XCTAssertEqual(realm2, c2.realm);
+
+    XCTAssertEqualObjects(@"1", c.data);
+    XCTAssertEqualObjects(@"3", c2.data);
+    XCTAssertEqualObjects(@"2", c2.next.data);
+    XCTAssertEqualObjects(@"1", c2.next.next.data);
+}
+
 - (void)testRealmTransactionBlock {
     RLMRealm *realm = [self realmWithTestPath];
     [realm transactionWithBlock:^{
