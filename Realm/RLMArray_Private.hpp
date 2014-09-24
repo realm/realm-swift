@@ -73,8 +73,8 @@
     tightdb::LinkViewRef _backingLinkView;
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                          view:(tightdb::LinkViewRef)view
-                                         realm:(RLMRealm *)realm;
+                                    view:(tightdb::LinkViewRef)view
+                                   realm:(RLMRealm *)realm;
 @end
 
 
@@ -88,6 +88,10 @@
 }
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                    query:(tightdb::Query &)query
+                                   realm:(RLMRealm *)realm;
+
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                    view:(tightdb::TableView)view
                                    realm:(RLMRealm *)realm;
 
 @end
