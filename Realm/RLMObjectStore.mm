@@ -226,14 +226,8 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
     // try to get existing row if updating
     size_t rowIndex = tightdb::not_found;
     tightdb::Table &table = *schema->_table;
-    if (tryUpdate) {
-        // verify primary key
-        RLMProperty *primaryProperty = schema.primaryKeyProperty;
-        if (!primaryProperty) {
-            NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
-            @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
-        }
-
+    RLMProperty *primaryProperty = schema.primaryKeyProperty;
+    if (tryUpdate && primaryProperty) {
         // get primary value
         id primaryValue = primaryValueGetter(primaryProperty);
         

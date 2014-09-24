@@ -15,6 +15,7 @@
 * Fix error about not being able to persist property 'hash' with incompatible
   type when building for devices with Xcode 6.
 * Fix spurious notifications of new versions of Realm.
+* Fix for updating nested objects where some types do not have primary keys.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
