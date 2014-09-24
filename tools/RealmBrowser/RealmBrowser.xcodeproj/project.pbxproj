@@ -25,7 +25,7 @@
 		844C34DF19473D9D0027E902 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C34DE19473D9D0027E902 /* libc++.dylib */; };
 		844C34E3194859080027E902 /* TestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E2194859080027E902 /* TestClasses.m */; };
 		844C350E19499BC20027E902 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
-		844C350F19499CB90027E902 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
+		844C350F19499CB90027E902 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457294C1962E3860076D4F1 /* RLMTableView.m */; };
 		8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */; };
 		8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2BC195452BE00BCA755 /* RLMInstanceTableViewController.m */; };
@@ -527,7 +527,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLM;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Realm inc.";
 				TargetAttributes = {
 					84E0F96F1921F3B900D6CA14 = {
