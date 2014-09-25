@@ -34,7 +34,12 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, 
 // sort an existing view by the specified property name and direction
 void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSString *property, BOOL ascending);
 
-NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *desc, NSString *columnName);
+// validate and returns a property used for sorting - throw for invalid property types or names
+RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName);
+
+// return column index - throw for invalid column name
+NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
+
 
 // This macro validates predicate format with optional arguments
 #define RLM_VARARG(PREDICATE_FORMAT, ARGS) \

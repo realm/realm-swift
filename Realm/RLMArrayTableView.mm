@@ -43,6 +43,16 @@
     return ar;
 }
 
++ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
+                                    view:(tightdb::TableView)view
+                                   realm:(RLMRealm *)realm {
+    RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
+    ar->_viewCreated = YES;
+    ar->_backingView = move(view);
+    ar->_realm = realm;
+    return ar;
+}
+
 - (BOOL)isReadOnly {
     return YES;
 }
