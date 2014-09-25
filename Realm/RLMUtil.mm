@@ -190,9 +190,9 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
     for (RLMProperty *prop in properties) {
         // set out object to validated input or default value
         id obj = (isDict || [value respondsToSelector:NSSelectorFromString(prop.name)]) ? [value valueForKey:prop.name] : nil;
-        obj = obj ?: defaults[prop.name];
+        obj = obj && obj != NSNull.null ? obj : defaults[prop.name];
         obj = RLMValidatedObjectForProperty(obj, prop, schema);
-        if (obj && obj != NSNull.null)
+        if (obj)
             outDict[prop.name] = obj;
     }
     return outDict;

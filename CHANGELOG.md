@@ -17,6 +17,8 @@
   type when building for devices with Xcode 6.
 * Fix spurious notifications of new versions of Realm.
 * Fix for updating nested objects where some types do not have primary keys.
+* Fix for inserting objects from JSON with NSNull values when default values
+  should be used.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
