@@ -112,10 +112,10 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
         case RLMPropertyTypeArray: {
             RLMArray *referredArray = (RLMArray *)propertyValue;
             if (format == RLMDescriptionFormatEllipsis) {
-                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, referredArray.count];
+                return [NSString stringWithFormat:@"<%@>[%lu]", referredArray.objectClassName, referredArray.count];
             }
             
-            return [NSString stringWithFormat:@"%@[]", referredArray.objectClassName];
+            return [NSString stringWithFormat:@"<%@>", referredArray.objectClassName];
         }
             
         case RLMPropertyTypeDate:
@@ -134,15 +134,15 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
             }
             
             if (format == RLMDescriptionFormatEllipsis) {
-                return [NSString stringWithFormat:@"%@(...)", referredObject.objectSchema.className];
+                return [NSString stringWithFormat:@"%@[...]", referredObject.objectSchema.className];
             }
             
             NSString *returnString;
             if (format == RLMDescriptionFormatObject) {
-                returnString = @"(";
+                returnString = @"[";
             }
             else {
-                returnString = [NSString stringWithFormat:@"%@(", referredObject.objectSchema.className];
+                returnString = [NSString stringWithFormat:@"%@[", referredObject.objectSchema.className];
             }
             
             for (RLMProperty *property in referredObject.objectSchema.properties) {
@@ -163,7 +163,7 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
                 returnString = [returnString substringToIndex:returnString.length - 2];
             }
             
-            return [returnString stringByAppendingString:@")"];
+            return [returnString stringByAppendingString:@"]"];
         }
     }
 }
@@ -209,7 +209,7 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
 - (NSString *)tooltipForObject:(RLMObject *)object withDepth:(NSUInteger)depth
 {
     if (depth == kMaxDepthForTooltips) {
-        return [object.objectSchema.className stringByAppendingString:@"(...)"];
+        return [object.objectSchema.className stringByAppendingString:@"[...]"];
     }
     
     NSMutableString *string = [NSMutableString stringWithFormat:@"%@:\n", object.objectSchema.className];
@@ -251,12 +251,12 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
 - (NSString *)tooltipForArray:(RLMArray *)array withDepth:(NSUInteger)depth
 {
     if (depth == kMaxDepthForTooltips) {
-        return [array.objectClassName stringByAppendingFormat:@"[%lu]", array.count];
+        return [NSString stringWithFormat:@"<%@>[%lu]", array.objectClassName, array.count];
     }
     
     const NSUInteger maxObjects = 3;
     NSString *tabs = [@"" stringByPaddingToLength:depth withString:@"\t" startingAtIndex:0];
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@%@[%lu]", tabs, array.objectClassName, array.count];
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@<%@>[%lu]", tabs, array.objectClassName, array.count];
     
     if (array.count == 0) {
         return string;

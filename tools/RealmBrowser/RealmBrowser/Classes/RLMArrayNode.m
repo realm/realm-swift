@@ -108,20 +108,27 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                                  owner:self];
+    RLMSidebarTableCellView *cellView = [tableView makeViewWithIdentifier:@"MainCell" owner:self];
     if (name) {
-        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
+        cellView.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
-        result.textField.stringValue = [NSString stringWithFormat:@"%@: %@[]", referringProperty.name, referringProperty.objectClassName];
+        NSString *propertyName = [referringProperty.name stringByAppendingString:@":"];
+        NSString *className = [NSString stringWithFormat:@" <%@>", referringProperty.objectClassName];
+        
+        NSString *labelString = [propertyName stringByAppendingString:className];
+        NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:labelString];
+        [string addAttribute:NSForegroundColorAttributeName value:[NSColor grayColor]
+                       range:NSMakeRange(propertyName.length, className.length)];
+        
+        cellView.textField.attributedStringValue = string;
     }
 
-    result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
-    [[result.button cell] setHighlightsBy:0];
-    result.button.hidden = NO;
+    cellView.button.title =[NSString stringWithFormat:@"%lu", [self instanceCount]];
+    [[cellView.button cell] setHighlightsBy:0];
+    cellView.button.hidden = NO;
     
-    return result;
+    return cellView;
 }
 
 #pragma mark - RLMRealmOutlineNode Implementation
