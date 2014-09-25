@@ -113,7 +113,8 @@
         cellView.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
-        cellView.textField.stringValue = [NSString stringWithFormat:@"%@: <%@>", referringProperty.name, referringProperty.objectClassName];
+        cellView.textField.stringValue = [NSString stringWithFormat:@"%@: <%@>",
+                                          referringProperty.name, referringProperty.objectClassName];
     }
 
     cellView.button.title =[NSString stringWithFormat:@"%lu", [self instanceCount]];
