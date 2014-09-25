@@ -507,7 +507,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     for (NSString *key in keys) {
         NSMutableDictionary *dict = [inputValues mutableCopy];
         dict[key] = NSNull.null;
-        [dict removeObjectForKey:key];
         [DefaultObject createInRealm:realm withObject:dict];
     }
 
