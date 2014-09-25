@@ -113,15 +113,7 @@
         cellView.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
-        NSString *propertyName = [referringProperty.name stringByAppendingString:@":"];
-        NSString *className = [NSString stringWithFormat:@" <%@>", referringProperty.objectClassName];
-        
-        NSString *labelString = [propertyName stringByAppendingString:className];
-        NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:labelString];
-        [string addAttribute:NSForegroundColorAttributeName value:[NSColor grayColor]
-                       range:NSMakeRange(propertyName.length, className.length)];
-        
-        cellView.textField.attributedStringValue = string;
+        cellView.textField.stringValue = [NSString stringWithFormat:@"%@: <%@>", referringProperty.name, referringProperty.objectClassName];
     }
 
     cellView.button.title =[NSString stringWithFormat:@"%lu", [self instanceCount]];
