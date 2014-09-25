@@ -83,12 +83,19 @@ static RLMPRealmPlugin *sharedPlugin;
 
         return;
     }
-
-    NSArray *arguments = @[@"-xcode"];
+    
+    NSArray *workspaceWindowControllers = [NSClassFromString(@"IDEWorkspaceWindowController") valueForKey:@"workspaceWindowControllers"];
+    NSWorkspace *workSpace;
+    for (NSWindowController *controller in workspaceWindowControllers) {
+        if ([[controller valueForKey:@"window"] isEqual:[NSApp keyWindow]]) {
+            workSpace = [controller valueForKey:@"_workspace"];
+        }
+    }
+    NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
+    NSArray *arguments = @[@"-xcodeProjectPath", workspacePath];
     NSDictionary *configuration = @{NSWorkspaceLaunchConfigurationArguments : arguments};
     
     NSError *error;
-    
     if (![[NSWorkspace sharedWorkspace] launchApplicationAtURL:self.browserUrl options:0 configuration:configuration error:&error]) {
         // This will happen if the Browser was present at Xcode launch and then was deleted
         NSAlert *alert = [NSAlert alertWithMessageText:@"Could not launch the Realm Browser"
