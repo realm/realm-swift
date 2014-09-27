@@ -17,6 +17,7 @@
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
 * Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
 * Updating to core library version 0.85.0.
+* Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
 
 ### Bugfixes
 
@@ -39,6 +40,7 @@
   (as it was previously).
 * Fix another bug which would sometimes result in subclassing RLMObject
   subclasses not working.
+
 
 0.86.2 Release notes (2014-10-06)
 =============================================================

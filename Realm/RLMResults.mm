@@ -35,6 +35,10 @@
     std::unique_ptr<tightdb::Query> _backingQuery;
     tightdb::TableView _backingView;
     BOOL _viewCreated;
+
+@protected
+    RLMRealm *_realm;
+    NSString *_objectClassName;
 }
 
 - (instancetype)initPrivate {
