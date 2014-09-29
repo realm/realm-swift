@@ -165,6 +165,13 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
         obj->_row.nullify_link(colIndex);
     }
     else {
+        // make sure it is the correct type
+        if (![[obj.objectSchema.properties[colIndex] objectClassName] isEqualToString:val.objectSchema.className]) {
+            NSString *reason = [NSString stringWithFormat:@"Can't set object of type '%@' to property of type '%@'",
+                                val.objectSchema.className, [obj.objectSchema.properties[colIndex] objectClassName]];
+            @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        }
+
         // add to Realm if not in it.
         RLMObject *link = val;
         if (link.realm != obj.realm) {
@@ -524,9 +531,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
     if (!objectClass || !schema || !accessorClassPrefix) {
         @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
     }
-    
-    // if objectClass is a dicrect RLMSubclass use it, otherwise use proxy class
-    if (class_getSuperclass(objectClass) != RLMObject.class) {
+    if (!RLMIsSubclass(objectClass, RLMObject.class)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
     

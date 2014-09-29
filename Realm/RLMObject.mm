@@ -208,6 +208,10 @@
 
 - (NSString *)description
 {
+    if (self.isDeletedFromRealm) {
+        return @"[deleted object]";
+    }
+
     return [self descriptionWithMaxDepth:5];
 }
 
