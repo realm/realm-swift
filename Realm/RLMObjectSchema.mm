@@ -68,7 +68,13 @@
 
 + (instancetype)schemaForObjectClass:(Class)objectClass createAccessors:(BOOL)create {
     RLMObjectSchema *schema = [RLMObjectSchema new];
-    schema.className = [objectClass className];
+
+    // determine classname from objectclass as className method has not yet been updated
+    NSString *className = NSStringFromClass(objectClass);
+    if ([RLMSwiftSupport isSwiftClassName:className]) {
+        className = [RLMSwiftSupport demangleClassName:className];
+    }
+    schema.className = className;
     schema.objectClass = objectClass;
 
     // create array of RLMProperties, inserting properties of superclasses first
@@ -92,7 +98,7 @@
 
         if (!schema.primaryKeyProperty) {
             NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
-                                 primaryKey, schema.className];
+                                 primaryKey, className];
             @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
         }
         if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
@@ -106,7 +112,7 @@
         schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
 
         RLMReplaceSharedSchemaMethod(objectClass, schema);
-        RLMReplaceClassNameMethod(objectClass, schema.className);
+        RLMReplaceClassNameMethod(objectClass, className);
     }
 
     return schema;

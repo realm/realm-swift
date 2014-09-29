@@ -28,12 +28,12 @@ xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Rele
 SF_FRAMEWORK_PATH="${BUILT_PRODUCTS_DIR}/Realm.framework"
 SF_RELEASE_IOS_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphoneos/Realm.framework/Realm"
 SF_RELEASE_SIM_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/Realm.framework/Realm"
-xcrun rm "${SF_FRAMEWORK_PATH}/Realm"
+rm "${SF_FRAMEWORK_PATH}/Realm"
 xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${SF_FRAMEWORK_PATH}/Realm" 
 
 # Step 3 - copy out
 SF_OUT_DIR="${SRCROOT}/build/ios"
 if [[ ! -d "${SF_OUT_DIR}" ]]; then
-    xcrun mkdir -p "${SF_OUT_DIR}"
+    mkdir -p "${SF_OUT_DIR}"
 fi
-xcrun cp -R "${SF_FRAMEWORK_PATH}" "${SF_OUT_DIR}"
+cp -R "${SF_FRAMEWORK_PATH}" "${SF_OUT_DIR}"
