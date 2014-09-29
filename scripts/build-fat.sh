@@ -34,7 +34,6 @@ xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${
 # Step 3 - copy out
 SF_OUT_DIR="${SRCROOT}/build/ios"
 if [[ ! -d "${SF_OUT_DIR}" ]]; then
-    xcrun mkir -p "${SF_OUT_DIR}"
+    xcrun mkdir -p "${SF_OUT_DIR}"
 fi
 xcrun cp -R "${SF_FRAMEWORK_PATH}" "${SF_OUT_DIR}"
-

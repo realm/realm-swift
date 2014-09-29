@@ -62,36 +62,13 @@ EOF
 # Xcode Helpers
 ######################################
 
-if [ -z "$XCODE_VERSION" ]; then
-    XCODE_VERSION=6
-fi
-
 xcode() {
-    if [ -L build/bin ]; then
-        unlink build/bin
-    fi
-    rm -rf build/bin
     mkdir -p build/DerivedData
-
-    local xc_path="$XCODE_PATH"
-    if [ -z "$xc_path" ]; then
-        case "$XCODE_VERSION" in
-            6)
-                xc_path="/Applications/Xcode6-Beta7.app"
-                ;;
-            *)
-                echo "Unsupported version of xcode specified"
-                exit 1
-        esac
-    fi
-
-    ln -s $xc_path/Contents/Developer/usr/bin build/bin
-
-    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
 }
 
 xc() {
-    echo "Building target \"$1\" with xcode${XCODE_VERSION}"
+    echo "Building target \"$1\""
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode $1
     elif [[ "$XCMODE" == "xcpretty" ]]; then
