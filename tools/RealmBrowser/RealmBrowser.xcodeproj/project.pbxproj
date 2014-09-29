@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2206942019D5AFE000377F5C /* RLMPopupWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2206941F19D5AFE000377F5C /* RLMPopupWindowController.m */; };
 		22096B2719911F7300233D77 /* RLMBadgeTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22096B2619911F7300233D77 /* RLMBadgeTableCellView.m */; };
 		220D382819B639D700F79496 /* RLMTestDataGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 220D382719B639D700F79496 /* RLMTestDataGenerator.m */; };
 		221322FA19954AB100D25737 /* RLMImageTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 221322F919954AB100D25737 /* RLMImageTableCellView.m */; };
@@ -115,6 +116,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2206941E19D5AFE000377F5C /* RLMPopupWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMPopupWindowController.h; path = Classes/RLMPopupWindowController.h; sourceTree = "<group>"; };
+		2206941F19D5AFE000377F5C /* RLMPopupWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMPopupWindowController.m; path = Classes/RLMPopupWindowController.m; sourceTree = "<group>"; };
 		22096B2519911F7300233D77 /* RLMBadgeTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBadgeTableCellView.h; path = Classes/RLMBadgeTableCellView.h; sourceTree = "<group>"; };
 		22096B2619911F7300233D77 /* RLMBadgeTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBadgeTableCellView.m; path = Classes/RLMBadgeTableCellView.m; sourceTree = "<group>"; };
 		220D382619B639D700F79496 /* RLMTestDataGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestDataGenerator.h; sourceTree = "<group>"; };
@@ -262,6 +265,8 @@
 		8413B8FF196D2F4E0012EBE8 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				2206941E19D5AFE000377F5C /* RLMPopupWindowController.h */,
+				2206941F19D5AFE000377F5C /* RLMPopupWindowController.m */,
 				84754ABC193CA4600093604E /* RLMRealmBrowserWindowController.h */,
 				84754ABD193CA4600093604E /* RLMRealmBrowserWindowController.m */,
 				8474E2B219544D8000BCA755 /* RLMTypeOutlineViewController.h */,
@@ -626,6 +631,7 @@
 				22E4737219924CF700EEF7C9 /* RLMBasicTableCellView.m in Sources */,
 				22E473791992562400EEF7C9 /* RLMBoolTableCellView.m in Sources */,
 				8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */,
+				2206942019D5AFE000377F5C /* RLMPopupWindowController.m in Sources */,
 				84754ABE193CA4600093604E /* RLMRealmBrowserWindowController.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				84925C61195AD5B000EE27B1 /* NSColor+ByteSizeFactory.m in Sources */,
