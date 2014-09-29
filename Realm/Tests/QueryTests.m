@@ -1419,98 +1419,63 @@
     ////////////////////////
 
     // BOOL
-    NSUInteger (^query)() = ^{ return [[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"boolCol IN %@", @[@YES]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO, @YES]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO, @YES]] count]));
 
     // int
-    query = ^{ return [[AllTypesObject objectsWhere:@"intCol IN %@", @[@0, @2, @3]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"intCol IN %@", @[@1]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"intCol IN %@", @[@1, @2]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1, @2]] count]));
 
     // float
-    query = ^{ return [[AllTypesObject objectsWhere:@"floatCol IN %@", @[@0, @2, @3]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1, @2]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1, @2]] count]));
 
     // double
-    query = ^{ return [[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@0, @2, @3]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1, @2]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1, @2]] count]));
 
     // NSString
-    query = ^{ return [[StringObject objectsWhere:@"stringCol IN %@", @[@"abc"]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[StringObject objectsWhere:@"stringCol IN %@", @[@"def"]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[StringObject objectsWhere:@"stringCol IN %@", @[@"ABC"]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"abc"]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"ABC"]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"ABC"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"ABC"]] count]));
 
     // NSData
-    query = ^{ return [[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
 
     // NSDate
-    query = ^{ return [[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]] count]));
 
     // bool
-    query = ^{ return [[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@YES]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO, @YES]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO, @YES]] count]));
 
     // int64_t
-    query = ^{ return [[AllTypesObject objectsWhere:@"longCol IN %@", @[@0, @2, @3]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"longCol IN %@", @[@1]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"longCol IN %@", @[@1, @2]] count]; };
-    XCTAssertEqual(1U, query());
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1, @2]] count]));
 
     // mixed
     // FIXME: Support IN predicates with mixed properties
-    query = ^{ return [[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]; };
-    XCTAssertThrows(query());
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]));
 
     // string subobject
-    query = ^{ return [[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]; };
-    XCTAssertEqual(1U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]; };
-    XCTAssertEqual(0U, query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]; };
-    XCTAssertEqual(0U, query());
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]));
     // FIXME: Shouldn't throw on insensitive link string queries
-    query = ^{ return [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]; };
-    XCTAssertThrows(query());
-    query = ^{ return [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]; };
-    XCTAssertThrows(query());
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
 @end
