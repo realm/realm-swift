@@ -449,7 +449,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     [realm commitWriteTransaction];
 
-    // ensuere creation in proper table
+    // ensure creation in proper table
     RLMArray *results = StringSubclassObject.allObjects;
     XCTAssertEqual(1U, results.count);
     XCTAssertEqual(1U, StringObject.allObjects.count);
