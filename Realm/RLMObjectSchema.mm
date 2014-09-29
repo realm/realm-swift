@@ -71,8 +71,14 @@
     schema.className = [objectClass className];
     schema.objectClass = objectClass;
 
-    // create array of RLMProperties
-    schema.properties = [self propertiesForClass:objectClass];
+    // create array of RLMProperties, inserting properties of superclasses first
+    Class cls = objectClass;
+    NSArray *props = @[];
+    while (cls != RLMObject.class) {
+        props = [[RLMObjectSchema propertiesForClass:cls] arrayByAddingObjectsFromArray:props];
+        cls = class_getSuperclass(cls);
+    }
+    schema.properties = props;
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {

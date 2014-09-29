@@ -141,6 +141,21 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
+@interface StringSubclassObject : StringObject
+@property NSString *stringCol2;
+@end
+
+@implementation StringSubclassObject
+@end
+
+@interface StringLinkObject : RLMObject
+@property StringObject *stringObjectCol;
+@property RLMArray<StringObject> *stringObjectArrayCol;
+@end
+
+@implementation StringLinkObject
+@end
+
 @interface ReadOnlyPropertyObject ()
 @property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
@@ -421,6 +436,32 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertTrue([row1.mixedCol isEqual:@"string"],    @"row1.mixedCol");
     XCTAssertEqualObjects(row2.mixedCol, @2,            @"row2.mixedCol");
 }
+
+- (void)testObjectSubclass {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [StringObject createInDefaultRealmWithObject:@[@"string"]];
+    StringSubclassObject *obj = [StringSubclassObject createInDefaultRealmWithObject:@[@"string", @"string2"]];
+
+    // ensure property ordering
+    XCTAssertEqualObjects([obj.objectSchema.properties[0] name], @"stringCol");
+    XCTAssertEqualObjects([obj.objectSchema.properties[1] name], @"stringCol2");
+
+    [realm commitWriteTransaction];
+
+    // ensure creation in proper table
+    RLMArray *results = StringSubclassObject.allObjects;
+    XCTAssertEqual(1U, results.count);
+    XCTAssertEqual(1U, StringObject.allObjects.count);
+
+    // ensure exceptions on when using polymorphism
+    [realm beginWriteTransaction];
+    StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithObject:@[NSNull.null, @[]]];
+    XCTAssertThrows(linkObject.stringObjectCol = obj);
+    XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
+    [realm commitWriteTransaction];
+}
+
 
 #pragma mark - Default Property Values
 
