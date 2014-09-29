@@ -13,6 +13,8 @@
 * `readonly` properties are automatically ignored rather than having to be
   added to `ignoredProperties`.
 * Updating to core library version 0.83.1.
+* Return "[deleted object]" rather than throwing an exception when
+  `-description` is called on a deleted RLMObject.
 
 ### Bugfixes
 

@@ -820,6 +820,18 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertNoThrow(obj.description);
 }
 
+- (void)testDeletedObjectDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *obj = [EmployeeObject createInRealm:realm withObject:@[@"Peter", @30, @YES]];
+    [realm deleteObject:obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertNoThrow(obj.description);
+}
+
 #pragma mark - Indexing Tests
 
 - (void)testIndex
