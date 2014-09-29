@@ -67,7 +67,6 @@
     return nil; // Default implementation - should be overridden by subclasses.    
 }
 
-
 #pragma mark - Public methods - Accessors
 
 - (NSString *)name
@@ -102,7 +101,7 @@
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:propertyCount];
     for (NSUInteger index = 0; index < propertyCount; index++) {
         RLMProperty *property = properties[index];        
-        RLMClazzProperty *tableColumn = [[RLMClazzProperty alloc] initWithProperty:property];
+        RLMClassProperty *tableColumn = [[RLMClassProperty alloc] initWithProperty:property];
         [result addObject:tableColumn];
     }
     

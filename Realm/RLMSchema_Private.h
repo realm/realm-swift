@@ -33,10 +33,6 @@ extern const char *c_versionColumnName;
 extern const size_t c_versionColumnIndex;
 extern const NSUInteger RLMNotVersioned;
 
-inline NSString *RLMTableNameForClassName(NSString *className) {
-    return [c_objectTableNamePrefix stringByAppendingString:className];
-}
-
 inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
         return [tableName substringFromIndex:6];
@@ -44,14 +40,25 @@ inline NSString *RLMClassForTableName(NSString *tableName) {
     return nil;
 }
 
+inline NSString *RLMTableNameForClass(NSString *className) {
+    return [c_objectTableNamePrefix stringByAppendingString:className];
+}
+
 
 //
-// Realm schema version
+// Realm schema metadata
 //
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm);
 
 // must be in write transaction to set
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
+
+// get primary key property name for object class
+NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass);
+
+// sets primary key property for object class
+// must be in write transaction to set
+void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey);
 
 
 //
@@ -60,9 +67,6 @@ void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version);
 @class RLMRealm;
 @interface RLMSchema ()
 @property (nonatomic, readwrite, copy) NSArray *objectSchema;
-
-// mapping of className to tableName
-@property (nonatomic, readonly) NSMutableDictionary *tableNamesForClass;
 
 // schema based on runtime objects
 +(instancetype)sharedSchema;

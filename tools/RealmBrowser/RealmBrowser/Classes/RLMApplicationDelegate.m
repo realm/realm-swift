@@ -19,36 +19,76 @@
 #import "RLMApplicationDelegate.h"
 
 #import <Realm/Realm.h>
+#import "RLMTestDataGenerator.h"
 
 #import "TestClasses.h"
 
-NSString *const kRealmFileExension = @"realm";
-
-const NSUInteger kTestDatabaseSizeMultiplicatorFactor = 1;
 const NSUInteger kTopTipDelay = 250;
+const NSUInteger kMaxFilesPerCategory = 7;
+const CGFloat kMenuImageSize = 16;
+
+NSString *const kRealmFileExension = @"realm";
+NSString *const kDeveloperFolder = @"/Developer";
+NSString *const kSimulatorFolder = @"/Library/Application Support/iPhone Simulator";
+NSString *const kDesktopFolder = @"/Desktop";
+NSString *const kDownloadFolder = @"/Download";
+NSString *const kDocumentsFolder = @"/Documents";
+
+@interface RLMApplicationDelegate ()
+
+@property (nonatomic, weak) IBOutlet NSMenu *fileMenu;
+@property (nonatomic, weak) IBOutlet NSMenuItem *openMenuItem;
+@property (nonatomic, weak) IBOutlet NSMenu *openAnyRealmMenu;
+
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
+
+@property (nonatomic, assign) BOOL didLoadFile;
+
+@property (nonatomic, strong) NSMetadataQuery *realmQuery;
+@property (nonatomic, strong) NSMetadataQuery *appQuery;
+@property (nonatomic, strong) NSMetadataQuery *projQuery;
+@property (nonatomic, strong) NSArray *groupedFileItems;
+
+@end
 
 @implementation RLMApplicationDelegate
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay)
-                                              forKey:@"NSInitialToolTipDelay"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     
-    NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
-    [self.fileMenu performActionForItemAtIndex:openFileIndex];    
+    if (!self.didLoadFile) {
+        NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
+        [self.fileMenu performActionForItemAtIndex:openFileIndex];
+        
+        self.realmQuery = [[NSMetadataQuery alloc] init];
+        [self.realmQuery setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:(id)kMDItemContentModificationDate ascending:NO]]];
+        NSPredicate *realmPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.realm'"];
+        self.realmQuery.predicate = realmPredicate;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(realmQueryNote:) name:nil object:self.realmQuery];
+        [self.realmQuery startQuery];
+        
+        self.appQuery = [[NSMetadataQuery alloc] init];
+        NSPredicate *appPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.app'"];
+        self.appQuery.predicate = appPredicate;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.appQuery];
+
+        self.projQuery = [[NSMetadataQuery alloc] init];
+        NSPredicate *projPredicate = [NSPredicate predicateWithFormat:@"kMDItemFSName like[c] '*.xcodeproj'"];
+        self.projQuery.predicate = projPredicate;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(otherQueryNote:) name:nil object:self.projQuery];
+
+        self.dateFormatter = [[NSDateFormatter alloc] init];
+        self.dateFormatter.dateStyle = NSDateFormatterMediumStyle;
+        self.dateFormatter.timeStyle = NSDateFormatterShortStyle;
+    }
 }
 
 - (BOOL)application:(NSApplication *)application openFile:(NSString *)filename
 {
-    NSURL *fileUrl = [NSURL fileURLWithPath:filename];
-    
-    NSDocumentController *documentController = [[NSDocumentController alloc] init];
-    [documentController openDocumentWithContentsOfURL:fileUrl
-                                              display:YES
-                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
-                                        NSLog(@"Error %@", error);
-                                    }];
-    
+    [self openFileAtURL:[NSURL fileURLWithPath:filename]];
+    self.didLoadFile = YES;
+
     return YES;
 }
 
@@ -64,12 +104,197 @@ const NSUInteger kTopTipDelay = 250;
 
 #pragma mark - Event handling
 
+- (void)realmQueryNote:(NSNotification *)notification {
+    if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
+        [self updateFileItems];
+        [self.appQuery startQuery];
+        [self.projQuery startQuery];
+    }
+    else if ([[notification name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
+        [self updateFileItems];
+        [self.appQuery startQuery];
+    }
+}
+
+- (void)otherQueryNote:(NSNotification *)notification {
+    if ([[notification name] isEqualToString:NSMetadataQueryDidFinishGatheringNotification]) {
+        [self updateFileItems];
+    }
+    else if ([[notification name] isEqualToString:NSMetadataQueryDidUpdateNotification]) {
+        [self updateFileItems];
+    }
+}
+
+-(void)menuNeedsUpdate:(NSMenu *)menu
+{
+    if (menu == self.openAnyRealmMenu) {
+        [menu removeAllItems];
+        NSArray *allItems = [self.groupedFileItems valueForKeyPath:@"Items.@unionOfArrays.self"];
+        [self updateMenu:menu withItems:allItems indented:YES];
+    }
+}
+
+-(void)updateMenu:(NSMenu *)menu withItems:(NSArray *)items indented:(BOOL)indented
+{
+    NSImage *image = [NSImage imageNamed:@"AppIcon"];
+    image.size = NSMakeSize(kMenuImageSize, kMenuImageSize);
+    
+    for (id item in items) {
+        // Category heading, create disabled menu item with corresponding name
+        if ([item isKindOfClass:[NSString class]]) {
+            NSMenuItem *categoryItem = [[NSMenuItem alloc] init];
+            categoryItem.title = (NSString *)item;
+            categoryItem.enabled = NO;
+            [menu addItem:categoryItem];
+        }
+        // Array of items, create cubmenu and set them up there by calling this method recursively
+        else if ([item isKindOfClass:[NSArray class]]) {
+            NSMenuItem *submenuItem = [[NSMenuItem alloc] init];
+            submenuItem.title = @"More";
+            submenuItem.indentationLevel = 1;
+            [menu addItem:submenuItem];
+            
+            NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"More"];
+            NSArray *subitems = item;
+            [self updateMenu:submenu withItems:subitems indented:NO];
+            [menu setSubmenu:submenu forItem:submenuItem];
+        }
+        // Normal file item, just create a menu item for it and wire it up
+        else if ([item isMemberOfClass:[NSMetadataItem class]]) {
+            NSMetadataItem *metadataItem = (NSMetadataItem *)item;
+            
+            // Get the path to the realm and see if there is additional info for it, such as app name
+            NSString *path = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+            NSString *title = [[path lastPathComponent] stringByAppendingString:[self extraInfoForRealmWithPath:path]];
+
+            // Create a menu item using the title and link it with opening the file
+            NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+            menuItem.title = title;
+            menuItem.representedObject = [NSURL fileURLWithPath:path];
+            
+            menuItem.target = self;
+            menuItem.action = @selector(openFileWithMenuItem:);
+            menuItem.image = image;
+            menuItem.indentationLevel = indented ? 1 : 0;
+            
+            // Give the menu item a tooltip with modification date and full path
+            NSDate *date = [metadataItem valueForAttribute:NSMetadataItemFSContentChangeDateKey];
+            NSString *dateString = [self.dateFormatter stringFromDate:date];
+            menuItem.toolTip = [NSString stringWithFormat:@"%@\n\nModified: %@", path, dateString];
+            
+            [menu addItem:menuItem];
+        }
+    }
+}
+
+-(NSString *)extraInfoForRealmWithPath:(NSString *)realmPath
+{
+    NSArray *searchPaths;
+    NSString *searchEndPath;
+    
+    NSString *developerPrefix = [NSHomeDirectory() stringByAppendingPathComponent:kDeveloperFolder];
+    NSString *simulatorPrefix = [NSHomeDirectory() stringByAppendingPathComponent:kSimulatorFolder];
+    
+    if ([realmPath hasPrefix:developerPrefix]) {
+        // The realm file is in the simulator, so we are looking for *.xcodeproj files
+        searchPaths = [self.projQuery results];
+        searchEndPath = developerPrefix;
+    }
+    else if ([realmPath hasPrefix:simulatorPrefix]) {
+        // The realm file is in the simulator, so we are looking for *.app files
+        searchPaths = [self.appQuery results];
+        searchEndPath = simulatorPrefix;
+    }
+    else {
+        // We have no extra info for this containing folder
+        return @"";
+    }
+    
+    // Search at most four levels up for a corresponding app/project file
+    for (NSUInteger i = 0; i < 4; i++) {
+        // Go up one level in the file hierachy by deleting last path component
+        realmPath = [[realmPath stringByDeletingLastPathComponent] copy];
+        if ([realmPath isEqualToString:searchEndPath]) {
+            // Reached end of iteration, the respective folder we are searching within
+            return @"";
+        }
+        
+        for (NSString *pathItem in searchPaths) {
+            NSMetadataItem *metadataItem = (NSMetadataItem *)pathItem;
+            NSString *foundPath = [metadataItem valueForAttribute:NSMetadataItemPathKey];
+            
+            if ([[foundPath stringByDeletingLastPathComponent] isEqualToString:realmPath]) {
+                // Found a project/app file, returning it in formatted form
+                NSString *extraInfo = [[[foundPath pathComponents] lastObject] stringByDeletingPathExtension];
+                return [NSString stringWithFormat: @" - %@", extraInfo];
+            }
+        }
+    }
+    
+    // Tried four levels up and still found nothing, nor reached containing folder. Giving up
+    return @"";
+}
+
+-(void)updateFileItems
+{
+    NSString *homeDir = NSHomeDirectory();
+    
+    NSString *kPrefix = @"Prefix";
+    NSString *kItems = @"Items";
+    
+    NSString *simPrefix = [homeDir stringByAppendingPathComponent:kSimulatorFolder];
+    NSDictionary *simDict = @{kPrefix : simPrefix, kItems : [NSMutableArray arrayWithObject:@"iPhone Simulator"]};
+    
+    NSString *devPrefix = [homeDir stringByAppendingPathComponent:kDeveloperFolder];
+    NSDictionary *devDict = @{kPrefix : devPrefix, kItems : [NSMutableArray arrayWithObject:@"Developer"]};
+    
+    NSString *desktopPrefix = [homeDir stringByAppendingPathComponent:kDesktopFolder];
+    NSDictionary *desktopDict = @{kPrefix : desktopPrefix, kItems : [NSMutableArray arrayWithObject:@"Desktop"]};
+    
+    NSString *downloadPrefix = [homeDir stringByAppendingPathComponent:kDownloadFolder];
+    NSDictionary *downloadDict = @{kPrefix : downloadPrefix, kItems : [NSMutableArray arrayWithObject:@"Download"]};
+    
+    NSString *documentsPrefix = [homeDir stringByAppendingPathComponent:kDocumentsFolder];
+    NSDictionary *documentsdDict = @{kPrefix : documentsPrefix, kItems : [NSMutableArray arrayWithObject:@"Documents"]};
+    
+    NSString *allPrefix = @"/";
+    NSDictionary *otherDict = @{kPrefix : allPrefix, kItems : [NSMutableArray arrayWithObject:@"Other"]};
+    
+    // Create array of dictionaries, each corresponding to search folders
+    self.groupedFileItems = @[simDict, devDict, desktopDict, documentsdDict, downloadDict, otherDict];
+    
+    // Iterate through all search results
+    for (NSMetadataItem *fileItem in self.realmQuery.results) {
+        // Iterate through the different prefixes and add item to corresponding array within dictionary
+        for (NSDictionary *dict in self.groupedFileItems) {
+            if ([[fileItem valueForAttribute:NSMetadataItemPathKey] hasPrefix:dict[kPrefix]]) {
+                NSMutableArray *items = dict[kItems];
+                // The first few items are just added
+                if (items.count - 1 < kMaxFilesPerCategory) {
+                    [items addObject:fileItem];
+                }
+                // When we reach the maximum number of files to show in the overview we create an array...
+                else if (items.count - 1 == kMaxFilesPerCategory) {
+                    NSMutableArray *moreFileItems = [NSMutableArray arrayWithObject:fileItem];
+                    [items addObject:moreFileItems];
+                }
+                // ... and henceforth we put fileItems here instead - the menu method will create a submenu.
+                else {
+                    NSMutableArray *moreFileItems = [items lastObject];
+                    [moreFileItems addObject:fileItem];
+                }
+                // We have already found a matching prefix, we can stop considering this item
+                break;
+            }
+        }
+    }
+}
+
 - (IBAction)generatedDemoDatabase:(id)sender
 {
     // Find the document directory using it as default location for realm file.
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSArray *directories = [fileManager URLsForDirectory:NSDocumentDirectory
-                                               inDomains:NSUserDomainMask];
+    NSArray *directories = [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
     NSURL *url = [directories firstObject];
     
     // Prompt the user for location af new realm file.
@@ -81,16 +306,15 @@ const NSUInteger kTopTipDelay = 250;
             NSString *path = selectedFile.path;
             BOOL isDirectory = NO;
             
-            if ([fileManager fileExistsAtPath:path
-                                  isDirectory:&isDirectory]) {
+            if ([fileManager fileExistsAtPath:path isDirectory:&isDirectory]) {
                 if (!isDirectory) {
                     NSError *error;
-                    [fileManager removeItemAtURL:selectedFile
-                                           error:&error];
+                    [fileManager removeItemAtURL:selectedFile error:&error];
                 }
             }
             
-            BOOL success = [self createAndPopulateDemoDatabaseAtUrl:selectedFile];
+            NSArray *classNames = @[[RealmTestClass0 className], [RealmTestClass1 className], [RealmTestClass2 className]];
+            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:1000];
             
             if (success) {
                 NSAlert *alert = [[NSAlert alloc] init];
@@ -101,14 +325,10 @@ const NSUInteger kTopTipDelay = 250;
                 alert.messageText = @"Open demo database?";
                 [alert addButtonWithTitle:@"Ok"];
                 [alert addButtonWithTitle:@"Cancel"];
-
+                
                 NSUInteger response = [alert runModal];
                 if (response == NSAlertFirstButtonReturn) {
-                    NSDocumentController *documentController = [[NSDocumentController alloc] init];
-                    [documentController openDocumentWithContentsOfURL:selectedFile
-                                                              display:YES
-                                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
-                                                    }];
+                    [self openFileAtURL:selectedFile];
                 }
             }
         }
@@ -117,70 +337,23 @@ const NSUInteger kTopTipDelay = 250;
 
 #pragma mark - Private methods
 
-- (BOOL)createAndPopulateDemoDatabaseAtUrl:(NSURL *)url
+-(void)openFileWithMenuItem:(NSMenuItem *)menuItem
 {
-    NSString *path = url.path;
+    [self openFileAtURL:menuItem.representedObject];
+}
 
-    NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:path
-                                     readOnly:NO
-                                        error:&error];
-    
-    if (error == nil) {
-        [realm beginWriteTransaction];
-        
-        for (NSUInteger index = 0; index < kTestDatabaseSizeMultiplicatorFactor; index++) {
-            RealmTestClass0 *tc0_0 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"John"]];
-            RealmTestClass0 *tc0_1 = [RealmTestClass0 createInRealm:realm withObject:@[@23, @"Mary"]];
-            RealmTestClass0 *tc0_2 = [RealmTestClass0 createInRealm:realm withObject:@[@38, @"Peter"]];
-            RealmTestClass0 *tc0_3 = [RealmTestClass0 createInRealm:realm withObject:@[@12, @"Susan"]];
-            RealmTestClass0 *tc0_4 = [RealmTestClass0 createInRealm:realm withObject:@[@34, @"John"]];
-            RealmTestClass0 *tc0_5 = [RealmTestClass0 createInRealm:realm withObject:@[@75, @"James"]];
-            RealmTestClass0 *tc0_6 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Gilbert"]];
-            RealmTestClass0 *tc0_7 = [RealmTestClass0 createInRealm:realm withObject:@[@45, @"Ann"]];
-            
-            RealmTestClass1 *tc1_0 = [RealmTestClass1 createInRealm:realm withObject:@[@1,      @YES,   @123.456f, @123456.789, @"ten",      [NSDate date],                                                      @[]]];
-            RealmTestClass1 *tc1_1 = [RealmTestClass1 createInRealm:realm withObject:@[@20,     @NO,    @23.4561f, @987654.321, @"twenty",   [NSDate distantPast],                                               @[]]];
-            RealmTestClass1 *tc1_2 = [RealmTestClass1 createInRealm:realm withObject:@[@30,     @YES,   @3.45612f, @1234.56789, @"thirty",   [NSDate distantFuture],                                             @[]]];
-            RealmTestClass1 *tc1_3 = [RealmTestClass1 createInRealm:realm withObject:@[@40,     @NO,    @.456123f, @9876.54321, @"fourty",   [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 7.0], @[]]];
-            RealmTestClass1 *tc1_4 = [RealmTestClass1 createInRealm:realm withObject:@[@50,     @YES,   @654.321f, @123.456789, @"fifty",    [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 7.0], @[]]];
-            RealmTestClass1 *tc1_5 = [RealmTestClass1 createInRealm:realm withObject:@[@60,     @NO,    @6543.21f, @987.654321, @"sixty",    [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 24.0 * 1.0], @[]]];
-            RealmTestClass1 *tc1_6 = [RealmTestClass1 createInRealm:realm withObject:@[@70,     @YES,   @65432.1f, @12.3456789, @"seventy",  [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 24.0 * 1.0], @[]]];
-            RealmTestClass1 *tc1_7 = [RealmTestClass1 createInRealm:realm withObject:@[@80,     @NO,    @654321.f, @98.7654321, @"eighty",   [[NSDate date] dateByAddingTimeInterval:-60.0 * 60.0 * 12.0 * 1.0], @[]]];
-            RealmTestClass1 *tc1_8 = [RealmTestClass1 createInRealm:realm withObject:@[@90,     @YES,   @123.456f, @1.23456789, @"ninety",   [[NSDate date] dateByAddingTimeInterval:+60.0 * 60.0 * 12.0 * 1.0], @[]]];
-            RealmTestClass1 *tc1_9 = [RealmTestClass1 createInRealm:realm withObject:@[@100,    @NO,    @123.456f, @9.87654321, @"hundred",  [[NSDate date] dateByAddingTimeInterval:+60.0 *  5.0 *  1.0 * 1.0], @[]]];
-            
-            [tc1_0.arrayReference addObjectsFromArray:@[tc0_0, tc0_1, tc0_3]];
-            [tc1_1.arrayReference addObjectsFromArray:@[tc0_2]];
-            [tc1_2.arrayReference addObjectsFromArray:@[tc0_0, tc0_4]];
-            [tc1_4.arrayReference addObjectsFromArray:@[tc0_5]];
-            [tc1_5.arrayReference addObjectsFromArray:@[tc0_1, tc0_2, tc0_3, tc0_4, tc0_5, tc0_6, tc0_7]];
-            [tc1_6.arrayReference addObjectsFromArray:@[tc0_6, tc0_7]];
-            [tc1_7.arrayReference addObjectsFromArray:@[tc0_7, tc0_6]];
-            [tc1_9.arrayReference addObjectsFromArray:@[tc0_0]];
-            
-            [RealmTestClass2 createInRealm:realm withObject:@[@1111, @YES, tc1_0]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@2211, @YES, tc1_2]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@3322, @YES, tc1_4]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@007,  @YES, [NSNull null]]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@4433, @NO,  tc1_6]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@5544, @YES, tc1_8]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@003,  @YES, [NSNull null]]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@7766, @NO,  tc1_0]];
-            [RealmTestClass2 createInRealm:realm withObject:@[@9876, @NO,  tc1_3]];            
-        }
-        
-        [realm commitWriteTransaction];
-        
-        return YES;
-    }
-    
-    return NO;
+-(void)openFileAtURL:(NSURL *)url
+{
+    NSDocumentController *documentController = [[NSDocumentController alloc] init];
+    [documentController openDocumentWithContentsOfURL:url
+                                              display:YES
+                                    completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error){
+                                    }];
 }
 
 - (void)showSavePanelStringFromDirectory:(NSURL *)directoryUrl completionHandler:(void(^)(BOOL userSelectesFile, NSURL *selectedFile))completion
 {
-    NSSavePanel * savePanel = [NSSavePanel savePanel];
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
     
     // Restrict the file type to whatever you like
     savePanel.allowedFileTypes = @[kRealmFileExension];
@@ -211,3 +384,4 @@ const NSUInteger kTopTipDelay = 250;
 }
 
 @end
+

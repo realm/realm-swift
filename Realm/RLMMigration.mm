@@ -18,10 +18,30 @@
 
 #import "RLMMigration_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMArray.h"
+
+// The source realm for a migration has to use a SharedGroup to be able to share
+// the file with the destination realm, but we don't want to let the user call
+// beginWriteTransaction on it as that would make no sense.
+@interface RLMMigrationRealm : RLMRealm
+@end
+
+@implementation RLMMigrationRealm
+- (BOOL)readonly {
+    return YES;
+}
+
+- (void)beginWriteTransaction {
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Cannot modify the source Realm in a migration"
+                                 userInfo:nil];
+}
+@end
 
 @implementation RLMMigration
 
@@ -35,7 +55,10 @@
     }
     
     // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [RLMRealm realmWithPath:path readOnly:YES dynamic:YES schema:nil error:error];
+    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO error:error];
+    if (migration->_oldRealm) {
+        RLMRealmInitializeReadOnlyWithSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
+    }
     if (error && *error) {
         return nil;
     }
@@ -72,27 +95,69 @@
     }
 }
 
+- (void)verifyPrimaryKeyUniqueness {
+    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+        // if we have a new primary key not equal to our old one, verify uniqueness
+        RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
+        RLMProperty *oldPrimaryProperty = [[_oldRealm.schema schemaForClassName:objectSchema.className] primaryKeyProperty];
+        if (primaryProperty && primaryProperty != oldPrimaryProperty) {
+            // FIXME: replace with count of distinct once we support indexing
+
+            // FIXME: support other types
+            tightdb::TableRef &table = objectSchema->_table;
+            NSUInteger count = table->size();
+            if (primaryProperty.type == RLMPropertyTypeString) {
+                for (NSUInteger i = 0; i < count; i++) {
+                    if (table->count_string(primaryProperty.column, table->get_string(primaryProperty.column, i)) > 1) {
+                        NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
+                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    }
+                }
+            }
+            else {
+                for (NSUInteger i = 0; i < count; i++) {
+                    if (table->count_int(primaryProperty.column, table->get_int(primaryProperty.column, i)) > 1) {
+                        NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
+                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    }
+                }
+            }
+        }
+    }
+}
+
 - (void)migrateWithBlock:(RLMMigrationBlock)block {
     // start write transaction
     [_realm beginWriteTransaction];
 
-    // add new tables/columns for the current shared schema
-    bool changed = RLMRealmSetSchema(_realm, [RLMSchema sharedSchema], true);
+    @try {
+        // add new tables/columns for the current shared schema
+        bool changed = RLMRealmSetSchema(_realm, [RLMSchema sharedSchema], true);
 
-    // apply block and set new schema version
-    NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
-    NSUInteger newVersion = block(self, oldVersion);
-    RLMRealmSetSchemaVersion(_realm, newVersion);
+        // disable all primary keys for migration
+        for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+            objectSchema.primaryKeyProperty.isPrimary = NO;
+        }
 
-    // make sure a new version was provided if changes were made
-    if (changed && oldVersion >= newVersion) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Migration block should return a higher version after a schema update"
-                                     userInfo:@{@"path" : _realm.path}];
+        // apply block and set new schema version
+        NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
+        NSUInteger newVersion = block(self, oldVersion);
+        RLMRealmSetSchemaVersion(_realm, newVersion);
+
+        // make sure a new version was provided if changes were made
+        if (changed && oldVersion >= newVersion) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Migration block should return a higher version after a schema update"
+                                         userInfo:@{@"path" : _realm.path}];
+        }
+
+        // verify uniqueness for any new unique columns before committing
+        [self verifyPrimaryKeyUniqueness];
     }
-
-    // end transaction
-    [_realm commitWriteTransaction];
+    @finally {
+        // end transaction
+        [_realm commitWriteTransaction];
+    }
 }
 
 @end

@@ -97,10 +97,29 @@
     return realm;
 }
 
-- (void)testCountWhere {
+- (void)testCountWhereQuery {
     RLMRealm *realm = [self createStringObjects];
     [self measureBlock:^{
-        [[StringObject objectsInRealm:realm where:@"stringCol = 'a'"] count];
+        RLMArray *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
+        [array count];
+    }];
+}
+
+- (void)testCountWhereTable {
+    RLMRealm *realm = [self createStringObjects];
+    [self measureBlock:^{
+        RLMArray *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
+        [array firstObject]; // Force materialization of backing table view
+        [array count];
+    }];
+}
+
+- (void)testCountWhereTablePrematerialized {
+    RLMRealm *realm = [self createStringObjects];
+    RLMArray *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
+    [array firstObject]; // Force materialization of backing table view
+    [self measureBlock:^{
+        [array count];
     }];
 }
 
@@ -148,6 +167,17 @@
             so.stringCol = @"c";
         }
         [realm commitWriteTransaction];
+    }];
+}
+
+- (void)testQueryConstruction {
+    RLMRealm *realm = self.realmWithTestPath;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and longCol != 7 and stringCol IN {'a', 'b', 'c'}"];
+
+    [self measureBlock:^{
+        for (int i = 0; i < 100; ++i) {
+            [AllTypesObject objectsInRealm:realm withPredicate:predicate];
+        }
     }];
 }
 

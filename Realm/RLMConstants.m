@@ -19,4 +19,5 @@
 #include <stdio.h>
 #import <Foundation/Foundation.h>
 
+NSString * const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
 NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";

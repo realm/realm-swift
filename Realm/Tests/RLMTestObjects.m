@@ -29,6 +29,9 @@
 @implementation IntObject
 @end
 
+@implementation AllIntSizesObject
+@end
+
 @implementation FloatObject
 @end
 
@@ -104,6 +107,11 @@
 @implementation CircleObject
 @end
 
+#pragma mark CircleArrayObject
+
+@implementation CircleArrayObject
+@end
+
 #pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject
@@ -117,4 +125,21 @@
 #pragma mark AggregateObject
 
 @implementation AggregateObject
+@end
+
+
+@implementation PrimaryStringObject
++ (NSString *)primaryKey {
+    return @"stringCol";
+}
+@end
+
+@interface ReadOnlyPropertyObject ()
+@property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
+@end
+
+@implementation ReadOnlyPropertyObject
+- (NSNumber *)readOnlyUnsupportedProperty {
+    return nil;
+}
 @end

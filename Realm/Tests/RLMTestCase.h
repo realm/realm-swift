@@ -19,20 +19,23 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define SWIFT
-#import <TestFramework/TestFramework.h>
-#else
+#ifdef REALM_XCODE5
 #import "RLMTestObjects.h"
+#else
+#import <TestFramework/TestFramework.h>
 #endif
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 NSString *RLMTestRealmPath(void);
 NSString *RLMDefaultRealmPath(void);
 NSString *RLMRealmPathForFile(NSString *);
+#ifdef __cplusplus
+}
+#endif
 
-
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
 @interface XCTestExpectation : NSObject
 - (void)fulfill;
 @end
@@ -44,7 +47,7 @@ NSString *RLMRealmPathForFile(NSString *);
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
 
-#if !defined(SWIFT)
+#ifdef REALM_XCODE5
 - (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(id)noop;
 - (XCTestExpectation *)expectationWithDescription:(NSString *)desc;
 #endif

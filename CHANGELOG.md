@@ -1,31 +1,105 @@
-0.84.0 Release notes (YYYY-MM-DD)
+0.86.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+### Enhancements
+
+* Add support for sorting RLMArray properties.
+* Speed up inserting objects with `addObject:` by ~20%.
+* `readonly` properties are automatically ignored rather than having to be
+  added to `ignoredProperties`.
+* Updating to core library version 0.83.1.
+
+### Bugfixes
+
+* Fix error about not being able to persist property 'hash' with incompatible
+  type when building for devices with Xcode 6.
+* Fix spurious notifications of new versions of Realm.
+* Fix for updating nested objects where some types do not have primary keys.
+* Fix for inserting objects from JSON with NSNull values when default values
+  should be used.
+
+0.85.0 Release notes (2014-09-15)
+=============================================================
+
+### API breaking changes
+
+* Notifications for a refresh being needed (when autorefresh is off) now send
+  the notification type RLMRealmRefreshRequiredNotification rather than
+  RLMRealmDidChangeNotification.
+
+### Enhancements
+
+* Updating to core library version 0.83.0.
+* Support for primary key properties (for int and string columns). Declaring a property
+  to be the primary key ensures uniqueness for that property for all objects of a given type.
+  At the moment indexes on primary keys are not yet supported but this will be added in a future
+  release.
+* Added methods to update or insert (upsert) for objects with primary keys defined.
+* `[RLMObject initWithObject:]` and `[RLMObject createInRealmWithObject:]` now support
+  any object type with kvc properties.
+* The Swift support has been reworked to work around Swift not being supported
+  in Frameworks on iOS 7.
+* Improve performance when getting the count of items matching a query but not
+  reading any of the objects in the results.
+* Add a return value to `-[RLMRealm refresh]` that indicates whether or not
+  there was anything to refresh.
+* Add the class name to the error message when an RLMObject is missing a value
+  for a property without a default.
+* Add support for opening Realms in read-only mode.
+* Add an automatic check for updates when using Realm in a simulator (the
+  checker code is not compiled into device builds). This can be disabled by
+  setting the REALM_DISABLE_UPDATE_CHECKER environment variable to any value.
+* Add support for Int16 and Int64 properties in Swift classes.
+
+### Bugfixes
+
+* Realm change notifications when beginning a write transaction are now sent
+  after updating rather than before, to match refresh.
+* `-isEqual:` now uses the default `NSObject` implementation unless a primary key
+  is specified for an RLMObject. When a primary key is specified, `-isEqual:` calls 
+  `-isEqualToObject:` and a corresponding implementation for `-hash` is also implemented.
+
+0.84.0 Release notes (2014-08-28)
 =============================================================
 
 ### API breaking changes
 
 * The timer used to trigger notifications has been removed. Notifications are now
   only triggered by commits made in other threads, and can not currently be triggered
-  by changes made by other processes. Interprocess notifications will be re-added in 
+  by changes made by other processes. Interprocess notifications will be re-added in
   a future commit with an improved design.
 
 ### Enhancements
 
+* Updating to core library version 0.82.2.
 * Add property `deletedFromRealm` to RLMObject to indicate objects which have been deleted.
 * Add support for the IN operator in predicates.
+* Add support for the BETWEEN operator in link queries.
+* Add support for multi-level link queries in predicates (e.g. `foo.bar.baz = 5`).
 * Switch to building the SDK from source when using CocoaPods and add a
   Realm.Headers subspec for use in targets that should not link a copy of Realm
   (such as test targets).
 * Allow unregistering from change notifications in the change notification
   handler block.
+* Significant performance improvements when holding onto large numbers of RLMObjects.
+* Realm-Xcode6.xcodeproj now only builds using Xcode6-Beta6.
+* Improved performance during RLMArray iteration, especially when mutating
+  contained objects.
 
 ### Bugfixes
 
+* Fix crashes and assorted bugs when sorting or querying a RLMArray returned
+  from a query.
 * Notifications are no longer sent when initializing new RLMRealm instances on background
   threads.
 * Handle object cycles in -[RLMObject description] and -[RLMArray description].
 * Lowered the deployment target for the Xcode 6 projects and Swift examples to
   iOS 7.0, as they didn't actually require 8.0.
 * Support setting model properties starting with the letter 'z'
+* Fixed crashes that could result from switching between Debug and Relase
+  builds of Realm.
 
 0.83.0 Release notes (2014-08-13)
 =============================================================

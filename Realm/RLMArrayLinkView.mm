@@ -18,10 +18,11 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMConstants.h"
-#import "RLMObjectStore.h"
+#import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema.h"
 
@@ -225,6 +226,21 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
 
     // delete all target rows from the realm
     self->_backingLinkView->remove_all_target_rows();
+}
+
+- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+{
+    RLMLinkViewArrayValidateAttached(self);
+    
+    // validate sort criteria
+    RLMProperty *prop = RLMValidatedPropertyForSort(_realm.schema[self.objectClassName], property);
+    
+    // apply order
+    tightdb::TableView const &tv = _backingLinkView->get_sorted_view(prop.column, ascending);
+    RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
+                                                                   view:tv
+                                                                  realm:_realm];
+    return ar;
 }
 
 @end
