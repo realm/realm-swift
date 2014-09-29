@@ -464,6 +464,9 @@
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
+    // upsert on non-primary key object shoudld throw
+    XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
+
     [realm commitWriteTransaction];
 }
 

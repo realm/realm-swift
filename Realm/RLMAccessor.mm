@@ -118,8 +118,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInte
         return;
     }
     if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'",
-                            val, propName];
+        NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     obj->_row.set_string(colIndex, str);
@@ -169,14 +168,9 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
         // add to Realm if not in it.
         RLMObject *link = val;
         if (link.realm != obj.realm) {
-            // only try to update if link object has primary key
-            if (tryUpdate && link.objectSchema.primaryKeyProperty) {
-                [obj.realm addOrUpdateObject:link];
-            }
-            else {
-                [obj.realm addObject:link];
-            }
+            RLMAddObjectToRealm(link, obj.realm, tryUpdate);
         }
+
         // set link
         obj->_row.set_link(colIndex, link->_row.get_index());
     }
@@ -202,13 +196,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
     for (RLMObject *link in val) {
         // add to realm if needed
         if (link.realm != obj.realm) {
-            // only try to update if link object has primary key
-            if (tryUpdate && link.objectSchema.primaryKeyProperty) {
-                [obj.realm addOrUpdateObject:link];
-            }
-            else {
-                [obj.realm addObject:link];
-            }
+            RLMAddObjectToRealm(link, obj.realm, tryUpdate);
         }
         // set in link view
         linkView->add(link->_row.get_index());
