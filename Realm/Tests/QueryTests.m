@@ -1495,4 +1495,17 @@
     XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
 }
 
+- (void)testQueryChaining {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari'"] count]);
+    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age == 29"] count]);
+    XCTAssertEqual(0U, [[[PersonObject objectsWhere:@"name == 'Ari'"] objectsWhere:@"age == 29"] count]);
+}
+
 @end
