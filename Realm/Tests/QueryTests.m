@@ -1415,7 +1415,6 @@
 
     ////////////////////////
     // Format Predicates
-    // Note: block are used to avoid competing va_lists in objectsWhere: and XCTAssert
     ////////////////////////
 
     // BOOL
