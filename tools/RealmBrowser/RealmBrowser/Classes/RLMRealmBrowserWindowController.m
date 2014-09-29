@@ -18,6 +18,7 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMNavigationStack.h"
+#import "RLMPopupViewController.h"
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
@@ -78,6 +79,12 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmPath]];
     
     [self reloadAfterEdit];
+}
+
+-(void)showPopoverForArrayNode:(RLMArrayNode *)arrayNode
+{
+    RLMPopupViewController *popover = [[RLMPopupViewController alloc] initWithNibName:@"RLMPopupViewController" bundle:nil];
+    [popover setupColumnsWithArrayNode:arrayNode fromWindow:self.window];
 }
 
 #pragma mark - Public methods - Accessors

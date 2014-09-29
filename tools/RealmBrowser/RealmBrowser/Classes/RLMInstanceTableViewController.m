@@ -104,8 +104,7 @@
     
     if ([newState isMemberOfClass:[RLMNavigationState class]]) {
         self.displayedType = newState.selectedType;
-        [self.realmTableView setupColumnsWithType:newState.selectedType
-                               withSelectionAtRow:newState.selectedInstanceIndex];
+        [self.realmTableView setupColumnsWithType:newState.selectedType];
         [self setSelectionIndex:newState.selectedInstanceIndex];
     }
     else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
@@ -117,7 +116,7 @@
                                                                          onObject:referingInstance
                                                                             realm:realm];
         self.displayedType = arrayNode;
-        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode];
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
@@ -127,7 +126,7 @@
                                                                result:arrayState.results
                                                             andParent:arrayState.selectedType];
         self.displayedType = arrayNode;
-        [self.realmTableView setupColumnsWithType:arrayNode withSelectionAtRow:0];
+        [self.realmTableView setupColumnsWithType:arrayNode];
         [self setSelectionIndex:0];
     }
     
@@ -446,13 +445,31 @@
 
 - (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)column
 {
+    [self openArrayInPopupAtRow:row column:column];
+    return;
+    
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
                                                                                  typeIndex:row
                                                                                   property:propertyNode.property
                                                                                 arrayIndex:0];
+    
     [self.parentWindowController newWindowWithNavigationState:state];
+}
+
+- (void)openArrayInPopupAtRow:(NSInteger)row column:(NSInteger)column
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
+    RLMObject *referingInstance = [self.displayedType instanceAtIndex:row];
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:propertyNode.property
+                                                                     onObject:referingInstance
+                                                                        realm:realm];
+    
+    [self.parentWindowController showPopoverForArrayNode:arrayNode];
 }
 
 #pragma mark - Private Methods - RLMTableView Delegate

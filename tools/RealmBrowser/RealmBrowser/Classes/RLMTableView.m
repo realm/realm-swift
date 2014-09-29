@@ -377,7 +377,7 @@
 
 #pragma mark - Public Methods
 
-- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode
 {
     while (self.numberOfColumns > 0) {
         [self removeTableColumn:[self.tableColumns lastObject]];

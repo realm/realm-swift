@@ -15,7 +15,6 @@
 @property (nonatomic) id<RLMRealmOutlineNode> parentNode;
 
 - (instancetype)initWithObject:(RLMObject *)object realm:(RLMRealm *)realm;
-
 - (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
 @end
