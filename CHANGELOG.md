@@ -5,6 +5,9 @@
 
 ### Enhancements
 
+* Support subclassing RLMObject models. Although you can now use subclasses
+  as you an other objects, polymorphic behavior is not supported (i.e. setting
+  a property to an instance of a subclass).
 * Add support for sorting RLMArray properties.
 * Speed up inserting objects with `addObject:` by ~20%.
 * `readonly` properties are automatically ignored rather than having to be
