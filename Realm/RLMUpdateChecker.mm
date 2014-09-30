@@ -25,8 +25,8 @@
 #endif
 
 void RLMCheckForUpdates() {
-#if TARGET_IPHONE_SIMULATOR && __IPHONE_OS_VERSION_MIN_REQUIRED >= 7000
-    if (getenv("REALM_DISABLE_UPDATE_CHECKER")) {
+#if TARGET_IPHONE_SIMULATOR
+    if (getenv("REALM_DISABLE_UPDATE_CHECKER") || ![[NSUserDefaults class] instancesRespondToSelector:@selector(initWithSuiteName:)]) {
         return;
     }
 
