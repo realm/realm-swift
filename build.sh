@@ -64,27 +64,27 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    xcodebuild -IDECustomDerivedDataLocation=build/DerivedData -destination 'name=iPad 2'  $@
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
+    echo "Building with command:" $CMD
+    eval $CMD
 }
 
 xc() {
-    echo "Building target \"$1\""
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode $1
+        xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
-        mkdir -p build
-        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
+        xcode "$@" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool $1
+        xctool "$@"
     fi
 }
 
 xcrealm() {
     PROJECT=Realm.xcodeproj
-    xc "-project $PROJECT $1"
+    xc "-project $PROJECT $@"
 }
 
 ######################################
@@ -232,7 +232,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' test"
         exit 0
         ;;
 
@@ -242,7 +242,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' test"
         exit 0
         ;;
 
