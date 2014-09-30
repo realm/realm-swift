@@ -232,7 +232,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator test"
         exit 0
         ;;
 
@@ -242,7 +242,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
         exit 0
         ;;
 
