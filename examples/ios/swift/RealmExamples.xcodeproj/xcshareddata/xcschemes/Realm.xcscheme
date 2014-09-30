@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E889C4C41975E940003DE97D"
-               BuildableName = "RealmSwiftEncryptionExample.app"
-               BlueprintName = "RealmSwiftEncryptionExample"
-               ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+               BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+               BuildableName = "Realm"
+               BlueprintName = "Realm"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -48,15 +39,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "Realm"
+            BlueprintName = "Realm"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -66,15 +57,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "Realm"
+            BlueprintName = "Realm"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
