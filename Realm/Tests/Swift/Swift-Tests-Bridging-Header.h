@@ -16,5 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <TestFramework/RLMTestObjects.h>
-#import <TestFramework/RLMRealm_Dynamic.h>
+#import <Realm/Realm.h>
+#import "RLMTestObjects.h"
+#import "RLMRealm_Dynamic.h"
