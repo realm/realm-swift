@@ -471,7 +471,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"build/ios/Realm.framework\" ]]; then\n    sh build.sh ios\nfi\n";
+			shellScript = "cd ../../../\nif [[ ! -d \"ios/Realm.framework\" ]]; then\n    sh build.sh ios\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -573,7 +573,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../build/ios",
+					"$(SRCROOT)/../../../ios",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -614,7 +617,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../build/ios",
+					"$(SRCROOT)/../../../ios",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
