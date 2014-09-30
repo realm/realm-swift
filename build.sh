@@ -73,6 +73,7 @@ xc() {
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
+        mkdir -p build
         xcode "$@" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
