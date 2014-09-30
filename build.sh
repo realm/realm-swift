@@ -64,7 +64,7 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
+    xcodebuild -IDECustomDerivedDataLocation=build/DerivedData -destination 'name=iPad 2'  $@
 }
 
 xc() {
