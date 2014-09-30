@@ -17,6 +17,7 @@
 * Updating to core library version 0.83.1.
 * Return "[deleted object]" rather than throwing an exception when
   `-description` is called on a deleted RLMObject.
+* Significantly improve performance of very large queries.
 
 ### Bugfixes
 
