@@ -412,7 +412,7 @@ case "$COMMAND" in
         sh build.sh test-ios "$XCMODE"
         sh build.sh examples "$XCMODE"
 
-        cd build/Release
+        cd build/ios
         zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
@@ -495,7 +495,7 @@ EOF
 
         echo 'Packaging iOS'
         sh tightdb_objc/build.sh package-ios
-        cp tightdb_objc/build/Release/realm-framework-ios.zip .
+        cp tightdb_objc/build/ios/realm-framework-ios.zip .
 
         echo 'Packaging OS X'
         sh tightdb_objc/build.sh package-osx
