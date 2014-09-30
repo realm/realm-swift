@@ -69,7 +69,7 @@
     [self.tableView endUpdates];
 
     RLMPopupWindow *popupWindow = [[RLMPopupWindow alloc] initWithView:self.view
-                                                               atPoint:NSMakePoint(200, 200)
+                                                               atPoint:NSMakePoint(100, 100)
                                                               inWindow:self.tableView.window];
     [window addChildWindow:popupWindow ordered:NSWindowAbove];
 }
