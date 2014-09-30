@@ -26,7 +26,7 @@
 
 void RLMCheckForUpdates() {
 #if TARGET_IPHONE_SIMULATOR
-    if (getenv("REALM_DISABLE_UPDATE_CHECKER")) {
+    if (getenv("REALM_DISABLE_UPDATE_CHECKER") || ![NSUserDefaults instancesRespondToSelector:@selector(initWithSuiteName:)]) {
         return;
     }
 
