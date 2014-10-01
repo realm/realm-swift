@@ -540,7 +540,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)addObject:(RLMObject *)object {
-    RLMAddObjectToRealm(object, self, false);
+    RLMAddObjectToRealm(object, self);
 }
 
 - (void)addObjectsFromArray:(id)array {
@@ -550,7 +550,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)addOrUpdateObject:(RLMObject *)object {
-    RLMAddObjectToRealm(object, self, true);
+    // verify primary key
+    if (!object.objectSchema.primaryKeyProperty) {
+        NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", object.objectSchema.className];
+        @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
+    }
+
+    RLMAddObjectToRealm(object, self, RLMSetFlagUpdateOrCreate);
 }
 
 - (void)addOrUpdateObjectsFromArray:(id)array {

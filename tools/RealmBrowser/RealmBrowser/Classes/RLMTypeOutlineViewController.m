@@ -22,6 +22,8 @@
 #import "RLMRealmOutlineNode.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
+#import "RLMObjectNode.h"
+#import "RLMRealmOutlineNode.h"
 
 @interface RLMTypeOutlineViewController ()
 
@@ -68,10 +70,14 @@
         NSInteger selectionIndex = arrayState.selectedInstanceIndex;
         RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
         
-        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
+        RLMObjectNode *objectNode = [parentClassNode displayChildObject:selectedInstance];
         
+        RLMArrayNode *arrayNode = [objectNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
+        objectNode.childNode = arrayNode;
+
         [self.classesOutlineView reloadData];
         [self.classesOutlineView expandItem:parentClassNode];
+        [self.classesOutlineView expandItem:objectNode];
         
         NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
         if (index != NSNotFound) {
@@ -144,27 +150,15 @@
 
 #pragma mark - NSOutlineViewDelegate implementation
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
-{
-    return [item isKindOfClass:[RLMRealmNode class]];
-}
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
     // Group headers should not be selectable
     return ![item isKindOfClass:[RLMRealmNode class]];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
-{
-    // The top level node should not be collapsed.
-    return item != self.parentWindowController.modelDocument.presentedRealm;
-}
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowOutlineCellForItem:(id)item
 {
-    // The top level node should not display the toggle triangle.
-    return item != self.parentWindowController.modelDocument.presentedRealm;
+    return NO;
 }
 
 - (NSString *)outlineView:(NSOutlineView *)outlineView
@@ -188,18 +182,33 @@
     NSOutlineView *outlineView = notification.object;
     if (outlineView == self.classesOutlineView) {
         NSInteger row = [outlineView selectedRow];
-        id selectedItem = [outlineView itemAtRow:row];
 
         // The arrays we get from link views are ephemeral, so we
         // remove them when any class node is selected
-        if ([selectedItem isKindOfClass:[RLMClassNode class]]) {
-            [self removeAllChildArrays];
+        if (row != -1) {
+            [self selectedItem:[outlineView itemAtRow:row]];
         }
-
-        RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:selectedItem index:0];
-
-        [self.parentWindowController addNavigationState:state fromViewController:self];
     }
+}
+
+-(void)selectedItem:(id<RLMRealmOutlineNode>)item
+{
+    id<RLMRealmOutlineNode> theItem = item;
+    
+    // If we didn't select an array, we should flatten the outline view
+    if (![item isKindOfClass:[RLMArrayNode class]]) {
+        [self removeAllChildArrays];
+    }
+    
+    // If we clicked an object, collapse and then select its parent
+    if ([item isKindOfClass:[RLMObjectNode class]]) {
+        theItem = ((RLMObjectNode *)item).parentNode;
+    }
+    
+    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:theItem index:0];
+    [self.parentWindowController addNavigationState:state fromViewController:self];
+    NSInteger typeIndex = [self.classesOutlineView rowForItem:theItem];
+    [self setSelectionIndex:typeIndex];
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView didAddRowView:(NSTableRowView *)rowView forRow:(NSInteger)row

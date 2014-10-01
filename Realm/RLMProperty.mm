@@ -22,6 +22,7 @@
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
+#import "RLMUtil.hpp"
 
 @implementation RLMProperty
 
@@ -55,6 +56,9 @@
         firstChar = shouldUppercase ? firstChar.uppercaseString : firstChar;
         _setterName = [NSString stringWithFormat:@"set%@%@:", firstChar, [_name substringFromIndex:1]];
     }
+
+    _getterSel = NSSelectorFromString(_getterName);
+    _setterSel = NSSelectorFromString(_setterName);
 }
 
 -(void)setObjcCodeFromType {
@@ -145,7 +149,7 @@
 
                 // verify type
                 Class cls = [RLMSchema classForString:className];
-                if (class_getSuperclass(cls) != RLMObject.class) {
+                if (!RLMIsSubclass(cls, RLMObject.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];
@@ -161,14 +165,18 @@
     }
 }
 
-- (void)parseObjcProperty:(objc_property_t)property {
+- (bool)parseObjcProperty:(objc_property_t)property {
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
+    bool ignore = false;
     for (size_t i = 0; i < count; ++i) {
         switch (*attrs[i].name) {
             case 'T':
                 _objcRawType = @(attrs[i].value);
+                break;
+            case 'R':
+                ignore = true;
                 break;
             case 'N':
                 // nonatomic
@@ -187,6 +195,8 @@
         }
     }
     free(attrs);
+
+    return ignore;
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
@@ -201,7 +211,9 @@
     _name = name;
     _attributes = attributes;
 
-    [self parseObjcProperty:property];
+    if ([self parseObjcProperty:property]) {
+        return nil;
+    }
 
     // convert array types to objc variant
     if ([_objcRawType isEqualToString:@"@\"RLMArray\""]) {
@@ -239,8 +251,10 @@
     _name = name;
     _attributes = attributes;
 
-    // parse propery and extract type
-    [self parseObjcProperty:property];
+    if ([self parseObjcProperty:property]) {
+        return nil;
+    }
+
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name];

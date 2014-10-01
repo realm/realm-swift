@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject.h"
-#import "RLMRealm.h"
+#import <Realm/Realm.h>
 
 #pragma mark - Abstract Objects
 #pragma mark -
@@ -245,10 +244,14 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
-
 @interface PrimaryStringObject : RLMObject
 @property NSString *stringCol;
 @property int intCol;
+@end
+
+@interface ReadOnlyPropertyObject : RLMObject
+@property (readonly) NSNumber *readOnlyUnsupportedProperty;
+@property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
 

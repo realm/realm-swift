@@ -202,6 +202,30 @@
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
 
+- (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
+    RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    AllTypesObject *obj = results[0];
+    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+    
+    RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
+    results = [ar arraySortedByProperty:column ascending:ascending];
+    obj = results[0];
+    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+}
+
+- (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
+    // test TableView query
+    RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
+    
+    // test LinkView query
+    RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
+    results = [ar arraySortedByProperty:column ascending:ascending];
+    XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
+}
+
+
+
 - (void)testQuerySorting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -212,84 +236,100 @@
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
 
     [realm beginWriteTransaction];
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withObject:@{}];
+
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
-    [AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
+    
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]]];
+    
     [realm commitWriteTransaction];
 
 
     //////////// sort by boolCol
-    RLMArray *results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"boolCol" ascending:YES];
-    AllTypesObject *o = results[0];
-    XCTAssertEqual(o.boolCol, NO, @"Should be NO");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"boolCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqual(o.boolCol, YES, @"Should be YES");
-
+    [self verifySort:realm column:@"boolCol" ascending:YES expected:@NO];
+    [self verifySort:realm column:@"boolCol" ascending:NO expected:@YES];
 
     //////////// sort by intCol
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"intCol" ascending:YES];
-    o = results[0];
-    XCTAssertEqual(o.intCol, 1, @"Should be 1");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"intCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqual(o.intCol, 33, @"Should be 33");
-
-
+    [self verifySort:realm column:@"intCol" ascending:YES expected:@1];
+    [self verifySort:realm column:@"intCol" ascending:NO expected:@33];
+    
     //////////// sort by dateCol
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"dateCol" ascending:YES];
-    o = results[0];
-    XCTAssertEqualWithAccuracy(o.dateCol.timeIntervalSince1970, date1.timeIntervalSince1970, 1, @"Should be date1");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"dateCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqualWithAccuracy(o.dateCol.timeIntervalSince1970, date33.timeIntervalSince1970, 1, @"Should be date33");
-
-
+    double (^dateGetter)(id) = ^(NSDate *d) { return d.timeIntervalSince1970; };
+    [self verifySortWithAccuracy:realm column:@"dateCol" ascending:YES getter:dateGetter expected:date1.timeIntervalSince1970 accuracy:1];
+    [self verifySortWithAccuracy:realm column:@"dateCol" ascending:NO getter:dateGetter expected:date33.timeIntervalSince1970 accuracy:1];
+    
     //////////// sort by doubleCol
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"doubleCol" ascending:YES];
-    o = results[0];
-    XCTAssertEqual(o.doubleCol, 1.0, @"Should be 1.0");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"doubleCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqualWithAccuracy(o.doubleCol, 3.3, 0.0000001, @"Should be 3.3");
-
+    double (^doubleGetter)(id) = ^(NSNumber *n) { return n.doubleValue; };
+    [self verifySortWithAccuracy:realm column:@"doubleCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
+    [self verifySortWithAccuracy:realm column:@"doubleCol" ascending:NO getter:doubleGetter expected:3.3 accuracy:0.0000001];
 
     //////////// sort by floatCol
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"floatCol" ascending:YES];
-    o = results[0];
-    XCTAssertEqual(o.floatCol, 1.0, @"Should be 1.0");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"floatCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqualWithAccuracy(o.floatCol, 3.3, 0.0000001, @"Should be 3.3");
-
-
+    [self verifySortWithAccuracy:realm column:@"floatCol" ascending:YES getter:doubleGetter expected:1.0 accuracy:0.0000001];
+    [self verifySortWithAccuracy:realm column:@"floatCol" ascending:NO getter:doubleGetter expected:3.3 accuracy:0.0000001];
+    
     //////////// sort by stringCol
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"stringCol" ascending:YES];
-    o = results[0];
-    XCTAssertEqualObjects(o.stringCol, @"a", @"Should be a");
-
-    results = [[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"stringCol" ascending:NO];
-    o = results[0];
-    XCTAssertEqualObjects(o.stringCol, @"cc", @"Should be cc");
-
-
+    [self verifySort:realm column:@"stringCol" ascending:YES expected:@"a"];
+    [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
+    
     // sort by mixed column
-    XCTAssertThrows([[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"mixedCol" ascending:YES], @"Sort on mixed col not supported");
-    XCTAssertThrows([[AllTypesObject objectsWithPredicate:nil] arraySortedByProperty:@"mixedCol" ascending:NO], @"Sort on mixed col not supported");
-
-    // sort by invalid column name
-    XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"invalidProperty" ascending:YES]);
+    XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"mixedCol" ascending:YES],
+                    @"Sort on mixed col not supported");
+    XCTAssertThrows([arrayOfAll.array arraySortedByProperty:@"mixedCol" ascending:NO],
+                    @"Sort on mixed col not supported");
+    
+    // sort invalid name
+    XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"invalidCol" ascending:YES],
+                    @"Sort on invalid col not supported");
+    XCTAssertThrows([arrayOfAll.array arraySortedByProperty:@"invalidCol" ascending:NO],
+                    @"Sort on invalid col not supported");
 }
 
-- (void)testClassMisuse
+- (void)testSortedLinkViewWithDeletion {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    NSDate *date3 = [date2 dateByAddingTimeInterval:1];
+    NSDate *date33 = [date3 dateByAddingTimeInterval:1];
+
+    [realm beginWriteTransaction];
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withObject:@{}];
+
+    StringObject *stringObj = [StringObject new];
+    stringObj.stringCol = @"string";
+
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]]];
+
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
+    XCTAssertEqualObjects([results[0] stringCol], @"cc");
+
+    // delete cc, add d results should update
+    [realm transactionWithBlock:^{
+        [arrayOfAll.array removeObjectAtIndex:3];
+        
+        // create extra alltypesobject
+        [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"d", [@"d" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
+    }];
+    XCTAssertEqualObjects([results[0] stringCol], @"d");
+    XCTAssertEqualObjects([results[1] stringCol], @"c");
+
+    // delete from realm should be removed from results
+    [realm transactionWithBlock:^{
+        [realm deleteObject:arrayOfAll.array.lastObject];
+    }];
+    XCTAssertEqualObjects([results[0] stringCol], @"c");
+}
+
+- (void)testDynamicQueryInvalidClass
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -440,34 +480,35 @@
     [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
 
     [realm commitWriteTransaction];
+    
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 == bool2" expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"bool1 != bool2" expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 == bool1" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 == bool2" expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 != bool2" expectedCount:4];
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 == int2"  expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 != int2"  expectedCount:5];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 > int2"   expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 < int2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 >= int2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"int1 <= int2"  expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 == int1"  expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 == int2"  expectedCount:2];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 != int2"  expectedCount:5];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 > int2"   expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 < int2"   expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 >= int2"  expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 <= int2"  expectedCount:6];
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 == float1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 == float2"  expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 != float2"  expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 > float2"   expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 < float2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 >= float2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"float1 <= float2"  expectedCount:5];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 == float1"  expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 == float2"  expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 != float2"  expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 > float2"   expectedCount:2];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 < float2"   expectedCount:4];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 >= float2"  expectedCount:3];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 <= float2"  expectedCount:5];
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 == double1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 == double2" expectedCount:0];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 != double2" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 > double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 < double2" expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 >= double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:[QueryObject class] predicate:@"double1 <= double2" expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 == double1" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 == double2" expectedCount:0];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 != double2" expectedCount:7];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 > double2" expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 < double2" expectedCount:6];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 >= double2" expectedCount:1];
+    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 <= double2" expectedCount:6];
 
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int1"  expectedCount:7];
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int2"  expectedCount:2];
@@ -493,27 +534,27 @@
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 >= double2" expectedCount:1];
     [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 <= double2" expectedCount:6];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"int1 == float1"
                                               expectedReason:@"Property type mismatch between int and float"];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"float2 >= double1"
                                               expectedReason:@"Property type mismatch between float and double"];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"double2 <= int2"
                                               expectedReason:@"Property type mismatch between double and int"];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"int2 != recordTag"
                                               expectedReason:@"Property type mismatch between int and string"];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"float1 > recordTag"
                                               expectedReason:@"Property type mismatch between float and string"];
 
-    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject class]
+    [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"double1 < recordTag"
                                               expectedReason:@"Property type mismatch between double and string"];
 }
@@ -749,32 +790,6 @@
     XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'ABC'"].count);
 }
 
-- (void)testStringIN
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
-    [realm commitWriteTransaction];
-
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN {'abc'}"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'abc'}"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'def'}"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'ABC'}"].count);
-
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"].count);
-#if 0 // FIXME: enable when support is added
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"].count);
-#else
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol INc] {'abc'}"]);
-#endif
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"].count);
-}
-
 - (void)testStringUnsupportedOperations
 {
     XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
@@ -840,14 +855,13 @@
                                  @"Key path in absent in an integer comparison.");
 }
 
-- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(Class)class
+- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(NSString *)className
                                                    predicate:(NSString *)predicate
                                                expectedCount:(NSUInteger)expectedCount
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMArray *queryResult = [realm objects:NSStringFromClass(class)
-                       where:predicate];
+    RLMArray *queryResult = [realm objects:className where:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
                    predicate, expectedCount, actualCount);
@@ -862,14 +876,13 @@
                    predicate, expectedCount, actualCount);
 }
 
-- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(Class)class
+- (void)executeInvalidTwoColumnKeypathRealmComparisonQuery:(NSString *)className
                                                  predicate:(NSString *)predicate
                                             expectedReason:(NSString *)expectedReason
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     @try {
-        RLMArray *queryResult = [realm objects:NSStringFromClass(class)
-                           where:predicate];
+        RLMArray *queryResult = [realm objects:className where:predicate];
         NSUInteger actualCount = queryResult.count;
 #pragma unused(actualCount)
 
@@ -1262,11 +1275,11 @@
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
     NSDate *date3 = [date2 dateByAddingTimeInterval:1];
 
-    StringObject *stringObj0 = [[StringObject alloc] initWithObject:@[@"string0"]];
-    StringObject *stringObj1 = [[StringObject alloc] initWithObject:@[@"string1"]];
-    StringObject *stringObj2 = [[StringObject alloc] initWithObject:@[@"string2"]];
-
     [realm beginWriteTransaction];
+
+    StringObject *stringObj0 = [StringObject createInRealm:realm withObject:@[@"string0"]];
+    StringObject *stringObj1 = [StringObject createInRealm:realm withObject:@[@"string1"]];
+    StringObject *stringObj2 = [StringObject createInRealm:realm withObject:@[@"string2"]];
 
     AllTypesObject *obj0 = [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1LL, @1, stringObj0]];
     AllTypesObject *obj1 = [AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2LL, @"mixed", stringObj1]];
@@ -1330,31 +1343,138 @@
     XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
-- (void)testINPredicate {
+- (void)testINPredicate
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"age IN {0, 1, 2}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"age IN {29}"] count]);
-    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33}"] count]);
-    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33, 45}"] count]);
+    // Tests for each type always follow: none, some, more
 
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name IN {''}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'Tim'}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'a', 'Tim'}"] count]);
+    ////////////////////////
+    // Literal Predicates
+    ////////////////////////
 
-    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"age IN %@", @[@0, @1, @2]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"age IN %@", @[@29]] count]));
-    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33]] count]));
-    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33, @45]] count]));
+    // BOOL
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"boolCol IN {NO}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {YES}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {NO, YES}"] count]);
 
-    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"name IN %@", @[@""]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim"]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim", @"a"]] count]));
+    // int
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"intCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1, 2}"] count]);
+
+    // float
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"floatCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1, 2}"] count]);
+
+    // double
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"doubleCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1, 2}"] count]);
+
+    // NSString
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN {'abc'}"] count]);
+    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'def'}"] count]);
+    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'ABC'}"] count]);
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'abc'}"] count]);
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"] count]);
+
+    // NSData
+    // Can't represent NSData with NSPredicate literal. See format predicates below
+
+    // NSDate
+    // Can't represent NSDate with NSPredicate literal. See format predicates below
+
+    // bool
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {YES}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO, YES}"] count]);
+
+    // int64_t
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"longCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1, 2}"] count]);
+
+    // mixed
+    // FIXME: Support IN predicates with mixed properties
+    XCTAssertThrows([AllTypesObject objectsWhere:@"mixedCol IN {0, 2, 3}"]);
+
+    // string subobject
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"] count]);
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"] count]);
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"] count]);
+    // FIXME: Shouldn't throw on insensitive link string queries
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"]);
+
+    ////////////////////////
+    // Format Predicates
+    ////////////////////////
+
+    // BOOL
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO, @YES]] count]));
+
+    // int
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1, @2]] count]));
+
+    // float
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1, @2]] count]));
+
+    // double
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1, @2]] count]));
+
+    // NSString
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"ABC"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"ABC"]] count]));
+
+    // NSData
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+
+    // NSDate
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]] count]));
+
+    // bool
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO, @YES]] count]));
+
+    // int64_t
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1, @2]] count]));
+
+    // mixed
+    // FIXME: Support IN predicates with mixed properties
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]));
+
+    // string subobject
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]));
+    // FIXME: Shouldn't throw on insensitive link string queries
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
 @end
