@@ -163,22 +163,20 @@
         if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
             return;
         }
-        else {
-            if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
-            }
-
-            CGRect cellRect = [self rectOfLocation:previousMouseLocation];
-            [self setNeedsDisplayInRect:cellRect];
-
-            previousMouseLocation = currentMouseLocation;
-
-            if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
-            }
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
         }
-
-        CGRect cellRect = [self rectOfLocation:currentMouseLocation];
+        
+        CGRect cellRect = [self rectOfLocation:previousMouseLocation];
+        [self setNeedsDisplayInRect:cellRect];
+        
+        previousMouseLocation = currentMouseLocation;
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
+        }
+        
         [self setNeedsDisplayInRect:cellRect];
     }
 }

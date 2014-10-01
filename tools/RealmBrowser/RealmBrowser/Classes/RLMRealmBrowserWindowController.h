@@ -42,4 +42,6 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 - (void)reloadAfterEdit;
 
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination;
+
 @end

@@ -146,6 +146,20 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     _backingLinkView->insert(index, object->_row.get_index());
 }
 
+- (void)moveObjectFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
+    if (fromIndex >= _backingLinkView->size()) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Trying to move object from invalid index" userInfo:nil];
+    }
+    if (toIndex > _backingLinkView->size()) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Trying to move object to invalid index" userInfo:nil];
+    }
+    _backingLinkView->move(fromIndex, toIndex);
+}
+
 - (void)removeObjectAtIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
