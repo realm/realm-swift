@@ -77,51 +77,38 @@ static NSMutableDictionary *s_localNameToClass;
     }
 }
 
-static inline bool IsRLMObjectSubclass(Class cls) {
-    Class parent = class_getSuperclass(cls);
-    if (parent != RLMObject.class) {
-        if (parent && RLMIsSubclass(parent, RLMObject.class)) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"Class '%s' inherits from a RLMObject subclass. This is currently not supported. All model classes must inherit directly from RLMObject and cannot have subclasses of their own.",
-                                                   class_getName(cls)]
-                                         userInfo:nil];
-        }
-        return false;
-    }
-    return true;
-}
-
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_localNameToClass = [NSMutableDictionary dictionary];
-
         NSMutableArray *schemaArray = [NSMutableArray array];
         RLMSchema *schema = [[RLMSchema alloc] init];
 
         unsigned int numClasses;
         Class *classes = objc_copyClassList(&numClasses);
+
+        // first create class to name mapping so we can do array validation
+        // when creating object schema
+        s_localNameToClass = [NSMutableDictionary dictionary];
         for (unsigned int i = 0; i < numClasses; i++) {
             Class cls = classes[i];
-            if (!IsRLMObjectSubclass(cls)) {
+            if (!RLMIsSubclass(cls, RLMObject.class)) {
                 continue;
             }
 
-            // Delay init of Swift classes until after we know the names of all
-            // of them so that we can validate array types
             NSString *className = NSStringFromClass(cls);
             if ([RLMSwiftSupport isSwiftClassName:className]) {
                 s_localNameToClass[[RLMSwiftSupport demangleClassName:className]] = cls;
             }
             else {
-                [schemaArray addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
+                s_localNameToClass[className] = cls;
             }
         }
-        free(classes);
 
+        // process all RLMObject subclasses
         for (Class cls in s_localNameToClass.allValues) {
             [schemaArray addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
         }
+        free(classes);
 
         // set class array
         schema.objectSchema = schemaArray;

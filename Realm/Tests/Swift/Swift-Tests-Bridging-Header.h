@@ -16,24 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
-#import "RLMTypeNode.h"
-#import "RLMArrayNode.h"
-
-@class RLMObjectNode;
-@interface RLMClassNode : RLMTypeNode
-
-@property (nonatomic) RLMArray *allObjects;
-
-- (RLMObjectNode *)displayChildObject:(RLMObject *)object;
-
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
-
-- (void)removeAllChildNodes;
-
-- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
-
-- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;
-
-@end
+#import <Realm/Realm.h>
+#import "RLMTestObjects.h"
+#import "RLMRealm_Dynamic.h"

@@ -16,24 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import "RLMTypeNode.h"
-#import "RLMArrayNode.h"
 
-@class RLMObjectNode;
-@interface RLMClassNode : RLMTypeNode
+@class RLMArrayNode;
+@interface RLMObjectNode : RLMTypeNode
 
-@property (nonatomic) RLMArray *allObjects;
+@property (nonatomic) id<RLMRealmOutlineNode> childNode;
+@property (nonatomic) id<RLMRealmOutlineNode> parentNode;
 
-- (RLMObjectNode *)displayChildObject:(RLMObject *)object;
+- (instancetype)initWithObject:(RLMObject *)object realm:(RLMRealm *)realm;
 
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
-
-- (void)removeAllChildNodes;
-
-- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
-
-- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;
+- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
 
 @end

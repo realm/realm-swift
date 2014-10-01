@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject.h"
-#import "RLMRealm.h"
+#import <Realm/Realm.h>
 
 #pragma mark - Abstract Objects
 #pragma mark -

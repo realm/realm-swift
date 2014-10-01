@@ -35,8 +35,7 @@
     RLMSchema *realmSchema = realm.schema;
     RLMObjectSchema *elementSchema = [realmSchema schemaForClassName:elementTypeName];
     
-    if (self = [super initWithSchema:elementSchema
-                             inRealm:realm]) {
+    if (self = [super initWithSchema:elementSchema inRealm:realm]) {
         referringProperty = property;
         referringObject = object;
         displayedArray = object[property.name];
@@ -75,7 +74,7 @@
     return YES;
 }
 
-#pragma mark - RLMObjectNode Overrides
+#pragma mark - RLMTypeNode Overrides
 
 - (NSString *)name
 {
@@ -108,21 +107,20 @@
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
 {
-    RLMSidebarTableCellView *result = [tableView makeViewWithIdentifier:@"MainCell"
-                                                                  owner:self];
+    RLMSidebarTableCellView *cellView = [tableView makeViewWithIdentifier:@"MainCell" owner:self];
     if (name) {
-        result.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
+        cellView.textField.stringValue = [NSString stringWithFormat:@"\"%@\"", name];
     }
     else {
-        result.textField.stringValue = [NSString stringWithFormat:@"%@.%@[]", referringProperty.name, referringProperty.objectClassName];
+        cellView.textField.stringValue = [NSString stringWithFormat:@"%@: <%@>",
+                                          referringProperty.name, referringProperty.objectClassName];
     }
 
-    result.button.title =[NSString stringWithFormat:@"%lu", (unsigned long)[self instanceCount]];
-    [[result.button cell] setHighlightsBy:0];
-    result.button.hidden = NO;
-    result.imageView.image = [NSImage imageNamed:@"ArrayIcon"];
+    cellView.button.title = [NSString stringWithFormat:@"%lu", [self instanceCount]];
+    [[cellView.button cell] setHighlightsBy:0];
+    cellView.button.hidden = NO;
     
-    return result;
+    return cellView;
 }
 
 #pragma mark - RLMRealmOutlineNode Implementation

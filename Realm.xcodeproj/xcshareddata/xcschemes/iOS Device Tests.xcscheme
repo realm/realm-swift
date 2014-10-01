@@ -9,15 +9,15 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E889C4C41975E940003DE97D"
-               BuildableName = "RealmSwiftEncryptionExample.app"
-               BlueprintName = "RealmSwiftEncryptionExample"
-               ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+               BuildableName = "iOS Device Tests.xctest"
+               BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,16 +26,26 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
+      buildConfiguration = "Release">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+               BuildableName = "iOS Device Tests.xctest"
+               BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:Realm.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -48,15 +58,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -66,15 +76,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E889C4C41975E940003DE97D"
-            BuildableName = "RealmSwiftEncryptionExample.app"
-            BlueprintName = "RealmSwiftEncryptionExample"
-            ReferencedContainer = "container:RealmSwiftExamples.xcodeproj">
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -17,23 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/Realm.h>
 
-#import "RLMTypeNode.h"
-#import "RLMArrayNode.h"
+@interface RLMDescriptions : NSObject
 
-@class RLMObjectNode;
-@interface RLMClassNode : RLMTypeNode
-
-@property (nonatomic) RLMArray *allObjects;
-
-- (RLMObjectNode *)displayChildObject:(RLMObject *)object;
-
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
-
-- (void)removeAllChildNodes;
-
-- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
-
-- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;
+-(NSString *)descriptionOfObject:(RLMObject *)object;
+-(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType;
+-(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType;
 
 @end
