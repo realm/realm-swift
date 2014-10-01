@@ -254,7 +254,6 @@
 		0217D7B819CD0ACD00DE5C32 /* Swift-Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swift-Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		024E6093198B2D51002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		024E6096198B2D59002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
-		02BB492119D09DD600401323 /* iOS Tests copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "iOS Tests copy-Info.plist"; path = "/Users/ari/src/realm/realm-cocoa/iOS Tests copy-Info.plist"; sourceTree = "<absolute>"; };
 		26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
 		3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerformanceTests.m; sourceTree = "<group>"; };
 		3F1A5E721992EB7400F45F4C /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -460,7 +459,6 @@
 				E8D89B9A1955FC6D00CF2B9A /* Realm */,
 				E8D89BA71955FC6D00CF2B9A /* Tests */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
-				02BB492119D09DD600401323 /* iOS Tests copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
