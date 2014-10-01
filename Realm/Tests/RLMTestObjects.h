@@ -177,7 +177,7 @@ RLM_ARRAY_TYPE(DogObject)
 
 @interface BaseClassStringObject : RLMObject
 
-@property int intCol;
+@property NSInteger intCol;
 
 @end
 
@@ -214,12 +214,23 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
+#pragma mark - Class Extension
+
+@interface RLMRealm ()
+
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                      dynamic:(BOOL)dynamic
+                        error:(NSError **)outError;
+
+@end
+
 #pragma mark DynamicObject
 
 @interface DynamicObject : RLMObject
 
 @property NSString *stringCol;
-@property int intCol;
+@property NSInteger intCol;
 
 @end
 

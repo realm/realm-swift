@@ -18,11 +18,6 @@
 
 #import "RLMSwiftSupport.h"
 
-#import "RLMObject.h"
-#import "RLMProperty.h"
-
-#import <objc/runtime.h>
-
 @implementation RLMSwiftSupport
 
 + (BOOL)isSwiftClassName:(NSString *)className {
@@ -32,4 +27,5 @@
 + (NSString *)demangleClassName:(NSString *)className {
     return [className substringFromIndex:[className rangeOfString:@"."].location + 1];
 }
+
 @end

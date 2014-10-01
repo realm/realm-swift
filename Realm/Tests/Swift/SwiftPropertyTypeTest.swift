@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmSwift
 
 class SwiftPropertyTypeTest: SwiftTestCase {
     
@@ -29,23 +29,23 @@ class SwiftPropertyTypeTest: SwiftTestCase {
         
         let realm = realmWithTestPath()
         
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         SwiftIntObject.createInRealm(realm, withObject: [longNumber])
         SwiftIntObject.createInRealm(realm, withObject: [intNumber])
         SwiftIntObject.createInRealm(realm, withObject: [negativeLongNumber])
-        realm.commitWriteTransaction()
+        realm.commitWrite()
         
-        let objects = SwiftIntObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
-        XCTAssertEqual((objects[0] as SwiftIntObject).intCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual((objects[1] as SwiftIntObject).intCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual((objects[2] as SwiftIntObject).intCol, negativeLongNumber, "-2 ^ 34 expected")
+        let objects = realm.objects(SwiftIntObject)
+        XCTAssertEqual(objects.count, 3, "3 rows expected")
+        XCTAssertEqual(objects[0]!.intCol, longNumber, "2 ^ 34 expected")
+        XCTAssertEqual(objects[1]!.intCol, intNumber, "2 ^ 31 - 1 expected")
+        XCTAssertEqual(objects[2]!.intCol, negativeLongNumber, "-2 ^ 34 expected")
         
-        realm.beginWriteTransaction()
-        (objects[0] as SwiftIntObject).intCol = updatedLongNumber
-        realm.commitWriteTransaction()
+        realm.beginWrite()
+        objects[0]!.intCol = updatedLongNumber
+        realm.commitWrite()
         
-        XCTAssertEqual((objects[0] as SwiftIntObject).intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssertEqual(objects[0]!.intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
     func testIntSizes() {
@@ -55,7 +55,7 @@ class SwiftPropertyTypeTest: SwiftTestCase {
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
-        realm.transactionWithBlock() {
+        realm.write {
             let obj = SwiftAllIntSizesObject()
 
             obj.int16 = v16
@@ -65,36 +65,10 @@ class SwiftPropertyTypeTest: SwiftTestCase {
             obj.int64 = v64
             XCTAssertEqual(obj.int64, v64)
 
-            realm.addObject(obj)
+            realm.add(obj)
         }
 
-        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0]! as SwiftAllIntSizesObject
-        XCTAssertEqual(obj.int16, v16)
-        XCTAssertEqual(obj.int32, v32)
-        XCTAssertEqual(obj.int64, v64)
-    }
-
-    func testIntSizes_objc() {
-        let realm = realmWithTestPath()
-
-        let v16 = Int16(1) << 12
-        let v32 = Int32(1) << 30
-        // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
-        let v64 = Int64(1) << 40
-        realm.transactionWithBlock() {
-            let obj = AllIntSizesObject()
-
-            obj.int16 = v16
-            XCTAssertEqual(obj.int16, v16)
-            obj.int32 = v32
-            XCTAssertEqual(obj.int32, v32)
-            obj.int64 = v64
-            XCTAssertEqual(obj.int64, v64)
-
-            realm.addObject(obj)
-        }
-
-        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0]! as AllIntSizesObject
+        let obj = realm.objects(SwiftAllIntSizesObject).first()!
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
