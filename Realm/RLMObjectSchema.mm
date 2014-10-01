@@ -68,16 +68,23 @@
 
 + (instancetype)schemaForObjectClass:(Class)objectClass createAccessors:(BOOL)create {
     RLMObjectSchema *schema = [RLMObjectSchema new];
-    schema.className = [objectClass className];
+
+    // determine classname from objectclass as className method has not yet been updated
+    NSString *className = NSStringFromClass(objectClass);
+    if ([RLMSwiftSupport isSwiftClassName:className]) {
+        className = [RLMSwiftSupport demangleClassName:className];
+    }
+    schema.className = className;
     schema.objectClass = objectClass;
 
-    // create array of RLMProperties
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)]) {
-        schema.properties = [RLMSwiftSupport propertiesForClass:objectClass];
+    // create array of RLMProperties, inserting properties of superclasses first
+    Class cls = objectClass;
+    NSArray *props = @[];
+    while (cls != RLMObject.class) {
+        props = [[RLMObjectSchema propertiesForClass:cls] arrayByAddingObjectsFromArray:props];
+        cls = class_getSuperclass(cls);
     }
-    else {
-        schema.properties = [self propertiesForClass:objectClass];
-    }
+    schema.properties = props;
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -91,7 +98,7 @@
 
         if (!schema.primaryKeyProperty) {
             NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
-                                 primaryKey, schema.className];
+                                 primaryKey, className];
             @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
         }
         if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
@@ -105,7 +112,7 @@
         schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
 
         RLMReplaceSharedSchemaMethod(objectClass, schema);
-        RLMReplaceClassNameMethod(objectClass, schema.className);
+        RLMReplaceClassNameMethod(objectClass, className);
     }
 
     return schema;
@@ -113,6 +120,13 @@
 
 + (NSArray *)propertiesForClass:(Class)objectClass {
     NSArray *ignoredProperties = [objectClass ignoredProperties];
+
+    // For Swift classes we need an instance of the object when parsing properties
+    id swiftObjectInstance = nil;
+    BOOL isSwiftClass = [RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)];
+    if (isSwiftClass) {
+        swiftObjectInstance = [[objectClass alloc] init];
+    }
 
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -123,16 +137,22 @@
             continue;
         }
 
-        unsigned int attCount;
-        objc_property_attribute_t *atts = property_copyAttributeList(props[i], &attCount);
-        RLMProperty *prop = [[RLMProperty alloc]  initWithName:propertyName
-                                                    attributes:[objectClass attributesForProperty:propertyName]
-                                                 attributeList:atts
-                                                attributeCount:attCount];
-        free(atts);
-        [propArray addObject:prop];
-    }
+        RLMPropertyAttributes atts = [objectClass attributesForProperty:propertyName];
+        RLMProperty *prop = nil;
+        if (isSwiftClass) {
+            prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
+                                                       attributes:atts
+                                                         property:props[i]
+                                                         instance:swiftObjectInstance];
+        }
+        else {
+            prop = [[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]];
+        }
 
+        if (prop) {
+            [propArray addObject:prop];
+         }
+    }
     free(props);
 
     return propArray;

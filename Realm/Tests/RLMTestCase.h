@@ -18,13 +18,7 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
-
-#if defined(__IPHONE_8_0) || defined(__MAC_10_10)
-#define SWIFT
-#import <TestFramework/TestFramework.h>
-#else
 #import "RLMTestObjects.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,21 +30,10 @@ NSString *RLMRealmPathForFile(NSString *);
 }
 #endif
 
-#if !defined(SWIFT)
-@interface XCTestExpectation : NSObject
-- (void)fulfill;
-@end
-#endif
-
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
-
-#if !defined(SWIFT)
-- (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(id)noop;
-- (XCTestExpectation *)expectationWithDescription:(NSString *)desc;
-#endif
 
 @end

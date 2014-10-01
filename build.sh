@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.83.0
+    REALM_CORE_VERSION=0.83.1
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -43,7 +43,7 @@ command:
   test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
   test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
-  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations, on Xcode 5 and Xcode 6
+  test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
   browser [xcmode]:        builds the RealmBrowser OSX app
@@ -62,60 +62,30 @@ EOF
 # Xcode Helpers
 ######################################
 
-if [ -z "$XCODE_VERSION" ]; then
-    XCODE_VERSION=5
-fi
-
-xcode5() {
-    ln -s /Applications/Xcode.app/Contents/Developer/usr/bin build/bin
-    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
-}
-
-xcode6() {
-    ln -s /Applications/Xcode6-Beta7.app/Contents/Developer/usr/bin build/bin
-    PATH=./build/bin:$PATH xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@
-}
-
 xcode() {
-    if [ -L build/bin ]; then
-        unlink build/bin
-    fi
-    rm -rf build/bin
     mkdir -p build/DerivedData
-    case "$XCODE_VERSION" in
-        5)
-            xcode5 $@
-            ;;
-        6)
-            xcode6 $@
-            ;;
-        *)
-            echo "Unsupported version of xcode specified"
-            exit 1
-    esac
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
+    echo "Building with command:" $CMD
+    eval $CMD
 }
 
 xc() {
-    echo "Building target \"$1\" with xcode${XCODE_VERSION}"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode $1
+        xcode "$@"
     elif [[ "$XCMODE" == "xcpretty" ]]; then
         mkdir -p build
-        xcode $1 | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
+        xcode "$@" | tee build/build.log | xcpretty -c ${XCPRETTY_PARAMS} || {
             echo "The raw xcodebuild output is available in build/build.log"
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool $1
+        xctool "$@"
     fi
 }
 
 xcrealm() {
     PROJECT=Realm.xcodeproj
-    if [[ "$XCODE_VERSION" == "6" ]]; then
-        PROJECT=Realm-Xcode6.xcodeproj
-    fi
-    xc "-project $PROJECT $1"
+    xc "-project $PROJECT $@"
 }
 
 ######################################
@@ -138,14 +108,20 @@ fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    TMP_DIR="$(mktemp -dt "$0")"
-    curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
+    TMP_DIR="/tmp/core_bin"
+    mkdir -p "${TMP_DIR}"
+    CORE_TMP_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip.tmp"
+    CORE_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
+    if [ ! -f "${CORE_ZIP}" ]; then
+        curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${CORE_TMP_ZIP}"
+        mv "${CORE_TMP_ZIP}" "${CORE_ZIP}"
+    fi
     (
         cd "${TMP_DIR}"
-        unzip "core-${REALM_CORE_VERSION}.zip"
+        unzip "${CORE_ZIP}"
         mv core core-${REALM_CORE_VERSION}
-        rm -f "core-${REALM_CORE_VERSION}.zip"
     )
+
     rm -rf core-${REALM_CORE_VERSION} core
     mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
     ln -s core-${REALM_CORE_VERSION} core
@@ -162,10 +138,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator clean"
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator clean"
-        xcrealm "-scheme OSX -configuration Debug clean"
-        xcrealm "-scheme OSX -configuration Release clean"
+        find . -type d -name build -ls -delete
         exit 0
         ;;
 
@@ -214,18 +187,7 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            # Build Universal Simulator/Device framework
-            xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Release -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products
-            mkdir -p Release-iphone
-            cp -R Release-iphoneos/Realm.framework Release-iphone
-            lipo -create -output Realm Release-iphoneos/Realm.framework/Realm Release-iphonesimulator/Realm.framework/Realm
-            mv Realm Release-iphone/Realm.framework
-        else
-            xcrealm "-scheme iOS -configuration Release"
-        fi
+        xcrealm "-scheme iOS -configuration Release-Combined"
         exit 0
         ;;
 
@@ -235,18 +197,7 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        if [[ "$XCODE_VERSION" == "6" ]]; then
-            # Build Universal Simulator/Device framework
-            xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator"
-            xcrealm "-scheme iOS -configuration Debug -sdk iphoneos"
-            cd build/DerivedData/Realm-Xcode6/Build/Products
-            mkdir -p Debug-iphone
-            cp -R Debug-iphoneos/Realm.framework Debug-iphone
-            lipo -create -output Realm Debug-iphoneos/Realm.framework/Realm Debug-iphonesimulator/Realm.framework/Realm
-            mv Realm Debug-iphone/Realm.framework
-        else
-            xcrealm "-scheme iOS -configuration Debug"
-        fi
+        xcrealm "-scheme iOS -configuration Debug"
         exit 0
         ;;
 
@@ -284,13 +235,11 @@ case "$COMMAND" in
         failed=0
         sh build.sh test "$XCMODE" || failed=1
         sh build.sh test-debug "$XCMODE" || failed=1
-        XCODE_VERSION=6 sh build.sh test "$XCMODE" || failed=1
-        XCODE_VERSION=6 sh build.sh test-debug "$XCMODE" || failed=1
         exit $failed
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -300,7 +249,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-debug")
-        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -333,34 +282,31 @@ case "$COMMAND" in
     # Examples
     ######################################
     "examples")
+        sh build.sh clean
+
         cd examples
-        XCODE_VERSION=6
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftEncryptionExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        XCODE_VERSION=5
-        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-debug")
+        sh build.sh clean
         cd examples
-        XCODE_VERSION=6
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftSimpleExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftTableViewExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftMigrationExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        xc "-project swift/RealmSwiftExamples.xcodeproj -scheme RealmSwiftEncryptionExample -configuration Release clean build ${CODESIGN_PARAMS}"
-        XCODE_VERSION=5
-        xc "-project objc/RealmSimpleExample/RealmSimpleExample.xcodeproj -scheme RealmSimpleExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmTableViewExample/RealmTableViewExample.xcodeproj -scheme RealmTableViewExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmMigrationExample/RealmMigrationExample.xcodeproj -scheme RealmMigrationExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmRestExample/RealmRestExample.xcodeproj -scheme RealmRestExample -configuration Debug clean build ${CODESIGN_PARAMS}"
-        xc "-project objc/RealmJSONImportExample/RealmJSONImportExample.xcodeproj -scheme RealmJSONImportExample -configuration Debug clean build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -368,12 +314,7 @@ case "$COMMAND" in
     # Browser
     ######################################
     "browser")
-        if [[ "$XCODE_VERSION" != "6" ]]; then
-            xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
-        else
-            echo "Realm Browser can only be built with Xcode 5."
-            exit 1
-        fi
+        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -423,6 +364,174 @@ case "$COMMAND" in
         mkdir include-osx/Realm
         cp Realm/*.{h,hpp} include-osx/Realm
         cp Realm/osx/*.h include-osx/Realm
+        ;;
+
+    ######################################
+    # Release packaging
+    ######################################
+    "package-browser")
+        mkdir -p test-reports
+        cd tightdb_objc/tools/RealmBrowser
+        xcodebuild -project RealmBrowser.xcodeproj -scheme RealmBrowser -IDECustomDerivedDataLocation=../../build/DerivedData -configuration Release clean build CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+        cd ${WORKSPACE}/tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release
+        zip -r realm-browser.zip Realm\ Browser.app
+        ;;
+
+    "package-docs")
+        cd tightdb_objc
+        sh build.sh docs
+        cd docs/output/*
+        tar --exclude='realm-docset.tgz' \
+            --exclude='realm.xar' \
+            -cvzf \
+            realm-docs.tgz *
+        ;;
+
+    "package-examples")
+        cd tightdb_objc
+        ./scripts/package_examples.rb
+        zip --symlinks -r realm-obj-examples.zip examples
+        ;;
+
+    "package-test-examples")
+        ( mkdir ios; cd ios; unzip ../realm-framework-ios.zip )
+        ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
+        unzip realm-obj-examples.zip
+
+        rm *.zip
+        cd examples
+
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        ;;
+
+    "package-ios")
+        cd tightdb_objc
+        sh build.sh test-ios "$XCMODE"
+        sh build.sh examples "$XCMODE"
+
+        cd build/ios
+        zip --symlinks -r realm-framework-ios.zip Realm.framework
+        ;;
+
+    "package-osx")
+        cd tightdb_objc
+        sh build.sh test-osx "$XCMODE"
+
+        cd build/DerivedData/Realm/Build/Products/Release
+        zip --symlinks -r realm-framework-osx.zip Realm.framework
+        ;;
+
+    "package-release")
+        TEMPDIR=$(mktemp -d /tmp/realm-release-package.XXXX)
+
+        cd tightdb_objc
+        VERSION=$(sh build.sh get-version)
+        cd ..
+
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/browser
+
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}/osx
+            unzip ${WORKSPACE}/realm-framework-osx.zip
+        )
+
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}/ios
+            unzip ${WORKSPACE}/realm-framework-ios.zip
+        )
+
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}/browser
+            unzip ${WORKSPACE}/realm-browser.zip
+        )
+
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}
+            unzip ${WORKSPACE}/realm-obj-examples.zip
+        )
+
+        cp -R ${WORKSPACE}/tightdb_objc/plugin ${TEMPDIR}/realm-cocoa-${VERSION}
+        cp ${WORKSPACE}/tightdb_objc/LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
+
+        cat > ${TEMPDIR}/realm-cocoa-${VERSION}/docs.webloc <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>URL</key>
+    <string>http://realm.io/docs/ios/latest</string>
+</dict>
+</plist>
+EOF
+
+        (
+          cd ${TEMPDIR}
+          zip --symlinks -r realm-cocoa-${VERSION}.zip realm-cocoa-${VERSION}
+          mv realm-cocoa-${VERSION}.zip ${WORKSPACE}
+        )
+        ;;
+
+    "test-package-release")
+        # Generate a release package locally for testing purposes
+        # Real releases should always be done via Jenkins
+        if [ -z "${WORKSPACE}" ]; then
+            echo 'WORKSPACE must be set to a directory to assemble the release in'
+            exit 1
+        fi
+        if [ -d "${WORKSPACE}" ]; then
+            echo 'WORKSPACE directory should not already exist'
+            exit 1
+        fi
+
+        REALM_SOURCE=$(pwd)
+        mkdir $WORKSPACE
+        cd $WORKSPACE
+        git clone $REALM_SOURCE tightdb_objc
+
+        echo 'Packaging iOS'
+        sh tightdb_objc/build.sh package-ios
+        cp tightdb_objc/build/ios/realm-framework-ios.zip .
+
+        echo 'Packaging OS X'
+        sh tightdb_objc/build.sh package-osx
+        cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
+
+        echo 'Packaging docs'
+        sh tightdb_objc/build.sh package-docs
+        cp tightdb_objc/docs/output/*/realm-docs.tgz .
+
+        echo 'Packaging examples'
+        cd tightdb_objc/examples
+        git clean -xfd
+        cd ../..
+
+        sh tightdb_objc/build.sh package-examples
+        cp tightdb_objc/realm-obj-examples.zip .
+
+        echo 'Testing packaged examples'
+        (
+            mkdir -p examples-test
+            cd examples-test
+            cp ../realm-framework-ios.zip .
+            cp ../realm-framework-osx.zip .
+            cp ../realm-obj-examples.zip .
+            ln -s $WORKSPACE/tightdb_objc .
+
+            sh ../tightdb_objc/build.sh package-test-examples
+        )
+
+        echo 'Packaging browser'
+        sh tightdb_objc/build.sh package-browser
+        cp tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release/realm-browser.zip .
+
+        echo 'Building final release package'
+        sh tightdb_objc/build.sh package-release
+
         ;;
 
     *)

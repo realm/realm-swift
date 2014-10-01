@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
   s.documentation_url       = "http://realm.io/docs/cocoa/#{s.version}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
-  s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='\"#{s.version}\"'"
+  s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.private_header_files    = 'include-ios/**/*.hpp', 'include-osx/**/*.hpp', '**/*_Private.h'
   s.source_files            = 'Realm/*.{m,mm}', 'core/**/*.{h,hpp}'

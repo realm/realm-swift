@@ -27,19 +27,6 @@
 + (void)clearRealmCache;
 @end
 
-#if !defined(SWIFT)
-@implementation XCTestExpectation{
-@public
-    BOOL _fulfilled;
-}
-
-- (void)fulfill {
-    _fulfilled = YES;
-    CFRunLoopStop(CFRunLoopGetMain());
-}
-@end
-#endif
-
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -82,11 +69,6 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 
 @implementation RLMTestCase
-#if !defined(SWIFT)
-{
-    NSMutableArray *_expectations;
-}
-#endif
 
 + (void)setUp
 {
@@ -111,10 +93,6 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (void)invokeTest
 {
-#if !defined(SWIFT)
-    _expectations = [NSMutableArray new];
-#endif
-
     [RLMTestCase setUp];
     @autoreleasepool {
         [super invokeTest];
@@ -134,30 +112,6 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:schema error:nil];
 }
-
-#if !defined(SWIFT)
-- (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(__unused id)noop {
-    NSDate *endDate = [NSDate dateWithTimeIntervalSinceNow:interval];
-    while (_expectations.count && [endDate timeIntervalSinceNow] > 0) {
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:endDate];
-        for (NSInteger i = (NSInteger)_expectations.count-1; i >= 0; i--) {
-            if (((XCTestExpectation *)_expectations[i])->_fulfilled) {
-                [_expectations removeObjectAtIndex:i];
-            }
-        }
-    }
-
-    if (_expectations.count) {
-        XCTFail(@"Wait for expectation timed out after %f seconds", interval);
-    }
-}
-
-- (XCTestExpectation *)expectationWithDescription:(__unused NSString *)desc {
-    XCTestExpectation *exp = [[XCTestExpectation alloc] init];
-    [_expectations addObject:exp];
-    return exp;
-}
-#endif
 
 @end
 

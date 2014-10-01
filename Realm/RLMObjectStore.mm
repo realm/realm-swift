@@ -222,18 +222,12 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 }
 
 template<typename F>
-static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, bool tryUpdate, bool &created) {
+static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMSetFlag options, bool &created) {
     // try to get existing row if updating
     size_t rowIndex = tightdb::not_found;
     tightdb::Table &table = *schema->_table;
-    if (tryUpdate) {
-        // verify primary key
-        RLMProperty *primaryProperty = schema.primaryKeyProperty;
-        if (!primaryProperty) {
-            NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
-            @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
-        }
-
+    RLMProperty *primaryProperty = schema.primaryKeyProperty;
+    if ((options & RLMSetFlagUpdateOrCreate) && primaryProperty) {
         // get primary value
         id primaryValue = primaryValueGetter(primaryProperty);
         
@@ -257,19 +251,18 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
     return rowIndex;
 }
 
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
-    // if already in the right realm then no-op
-    if (object.realm == realm) {
-        return;
-    }
-
-    // verify writable
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options) {
     RLMVerifyInWriteTransaction(realm);
 
-    // verify object
+    // verify that object is standalone
     if (object.deletedFromRealm) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Adding a deleted object to a Realm is not permitted"
+                                     userInfo:nil];
+    }
+    if (object.realm) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object is already persisted in a Realm"
                                      userInfo:nil];
     }
 
@@ -279,21 +272,16 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
     object.objectSchema = schema;
     object.realm = realm;
 
-    // _row may already be attached to a different table if the object was
-    // already in another realm, and setting it to the new table doesn't
-    // automatically detach it
-    object->_row.detach();
-
     // get or create row
     bool created;
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, update, created)];
+    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
 
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
         // get object from ivar using key value coding
         id value = nil;
-        if ([object respondsToSelector:NSSelectorFromString(prop.getterName)]) {
+        if ([object respondsToSelector:prop.getterSel]) {
             value = [object valueForKey:prop.getterName];
         }
 
@@ -308,7 +296,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, prop.isPrimary, update);
+            RLMDynamicSet(object, prop, value, options | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
         }
     }
 
@@ -317,7 +305,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, bool update) {
 }
 
 
-RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool update) {
+RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMSetFlag options) {
     // verify writable
     RLMVerifyInWriteTransaction(realm);
 
@@ -333,7 +321,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, update, created)];
+        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // populate
         NSArray *props = objectSchema.properties;
@@ -341,7 +329,8 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, (RLMProperty *)prop, array[i], prop.isPrimary, update);
+                RLMDynamicSet(object, prop, array[i],
+                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
             }
         }
     }
@@ -352,13 +341,14 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return dict[p.name]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, update, created)];
+        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name], prop.isPrimary, update);
+                RLMDynamicSet(object, prop, dict[prop.name],
+                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
             }
         }
     }
@@ -393,7 +383,9 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
     
     // create and populate array
-    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName query:query realm:realm];
+    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
+                                                                             query:std::make_unique<Query>(query)
+                                                                             realm:realm];
     return array;
 }
 

@@ -18,7 +18,6 @@
 
 import XCTest
 import Realm
-import TestFramework
 
 class SwiftArrayTests: SwiftTestCase {
 
