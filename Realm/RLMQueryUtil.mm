@@ -292,9 +292,9 @@ void add_link_constraint_to_query(tightdb::Query & query,
 // iterate over an array of subpredicates, using @func to build a query from each
 // one and ORing them together
 template<typename Func>
-void process_or_group(Query &query, id value, Func&& func) {
-    NSArray *array = RLMDynamicCast<NSArray>(value);
-    RLMPrecondition(array, @"Invalid value", @"IN clause requires an array of items");
+void process_or_group(Query &query, id array, Func&& func) {
+    RLMPrecondition([array conformsToProtocol:@protocol(NSFastEnumeration)],
+                    @"Invalid value", @"IN clause requires an array of items");
 
     query.group();
 
