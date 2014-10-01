@@ -187,6 +187,14 @@
     return RLMGetObjects(realm, self.className, predicate);
 }
 
++ (instancetype)objectWithKey:(id)primaryKey {
+    return RLMGetObject(RLMRealm.defaultRealm, self.className, primaryKey);
+}
+
++ (instancetype)objectInRealm:(RLMRealm *)realm withKey:(id)primaryKey {
+    return RLMGetObject(realm, self.className, primaryKey);
+}
+
 - (NSString *)JSONString {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];

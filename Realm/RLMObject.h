@@ -282,6 +282,20 @@
  */
 + (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
 
+/**
+ Get the single object with the given primary key from the default Realm.
+
+ Returns the object from the default Realm which has the given primary key, or
+ `nil` if the object does not exist. This is slightly faster than the otherwise
+ equivalent `[[SubclassName objectsWhere:@"primaryKeyPropertyName = %@", key] firstObject]`.
+
+ This method requries that `primaryKey` be overridden on the receiving subclass.
+
+ @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ @see       -primaryKey
+ */
++ (instancetype)objectWithKey:(id)primaryKey;
+
 
 /**---------------------------------------------------------------------------------------
  *  @name Querying Specific Realms
@@ -316,6 +330,20 @@
  @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
  */
 + (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
+
+/**
+ Get the single object with the given primary key from the specified Realm.
+
+ Returns the object from the specified Realm which has the given primary key, or
+ `nil` if the object does not exist. This is slightly faster than the otherwise
+ equivalent `[[SubclassName objectsInRealm:realm where:@"primaryKeyPropertyName = %@", key] firstObject]`.
+
+ This method requries that `primaryKey` be overridden on the receiving subclass.
+
+ @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ @see       -primaryKey
+ */
++ (instancetype)objectInRealm:(RLMRealm *)realm withKey:(id)primaryKey;
 
 /**
  Returns YES if another RLMObject points to the same object in a RLMRealm. For RLMObject types
