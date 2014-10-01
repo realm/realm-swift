@@ -395,12 +395,12 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
             if (isAny) {
                 RLMPrecondition(prop.type == RLMPropertyTypeArray,
                                 @"Invalid predicate",
-                                @"RLMArray predicates must contain the ANY modifier");
+                                @"ANY modifier can only be used for RLMArray properties");
             }
             else {
                 RLMPrecondition(prop.type != RLMPropertyTypeArray,
                                 @"Invalid predicate",
-                                @"ANY modifier can only be used for RLMArray properties");
+                                @"RLMArray predicates must contain the ANY modifier");
             }
         }
 
