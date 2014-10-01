@@ -2,25 +2,16 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 set -e
-set +u
+set -u
 
-# Avoid recursively calling this script.
-if [[ $SF_MASTER_SCRIPT_RUNNING ]]; then
+# Only run for release
+if [[ "$CONFIGURATION" != "Release-Combined" ]]; then
     exit 0
 fi
-set -u
-export SF_MASTER_SCRIPT_RUNNING=1
 
 
 # The following conditionals come from
 # https://github.com/kstenerud/iOS-Universal-Framework
-
-if [[ "$SDK_NAME" =~ ([A-Za-z]+) ]]; then
-    SF_SDK_PLATFORM=${BASH_REMATCH[1]}
-else
-    echo "Could not find platform name from SDK_NAME: $SDK_NAME"
-    exit 1
-fi
 
 if [[ "$SDK_NAME" =~ ([0-9]+.*$) ]]; then
     SF_SDK_VERSION=${BASH_REMATCH[1]}
@@ -29,36 +20,20 @@ else
     exit 1
 fi
 
-if [[ "$SF_SDK_PLATFORM" = "iphoneos" ]]; then
-    SF_OTHER_PLATFORM=iphonesimulator
-else
-    SF_OTHER_PLATFORM=iphoneos
+# Step 1 - build platform
+xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphoneos${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
+xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphonesimulator${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
+
+# Step 2 - make fat binary
+SF_FRAMEWORK_PATH="${BUILT_PRODUCTS_DIR}/Realm.framework"
+SF_RELEASE_IOS_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphoneos/Realm.framework/Realm"
+SF_RELEASE_SIM_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/Realm.framework/Realm"
+rm "${SF_FRAMEWORK_PATH}/Realm"
+xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${SF_FRAMEWORK_PATH}/Realm" 
+
+# Step 3 - copy out
+SF_OUT_DIR="${SRCROOT}/build/ios"
+if [[ ! -d "${SF_OUT_DIR}" ]]; then
+    mkdir -p "${SF_OUT_DIR}"
 fi
-
-if [[ "$BUILT_PRODUCTS_DIR" =~ (.*)$SF_SDK_PLATFORM$ ]]; then
-    SF_OTHER_BUILT_PRODUCTS_DIR="${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}"
-else
-    echo "Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR"
-    exit 1
-fi
-
-# debug vs release
-if [[ "$CONFIGURATION" = "Debug" ]]; then
-    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios-dbg.a"
-else
-    SF_CORE_PATH="${SRCROOT}/core/libtightdb-ios.a"
-fi
-
-# We have to build the other platform and combine with it and the core libraries
-REALM_TARGET_NAME="iOS Library"
-SF_FAT_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-fat.a"
-SF_LIB_PATH="${BUILT_PRODUCTS_DIR}/libRealm.a"
-SF_OTHER_LIB_PATH="${SF_OTHER_BUILT_PRODUCTS_DIR}/libRealm.a"
-SF_COMBINED_PATH="${BUILD_DIR}/${CONFIGURATION}/libRealm-combined.a"
-
-# Step 1 - build other platform
-xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target "${REALM_TARGET_NAME}" -configuration "${CONFIGURATION}" -sdk "${SF_OTHER_PLATFORM}${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" clean build
-
-# Step 2 - move files and make fat
-mkdir -p "${BUILD_DIR}/${CONFIGURATION}"
-xcrun lipo -create "${SF_LIB_PATH}" "${SF_OTHER_LIB_PATH}" -output "${SF_FAT_PATH}"
+cp -R "${SF_FRAMEWORK_PATH}" "${SF_OUT_DIR}"

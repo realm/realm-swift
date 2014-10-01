@@ -21,6 +21,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0295B8FF19D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		0295B90019D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		E8AB71DD19BA503500F3EDB4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		E8AB71DE19BA503500F3EDB4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E8AB71DF19BA503500F3EDB4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -36,7 +41,6 @@
 		E8AB729519BA504900F3EDB4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		E8AB729619BA504900F3EDB4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E8AB729719BA504900F3EDB4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
-		E8D5D6A919BA53DA0053D333 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ECE19BA52E3006F60D5 /* Realm.framework */; };
 		E8D5D6AA19BA53DF0053D333 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E8F70E9319BA5083006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70E9019BA5083006F60D5 /* AppDelegate.m */; };
 		E8F70E9419BA5083006F60D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70E9119BA5083006F60D5 /* main.m */; };
@@ -55,13 +59,9 @@
 		E8F70EBE19BA50A3006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EB719BA50A3006F60D5 /* AppDelegate.m */; };
 		E8F70EC419BA50AB006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EC119BA50AB006F60D5 /* AppDelegate.m */; };
 		E8F70EC619BA50AB006F60D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EC319BA50AB006F60D5 /* main.m */; };
-		E8F70ECF19BA52E3006F60D5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ECE19BA52E3006F60D5 /* Realm.framework */; };
 		E8F70ED119BA52E8006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		E8F70ED419BA5308006F60D5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ECE19BA52E3006F60D5 /* Realm.framework */; };
 		E8F70ED519BA530C006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		E8F70ED819BA534A006F60D5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ECE19BA52E3006F60D5 /* Realm.framework */; };
 		E8F70ED919BA534E006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		E8F70EDC19BA537C006F60D5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ECE19BA52E3006F60D5 /* Realm.framework */; };
 		E8F70EDD19BA5380006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
@@ -104,6 +104,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios/Realm.framework; sourceTree = "<group>"; };
 		E8AB71A919BA502500F3EDB4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E8AB71AD19BA502500F3EDB4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -143,7 +144,6 @@
 		E8F70EC119BA50AB006F60D5 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E8F70EC219BA50AB006F60D5 /* Encryption-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Encryption-Info.plist"; sourceTree = "<group>"; };
 		E8F70EC319BA50AB006F60D5 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		E8F70ECE19BA52E3006F60D5 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/Release/Realm.framework; sourceTree = "<group>"; };
 		E8F70ED019BA52E8006F60D5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -153,10 +153,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70ED119BA52E8006F60D5 /* libc++.dylib in Frameworks */,
-				E8F70ECF19BA52E3006F60D5 /* Realm.framework in Frameworks */,
 				E8AB71DE19BA503500F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB71DF19BA503500F3EDB4 /* UIKit.framework in Frameworks */,
 				E8AB71DD19BA503500F3EDB4 /* Foundation.framework in Frameworks */,
+				0295B8FF19D102880036D6C3 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,10 +165,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70ED519BA530C006F60D5 /* libc++.dylib in Frameworks */,
-				E8F70ED419BA5308006F60D5 /* Realm.framework in Frameworks */,
 				E8AB720C19BA503B00F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB720D19BA503B00F3EDB4 /* UIKit.framework in Frameworks */,
 				E8AB720B19BA503B00F3EDB4 /* Foundation.framework in Frameworks */,
+				0295B90019D102880036D6C3 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,10 +177,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70ED919BA534E006F60D5 /* libc++.dylib in Frameworks */,
-				E8F70ED819BA534A006F60D5 /* Realm.framework in Frameworks */,
 				E8AB723A19BA504000F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB723B19BA504000F3EDB4 /* UIKit.framework in Frameworks */,
 				E8AB723919BA504000F3EDB4 /* Foundation.framework in Frameworks */,
+				0295B90119D102880036D6C3 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,10 +189,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70EDD19BA5380006F60D5 /* libc++.dylib in Frameworks */,
-				E8F70EDC19BA537C006F60D5 /* Realm.framework in Frameworks */,
 				E8AB726819BA504500F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB726919BA504500F3EDB4 /* UIKit.framework in Frameworks */,
 				E8AB726719BA504500F3EDB4 /* Foundation.framework in Frameworks */,
+				0295B90219D102880036D6C3 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,10 +201,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8D5D6AA19BA53DF0053D333 /* libc++.dylib in Frameworks */,
-				E8D5D6A919BA53DA0053D333 /* Realm.framework in Frameworks */,
 				E8AB729619BA504900F3EDB4 /* CoreGraphics.framework in Frameworks */,
 				E8AB729719BA504900F3EDB4 /* UIKit.framework in Frameworks */,
 				E8AB729519BA504900F3EDB4 /* Foundation.framework in Frameworks */,
+				0295B90319D102880036D6C3 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,8 +239,8 @@
 		E8AB71A819BA502500F3EDB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0295B8FE19D102880036D6C3 /* Realm.framework */,
 				E8F70ED019BA52E8006F60D5 /* libc++.dylib */,
-				E8F70ECE19BA52E3006F60D5 /* Realm.framework */,
 				E8AB71A919BA502500F3EDB4 /* Foundation.framework */,
 				E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */,
 				E8AB71AD19BA502500F3EDB4 /* UIKit.framework */,
@@ -467,10 +467,11 @@
 			);
 			name = "Build Realm";
 			outputPaths = (
+				"$(SRCROOT)/../../../build/ios/Realm.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"build/Release/Realm.framework\" ]]; then\n    sh build.sh ios\nfi\n";
+			shellScript = "cd ../../../\nif [[ ! -d \"ios/Realm.framework\" ]]; then\n    sh build.sh ios\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -573,8 +574,8 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					../../../ios,
-					../../../build/Release,
+					"$(SRCROOT)/../../../build/ios",
+					"$(SRCROOT)/../../../ios",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -617,8 +618,8 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
-					../../../ios,
-					../../../build/Release,
+					"$(SRCROOT)/../../../build/ios",
+					"$(SRCROOT)/../../../ios",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -639,6 +640,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -656,6 +658,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
@@ -669,6 +672,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -686,6 +690,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
@@ -699,6 +704,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -716,6 +722,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
@@ -729,6 +736,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -746,6 +754,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
@@ -759,6 +768,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -776,6 +786,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "REST/REST-Info.plist";

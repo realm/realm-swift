@@ -18,7 +18,6 @@
 
 import XCTest
 import Realm
-import TestFramework
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 

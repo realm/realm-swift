@@ -2,14 +2,22 @@
 =============================================================
 
 ### API breaking changes
+* Xcode6 is now supported from the main Xcode project Realm.xcodeproj. Xcode5 is no
+  longer supported. 
 
 ### Enhancements
 
+* Support subclassing RLMObject models. Although you can now persist subclasses
+  polymorphic behavior is not supported (i.e. setting a property to an 
+  instance of its subclass).
 * Add support for sorting RLMArray properties.
 * Speed up inserting objects with `addObject:` by ~20%.
 * `readonly` properties are automatically ignored rather than having to be
   added to `ignoredProperties`.
 * Updating to core library version 0.83.1.
+* Return "[deleted object]" rather than throwing an exception when
+  `-description` is called on a deleted RLMObject.
+* Significantly improve performance of very large queries.
 
 ### Bugfixes
 
@@ -19,6 +27,8 @@
 * Fix for updating nested objects where some types do not have primary keys.
 * Fix for inserting objects from JSON with NSNull values when default values
   should be used.
+* Trying to add a persisted RLMObject to a different Realm now throws an
+  exception rather than creating an uninitialized object.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
