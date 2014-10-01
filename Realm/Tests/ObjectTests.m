@@ -480,8 +480,9 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     // Test #1
     StringObject *stringObject = [[StringObject alloc] init];
     XCTAssertThrows(([realm addObject:stringObject]), @"Adding object with no values specified for NSObject properties should throw exception if NSObject property is nil");
-    
+
     // Test #2
+    stringObject = [[StringObject alloc] init];
     stringObject.stringCol = @"";
     XCTAssertNoThrow(([realm addObject:stringObject]), @"Having values in all NSObject properties should not throw exception when being added to realm");
     
@@ -869,34 +870,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 {
     IntObject *obj = [[IntObject alloc] init];
     IntObject *otherObj = [[IntObject alloc] init];
-    BoolObject *boolObj = [[BoolObject alloc] init];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMRealm *otherRealm = [self realmWithTestPath];
 
     XCTAssertTrue([obj isEqual:obj], @"Same instance.");
-    XCTAssertFalse([obj isEqual:otherObj], @"Comparison outside of realm.");
+    XCTAssertTrue([obj isEqualToObject:obj], @"Same instance.");
+    XCTAssertFalse([obj isEqualToObject:otherObj], @"Comparison outside of realm.");
 
     [realm beginWriteTransaction];
-    [realm addObject: obj];
+    [realm addObject:obj];
     [realm commitWriteTransaction];
 
-    XCTAssertFalse([obj isEqual:otherObj], @"One in realm, the other is not.");
+    XCTAssertFalse([obj isEqualToObject:otherObj], @"One in realm, the other is not.");
     XCTAssertTrue([obj isEqualToObject:[IntObject allObjects][0]], @"Same table and index.");
 
     [otherRealm beginWriteTransaction];
-    [otherRealm addObject: otherObj];
+    [otherRealm addObject:otherObj];
     [otherRealm commitWriteTransaction];
 
-    XCTAssertFalse([obj isEqual:otherObj], @"Different realms.");
+    XCTAssertFalse([obj isEqualToObject:otherObj], @"Different realms.");
 
     [realm beginWriteTransaction];
-    [realm addObject: otherObj];
-    [realm addObject: boolObj];
+    [realm addObject:[[IntObject alloc] init]];
+    [realm addObject:[[BoolObject alloc] init]];
     [realm commitWriteTransaction];
 
-    XCTAssertFalse([obj isEqual:[IntObject allObjects][1]], @"Same table, different index.");
-    XCTAssertFalse([obj isEqual:[BoolObject allObjects][0]], @"Different tables.");
+    XCTAssertFalse([obj isEqualToObject:[IntObject allObjects][1]], @"Same table, different index.");
+    XCTAssertFalse([obj isEqualToObject:[BoolObject allObjects][0]], @"Different tables.");
 }
 
 - (void)testCrossThreadAccess

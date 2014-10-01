@@ -27,6 +27,8 @@
 * Fix for updating nested objects where some types do not have primary keys.
 * Fix for inserting objects from JSON with NSNull values when default values
   should be used.
+* Trying to add a persisted RLMObject to a different Realm now throws an
+  exception rather than creating an uninitialized object.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
