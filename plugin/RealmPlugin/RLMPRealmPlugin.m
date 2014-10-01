@@ -89,6 +89,7 @@ static RLMPRealmPlugin *sharedPlugin;
     for (NSWindowController *controller in workspaceWindowControllers) {
         if ([[controller valueForKey:@"window"] isEqual:[NSApp keyWindow]]) {
             workSpace = [controller valueForKey:@"_workspace"];
+            break;
         }
     }
     NSString *workspacePath = [[workSpace valueForKey:@"representingFilePath"] valueForKey:@"_pathString"];
