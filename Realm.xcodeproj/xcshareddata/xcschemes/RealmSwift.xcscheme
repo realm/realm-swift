@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
-               BuildableName = "Realm"
-               BlueprintName = "Realm"
-               ReferencedContainer = "container:RealmExamples.xcodeproj">
+               BlueprintIdentifier = "E86C4F7619DBB29B000CDC28"
+               BuildableName = "RealmSwift.framework"
+               BlueprintName = "RealmSwift"
+               ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,7 +28,26 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E856D1DE195614A400FB2FCF"
+               BuildableName = "iOS Tests.xctest"
+               BlueprintName = "iOS Tests"
+               ReferencedContainer = "container:Realm.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E86C4F7619DBB29B000CDC28"
+            BuildableName = "RealmSwift.framework"
+            BlueprintName = "RealmSwift"
+            ReferencedContainer = "container:Realm.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -42,10 +61,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
-            BuildableName = "Realm"
-            BlueprintName = "Realm"
-            ReferencedContainer = "container:RealmExamples.xcodeproj">
+            BlueprintIdentifier = "E86C4F7619DBB29B000CDC28"
+            BuildableName = "RealmSwift.framework"
+            BlueprintName = "RealmSwift"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -60,10 +79,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
-            BuildableName = "Realm"
-            BlueprintName = "Realm"
-            ReferencedContainer = "container:RealmExamples.xcodeproj">
+            BlueprintIdentifier = "E86C4F7619DBB29B000CDC28"
+            BuildableName = "RealmSwift.framework"
+            BlueprintName = "RealmSwift"
+            ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
