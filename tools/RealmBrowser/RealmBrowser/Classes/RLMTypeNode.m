@@ -81,26 +81,6 @@
 
 #pragma mark - Public methods
 
-- (id)minimumOfPropertyNamed:(NSString *)propertyName
-{
-    return @0; // Default implementation - should be overridden by subclasses.
-}
-
-- (NSNumber *)averageOfPropertyNamed:(NSString *)propertyName
-{
-    return @0; // Default implementation - should be overridden by subclasses.
-}
-
-- (id)maximumOfPropertyNamed:(NSString *)propertyName
-{
-    return @0; // Default implementation - should be overridden by subclasses.
-}
-
-- (NSNumber *)sumOfPropertyNamed:(NSString *)propertyName
-{
-    return @0; // Default implementation - should be overridden by subclasses.
-}
-
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
     return nil; // Default implementation - should be overridden by subclasses.

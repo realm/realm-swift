@@ -167,44 +167,47 @@
     // For certain types we want to add some statistics
     RLMPropertyType type = propertyColumn.property.type;
     NSString *propertyName = propertyColumn.property.name;
-    NSString *statsString;
-    
-    switch (type) {
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble: {
-            numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
-            NSString *min = [numberFormatter stringFromNumber:[self.displayedType minimumOfPropertyNamed:propertyName]];
-            NSString *avg = [numberFormatter stringFromNumber:[self.displayedType averageOfPropertyNamed:propertyName]];
-            NSString *max = [numberFormatter stringFromNumber:[self.displayedType maximumOfPropertyNamed:propertyName]];
-            NSString *sum = [numberFormatter stringFromNumber:[self.displayedType sumOfPropertyNamed:propertyName]];
-            
-            statsString = [NSString stringWithFormat:@"Minimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
-            break;
-        }
-        case RLMPropertyTypeDate: {
-            NSString *min = [dateFormatter stringFromDate:[self.displayedType minimumOfPropertyNamed:propertyName]];
-            NSString *max = [dateFormatter stringFromDate:[self.displayedType maximumOfPropertyNamed:propertyName]];
-            
-            statsString = [NSString stringWithFormat:@"Earliest: %@\nLatest: %@", min, max];
-            break;
-        }
-        default: {
-            statsString = nil;
-            break;
+    NSString *statsString = @"";
+        
+    if ([self.displayedType isKindOfClass:[RLMClassNode class]]) {
+        RLMArray *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
+        
+        switch (type) {
+            case RLMPropertyTypeInt:
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeDouble: {
+                numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
+                NSString *min = [numberFormatter stringFromNumber:[tvArray minOfProperty:propertyName]];
+                NSString *avg = [numberFormatter stringFromNumber:[tvArray averageOfProperty:propertyName]];
+                NSString *max = [numberFormatter stringFromNumber:[tvArray maxOfProperty:propertyName]];
+                NSString *sum = [numberFormatter stringFromNumber:[tvArray sumOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nMinimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
+                break;
+            }
+            case RLMPropertyTypeDate: {
+                NSString *min = [dateFormatter stringFromDate:[tvArray minOfProperty:propertyName]];
+                NSString *max = [dateFormatter stringFromDate:[tvArray maxOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nEarliest: %@\nLatest: %@", min, max];
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
     
     // Return the final tooltip string with the type name, and possibly some statistics
     switch (type) {
         case RLMPropertyTypeInt:
-            return [@"Int\n\n" stringByAppendingString:statsString];
+            return [@"Int" stringByAppendingString:statsString];
         case RLMPropertyTypeFloat:
-            return [@"Float\n\n" stringByAppendingString:statsString];
+            return [@"Float" stringByAppendingString:statsString];
         case RLMPropertyTypeDouble:
-            return [@"Float\n\n" stringByAppendingString:statsString];
+            return [@"Float" stringByAppendingString:statsString];
         case RLMPropertyTypeDate:
-            return [@"Date\n\n" stringByAppendingString:statsString];
+            return [@"Date" stringByAppendingString:statsString];
         case RLMPropertyTypeBool:
             return @"Boolean";
         case RLMPropertyTypeString:

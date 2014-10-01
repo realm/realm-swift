@@ -32,14 +32,6 @@
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm;
 
-- (id)minimumOfPropertyNamed:(NSString *)propertyName;
-
-- (NSNumber *)averageOfPropertyNamed:(NSString *)propertyName;
-
-- (id)maximumOfPropertyNamed:(NSString *)propertyName;
-
-- (NSNumber *)sumOfPropertyNamed:(NSString *)propertyName;
-
 - (RLMObject *)instanceAtIndex:(NSUInteger)index;
 
 - (NSUInteger)indexOfInstance:(RLMObject *)instance;
