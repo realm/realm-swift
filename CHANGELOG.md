@@ -32,6 +32,7 @@
 * Trying to add a persisted RLMObject to a different Realm now throws an
   exception rather than creating an uninitialized object.
 * Fix validation errors when using IN on array properties.
+* Fix errors when an IN clause has zero items.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================

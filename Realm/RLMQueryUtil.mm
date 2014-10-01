@@ -307,6 +307,20 @@ void process_or_group(Query &query, id array, Func&& func) {
 
         func(item);
     }
+
+    if (first) {
+        // Queries can't be empty, so if there's zero things in the OR group
+        // validation will fail. Work around this by adding an expression which
+        // will never find any rows in a table.
+        // FIXME: this should be supported by core in some way
+        struct FalseExpression : tightdb::Expression {
+            size_t find_first(size_t, size_t) const override { return tightdb::not_found; }
+            void set_table() override {}
+            const Table* get_table() override { return nullptr; }
+        };
+        query.expression(new FalseExpression);
+    }
+
     query.end_group();
 }
 
