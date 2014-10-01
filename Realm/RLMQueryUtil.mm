@@ -413,6 +413,18 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
     return prop;
 }
 
+void validate_property_value(RLMProperty *prop, id value, NSString *err) {
+    if (prop.type == RLMPropertyTypeArray) {
+        Class cls = [value class];
+        RLMPrecondition(RLMIsKindOfclass(cls, RLMObject.class) && [[cls className] isEqualToString:prop.objectClassName],
+                        @"Invalid value", err, prop.objectClassName);
+    }
+    else {
+        RLMPrecondition(RLMIsObjectValidForProperty(value, prop),
+                        @"Invalid value", err, RLMTypeToString(prop.type));
+    }
+}
+
 void update_query_with_value_expression(RLMSchema *schema,
                                         RLMObjectSchema *desc,
                                         tightdb::Query &query,
@@ -436,27 +448,14 @@ void update_query_with_value_expression(RLMSchema *schema,
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
         process_or_group(query, value, [&](id item) {
             id normalized = value_from_constant_expression_or_value(item);
-            RLMPrecondition(RLMIsObjectValidForProperty(normalized, prop),
-                            @"Invalid value", @"object in IN clause must be of type %@",
-                            RLMTypeToString(prop.type));
+            validate_property_value(prop, normalized, @"Object in IN clause must be of type %@");
             add_constraint_to_query(query, prop.type, NSEqualToPredicateOperatorType,
                                     pred.options, indexes, index, normalized);
         });
         return;
     }
 
-    // validate value
-    if (prop.type == RLMPropertyTypeArray) {
-        Class cls = [value class];
-        RLMPrecondition(RLMIsKindOfclass(cls, RLMObject.class) && [[cls className] isEqualToString:prop.objectClassName],
-                        @"Invalid value", @"object must be of type %@", prop.objectClassName);
-    }
-    else {
-        RLMPrecondition(RLMIsObjectValidForProperty(value, prop),
-                        @"Invalid value", @"object must be of type %@", RLMTypeToString(prop.type));
-    }
-
-    // finally cast to native types and add query clause
+    validate_property_value(prop, value, @"object must be of type %@");
     add_constraint_to_query(query, prop.type, pred.predicateOperatorType,
                             pred.options, indexes, index, value);
 }

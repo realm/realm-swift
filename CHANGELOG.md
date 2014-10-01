@@ -30,6 +30,7 @@
   should be used.
 * Trying to add a persisted RLMObject to a different Realm now throws an
   exception rather than creating an uninitialized object.
+* Fix validation errors when using IN on array properties.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
