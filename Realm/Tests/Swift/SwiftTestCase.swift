@@ -17,27 +17,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmSwift
 
 func testRealmPath() -> String {
     return realmPathForFile("test.realm")
 }
 
-func defaultRealmPath() -> String {
-    return realmPathForFile("default.realm")
-}
-
 func realmPathForFile(fileName: String) -> String {
-    #if os(iOS)
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
-        return (paths[0] as String) + fileName
-    #else
-        return fileName
-    #endif
+    return defaultRealmPath().stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
 }
 
 func realmLockPath(path: String) -> String {
-    return path + ".lock"
+    return path.stringByAppendingPathComponent(".lock")
 }
 
 func deleteRealmFilesAtPath(path: String) {
@@ -50,18 +41,10 @@ func deleteRealmFilesAtPath(path: String) {
     assert(error == nil, "Unable to delete realm")
 }
 
-func realmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, dynamic: false, schema: schema, error: nil)
-}
-
-func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, dynamic: true, schema: schema, error: nil)
-}
-
 class SwiftTestCase: XCTestCase {
 
-    func realmWithTestPath() -> RLMRealm {
-        return RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+    func realmWithTestPath() -> Realm {
+        return Realm(path: testRealmPath())
     }
 
     override func setUp() {
@@ -74,9 +57,6 @@ class SwiftTestCase: XCTestCase {
 
     override func tearDown() {
         super.tearDown()
-
-        // Reset Realm cache
-        RLMRealm.clearRealmCache()
 
         // Delete realm files
         deleteRealmFilesAtPath(defaultRealmPath())
