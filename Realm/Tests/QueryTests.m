@@ -790,32 +790,6 @@
     XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'ABC'"].count);
 }
 
-- (void)testStringIN
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
-    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, @1, so]];
-    [realm commitWriteTransaction];
-
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN {'abc'}"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'abc'}"].count);
-    XCTAssertEqual(1U, [StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'def'}"].count);
-    XCTAssertEqual(0U, [StringObject objectsWhere:@"stringCol IN {'ABC'}"].count);
-
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"].count);
-#if 0 // FIXME: enable when support is added
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"].count);
-    XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"].count);
-#else
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol INc] {'abc'}"]);
-#endif
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"].count);
-    XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"].count);
-}
-
 - (void)testStringUnsupportedOperations
 {
     XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
@@ -1369,31 +1343,138 @@
     XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
-- (void)testINPredicate {
+- (void)testINPredicate
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
-    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    StringObject *so = [StringObject createInRealm:realm withObject:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], [NSDate dateWithTimeIntervalSince1970:1], @YES, @1LL, @1, so]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"age IN {0, 1, 2}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"age IN {29}"] count]);
-    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33}"] count]);
-    XCTAssertEqual(2U, [[PersonObject objectsWhere:@"age IN {29, 33, 45}"] count]);
+    // Tests for each type always follow: none, some, more
 
-    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name IN {''}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'Tim'}"] count]);
-    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name IN {'a', 'Tim'}"] count]);
+    ////////////////////////
+    // Literal Predicates
+    ////////////////////////
 
-    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"age IN %@", @[@0, @1, @2]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"age IN %@", @[@29]] count]));
-    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33]] count]));
-    XCTAssertEqual(2U, ([[PersonObject objectsWhere:@"age IN %@", @[@29, @33, @45]] count]));
+    // BOOL
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"boolCol IN {NO}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {YES}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {NO, YES}"] count]);
 
-    XCTAssertEqual(0U, ([[PersonObject objectsWhere:@"name IN %@", @[@""]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim"]] count]));
-    XCTAssertEqual(1U, ([[PersonObject objectsWhere:@"name IN %@", @[@"Tim", @"a"]] count]));
+    // int
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"intCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1, 2}"] count]);
+
+    // float
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"floatCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1, 2}"] count]);
+
+    // double
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"doubleCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1, 2}"] count]);
+
+    // NSString
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN {'abc'}"] count]);
+    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'def'}"] count]);
+    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'ABC'}"] count]);
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'abc'}"] count]);
+    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"] count]);
+
+    // NSData
+    // Can't represent NSData with NSPredicate literal. See format predicates below
+
+    // NSDate
+    // Can't represent NSDate with NSPredicate literal. See format predicates below
+
+    // bool
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {YES}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO, YES}"] count]);
+
+    // int64_t
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"longCol IN {0, 2, 3}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1, 2}"] count]);
+
+    // mixed
+    // FIXME: Support IN predicates with mixed properties
+    XCTAssertThrows([AllTypesObject objectsWhere:@"mixedCol IN {0, 2, 3}"]);
+
+    // string subobject
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"] count]);
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"] count]);
+    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"] count]);
+    // FIXME: Shouldn't throw on insensitive link string queries
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"]);
+
+    ////////////////////////
+    // Format Predicates
+    ////////////////////////
+
+    // BOOL
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO, @YES]] count]));
+
+    // int
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1, @2]] count]));
+
+    // float
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1, @2]] count]));
+
+    // double
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1, @2]] count]));
+
+    // NSString
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"ABC"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"ABC"]] count]));
+
+    // NSData
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+
+    // NSDate
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]] count]));
+
+    // bool
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@YES]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO, @YES]] count]));
+
+    // int64_t
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1, @2]] count]));
+
+    // mixed
+    // FIXME: Support IN predicates with mixed properties
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]));
+
+    // string subobject
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]));
+    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]));
+    // FIXME: Shouldn't throw on insensitive link string queries
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
 @end
