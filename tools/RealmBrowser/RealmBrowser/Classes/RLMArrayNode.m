@@ -35,8 +35,7 @@
     RLMSchema *realmSchema = realm.schema;
     RLMObjectSchema *elementSchema = [realmSchema schemaForClassName:elementTypeName];
     
-    if (self = [super initWithSchema:elementSchema
-                             inRealm:realm]) {
+    if (self = [super initWithSchema:elementSchema inRealm:realm]) {
         referringProperty = property;
         referringObject = object;
         displayedArray = object[property.name];
@@ -75,7 +74,7 @@
     return YES;
 }
 
-#pragma mark - RLMObjectNode Overrides
+#pragma mark - RLMTypeNode Overrides
 
 - (NSString *)name
 {
@@ -117,7 +116,7 @@
                                           referringProperty.name, referringProperty.objectClassName];
     }
 
-    cellView.button.title =[NSString stringWithFormat:@"%lu", [self instanceCount]];
+    cellView.button.title = [NSString stringWithFormat:@"%lu", [self instanceCount]];
     [[cellView.button cell] setHighlightsBy:0];
     cellView.button.hidden = NO;
     

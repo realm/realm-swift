@@ -71,12 +71,12 @@
 
 - (NSString *)name
 {
-    return @"";
+    return @""; // Default implementation - should be overridden by subclasses.
 }
 
 - (NSUInteger)instanceCount
 {
-    return 0;
+    return 0; // Default implementation - should be overridden by subclasses.
 }
 
 #pragma mark - Public methods

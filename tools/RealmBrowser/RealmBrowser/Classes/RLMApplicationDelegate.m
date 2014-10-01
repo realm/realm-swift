@@ -56,6 +56,7 @@ NSString *const kDocumentsFolder = @"/Documents";
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     if (!self.didLoadFile) {
         NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];

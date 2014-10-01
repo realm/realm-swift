@@ -24,6 +24,8 @@
 @class RLMObjectNode;
 @interface RLMClassNode : RLMTypeNode
 
+@property (nonatomic) RLMArray *allObjects;
+
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object;
 
 - (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
