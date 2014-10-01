@@ -87,11 +87,11 @@
 }
 
 +(instancetype)createInDefaultRealmWithObject:(id)object {
-    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object);
+    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMSetFlagAllowCopy);
 }
 
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
-    return RLMCreateObjectInRealmWithValue(realm, [self className], value);
+    return RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMSetFlagAllowCopy);
 }
 
 +(instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
@@ -102,11 +102,11 @@
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
 
-    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, true);
+    return RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMSetFlagUpdateOrCreate | RLMSetFlagAllowCopy);
 }
 
 +(instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
-    return RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
+    return RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMSetFlagUpdateOrCreate | RLMSetFlagAllowCopy);
 }
 
 // default attributes for property implementation
@@ -208,6 +208,10 @@
 
 - (NSString *)description
 {
+    if (self.isDeletedFromRealm) {
+        return @"[deleted object]";
+    }
+
     return [self descriptionWithMaxDepth:5];
 }
 

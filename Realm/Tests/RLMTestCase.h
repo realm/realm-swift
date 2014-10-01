@@ -18,12 +18,7 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
-
-#ifdef REALM_XCODE5
 #import "RLMTestObjects.h"
-#else
-#import <TestFramework/TestFramework.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,21 +30,10 @@ NSString *RLMRealmPathForFile(NSString *);
 }
 #endif
 
-#ifdef REALM_XCODE5
-@interface XCTestExpectation : NSObject
-- (void)fulfill;
-@end
-#endif
-
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
-
-#ifdef REALM_XCODE5
-- (void)waitForExpectationsWithTimeout:(NSTimeInterval)interval handler:(id)noop;
-- (XCTestExpectation *)expectationWithDescription:(NSString *)desc;
-#endif
 
 @end

@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "421A99481933646F00F5E4D4"
-               BuildableName = "iOS Framework"
-               BlueprintName = "iOS Framework"
+               BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
+               BuildableName = "Realm.framework"
+               BlueprintName = "iOS"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02C415111921B0C400F858D9"
+               BlueprintIdentifier = "E856D1DE195614A400FB2FCF"
                BuildableName = "iOS Tests.xctest"
                BlueprintName = "iOS Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
@@ -45,16 +45,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "421A99481933646F00F5E4D4"
-            BuildableName = "iOS Framework"
-            BlueprintName = "iOS Framework"
+            BlueprintIdentifier = "E856D1D4195614A300FB2FCF"
+            BuildableName = "Realm.framework"
+            BlueprintName = "iOS"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

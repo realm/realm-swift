@@ -645,7 +645,7 @@
         [realm commitWriteTransaction];
     }
     
-    [self.tableView reloadData];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (IBAction)editedCheckBox:(NSButton *)sender
@@ -664,6 +664,8 @@
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
     [realm commitWriteTransaction];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)rightClickedLocation:(RLMTableLocation)location
