@@ -30,6 +30,7 @@
 @interface RLMClassNode ()
 
 @property (nonatomic) RLMArray *allObjects;
+@property (nonatomic) NSMutableArray *displayedItems;
 
 @end
 
@@ -69,33 +70,17 @@
 
 - (BOOL)isExpandable
 {
-    if (displaysQuery) {
-        return displayedArrays.count > 0;
-    }
-    else {
-        return displayedObjects.count > 0;
-    }
+    return self.displayedItems.count > 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    if (displaysQuery) {
-        return displayedArrays.count;
-    }
-    else {
-        return displayedObjects.count;
-    }
+    return self.displayedItems.count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    if (displaysQuery) {
-        return displayedArrays[index];
-    }
-    else {
-        return displayedObjects[index];
-
-    }
+    return self.displayedItems[index];
 }
 
 #pragma mark - RLMObjectNode overrides
@@ -139,6 +124,7 @@
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object
 {
     displaysQuery = NO;
+    
     RLMObjectNode *objectNode = [[RLMObjectNode alloc] initWithObject:object realm:self.realm];
     objectNode.parentNode = self;
     
@@ -194,6 +180,11 @@
     }
     
     return _allObjects;
+}
+
+- (NSMutableArray *)displayedItems
+{
+    return displaysQuery ? displayedArrays : displayedObjects;
 }
 
 @end
