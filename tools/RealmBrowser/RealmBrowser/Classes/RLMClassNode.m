@@ -18,6 +18,7 @@
 
 #import "RLMClassNode.h"
 
+#import "RLMObjectNode.h"
 #import "RLMSidebarTableCellView.h"
 
 // private redeclaration
@@ -34,15 +35,19 @@
 
 
 @implementation RLMClassNode {
-
+    NSMutableArray *displayedObjects;
     NSMutableArray *displayedArrays;
+    
+    BOOL displaysQuery;
 }
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm
 {
     self = [super initWithSchema:schema inRealm:realm];
     if (self) {
+        displayedObjects = [[NSMutableArray alloc] initWithCapacity:10];
         displayedArrays = [[NSMutableArray alloc] initWithCapacity:10];
+        displaysQuery = NO;
     }
     
     return self;
@@ -64,17 +69,33 @@
 
 - (BOOL)isExpandable
 {
-    return displayedArrays.count > 0;
+    if (displaysQuery) {
+        return displayedArrays.count > 0;
+    }
+    else {
+        return displayedObjects.count > 0;
+    }
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    return displayedArrays.count;
+    if (displaysQuery) {
+        return displayedArrays.count;
+    }
+    else {
+        return displayedObjects.count;
+    }
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    return displayedArrays[index];
+    if (displaysQuery) {
+        return displayedArrays[index];
+    }
+    else {
+        return displayedObjects[index];
+
+    }
 }
 
 #pragma mark - RLMObjectNode overrides
@@ -115,25 +136,27 @@
 
 #pragma mark - Public methods
 
-- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object
+- (RLMObjectNode *)displayChildObject:(RLMObject *)object
 {
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:property
-                                                                     onObject:object
-                                                                        realm:self.realm];
+    displaysQuery = NO;
+    RLMObjectNode *objectNode = [[RLMObjectNode alloc] initWithObject:object realm:self.realm];
+    objectNode.parentNode = self;
     
-    if (displayedArrays.count == 0) {
-        [displayedArrays addObject:arrayNode];
+    if (displayedObjects.count == 0) {
+        [displayedObjects addObject:objectNode];
     }
     else {
-        [displayedArrays replaceObjectAtIndex:0
-                                   withObject:arrayNode];
+        [displayedObjects replaceObjectAtIndex:0
+                                   withObject:objectNode];
     }
 
-    return arrayNode;
+    return objectNode;
 }
 
 - (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result
 {
+    displaysQuery = YES;
+
     RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:searchText result:result andParent:self];
 
     if (displayedArrays.count == 0) {
@@ -149,6 +172,7 @@
 - (void)removeAllChildNodes
 {
     [displayedArrays removeAllObjects];
+    [displayedObjects removeAllObjects];
 }
 
 - (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index
