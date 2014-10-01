@@ -1477,4 +1477,22 @@
     XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
+- (void)testArrayIn
+{
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], @[]]];
+    [arr.array addObject:[StringObject createInRealm:realm withObject:@[@"value"]]];
+    [realm commitWriteTransaction];
+
+
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"missing"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"value"]] count]));
+
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
+}
+
 @end

@@ -19,6 +19,7 @@
 * Return "[deleted object]" rather than throwing an exception when
   `-description` is called on a deleted RLMObject.
 * Significantly improve performance of very large queries.
+* Allow passing any enumerable to IN clauses rather than just NSArray.
 
 ### Bugfixes
 
@@ -30,6 +31,8 @@
   should be used.
 * Trying to add a persisted RLMObject to a different Realm now throws an
   exception rather than creating an uninitialized object.
+* Fix validation errors when using IN on array properties.
+* Fix errors when an IN clause has zero items.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
