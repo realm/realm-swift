@@ -20,7 +20,7 @@
 #import <Realm/Realm.h>
 
 NSString * const kLanguageJava = @"Java";
-NSString * const kLanguageObjC = @"Objective C";
+NSString * const kLanguageObjC = @"Objective-C";
 
 @implementation RLMModelExporter
 
@@ -49,7 +49,7 @@ NSString * const kLanguageObjC = @"Objective C";
     else if ([language isEqualToString:kLanguageObjC]) {
         NSSavePanel *fileDialog = [NSSavePanel savePanel];
         fileDialog.prompt = @"Save as filename";
-        fileDialog.nameFieldStringValue = @"MyClasses";
+        fileDialog.nameFieldStringValue = @"RealmModels";
         fileDialog.canCreateDirectories = YES;
         fileDialog.title = dialogTitle;
         [fileDialog beginWithCompletionHandler:^(NSInteger result) {
@@ -88,7 +88,7 @@ NSString * const kLanguageObjC = @"Objective C";
     NSMutableArray *models = [NSMutableArray array];
     
     for (RLMObjectSchema *schema in schemas) {
-        NSString *fileName = [schema.className stringByAppendingString:@".java"];
+        NSString *fileName = [schema.className stringByAppendingPathExtension:@"java"];
         
         NSMutableString *model = [NSMutableString string];
         [model appendFormat:@"import io.realm.RealmObject\n\npublic class %@ extends RealmObject {\n", schema.className];
@@ -134,7 +134,7 @@ NSString * const kLanguageObjC = @"Objective C";
 +(NSArray *)objcModelsOfSchemas:(NSArray *)schemas withFileName:(NSString *)fileName
 {
     // Filename for h-file
-    NSString *hFilename = [fileName stringByAppendingString:@".h"];
+    NSString *hFilename = [fileName stringByAppendingPathExtension:@"h"];
     
     // Contents of h-file
     NSMutableString *hContents= [NSMutableString string];
@@ -161,7 +161,7 @@ NSString * const kLanguageObjC = @"Objective C";
     NSArray *hModel = @[hFilename, hContents];
     
     // Filename for m-file
-    NSString *mFilename = [fileName stringByAppendingString:@".m"];
+    NSString *mFilename = [fileName stringByAppendingPathExtension:@"m"];
     
     // Contents of m-file
     NSMutableString *mContents= [NSMutableString string];
