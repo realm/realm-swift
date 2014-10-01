@@ -858,7 +858,7 @@ const NSUInteger kMaxDepthForTooltips = 2;
         [realm commitWriteTransaction];
     }
     
-    [self.tableView reloadData];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (IBAction)editedCheckBox:(NSButton *)sender
@@ -877,6 +877,8 @@ const NSUInteger kMaxDepthForTooltips = 2;
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
     [realm commitWriteTransaction];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)rightClickedLocation:(RLMTableLocation)location
