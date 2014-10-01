@@ -2,12 +2,13 @@
 =============================================================
 
 ### API breaking changes
-* Xcode6 is now supported from the main Xcode project Realm.xcodeproj. Xcode5 is no
-  longer supported. 
+
+* Building `Realm.xcodeproj` requires Xcode 6 (Beta 5 & later). It is still possible to 
+  build Realm in Xcode 5 from CocoaPods. `Realm.framework` can still be used in Xcode 5 projects.
 
 ### Enhancements
 
-* Support subclassing RLMObject models. Although you can now persist subclasses
+* Support subclassing RLMObject models. Although you can now persist subclasses,
   polymorphic behavior is not supported (i.e. setting a property to an 
   instance of its subclass).
 * Add support for sorting RLMArray properties.
