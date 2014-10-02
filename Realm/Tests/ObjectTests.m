@@ -478,12 +478,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     static const int maxSize = 0xFFFFFF - 15;
 
     // Multiple 16 MB blobs should be fine
+    void *buffer = malloc(maxSize);
+    strcpy((char *)buffer + maxSize - sizeof("hello") - 1, "hello");
     DataObject *obj = [[DataObject alloc] init];
-    obj.data1 = obj.data2 = [NSData dataWithBytesNoCopy:malloc(maxSize) length:maxSize freeWhenDone:YES];
+    obj.data1 = obj.data2 = [NSData dataWithBytesNoCopy:buffer length:maxSize freeWhenDone:YES];
 
     [realm beginWriteTransaction];
     [realm addObject:obj];
     [realm commitWriteTransaction];
+
+    XCTAssertEqual(maxSize, obj.data1.length);
+    XCTAssertEqual(maxSize, obj.data2.length);
+    XCTAssertTrue(strcmp((const char *)obj.data1.bytes + obj.data1.length - sizeof("hello") - 1, "hello") == 0);
+    XCTAssertTrue(strcmp((const char *)obj.data2.bytes + obj.data2.length - sizeof("hello") - 1, "hello") == 0);
 
     // A blob over 16 MB should throw (and not crash)
     [realm beginWriteTransaction];
