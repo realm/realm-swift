@@ -30,7 +30,7 @@
 @interface RLMClassNode ()
 
 @property (nonatomic) RLMArray *allObjects;
-@property (nonatomic) NSMutableArray *displayedItems;
+@property (nonatomic, readonly) NSMutableArray *displayedItems;
 
 @end
 
