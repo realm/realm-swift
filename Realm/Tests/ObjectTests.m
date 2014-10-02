@@ -160,6 +160,14 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @property (readwrite) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
+@interface DataObject : RLMObject
+@property NSData *data1;
+@property NSData *data2;
+@end
+
+@implementation DataObject
+@end
+
 #pragma mark - Private
 
 @interface RLMRealm ()
@@ -459,6 +467,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithObject:@[NSNull.null, @[]]];
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
+    [realm commitWriteTransaction];
+}
+
+- (void)testDataSizeLimits {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // Allocation must be < 16 MB, with an 8-byte header and the allcation size
+    // 8-byte aligned
+    static const int maxSize = 0xFFFFFF - 15;
+
+    // Multiple 16 MB blobs should be fine
+    void *buffer = malloc(maxSize);
+    strcpy((char *)buffer + maxSize - sizeof("hello") - 1, "hello");
+    DataObject *obj = [[DataObject alloc] init];
+    obj.data1 = obj.data2 = [NSData dataWithBytesNoCopy:buffer length:maxSize freeWhenDone:YES];
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(maxSize, obj.data1.length);
+    XCTAssertEqual(maxSize, obj.data2.length);
+    XCTAssertTrue(strcmp((const char *)obj.data1.bytes + obj.data1.length - sizeof("hello") - 1, "hello") == 0);
+    XCTAssertTrue(strcmp((const char *)obj.data2.bytes + obj.data2.length - sizeof("hello") - 1, "hello") == 0);
+
+    // A blob over 16 MB should throw (and not crash)
+    [realm beginWriteTransaction];
+    XCTAssertThrows(obj.data1 = [NSData dataWithBytesNoCopy:malloc(maxSize + 1) length:maxSize + 1 freeWhenDone:YES]);
     [realm commitWriteTransaction];
 }
 
