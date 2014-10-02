@@ -51,8 +51,9 @@
     [super performUpdateUsingState:newState oldState:oldState];
  
     if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] || [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        RLMClassNode *parentNode = (RLMClassNode *)oldState.selectedType;
-        [parentNode removeAllChildNodes];
+        if ([oldState.selectedType isMemberOfClass:[RLMClassNode class]] && ![newState.selectedType isMemberOfClass:[RLMArrayNode class]]) {
+            [(RLMClassNode *)oldState.selectedType removeAllChildNodes];
+        }
         [self.tableView reloadData];
     }
     
@@ -68,10 +69,18 @@
         
         RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
         NSInteger selectionIndex = arrayState.selectedInstanceIndex;
+
         RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
         
-        RLMObjectNode *objectNode = [parentClassNode displayChildObject:selectedInstance];
+        RLMObjectNode *objectNode;
         
+        if ([oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
+            objectNode = [(RLMClassNode *)oldState.selectedType displayChildObject:selectedInstance];
+        }
+        else {
+            objectNode = [parentClassNode displayChildObject:selectedInstance];
+        }
+
         RLMArrayNode *arrayNode = [objectNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
         objectNode.childNode = arrayNode;
 

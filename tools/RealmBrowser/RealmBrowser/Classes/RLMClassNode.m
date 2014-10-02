@@ -29,7 +29,6 @@
 
 @interface RLMClassNode ()
 
-@property (nonatomic) RLMArray *allObjects;
 @property (nonatomic, readonly) NSMutableArray *displayedItems;
 
 @end
@@ -83,7 +82,7 @@
     return self.displayedItems[index];
 }
 
-#pragma mark - RLMObjectNode overrides
+#pragma mark - RLMTypeNode overrides
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
@@ -119,6 +118,15 @@
     return result;
 }
 
+- (RLMArray *)allObjects
+{
+    if (!_allObjects) {
+        _allObjects = [self.realm allObjects:self.schema.className];
+    }
+    
+    return _allObjects;
+}
+
 #pragma mark - Public methods
 
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object
@@ -132,8 +140,7 @@
         [displayedObjects addObject:objectNode];
     }
     else {
-        [displayedObjects replaceObjectAtIndex:0
-                                   withObject:objectNode];
+        [displayedObjects replaceObjectAtIndex:0 withObject:objectNode];
     }
 
     return objectNode;
@@ -172,15 +179,6 @@
 }
 
 #pragma mark - Private methods
-
-- (RLMArray *)allObjects
-{
-    if (!_allObjects) {
-        _allObjects = [self.realm allObjects:self.schema.className];
-    }
-    
-    return _allObjects;
-}
 
 - (NSMutableArray *)displayedItems
 {

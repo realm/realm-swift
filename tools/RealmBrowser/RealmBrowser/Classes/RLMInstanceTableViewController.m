@@ -162,32 +162,65 @@
 
 -(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn
 {
-    NSString *toolTip;
+    numberFormatter.maximumFractionDigits = 3;
+
+    // For certain types we want to add some statistics
+    RLMPropertyType type = propertyColumn.property.type;
+    NSString *propertyName = propertyColumn.property.name;
+    NSString *statsString = @"";
+        
+    if ([self.displayedType isKindOfClass:[RLMClassNode class]]) {
+        RLMArray *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
+        
+        switch (type) {
+            case RLMPropertyTypeInt:
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeDouble: {
+                numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
+                NSString *min = [numberFormatter stringFromNumber:[tvArray minOfProperty:propertyName]];
+                NSString *avg = [numberFormatter stringFromNumber:[tvArray averageOfProperty:propertyName]];
+                NSString *max = [numberFormatter stringFromNumber:[tvArray maxOfProperty:propertyName]];
+                NSString *sum = [numberFormatter stringFromNumber:[tvArray sumOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nMinimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
+                break;
+            }
+            case RLMPropertyTypeDate: {
+                NSString *min = [dateFormatter stringFromDate:[tvArray minOfProperty:propertyName]];
+                NSString *max = [dateFormatter stringFromDate:[tvArray maxOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nEarliest: %@\nLatest: %@", min, max];
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
     
-    switch (propertyColumn.property.type) {
+    // Return the final tooltip string with the type name, and possibly some statistics
+    switch (type) {
+        case RLMPropertyTypeInt:
+            return [@"Int" stringByAppendingString:statsString];
+        case RLMPropertyTypeFloat:
+            return [@"Float" stringByAppendingString:statsString];
+        case RLMPropertyTypeDouble:
+            return [@"Float" stringByAppendingString:statsString];
+        case RLMPropertyTypeDate:
+            return [@"Date" stringByAppendingString:statsString];
         case RLMPropertyTypeBool:
             return @"Boolean";
-        case RLMPropertyTypeInt:
-            return @"Integer";
-        case RLMPropertyTypeFloat:
-            return @"Float";
-        case RLMPropertyTypeDouble:
-            return @"Double";
         case RLMPropertyTypeString:
             return @"String";
         case RLMPropertyTypeData:
             return @"Data";
         case RLMPropertyTypeAny:
             return @"Any";
-        case RLMPropertyTypeDate:
-            return @"Date";
         case RLMPropertyTypeArray:
             return [NSString stringWithFormat:@"<%@>", propertyColumn.property.objectClassName];
         case RLMPropertyTypeObject:
             return [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
     }
-    
-    return toolTip;
 }
 
 #pragma mark - NSTableView Delegate
