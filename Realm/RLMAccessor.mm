@@ -144,6 +144,16 @@ static inline NSData *RLMGetData(__unsafe_unretained RLMObject *obj, NSUInteger 
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSData *data) {
     RLMVerifyInWriteTransaction(obj);
+
+    // Allocations are limited to 16 MB, including the 8 byte header. Additional
+    // -7 is due to that the allocation size is rounded up to a multiple of 8.
+    static const size_t maxSize = 0xFFFFFF - 15;
+    if (data.length > maxSize) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"NSData stored in Realm must be less than 16 MB"
+                                     userInfo:nil];
+    }
+
     obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
 }
 
