@@ -35,10 +35,10 @@ class SwiftLinkTests: SwiftTestCase {
         let dogs = realm.objects(SwiftDogObject)
         XCTAssertEqual(owners.count, 1, "Expecting 1 owner")
         XCTAssertEqual(dogs.count, 1, "Expecting 1 dog")
-        XCTAssertEqual(owners[0]!.name, "Tim", "Tim is named Tim")
-        XCTAssertEqual(dogs[0]!.dogName, "Harvie", "Harvie is named Harvie")
+        XCTAssertEqual(owners[0].name, "Tim", "Tim is named Tim")
+        XCTAssertEqual(dogs[0].dogName, "Harvie", "Harvie is named Harvie")
 
-        XCTAssertEqual(owners[0]!.dog.dogName, "Harvie", "Tim's dog should be Harvie")
+        XCTAssertEqual(owners[0].dog.dogName, "Harvie", "Tim's dog should be Harvie")
     }
     
     func testMultipleOwnerLink() {

@@ -39,7 +39,7 @@ class SwiftObject: Object {
     dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol = SwiftBoolObject()
-    dynamic var arrayCol = ArrayProperty(SwiftBoolObject)
+    let arrayCol = List<SwiftBoolObject>()
 }
 
 class SwiftOptionalObject: Object {
@@ -52,7 +52,7 @@ class SwiftOptionalObject: Object {
 //    dynamic var optBinaryCol: NSData?
 //    dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
-//    dynamic var arrayCol = ArrayProperty(SwiftBoolObject)
+//    let arrayCol = List<SwiftBoolObject>()
 }
 
 class SwiftDogObject: Object {
@@ -85,13 +85,17 @@ class SwiftEmployeeObject: Object {
 }
 
 class SwiftCompanyObject: Object {
-    dynamic var employees = ArrayProperty(SwiftEmployeeObject)
+    let employees = List<SwiftEmployeeObject>()
 }
 
 class SwiftArrayPropertyObject: Object {
     dynamic var name = ""
-    dynamic var array = ArrayProperty(SwiftStringObject)
-    dynamic var intArray = ArrayProperty(SwiftIntObject)
+    let array = List<SwiftStringObject>()
+    let intArray = List<SwiftIntObject>()
+}
+
+class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
+    let boolArray = List<SwiftBoolObject>()
 }
 
 class SwiftDynamicObject: Object {

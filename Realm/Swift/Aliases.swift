@@ -18,10 +18,6 @@
 
 import Realm
 
-// Realm introspection depends on models to directly subclass RLMObject
-// so we typealias it to remove the 'RLM' prefix
-public typealias Object = RLMObject
-
 // These types don't change when wrapping in Swift
 // so we just typealias them to remove the 'RLM' prefix
 public typealias PropertyType = RLMPropertyType

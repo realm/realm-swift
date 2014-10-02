@@ -16,16 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+#import "RLMListBase.h"
 
-public func == <T: Object>(lhs: T, rhs: T) -> Bool {
-    return lhs.isEqualToObject(rhs)
-}
-
-extension Object: Equatable {
-
-    // Override createInRealm() to accept Realm instead of RLMRealm
-    public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-        return createInRealm(realm.rlmRealm, withObject: object)
+@implementation RLMListBase
+- (instancetype)initWithArray:(RLMArray *)array {
+    self = [super init];
+    if (self) {
+        __rlmArray = array;
     }
+    return self;
 }
+@end

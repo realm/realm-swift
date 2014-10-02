@@ -37,6 +37,59 @@
                BlueprintName = "iOS Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ArrayPropertyTests">
+               </Test>
+               <Test
+                  Identifier = "ArrayTests">
+               </Test>
+               <Test
+                  Identifier = "DynamicTests">
+               </Test>
+               <Test
+                  Identifier = "EnumeratorTests">
+               </Test>
+               <Test
+                  Identifier = "LinkTests">
+               </Test>
+               <Test
+                  Identifier = "MigrationTests">
+               </Test>
+               <Test
+                  Identifier = "MixedTests">
+               </Test>
+               <Test
+                  Identifier = "ObjectInterfaceTests">
+               </Test>
+               <Test
+                  Identifier = "ObjectTests">
+               </Test>
+               <Test
+                  Identifier = "PerformanceTests">
+               </Test>
+               <Test
+                  Identifier = "PropertyTypeTests">
+               </Test>
+               <Test
+                  Identifier = "QueryTests">
+               </Test>
+               <Test
+                  Identifier = "RLMTestCase">
+               </Test>
+               <Test
+                  Identifier = "RealmTests">
+               </Test>
+               <Test
+                  Identifier = "SchemaTests">
+               </Test>
+               <Test
+                  Identifier = "TransactionTests">
+               </Test>
+               <Test
+                  Identifier = "UnicodeTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>
