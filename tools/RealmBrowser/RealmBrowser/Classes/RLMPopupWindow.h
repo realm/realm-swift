@@ -11,6 +11,8 @@
 @class RLMArrayNode;
 @interface RLMPopupWindow : NSWindow
 
--(instancetype)initWithView:(NSView *)view atPoint:(NSPoint)point inWindow:(NSWindow *)window;
+- (instancetype)initWithView:(NSView *)view inWindow:(NSWindow *)window;
+
+- (void)updateGeometryAtPoint:(NSPoint)point;
 
 @end

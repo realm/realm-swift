@@ -148,7 +148,7 @@
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
-                                                       withObject:@[@"name", [realm allObjects:StringObject.className], @[]]];
+                                                       withObject:@[@"name", [StringObject allObjects], @[]]];
     [realm commitWriteTransaction];
 
     [self measureBlock:^{

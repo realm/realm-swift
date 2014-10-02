@@ -29,7 +29,7 @@
 
 @interface RLMClassNode ()
 
-@property (nonatomic) RLMArray *allObjects;
+@property (nonatomic, readonly) NSMutableArray *displayedItems;
 
 @end
 
@@ -69,36 +69,20 @@
 
 - (BOOL)isExpandable
 {
-    if (displaysQuery) {
-        return displayedArrays.count > 0;
-    }
-    else {
-        return displayedObjects.count > 0;
-    }
+    return self.displayedItems.count > 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    if (displaysQuery) {
-        return displayedArrays.count;
-    }
-    else {
-        return displayedObjects.count;
-    }
+    return self.displayedItems.count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    if (displaysQuery) {
-        return displayedArrays[index];
-    }
-    else {
-        return displayedObjects[index];
-
-    }
+    return self.displayedItems[index];
 }
 
-#pragma mark - RLMObjectNode overrides
+#pragma mark - RLMTypeNode overrides
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
@@ -134,11 +118,21 @@
     return result;
 }
 
+- (RLMArray *)allObjects
+{
+    if (!_allObjects) {
+        _allObjects = [self.realm allObjects:self.schema.className];
+    }
+    
+    return _allObjects;
+}
+
 #pragma mark - Public methods
 
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object
 {
     displaysQuery = NO;
+    
     RLMObjectNode *objectNode = [[RLMObjectNode alloc] initWithObject:object realm:self.realm];
     objectNode.parentNode = self;
     
@@ -146,8 +140,7 @@
         [displayedObjects addObject:objectNode];
     }
     else {
-        [displayedObjects replaceObjectAtIndex:0
-                                   withObject:objectNode];
+        [displayedObjects replaceObjectAtIndex:0 withObject:objectNode];
     }
 
     return objectNode;
@@ -187,13 +180,9 @@
 
 #pragma mark - Private methods
 
-- (RLMArray *)allObjects
+- (NSMutableArray *)displayedItems
 {
-    if (!_allObjects) {
-        _allObjects = [self.realm allObjects:self.schema.className];
-    }
-    
-    return _allObjects;
+    return displaysQuery ? displayedArrays : displayedObjects;
 }
 
 @end

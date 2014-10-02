@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4236AC141934864D00ADD527"
-               BuildableName = "Download binary core for iOS"
-               BlueprintName = "Download binary core for iOS"
-               ReferencedContainer = "container:Realm.xcodeproj">
+               BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+               BuildableName = "Realm"
+               BlueprintName = "Realm"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -42,10 +42,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4236AC141934864D00ADD527"
-            BuildableName = "Download binary core for iOS"
-            BlueprintName = "Download binary core for iOS"
-            ReferencedContainer = "container:Realm.xcodeproj">
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "Realm"
+            BlueprintName = "Realm"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -57,6 +57,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "Realm"
+            BlueprintName = "Realm"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

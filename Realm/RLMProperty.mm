@@ -22,6 +22,7 @@
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
+#import "RLMUtil.hpp"
 
 @implementation RLMProperty
 
@@ -148,7 +149,7 @@
 
                 // verify type
                 Class cls = [RLMSchema classForString:className];
-                if (class_getSuperclass(cls) != RLMObject.class) {
+                if (!RLMIsSubclass(cls, RLMObject.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];

@@ -12,6 +12,17 @@
 
 @interface RLMPopupViewController : NSViewController
 
-- (void)setupColumnsWithArrayNode:(RLMArrayNode *)arrayNode fromWindow:(NSWindow *)window;
+@property (nonatomic) RLMArrayNode *arrayNode;
+@property (nonatomic) NSPoint displayPoint;
+
+@property (nonatomic) BOOL showingWindow;
+
+- (void)setupFromWindow:(NSWindow *)parentWindow;
+
+- (void)updateTableView;
+
+- (void)showWindow;
+
+- (void)hideWindow;
 
 @end

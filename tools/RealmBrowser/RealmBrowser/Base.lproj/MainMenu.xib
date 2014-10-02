@@ -95,6 +95,26 @@
                                     </connections>
                                 </menu>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="WZk-W9-hhB"/>
+                            <menuItem title="Save Model Definitions" id="AC9-MV-vQr">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Save Model Definitions" id="YSO-b8-a2a">
+                                    <items>
+                                        <menuItem title="Save Java definitions..." tag="101" id="kuf-fu-JL0">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="saveJavaModels:" target="-1" id="6op-mb-kj6"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Save Objective-C definitions..." id="yRS-DK-aHw">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="saveObjcModels:" target="-1" id="6Rj-7H-W6J"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                             <menuItem title="Close" keyEquivalent="w" id="DVo-aG-piG">
                                 <connections>

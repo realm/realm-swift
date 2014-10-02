@@ -17,9 +17,11 @@
 		2251D3CC19D9885800B09FD0 /* RLMPopupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2251D3CA19D9885800B09FD0 /* RLMPopupViewController.xib */; };
 		22565D6719C1BCF400C8C8EC /* RLMLinkTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */; };
 		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
+		22A4CA3519DC02AB00A4764F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A4CA2E19DC027400A4764F /* Realm.framework */; };
 		22A55FEB19D18BA8009178BC /* RLMObjectNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FEA19D18BA8009178BC /* RLMObjectNode.m */; };
 		22A55FF119D19842009178BC /* RLMDescriptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FF019D19842009178BC /* RLMDescriptions.m */; };
 		22D28EA71993AAAB00497FD3 /* RLMNumberTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */; };
+		22D3AC8A19CC5D710042C1B2 /* RLMModelExporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D3AC8919CC5D710042C1B2 /* RLMModelExporter.m */; };
 		22E4737219924CF700EEF7C9 /* RLMBasicTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E4737119924CF700EEF7C9 /* RLMBasicTableCellView.m */; };
 		22E473791992562400EEF7C9 /* RLMBoolTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E473781992562400EEF7C9 /* RLMBoolTableCellView.m */; };
 		3615BDB6196FA8BF00E1AE3F /* RLMQueryNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 3615BDB5196FA8BF00E1AE3F /* RLMQueryNavigationState.m */; };
@@ -27,8 +29,6 @@
 		84446534195891AA00CEEA5B /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84446533195891AA00CEEA5B /* RLMViewController.m */; };
 		844C34DF19473D9D0027E902 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C34DE19473D9D0027E902 /* libc++.dylib */; };
 		844C34E3194859080027E902 /* TestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 844C34E2194859080027E902 /* TestClasses.m */; };
-		844C350E19499BC20027E902 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; };
-		844C350F19499CB90027E902 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 844C350519499A350027E902 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457294C1962E3860076D4F1 /* RLMTableView.m */; };
 		8474E2B419544D8000BCA755 /* RLMTypeOutlineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2B319544D8000BCA755 /* RLMTypeOutlineViewController.m */; };
 		8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474E2BC195452BE00BCA755 /* RLMInstanceTableViewController.m */; };
@@ -60,12 +60,33 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		844C350419499A350027E902 /* PBXContainerItemProxy */ = {
+		22A4CA2D19DC027400A4764F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 02C4145E191DE49600F858D9;
-			remoteInfo = "OSX Framework";
+			remoteGlobalIDString = E8D89B981955FC6D00CF2B9A;
+			remoteInfo = OSX;
+		};
+		22A4CA2F19DC027400A4764F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E856D1D5195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		22A4CA3119DC027400A4764F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3F8DCA5719930F550008BD7F;
+			remoteInfo = "iOS Device Tests";
+		};
+		22A4CA3319DC027400A4764F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3F1A5E721992EB7400F45F4C;
+			remoteInfo = TestHost;
 		};
 		844C350619499A350027E902 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -74,26 +95,12 @@
 			remoteGlobalIDString = 02C4146E191DE49600F858D9;
 			remoteInfo = "OSX Tests";
 		};
-		844C350819499A350027E902 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 02C415051921B0C300F858D9;
-			remoteInfo = "iOS Library";
-		};
 		844C350A19499A350027E902 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 02C415121921B0C400F858D9;
 			remoteInfo = "iOS Tests";
-		};
-		844C350C19499A4B0027E902 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 844C34FC19499A350027E902 /* Realm.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 02C4145D191DE49600F858D9;
-			remoteInfo = "OSX Framework";
 		};
 		84E0F9741921F3B900D6CA14 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -111,7 +118,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				844C350F19499CB90027E902 /* Realm.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +149,8 @@
 		22A55FF019D19842009178BC /* RLMDescriptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDescriptions.m; path = Classes/RLMDescriptions.m; sourceTree = "<group>"; };
 		22D28EA51993AAAB00497FD3 /* RLMNumberTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNumberTableCellView.h; path = Classes/RLMNumberTableCellView.h; sourceTree = "<group>"; };
 		22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNumberTableCellView.m; path = Classes/RLMNumberTableCellView.m; sourceTree = "<group>"; };
+		22D3AC8819CC5D710042C1B2 /* RLMModelExporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMModelExporter.h; path = Classes/RLMModelExporter.h; sourceTree = "<group>"; };
+		22D3AC8919CC5D710042C1B2 /* RLMModelExporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMModelExporter.m; path = Classes/RLMModelExporter.m; sourceTree = "<group>"; };
 		22E4737019924CF700EEF7C9 /* RLMBasicTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBasicTableCellView.h; path = Classes/RLMBasicTableCellView.h; sourceTree = "<group>"; };
 		22E4737119924CF700EEF7C9 /* RLMBasicTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBasicTableCellView.m; path = Classes/RLMBasicTableCellView.m; sourceTree = "<group>"; };
 		22E473771992562400EEF7C9 /* RLMBoolTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBoolTableCellView.h; path = Classes/RLMBoolTableCellView.h; sourceTree = "<group>"; };
@@ -215,7 +223,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				844C350E19499BC20027E902 /* Realm.framework in Frameworks */,
+				22A4CA3519DC02AB00A4764F /* Realm.framework in Frameworks */,
 				844C34DF19473D9D0027E902 /* libc++.dylib in Frameworks */,
 				84E0F9501921F3B900D6CA14 /* Cocoa.framework in Frameworks */,
 			);
@@ -299,10 +307,12 @@
 		844C34FD19499A350027E902 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				844C350519499A350027E902 /* Realm.framework */,
+				22A4CA2E19DC027400A4764F /* Realm.framework */,
 				844C350719499A350027E902 /* OSX Tests.xctest */,
-				844C350919499A350027E902 /* libRealm.a */,
+				22A4CA3019DC027400A4764F /* Realm.framework */,
 				844C350B19499A350027E902 /* iOS Tests.xctest */,
+				22A4CA3219DC027400A4764F /* iOS Device Tests.xctest */,
+				22A4CA3419DC027400A4764F /* TestHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -381,6 +391,8 @@
 				84925C64195AE8E800EE27B1 /* UI */,
 				84925C62195AE8C900EE27B1 /* Extensions */,
 				84925C63195AE8DA00EE27B1 /* Test */,
+				22D3AC8819CC5D710042C1B2 /* RLMModelExporter.h */,
+				22D3AC8919CC5D710042C1B2 /* RLMModelExporter.m */,
 			);
 			name = Aux;
 			sourceTree = "<group>";
@@ -508,7 +520,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				844C350D19499A4B0027E902 /* PBXTargetDependency */,
 			);
 			name = RealmBrowser;
 			productName = RealmVisualEditor;
@@ -574,11 +585,32 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		844C350519499A350027E902 /* Realm.framework */ = {
+		22A4CA2E19DC027400A4764F /* Realm.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Realm.framework;
-			remoteRef = 844C350419499A350027E902 /* PBXContainerItemProxy */;
+			remoteRef = 22A4CA2D19DC027400A4764F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		22A4CA3019DC027400A4764F /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = 22A4CA2F19DC027400A4764F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		22A4CA3219DC027400A4764F /* iOS Device Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Device Tests.xctest";
+			remoteRef = 22A4CA3119DC027400A4764F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		22A4CA3419DC027400A4764F /* TestHost.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestHost.app;
+			remoteRef = 22A4CA3319DC027400A4764F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		844C350719499A350027E902 /* OSX Tests.xctest */ = {
@@ -586,13 +618,6 @@
 			fileType = wrapper.cfbundle;
 			path = "OSX Tests.xctest";
 			remoteRef = 844C350619499A350027E902 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		844C350919499A350027E902 /* libRealm.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRealm.a;
-			remoteRef = 844C350819499A350027E902 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		844C350B19499A350027E902 /* iOS Tests.xctest */ = {
@@ -641,6 +666,7 @@
 				22E473791992562400EEF7C9 /* RLMBoolTableCellView.m in Sources */,
 				8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */,
 				84754ABE193CA4600093604E /* RLMRealmBrowserWindowController.m in Sources */,
+				22D3AC8A19CC5D710042C1B2 /* RLMModelExporter.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				84925C61195AD5B000EE27B1 /* NSColor+ByteSizeFactory.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
@@ -682,11 +708,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		844C350D19499A4B0027E902 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "OSX Framework";
-			targetProxy = 844C350C19499A4B0027E902 /* PBXContainerItemProxy */;
-		};
 		84E0F9751921F3B900D6CA14 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 84E0F94B1921F3B900D6CA14 /* RealmBrowser */;

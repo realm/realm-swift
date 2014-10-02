@@ -24,29 +24,40 @@
 
 @property (nonatomic) RLMDescriptions *realmDescriptions;
 @property (nonatomic) IBOutlet NSTableView *tableView;
-@property (nonatomic) RLMArrayNode *arrayNode;
+
+@property (nonatomic) RLMPopupWindow *popupWindow;
 
 @end
 
 
 @implementation RLMPopupViewController
 
--(void)awakeFromNib
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    [super awakeFromNib];
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        self.realmDescriptions = [[RLMDescriptions alloc] init];
+    }
+    
+    return self;
 }
 
-- (void)setupColumnsWithArrayNode:(RLMArrayNode *)arrayNode fromWindow:(NSWindow *)window
+-(void)setupFromWindow:(NSWindow *)parentWindow
 {
-    [self loadView];
-    self.arrayNode = arrayNode;
+    self.popupWindow = [[RLMPopupWindow alloc] initWithView:self.view inWindow:self.tableView.window];
+    [parentWindow addChildWindow:self.popupWindow ordered:NSWindowAbove];
+}
 
+#pragma mark - Public Methods
+
+- (void)updateTableView
+{
     while (self.tableView.numberOfColumns > 0) {
         [self.tableView removeTableColumn:[self.tableView.tableColumns lastObject]];
     }
+    [self.tableView reloadData];
     
     [self.tableView beginUpdates];
-    self.realmDescriptions = [[RLMDescriptions alloc] init];
 
     // If array, add extra first column with numbers
     RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
@@ -55,7 +66,7 @@
     [tableColumn.headerCell setStringValue:@"#"];
     
     // ... and add new columns matching the structure of the new realm table.
-    NSArray *propertyColumns = arrayNode.propertyColumns;
+    NSArray *propertyColumns = self.arrayNode.propertyColumns;
     
     for (NSUInteger index = 0; index < propertyColumns.count; index++) {
         RLMClassProperty *propertyColumn = propertyColumns[index];
@@ -67,11 +78,27 @@
     }
     
     [self.tableView endUpdates];
+}
 
-    RLMPopupWindow *popupWindow = [[RLMPopupWindow alloc] initWithView:self.view
-                                                               atPoint:NSMakePoint(100, 100)
-                                                              inWindow:self.tableView.window];
-    [window addChildWindow:popupWindow ordered:NSWindowAbove];
+- (void)setDisplayPoint:(NSPoint)displayPoint
+{
+    if (displayPoint.x != _displayPoint.x || displayPoint.x != _displayPoint.x) {
+        _displayPoint = displayPoint;
+        [self.popupWindow updateGeometryAtPoint:displayPoint];
+    }
+}
+
+- (void)showWindow
+{
+    self.popupWindow.animator.alphaValue = 1.0;
+    [self.popupWindow makeKeyAndOrderFront:self];
+    self.showingWindow = YES;
+}
+
+- (void)hideWindow
+{
+    self.popupWindow.animator.alphaValue = 0.0;
+    self.showingWindow = NO;
 }
 
 #pragma mark - NSTableView Delegate
@@ -156,5 +183,6 @@
     }
 }
 
-
 @end
+
+

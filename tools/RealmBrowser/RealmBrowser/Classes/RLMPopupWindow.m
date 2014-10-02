@@ -25,7 +25,7 @@
 
 @implementation RLMPopupWindow
 
--(instancetype)initWithView:(NSView *)view atPoint:(NSPoint)point inWindow:(NSWindow *)window
+-(instancetype)initWithView:(NSView *)view inWindow:(NSWindow *)window
 {
     self = [super initWithContentRect:NSZeroRect
                             styleMask:NSBorderlessWindowMask
@@ -47,18 +47,14 @@
         
         self.borderWidth = 2.0;
         self.viewMargin = 25.0;
-        self.displayPoint = point;
         self.borderColor = [NSColor grayColor];
         self.backgroundColor = [NSColor whiteColor];
-        
-        [self setupGeometry];
-        [self setupBackground];
     }
     
     return self;
 }
 
-- (void)setupGeometry
+- (void)updateGeometryAtPoint:(NSPoint)point
 {
     NSRect contentRect = NSInsetRect(self.view.frame, -self.viewMargin, -self.viewMargin);
     contentRect.origin = NSMakePoint(100, 100);
@@ -67,9 +63,11 @@
     NSRect viewFrame = self.view.frame;
     viewFrame.origin = NSMakePoint(self.viewMargin, self.viewMargin);
     self.view.frame = viewFrame;
+    
+    [self updateBackground];
 }
 
-- (void)setupBackground
+- (void)updateBackground
 {
     // Call NSWindow's implementation of -setBackgroundColor: because we override
     // it in this class to let us set the entire background image of the window

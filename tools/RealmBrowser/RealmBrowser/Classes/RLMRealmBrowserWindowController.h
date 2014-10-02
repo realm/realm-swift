@@ -42,6 +42,4 @@ extern const NSUInteger kMaxNumberOfArrayEntriesInToolTip;
 
 - (void)reloadAfterEdit;
 
-- (void)showPopoverForArrayNode:(RLMArrayNode *)arrayNode;
-
 @end

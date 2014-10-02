@@ -16,5 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <TestFramework/RLMTestObjects.h>
-#import <TestFramework/RLMRealm_Dynamic.h>
+#import <AppKit/AppKit.h>
+
+@interface RLMPRealmPlugin : NSObject
+
+@end

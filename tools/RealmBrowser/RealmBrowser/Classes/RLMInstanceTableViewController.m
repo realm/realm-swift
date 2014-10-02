@@ -18,6 +18,7 @@
 
 #import "RLMInstanceTableViewController.h"
 
+#import "RLMPopupViewController.h"
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
@@ -45,6 +46,14 @@
                 defaultValues:(BOOL)useDefaults;
 
 @end
+
+
+@interface RLMInstanceTableViewController ()
+
+@property (nonatomic) RLMPopupViewController *popupController;
+
+@end
+
 
 @implementation RLMInstanceTableViewController {
     BOOL awake;
@@ -81,6 +90,9 @@
     autofittedColumns = [NSMutableDictionary dictionary];
     
     realmDescriptions = [[RLMDescriptions alloc] init];
+    
+    self.popupController = [[RLMPopupViewController alloc] initWithNibName:@"RLMPopupViewController" bundle:nil];
+    [self.popupController setupFromWindow:self.parentWindowController.window];
     
     awake = YES;
 }
@@ -161,32 +173,65 @@
 
 -(NSString *)headerToolTipForColumn:(RLMClassProperty *)propertyColumn
 {
-    NSString *toolTip;
+    numberFormatter.maximumFractionDigits = 3;
+
+    // For certain types we want to add some statistics
+    RLMPropertyType type = propertyColumn.property.type;
+    NSString *propertyName = propertyColumn.property.name;
+    NSString *statsString = @"";
+        
+    if ([self.displayedType isKindOfClass:[RLMClassNode class]]) {
+        RLMArray *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
+        
+        switch (type) {
+            case RLMPropertyTypeInt:
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeDouble: {
+                numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
+                NSString *min = [numberFormatter stringFromNumber:[tvArray minOfProperty:propertyName]];
+                NSString *avg = [numberFormatter stringFromNumber:[tvArray averageOfProperty:propertyName]];
+                NSString *max = [numberFormatter stringFromNumber:[tvArray maxOfProperty:propertyName]];
+                NSString *sum = [numberFormatter stringFromNumber:[tvArray sumOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nMinimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
+                break;
+            }
+            case RLMPropertyTypeDate: {
+                NSString *min = [dateFormatter stringFromDate:[tvArray minOfProperty:propertyName]];
+                NSString *max = [dateFormatter stringFromDate:[tvArray maxOfProperty:propertyName]];
+                
+                statsString = [NSString stringWithFormat:@"\n\nEarliest: %@\nLatest: %@", min, max];
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
     
-    switch (propertyColumn.property.type) {
+    // Return the final tooltip string with the type name, and possibly some statistics
+    switch (type) {
+        case RLMPropertyTypeInt:
+            return [@"Int" stringByAppendingString:statsString];
+        case RLMPropertyTypeFloat:
+            return [@"Float" stringByAppendingString:statsString];
+        case RLMPropertyTypeDouble:
+            return [@"Float" stringByAppendingString:statsString];
+        case RLMPropertyTypeDate:
+            return [@"Date" stringByAppendingString:statsString];
         case RLMPropertyTypeBool:
             return @"Boolean";
-        case RLMPropertyTypeInt:
-            return @"Integer";
-        case RLMPropertyTypeFloat:
-            return @"Float";
-        case RLMPropertyTypeDouble:
-            return @"Double";
         case RLMPropertyTypeString:
             return @"String";
         case RLMPropertyTypeData:
             return @"Data";
         case RLMPropertyTypeAny:
             return @"Any";
-        case RLMPropertyTypeDate:
-            return @"Date";
         case RLMPropertyTypeArray:
             return [NSString stringWithFormat:@"<%@>", propertyColumn.property.objectClassName];
         case RLMPropertyTypeObject:
             return [NSString stringWithFormat:@"%@", propertyColumn.property.objectClassName];
     }
-    
-    return toolTip;
 }
 
 #pragma mark - NSTableView Delegate
@@ -445,9 +490,6 @@
 
 - (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)column
 {
-    [self openArrayInPopupAtRow:row column:column];
-    return;
-    
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
     RLMArrayNavigationState *state = [[RLMArrayNavigationState alloc] initWithSelectedType:self.displayedType
@@ -456,20 +498,6 @@
                                                                                 arrayIndex:0];
     
     [self.parentWindowController newWindowWithNavigationState:state];
-}
-
-- (void)openArrayInPopupAtRow:(NSInteger)row column:(NSInteger)column
-{
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-
-    NSInteger propertyIndex = [self propertyIndexForColumn:column];
-    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
-    RLMObject *referingInstance = [self.displayedType instanceAtIndex:row];
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:propertyNode.property
-                                                                     onObject:referingInstance
-                                                                        realm:realm];
-    
-    [self.parentWindowController showPopoverForArrayNode:arrayNode];
 }
 
 #pragma mark - Private Methods - RLMTableView Delegate
@@ -573,7 +601,7 @@
     [self.parentWindowController reloadAllWindows];
 }
 
-#pragma mark - Mouse Handling
+#pragma mark - RLMTableView Delegate Methods - Mouse Handling
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
@@ -586,31 +614,69 @@
         
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
         
+    RLMObject *selectedInstance = [self.displayedType instanceAtIndex:location.row];
+    id propertyValue = selectedInstance[propertyNode.name];
+
+    if (!propertyValue) {
+        [self disableLinkCursor];
+        return;
+    }
+
     if (propertyNode.type == RLMPropertyTypeObject) {
-        RLMObject *selectedInstance = [self.displayedType instanceAtIndex:location.row];
-        NSObject *propertyValue = selectedInstance[propertyNode.name];
-        
-        if (propertyValue) {
-            [self enableLinkCursor];
-            return;
-        }
+        [self enableLinkCursor];
     }
     else if (propertyNode.type == RLMPropertyTypeArray) {
         [self enableLinkCursor];
-        return;
+        [self openPopupFromLocation:location];
     }
-    
-    [self disableLinkCursor];
 }
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
 {
+    [self hidePopupWindow];
     [self disableLinkCursor];
 }
 
 - (void)mouseDidExitView:(RLMTableView *)view
 {
     [self disableLinkCursor];
+}
+
+#pragma mark - Private Methods - Mouse Handling
+
+- (void)openPopupFromLocation:(RLMTableLocation)location
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    NSInteger propertyIndex = [self propertyIndexForColumn:location.column];
+    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
+    RLMObject *referingInstance = [self.displayedType instanceAtIndex:location.row];
+    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:propertyNode.property
+                                                                     onObject:referingInstance
+                                                                        realm:realm];
+    
+    
+    NSPoint position = NSMakePoint(400, 200);
+    NSView *cell = [self.tableView viewAtColumn:location.column row:location.row makeIfNecessary:NO];
+    if (cell) {
+        position.x = cell.frame.origin.x;
+    }
+    
+    self.popupController.arrayNode = arrayNode;
+    self.popupController.displayPoint = position;
+
+    [self.popupController updateTableView];
+    [self.popupController showWindow];
+}
+
+-(void)hidePopupWindow
+{
+    [self.popupController hideWindow];
+//    [self.popupController performSelector:@selector(updateAndShowWindow) withObject:nil afterDelay:1.0];
+//    
+//    
+//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateAndShowWindow) object:nil];
+
 }
 
 #pragma mark - Public Methods - NSTableView Event Handling
@@ -662,7 +728,7 @@
         [realm commitWriteTransaction];
     }
     
-    [self.tableView reloadData];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (IBAction)editedCheckBox:(NSButton *)sender
@@ -681,6 +747,8 @@
     [realm beginWriteTransaction];
     selectedInstance[propertyNode.name] = result;
     [realm commitWriteTransaction];
+    
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)rightClickedLocation:(RLMTableLocation)location
