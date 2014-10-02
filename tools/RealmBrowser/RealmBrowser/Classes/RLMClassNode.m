@@ -29,7 +29,7 @@
 
 @interface RLMClassNode ()
 
-@property (nonatomic) NSMutableArray *displayedItems;
+@property (nonatomic, readonly) NSMutableArray *displayedItems;
 
 @end
 
@@ -39,7 +39,6 @@
     NSMutableArray *displayedArrays;
     
     BOOL displaysQuery;
-    RLMArray *_allObjects;
 }
 
 - (instancetype)initWithSchema:(RLMObjectSchema *)schema inRealm:(RLMRealm *)realm
