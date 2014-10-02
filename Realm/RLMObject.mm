@@ -187,11 +187,11 @@
     return RLMGetObjects(realm, self.className, predicate);
 }
 
-+ (instancetype)objectWithKey:(id)primaryKey {
++ (instancetype)objectForPrimaryKey:(id)primaryKey {
     return RLMGetObject(RLMRealm.defaultRealm, self.className, primaryKey);
 }
 
-+ (instancetype)objectInRealm:(RLMRealm *)realm withKey:(id)primaryKey {
++ (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey {
     return RLMGetObject(realm, self.className, primaryKey);
 }
 

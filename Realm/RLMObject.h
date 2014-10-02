@@ -294,7 +294,7 @@
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (instancetype)objectWithKey:(id)primaryKey;
++ (instancetype)objectForPrimaryKey:(id)primaryKey;
 
 
 /**---------------------------------------------------------------------------------------
@@ -343,7 +343,7 @@
  @return    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
-+ (instancetype)objectInRealm:(RLMRealm *)realm withKey:(id)primaryKey;
++ (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
 
 /**
  Returns YES if another RLMObject points to the same object in a RLMRealm. For RLMObject types
