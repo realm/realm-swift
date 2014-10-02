@@ -569,13 +569,13 @@ static Class RLMCreateAccessorClass(Class objectClass,
     for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
         RLMProperty *prop = schema.properties[propNum];
         char accessorCode = accessorCodeForType(prop.objcType, prop.type);
-        if (getterGetter) {
+        if (prop.getterSel && getterGetter) {
             IMP getterImp = getterGetter(prop, accessorCode, prop.objectClassName);
             if (getterImp) {
                 class_replaceMethod(accClass, prop.getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
             }
         }
-        if (setterGetter) {
+        if (prop.setterSel && setterGetter) {
             IMP setterImp = setterGetter(prop, accessorCode);
             if (setterImp) {
                 class_replaceMethod(accClass, prop.setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));

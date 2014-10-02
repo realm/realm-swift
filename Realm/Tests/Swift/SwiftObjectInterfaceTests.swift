@@ -37,7 +37,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         obj.dateCol = NSDate(timeIntervalSince1970: 123)
         obj.objectCol = SwiftBoolObject()
         obj.objectCol.boolCol = true
-        obj.arrayCol.addObject(obj.objectCol)
+        obj.arrayCol.append(obj.objectCol)
         realm.commitWrite()
 
         let firstObj = realm.objects(SwiftObject).first()!
@@ -50,7 +50,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
         XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
-        XCTAssertEqual(obj.arrayCol.list(SwiftBoolObject).first()!.boolCol, true, "should be true")
+        XCTAssertEqual(obj.arrayCol.first()!.boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftObject() {
@@ -66,7 +66,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding)!, "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
-        XCTAssertEqual(firstObj.arrayCol.list(SwiftBoolObject).count, 0, "array count should be zero")
+        XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
     }
 
     func testOptionalSwiftProperties() {

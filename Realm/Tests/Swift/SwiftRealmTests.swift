@@ -49,17 +49,17 @@ class SwiftRealmTests: SwiftTestCase {
         // test again after write transaction
         var objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, 3, "Expecting 3 objects")
-        XCTAssertEqual(objects[0]!.stringCol, "a", "Expecting column to be 'a'")
+        XCTAssertEqual(objects[0].stringCol, "a", "Expecting column to be 'a'")
 
         realm.beginWrite()
-        realm.delete(objects[2]!)
-        realm.delete(objects[0]!)
+        realm.delete(objects[2])
+        realm.delete(objects[0])
         XCTAssertEqual(realm.objects(SwiftStringObject).count, 1, "Expecting 1 object")
         realm.commitWrite()
 
         objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, 1, "Expecting 1 object")
-        XCTAssertEqual(objects[0]!.stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqual(objects[0].stringCol, "b", "Expecting column to be 'b'")
     }
 
     func testRealmIsUpdatedAfterBackgroundUpdate() {
@@ -84,7 +84,7 @@ class SwiftRealmTests: SwiftTestCase {
         // get object
         let objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-        XCTAssertEqual(objects[0]!.stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
     }
 
     func testRealmIgnoresProperties() {
@@ -104,8 +104,8 @@ class SwiftRealmTests: SwiftTestCase {
 
         let objects = realm.objects(SwiftIgnoredPropertiesObject)
         XCTAssertEqual(objects.count, 1, "There should be 1 object of type SwiftIgnoredPropertiesObject")
-        XCTAssertNil(objects[0]!.runtimeProperty, "Ignored property should be nil")
-        XCTAssertEqual(objects[0]!.name, "@fz", "Value of the name column doesn't match the assigned one.")
+        XCTAssertNil(objects[0].runtimeProperty, "Ignored property should be nil")
+        XCTAssertEqual(objects[0].name, "@fz", "Value of the name column doesn't match the assigned one.")
     }
 
     func testUpdatingSortedArrayAfterBackgroundUpdate() {
@@ -154,7 +154,7 @@ class SwiftRealmTests: SwiftTestCase {
 
             let objects = realm.objects(SwiftStringObject)
             XCTAssertEqual(objects.count, 1, "There should be 1 object of type StringObject")
-            XCTAssertEqual(objects[0]!.stringCol, "string", "Value of first column should be 'string'")
+            XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
         }
 
         waitForExpectationsWithTimeout(2, handler: nil)
@@ -163,6 +163,6 @@ class SwiftRealmTests: SwiftTestCase {
         // get object
         let objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, 1, "There should be 1 object of type RLMTestObject")
-        XCTAssertEqual(objects[0]!.stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
     }
 }

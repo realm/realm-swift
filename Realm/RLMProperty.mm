@@ -274,6 +274,26 @@
     return self;
 }
 
+- (instancetype)initSwiftListPropertyWithName:(NSString *)name
+                                         ivar:(Ivar)ivar
+                              objectClassName:(NSString *)objectClassName
+{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+
+    _name = name;
+    _type = RLMPropertyTypeArray;
+    _objectClassName = objectClassName;
+    _objcType = 't';
+    _swiftListIvar = ivar;
+
+    // no obj-c property for generic lists, and thus no getter/setter names
+
+    return self;
+}
+
 
 -(BOOL)isEqualToProperty:(RLMProperty *)prop {
     return [_name isEqualToString:prop.name] && _type == prop.type && prop.isPrimary == _isPrimary &&
