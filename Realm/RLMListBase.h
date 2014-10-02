@@ -16,11 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+#import <Foundation/Foundation.h>
 
-// These types don't change when wrapping in Swift
-// so we just typealias them to remove the 'RLM' prefix
-public typealias PropertyType = RLMPropertyType
-public typealias PropertyAttributes = RLMPropertyAttributes
-public typealias NotificationToken = RLMNotificationToken
-public typealias ObjectMigrationBlock = RLMObjectMigrationBlock
+@class RLMArray;
+
+// A base class for Swift generic Lists to make it possible to interact with
+// them from obj-c
+@interface RLMListBase : NSObject
+@property (nonatomic, strong) RLMArray *_rlmArray;
+
+- (instancetype)initWithArray:(RLMArray *)array;
+@end

@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMArray.h"
+#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
@@ -24,6 +26,20 @@
 #import "RLMUtil.hpp"
 
 #import <tightdb/table.hpp>
+
+@interface RLMObject (Swift)
++ (NSArray *)getGenericListPropertyNames:(id)obj;
+@end
+
+@implementation RLMObject (Swift)
+// We need to implement this method in Swift, but we don't want the obj-c and
+// Swift in the same target to avoid polluting the RealmSwift namespace with
+// obj-c stuff. As such, this method is overridden in RealmSwift.Object to
+// supply the real implementation at runtime without a compile-time dependency.
++ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
+}
+@end
 
 // private properties
 @interface RLMObjectSchema ()
@@ -71,7 +87,8 @@
 
     // determine classname from objectclass as className method has not yet been updated
     NSString *className = NSStringFromClass(objectClass);
-    if ([RLMSwiftSupport isSwiftClassName:className]) {
+    bool isSwift = [RLMSwiftSupport isSwiftClassName:className];
+    if (isSwift) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
     schema.className = className;
@@ -85,6 +102,9 @@
         cls = class_getSuperclass(cls);
     }
     schema.properties = props;
+
+    // verify that we didn't add any properties twice due to inheritance
+    assert(props.count == [NSSet setWithArray:[props valueForKey:@"name"]].count);
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -109,7 +129,12 @@
     }
 
     if (create) {
-        schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
+        if (isSwift) {
+            schema.standaloneClass = objectClass;
+        }
+        else {
+            schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
+        }
 
         RLMReplaceSharedSchemaMethod(objectClass, schema);
         RLMReplaceClassNameMethod(objectClass, className);
@@ -154,6 +179,20 @@
          }
     }
     free(props);
+
+    if (isSwiftClass) {
+        // List<> properties don't show up as objective-C properties due to
+        // being generic, so use Swift reflection to get a list of them, and
+        // then access their ivars directly
+        for (NSString *propName in [objectClass getGenericListPropertyNames:swiftObjectInstance]) {
+            Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
+            id value = object_getIvar(swiftObjectInstance, ivar);
+            NSString *className = [value _rlmArray].objectClassName;
+            [propArray addObject:[[RLMProperty alloc] initSwiftListPropertyWithName:propName
+                                                                               ivar:ivar
+                                                                    objectClassName:className]];
+        }
+    }
 
     return propArray;
 }

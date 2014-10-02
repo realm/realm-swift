@@ -34,6 +34,8 @@
 
 @interface RLMObject (Swift)
 
+- (instancetype)initWithRealm:(RLMRealm *)realm schema:(RLMObjectSchema *)schema defaultValues:(BOOL)useDefaults;
+
 + (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 + (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 

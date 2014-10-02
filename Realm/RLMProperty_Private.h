@@ -31,21 +31,26 @@
                                  property:(objc_property_t)property
                                  instance:(RLMObject *)objectInstance;
 
+- (instancetype)initSwiftListPropertyWithName:(NSString *)name
+                                         ivar:(Ivar)ivar
+                              objectClassName:(NSString *)objectClassName;
+
 // private setters
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
+@property (nonatomic, copy) NSString *objectClassName;
 
 // private properties
 @property (nonatomic, copy) NSString *objcRawType;
 @property (nonatomic, assign) char objcType;
+@property (nonatomic, assign) BOOL isPrimary;
+@property (nonatomic, assign) Ivar swiftListIvar;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
 @property (nonatomic, copy) NSString *setterName;
 @property (nonatomic) SEL getterSel;
 @property (nonatomic) SEL setterSel;
-@property (nonatomic, copy) NSString *objectClassName;
-@property (nonatomic, assign) BOOL isPrimary;
 
 @end
 

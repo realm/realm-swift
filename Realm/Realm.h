@@ -27,4 +27,5 @@
 
 #if defined(__IPHONE_8_0) && TARGET_OS_IPHONE
 #import <Realm/RLMSwiftHelpers.h>
+#import <Realm/RLMListBase.h>
 #endif

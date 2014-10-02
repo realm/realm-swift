@@ -18,108 +18,94 @@
 
 import Realm
 
-// Since RLMArray's should only be used as object properties, typealias to ArrayProperty
-public typealias ArrayProperty = RLMArray
-
-public extension ArrayProperty {
-
-    // Initialize empty ArrayProperty with objectClass of type T
-    public convenience init<T: Object>(_: T.Type) {
-        self.init(objectClassName: demangleClassName(NSStringFromClass(T))!)
-    }
-
-    // Convert ArrayProperty to generic List version
-    public func list<T: Object>(_: T.Type) -> List<T> {
-        assert(demangleClassName(NSStringFromClass(T))! == objectClassName,
-            "Must pass same Object type to list() as was used to create the ArrayProperty")
-        return List<T>(rlmArray: self)
-    }
+public class ListBase: RLMListBase, Printable {
+    // Printable requires a description property defined in Swift (and not obj-c),
+    // and it has to be defined as @objc override, which can't be done in a
+    // generic class.
+    @objc public override var description: String { return _rlmArray.description }
+    public var count: UInt { return _rlmArray.count }
 }
 
-public class List<T: Object>: SequenceType, Printable {
+public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Properties
 
-    var rlmArray: RLMArray
-    public var count: UInt { return rlmArray.count }
-    public var realm: Realm { return Realm(rlmRealm: rlmArray.realm) }
-    public var description: String { return rlmArray.description }
+    public var realm: Realm { return Realm(rlmRealm: _rlmArray.realm) }
 
     // MARK: Initializers
 
-    public init() {
-        rlmArray = RLMArray(objectClassName: demangleClassName(NSStringFromClass(T.self)))
+    public override init() {
+        super.init(array: RLMArray(objectClassName: demangleClassName(NSStringFromClass(T))))
     }
 
-    convenience init(rlmArray: RLMArray) {
-        self.init()
-        self.rlmArray = rlmArray
+    init(_ rlmArray: RLMArray) {
+        super.init(array: rlmArray)
     }
 
     // MARK: Index Retrieval
 
     public func indexOf(object: T) -> UInt? {
-        return rlmArray.indexOfObject(object)
+        return _rlmArray.indexOfObject(object)
     }
 
     public func indexOf(predicate: NSPredicate) -> UInt? {
-        return rlmArray.indexOfObjectWithPredicate(predicate)
+        return _rlmArray.indexOfObjectWithPredicate(predicate)
     }
 
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> UInt? {
-        return rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args))
+        return _rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
     // MARK: Object Retrieval
 
-    public subscript(index: UInt) -> T? {
+    public subscript(index: UInt) -> T {
         get {
-            return rlmArray[index] as T?
+            return _rlmArray[index] as T
         }
         set {
-            return rlmArray[index] = newValue
+            return _rlmArray[index] = newValue
         }
     }
 
     public func first() -> T? {
-        return rlmArray.firstObject() as T?
+        return _rlmArray.firstObject() as T?
     }
 
     public func last() -> T? {
-        return rlmArray.lastObject() as T?
+        return _rlmArray.lastObject() as T?
     }
 
     // MARK: Subarray Retrieval
 
     public func filter(predicateFormat: String, _ args: CVarArgType...) -> List<T> {
-        return List<T>(rlmArray: rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
+        return List<T>(_rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
     }
 
     public func filter(predicate: NSPredicate) -> List<T> {
-        return List<T>(rlmArray: rlmArray.objectsWithPredicate(predicate))
+        return List<T>(_rlmArray.objectsWithPredicate(predicate))
     }
 
     // MARK: Sorting
 
     public func sorted(property: String, ascending: Bool = true) -> List<T> {
-        return List<T>(rlmArray: rlmArray.arraySortedByProperty(property, ascending: ascending))
+        return List<T>(_rlmArray.arraySortedByProperty(property, ascending: ascending))
     }
 
     // MARK: Aggregate Operations
 
     public func min<U: Sortable>(property: String) -> U {
-        return rlmArray.minOfProperty(property) as U
+        return _rlmArray.minOfProperty(property) as U
     }
 
     public func max<U: Sortable>(property: String) -> U {
-        return rlmArray.maxOfProperty(property) as U
+        return _rlmArray.maxOfProperty(property) as U
     }
 
     public func sum(property: String) -> Double {
-        return rlmArray.sumOfProperty(property) as Double
+        return _rlmArray.sumOfProperty(property) as Double
     }
 
     public func average(property: String) -> Double {
-        return rlmArray.averageOfProperty(property) as Double
+        return _rlmArray.averageOfProperty(property) as Double
     }
 
     // MARK: Sequence Support
@@ -127,10 +113,10 @@ public class List<T: Object>: SequenceType, Printable {
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {
-            if (i >= self.rlmArray.count) {
+            if (i >= self._rlmArray.count) {
                 return .None
             } else {
-                return self.rlmArray[i++] as? T
+                return self._rlmArray[i++] as? T
             }
         }
     }
@@ -138,23 +124,23 @@ public class List<T: Object>: SequenceType, Printable {
     // MARK: Mutating
 
     public func append(object: T) {
-        rlmArray.addObject(object)
+        _rlmArray.addObject(object)
     }
 
     public func append(objects: [T]) {
-        rlmArray.addObjectsFromArray(objects)
+        _rlmArray.addObjectsFromArray(objects)
     }
 
     public func append(list: List<T>) {
-        rlmArray.addObjectsFromArray(list.rlmArray)
+        _rlmArray.addObjectsFromArray(list._rlmArray)
     }
 
     public func insert(object: T, atIndex index: UInt) {
-        rlmArray.insertObject(object, atIndex: index)
+        _rlmArray.insertObject(object, atIndex: index)
     }
 
     public func remove(index: UInt) {
-        rlmArray.removeObjectAtIndex(index)
+        _rlmArray.removeObjectAtIndex(index)
     }
 
     public func remove(object: T) {
@@ -164,14 +150,14 @@ public class List<T: Object>: SequenceType, Printable {
     }
 
     public func removeLast() {
-        rlmArray.removeLastObject()
+        _rlmArray.removeLastObject()
     }
 
     public func removeAll() {
-        rlmArray.removeAllObjects()
+        _rlmArray.removeAllObjects()
     }
     
     public func replace(index: UInt, object: T) {
-        rlmArray.replaceObjectAtIndex(index, withObject: object)
+        _rlmArray.replaceObjectAtIndex(index, withObject: object)
     }
 }
