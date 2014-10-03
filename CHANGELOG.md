@@ -20,6 +20,8 @@
   `-description` is called on a deleted RLMObject.
 * Significantly improve performance of very large queries.
 * Allow passing any enumerable to IN clauses rather than just NSArray.
+* Add `objectForPrimaryKey:` and `objectInRealm:forPrimaryKey:` convenience
+  methods to fetch an object by primary key.
 
 ### Bugfixes
 
