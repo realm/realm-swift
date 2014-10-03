@@ -1,3 +1,11 @@
+0.86.1 Release notes (2014-10-03)
+=============================================================
+
+### Bugfixes
+
+* Fix a bug which would sometimes result in subclassing RLMObject subclasses
+  not working.
+
 0.86.0 Release notes (2014-10-03)
 =============================================================
 
