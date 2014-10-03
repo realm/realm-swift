@@ -95,7 +95,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
                     NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
                 }
                 else {
-                    table.set_index(prop.column);
+                    table.add_search_index(prop.column);
                 }
             }
         }

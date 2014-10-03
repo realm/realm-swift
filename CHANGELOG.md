@@ -35,6 +35,7 @@
   exception rather than creating an uninitialized object.
 * Fix validation errors when using IN on array properties.
 * Fix errors when an IN clause has zero items.
+* Fix for chained queries ignoring all but the last query's conditions.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================
