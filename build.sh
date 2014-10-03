@@ -457,6 +457,8 @@ case "$COMMAND" in
 
         cp -R ${WORKSPACE}/tightdb_objc/plugin ${TEMPDIR}/realm-cocoa-${VERSION}
         cp ${WORKSPACE}/tightdb_objc/LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
+        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/Swift/
 
         cat > ${TEMPDIR}/realm-cocoa-${VERSION}/docs.webloc <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
