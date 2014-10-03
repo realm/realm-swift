@@ -9,6 +9,14 @@
 #import "RLMPopupWindow.h"
 #import "RLMArrayNode.h"
 
+const CGFloat triangleHeight = 30.0;
+const CGFloat triangleWidth = 50.0;
+
+const CGFloat viewMargin = 25.0;
+const CGFloat windowMargin = 40.0;
+const CGFloat borderWidth = 2.0;
+const CGFloat cornerRadius = 25.0;
+
 @interface RLMPopupWindow ()
 
 @property (nonatomic, weak) NSWindow *parentWindow;
@@ -18,7 +26,7 @@
 @property (nonatomic) NSColor *borderColor;
 
 @property (nonatomic) NSPoint displayPoint;
-@property (nonatomic) CGFloat viewMargin;
+@property (nonatomic) BOOL displayAtLeft;
 
 @end
 
@@ -45,8 +53,6 @@
         self.parentWindow = window;
         self.view = view;
         
-        self.borderWidth = 2.0;
-        self.viewMargin = 25.0;
         self.borderColor = [NSColor grayColor];
         self.backgroundColor = [NSColor whiteColor];
     }
@@ -54,15 +60,52 @@
     return self;
 }
 
-- (void)updateGeometryAtPoint:(NSPoint)point
+- (void)updateGeometryAtPoint:(NSPoint)displayPoint
 {
-    NSRect contentRect = NSInsetRect(self.view.frame, -self.viewMargin, -self.viewMargin);
-    contentRect.origin = NSMakePoint(100, 100);
+    NSLog(@"updating geomtry for point: %@", NSStringFromPoint(displayPoint));
+
+    NSSize screenSize = self.screen.frame.size;
+    NSSize windowSize = self.frame.size;
+    NSPoint origin = displayPoint;
+    
+    // Put the window on the right of the displayPoint if possible, if not, on the left
+    if (displayPoint.x + triangleWidth + windowSize.width + windowMargin > screenSize.width) {
+        self.displayAtLeft = YES;
+        origin.x = displayPoint.x - triangleWidth - windowSize.width;
+    }
+    else {
+        self.displayAtLeft = NO;
+        origin.x = displayPoint.x + triangleWidth;
+    }
+    
+    // Try to center vertically if displayPoint is not too close to top or bottom of the screen
+    CGFloat innerMargin = triangleHeight/2.0 + cornerRadius;
+    if (displayPoint.y + innerMargin > screenSize.height/2.0 + windowSize.height/2.0) {
+        origin.y = displayPoint.y + innerMargin - windowSize.height;
+    }
+    else if (displayPoint.y - innerMargin < screenSize.height/2.0 - windowSize.height/2.0) {
+        origin.y = displayPoint.y - innerMargin;
+    }
+    else {
+        origin.y = screenSize.height/2.0 - windowSize.height/2.0;
+    }
+    
+    NSLog(@"%@ self.view.frame BEFORE: %@", self, NSStringFromRect(self.view.frame));
+    NSLog(@"%@ self.frame BEFORE: %@", self, NSStringFromRect(self.frame));
+    
+    NSRect contentRect = NSInsetRect(self.view.frame, -viewMargin, -viewMargin);
+    contentRect.origin = origin;
     [self setFrame:contentRect display:NO];
     
+    NSLog(@"%@ self.view.frame MID: %@", self, NSStringFromRect(self.view.frame));
+    NSLog(@"%@ self.frame MID: %@", self, NSStringFromRect(self.frame));
+
     NSRect viewFrame = self.view.frame;
-    viewFrame.origin = NSMakePoint(self.viewMargin, self.viewMargin);
+    viewFrame.origin = NSMakePoint(viewMargin, viewMargin);
     self.view.frame = viewFrame;
+    
+    NSLog(@"%@ self.view.frame AFTER: %@", self, NSStringFromRect(self.view.frame));
+    NSLog(@"%@ self.frame AFTER: %@", self, NSStringFromRect(self.frame));
     
     [self updateBackground];
 }
@@ -110,8 +153,8 @@
 
 - (NSBezierPath *)backgroundPath
 {
-    NSRect frame = NSInsetRect(self.view.frame, -self.viewMargin, -self.viewMargin);
-    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:frame xRadius:25.0 yRadius:25.0];
+    NSRect frame = NSInsetRect(self.view.frame, -viewMargin, -viewMargin);
+    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:frame xRadius:cornerRadius yRadius:cornerRadius];
     [path setLineJoinStyle:NSRoundLineJoinStyle];
     
     return path;

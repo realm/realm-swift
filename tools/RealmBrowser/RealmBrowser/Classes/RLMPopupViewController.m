@@ -82,7 +82,9 @@
 
 - (void)setDisplayPoint:(NSPoint)displayPoint
 {
-    if (displayPoint.x != _displayPoint.x || displayPoint.x != _displayPoint.x) {
+    NSLog(@"setDisplayPoint: %@", NSStringFromPoint(displayPoint));
+
+    if (displayPoint.x != _displayPoint.x || displayPoint.y != _displayPoint.y) {
         _displayPoint = displayPoint;
         [self.popupWindow updateGeometryAtPoint:displayPoint];
     }

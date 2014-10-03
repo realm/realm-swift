@@ -639,6 +639,7 @@
 
 - (void)mouseDidExitView:(RLMTableView *)view
 {
+    [self hidePopupWindow];
     [self disableLinkCursor];
 }
 
@@ -655,15 +656,14 @@
                                                                      onObject:referingInstance
                                                                         realm:realm];
     
+    NSRect cellFrame = [self.tableView frameOfCellAtColumn:location.column row:location.row];
+    NSPoint cellCenter = NSMakePoint(NSMidX(cellFrame), NSMidY(cellFrame));
     
-    NSPoint position = NSMakePoint(400, 200);
-    NSView *cell = [self.tableView viewAtColumn:location.column row:location.row makeIfNecessary:NO];
-    if (cell) {
-        position.x = cell.frame.origin.x;
-    }
+    cellCenter = [self.tableView convertPoint:cellCenter toView:nil];
+    cellCenter = [self.tableView.window convertBaseToScreen:cellCenter];
     
     self.popupController.arrayNode = arrayNode;
-    self.popupController.displayPoint = position;
+    self.popupController.displayPoint = cellCenter;
 
     [self.popupController updateTableView];
     [self.popupController showWindow];
