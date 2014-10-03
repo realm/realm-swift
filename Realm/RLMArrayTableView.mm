@@ -229,18 +229,17 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
 }
 
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending
 {
     RLMArrayTableViewValidate(self);
 
-    // apply order
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
                                                                   query:move(query)
                                                                   realm:_realm];
     // attach new table view
     RLMArrayTableViewValidateAttached(ar);
-    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
+    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], properties, ascending);
     return ar;
 }
 

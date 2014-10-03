@@ -239,6 +239,16 @@
  */
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 
+/**
+ Get a sorted RLMArray from an existing RLMArray
+
+ @param properties  An array of property names to sort by.
+ @param ascending   The direction to sort by for each property name.
+
+ @return    An RLMArray sorted by the specified properties.
+ */
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending;
+
 #pragma mark -
 
 

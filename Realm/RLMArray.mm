@@ -191,6 +191,11 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
+    return [self arraySortedByProperties:@[property] ascending:@[@(ascending)]];
+}
+
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending
+{
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }

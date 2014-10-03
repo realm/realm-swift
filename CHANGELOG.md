@@ -6,11 +6,12 @@
 ### Enhancements
 
 * Add support for != in queries on object relationships.
+* Add support for sorting `RLMArray`s by multiple columns with `sortedArrayUsingDescriptors:`
 
 ### Bugfixes
 
 * Re-adding an object to its Realm no longer throws an exception and is now a no-op
-  (as it was previously). 
+  (as it was previously).
 
 0.86.2 Release notes (2014-10-06)
 =============================================================
