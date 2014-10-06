@@ -347,7 +347,7 @@
         }
     }
     
-    cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
+//    cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
     
     return cellView;
 }
@@ -627,33 +627,34 @@
     }
     else if (propertyNode.type == RLMPropertyTypeArray) {
         [self enableLinkCursor];
-        [self openPopupFromLocation:location];
+        [self updatePopupLocation:location];
+        [self showPopupWindowAfterDelay];
     }
 }
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
 {
-    [self hidePopupWindow];
+    [self hidePopupWindowAfterDelay];
     [self disableLinkCursor];
 }
 
 - (void)mouseDidExitView:(RLMTableView *)view
 {
-    [self hidePopupWindow];
+    [self hidePopupWindowAfterDelay];
     [self disableLinkCursor];
 }
 
 #pragma mark - Private Methods - Mouse Handling
 
-- (void)openPopupFromLocation:(RLMTableLocation)location
+- (void)updatePopupLocation:(RLMTableLocation)location
 {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     
     NSInteger propertyIndex = [self propertyIndexForColumn:location.column];
     RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
-    RLMObject *referingInstance = [self.displayedType instanceAtIndex:location.row];
+    RLMObject *referringInstance = [self.displayedType instanceAtIndex:location.row];
     RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:propertyNode.property
-                                                                     onObject:referingInstance
+                                                                     onObject:referringInstance
                                                                         realm:realm];
     
     NSRect cellFrame = [self.tableView frameOfCellAtColumn:location.column row:location.row];
@@ -664,19 +665,32 @@
     
     self.popupController.arrayNode = arrayNode;
     self.popupController.displayPoint = cellCenter;
+}
 
-    [self.popupController updateTableView];
-    [self.popupController showWindow];
+-(void)hidePopupWindowAfterDelay
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showPopupWindow) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hidePopupWindow) object:nil];
+    [self performSelector:@selector(hidePopupWindow) withObject:nil afterDelay:0.1];
 }
 
 -(void)hidePopupWindow
 {
     [self.popupController hideWindow];
-//    [self.popupController performSelector:@selector(updateAndShowWindow) withObject:nil afterDelay:1.0];
-//    
-//    
-//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateAndShowWindow) object:nil];
+}
 
+-(void)showPopupWindowAfterDelay
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showPopupWindow) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hidePopupWindow) object:nil];
+    CGFloat delay = self.popupController.showingWindow ? 0.1 : 0.25;
+    [self performSelector:@selector(showPopupWindow) withObject:nil afterDelay:delay];
+}
+
+-(void)showPopupWindow
+{
+    [self.popupController showWindow];
+    [self.popupController updateTableView];
 }
 
 #pragma mark - Public Methods - NSTableView Event Handling

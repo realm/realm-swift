@@ -58,8 +58,6 @@
     }
     [self.tableView reloadData];
     
-    return;
-    
     [self.tableView beginUpdates];
 
     // If array, add extra first column with numbers
@@ -81,6 +79,7 @@
     }
     
     [self.tableView endUpdates];
+    [self.tableView deselectAll:self];
 }
 
 - (void)setDisplayPoint:(NSPoint)displayPoint
@@ -121,6 +120,8 @@
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+    NSLog(@"viewForTableColumn: %lu (%lu)", rowIndex, self.arrayNode.instanceCount);
+    
     NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
     NSInteger propertyIndex = column - 1;
     
