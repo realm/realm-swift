@@ -1,3 +1,10 @@
+0.86.2 Release notes (2014-10-06)
+=============================================================
+
+### Bugfixes
+
+* Fixed issues with packaging "Realm Browser.app" for release.
+
 0.86.1 Release notes (2014-10-03)
 =============================================================
 
