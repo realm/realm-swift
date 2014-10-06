@@ -119,9 +119,7 @@
 }
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-    NSLog(@"viewForTableColumn: %lu (%lu)", rowIndex, self.arrayNode.instanceCount);
-    
+{    
     NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
     NSInteger propertyIndex = column - 1;
     

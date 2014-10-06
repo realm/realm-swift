@@ -86,15 +86,11 @@
 
 - (NSUInteger)instanceCount
 {
-    NSLog(@"instanceCount: %lu", displayedArray.count);
-
     return displayedArray.count;
 }
 
 - (RLMObject *)instanceAtIndex:(NSUInteger)index
 {
-    NSLog(@"instanceAtIndex: %lu (%lu)", index, displayedArray.count);
-
     return displayedArray[index];
 }
 
