@@ -206,11 +206,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "docs")
-        sh scripts/build-docs.sh
-        exit 0
-        ;;
-
     ######################################
     # Testing
     ######################################
@@ -340,30 +335,6 @@ case "$COMMAND" in
             PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         done
         exit 0
-        ;;
-
-    ######################################
-    # CocoaPods
-    ######################################
-    "cocoapods-setup")
-        sh build.sh download-core
-
-        # CocoaPods seems to not like symlinks
-        mv core tmp
-        mv $(readlink tmp) core
-        rm tmp
-
-        mkdir include-ios
-        cp -R core/include/* include-ios
-        mkdir include-ios/Realm
-        cp Realm/*.{h,hpp} include-ios/Realm
-        cp Realm/ios/*.h include-ios/Realm
-
-        mkdir include-osx
-        cp -R core/include/* include-osx
-        mkdir include-osx/Realm
-        cp Realm/*.{h,hpp} include-osx/Realm
-        cp Realm/osx/*.h include-osx/Realm
         ;;
 
     ######################################
