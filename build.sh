@@ -105,6 +105,10 @@ test_ios_devices() {
     done <<< "$serial_numbers_str"
     if [[ ${#serial_numbers[@]} == 0 ]]; then
         echo "At least one iOS device must be connected to this computer to run device tests"
+        if [ -z "${JENKINS_HOME}" ]; then
+            # Don't fail if running locally and there's no device
+            exit 0
+        fi
         exit 1
     fi
     configuration="$1"
@@ -244,6 +248,7 @@ case "$COMMAND" in
         set +e # Run both sets of tests even if the first fails
         failed=0
         sh build.sh test-ios "$XCMODE" || failed=1
+        sh build.sh test-ios-devices || failed=1
         sh build.sh test-osx "$XCMODE" || failed=1
         exit $failed
         ;;
@@ -252,6 +257,7 @@ case "$COMMAND" in
         set +e
         failed=0
         sh build.sh test-ios-debug "$XCMODE" || failed=1
+        sh build.sh test-ios-devices-debug || failed=1
         sh build.sh test-osx-debug "$XCMODE" || failed=1
         exit $failed
         ;;
