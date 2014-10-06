@@ -9,12 +9,12 @@
 #import "RLMPopupWindow.h"
 #import "RLMArrayNode.h"
 
-const CGFloat triangleHeight = 30.0;
-const CGFloat triangleWidth = 50.0;
+const CGFloat arrowBase = 30.0;
+const CGFloat arrowLength = 50.0;
 
 const CGFloat viewMargin = 25.0;
 const CGFloat windowMargin = 40.0;
-const CGFloat borderWidth = 2.0;
+const CGFloat borderWidth = 3.0;
 const CGFloat cornerRadius = 25.0;
 
 @interface RLMPopupWindow ()
@@ -22,7 +22,6 @@ const CGFloat cornerRadius = 25.0;
 @property (nonatomic, weak) NSWindow *parentWindow;
 @property (nonatomic, weak) NSView *view;
 
-@property (nonatomic) CGFloat borderWidth;
 @property (nonatomic) NSColor *borderColor;
 
 @property (nonatomic) NSPoint displayPoint;
@@ -35,7 +34,11 @@ const CGFloat cornerRadius = 25.0;
 
 -(instancetype)initWithView:(NSView *)view inWindow:(NSWindow *)window
 {
-    self = [super initWithContentRect:NSZeroRect
+    CGFloat commonMargin = viewMargin + cornerRadius;
+    NSRect contentRect = NSInsetRect(view.bounds, -commonMargin, -commonMargin);
+    contentRect.size.width += arrowLength;
+    
+    self = [super initWithContentRect:contentRect
                             styleMask:NSBorderlessWindowMask
                               backing:NSBackingStoreBuffered
                                 defer:NO];
@@ -52,9 +55,8 @@ const CGFloat cornerRadius = 25.0;
 
         self.parentWindow = window;
         self.view = view;
-        
+
         self.borderColor = [NSColor grayColor];
-        self.backgroundColor = [NSColor whiteColor];
     }
     
     return self;
@@ -62,85 +64,71 @@ const CGFloat cornerRadius = 25.0;
 
 - (void)updateGeometryAtPoint:(NSPoint)displayPoint
 {
-    NSLog(@"updating geomtry for point: %@", NSStringFromPoint(displayPoint));
-
-    NSSize screenSize = self.screen.frame.size;
-    NSSize windowSize = self.frame.size;
-    NSPoint origin = displayPoint;
+    self.displayPoint = displayPoint;
+    self.displayAtLeft = displayPoint.x + NSWidth(self.frame) + windowMargin > NSWidth(self.screen.frame);
     
-    // Put the window on the right of the displayPoint if possible, if not, on the left
-    if (displayPoint.x + triangleWidth + windowSize.width + windowMargin > screenSize.width) {
-        self.displayAtLeft = YES;
-        origin.x = displayPoint.x - triangleWidth - windowSize.width;
-    }
-    else {
-        self.displayAtLeft = NO;
-        origin.x = displayPoint.x + triangleWidth;
-    }
-    
-    // Try to center vertically if displayPoint is not too close to top or bottom of the screen
-    CGFloat innerMargin = triangleHeight/2.0 + cornerRadius;
-    if (displayPoint.y + innerMargin > screenSize.height/2.0 + windowSize.height/2.0) {
-        origin.y = displayPoint.y + innerMargin - windowSize.height;
-    }
-    else if (displayPoint.y - innerMargin < screenSize.height/2.0 - windowSize.height/2.0) {
-        origin.y = displayPoint.y - innerMargin;
-    }
-    else {
-        origin.y = screenSize.height/2.0 - windowSize.height/2.0;
-    }
-    
-    NSLog(@"%@ self.view.frame BEFORE: %@", self, NSStringFromRect(self.view.frame));
-    NSLog(@"%@ self.frame BEFORE: %@", self, NSStringFromRect(self.frame));
-    
-    NSRect contentRect = NSInsetRect(self.view.frame, -viewMargin, -viewMargin);
-    contentRect.origin = origin;
-    [self setFrame:contentRect display:NO];
-    
-    NSLog(@"%@ self.view.frame MID: %@", self, NSStringFromRect(self.view.frame));
-    NSLog(@"%@ self.frame MID: %@", self, NSStringFromRect(self.frame));
-
-    NSRect viewFrame = self.view.frame;
-    viewFrame.origin = NSMakePoint(viewMargin, viewMargin);
-    self.view.frame = viewFrame;
-    
-    NSLog(@"%@ self.view.frame AFTER: %@", self, NSStringFromRect(self.view.frame));
-    NSLog(@"%@ self.frame AFTER: %@", self, NSStringFromRect(self.frame));
-    
+    [self updateWindowPosition];
     [self updateBackground];
+}
+
+- (void)updateWindowPosition
+{
+    NSRect windowFrame = self.frame;
+    NSRect viewFrame = self.view.frame;
+    
+    // Position view and window horizontally
+    if (self.displayAtLeft) {
+        windowFrame.origin.x = self.displayPoint.x - NSWidth(windowFrame);
+        viewFrame.origin.x = viewMargin + cornerRadius;
+    }
+    else {
+        windowFrame.origin.x = self.displayPoint.x;
+        viewFrame.origin.x = viewMargin + cornerRadius + arrowLength;
+    }
+    
+    // Position view vertically within the window
+    viewFrame.origin.y = viewMargin + cornerRadius;
+    
+    // Try to center window vertically if displayPoint is not too close to top or bottom of the screen
+    CGFloat arrowMargin = arrowBase/2.0 + cornerRadius;
+    
+    if (self.displayPoint.y + arrowMargin > NSHeight(self.screen.frame)/2.0 + NSHeight(windowFrame)/2.0) {
+        windowFrame.origin.y = self.displayPoint.y + arrowMargin - NSHeight(windowFrame);
+    }
+    else if (self.displayPoint.y - arrowMargin < NSHeight(self.screen.frame)/2.0 - NSHeight(windowFrame)/2.0) {
+        windowFrame.origin.y = self.displayPoint.y - arrowMargin;
+    }
+    else {
+        windowFrame.origin.y = NSHeight(self.screen.frame)/2.0 - NSHeight(windowFrame)/2.0;
+    }
+    
+    [self setFrame:windowFrame display:NO];
+    self.view.frame = viewFrame;
 }
 
 - (void)updateBackground
 {
-    // Call NSWindow's implementation of -setBackgroundColor: because we override
-    // it in this class to let us set the entire background image of the window
-    // as an NSColor patternImage.
     NSDisableScreenUpdates();
     [super setBackgroundColor:[self backgroundColorPatternImage]];
-    if ([self isVisible]) {
-        [self display];
-        [self invalidateShadow];
-    }
+    [self display];
+    [self invalidateShadow];
     NSEnableScreenUpdates();
 }
 
 - (NSColor *)backgroundColorPatternImage
 {
     NSImage *bg = [[NSImage alloc] initWithSize:self.frame.size];
-    NSRect bgRect = NSZeroRect;
-    bgRect.size = bg.size;
-    
     [bg lockFocus];
     NSBezierPath *bgPath = [self backgroundPath];
     [NSGraphicsContext saveGraphicsState];
     [bgPath addClip];
     
-    // Draw background.
-    [self.backgroundColor set];
+    // Draw background
+    [[NSColor whiteColor] set];
     [bgPath fill];
     
-    // Draw border if appropriate.
-    bgPath.lineWidth = 2.0*self.borderWidth;
+    // Draw border
+    bgPath.lineWidth = borderWidth;
     [self.borderColor set];
     [bgPath stroke];
     
@@ -150,17 +138,53 @@ const CGFloat cornerRadius = 25.0;
     return [NSColor colorWithPatternImage:bg];
 }
 
-
 - (NSBezierPath *)backgroundPath
 {
-    NSRect frame = NSInsetRect(self.view.frame, -viewMargin, -viewMargin);
-    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:frame xRadius:cornerRadius yRadius:cornerRadius];
+    NSBezierPath *path = [NSBezierPath bezierPath];
     [path setLineJoinStyle:NSRoundLineJoinStyle];
     
+    CGFloat arrowTipY = self.displayPoint.y - NSMinY(self.frame);
+    
+    // Set up the points
+    CGFloat margin = viewMargin + cornerRadius;
+    CGRect paddedFrame = NSInsetRect(self.view.frame, -margin, -margin);
+
+    NSPoint rightUpperArrowBase = NSMakePoint(NSMaxX(paddedFrame), arrowTipY + arrowBase/2.0);
+    NSPoint rightArrowTip       = NSMakePoint(NSWidth(self.frame), arrowTipY);
+    NSPoint rightLowerArrowBase = NSMakePoint(NSMaxX(paddedFrame), arrowTipY - arrowBase/2.0);
+
+    NSPoint lowerRight = NSMakePoint(NSMaxX(paddedFrame), NSMinY(paddedFrame));
+    NSPoint lowerLeft  = NSMakePoint(NSMinX(paddedFrame), NSMinY(paddedFrame));
+    
+    NSPoint leftLowerArrowBase = NSMakePoint(NSMinX(paddedFrame), arrowTipY - arrowBase/2.0);
+    NSPoint leftArrowTip       = NSMakePoint(0.0,                 arrowTipY);
+    NSPoint leftUpperArrowBase = NSMakePoint(NSMinX(paddedFrame), arrowTipY + arrowBase/2.0);
+
+    NSPoint upperLeft = NSMakePoint(NSMinX(paddedFrame), NSMaxY(paddedFrame));
+    NSPoint upperRight = NSMakePoint(NSMaxX(paddedFrame), NSMaxY(paddedFrame));
+
+    // Draw the path
+    [path moveToPoint:rightUpperArrowBase];
+    [path lineToPoint:rightArrowTip];
+    [path lineToPoint:rightLowerArrowBase];
+
+    [path appendBezierPathWithArcFromPoint:lowerRight toPoint:lowerLeft radius:cornerRadius];
+    [path appendBezierPathWithArcFromPoint:lowerLeft toPoint:leftLowerArrowBase radius:cornerRadius];
+    
+    [path lineToPoint:leftLowerArrowBase];
+    [path lineToPoint:leftArrowTip];
+    [path lineToPoint:leftUpperArrowBase];
+
+    [path appendBezierPathWithArcFromPoint:upperLeft toPoint:upperRight radius:cornerRadius];
+    [path appendBezierPathWithArcFromPoint:upperRight toPoint:rightUpperArrowBase radius:cornerRadius];
+    
+    [path closePath];
     return path;
 }
 
+-(NSPoint)shiftPoint:(NSPoint)point byX:(CGFloat)xShift y:(CGFloat)yShift
+{
+    return NSMakePoint(point.x + xShift, point.y + yShift);
+}
+
 @end
-
-
-

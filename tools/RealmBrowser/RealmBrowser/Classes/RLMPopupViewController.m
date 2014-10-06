@@ -45,6 +45,7 @@
 -(void)setupFromWindow:(NSWindow *)parentWindow
 {
     self.popupWindow = [[RLMPopupWindow alloc] initWithView:self.view inWindow:self.tableView.window];
+    self.popupWindow.alphaValue = 0.0;
     [parentWindow addChildWindow:self.popupWindow ordered:NSWindowAbove];
 }
 
@@ -56,6 +57,8 @@
         [self.tableView removeTableColumn:[self.tableView.tableColumns lastObject]];
     }
     [self.tableView reloadData];
+    
+    return;
     
     [self.tableView beginUpdates];
 
@@ -82,8 +85,6 @@
 
 - (void)setDisplayPoint:(NSPoint)displayPoint
 {
-    NSLog(@"setDisplayPoint: %@", NSStringFromPoint(displayPoint));
-
     if (displayPoint.x != _displayPoint.x || displayPoint.y != _displayPoint.y) {
         _displayPoint = displayPoint;
         [self.popupWindow updateGeometryAtPoint:displayPoint];
