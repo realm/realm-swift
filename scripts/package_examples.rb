@@ -40,6 +40,7 @@ end
 
 objc_examples = [
   "examples/ios/objc/RealmExamples.xcodeproj",
+  "examples/ios/swift/RealmExamples.xcodeproj",
   "examples/osx/objc/RealmExamples.xcodeproj"
 ]
 
@@ -50,8 +51,8 @@ objc_examples.each do |example|
   filepath = File.join(example, "project.pbxproj")
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
-    file.puts contents.sub("build/Release/", "ios/").
-                       sub("build/DerivedData/Realm/Build/Products/Release/", "osx/")
+    file.puts contents.sub("/build/ios", "/ios").
+                       sub("build/DerivedData/Realm/Build/Products/Release", "osx")
   end
 end
 
