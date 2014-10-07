@@ -1477,4 +1477,35 @@
     XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
+- (void)testArrayIn
+{
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    ArrayPropertyObject *arr = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], @[]]];
+    [arr.array addObject:[StringObject createInRealm:realm withObject:@[@"value"]]];
+    [realm commitWriteTransaction];
+
+
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"missing"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array.stringCol IN %@", @[@"value"]] count]));
+
+    XCTAssertEqual(0U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]] count]));
+    XCTAssertEqual(1U, ([[ArrayPropertyObject objectsWhere:@"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]] count]));
+}
+
+- (void)testQueryChaining {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [PersonObject createInRealm:realm withObject:@[@"Tim", @29]];
+    [PersonObject createInRealm:realm withObject:@[@"Ari", @33]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari'"] count]);
+    XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age == 29"] count]);
+    XCTAssertEqual(0U, [[[PersonObject objectsWhere:@"name == 'Ari'"] objectsWhere:@"age == 29"] count]);
+}
+
 @end

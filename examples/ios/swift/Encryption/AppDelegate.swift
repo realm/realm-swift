@@ -29,7 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
-
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()

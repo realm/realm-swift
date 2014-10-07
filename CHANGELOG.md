@@ -1,13 +1,29 @@
-0.86.0 Release notes (YYYY-MM-DD)
+0.86.2 Release notes (2014-10-06)
+=============================================================
+
+### Bugfixes
+
+* Fixed issues with packaging "Realm Browser.app" for release.
+
+0.86.1 Release notes (2014-10-03)
+=============================================================
+
+### Bugfixes
+
+* Fix a bug which would sometimes result in subclassing RLMObject subclasses
+  not working.
+
+0.86.0 Release notes (2014-10-03)
 =============================================================
 
 ### API breaking changes
-* Xcode6 is now supported from the main Xcode project Realm.xcodeproj. Xcode5 is no
-  longer supported. 
+
+* Xcode 6 is now supported from the main Xcode project `Realm.xcodeproj`.
+  Xcode 5 is no longer supported.
 
 ### Enhancements
 
-* Support subclassing RLMObject models. Although you can now persist subclasses
+* Support subclassing RLMObject models. Although you can now persist subclasses,
   polymorphic behavior is not supported (i.e. setting a property to an 
   instance of its subclass).
 * Add support for sorting RLMArray properties.
@@ -18,6 +34,9 @@
 * Return "[deleted object]" rather than throwing an exception when
   `-description` is called on a deleted RLMObject.
 * Significantly improve performance of very large queries.
+* Allow passing any enumerable to IN clauses rather than just NSArray.
+* Add `objectForPrimaryKey:` and `objectInRealm:forPrimaryKey:` convenience
+  methods to fetch an object by primary key.
 
 ### Bugfixes
 
@@ -29,6 +48,9 @@
   should be used.
 * Trying to add a persisted RLMObject to a different Realm now throws an
   exception rather than creating an uninitialized object.
+* Fix validation errors when using IN on array properties.
+* Fix errors when an IN clause has zero items.
+* Fix for chained queries ignoring all but the last query's conditions.
 
 0.85.0 Release notes (2014-09-15)
 =============================================================

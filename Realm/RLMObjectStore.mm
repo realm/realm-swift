@@ -95,7 +95,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
                     NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
                 }
                 else {
-                    table.set_index(prop.column);
+                    table.add_search_index(prop.column);
                 }
             }
         }
@@ -387,6 +387,52 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
                                                                              query:std::make_unique<Query>(query)
                                                                              realm:realm];
     return array;
+}
+
+id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
+    RLMCheckThread(realm);
+
+    RLMObjectSchema *objectSchema = realm.schema[objectClassName];
+
+    RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
+    if (!primaryProperty) {
+        NSString *msg = [NSString stringWithFormat:@"%@ does not have a primary key", objectClassName];
+        @throw [NSException exceptionWithName:@"RLMException" reason:msg userInfo:nil];
+    }
+
+    if (!objectSchema->_table) {
+        // read-only realms may be missing tables since we can't add any
+        // missing ones on init
+        return nil;
+    }
+
+    size_t row = tightdb::not_found;
+    if (primaryProperty.type == RLMPropertyTypeString) {
+        if (NSString *str = RLMDynamicCast<NSString>(key)) {
+            row = objectSchema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value '%@' for primary key", key]
+                                         userInfo:nil];
+        }
+    }
+    else {
+        if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
+            row = objectSchema->_table->find_first_int(primaryProperty.column, number.longLongValue);
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:[NSString stringWithFormat:@"Invalid value '%@' for primary key", key]
+                                         userInfo:nil];
+        }
+    }
+
+    if (row == tightdb::not_found) {
+        return nil;
+    }
+
+    return RLMCreateObjectAccessor(realm, objectClassName, row);
 }
 
 // Create accessor and register with realm

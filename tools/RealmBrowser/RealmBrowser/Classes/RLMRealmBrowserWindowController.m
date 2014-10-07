@@ -18,6 +18,7 @@
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMNavigationStack.h"
+#import "RLMModelExporter.h"
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
@@ -85,6 +86,20 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (RLMNavigationState *)currentState
 {
     return navigationStack.currentState;
+}
+
+#pragma mark - Public methods - Menu items
+
+- (IBAction)saveJavaModels:(id)sender
+{
+    NSArray *objectSchemas = self.modelDocument.presentedRealm.realm.schema.objectSchema;
+    [RLMModelExporter saveModelsForSchemas:objectSchemas inLanguage:kLanguageJava];
+}
+
+- (IBAction)saveObjcModels:(id)sender
+{
+    NSArray *objectSchemas = self.modelDocument.presentedRealm.realm.schema.objectSchema;
+    [RLMModelExporter saveModelsForSchemas:objectSchemas inLanguage:kLanguageObjC];
 }
 
 #pragma mark - Public methods - User Actions

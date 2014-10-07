@@ -9,22 +9,35 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>io.Realm.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>io.realm.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
-	<string>FMWK</string>
+	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.86.2</string>
+	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.86.2</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014 Realm. All rights reserved.</string>
+	<string>1</string>
+	<key>DVTPlugInCompatibilityUUIDs</key>
+	<array>
+		<string>640F884E-CE55-4B40-87C0-8869546CAB7A</string>
+		<string>37B30044-3B14-46BA-ABAA-F01000C27B63</string>
+		<string>A2E4D43F-41F4-4FB9-BB94-7177011C9AED</string>
+		<string>C4A681B0-4A26-480E-93EC-1218098B9AA0</string>
+	</array>
 	<key>NSPrincipalClass</key>
-	<string></string>
+	<string>RLMPRealmPlugin</string>
+	<key>XC4Compatible</key>
+	<true/>
+	<key>XC5Compatible</key>
+	<true/>
+	<key>XCGCReady</key>
+	<true/>
+	<key>XCPluginHasUI</key>
+	<false/>
 </dict>
 </plist>

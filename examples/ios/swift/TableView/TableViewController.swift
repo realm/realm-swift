@@ -57,7 +57,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = defaultRealm().addNotificationBlock { _, _ in
+        notificationToken = defaultRealm().addNotificationBlock { [unowned self] _, _ in
             self.reloadData()
         }
 
@@ -123,6 +123,7 @@ class TableViewController: UITableViewController {
     func add() {
         let realm = defaultRealm()
         realm.beginWrite()
+        // Add row via array. Order must match model definition.
         DemoObject.createInDefaultRealmWithObject([randomString(), randomDate()])
         realm.commitWrite()
     }

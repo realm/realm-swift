@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-               BuildableName = "Realm Browser.app"
-               BlueprintName = "RealmBrowser"
-               ReferencedContainer = "container:RealmBrowser.xcodeproj">
+               BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+               BuildableName = "RealmSwift"
+               BlueprintName = "RealmSwift"
+               ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,26 +28,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "84E0F96F1921F3B900D6CA14"
-               BuildableName = "RealmBrowserTests.xctest"
-               BlueprintName = "RealmBrowserTests"
-               ReferencedContainer = "container:RealmBrowser.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "Realm Browser.app"
-            BlueprintName = "RealmBrowser"
-            ReferencedContainer = "container:RealmBrowser.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -58,15 +39,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "Realm Browser.app"
-            BlueprintName = "RealmBrowser"
-            ReferencedContainer = "container:RealmBrowser.xcodeproj">
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "RealmSwift"
+            BlueprintName = "RealmSwift"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -76,15 +57,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84E0F94B1921F3B900D6CA14"
-            BuildableName = "Realm Browser.app"
-            BlueprintName = "RealmBrowser"
-            ReferencedContainer = "container:RealmBrowser.xcodeproj">
+            BlueprintIdentifier = "0295B90B19D1034F0036D6C3"
+            BuildableName = "RealmSwift"
+            BlueprintName = "RealmSwift"
+            ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -24,12 +24,14 @@ fi
 xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphoneos${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
 xcrun xcodebuild -project "${PROJECT_FILE_PATH}" -target iOS -configuration Release -sdk "iphonesimulator${SF_SDK_VERSION}" BUILD_DIR="${BUILD_DIR}" OBJROOT="${OBJROOT}" BUILD_ROOT="${BUILD_ROOT}" SYMROOT="${SYMROOT}" build
 
+FRAMEWORK_NAME="$1"
+
 # Step 2 - make fat binary
-SF_FRAMEWORK_PATH="${BUILT_PRODUCTS_DIR}/Realm.framework"
-SF_RELEASE_IOS_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphoneos/Realm.framework/Realm"
-SF_RELEASE_SIM_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/Realm.framework/Realm"
-rm "${SF_FRAMEWORK_PATH}/Realm"
-xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${SF_FRAMEWORK_PATH}/Realm" 
+SF_FRAMEWORK_PATH="${BUILT_PRODUCTS_DIR}/${FRAMEWORK_NAME}.framework"
+SF_RELEASE_IOS_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphoneos/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}"
+SF_RELEASE_SIM_PATH="${BUILT_PRODUCTS_DIR}/../Release-iphonesimulator/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}"
+rm "${SF_FRAMEWORK_PATH}/${FRAMEWORK_NAME}"
+xcrun lipo -create "${SF_RELEASE_IOS_PATH}" "${SF_RELEASE_SIM_PATH}" -output "${SF_FRAMEWORK_PATH}/${FRAMEWORK_NAME}" 
 
 # Step 3 - copy out
 SF_OUT_DIR="${SRCROOT}/build/ios"
