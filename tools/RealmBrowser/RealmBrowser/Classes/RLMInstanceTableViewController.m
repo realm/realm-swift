@@ -346,9 +346,7 @@
             break;
         }
     }
-    
-//    cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
-    
+
     return cellView;
 }
 
@@ -689,6 +687,7 @@
 
 -(void)showPopupWindow
 {
+    [self disableLinkCursor];
     [self.popupController showWindow];
     [self.popupController updateTableView];
 }

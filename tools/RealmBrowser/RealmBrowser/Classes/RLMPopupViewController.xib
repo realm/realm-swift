@@ -284,7 +284,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="10000" height="17"/>
                 <autoresizingMask key="autoresizingMask"/>
             </tableHeaderView>
-            <point key="canvasLocation" x="557" y="711"/>
+            <point key="canvasLocation" x="618" y="777"/>
         </scrollView>
         <viewController title="Popup123" nibName="RLMPopupViewController" id="NYV-D6-t4z" customClass="RLMPopupViewController"/>
     </objects>
