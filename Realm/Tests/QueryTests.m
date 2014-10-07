@@ -1295,12 +1295,11 @@
     [realm commitWriteTransaction];
 
     // simple queries
-    NSPredicate *pred1 = [NSPredicate predicateWithFormat:@"objectCol = %@", stringObj0];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:pred1].count, 2U, @"Count should be 2");
-    NSPredicate *pred2 = [NSPredicate predicateWithFormat:@"objectCol = %@", stringObj1];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:pred2].count, 1U, @"Count should be 1");
-    NSPredicate *predNil = [NSPredicate predicateWithFormat:@"objectCol = nil"];
-    XCTAssertEqual([AllTypesObject objectsWithPredicate:predNil].count, 1U, @"Count should be 1");
+    XCTAssertEqual(2U, ([AllTypesObject objectsWhere:@"objectCol = %@", stringObj0].count));
+    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"objectCol = %@", stringObj1].count));
+    XCTAssertEqual(1U, ([AllTypesObject objectsWhere:@"objectCol = nil"].count));
+    XCTAssertEqual(4U, ([AllTypesObject objectsWhere:@"objectCol != nil"].count));
+    XCTAssertEqual(3U, ([AllTypesObject objectsWhere:@"objectCol != %@", stringObj0].count));
 
     NSPredicate *longPred = [NSPredicate predicateWithFormat:@"longCol = %lli", 34359738368];
     XCTAssertEqual([AllTypesObject objectsWithPredicate:longPred].count, 1U, @"Count should be 1");
@@ -1308,15 +1307,11 @@
     NSPredicate *longBetweenPred = [NSPredicate predicateWithFormat:@"longCol BETWEEN %@", @[@34359738367LL, @34359738369LL]];
     XCTAssertEqual([AllTypesObject objectsWithPredicate:longBetweenPred].count, 1U, @"Count should be 1");
 
-    // invalid object queries
-    NSPredicate *pred3 = [NSPredicate predicateWithFormat:@"objectCol != %@", stringObj1];
-    XCTAssertThrows([AllTypesObject objectsWithPredicate:pred3], @"Operator other than = should throw");
-
     // check for ANY object in array
-    NSPredicate *pred9 = [NSPredicate predicateWithFormat:@"ANY array = %@", obj0];
-    XCTAssertEqual([ArrayOfAllTypesObject objectsWithPredicate:pred9].count, 2U, @"Count should be 2");
-    NSPredicate *pred10 = [NSPredicate predicateWithFormat:@"array = %@", obj3];
-    XCTAssertThrows([ArrayOfAllTypesObject objectsWithPredicate:pred10].count, @"Array query without ANY should throw");
+    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array = %@", obj0].count));
+    XCTAssertEqual(2U, ([ArrayOfAllTypesObject objectsWhere:@"ANY array != %@", obj1].count));
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
 }
 
 - (void)testCompoundOrQuery {
