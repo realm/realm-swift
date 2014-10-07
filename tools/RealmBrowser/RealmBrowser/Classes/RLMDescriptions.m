@@ -168,6 +168,32 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
     }
 }
 
++(NSString *)nameOfProperty:(RLMProperty *)property
+{
+    switch (property.type) {
+        case RLMPropertyTypeInt:
+            return @"Int";
+        case RLMPropertyTypeFloat:
+            return @"Float";
+        case RLMPropertyTypeDouble:
+            return @"Float";
+        case RLMPropertyTypeDate:
+            return @"Date";
+        case RLMPropertyTypeBool:
+            return @"Boolean";
+        case RLMPropertyTypeString:
+            return @"String";
+        case RLMPropertyTypeData:
+            return @"Data";
+        case RLMPropertyTypeAny:
+            return @"Any";
+        case RLMPropertyTypeArray:
+            return [NSString stringWithFormat:@"<%@>", property.objectClassName];
+        case RLMPropertyTypeObject:
+            return [NSString stringWithFormat:@"[%@]", property.objectClassName];
+    }
+}
+
 -(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
     if (!propertyValue) {

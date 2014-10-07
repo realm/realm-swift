@@ -38,10 +38,7 @@ const CGFloat cornerRadius = 30.0;
     NSRect contentRect = NSInsetRect(view.bounds, -commonMargin, -commonMargin);
     contentRect.size.width += arrowLength;
     
-    self = [super initWithContentRect:contentRect
-                            styleMask:NSBorderlessWindowMask
-                              backing:NSBackingStoreBuffered
-                                defer:NO];
+    self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
     
     if (self) {
         self.movableByWindowBackground = NO;
@@ -180,11 +177,6 @@ const CGFloat cornerRadius = 30.0;
     
     [path closePath];
     return path;
-}
-
--(NSPoint)shiftPoint:(NSPoint)point byX:(CGFloat)xShift y:(CGFloat)yShift
-{
-    return NSMakePoint(point.x + xShift, point.y + yShift);
 }
 
 @end

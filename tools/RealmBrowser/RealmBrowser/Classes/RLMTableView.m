@@ -19,6 +19,8 @@
 #import "RLMTableView.h"
 #import "RLMTableColumn.h"
 #import "RLMArrayNode.h"
+#import "RLMTableHeaderCell.h"
+#import "RLMDescriptions.h"
 
 @interface RLMTableView()<NSMenuDelegate>
 
@@ -370,14 +372,25 @@
     
     [self reloadData];
 
+    NSRect frame = self.headerView.frame;
+    frame.size.height = 36;
+    self.headerView.frame = frame;
+    
     [self beginUpdates];
     // If array, add extra first column with numbers
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
         tableColumn.propertyType = RLMPropertyTypeInt;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:@"#"];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = @"";
+        headerCell.secondLine = @"#";
+        tableColumn.headerCell = headerCell;
+
         tableColumn.headerToolTip = @"Order of object within array";
+        
+        [self addTableColumn:tableColumn];
     }
     
     // ... and add new columns matching the structure of the new realm table.
@@ -388,9 +401,15 @@
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
         
         tableColumn.propertyType = propertyColumn.type;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = propertyColumn.name;
+        headerCell.secondLine = [RLMDescriptions nameOfProperty:propertyColumn.property];
+        tableColumn.headerCell = headerCell;
+        
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
+        [self addTableColumn:tableColumn];
     }
     
     [self endUpdates];
