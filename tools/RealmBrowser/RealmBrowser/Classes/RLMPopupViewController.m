@@ -64,6 +64,11 @@
         [self.tableView removeTableColumn:[self.tableView.tableColumns lastObject]];
     }
     [self.tableView reloadData];
+ 
+    
+    NSRect frame = self.tableView.headerView.frame;
+    frame.size.height = 36;
+    self.tableView.headerView.frame = frame;
     
     [self.tableView beginUpdates];
 
@@ -73,7 +78,9 @@
     [self.tableView addTableColumn:tableColumn];
     
     RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
-    headerCell.stringValue = @"#";
+    headerCell.wraps = YES;
+    headerCell.firstLine = @"#";
+    headerCell.secondLine = @"";
     tableColumn.headerCell = headerCell;
     
     tableColumn.width = [tableColumn sizeThatFitsWithLimit:YES];
@@ -89,7 +96,9 @@
         [self.tableView addTableColumn:tableColumn];
         
         RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
-        headerCell.stringValue = propertyColumn.name;
+        headerCell.wraps = YES;
+        headerCell.firstLine = propertyColumn.name;
+        headerCell.secondLine = [self nameOfProperty:propertyColumn.property];
         tableColumn.headerCell = headerCell;
         
         tableColumn.width = [tableColumn sizeThatFitsWithLimit:YES];
@@ -97,6 +106,32 @@
     
     [self.tableView endUpdates];
     [self.tableView deselectAll:self];
+}
+
+-(NSString *)nameOfProperty:(RLMProperty *)property
+{
+    switch (property.type) {
+        case RLMPropertyTypeInt:
+            return @"Int";
+        case RLMPropertyTypeFloat:
+            return @"Float";
+        case RLMPropertyTypeDouble:
+            return @"Float";
+        case RLMPropertyTypeDate:
+            return @"Date";
+        case RLMPropertyTypeBool:
+            return @"Boolean";
+        case RLMPropertyTypeString:
+            return @"String";
+        case RLMPropertyTypeData:
+            return @"Data";
+        case RLMPropertyTypeAny:
+            return @"Any";
+        case RLMPropertyTypeArray:
+            return [NSString stringWithFormat:@"<%@>", property.objectClassName];
+        case RLMPropertyTypeObject:
+            return [NSString stringWithFormat:@"[%@]", property.objectClassName];
+    }
 }
 
 -(void)setArrayNode:(RLMArrayNode *)arrayNode

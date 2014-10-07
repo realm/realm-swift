@@ -10,4 +10,7 @@
 
 @interface RLMTableHeaderCell : NSTableHeaderCell
 
+@property (nonatomic) NSString *firstLine;
+@property (nonatomic) NSString *secondLine;
+
 @end

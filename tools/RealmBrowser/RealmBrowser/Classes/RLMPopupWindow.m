@@ -10,12 +10,12 @@
 #import "RLMArrayNode.h"
 
 const CGFloat arrowBase = 30.0;
-const CGFloat arrowLength = 50.0;
+const CGFloat arrowLength = 40.0;
 
-const CGFloat viewMargin = 25.0;
+const CGFloat viewMargin = -5.0;
 const CGFloat windowMargin = 10.0;
 const CGFloat borderWidth = 3.0;
-const CGFloat cornerRadius = 25.0;
+const CGFloat cornerRadius = 30.0;
 
 @interface RLMPopupWindow ()
 

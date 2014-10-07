@@ -346,6 +346,10 @@
             break;
         }
     }
+    
+    if (type != RLMPropertyTypeArray) {
+        cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
+    }
 
     return cellView;
 }
