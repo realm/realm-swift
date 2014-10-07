@@ -20,6 +20,8 @@
 #import "RLMNumberTableCellView.h"
 #import "RLMImageTableCellView.h"
 
+#import "RLMTableHeaderCell.h"
+
 @interface RLMPopupViewController () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (nonatomic) RLMDescriptions *realmDescriptions;
@@ -53,6 +55,11 @@
 
 - (void)updateTableView
 {
+    [self.tableView reloadData];
+}
+
+- (void)updateTableColumnsWithArrayNode:(RLMArrayNode *)arrayNode
+{
     while (self.tableView.numberOfColumns > 0) {
         [self.tableView removeTableColumn:[self.tableView.tableColumns lastObject]];
     }
@@ -64,10 +71,15 @@
     RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
     tableColumn.propertyType = RLMPropertyTypeInt;
     [self.tableView addTableColumn:tableColumn];
-    [tableColumn.headerCell setStringValue:@"#"];
+    
+    RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+    headerCell.stringValue = @"#";
+    tableColumn.headerCell = headerCell;
+    
+    tableColumn.width = [tableColumn sizeThatFitsWithLimit:YES];
     
     // ... and add new columns matching the structure of the new realm table.
-    NSArray *propertyColumns = self.arrayNode.propertyColumns;
+    NSArray *propertyColumns = arrayNode.propertyColumns;
     
     for (NSUInteger index = 0; index < propertyColumns.count; index++) {
         RLMClassProperty *propertyColumn = propertyColumns[index];
@@ -75,11 +87,25 @@
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
         tableColumn.propertyType = propertyColumn.type;
         [self.tableView addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.stringValue = propertyColumn.name;
+        tableColumn.headerCell = headerCell;
+        
+        tableColumn.width = [tableColumn sizeThatFitsWithLimit:YES];
     }
     
     [self.tableView endUpdates];
     [self.tableView deselectAll:self];
+}
+
+-(void)setArrayNode:(RLMArrayNode *)arrayNode
+{
+    if (![arrayNode.schema isEqual:_arrayNode.schema]) {
+        [self updateTableColumnsWithArrayNode:arrayNode];
+    }
+    
+    _arrayNode = arrayNode;
 }
 
 - (void)setDisplayPoint:(NSPoint)displayPoint
