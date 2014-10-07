@@ -17,10 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMQueryUtil.hpp"
-#import "RLMUtil.hpp"
-#import "RLMProperty_Private.h"
+#import "RLMArray.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
+#import "RLMProperty_Private.h"
+#import "RLMUtil.hpp"
 
 #include <tightdb.hpp>
 using namespace tightdb;
@@ -681,25 +682,21 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, 
                     (int)validateMessage.size(), validateMessage.c_str());
 }
 
-void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties, NSArray *ascending,
+void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,
                          std::vector<size_t> &columns, std::vector<bool> &order) {
-    RLMPrecondition(properties.count == ascending.count, @"Invalid argument",
-                    @"Array of property names and array of sort orders must be the same length");
-
     columns.reserve(properties.count);
     order.reserve(properties.count);
 
-    for (NSUInteger i = 0; i < properties.count; ++i) {
-        RLMProperty *prop = RLMValidatedPropertyForSort(schema, properties[i]);
-        columns.push_back(prop.column);
-        order.push_back([ascending[i] boolValue]);
+    for (RLMSortDescriptor *descriptor in properties) {
+        columns.push_back(RLMValidatedPropertyForSort(schema, descriptor.property).column);
+        order.push_back(descriptor.ascending);
     }
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties, NSArray *ascending)
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties)
 {
     std::vector<size_t> columns;
     std::vector<bool> order;
-    RLMGetColumnIndices(schema, properties, ascending, columns, order);
+    RLMGetColumnIndices(schema, properties, columns, order);
     view.sort(move(columns), move(order));
 }

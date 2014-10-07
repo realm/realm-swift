@@ -229,7 +229,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
 }
 
-- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties
 {
     RLMArrayTableViewValidate(self);
 
@@ -239,7 +239,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
                                                                   realm:_realm];
     // attach new table view
     RLMArrayTableViewValidateAttached(ar);
-    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], properties, ascending);
+    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], properties);
     return ar;
 }
 

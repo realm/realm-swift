@@ -191,10 +191,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    return [self arraySortedByProperties:@[property] ascending:@[@(ascending)]];
+    return [self arraySortedByProperties:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
@@ -290,6 +290,25 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
     [mString appendFormat:@"\n)"];
     return [NSString stringWithString:mString];
+}
+
+@end
+
+@interface RLMSortDescriptor ()
+@property (nonatomic, strong) NSString *property;
+@property (nonatomic, assign) BOOL ascending;
+@end
+
+@implementation RLMSortDescriptor
++ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending {
+    RLMSortDescriptor *desc = [[RLMSortDescriptor alloc] init];
+    desc->_property = propertyName;
+    desc->_ascending = ascending;
+    return desc;
+}
+
+- (instancetype)reversedSortDescriptor {
+    return [self.class sortDescriptorWithProperty:_property ascending:!_ascending];
 }
 
 @end

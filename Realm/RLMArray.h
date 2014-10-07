@@ -242,12 +242,11 @@
 /**
  Get a sorted RLMArray from an existing RLMArray
 
- @param properties  An array of property names to sort by.
- @param ascending   The direction to sort by for each property name.
+ @param properties  An array of `RLMSortDescriptor`s to sort by.
 
  @return    An RLMArray sorted by the specified properties.
  */
-- (RLMArray *)arraySortedByProperties:(NSArray *)properties ascending:(NSArray *)ascending;
+- (RLMArray *)arraySortedByProperties:(NSArray *)properties;
 
 #pragma mark -
 
@@ -350,6 +349,36 @@
  RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
  */
 + (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
+
+@end
+
+/**
+ A RLMSortDescriptor stores a property name and a sort order for use with
+ `arraySortedByProperties:`. It is similar to NSSortDescriptor, but supports
+ only the subset of functionality which can be efficiently run by the query
+ engine. RLMSortDescriptor instances are immutable.
+ */
+@interface RLMSortDescriptor : NSObject
+
+/**
+ The name of the property which this sort descriptor orders results by.
+ */
+@property (nonatomic, readonly) NSString *property;
+
+/**
+ Whether this descriptor sorts in ascending or descending order.
+ */
+@property (nonatomic, readonly) BOOL ascending;
+
+/**
+ Returns a new sort descriptor for the given property name and order.
+ */
++ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
+
+/**
+ Returns a copy of the receiver with the sort order reversed.
+ */
+- (instancetype)reversedSortDescriptor;
 
 @end
 

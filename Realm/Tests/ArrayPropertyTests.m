@@ -309,7 +309,10 @@
     [realm commitWriteTransaction];
 
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
-        RLMArray *actual = [array.dogs arraySortedByProperties:properties ascending:ascending];
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
+        RLMArray *actual = [array.dogs arraySortedByProperties:sort];
+
         return [actual[0] isEqualToObject:dogs[0]]
             && [actual[1] isEqualToObject:dogs[1]]
             && [actual[2] isEqualToObject:dogs[2]]
@@ -325,11 +328,6 @@
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
-
-    // Mismatched array lengths
-    XCTAssertThrows(([DogObject.allObjects arraySortedByProperties:@[@"dogName", @"age"] ascending:@[@YES]]));
-    XCTAssertThrows(([DogObject.allObjects arraySortedByProperties:@[@"dogName"] ascending:@[@YES, @NO]]));
 }
-
 
 @end

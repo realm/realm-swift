@@ -32,13 +32,13 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, 
                                  RLMObjectSchema *objectSchema);
 
 // sort an existing view by the specified property name and direction
-void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties, NSArray *ascending);
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties);
 
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);
 
 // populate columns and order with the values in properties and ascending, with validation
-void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties, NSArray *ascending,
+void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,
                          std::vector<size_t> &columns, std::vector<bool> &order);
 
 
