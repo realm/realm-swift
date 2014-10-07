@@ -59,11 +59,11 @@
                                      realm:(RLMRealm *)realm;
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
                                       view:(tightdb::TableView)view
                                      realm:(RLMRealm *)realm;
 - (void)deleteObjectsFromRealm;
 @end
-
 
 //
 // RLMResults subclass used when a TableView can't be created - this is used

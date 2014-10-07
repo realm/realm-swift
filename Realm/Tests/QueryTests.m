@@ -84,10 +84,10 @@
     [realm commitWriteTransaction];
 
     // query on realm
-    XCTAssertEqual([realm objects:[PersonObject className] where:@"age > 28"].count, 2U, @"Expecting 2 results");
+    XCTAssertEqual([PersonObject objectsInRealm:realm where:@"age > 28"].count, 2U, @"Expecting 2 results");
 
     // query on realm with order
-    RLMResults *results = [[realm objects:[PersonObject className] where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -1592,13 +1592,16 @@
     CompanyObject *co = CompanyObject.allObjects.firstObject;
     RLMResults *basic = [co.employees objectsWhere:@"age = 40"];
     RLMResults *sort = [co.employees sortedResultsUsingProperty:@"name" ascending:YES];
+    RLMResults *sortQuery = [[co.employees sortedResultsUsingProperty:@"name" ascending:YES] objectsWhere:@"age = 40"];
     RLMResults *querySort = [[co.employees objectsWhere:@"age = 40"] sortedResultsUsingProperty:@"name" ascending:YES];
 
     XCTAssertEqual(1U, basic.count);
     XCTAssertEqual(2U, sort.count);
+    XCTAssertEqual(1U, sortQuery.count);
     XCTAssertEqual(1U, querySort.count);
 
     XCTAssertEqualObjects(@"Jill", [[basic lastObject] name]);
+    XCTAssertEqualObjects(@"Jill", [[sortQuery lastObject] name]);
     XCTAssertEqualObjects(@"Jill", [[querySort lastObject] name]);
 
     [realm beginWriteTransaction];
@@ -1607,9 +1610,11 @@
 
     XCTAssertEqual(2U, basic.count);
     XCTAssertEqual(3U, sort.count);
+    XCTAssertEqual(2U, sortQuery.count);
     XCTAssertEqual(2U, querySort.count);
 
     XCTAssertEqualObjects(@"Joe", [[basic lastObject] name]);
+    XCTAssertEqualObjects(@"Joe", [[sortQuery lastObject] name]);
     XCTAssertEqualObjects(@"Joe", [[querySort lastObject] name]);
 }
 
