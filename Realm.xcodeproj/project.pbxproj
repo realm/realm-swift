@@ -980,7 +980,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh scripts/build-fat.sh RealmSwift";
+			shellScript = "# sh scripts/build-fat.sh RealmSwift";
 		};
 /* End PBXShellScriptBuildPhase section */
 
