@@ -35,6 +35,7 @@
     std::unique_ptr<tightdb::Query> _backingQuery;
     tightdb::TableView _backingView;
     BOOL _viewCreated;
+    RowIndexes::Sorter _sortOrder;
 
 @protected
     RLMRealm *_realm;
@@ -49,10 +50,18 @@
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<tightdb::Query>)query
                                      realm:(RLMRealm *)realm {
+    return [self resultsWithObjectClassName:objectClassName query:move(query) sort:RowIndexes::Sorter{} realm:realm];
+}
+
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
+                                      sort:(RowIndexes::Sorter const&)sorter
+                                     realm:(RLMRealm *)realm {
     RLMResults *ar = [[RLMResults alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
+    ar->_sortOrder = sorter;
     ar->_realm = realm;
     return ar;
 }
@@ -78,6 +87,9 @@ static inline void RLMResultsValidateAttached(RLMResults *ar) {
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
         ar->_viewCreated = YES;
+        if (!ar->_sortOrder.m_columns.empty()) {
+            ar->_backingView.sort(ar->_sortOrder.m_columns, ar->_sortOrder.m_ascending);
+        }
     }
     else {
         // otherwiser verify attached and sync
@@ -244,7 +256,10 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     // copy array and apply new predicate creating a new query and view
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMUpdateQueryWithPredicate(query.get(), predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:move(query)
+                                             sort:_backingView.m_sorting_predicate
+                                            realm:_realm];
 }
 
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending {

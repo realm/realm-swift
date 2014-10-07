@@ -89,6 +89,10 @@
     // query on realm with order
     RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
+
+    // query on sorted results
+    results = [[[PersonObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"age" ascending:YES] objectsWhere:@"age > 28"];
+    XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
 -(void)testQueryBetween
@@ -332,10 +336,10 @@
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
 
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
 
     [realm commitWriteTransaction];
 
@@ -357,6 +361,36 @@
         [realm deleteObject:arrayOfAll.array.lastObject];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"c");
+}
+
+- (void)testQueryingSortedQueryPreservesOrder {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 5; ++i) {
+        [IntObject createInRealm:realm withObject:@[@(i)]];
+    }
+
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], [IntObject allObjects]]];
+    [realm commitWriteTransaction];
+
+    RLMResults *asc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:YES];
+    RLMResults *desc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:NO];
+
+    // sanity check; would work even without sort order being preserved
+    XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+
+    // check query on allObjects and query on query
+    XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
+
+    // same thing but on an linkview
+    asc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:YES];
+    desc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:NO];
+
+    XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
 }
 
 - (void)testDynamicQueryInvalidClass
