@@ -1097,5 +1097,27 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [[RLMRealm defaultRealm] commitWriteTransaction];
 }
 
+- (void)testObjectWithKey {
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    PrimaryStringObject *strObj = [PrimaryStringObject createInDefaultRealmWithObject:@[@"key", @0]];
+    PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithObject:@[@0]];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    // no PK
+    XCTAssertThrows([StringObject objectForPrimaryKey:@""]);
+    XCTAssertThrows([IntObject objectForPrimaryKey:@0]);
+
+    // wrong PK type
+    XCTAssertThrows([PrimaryStringObject objectForPrimaryKey:@0]);
+    XCTAssertThrows([PrimaryIntObject objectForPrimaryKey:@""]);
+
+    // no object with key
+    XCTAssertNil([PrimaryStringObject objectForPrimaryKey:@"bad key"]);
+    XCTAssertNil([PrimaryIntObject objectForPrimaryKey:@1]);
+
+    // object with key exists
+    XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForPrimaryKey:@"key"]);
+    XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
+}
 
 @end

@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.83.1
+    REALM_CORE_VERSION=0.84.0
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -40,6 +40,8 @@ command:
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
+  test-ios-devices:        tests iOS on all attached iOS devices with release configuration
+  test-ios-devices-debug:  tests iOS on all attached iOS devices with debug configuration
   test-osx [xcmode]:       tests OSX framework with release configuration
   test [xcmode]:           tests iOS and OS X frameworks with release configuration
   test-debug [xcmode]:     tests iOS and OS X frameworks with debug configuration
@@ -86,6 +88,30 @@ xc() {
 xcrealm() {
     PROJECT=Realm.xcodeproj
     xc "-project $PROJECT $@"
+}
+
+######################################
+# Device Test Helper
+######################################
+
+test_ios_devices() {
+    serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
+    serial_numbers=()
+    while read -r line; do
+        number=${line:15} # Serial number starts at position 15
+        if [[ ${#number} == 40 ]]; then
+            serial_numbers+=("$number")
+        fi
+    done <<< "$serial_numbers_str"
+    if [[ ${#serial_numbers[@]} == 0 ]]; then
+        echo "At least one iOS device must be connected to this computer to run device tests"
+        exit 1
+    fi
+    configuration="$1"
+    for device in "${serial_numbers[@]}"; do
+        xcrealm "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test"
+    done
+    exit 0
 }
 
 ######################################
@@ -206,11 +232,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "docs")
-        sh scripts/build-docs.sh
-        exit 0
-        ;;
-
     ######################################
     # Testing
     ######################################
@@ -243,6 +264,10 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "test-ios-devices")
+        test_ios_devices "Release"
+        ;;
+
     "test-osx")
         xcrealm "-scheme OSX -configuration Release test"
         exit 0
@@ -251,6 +276,10 @@ case "$COMMAND" in
     "test-ios-debug")
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
+        ;;
+
+    "test-ios-devices-debug")
+        test_ios_devices "Debug"
         ;;
 
     "test-osx-debug")
@@ -457,6 +486,8 @@ case "$COMMAND" in
 
         cp -R ${WORKSPACE}/tightdb_objc/plugin ${TEMPDIR}/realm-cocoa-${VERSION}
         cp ${WORKSPACE}/tightdb_objc/LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
+        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/Swift/
 
         cat > ${TEMPDIR}/realm-cocoa-${VERSION}/docs.webloc <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
