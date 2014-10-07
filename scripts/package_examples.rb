@@ -40,6 +40,7 @@ end
 
 objc_examples = [
   "examples/ios/objc/RealmExamples.xcodeproj",
+  "examples/ios/swift/RealmExamples.xcodeproj",
   "examples/osx/objc/RealmExamples.xcodeproj"
 ]
 
@@ -50,8 +51,9 @@ objc_examples.each do |example|
   filepath = File.join(example, "project.pbxproj")
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
-    file.puts contents.sub("build/Release/", "ios/").
-                       sub("build/DerivedData/Realm/Build/Products/Release/", "osx/")
+    file.puts contents.gsub("/build/ios", "/ios")
+                      .gsub("Realm/Swift", "Swift")
+                      .gsub("build/DerivedData/Realm/Build/Products/Release", "osx")
   end
 end
 
@@ -60,9 +62,5 @@ end
 rakefile_path = "examples/ios/rubymotion/Simple/Rakefile"
 contents = File.read(rakefile_path)
 File.open(rakefile_path, "w") do |file|
-  file.puts contents.gsub("build/Release", "ios")
+  file.puts contents.gsub("/build/ios", "/ios")
 end
-
-# Remove Swift examples
-
-FileUtils.rm_rf("examples/ios/swift")

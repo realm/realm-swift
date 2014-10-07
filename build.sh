@@ -237,11 +237,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "docs")
-        sh scripts/build-docs.sh
-        exit 0
-        ;;
-
     ######################################
     # Testing
     ######################################
