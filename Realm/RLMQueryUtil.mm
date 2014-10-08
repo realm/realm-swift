@@ -430,7 +430,7 @@ RLMProperty *get_property_from_key_path(RLMSchema *schema, RLMObjectSchema *desc
 void validate_property_value(RLMProperty *prop, id value, NSString *err) {
     if (prop.type == RLMPropertyTypeArray) {
         Class cls = [value class];
-        RLMPrecondition(RLMIsKindOfclass(cls, RLMObject.class) && [[cls className] isEqualToString:prop.objectClassName],
+        RLMPrecondition(RLMIsKindOfclass(cls, RLMObject.class) && [RLMDynamicCast<RLMObject>(value).objectSchema.className isEqualToString:prop.objectClassName],
                         @"Invalid value", err, prop.objectClassName);
     }
     else {

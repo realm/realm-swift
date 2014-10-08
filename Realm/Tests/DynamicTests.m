@@ -140,7 +140,7 @@
     [dyrealm commitWriteTransaction];
 
     XCTAssertEqual(1U, [dyrealm allObjects:StringObject.className].count);
-    XCTAssertEqual(1U, [dyrealm allObjects:AllTypesObject.className.className].count);
+    XCTAssertEqual(1U, [dyrealm allObjects:AllTypesObject.className].count);
 }
 
 - (void)testDynamicArray {
@@ -153,7 +153,7 @@
     [dyrealm beginWriteTransaction];
     RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
     RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withObject:@[@"string1"]];
-    [dyrealm createObject:ArrayPropertyObject.className withObject:@[@[stringObject, stringObject1], @[]]];
+    [dyrealm createObject:ArrayPropertyObject.className withObject:@[@"name", @[stringObject, stringObject1], @[]]];
     [dyrealm commitWriteTransaction];
 
     RLMArray *results = [dyrealm allObjects:ArrayPropertyObject.className];
@@ -161,7 +161,7 @@
     RLMObject *arrayObj = results.firstObject;
     RLMArray *array = arrayObj[@"array"];
     XCTAssertEqual(2U, array.count);
-    XCTAssertEqualObjects(array[0], stringObject);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject[@"stringCol"]);
 
     [dyrealm beginWriteTransaction];
     [array removeObjectAtIndex:0];
@@ -169,8 +169,8 @@
     [dyrealm commitWriteTransaction];
 
     XCTAssertEqual(2U, array.count);
-    XCTAssertEqualObjects(array[0], stringObject1);
-    XCTAssertEqualObjects(array[1], stringObject);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject1[@"stringCol"]);
+    XCTAssertEqualObjects(array[1][@"stringCol"], stringObject[@"stringCol"]);
 }
 
 @end

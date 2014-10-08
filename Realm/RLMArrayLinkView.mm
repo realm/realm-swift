@@ -62,7 +62,7 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *
     }
 }
 static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
-    NSString *objectClassName = [obj.class className];
+    NSString *objectClassName = obj.objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
                                      userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
