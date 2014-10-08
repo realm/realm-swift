@@ -122,7 +122,6 @@ inline void clearRealmCache() {
     }
 }
 
-BOOL s_useInMemoryDefaultRealm = NO;
 NSString *s_defaultRealmPath = nil;
 NSArray *s_objectDescriptors = nil;
 
@@ -176,10 +175,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             if (readonly) {
                 _readGroup = make_unique<Group>(path.UTF8String);
                 _group = _readGroup.get();
-            }
-            else if (s_useInMemoryDefaultRealm && [path isEqualToString:[RLMRealm defaultRealmPath]]) { // Only for default realm
-                _sharedGroup = make_unique<SharedGroup>(path.UTF8String, false, SharedGroup::durability_MemOnly);
-                _group = &const_cast<Group&>(_sharedGroup->begin_read());
             }
             else {
                 _writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
@@ -250,16 +245,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 + (instancetype)defaultRealm
 {
     return [RLMRealm realmWithPath:[RLMRealm defaultRealmPath] readOnly:NO error:nil];
-}
-
-+ (void)useInMemoryDefaultRealm
-{
-    @synchronized(s_realmsPerPath) {
-        if (realmsAtPath([RLMRealm defaultRealmPath]).count) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Can only set default realm to use in Memory before creating or getting a default RLMRealm instance" userInfo:nil];
-        }
-    }
-    s_useInMemoryDefaultRealm = YES;
 }
 
 + (instancetype)realmWithPath:(NSString *)path
