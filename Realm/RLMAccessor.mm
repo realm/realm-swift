@@ -555,8 +555,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
     }
     
     // create and register proxy class which derives from object class
-    NSString *objectClassName = [objectClass className];
-    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:objectClassName];
+    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:schema.className];
     Class accClass = objc_getClass(accessorClassName.UTF8String);
     if (!accClass) {
         accClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);

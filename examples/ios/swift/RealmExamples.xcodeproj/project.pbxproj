@@ -44,48 +44,36 @@
 		E8CB089C19BA6B080018434A /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB089819BA6B080018434A /* TableViewController.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		E8CB08BC19BA6B530018434A /* Embed Framework */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Framework";
-			runOnlyForDeploymentPostprocessing = 0;
+/* Begin PBXContainerItemProxy section */
+		E8AD212019E49249000603D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
 		};
-		E8CB08C219BA6B6B0018434A /* Embed Framework */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Framework";
-			runOnlyForDeploymentPostprocessing = 0;
+		E8AD212219E4924C000603D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
 		};
-		E8CB08C819BA6B860018434A /* Embed Framework */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Framework";
-			runOnlyForDeploymentPostprocessing = 0;
+		E8AD212419E4924F000603D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
 		};
-		E8CB08CE19BA6B9C0018434A /* Embed Framework */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Framework";
-			runOnlyForDeploymentPostprocessing = 0;
+		E8AD212619E49252000603D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
 		};
-/* End PBXCopyFilesBuildPhase section */
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0295B90619D103180036D6C3 /* RLMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMSupport.swift; sourceTree = "<group>"; };
@@ -234,11 +222,11 @@
 			buildPhases = (
 				E8CB07EB19BA6AB60018434A /* Sources */,
 				E8CB07EC19BA6AB60018434A /* Frameworks */,
-				E8CB08BC19BA6B530018434A /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E8AD212119E49249000603D7 /* PBXTargetDependency */,
 			);
 			name = Encryption;
 			productName = Encryption;
@@ -252,11 +240,11 @@
 				E8CB081019BA6ABD0018434A /* Sources */,
 				E8CB081119BA6ABD0018434A /* Frameworks */,
 				E8CB081219BA6ABD0018434A /* Resources */,
-				E8CB08C219BA6B6B0018434A /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E8AD212319E4924C000603D7 /* PBXTargetDependency */,
 			);
 			name = Migration;
 			productName = Migration;
@@ -270,11 +258,11 @@
 				E8CB083519BA6AC60018434A /* Sources */,
 				E8CB083619BA6AC60018434A /* Frameworks */,
 				E8CB083719BA6AC60018434A /* Resources */,
-				E8CB08C819BA6B860018434A /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E8AD212519E4924F000603D7 /* PBXTargetDependency */,
 			);
 			name = TableView;
 			productName = TableView;
@@ -287,11 +275,11 @@
 			buildPhases = (
 				E8CB085A19BA6ACA0018434A /* Sources */,
 				E8CB085B19BA6ACA0018434A /* Frameworks */,
-				E8CB08CE19BA6B9C0018434A /* Embed Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E8AD212719E49252000603D7 /* PBXTargetDependency */,
 			);
 			name = Simple;
 			productName = Simple;
@@ -423,6 +411,29 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		E8AD212119E49249000603D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8AD212019E49249000603D7 /* PBXContainerItemProxy */;
+		};
+		E8AD212319E4924C000603D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8AD212219E4924C000603D7 /* PBXContainerItemProxy */;
+		};
+		E8AD212519E4924F000603D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8AD212419E4924F000603D7 /* PBXContainerItemProxy */;
+		};
+		E8AD212719E49252000603D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8AD212619E49252000603D7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		0295B90D19D1034F0036D6C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -458,10 +469,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../build/ios",
-					"$(SRCROOT)/../../../ios",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -506,10 +514,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../build/ios",
-					"$(SRCROOT)/../../../ios",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
