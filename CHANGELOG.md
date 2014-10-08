@@ -9,6 +9,9 @@
 
 ### Bugfixes
 
+* Re-adding an object to its Realm no longer throws an exception and is now a no-op
+  (as it was previously). 
+
 0.86.2 Release notes (2014-10-06)
 =============================================================
 
