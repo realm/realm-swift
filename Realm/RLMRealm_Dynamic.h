@@ -74,7 +74,7 @@
 /**
  Create an RLMObject of type `className` in the Realm with a a given object.
 
- @param object  The object used to populate the object. This can be any key/value compliant
+ @param object  The object used to populate the object. This can be any key/value coding compliant
  object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
  an NSArray with one object for each persisted property. An exception will be
  thrown if all required properties are not present or no default is provided.
