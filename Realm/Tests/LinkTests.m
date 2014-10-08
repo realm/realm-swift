@@ -150,7 +150,23 @@
     [realm commitWriteTransaction];
 
     XCTAssertThrows([OwnerObject objectsInRealm:realm where:@"dog.dogName.first = 'Fifo'"], @"3 levels of relationship");
+}
 
+- (void)testBidirectionalRelationship {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    CircleObject *obj0 = [[CircleObject alloc] initWithObject:@[@"a", NSNull.null]];
+    CircleObject *obj1 = [[CircleObject alloc] initWithObject:@[@"b", obj0]];
+    obj0.next = obj1;
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj0];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+
+    RLMArray *results = [CircleObject allObjects];
+    XCTAssertEqualObjects(@"a", [results[0] data]);
+    XCTAssertEqualObjects(@"b", [results[1] data]);
 }
 
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
