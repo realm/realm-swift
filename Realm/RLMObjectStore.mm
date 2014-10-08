@@ -265,7 +265,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
             // no-op
             return;
         }
-        // for differint realms users must explicitly create the object in the second realm
+        // for differing realms users must explicitly create the object in the second realm
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object is already persisted in a Realm"
                                      userInfo:nil];
