@@ -279,8 +279,12 @@ void add_link_constraint_to_query(tightdb::Query & query,
                                  NSPredicateOperatorType operatorType,
                                  NSUInteger column,
                                  RLMObject *obj) {
-    RLMPrecondition(operatorType == NSEqualToPredicateOperatorType,
-                    @"Invalid operator type", @"Only 'Equal' operator supported for object comparison");
+    RLMPrecondition(operatorType == NSEqualToPredicateOperatorType || operatorType == NSNotEqualToPredicateOperatorType,
+                    @"Invalid operator type", @"Only 'Equal' and 'Not Equal' operators supported for object comparison");
+    if (operatorType == NSNotEqualToPredicateOperatorType) {
+        query.Not();
+    }
+
     if (obj) {
         query.links_to(column, obj->_row.get_index());
     }
