@@ -1,3 +1,15 @@
+0.87.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* In-memory Realms have been removed. They will be re-added once they can
+  support use from multiple threads.
+
+### Enhancements
+
+### Bugfixes
+
 0.86.2 Release notes (2014-10-06)
 =============================================================
 

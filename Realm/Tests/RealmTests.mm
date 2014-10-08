@@ -445,28 +445,6 @@
     XCTAssertTrue(notificationFired);
 }
 
-- (void)testRealmInMemory
-{
-    RLMRealm *realmWithFile = [RLMRealm defaultRealm];
-    [realmWithFile beginWriteTransaction];
-    [StringObject createInRealm:realmWithFile withObject:@[@"a"]];
-    [realmWithFile commitWriteTransaction];
-    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
-}
-
-- (void)testRealmInMemory2
-{
-    [RLMRealm useInMemoryDefaultRealm];
-
-    RLMRealm *realmInMemory = [RLMRealm defaultRealm];
-    [realmInMemory beginWriteTransaction];
-    [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"b"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([StringObject objectsInRealm:realmInMemory withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
-    [realmInMemory commitWriteTransaction];
-}
-
 - (void)testRealmFileAccess
 {
     XCTAssertThrows([RLMRealm realmWithPath:nil], @"nil path");
