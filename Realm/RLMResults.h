@@ -24,8 +24,8 @@
  RLMResults is an auto-updating container type in Realm returned from object
  queries.
 
- RLMResults can be queried with the same predicates as RLMObject and RLMRealm,
- so you can easily chain queries to further filter query results.
+ RLMResults can be queried with the same predicates as RLMObject and RLMArray
+ and you can chain queries to further filter query results.
 
  RLMResults cannot be created directly.
  */

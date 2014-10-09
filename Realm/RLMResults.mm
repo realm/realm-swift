@@ -45,7 +45,7 @@
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<tightdb::Query>)query
                                      realm:(RLMRealm *)realm {
-    RLMResults *ar = [RLMResults alloc];
+    RLMResults *ar = [[RLMResults alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
@@ -56,7 +56,7 @@
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                       view:(tightdb::TableView)view
                                      realm:(RLMRealm *)realm {
-    RLMResults *ar = [RLMResults alloc];
+    RLMResults *ar = [[RLMResults alloc] initPrivate];
     ar->_objectClassName = objectClassName;
     ar->_viewCreated = YES;
     ar->_backingView = move(view);
