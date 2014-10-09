@@ -18,6 +18,7 @@
 * Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
 * Updating to core library version 0.85.0.
 * Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
+* Add `cancelWriteTransaction` to revert all changes made in a write transaction and end the transaction.
 
 ### Bugfixes
 
