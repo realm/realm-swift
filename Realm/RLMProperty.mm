@@ -156,7 +156,7 @@
                 }
 
                 _type = RLMPropertyTypeObject;
-                _objectClassName = [cls className];
+                _objectClassName = className;
             }
             return YES;
         }
