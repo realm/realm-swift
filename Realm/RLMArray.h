@@ -265,7 +265,7 @@
 @end
 
 /**
- A RLMSortDescriptor stores a property name and a sort order for use with
+ An RLMSortDescriptor stores a property name and a sort order for use with
  `sortedResultsUsingDescriptors:`. It is similar to NSSortDescriptor, but supports
  only the subset of functionality which can be efficiently run by the query
  engine. RLMSortDescriptor instances are immutable.

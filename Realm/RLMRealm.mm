@@ -52,7 +52,7 @@
 }
 @end
 
-// A weak holder for a RLMRealm to allow calling performSelector:onThread: without
+// A weak holder for an RLMRealm to allow calling performSelector:onThread: without
 // a strong reference to the realm
 @interface RLMWeakNotifier : NSObject
 @property (nonatomic, weak) RLMRealm *realm;

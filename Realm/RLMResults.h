@@ -142,7 +142,7 @@
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get a sorted RLMResults from an existing RLMResults
+ Get a sorted `RLMResults` from an existing `RLMResults` sorted by a property.
 
  @param property    The property name to sort by.
  @param ascending   The direction to sort by.
@@ -152,7 +152,7 @@
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
- Get a sorted RLMResults from an existing RLMResults
+ Get a sorted `RLMResults` from an existing `RLMResults` sorted by an `NSArray`` of `RLMSortDescriptor`s.
 
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 

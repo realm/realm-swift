@@ -234,7 +234,7 @@
 + (NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to designate a property as the primary key for a RLMObject subclass. Only properties of
+ Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
 
@@ -346,7 +346,7 @@
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
 
 /**
- Returns YES if another RLMObject points to the same object in a RLMRealm. For RLMObject types
+ Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types
  with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
 

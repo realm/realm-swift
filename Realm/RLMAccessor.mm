@@ -42,7 +42,7 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObject *ob
 
     if (!obj->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on a RLMRealm instance first."
+                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first."
                                      userInfo:nil];
     }
 }
