@@ -156,7 +156,7 @@
     [dyrealm createObject:ArrayPropertyObject.className withObject:@[@"name", @[stringObject, stringObject1], @[]]];
     [dyrealm commitWriteTransaction];
 
-    RLMArray *results = [dyrealm allObjects:ArrayPropertyObject.className];
+    RLMResults *results = [dyrealm allObjects:ArrayPropertyObject.className];
     XCTAssertEqual(1U, results.count);
     RLMObject *arrayObj = results.firstObject;
     RLMArray *array = arrayObj[@"array"];
