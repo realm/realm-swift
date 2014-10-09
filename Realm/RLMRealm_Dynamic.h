@@ -72,7 +72,7 @@
 - (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 /**
- Create an RLMObject of type `className` in the Realm with a a given object.
+ Create an RLMObject of type `className` in the Realm with a given object.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
  object, or a JSON object such as those returned from the methods in NSJSONSerialization, or

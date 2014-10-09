@@ -107,7 +107,7 @@
 + (NSString *)className;
 
 /**
- Create an RLMObject in the default Realm with a a given object.
+ Create an RLMObject in the default Realm with a given object.
 
  Creates an instance of this object and adds it to the default Realm populating
  the object with the given object.
@@ -142,7 +142,7 @@
 +(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
 
 /**
- Create or update an RLMObject in the default Realm with a a given object.
+ Create or update an RLMObject in the default Realm with a given object.
 
  This method can only be called on object types with a primary key defined. If there is already
  an object with the same primary key value in the default RLMRealm its values are updated and the object
@@ -160,7 +160,7 @@
 +(instancetype)createOrUpdateInDefaultRealmWithObject:(id)object;
 
 /**
- Create or update an RLMObject with a a given object.
+ Create or update an RLMObject with a given object.
 
  This method can only be called on object types with a primary key defined. If there is already
  an object with the same primary key value in the provided RLMRealm its values are updated and the object
