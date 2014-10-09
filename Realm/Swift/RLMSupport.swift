@@ -48,7 +48,7 @@ extension RLMArray: SequenceType {
         return indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 }

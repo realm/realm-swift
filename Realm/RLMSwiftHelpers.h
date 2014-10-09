@@ -25,7 +25,14 @@
 
 @interface RLMArray (Swift)
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+
+@end
+
+@interface RLMResults (Swift)
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;

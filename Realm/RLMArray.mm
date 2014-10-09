@@ -38,6 +38,11 @@
     return self;
 }
 
+// FIXME - delete when we ship the new swift api with Lists
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
+    return [self initWithObjectClassName:objectClassName standalone:YES];
+}
+
 //
 // Generic implementations for all RLMArray variants
 //
