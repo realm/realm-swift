@@ -112,7 +112,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An NSArray or RLMArray of objects of the class contained by this RLMArray.
+ @param objects     An NSArray, RLMArray or RLMResults of objects of the class contained by this RLMArray.
  */
 - (void)addObjectsFromArray:(id)objects;
 
@@ -205,7 +205,7 @@
  
  @param predicateFormat The predicate format string which can accept variable arguments.
  
- @return                An RLMArray of objects that match the given predicate
+ @return                An RLMResults of objects that match the given predicate
  */
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -214,17 +214,17 @@
  
  @param predicate   The predicate to filter the objects.
  
- @return            An RLMArray of objects that match the given predicate
+ @return            An RLMResults of objects that match the given predicate
  */
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get a sorted RLMArray from an existing RLMArray
+ Get a sorted RLMResults from an RLMArray
  
  @param property    The property name to sort by.
  @param ascending   The direction to sort by.
  
- @return    An RLMArray sorted by the specified property.
+ @return    An RLMResults sorted by the specified property.
  */
 - (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 

@@ -65,7 +65,7 @@
 
 
 //
-// RLMResults private constructors
+// RLMResults private methods
 //
 @interface RLMResults ()
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
@@ -75,6 +75,7 @@
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                       view:(tightdb::TableView)view
                                      realm:(RLMRealm *)realm;
+- (void)deleteObjectsFromRealm;
 @end
 
 //

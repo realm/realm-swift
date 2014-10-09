@@ -28,13 +28,13 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 @end
 
 @interface RLMObject (Swift)
 
-+ (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 
 @end

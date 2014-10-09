@@ -63,10 +63,10 @@
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"hired = YES && age BETWEEN {20, 30}"];
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:pred];
     
-    // Do a query, and get all matches as RLMArray
+    // Do a query, and get all matches as RLMResults
     RLMResults *res = [EmployeeObject objectsWithPredicate:pred];
     
-    // Iterate over the resulting RLMArray
+    // Iterate over the resulting RLMResults
     index = 0;
     for (EmployeeObject *row in res) {
         XCTAssertEqualObjects(row.name, filteredArray[index][@"name"], @"Name in iteration should be equal to what was set.");

@@ -38,7 +38,7 @@
 
  @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
 
- @return    An RLMArray of all objects in this realm of the given type.
+ @return    An RLMResults of all objects in this realm of the given type.
 
  @see       RLMObject allObjects
  */
@@ -52,7 +52,7 @@
  @param className       The type of objects you are looking for (name of the class).
  @param predicateFormat The predicate format string which can accept variable arguments.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
@@ -66,7 +66,7 @@
  @param className   The type of objects you are looking for (name of the class).
  @param predicate   The predicate to filter the objects.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */

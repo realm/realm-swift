@@ -226,16 +226,18 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithObject:@[@"company", @[]]];
     for (NSInteger i = 0; i < 1012; ++i) {
         EmployeeObject *person = [[EmployeeObject alloc] init];
         person.name = @"Mary";
         person.age = 24;
         person.hired = YES;
+        [company.employees addObject:person];
         [realm addObject:person];
     }
     [realm commitWriteTransaction];
     
-    NSString *description = [[EmployeeObject allObjects] description];
+    NSString *description = [company.employees description];
     
     XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
     XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
@@ -244,6 +246,16 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMArray");
+
+    description = [[EmployeeObject allObjects] description];
+
+    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMResults");
+    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMResults");
+
+    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMResults");
+    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMResults");
+
+    XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMResults");
 }
 
 - (void)testDeleteLinksAndObjectsInArray
@@ -272,7 +284,7 @@
     
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
+    [company.employees addObjectsFromArray:[EmployeeObject allObjects]];
     [realm addObject:company];
     
     [realm commitWriteTransaction];

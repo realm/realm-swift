@@ -582,8 +582,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // call deleteObjectsFromRealm for our RLMArray
         [rlmArray deleteObjectsFromRealm];
     }
+    else if (RLMResults *rlmResults = RLMDynamicCast<RLMResults>(array)) {
+        // call deleteObjectsFromRealm for our RLMResults
+        [rlmResults deleteObjectsFromRealm];
+    }
     else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray or NSArray of RLMObjects" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects" userInfo:nil];
     }
 }
 

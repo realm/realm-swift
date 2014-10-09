@@ -151,7 +151,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 // Methods unsupported on standalone RLMArray instances
 //
 
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
     RLM_VARARG(predicateFormat, args);
@@ -160,13 +160,13 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
@@ -214,7 +214,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
 {
-    RLMArray *objects = [self objectsWithPredicate:predicate];
+    RLMResults *objects = [self objectsWithPredicate:predicate];
     if ([objects count] == 0) {
         return NSNotFound;
     }
