@@ -111,7 +111,9 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     }
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(__unsafe_unretained id [])buffer
+                                    count:(NSUInteger)len {
     RLMResultsValidate(self);
 
     __autoreleasing RLMCArrayHolder *items;
@@ -149,21 +151,18 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return batchCount;
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
-{
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self indexOfObjectWhere:predicateFormat args:args];
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
-{
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
     return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
                                                                    arguments:args]];
 }
 
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
-{
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     RLMResults *objects = [self objectsWithPredicate:predicate];
     if ([objects count] == 0) {
         return NSNotFound;
@@ -222,21 +221,18 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return result;
 }
 
-- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
-{
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     // validate predicate
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
-- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
-{
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
-{
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
     RLMResultsValidate(self);
 
     // copy array and apply new predicate creating a new query and view
@@ -245,13 +241,11 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
 }
 
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
-{
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
-{
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
     RLMResultsValidate(self);
 
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
@@ -362,8 +356,7 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     _backingView.clear();
 }
 
-- (NSString *)description
-{
+- (NSString *)description {
     return [self descriptionWithMaxDepth:5];
 }
 
@@ -401,6 +394,74 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     }
     [mString appendFormat:@"\n)"];
     return [NSString stringWithString:mString];
+}
+
+@end
+
+@implementation RLMEmptyResults
+
++ (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName realm:(RLMRealm *)realm {
+    RLMEmptyResults *results = [[RLMEmptyResults alloc] initPrivate];
+    results->_objectClassName = objectClassName;
+    results->_realm = realm;
+    return results;
+}
+
+- (NSUInteger)count {
+    return 0;
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(__unsafe_unretained id [])buffer
+                                    count:(NSUInteger)len {
+    return 0;
+}
+
+- (NSUInteger)indexOfObject:(RLMObject *)object {
+    return NSNotFound;
+}
+
+- (id)objectAtIndex:(NSUInteger)index {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
+}
+
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
+    return self;
+}
+
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
+    return self;
+}
+
+-(id)minOfProperty:(NSString *)property {
+   @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                  reason:@"minOfProperty not supported on empty RLMResults."
+                                userInfo:nil];
+}
+
+-(id)maxOfProperty:(NSString *)property {
+    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                   reason:@"maxOfProperty not supported on empty RLMResults."
+                                 userInfo:nil];
+}
+
+-(NSNumber *)sumOfProperty:(NSString *)property {
+    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                   reason:@"sumOfProperty not supported on empty RLMResults."
+                                 userInfo:nil];
+}
+
+-(NSNumber *)averageOfProperty:(NSString *)property {
+    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                   reason:@"averageOfProperty not supported on empty RLMResults."
+                                 userInfo:nil];
+}
+#pragma clang diagnostic pop
+
+- (void)deleteObjectsFromRealm {
 }
 
 @end

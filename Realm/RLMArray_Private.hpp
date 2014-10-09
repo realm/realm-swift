@@ -67,7 +67,13 @@
 //
 // RLMResults private methods
 //
-@interface RLMResults ()
+@interface RLMResults () {
+    @protected
+    // accessor ivars
+    RLMRealm *_realm;
+    NSString *_objectClassName;
+}
+
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<tightdb::Query>)query
                                      realm:(RLMRealm *)realm;
@@ -76,6 +82,14 @@
                                       view:(tightdb::TableView)view
                                      realm:(RLMRealm *)realm;
 - (void)deleteObjectsFromRealm;
+@end
+
+//
+// RLMResults subclass used when a TableView can't be created
+//
+@interface RLMEmptyResults : RLMResults
++ (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName
+                                          realm:(RLMRealm *)realm;
 @end
 
 //
