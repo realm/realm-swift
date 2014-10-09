@@ -19,7 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
+#import "RLMRealm_Dynamic.h"
 
 #import <libkern/OSAtomic.h>
 
@@ -558,7 +558,7 @@
         RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[@"a"]);
+        [realm createObject:StringObject.className withObject:@[@"a"]];
         [realm commitWriteTransaction];
     }
 
@@ -583,7 +583,7 @@
         RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[]);
+        [realm createObject:StringObject.className withObject:@[]];
         [realm commitWriteTransaction];
     }
 

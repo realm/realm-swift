@@ -21,7 +21,6 @@ extern "C" {
 }
 #import "RLMMigration.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
@@ -66,8 +65,8 @@ extern "C" {
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1]);
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2]);
+    [realm createObject:MigrationObject.className withObject:@[@1]];
+    [realm createObject:MigrationObject.className withObject:@[@2]];
     [realm commitWriteTransaction];
 
     // open realm with new schema before migration to test migration is necessary
@@ -106,8 +105,8 @@ extern "C" {
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"1", @YES]);
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2, @"2", @NO]);
+    [realm createObject:MigrationObject.className withObject:@[@1, @"1", @YES]];
+    [realm createObject:MigrationObject.className withObject:@[@2, @"2", @NO]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -136,8 +135,8 @@ extern "C" {
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"1"]);
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @"2"]);
+    [realm createObject:MigrationObject.className withObject:@[@1, @"1"]];
+    [realm createObject:MigrationObject.className withObject:@[@1, @"2"]];
     [realm commitWriteTransaction];
 
     // object migration object
@@ -173,8 +172,8 @@ extern "C" {
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @1]);
-    RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@2, @2]);
+    [realm createObject:MigrationObject.className withObject:@[@1, @1]];
+    [realm createObject:MigrationObject.className withObject:@[@2, @2]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -204,8 +203,8 @@ extern "C" {
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
     [realm beginWriteTransaction];
-    RLMCreateObjectInRealmWithValue(realm, MigrationPrimaryKeyObject.className, @[@1]);
-    RLMCreateObjectInRealmWithValue(realm, MigrationPrimaryKeyObject.className, @[@1]);
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
     [realm commitWriteTransaction];
 
     // apply migration
@@ -244,7 +243,7 @@ extern "C" {
         // create realm with old schema and populate
         RLMRealm *realm = [self realmWithSingleObject:objectSchema];
         [realm beginWriteTransaction];
-        RLMCreateObjectInRealmWithValue(realm, MigrationObject.className, @[@1, @1]);
+        [realm createObject:MigrationObject.className withObject:@[@1, @1]];
         [realm commitWriteTransaction];
     }
 
