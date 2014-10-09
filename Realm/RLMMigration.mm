@@ -126,7 +126,7 @@
     }
 }
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block {
+- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion {
     // start write transaction
     [_realm beginWriteTransaction];
 
@@ -141,7 +141,7 @@
 
         // apply block and set new schema version
         NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
-        NSUInteger newVersion = block(self, oldVersion);
+        block(self, oldVersion);
         RLMRealmSetSchemaVersion(_realm, newVersion);
 
         // make sure a new version was provided if changes were made

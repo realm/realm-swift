@@ -606,7 +606,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 static RLMMigrationBlock s_migrationBlock;
-+ (void)registerMigrationBlock:(RLMMigrationBlock)block {
+static NSUInteger s_currentSchemaVersion = 0;
++ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block {
+    s_currentSchemaVersion = version;
     s_migrationBlock = block;
 }
 
@@ -616,7 +618,7 @@ static RLMMigrationBlock s_migrationBlock;
     if (error) {
         return error;
     }
-    [migration migrateWithBlock:s_migrationBlock];
+    [migration migrateWithBlock:s_migrationBlock version:s_currentSchemaVersion];
 
     // clear cache for future callers
     clearRealmCache();

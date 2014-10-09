@@ -74,7 +74,7 @@ extern "C" {
     XCTAssertThrows([self realmWithTestPath], @"Migration should be required");
     
     // apply migration
-    [RLMRealm registerMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                               block:^(RLMObject *oldObject, RLMObject *newObject) {
@@ -84,7 +84,6 @@ extern "C" {
             NSString *stringObj = [NSString stringWithFormat:@"%@", intObj];
             XCTAssertNoThrow(newObject[@"stringCol"] = stringObj, @"Should be able to set stringCol");
         }];
-        return 1;
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
@@ -111,14 +110,13 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm registerMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNoThrow(oldObject[@"deletedCol"], @"Deleted column should be accessible on old object.");
             XCTAssertThrows(newObject[@"deletedCol"], @"Deleted column should not be accessible on new object.");
         }];
-        return 1;
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
@@ -152,10 +150,9 @@ extern "C" {
     };
 
     // apply migration
-    [RLMRealm registerMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className block:migrateObjectBlock];
-        return 1;
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
@@ -180,7 +177,7 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm registerMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
@@ -188,7 +185,6 @@ extern "C" {
             XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");
             newObject[@"stringCol"] = intObj.stringValue;
         }];
-        return 1;
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
@@ -212,18 +208,15 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // apply migration
-    [RLMRealm registerMigrationBlock:^NSUInteger(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-        return 1;
-    }];
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()],
                     @"Migration should throw due to duplicate primary keys)");
 
-    [RLMRealm registerMigrationBlock:^NSUInteger(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         __block int objectID = 0;
         [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"intCol"] = @(objectID++);
         }];
-        return 1;
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
@@ -231,9 +224,7 @@ extern "C" {
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
     @autoreleasepool { [self dynamicRealmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
 
-    [RLMRealm registerMigrationBlock:^NSUInteger(__unused RLMMigration *migration, NSUInteger oldSchemaVersion) {
-        return oldSchemaVersion;
-    }];
+    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
@@ -252,11 +243,10 @@ extern "C" {
         [realm commitWriteTransaction];
     }
 
-    [RLMRealm registerMigrationBlock:^NSUInteger(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration enumerateObjects:MigrationObject.className block:^(RLMObject *, RLMObject *newObject) {
             newObject[@"stringCol"] = @"";
         }];
-        return oldSchemaVersion;
     }];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }

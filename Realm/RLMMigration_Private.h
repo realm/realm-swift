@@ -26,6 +26,6 @@
 
 + (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block;
+- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion;
 
 @end

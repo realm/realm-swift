@@ -345,17 +345,18 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @return    Schema version number for the `RLMRealm` after completing the
             migration. Must be greater than `oldSchemaVersion`.
  */
-typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
 /**
- Specify a migration block which is applied to Realms with old schema versions.
+ Specify a schema version and an associated migration block which is applied when
+ opening any Realm with and old schema version.
 
  Before you can open an existing `RLMRealm` which has a different on-disk schema
  from the schema defined in your object interfaces you must provide a migration 
  block which converts from the disk schema to your current object schema. At the
  minimum your migration block must initialize any properties which were added to
- existing objects without defaults and return a new schema version which is
- higher than the version of the on-disk schema.
+ existing objects without defaults and ensure uniequeness if a primary key 
+ property is added to an existing object.
 
  You should call this method before accessing any `RLMRealm` instances which
  require migration. After registering your migration block Realm will call your 
@@ -370,12 +371,13 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
    during the migration. You are required to either supply a default value or to
    manually populate added properties during a migration.
 
+ @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
  @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
-+ (void)registerMigrationBlock:(RLMMigrationBlock)block;
++ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
 
 /**
  Performs the registered migration block on a Realm at the given path.
@@ -388,10 +390,9 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
  @return            The error that occurred while applying the migration if any.
 
  @see               RLMMigration
- @see               registerMigrationBlock:
+ @see               setSchemaVersion:withMigrationBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath;
-
 
 #pragma mark -
 
