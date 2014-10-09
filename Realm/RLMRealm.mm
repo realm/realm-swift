@@ -605,17 +605,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
-+ (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block {
-    return [self migrateRealmAtPath:[RLMRealm defaultRealmPath] withBlock:block];
+static RLMMigrationBlock s_migrationBlock;
++ (void)registerMigrationBlock:(RLMMigrationBlock)block {
+    s_migrationBlock = block;
 }
 
-+ (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block {
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath{
     NSError *error;
     RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:&error];
     if (error) {
         return error;
     }
-    [migration migrateWithBlock:block];
+    [migration migrateWithBlock:s_migrationBlock];
 
     // clear cache for future callers
     clearRealmCache();
