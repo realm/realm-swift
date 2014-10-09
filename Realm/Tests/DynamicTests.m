@@ -126,4 +126,116 @@
                           @"Child object should have string value 'string'");
 }
 
+- (void)testDynamicAdd {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
+    [dyrealm createObject:AllTypesObject.className withObject:@[@NO, @2, @2.2f, @2.22, @"string2",
+        [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, @0, stringObject]];
+    [dyrealm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [dyrealm allObjects:StringObject.className].count);
+    XCTAssertEqual(1U, [dyrealm allObjects:AllTypesObject.className].count);
+}
+
+- (void)testDynamicArray {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
+    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withObject:@[@"string1"]];
+    [dyrealm createObject:ArrayPropertyObject.className withObject:@[@"name", @[stringObject, stringObject1], @[]]];
+    [dyrealm commitWriteTransaction];
+
+    RLMArray *results = [dyrealm allObjects:ArrayPropertyObject.className];
+    XCTAssertEqual(1U, results.count);
+    RLMObject *arrayObj = results.firstObject;
+    RLMArray *array = arrayObj[@"array"];
+    XCTAssertEqual(2U, array.count);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject[@"stringCol"]);
+
+    [dyrealm beginWriteTransaction];
+    [array removeObjectAtIndex:0];
+    [array addObject:stringObject];
+    [dyrealm commitWriteTransaction];
+
+    XCTAssertEqual(2U, array.count);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject1[@"stringCol"]);
+    XCTAssertEqualObjects(array[1][@"stringCol"], stringObject[@"stringCol"]);
+}
+
+- (void)testTrulyDynamicArray {
+    NSString *className0 = @"TrulyDynamic0";
+    NSString *className1 = @"TrulyDynamic1";
+    NSString *className2 = @"TrulyDynamic2";
+    
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    
+    RLMProperty *prop00 = [[RLMProperty alloc] initWithName:@"anArrayLink"
+                                                       type:RLMPropertyTypeArray
+                                            objectClassName:className1
+                                                 attributes:0];
+    RLMProperty *prop01 = [[RLMProperty alloc] initWithName:@"anObjectLink"
+                                                       type:RLMPropertyTypeObject
+                                            objectClassName:className2
+                                                 attributes:0];
+    RLMObjectSchema *objectSchema0 = [[RLMObjectSchema alloc] initWithClassName:className0
+                                                                    objectClass:RLMObject.class properties:@[prop00, prop01]];
+    
+    RLMProperty *prop10 = [[RLMProperty alloc] initWithName:@"anInt"
+                                                       type:RLMPropertyTypeInt
+                                            objectClassName:nil
+                                                 attributes:0];
+    RLMObjectSchema *objectSchema1 = [[RLMObjectSchema alloc] initWithClassName:className1
+                                                                    objectClass:RLMObject.class properties:@[prop10]];
+    
+    RLMProperty *prop20 = [[RLMProperty alloc] initWithName:@"aString"
+                                                       type:RLMPropertyTypeString
+                                            objectClassName:nil
+                                                 attributes:0];
+    RLMObjectSchema *objectSchema2 = [[RLMObjectSchema alloc] initWithClassName:className2
+                                                                    objectClass:RLMObject.class properties:@[prop20]];
+    
+    schema.objectSchema = @[objectSchema0, objectSchema1, objectSchema2];
+    
+    
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:schema];
+    
+    [dyrealm beginWriteTransaction];
+    RLMObject *obj10 = [dyrealm createObject:className1 withObject:@[@0]];
+    RLMObject *obj11 = [dyrealm createObject:className1 withObject:@[@1]];
+    RLMObject *obj20 = [dyrealm createObject:className2 withObject:@[@"a string"]];
+    [dyrealm createObject:className0 withObject:@[@[obj10, obj11], obj20]];
+    [dyrealm commitWriteTransaction];
+    
+    XCTAssertNotNil(dyrealm, @"dynamic realm shouldn't be nil");
+    
+    RLMArray *class0Objects = [dyrealm allObjects:className0];
+    RLMArray *class1Objects = [dyrealm allObjects:className1];
+    RLMArray *class2Objects = [dyrealm allObjects:className2];
+    
+    XCTAssertEqual(1U, class0Objects.count, @"There should be 1 object of class 0");
+    XCTAssertEqual(2U, class1Objects.count, @"There should be 2 objects of class 1");
+    XCTAssertEqual(1U, class2Objects.count, @"There should be 1 object of class 2");
+    
+    RLMObject *obj = [dyrealm allObjects:className0].firstObject;
+    RLMArray *array = obj[@"anArrayLink"];
+    
+    XCTAssertEqual(2U, array.count, @"There should be 2 objects in this array");
+    XCTAssertEqual(array.objectClassName, className1, @"This array property should contain objects of class 1");
+
+    RLMObject *object = obj[@"anObjectLink"];
+
+    XCTAssertNotNil(object, @"There should be a non-nil object in this property");
+}
+
 @end

@@ -272,7 +272,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
     }
 
     // set the realm and schema
-    NSString *objectClassName = [object.class className];
+    NSString *objectClassName = object.objectSchema.className;
     RLMObjectSchema *schema = realm.schema[objectClassName];
     object.objectSchema = schema;
     object.realm = realm;
