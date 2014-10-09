@@ -550,7 +550,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
     if (!objectClass || !schema || !accessorClassPrefix) {
         @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
     }
-    if (!RLMIsSubclass(objectClass, RLMObject.class)) {
+    if (!RLMIsKindOfclass(objectClass, RLMObject.class)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
     
@@ -603,7 +603,7 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
-                                                @"Class name": [obj.class className]}];
+                                                @"Class name": obj.objectSchema.className}];
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
         @throw [NSException exceptionWithName:@"RLMException"
@@ -675,7 +675,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSStrin
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Invalid property name"
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
-                                                @"Class name": [obj.class className]}];
+                                                @"Class name": obj.objectSchema.className}];
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {

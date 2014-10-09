@@ -626,6 +626,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return nil;
 }
 
+- (RLMObject *)createObject:(NSString *)className withObject:(id)object {
+    return RLMCreateObjectInRealmWithValue(self, className, object);
+}
+
 @end
 
 @implementation RLMWeakNotifier

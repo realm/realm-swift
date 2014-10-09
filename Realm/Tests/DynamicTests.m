@@ -126,4 +126,51 @@
                           @"Child object should have string value 'string'");
 }
 
+- (void)testDynamicAdd {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
+    [dyrealm createObject:AllTypesObject.className withObject:@[@NO, @2, @2.2f, @2.22, @"string2",
+        [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, @0, stringObject]];
+    [dyrealm commitWriteTransaction];
+
+    XCTAssertEqual(1U, [dyrealm allObjects:StringObject.className].count);
+    XCTAssertEqual(1U, [dyrealm allObjects:AllTypesObject.className].count);
+}
+
+- (void)testDynamicArray {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+
+    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
+    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withObject:@[@"string1"]];
+    [dyrealm createObject:ArrayPropertyObject.className withObject:@[@"name", @[stringObject, stringObject1], @[]]];
+    [dyrealm commitWriteTransaction];
+
+    RLMArray *results = [dyrealm allObjects:ArrayPropertyObject.className];
+    XCTAssertEqual(1U, results.count);
+    RLMObject *arrayObj = results.firstObject;
+    RLMArray *array = arrayObj[@"array"];
+    XCTAssertEqual(2U, array.count);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject[@"stringCol"]);
+
+    [dyrealm beginWriteTransaction];
+    [array removeObjectAtIndex:0];
+    [array addObject:stringObject];
+    [dyrealm commitWriteTransaction];
+
+    XCTAssertEqual(2U, array.count);
+    XCTAssertEqualObjects(array[0][@"stringCol"], stringObject1[@"stringCol"]);
+    XCTAssertEqualObjects(array[1][@"stringCol"], stringObject[@"stringCol"]);
+}
+
 @end
