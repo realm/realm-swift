@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMCollection.h>
 
 @class RLMObject, RLMRealm, RLMResults;
 
@@ -33,7 +34,7 @@
  lazily created when accessed, or can be obtained by querying a Realm.
  */
 
-@interface RLMArray : NSObject<NSFastEnumeration>
+@interface RLMArray : NSObject<RLMCollection, NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
  *  @name RLMArray Properties
@@ -236,67 +237,6 @@
  @return    An RLMResults sorted by the specified properties.
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
-
-#pragma mark -
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Aggregating Property Values
- *  ---------------------------------------------------------------------------------------
- */
-
-/**
- Returns the minimum (lowest) value of the given property
-
- NSNumber *min = [array minOfProperty:@"age"];
-
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
-
- @param property The property to look for a minimum on. Only properties of type int, float, double and NSDate are supported.
-
- @return The minimum value for the property amongst objects in an RLMArray.
- */
-- (id)minOfProperty:(NSString *)property;
-
-/**
- Returns the maximum (highest) value of the given property of objects in an RLMArray
-
- NSNumber *max = [array maxOfProperty:@"age"];
-
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
-
- @param property The property to look for a maximum on. Only properties of type int, float, double and NSDate are supported.
-
- @return The maximum value for the property amongst objects in an RLMArray
- */
-- (id)maxOfProperty:(NSString *)property;
-
-/**
- Returns the sum of the given property for objects in an RLMArray.
- 
- NSNumber *sum = [array sumOfProperty:@"age"];
- 
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to calculate sum on. Only properties of type int, float and double are supported.
- 
- @return The sum of the given property over all objects in an RLMArray.
- */
-- (NSNumber *)sumOfProperty:(NSString *)property;
-
-/**
- Returns the average of a given property for objects in an RLMArray.
- 
- NSNumber *average = [table averageOfProperty:@"age"];
- 
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to calculate average on. Only properties of type int, float and double are supported.
- 
- @return    The average for the given property amongst objects in an RLMArray. This will be of type double for both
-            float and double properties.
- */
-- (NSNumber *)averageOfProperty:(NSString *)property;
 
 #pragma mark -
 

@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMCollection.h>
 
 @class RLMObject, RLMRealm;
 
@@ -30,15 +31,15 @@
  RLMResults cannot be created directly.
  */
 
-@interface RLMResults : NSObject<NSFastEnumeration>
+@interface RLMResults : NSObject<RLMCollection, NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
- *  @name RLMResults Properties
+ *  @name RLMArray Properties
  *  ---------------------------------------------------------------------------------------
  */
 
 /**
- Number of objects in the array.
+ Number of objects in the results.
  */
 @property (nonatomic, readonly, assign) NSUInteger count;
 
@@ -48,14 +49,14 @@
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
 /**
- The Realm in which this array is persisted. Returns nil for standalone arrays.
+ The Realm this `RLMResults` is associated with.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
- *  @name Accessing Objects from an Array
+ *  @name Accessing Objects from an RLMResults
  * ---------------------------------------------------------------------------------------
  */
 
@@ -69,7 +70,7 @@
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
- Returns the first object in the array.
+ Returns the first object in the results.
 
  Returns `nil` if called on an empty RLMResults.
 
@@ -78,7 +79,7 @@
 - (id)firstObject;
 
 /**
- Returns the last object in the array.
+ Returns the last object in the results.
 
  Returns `nil` if called on an empty RLMResults.
 
@@ -170,9 +171,9 @@
 /**
  Returns the minimum (lowest) value of the given property
 
- NSNumber *min = [array minOfProperty:@"age"];
+ NSNumber *min = [results minOfProperty:@"age"];
 
- @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
  @param property The property to look for a minimum on. Only properties of type int, float, double and NSDate are supported.
 
@@ -183,9 +184,9 @@
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMResults
 
- NSNumber *max = [array maxOfProperty:@"age"];
+ NSNumber *max = [results maxOfProperty:@"age"];
 
- @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
  @param property The property to look for a maximum on. Only properties of type int, float, double and NSDate are supported.
 
@@ -196,9 +197,9 @@
 /**
  Returns the sum of the given property for objects in an RLMResults.
 
- NSNumber *sum = [array sumOfProperty:@"age"];
+ NSNumber *sum = [results sumOfProperty:@"age"];
 
- @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
  @param property The property to calculate sum on. Only properties of type int, float and double are supported.
 
@@ -209,9 +210,9 @@
 /**
  Returns the average of a given property for objects in an RLMResults.
 
- NSNumber *average = [table averageOfProperty:@"age"];
+ NSNumber *average = [results averageOfProperty:@"age"];
 
- @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+ @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
 
  @param property The property to calculate average on. Only properties of type int, float and double are supported.
 
@@ -233,13 +234,13 @@
 
 /**
  -[RLMResults init] is not available because RLMResultss cannot be created directly.
- RLMResults properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
  */
 - (instancetype)init __attribute__((unavailable("RLMResults cannot be created directly")));
 
 /**
  +[RLMResults new] is not available because RLMResultss cannot be created directly.
- RLMResults properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
  */
 + (instancetype)new __attribute__((unavailable("RLMResults cannot be created directly")));
 

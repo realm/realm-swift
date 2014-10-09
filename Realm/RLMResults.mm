@@ -264,6 +264,10 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 -(id)minOfProperty:(NSString *)property {
     RLMResultsValidate(self);
 
+    if (self.count == 0) {
+        return nil;
+    }
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
@@ -287,6 +291,10 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 
 -(id)maxOfProperty:(NSString *)property {
     RLMResultsValidate(self);
+
+    if (self.count == 0) {
+        return nil;
+    }
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -312,6 +320,10 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 -(NSNumber *)sumOfProperty:(NSString *)property {
     RLMResultsValidate(self);
 
+    if (self.count == 0) {
+        return @0;
+    }
+
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
     
@@ -331,6 +343,10 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
     RLMResultsValidate(self);
+
+    if (self.count == 0) {
+        return nil;
+    }
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -436,29 +452,6 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return self;
 }
 
--(id)minOfProperty:(NSString *)property {
-   @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                  reason:@"minOfProperty not supported on empty RLMResults."
-                                userInfo:nil];
-}
-
--(id)maxOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                   reason:@"maxOfProperty not supported on empty RLMResults."
-                                 userInfo:nil];
-}
-
--(NSNumber *)sumOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                   reason:@"sumOfProperty not supported on empty RLMResults."
-                                 userInfo:nil];
-}
-
--(NSNumber *)averageOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
-                                   reason:@"averageOfProperty not supported on empty RLMResults."
-                                 userInfo:nil];
-}
 #pragma clang diagnostic pop
 
 - (void)deleteObjectsFromRealm {

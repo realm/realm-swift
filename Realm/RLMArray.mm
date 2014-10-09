@@ -38,7 +38,7 @@
     return self;
 }
 
-// FIXME - delete when we ship the new swift api with Lists
+// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     return [self initWithObjectClassName:objectClassName standalone:YES];
 }
@@ -188,25 +188,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
--(id)minOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(id)maxOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(NSNumber *)sumOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(NSNumber *)averageOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
 #pragma GCC diagnostic pop
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...

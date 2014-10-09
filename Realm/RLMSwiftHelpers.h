@@ -25,7 +25,7 @@
 
 @interface RLMArray (Swift)
 
-// FIXME - delete when we ship the new swift api with Lists
+// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;

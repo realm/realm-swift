@@ -150,11 +150,6 @@
     XCTAssertThrows([intArray.array addObject:intObj], @"Addint to string array should throw");
     [intArray.intArray addObject:intObj];
 
-    XCTAssertThrows([intArray.intArray sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
     XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
