@@ -87,7 +87,7 @@
     XCTAssertEqual([realm objects:[PersonObject className] where:@"age > 28"].count, 2U, @"Expecting 2 results");
 
     // query on realm with order
-    RLMArray *results = [[realm objects:[PersonObject className] where:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    RLMResults *results = [[realm objects:[PersonObject className] where:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -110,19 +110,19 @@
     [AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMArray *betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
-    XCTAssertEqual(betweenArray.count, 2U, @"Should equal 2");
-    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
-    XCTAssertEqual(betweenArray.count, 4U, @"Should equal 4");
-    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
-    XCTAssertEqual(betweenArray.count, 2U, @"Should equal 2");
-    betweenArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
-    XCTAssertEqual(betweenArray.count, 2U, @"Should equal 2");
+    RLMResults *betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol BETWEEN %@", @[@2, @3]]];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"floatCol BETWEEN %@", @[@1.0f, @4.0f]]];
+    XCTAssertEqual(betweenResults.count, 4U, @"Should equal 4");
+    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"doubleCol BETWEEN %@", @[@3.0, @7.0f]]];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    betweenResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol BETWEEN %@", @[date2,date3]]];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
 
-    betweenArray = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
-    XCTAssertEqual(betweenArray.count, 2U, @"Should equal 2");
-    betweenArray = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
-    XCTAssertEqual(betweenArray.count, 2U, @"Should equal 2");
+    betweenResults = [AllTypesObject objectsWhere:@"intCol BETWEEN {2, 3}"];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    betweenResults = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
 }
 
 - (void)testQueryWithDates
@@ -142,18 +142,18 @@
     [AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]];
     [realm commitWriteTransaction];
 
-    RLMArray *dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
-    XCTAssertEqual(dateArray.count, 2U, @"2 dates smaller");
-    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol =< %@", date3]];
-    XCTAssertEqual(dateArray.count, 3U, @"3 dates smaller or equal");
-    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol > %@", date1]];
-    XCTAssertEqual(dateArray.count, 2U, @"2 dates greater");
-    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol => %@", date1]];
-    XCTAssertEqual(dateArray.count, 3U, @"3 dates greater or equal");
-    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol == %@", date1]];
-    XCTAssertEqual(dateArray.count, 1U, @"1 date equal to");
-    dateArray = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol != %@", date1]];
-    XCTAssertEqual(dateArray.count, 2U, @"2 dates not equal to");
+    RLMResults *dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol < %@", date3]];
+    XCTAssertEqual(dateResults.count, 2U, @"2 dates smaller");
+    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol =< %@", date3]];
+    XCTAssertEqual(dateResults.count, 3U, @"3 dates smaller or equal");
+    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol > %@", date1]];
+    XCTAssertEqual(dateResults.count, 2U, @"2 dates greater");
+    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol => %@", date1]];
+    XCTAssertEqual(dateResults.count, 3U, @"3 dates greater or equal");
+    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol == %@", date1]];
+    XCTAssertEqual(dateResults.count, 1U, @"1 date equal to");
+    dateResults = [AllTypesObject objectsWithPredicate:[NSPredicate predicateWithFormat:@"dateCol != %@", date1]];
+    XCTAssertEqual(dateResults.count, 2U, @"2 dates not equal to");
 }
 
 - (void)testDefaultRealmQuery
@@ -167,10 +167,10 @@
     [realm commitWriteTransaction];
 
     // query on class
-    RLMArray *all = [PersonObject allObjects];
+    RLMResults *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
 
-    RLMArray *results = [PersonObject objectsWhere:@"age == 27"];
+    RLMResults *results = [PersonObject objectsWhere:@"age == 27"];
     XCTAssertEqual(results.count, 1U, @"Expecting 1 results");
 
     // with order
@@ -190,10 +190,10 @@
     [realm commitWriteTransaction];
 
     // query on class
-    RLMArray *all = [PersonObject allObjects];
+    RLMResults *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
 
-    RLMArray *some = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
 
     // query/order on array
     XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1U, @"Expecting 1 result");
@@ -203,7 +203,7 @@
 }
 
 - (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
-    RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
     AllTypesObject *obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
     
@@ -215,7 +215,7 @@
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
-    RLMArray *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
     
     // test LinkView query
@@ -309,7 +309,7 @@
 
     [realm commitWriteTransaction];
 
-    RLMArray *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
+    RLMResults *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
     XCTAssertEqualObjects([results[0] stringCol], @"cc");
 
     // delete cc, add d results should update
@@ -861,7 +861,7 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMArray *queryResult = [realm objects:className where:predicate];
+    RLMResults *queryResult = [realm objects:className where:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
                    predicate, expectedCount, actualCount);
@@ -870,7 +870,7 @@
 - (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
                                               expectedCount:(NSUInteger)expectedCount
 {
-    RLMArray *queryResult = [QueryObject objectsWhere:predicate];
+    RLMResults *queryResult = [QueryObject objectsWhere:predicate];
     NSUInteger actualCount = queryResult.count;
     XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
                    predicate, expectedCount, actualCount);
@@ -882,7 +882,7 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     @try {
-        RLMArray *queryResult = [realm objects:className where:predicate];
+        RLMResults *queryResult = [realm objects:className where:predicate];
         NSUInteger actualCount = queryResult.count;
 #pragma unused(actualCount)
 
@@ -928,8 +928,8 @@
     {
         [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
 
-        RLMArray *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
-        RLMArray *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
+        RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
+        RLMResults *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
 
         // Force resultsTableView to form the TableView to verify that it syncs
         // correctly, and don't call anything but count on resultsQuery so that
@@ -970,8 +970,8 @@
     [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
     [realm commitWriteTransaction];
 
-    RLMArray *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
-    RLMArray *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
+    RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
+    RLMResults *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
 
     // Force resultsTableView to form the TableView to verify that it syncs
     // correctly, and don't call anything but count on resultsQuery so that

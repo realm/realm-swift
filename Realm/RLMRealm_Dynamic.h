@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
+#import "RLMResults.h"
 #import "RLMObjectSchema.h"
 
 @interface RLMRealm (Dynamic)
@@ -41,7 +42,7 @@
 
  @see       RLMObject allObjects
  */
-- (RLMArray *)allObjects:(NSString *)className;
+- (RLMResults *)allObjects:(NSString *)className;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -55,7 +56,7 @@
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -69,7 +70,7 @@
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 @end
 

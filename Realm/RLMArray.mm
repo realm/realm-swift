@@ -27,26 +27,15 @@
 @synthesize realm = _realm;
 @synthesize objectClassName = _objectClassName;
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName {
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone {
     self = [super init];
     if (self) {
         _objectClassName = objectClassName;
-        _backingArray = [[NSMutableArray alloc] init];
+        if (standalone) {
+            _backingArray = [[NSMutableArray alloc] init];
+        }
     }
     return self;
-}
-
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName {
-    self = [super init];
-    if (self) {
-        _objectClassName = objectClassName;
-    }
-    return self;
-
-}
-
-- (BOOL)isReadOnly {
-    return NO;
 }
 
 //
@@ -112,12 +101,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
 }
 
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
-    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-    ar->_backingArray = [NSMutableArray array];
-    return ar;
-}
-
 - (id)objectAtIndex:(NSUInteger)index {
     return [_backingArray objectAtIndex:index];
 }
@@ -168,8 +151,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 // Methods unsupported on standalone RLMArray instances
 //
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
@@ -177,6 +158,8 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [self objectsWhere:predicateFormat args:args];
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
@@ -189,7 +172,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
@@ -214,6 +197,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
 {
@@ -236,13 +220,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
     return [self indexOfObject:[objects firstObject]];
 }
-#pragma GCC diagnostic pop
-
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
-}
-
 
 #pragma mark - Superclass Overrides
 

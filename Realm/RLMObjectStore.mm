@@ -374,7 +374,7 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     object.realm = nil;
 }
 
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
     RLMCheckThread(realm);
 
     // create view from table and predicate
@@ -382,16 +382,18 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     if (!objectSchema->_table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
-        return [RLMArray standaloneArrayWithObjectClassName:objectClassName];
+#warning FIXME
+    //    return [[RLMResults alloc] initWithObjectClassName:objectClassName standalone:YES];
+        return nil;
     }
     tightdb::Query query = objectSchema->_table->where();
     RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
     
     // create and populate array
-    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
-                                                                             query:std::make_unique<Query>(query)
-                                                                             realm:realm];
-    return array;
+    __autoreleasing RLMResults * results = [RLMResults resultsWithObjectClassName:objectClassName
+                                                                            query:std::make_unique<Query>(query)
+                                                                            realm:realm];
+    return results;
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {

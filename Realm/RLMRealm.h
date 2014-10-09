@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
 @interface RLMRealm : NSObject
 /**---------------------------------------------------------------------------------------

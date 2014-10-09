@@ -27,7 +27,7 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMArray *emptyPeople = [EmployeeObject allObjects];
+    RLMResults *emptyPeople = [EmployeeObject allObjects];
     
     // Enum for zero rows added
     for (EmployeeObject *row in emptyPeople) {
@@ -49,7 +49,7 @@
     [realm commitWriteTransaction];
 
     // Get all objects
-    RLMArray *people = [EmployeeObject allObjects];
+    RLMResults *people = [EmployeeObject allObjects];
     
     // Iterate using for...in
     NSUInteger index = 0;
@@ -64,7 +64,7 @@
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:pred];
     
     // Do a query, and get all matches as RLMArray
-    RLMArray *res = [EmployeeObject objectsWithPredicate:pred];
+    RLMResults *res = [EmployeeObject objectsWithPredicate:pred];
     
     // Iterate over the resulting RLMArray
     index = 0;

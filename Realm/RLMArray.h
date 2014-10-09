@@ -18,22 +18,17 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMRealm;
+@class RLMObject, RLMRealm, RLMResults;
 
 /**
  
- RLMArray is the primary container type in Realm.
+ RLMArray is the container type in Realm used to define one-to-many relationships.
+
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  This is referred to in these docs as the “type” of the array.
  
- RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
- so you can easily chain queries to further filter query results.
- 
- RLMArrays fulfill 2 primary purposes:
- 
- - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
- - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
- 
+ RLMArrays can be queried with the same predicates as RLMObject and RLMRealm.
+
  RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
  lazily created when accessed, or can be obtained by querying a Realm.
  */
@@ -54,12 +49,6 @@
  The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
-
-/**
- Indicates if the RLMArray is readOnly. 
- YES for RLMArray instances returned from predicate queries and object enumeration.
- */
-@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 /**
  The Realm in which this array is persisted. Returns nil for standalone arrays.
@@ -218,7 +207,7 @@
  
  @return                An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.
@@ -227,7 +216,7 @@
  
  @return            An RLMArray of objects that match the given predicate
  */
-- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted RLMArray from an existing RLMArray
@@ -237,7 +226,7 @@
  
  @return    An RLMArray sorted by the specified property.
  */
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 
 #pragma mark -
 
@@ -258,7 +247,7 @@
 
  @return The minimum value for the property amongst objects in an RLMArray.
  */
--(id)minOfProperty:(NSString *)property;
+- (id)minOfProperty:(NSString *)property;
 
 /**
  Returns the maximum (highest) value of the given property of objects in an RLMArray
@@ -271,7 +260,7 @@
 
  @return The maximum value for the property amongst objects in an RLMArray
  */
--(id)maxOfProperty:(NSString *)property;
+- (id)maxOfProperty:(NSString *)property;
 
 /**
  Returns the sum of the given property for objects in an RLMArray.
@@ -284,7 +273,7 @@
  
  @return The sum of the given property over all objects in an RLMArray.
  */
--(NSNumber *)sumOfProperty:(NSString *)property;
+- (NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
  Returns the average of a given property for objects in an RLMArray.
@@ -298,26 +287,9 @@
  @return    The average for the given property amongst objects in an RLMArray. This will be of type double for both
             float and double properties.
  */
--(NSNumber *)averageOfProperty:(NSString *)property;
-
-
-#pragma mark -
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Serializing an Array to JSON
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Returns the RLMArray and the RLMObjects it contains as a JSON string.
- 
- @return    JSON string representation of this RLMArray.
- */
-- (NSString *)JSONString;
-
+- (NSNumber *)averageOfProperty:(NSString *)property;
 
 #pragma mark -
-
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;

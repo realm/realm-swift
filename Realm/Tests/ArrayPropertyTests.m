@@ -52,9 +52,6 @@
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
-
-    // Test JSON output
-    XCTAssertThrows([array.array JSONString], @"Not yet implemented");
 }
 
 
@@ -91,7 +88,7 @@
     [obj.array addObjectsFromArray:@[child2, child1]];
     [realm commitWriteTransaction];
     
-    RLMArray *children = [StringObject allObjectsInRealm:realm];
+    RLMResults *children = [StringObject allObjectsInRealm:realm];
     XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }
@@ -160,8 +157,6 @@
 
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
 
-    XCTAssertThrows([intArray.intArray JSONString], @"Not yet implemented");
-
     // test standalone with literals
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
 }
@@ -178,7 +173,7 @@
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
+    [company.employees addObjectsFromArray:[EmployeeObject allObjects]];
     [company.employees removeObjectAtIndex:1];
 
     // test standalone

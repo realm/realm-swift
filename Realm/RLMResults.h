@@ -1,0 +1,238 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2014 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
+#import <Foundation/Foundation.h>
+
+@class RLMObject, RLMRealm;
+
+/**
+ RLMResults is an auto-updating container type in Realm returned from object
+ queries.
+
+ RLMResults can be queried with the same predicates as RLMObject and RLMRealm,
+ so you can easily chain queries to further filter query results.
+
+ RLMResults cannot be created directly.
+ */
+
+@interface RLMResults : NSObject<NSFastEnumeration>
+
+/**---------------------------------------------------------------------------------------
+ *  @name RLMResults Properties
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ Number of objects in the array.
+ */
+@property (nonatomic, readonly, assign) NSUInteger count;
+
+/**
+ The class name (i.e. type) of the RLMObjects contained in this RLMResults.
+ */
+@property (nonatomic, readonly, copy) NSString *objectClassName;
+
+/**
+ The Realm in which this array is persisted. Returns nil for standalone arrays.
+ */
+@property (nonatomic, readonly) RLMRealm *realm;
+
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Accessing Objects from an Array
+ * ---------------------------------------------------------------------------------------
+ */
+
+/**
+ Returns the object at the index specified.
+
+ @param index   The index to look up.
+
+ @return An RLMObject of the class contained by this RLMResults.
+ */
+- (id)objectAtIndex:(NSUInteger)index;
+
+/**
+ Returns the first object in the array.
+
+ Returns `nil` if called on an empty RLMResults.
+
+ @return An RLMObject of the class contained by this RLMResults.
+ */
+- (id)firstObject;
+
+/**
+ Returns the last object in the array.
+
+ Returns `nil` if called on an empty RLMResults.
+
+ @return An RLMObject of the class contained by this RLMResults.
+ */
+- (id)lastObject;
+
+
+
+#pragma mark -
+
+
+/**---------------------------------------------------------------------------------------
+ *  @name Querying Results
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Gets the index of an object.
+
+ Returns NSNotFound if the object is not found in this RLMResults.
+
+ @param object  An object (of the same type as returned from the objectClassName selector).
+ */
+- (NSUInteger)indexOfObject:(RLMObject *)object;
+
+/**
+ Gets the index of the first object matching the predicate.
+
+ @param predicateFormat The predicate format string which can accept variable arguments.
+
+ @return    Index of object or NSNotFound if the object is not found in this RLMResults.
+ */
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
+
+/**
+ Gets the index of the first object matching the predicate.
+
+ @param predicate   The predicate to filter the objects.
+
+ @return    Index of object or NSNotFound if the object is not found in this RLMResults.
+ */
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
+
+/**
+ Get objects matching the given predicate in the RLMResults.
+
+ @param predicateFormat The predicate format string which can accept variable arguments.
+
+ @return                An RLMResults of objects that match the given predicate
+ */
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
+
+/**
+ Get objects matching the given predicate in the RLMResults.
+
+ @param predicate   The predicate to filter the objects.
+
+ @return            An RLMResults of objects that match the given predicate
+ */
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+
+/**
+ Get a sorted RLMResults from an existing RLMResults
+
+ @param property    The property name to sort by.
+ @param ascending   The direction to sort by.
+
+ @return    An RLMResults sorted by the specified property.
+ */
+- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
+
+#pragma mark -
+
+
+/**---------------------------------------------------------------------------------------
+ *  @name Aggregating Property Values
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ Returns the minimum (lowest) value of the given property
+
+ NSNumber *min = [array minOfProperty:@"age"];
+
+ @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+
+ @param property The property to look for a minimum on. Only properties of type int, float, double and NSDate are supported.
+
+ @return The minimum value for the property amongst objects in an RLMResults.
+ */
+-(id)minOfProperty:(NSString *)property;
+
+/**
+ Returns the maximum (highest) value of the given property of objects in an RLMResults
+
+ NSNumber *max = [array maxOfProperty:@"age"];
+
+ @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+
+ @param property The property to look for a maximum on. Only properties of type int, float, double and NSDate are supported.
+
+ @return The maximum value for the property amongst objects in an RLMResults
+ */
+-(id)maxOfProperty:(NSString *)property;
+
+/**
+ Returns the sum of the given property for objects in an RLMResults.
+
+ NSNumber *sum = [array sumOfProperty:@"age"];
+
+ @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+
+ @param property The property to calculate sum on. Only properties of type int, float and double are supported.
+
+ @return The sum of the given property over all objects in an RLMResults.
+ */
+-(NSNumber *)sumOfProperty:(NSString *)property;
+
+/**
+ Returns the average of a given property for objects in an RLMResults.
+
+ NSNumber *average = [table averageOfProperty:@"age"];
+
+ @warning You cannot use this method on RLMObject, RLMResults, and NSData properties.
+
+ @param property The property to calculate average on. Only properties of type int, float and double are supported.
+
+ @return    The average for the given property amongst objects in an RLMResults. This will be of type double for both
+ float and double properties.
+ */
+-(NSNumber *)averageOfProperty:(NSString *)property;
+
+#pragma mark -
+
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
+
+#pragma mark -
+
+/**---------------------------------------------------------------------------------------
+ *  @name Unavailable Methods
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/**
+ -[RLMResults init] is not available because RLMResultss cannot be created directly.
+ RLMResults properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ */
+- (instancetype)init __attribute__((unavailable("RLMResults cannot be created directly")));
+
+/**
+ +[RLMResults new] is not available because RLMResultss cannot be created directly.
+ RLMResults properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ */
++ (instancetype)new __attribute__((unavailable("RLMResults cannot be created directly")));
+
+@end
+

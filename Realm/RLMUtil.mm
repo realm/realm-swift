@@ -168,7 +168,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
         else if (prop.type == RLMPropertyTypeArray && [obj isKindOfClass:NSArray.class]) {
             // for arrays, create objects for each literal object and return new array
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            RLMArray *objects = [RLMArray standaloneArrayWithObjectClassName:objSchema.className];
+            RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
             for (id el in obj) {
                 [objects addObject:[[objSchema.objectClass alloc] initWithObject:el]];
             }

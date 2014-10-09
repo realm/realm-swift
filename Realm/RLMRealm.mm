@@ -587,21 +587,21 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-- (RLMArray *)allObjects:(NSString *)objectClassName {
+- (RLMResults *)allObjects:(NSString *)objectClassName {
     return RLMGetObjects(self, objectClassName, nil);
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
+- (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objects:objectClassName where:predicateFormat args:args];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
+- (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
     return [self objects:objectClassName withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
+- (RLMResults *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(self, objectClassName, predicate);
 }
 

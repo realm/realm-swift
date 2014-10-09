@@ -29,42 +29,45 @@
 #import <tightdb/util/unique_ptr.hpp>
 
 //
-// RLMArray implementation
+// RLMResults implementation
 //
-@implementation RLMArrayTableView {
+@implementation RLMResults {
     std::unique_ptr<tightdb::Query> _backingQuery;
     tightdb::TableView _backingView;
     BOOL _viewCreated;
 }
 
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   query:(std::unique_ptr<tightdb::Query>)query
-                                  realm:(RLMRealm *)realm {
-    RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
+- (instancetype)initPrivate {
+    self = [super init];
+    return self;
+}
+
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
+                                     realm:(RLMRealm *)realm {
+    RLMResults *ar = [RLMResults alloc];
+    ar->_objectClassName = objectClassName;
     ar->_viewCreated = NO;
     ar->_backingQuery = move(query);
     ar->_realm = realm;
     return ar;
 }
 
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::TableView)view
-                                   realm:(RLMRealm *)realm {
-    RLMArrayTableView *ar = [[RLMArrayTableView alloc] initViewWithObjectClassName:objectClassName];
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                      view:(tightdb::TableView)view
+                                     realm:(RLMRealm *)realm {
+    RLMResults *ar = [RLMResults alloc];
+    ar->_objectClassName = objectClassName;
     ar->_viewCreated = YES;
     ar->_backingView = move(view);
     ar->_realm = realm;
     return ar;
 }
 
-- (BOOL)isReadOnly {
-    return YES;
-}
-
 //
 // validation helper
 //
-static inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
+static inline void RLMResultsValidateAttached(RLMResults *ar) {
     if (!ar->_viewCreated) {
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
@@ -73,19 +76,19 @@ static inline void RLMArrayTableViewValidateAttached(RLMArrayTableView *ar) {
     else {
         // otherwiser verify attached and sync
         if (!ar->_backingView.is_attached()) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMResults is no longer valid" userInfo:nil];
         }
         ar->_backingView.sync_if_needed();
     }
 }
-static inline void RLMArrayTableViewValidate(RLMArrayTableView *ar) {
-    RLMArrayTableViewValidateAttached(ar);
+static inline void RLMResultsValidate(RLMResults *ar) {
+    RLMResultsValidateAttached(ar);
     RLMCheckThread(ar->_realm);
 }
 
-static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView *ar) {
+static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     // first verify attached
-    RLMArrayTableViewValidate(ar);
+    RLMResultsValidate(ar);
 
     if (!ar->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
@@ -99,7 +102,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 //
 - (NSUInteger)count {
     if (_viewCreated) {
-        RLMArrayTableViewValidate(self);
+        RLMResultsValidate(self);
         return _backingView.size();
     }
     else {
@@ -109,7 +112,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     __autoreleasing RLMCArrayHolder *items;
     if (state->state == 0) {
@@ -146,8 +149,30 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return batchCount;
 }
 
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
+{
+    va_list args;
+    RLM_VARARG(predicateFormat, args);
+    return [self indexOfObjectWhere:predicateFormat args:args];
+}
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args
+{
+    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
+                                                                   arguments:args]];
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
+{
+    RLMResults *objects = [self objectsWithPredicate:predicate];
+    if ([objects count] == 0) {
+        return NSNotFound;
+    }
+    return [self indexOfObject:[objects firstObject]];
+}
+
 - (id)objectAtIndex:(NSUInteger)index {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
@@ -155,31 +180,24 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return RLMCreateObjectAccessor(_realm, _objectClassName, _backingView.get_source_ndx(index));
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-- (void)addObject:(RLMObject *)object {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
+- (id)firstObject {
+    if (self.count) {
+        return [self objectAtIndex:0];
+    }
+    return nil;
 }
 
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
-}
-
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
-}
-
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"Attempting to mutate a readOnly RLMArray" userInfo:nil];
+- (id)lastObject {
+    NSUInteger count = self.count;
+    if (count) {
+        return [self objectAtIndex:count-1];
+    }
+    return nil;
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
     if (object->_realm && !object->_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
     }
@@ -187,7 +205,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     // check that object types align
     if (![_objectClassName isEqualToString:object.objectSchema.className]) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMArray" userInfo:nil];
+                                       reason:@"Object type does not match RLMResults" userInfo:nil];
     }
 
     // if different tables then no match
@@ -204,9 +222,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return result;
 }
 
-#pragma GCC diagnostic pop
-
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     // validate predicate
     va_list args;
@@ -214,38 +230,42 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     return [self objectsWhere:predicateFormat args:args];
 }
 
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     // copy array and apply new predicate creating a new query and view
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
     RLMUpdateQueryWithPredicate(query.get(), predicate, _realm.schema, _realm.schema[self.objectClassName]);
-    return [RLMArrayTableView arrayWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
+    return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
 }
 
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     // apply order
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
-    RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
+    RLMResults *ar = [RLMResults resultsWithObjectClassName:self.objectClassName
                                                                   query:move(query)
                                                                   realm:_realm];
     // attach new table view
-    RLMArrayTableViewValidateAttached(ar);
+    RLMResultsValidateAttached(ar);
     RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
     return ar;
 }
 
+- (id)objectAtIndexedSubscript:(NSUInteger)index {
+    return [self objectAtIndex:index];
+}
+
 -(id)minOfProperty:(NSString *)property {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -269,7 +289,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -293,7 +313,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -313,7 +333,7 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    RLMArrayTableViewValidate(self);
+    RLMResultsValidate(self);
 
     NSUInteger colIndex = RLMValidatedColumnIndex(_realm.schema[self.objectClassName], property);
     RLMPropertyType colType = RLMPropertyType(_backingView.get_column_type(colIndex));
@@ -332,13 +352,8 @@ static inline void RLMArrayTableViewValidateInWriteTransaction(RLMArrayTableView
     }
 }
 
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
 - (void)deleteObjectsFromRealm {
-    RLMArrayTableViewValidateInWriteTransaction(self);
+    RLMResultsValidateInWriteTransaction(self);
 
     // call clear to remove all from the realm
     _backingView.clear();

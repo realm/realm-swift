@@ -61,7 +61,7 @@
     
     [realm commitWriteTransaction];
        
-    RLMArray *result = [AggregateObject objectsInRealm:realm where:@"intCol < %i", 100];
+    RLMResults *result = [AggregateObject objectsInRealm:realm where:@"intCol < %i", 100];
     
     XCTAssertEqual(result.count, (NSUInteger)18, @"18 objects added");
 
@@ -93,22 +93,6 @@
     XCTAssertNil(objects[0], @"Object should have been released");
 }
 
-- (void)testReadOnly
-{
-    RLMRealm *realm = self.realmWithTestPath;
-    
-    [realm beginWriteTransaction];
-    StringObject *obj1 = [StringObject createInRealm:realm withObject:@[@"name1"]];
-    StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"name2"]];
-    [realm commitWriteTransaction];
-    
-    RLMArray *array = [StringObject allObjects];
-    XCTAssertTrue(array.readOnly, @"Array returned from query should be readonly");
-    XCTAssertThrowsSpecificNamed([array addObject:obj1], NSException, @"RLMException", @"Mutating readOnly array should throw");
-    XCTAssertThrowsSpecificNamed([array replaceObjectAtIndex:0 withObject:obj2], NSException, @"RLMException", @"Mutating readOnly array should throw");
-    XCTAssertThrowsSpecificNamed([array insertObject:obj1 atIndex:0], NSException, @"RLMException", @"Mutating readOnly array should throw");
-}
-
 - (void)testObjectAggregate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -131,8 +115,8 @@
     
     [realm commitWriteTransaction];
     
-    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
+    RLMResults *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
+    RLMResults *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
@@ -260,8 +244,6 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
 
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMArray");
-    
-    XCTAssertThrowsSpecificNamed(([[EmployeeObject allObjects] JSONString]), NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 - (void)testDeleteLinksAndObjectsInArray
@@ -335,21 +317,8 @@
     XCTAssertEqual(peopleInCompany.count, (NSUInteger)0, @"0 remaining links");
     [realm commitWriteTransaction];
     
-    RLMArray *allPeople = [EmployeeObject allObjects];
+    RLMResults *allPeople = [EmployeeObject allObjects];
     XCTAssertEqual(allPeople.count, (NSUInteger)3, @"Only links should have been deleted, not the employees");
-    
-    
-    // Delete the actual employees
-    XCTAssertThrowsSpecificNamed([allPeople removeObjectAtIndex:1], NSException, @"RLMException", @"Not allowed in read transaction");
-    XCTAssertEqual(allPeople.count, (NSUInteger)3, @"No employees should have been deleted");
-
-    [realm beginWriteTransaction];
-    XCTAssertThrows([allPeople removeObjectAtIndex:0], @"Not implemented");
-    allPeople = [EmployeeObject allObjects]; // FIXME, when accessors are fully implemented, no need to retrieve all again
-
-    //XCTAssertNoThrow([allPeople removeObjectAtIndex:1], @"Should delete employee"); // FIXME, shouldn't it be possible to delete an item in the middle. Only last is supported
-    //XCTAssertEqual(allPeople.count, (NSUInteger)2, @" 1 employee should have been deleted");
-    [realm commitWriteTransaction];
 }
 
 - (void)testIndexOfObject
@@ -363,7 +332,7 @@
     [realm commitWriteTransaction];
 
     // test TableView RLMArray
-    RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+    RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
     XCTAssertEqual((NSUInteger)0, [results indexOfObject:po1]);
     XCTAssertEqual((NSUInteger)1, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
@@ -379,7 +348,7 @@
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+    RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
     XCTAssertEqual((NSUInteger)0, ([results indexOfObjectWhere:@"age = %d", 40]));
     XCTAssertEqual((NSUInteger)1, ([results indexOfObjectWhere:@"age = %d", 25]));
     XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 30]));
@@ -394,9 +363,9 @@
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMArray *subarray = nil;
+    RLMResults *subarray = nil;
     {
-        __attribute((objc_precise_lifetime)) RLMArray *results = [EmployeeObject objectsWhere:@"hired = YES"];
+        __attribute((objc_precise_lifetime)) RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
         subarray = [results objectsWhere:@"age = 40"];
     }
 
@@ -416,9 +385,9 @@
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMArray *subarray = nil;
+    RLMResults *subarray = nil;
     {
-        __attribute((objc_precise_lifetime)) RLMArray *results = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
+        __attribute((objc_precise_lifetime)) RLMResults *results = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
         subarray = [results arraySortedByProperty:@"age" ascending:NO];
     }
 
@@ -442,8 +411,8 @@
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMArray *sortedAge = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
-    RLMArray *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:NO];
+    RLMResults *sortedAge = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:NO];
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
@@ -474,7 +443,7 @@ static vm_size_t get_resident_size() {
     vm_size_t size = get_resident_size();
     for (int i = 0; i < 10000; ++i) {
         @autoreleasepool {
-            RLMArray *matches = [StringObject objectsInRealm:realm withPredicate:pred];
+            RLMResults *matches = [StringObject objectsInRealm:realm withPredicate:pred];
             XCTAssertEqualObjects([matches[0] stringCol], @"a");
         }
     }
@@ -490,13 +459,13 @@ static vm_size_t get_resident_size() {
     [StringObject createInRealm:realm withObject:@[@"name2"]];
     [realm commitWriteTransaction];
 
-    RLMArray *array = [StringObject allObjects];
-    XCTAssertNoThrow([array lastObject]);
+    RLMResults *results = [StringObject allObjects];
+    XCTAssertNoThrow([results lastObject]);
 
     // Using dispatch_async to ensure it actually lands on another thread
     __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows([array lastObject]);
+        XCTAssertThrows([results lastObject]);
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
