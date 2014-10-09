@@ -34,7 +34,7 @@ static NSString * const kTableName = @"table";
 
 @interface TableViewController ()
 
-@property (nonatomic, strong) RLMArray *array;
+@property (nonatomic, strong) RLMResults *array;
 @property (nonatomic, strong) RLMNotificationToken *notification;
 
 @end
@@ -110,7 +110,7 @@ static NSString * const kTableName = @"table";
 
 - (void)reloadData
 {
-    self.array = [[DemoObject allObjects] arraySortedByProperty:@"date" ascending:YES];
+    self.array = [[DemoObject allObjects] sortedResultsUsingProperty:@"date" ascending:YES];
     [self.tableView reloadData];
 }
 

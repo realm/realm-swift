@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = RLMArray(objectClassName: DemoObject.className())
+    var array = DemoObject.allObjects()
     var notificationToken: RLMNotificationToken?
 
     override func viewDidLoad() {
@@ -90,7 +90,7 @@ class TableViewController: UITableViewController {
     // Actions
 
     func reloadData() {
-        array = DemoObject.allObjects().arraySortedByProperty("date", ascending: true)
+        array = DemoObject.allObjects().sortedResultsUsingProperty("date", ascending: true)
         tableView.reloadData()
     }
 
