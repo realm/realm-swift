@@ -502,8 +502,8 @@ class SwiftArrayTests: SwiftTestCase {
         makeEmployee(realm, 40, "C", true)
         realm.commitWriteTransaction()
 
-        let sortedByAge = EmployeeObject.allObjectsInRealm(realm).arraySortedByProperty("age", ascending: true)
-        let sortedByName = sortedByAge.arraySortedByProperty("name", ascending: false)
+        let sortedByAge = EmployeeObject.allObjectsInRealm(realm).sortedResultsUsingProperty("age", ascending: true)
+        let sortedByName = sortedByAge.sortedResultsUsingProperty("name", ascending: false)
 
         XCTAssertEqual(20, (sortedByAge[0] as EmployeeObject).age)
         XCTAssertEqual(40, (sortedByName[0] as EmployeeObject).age)

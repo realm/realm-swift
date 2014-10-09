@@ -148,7 +148,7 @@
 
  @return    An RLMResults sorted by the specified property.
  */
-- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted RLMResults from an existing RLMResults
@@ -157,7 +157,7 @@
 
  @return    An RLMResults sorted by the specified properties.
  */
-- (RLMResults *)arraySortedByProperties:(NSArray *)properties;
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark -
 

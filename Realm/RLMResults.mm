@@ -245,12 +245,12 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
 }
 
-- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    return [self arraySortedByProperties:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
+    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMResults *)arraySortedByProperties:(NSArray *)properties
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     RLMResultsValidate(self);
 

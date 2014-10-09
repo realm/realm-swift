@@ -221,7 +221,7 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     self->_backingLinkView->remove_all_target_rows();
 }
 
-- (RLMResults *)arraySortedByProperties:(NSArray *)properties
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     RLMLinkViewArrayValidateAttached(self);
 

@@ -399,8 +399,8 @@
 
     RLMResults *subarray = nil;
     {
-        __attribute((objc_precise_lifetime)) RLMResults *results = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
-        subarray = [results arraySortedByProperty:@"age" ascending:NO];
+        __attribute((objc_precise_lifetime)) RLMResults *results = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+        subarray = [results sortedResultsUsingProperty:@"age" ascending:NO];
     }
 
     [realm beginWriteTransaction];
@@ -423,8 +423,8 @@
     [EmployeeObject createInRealm:realm withObject:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMResults *sortedAge = [[EmployeeObject allObjects] arraySortedByProperty:@"age" ascending:YES];
-    RLMResults *sortedName = [sortedAge arraySortedByProperty:@"name" ascending:NO];
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);

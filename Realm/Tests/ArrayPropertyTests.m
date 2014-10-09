@@ -157,7 +157,7 @@
 
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
     
     XCTAssertThrows([intArray.intArray indexOfObjectWhere:@"intCol == 1"], @"Not yet implemented");
     XCTAssertThrows(([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
@@ -306,7 +306,7 @@
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
         NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
                           [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
-        RLMResults *actual = [array.dogs arraySortedByProperties:sort];
+        RLMResults *actual = [array.dogs sortedResultsUsingDescriptors:sort];
 
         return [actual[0] isEqualToObject:dogs[0]]
             && [actual[1] isEqualToObject:dogs[1]]

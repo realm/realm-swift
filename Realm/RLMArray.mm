@@ -177,12 +177,12 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
 {
-    return [self arraySortedByProperties:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
+    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMArray *)arraySortedByProperties:(NSArray *)properties
+- (RLMArray *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     @throw [NSException exceptionWithName:@"RLMException"
                                    reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];

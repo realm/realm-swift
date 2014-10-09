@@ -87,7 +87,7 @@
     XCTAssertEqual([realm objects:[PersonObject className] where:@"age > 28"].count, 2U, @"Expecting 2 results");
 
     // query on realm with order
-    RLMResults *results = [[realm objects:[PersonObject className] where:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    RLMResults *results = [[realm objects:[PersonObject className] where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -174,7 +174,7 @@
     XCTAssertEqual(results.count, 1U, @"Expecting 1 results");
 
     // with order
-    results = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    results = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
     PersonObject *tim = results[0];
     XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
@@ -193,34 +193,34 @@
     RLMResults *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
 
-    RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] arraySortedByProperty:@"age" ascending:YES];
+    RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
 
     // query/order on array
     XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1U, @"Expecting 1 result");
     XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0U, @"Expecting 0 results");
-    some = [some arraySortedByProperty:@"age" ascending:NO];
+    some = [some sortedResultsUsingProperty:@"age" ascending:NO];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
 
 - (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
     AllTypesObject *obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
     
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
-    results = [ar arraySortedByProperty:column ascending:ascending];
+    results = [ar sortedResultsUsingProperty:column ascending:ascending];
     obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
 }
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] arraySortedByProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
     
     // test LinkView query
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
-    results = [ar arraySortedByProperty:column ascending:ascending];
+    results = [ar sortedResultsUsingProperty:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 }
 
@@ -276,15 +276,15 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
     
     // sort by mixed column
-    XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"mixedCol" ascending:YES],
+    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"mixedCol" ascending:YES],
                     @"Sort on mixed col not supported");
-    XCTAssertThrows([arrayOfAll.array arraySortedByProperty:@"mixedCol" ascending:NO],
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"mixedCol" ascending:NO],
                     @"Sort on mixed col not supported");
     
     // sort invalid name
-    XCTAssertThrows([[AllTypesObject allObjects] arraySortedByProperty:@"invalidCol" ascending:YES],
+    XCTAssertThrows([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES],
                     @"Sort on invalid col not supported");
-    XCTAssertThrows([arrayOfAll.array arraySortedByProperty:@"invalidCol" ascending:NO],
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO],
                     @"Sort on invalid col not supported");
 }
 
@@ -300,7 +300,7 @@
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
         NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
                           [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
-        RLMResults *actual = [DogObject.allObjects arraySortedByProperties:sort];
+        RLMResults *actual = [DogObject.allObjects sortedResultsUsingDescriptors:sort];
         return [actual[0] isEqualToObject:dogs[0]]
             && [actual[1] isEqualToObject:dogs[1]]
             && [actual[2] isEqualToObject:dogs[2]]
@@ -339,7 +339,7 @@
 
     [realm commitWriteTransaction];
 
-    RLMResults *results = [arrayOfAll.array arraySortedByProperty:@"stringCol" ascending:NO];
+    RLMResults *results = [arrayOfAll.array sortedResultsUsingProperty:@"stringCol" ascending:NO];
     XCTAssertEqualObjects([results[0] stringCol], @"cc");
 
     // delete cc, add d results should update
@@ -365,15 +365,15 @@
 
     // class not derived from RLMObject
     XCTAssertThrows([realm objects:@"NonRealmPersonObject" where:@"age > 25"], @"invalid object type");
-    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] arraySortedByProperty:@"age" ascending:YES], @"invalid object type");
+    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"invalid object type");
 
     // empty string for class name
     XCTAssertThrows([realm objects:@"" where:@"age > 25"], @"missing class name");
-    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] arraySortedByProperty:@"age" ascending:YES], @"missing class name");
+    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"missing class name");
 
     // nil class name
     XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
-    XCTAssertThrows([[realm objects:nil where:@"age > 25"] arraySortedByProperty:@"age" ascending:YES], @"nil class name");
+    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"nil class name");
 }
 
 - (void)testPredicateValidUse
