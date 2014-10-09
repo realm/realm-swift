@@ -20,6 +20,13 @@
 
 #import <libkern/OSAtomic.h>
 
+@interface DogArrayObject : RLMObject
+@property RLMArray<DogObject> *dogs;
+@end
+
+@implementation DogArrayObject
+@end
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -283,6 +290,39 @@
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
+}
+
+- (void)testSortByMultipleColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a1 = [DogObject createInDefaultRealmWithObject:@[@"a", @1]];
+    DogObject *a2 = [DogObject createInDefaultRealmWithObject:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithObject:@[@"b", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithObject:@[@"b", @2]];
+
+    DogArrayObject *array = [DogArrayObject createInDefaultRealmWithObject:@[@[a1, a2, b1, b2]]];
+    [realm commitWriteTransaction];
+
+    bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
+        RLMResults *actual = [array.dogs arraySortedByProperties:sort];
+
+        return [actual[0] isEqualToObject:dogs[0]]
+            && [actual[1] isEqualToObject:dogs[1]]
+            && [actual[2] isEqualToObject:dogs[2]]
+            && [actual[3] isEqualToObject:dogs[3]];
+    };
+
+    // Check each valid sort
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @YES], @[a1, a2, b1, b2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @NO], @[a2, a1, b2, b1]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @YES], @[b1, b2, a1, a2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @NO], @[b2, b1, a2, a1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @YES], @[a1, b1, a2, b2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
 }
 
 @end

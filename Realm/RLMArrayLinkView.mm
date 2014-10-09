@@ -221,15 +221,15 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     self->_backingLinkView->remove_all_target_rows();
 }
 
-- (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)arraySortedByProperties:(NSArray *)properties
 {
     RLMLinkViewArrayValidateAttached(self);
-    
-    // validate sort criteria
-    RLMProperty *prop = RLMValidatedPropertyForSort(_realm.schema[self.objectClassName], property);
-    
-    // apply order
-    tightdb::TableView const &tv = _backingLinkView->get_sorted_view(prop.column, ascending);
+
+    std::vector<size_t> columns;
+    std::vector<bool> order;
+    RLMGetColumnIndices(_realm.schema[_objectClassName], properties, columns, order);
+
+    tightdb::TableView const &tv = _backingLinkView->get_sorted_view(move(columns), move(order));
     return [RLMResults resultsWithObjectClassName:self.objectClassName view:tv realm:_realm];
 }
 

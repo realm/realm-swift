@@ -247,17 +247,20 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 
 - (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
 {
+    return [self arraySortedByProperties:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
+}
+
+- (RLMResults *)arraySortedByProperties:(NSArray *)properties
+{
     RLMResultsValidate(self);
 
-    // apply order
     auto query = std::make_unique<tightdb::Query>(*_backingQuery, tightdb::Query::TCopyExpressionTag{});
-    RLMResults *ar = [RLMResults resultsWithObjectClassName:self.objectClassName
-                                                                  query:move(query)
-                                                                  realm:_realm];
+    RLMResults *r = [RLMResults resultsWithObjectClassName:self.objectClassName query:move(query) realm:_realm];
+
     // attach new table view
-    RLMResultsValidateAttached(ar);
-    RLMUpdateViewWithOrder(ar->_backingView, _realm.schema[self.objectClassName], property, ascending);
-    return ar;
+    RLMResultsValidateAttached(r);
+    RLMUpdateViewWithOrder(r->_backingView, _realm.schema[self.objectClassName], properties);
+    return r;
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index {

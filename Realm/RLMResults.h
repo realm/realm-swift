@@ -150,6 +150,15 @@
  */
 - (RLMResults *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
 
+/**
+ Get a sorted RLMResults from an existing RLMResults
+
+ @param properties  An array of `RLMSortDescriptor`s to sort by.
+
+ @return    An RLMResults sorted by the specified properties.
+ */
+- (RLMResults *)arraySortedByProperties:(NSArray *)properties;
+
 #pragma mark -
 
 
