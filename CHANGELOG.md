@@ -3,8 +3,8 @@
 
 ### API breaking changes
 * RLMArray has been split into two classes, `RLMArray` and `RLMResults`. RLMArray is 
-  used for object properties as in previous releases. Moving forward all methods to 
-  enumerate, query or sort bjects return an instance of the new class `RLMResults`. This 
+  used for object properties as in previous releases. Moving forward all methods used to 
+  enumerate, query, and sort objects return an instance of a new class `RLMResults`. This 
   change was made to support diverging apis and the future addition of change notifications 
   for queries.
 * `arraySortedByProperty:ascending:` was renamed to `sortedArrayUsingProperty:ascending`
