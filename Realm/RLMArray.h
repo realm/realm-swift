@@ -27,7 +27,7 @@
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  This is referred to in these docs as the “type” of the array.
  
- RLMArrays can be queried with the same predicates as RLMObject and RLMRealm.
+ RLMArrays can be queried with the same predicates as RLMObject and RLMResults.
 
  RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
  lazily created when accessed, or can be obtained by querying a Realm.
