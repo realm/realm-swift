@@ -28,8 +28,8 @@
     RLMRealm *_realm;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
 
 // namespace properties to prevent collision with user properties

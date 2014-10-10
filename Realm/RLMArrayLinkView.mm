@@ -50,13 +50,13 @@
 //
 // validation helpers
 //
-static inline void RLMLinkViewArrayValidateAttached(RLMArrayLinkView *ar) {
+static inline void RLMLinkViewArrayValidateAttached(__unsafe_unretained RLMArrayLinkView *ar) {
     if (!ar->_backingLinkView->is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMArray is no longer valid" userInfo:nil];
     }
     RLMCheckThread(ar->_realm);
 }
-static inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *ar) {
+static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretained RLMArrayLinkView *ar) {
     // first verify attached
     RLMLinkViewArrayValidateAttached(ar);
 
@@ -66,7 +66,7 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *
                                      userInfo:nil];
     }
 }
-static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
+static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *expected) {
     NSString *objectClassName = obj.objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
