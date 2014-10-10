@@ -84,8 +84,11 @@
 - (void)deleteObjectsFromRealm;
 @end
 
+
 //
-// RLMResults subclass used when a TableView can't be created
+// RLMResults subclass used when a TableView can't be created - this is used
+// for readonly realms where we can't create an underlying table class for a
+// type, and we need to return a functioal RLMResults instance which is always empty.
 //
 @interface RLMEmptyResults : RLMResults
 + (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName

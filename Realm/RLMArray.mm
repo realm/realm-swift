@@ -168,13 +168,13 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
@@ -182,10 +182,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMArray *)sortedResultsUsingDescriptors:(NSArray *)properties
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
 #pragma GCC diagnostic pop

@@ -23,7 +23,7 @@
 
 /**
  
- RLMArray is the container type in Realm used to define one-to-many relationships.
+ RLMArray is the container type in Realm used to define to-many relationships.
 
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  This is referred to in these docs as the “type” of the array.
