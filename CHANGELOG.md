@@ -14,6 +14,8 @@
 ### Bugfixes
 
 * Fix for crash when running many simultaneous write transactions on background threads.
+* Don't run the query twice when `firstObject` or `lastObject` are called on an
+  `RLMResults` which has not had its results accessed already.
 
 0.87.4 Release notes (2014-11-07)
 =============================================================
