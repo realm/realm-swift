@@ -20,13 +20,6 @@
 
 #import <libkern/OSAtomic.h>
 
-@interface DogArrayObject : RLMObject
-@property RLMArray<DogObject> *dogs;
-@end
-
-@implementation DogArrayObject
-@end
-
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -60,7 +53,6 @@
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
 }
-
 
 -(void)testModifyDetatchedArray {
     RLMRealm *realm = [self realmWithTestPath];
@@ -98,6 +90,81 @@
     RLMResults *children = [StringObject allObjectsInRealm:realm];
     XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
+}
+
+- (void)testDeleteLinksAndObjectsInArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    EmployeeObject *po1 = [[EmployeeObject alloc] init];
+    po1.age = 40;
+    po1.name = @"Joe";
+    po1.hired = YES;
+
+    EmployeeObject *po2 = [[EmployeeObject alloc] init];
+    po2.age = 30;
+    po2.name = @"John";
+    po2.hired = NO;
+
+    EmployeeObject *po3 = [[EmployeeObject alloc] init];
+    po3.age = 25;
+    po3.name = @"Jill";
+    po3.hired = YES;
+
+    [realm addObject:po1];
+    [realm addObject:po2];
+    [realm addObject:po3];
+
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [company.employees addObjects:[EmployeeObject allObjects]];
+    [realm addObject:company];
+
+    [realm commitWriteTransaction];
+
+    RLMArray *peopleInCompany = company.employees;
+
+    // Delete link to employee
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeObjectAtIndex:1], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)3, @"No links should have been deleted");
+
+    [realm beginWriteTransaction];
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeObjectAtIndex:3], NSException, @"RLMException", @"Out of bounds");
+    XCTAssertNoThrow([peopleInCompany removeObjectAtIndex:1], @"Should delete link to employee");
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"link deleted when accessing via links");
+    EmployeeObject *test = peopleInCompany[0];
+    XCTAssertEqual(test.age, po1.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
+    //XCTAssertEqualObjects(test, po1, @"Should be equal"); //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+
+    test = peopleInCompany[1];
+    XCTAssertEqual(test.age, po3.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po3.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
+    //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
+
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeLastObject], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeAllObjects], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany replaceObjectAtIndex:0 withObject:po2], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed([peopleInCompany insertObject:po2 atIndex:0], NSException, @"RLMException", @"Not allowed in read transaction");
+
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([peopleInCompany removeLastObject], @"Should delete last link");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 remaining link");
+    [peopleInCompany replaceObjectAtIndex:0 withObject:po2];
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)1, @"1 link replaced");
+    [peopleInCompany insertObject:po1 atIndex:0];
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)2, @"2 links");
+    XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links");
+    XCTAssertEqual(peopleInCompany.count, (NSUInteger)0, @"0 remaining links");
+    [realm commitWriteTransaction];
+
+    RLMResults *allPeople = [EmployeeObject allObjects];
+    XCTAssertEqual(allPeople.count, (NSUInteger)3, @"Only links should have been deleted, not the employees");
 }
 
 -(void)testStandalone {
@@ -195,6 +262,33 @@
     // non realm employee
     EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithObject:@[@"NoName", @1, @NO]];
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
+}
+
+- (void)testObjectsInRange
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    CompanyObject *comp = [CompanyObject createInRealm:realm withObject:@[@"name", @[po1, po2, po3]]];
+    [realm commitWriteTransaction];
+
+    // test TableView RLMArray
+    NSArray *sub = [comp.employees objectsInRange:NSMakeRange(0, 3)];
+    XCTAssertEqual(sub.count, 3U);
+    XCTAssertEqualObjects([sub[0] name], @"Joe");
+    XCTAssertEqualObjects([sub[2] name], @"Jill");
+
+    sub = [comp.employees objectsInRange:NSMakeRange(1, 1)];
+    XCTAssertEqual(sub.count, 1U);
+    XCTAssertEqualObjects([sub[0] name], @"John");
+
+    sub = [comp.employees objectsInRange:NSMakeRange(1, 0)];
+    XCTAssertEqual(sub.count, 0U);
+
+    XCTAssertThrows([comp.employees objectsInRange:NSMakeRange(1, 3)]);
 }
 
 - (void)testFastEnumeration
@@ -318,6 +412,34 @@
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
+}
+
+
+- (void)testArrayDescription
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [CompanyObject createInDefaultRealmWithObject:@[@"company", @[]]];
+    for (NSInteger i = 0; i < 1012; ++i) {
+        EmployeeObject *person = [[EmployeeObject alloc] init];
+        person.name = @"Mary";
+        person.age = 24;
+        person.hired = YES;
+        [company.employees addObject:person];
+        [realm addObject:person];
+    }
+    [realm commitWriteTransaction];
+
+    NSString *description = [company.employees description];
+
+    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+
+    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound, @"property names should be displayed when calling \"description\" on RLMArray");
+    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMArray");
+
+    XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMArray");
 }
 
 @end

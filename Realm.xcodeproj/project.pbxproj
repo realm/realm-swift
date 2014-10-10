@@ -39,7 +39,7 @@
 		3F8DCA6519930F8E0008BD7F /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB86195DFA15007EFB12 /* SchemaTests.mm */; };
 		3F8DCA6619930F8E0008BD7F /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD11955FE0100FDED82 /* TransactionTests.m */; };
 		3F8DCA6719930F8E0008BD7F /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
-		3F8DCA6819930F960008BD7F /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ArrayTests.m */; };
+		3F8DCA6819930F960008BD7F /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ResultsTests.m */; };
 		3F8DCA6919930F960008BD7F /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		3F8DCA6A19930F960008BD7F /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; };
 		3F8DCA6B19930F960008BD7F /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; };
@@ -100,7 +100,7 @@
 		E81A1FB51955FCE000FDED82 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB31955FCE000FDED82 /* CHANGELOG.md */; };
 		E81A1FB61955FCE000FDED82 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E81A1FB41955FCE000FDED82 /* LICENSE */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; };
-		E81A1FD71955FE0100FDED82 /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ArrayTests.m */; };
+		E81A1FD71955FE0100FDED82 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ResultsTests.m */; };
 		E81A1FD91955FE0100FDED82 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; };
 		E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; };
@@ -145,7 +145,7 @@
 		E856D2121956154C00FB2FCF /* RLMUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F821955FC9300FDED82 /* RLMUtil.mm */; };
 		E856D213195615A900FB2FCF /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD11955FE0100FDED82 /* TransactionTests.m */; };
 		E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; };
-		E856D215195615A900FB2FCF /* ArrayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ArrayTests.m */; };
+		E856D215195615A900FB2FCF /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB91955FE0100FDED82 /* ResultsTests.m */; };
 		E856D216195615A900FB2FCF /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; };
 		E856D218195615A900FB2FCF /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; };
@@ -304,7 +304,7 @@
 		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		E81A1FB41955FCE000FDED82 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ArrayPropertyTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		E81A1FB91955FE0100FDED82 /* ArrayTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ArrayTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		E81A1FB91955FE0100FDED82 /* ResultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ResultsTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		E81A1FBA1955FE0100FDED82 /* DynamicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DynamicTests.m; sourceTree = "<group>"; };
 		E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnumeratorTests.m; sourceTree = "<group>"; };
 		E81A1FBC1955FE0100FDED82 /* LinkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkTests.m; sourceTree = "<group>"; };
@@ -435,7 +435,7 @@
 				E81A1FC41955FE0100FDED82 /* RLMTestCase.h */,
 				E81A1FC51955FE0100FDED82 /* RLMTestCase.m */,
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
-				E81A1FB91955FE0100FDED82 /* ArrayTests.m */,
+				E81A1FB91955FE0100FDED82 /* ResultsTests.m */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
 				E81A1FBC1955FE0100FDED82 /* LinkTests.m */,
@@ -913,7 +913,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F8DCA6419930F8E0008BD7F /* ArrayPropertyTests.m in Sources */,
-				3F8DCA6819930F960008BD7F /* ArrayTests.m in Sources */,
+				3F8DCA6819930F960008BD7F /* ResultsTests.m in Sources */,
 				3F8DCA6919930F960008BD7F /* DynamicTests.m in Sources */,
 				3F8DCA6A19930F960008BD7F /* EnumeratorTests.m in Sources */,
 				3F8DCA6B19930F960008BD7F /* LinkTests.m in Sources */,
@@ -963,7 +963,7 @@
 			files = (
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
-				E856D215195615A900FB2FCF /* ArrayTests.m in Sources */,
+				E856D215195615A900FB2FCF /* ResultsTests.m in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
 				E856D218195615A900FB2FCF /* LinkTests.m in Sources */,
@@ -1024,7 +1024,7 @@
 			files = (
 				028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */,
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
-				E81A1FD71955FE0100FDED82 /* ArrayTests.m in Sources */,
+				E81A1FD71955FE0100FDED82 /* ResultsTests.m in Sources */,
 				E81A1FD91955FE0100FDED82 /* DynamicTests.m in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,
 				E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */,

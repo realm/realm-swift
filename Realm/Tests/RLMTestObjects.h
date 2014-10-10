@@ -21,57 +21,39 @@
 #pragma mark - Abstract Objects
 #pragma mark -
 
-#pragma mark SingleTypeObjects
-
 @interface StringObject : RLMObject
-
 @property NSString *stringCol;
-
 @end
 
 @interface IntObject : RLMObject
-
 @property int intCol;
-
 @end
 
 @interface AllIntSizesObject : RLMObject
 // int8_t not supported due to being ambiguous with BOOL
-
 @property int16_t int16;
 @property int32_t int32;
 @property int64_t int64;
-
 @end
 
 @interface FloatObject : RLMObject
-
 @property float floatCol;
-
 @end
 
 @interface DoubleObject : RLMObject
-
 @property double doubleCol;
-
 @end
 
 @interface BoolObject : RLMObject
-
 @property BOOL boolCol;
-
 @end
 
 @interface DateObject : RLMObject
-
 @property NSDate *dateCol;
-
 @end
 
 @interface BinaryObject : RLMObject
-
 @property NSData *binaryCol;
-
 @end
 
 @interface UTF8Object : RLMObject
@@ -84,7 +66,6 @@ RLM_ARRAY_TYPE(IntObject)
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-
 @property BOOL          boolCol;
 @property int           intCol;
 @property float         floatCol;
@@ -96,7 +77,6 @@ RLM_ARRAY_TYPE(IntObject)
 @property int64_t     longCol;
 @property id            mixedCol;
 @property StringObject *objectCol;
-
 @end
 
 RLM_ARRAY_TYPE(AllTypesObject)
@@ -112,28 +92,18 @@ RLM_ARRAY_TYPE(AllTypesObject)
 #pragma mark - Real Life Objects
 #pragma mark -
 
-#pragma mark EmployeeObject
-
 @interface EmployeeObject : RLMObject
-
 @property NSString *name;
 @property int age;
 @property BOOL hired;
-
 @end
 
 RLM_ARRAY_TYPE(EmployeeObject)
 
-#pragma mark CompanyObject
-
 @interface CompanyObject : RLMObject
-
 @property NSString *name;
 @property RLMArray<EmployeeObject> *employees;
-
 @end
-
-#pragma mark DogObject
 
 @interface DogObject : RLMObject
 @property NSString *dogName;
@@ -142,79 +112,53 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 RLM_ARRAY_TYPE(DogObject)
 
-#pragma mark OwnerObject
-
 @interface OwnerObject : RLMObject
-
 @property NSString *name;
 @property DogObject *dog;
+@end
 
+@interface DogArrayObject : RLMObject
+@property RLMArray<DogObject> *dogs;
 @end
 
 #pragma mark - Specific Use Objects
 #pragma mark -
 
-#pragma mark MixedObject
-
 @interface MixedObject : RLMObject
-
 @property BOOL hired;
 @property id other;
 @property NSInteger age;
-
 @end
-
-#pragma mark CustomAccessorsObject
 
 @interface CustomAccessorsObject : RLMObject
-
 @property (getter = getThatName) NSString *name;
 @property (setter = setTheInt:)  int age;
-
 @end
 
-#pragma mark BaseClassStringObject
-
 @interface BaseClassStringObject : RLMObject
-
 @property NSInteger intCol;
-
 @end
 
 @interface BaseClassStringObject ()
-
 @property NSString *stringCol;
-
 @end
 
-#pragma mark CircleObject
-
 @interface CircleObject : RLMObject
-
 @property NSString *data;
 @property CircleObject *next;
-
 @end
 
 RLM_ARRAY_TYPE(CircleObject);
-
-#pragma mark CircleArrayObject
 
 @interface CircleArrayObject : RLMObject
 @property RLMArray<CircleObject> *circles;
 @end
 
-#pragma mark ArrayPropertyObject
-
 @interface ArrayPropertyObject : RLMObject
-
 @property NSString *name;
 @property RLMArray<StringObject> *array;
 @property RLMArray<IntObject> *intArray;
-
 @end
-
-#pragma mark - Class Extension
 
 @interface RLMRealm ()
 
@@ -225,25 +169,17 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
-#pragma mark DynamicObject
-
 @interface DynamicObject : RLMObject
-
 @property NSString *stringCol;
 @property NSInteger intCol;
-
 @end
 
-#pragma mark AggregateObject
-
 @interface AggregateObject : RLMObject
-
 @property int     intCol;
 @property float   floatCol;
 @property double  doubleCol;
 @property BOOL    boolCol;
 @property NSDate *dateCol;
-
 @end
 
 @interface PrimaryStringObject : RLMObject
