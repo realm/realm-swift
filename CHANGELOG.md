@@ -2,10 +2,17 @@
 =============================================================
 
 ### API breaking changes
+* RLMArray has been split into two classes, `RLMArray` and `RLMResults`. RLMArray is 
+  used for object properties as in previous releases. Moving forward all methods used to 
+  enumerate, query, and sort objects return an instance of a new class `RLMResults`. This 
+  change was made to support diverging apis and the future addition of change notifications 
+  for queries.
+* `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 
 ### Enhancements
 
 * Add support for != in queries on object relationships.
+* Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
 
 ### Bugfixes
 

@@ -42,7 +42,7 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObject *ob
 
     if (!obj->_realm->_inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on a RLMRealm instance first."
+                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first."
                                      userInfo:nil];
     }
 }
@@ -433,7 +433,7 @@ static IMP RLMAccessorStandaloneGetter(RLMProperty *prop, char accessorCode, NSS
         return imp_implementationWithBlock(^(RLMObject *obj) {
             id val = RLMSuperGet(obj, propName);
             if (!val) {
-                val = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
+                val = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
                 RLMSuperSet(obj, propName, val);
             }
             return val;
@@ -448,7 +448,7 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
         NSString *objectClassName = prop.objectClassName;
         return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
-            RLMArray *standaloneAr = [RLMArray standaloneArrayWithObjectClassName:objectClassName];
+            RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
             [standaloneAr addObjectsFromArray:ar];
             RLMSuperSet(obj, propName, standaloneAr);
         });

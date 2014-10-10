@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMAccessor.h"
+#import "RLMResults.h"
 
 //
 // Table modifications
@@ -46,7 +47,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options 
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
 // get objects of a given class
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
 
 // get an object with the given primary key
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key);

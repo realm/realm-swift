@@ -20,11 +20,11 @@ import Realm
 
 extension RLMObject {
     // Swift query convenience functions
-    public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+    public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 
-    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+    public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
         return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
     }
 }
@@ -48,7 +48,31 @@ extension RLMArray: SequenceType {
         return indexOfObjectWhere(predicateFormat, args: getVaList(args))
     }
 
-    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMArray {
+    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
+        return objectsWhere(predicateFormat, args: getVaList(args))
+    }
+}
+
+extension RLMResults: SequenceType {
+    // Support Sequence-style enumeration
+    public func generate() -> GeneratorOf<RLMObject> {
+        var i: UInt  = 0
+
+        return GeneratorOf<RLMObject> {
+            if (i >= self.count) {
+                return .None
+            } else {
+                return self[i++] as? RLMObject
+            }
+        }
+    }
+
+    // Swift query convenience functions
+    public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArgType...) -> UInt {
+        return indexOfObjectWhere(predicateFormat, args: getVaList(args))
+    }
+
+    public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
         return objectsWhere(predicateFormat, args: getVaList(args))
     }
 }

@@ -20,6 +20,13 @@
 
 #import <libkern/OSAtomic.h>
 
+@interface DogArrayObject : RLMObject
+@property RLMArray<DogObject> *dogs;
+@end
+
+@implementation DogArrayObject
+@end
+
 @interface ArrayPropertyTests : RLMTestCase
 @end
 
@@ -52,9 +59,6 @@
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
-
-    // Test JSON output
-    XCTAssertThrows([array.array JSONString], @"Not yet implemented");
 }
 
 
@@ -91,7 +95,7 @@
     [obj.array addObjectsFromArray:@[child2, child1]];
     [realm commitWriteTransaction];
     
-    RLMArray *children = [StringObject allObjectsInRealm:realm];
+    RLMResults *children = [StringObject allObjectsInRealm:realm];
     XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }
@@ -146,21 +150,14 @@
     XCTAssertThrows([intArray.array addObject:intObj], @"Addint to string array should throw");
     [intArray.intArray addObject:intObj];
 
-    XCTAssertThrows([intArray.intArray sumOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray averageOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray minOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray maxOfProperty:@"intCol"], @"Should throw on standalone RLMArray");
-
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on standalone RLMArray");
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on standalone RLMArray");
-    XCTAssertThrows([intArray.intArray arraySortedByProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
+    XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on standalone RLMArray");
     
     XCTAssertThrows([intArray.intArray indexOfObjectWhere:@"intCol == 1"], @"Not yet implemented");
     XCTAssertThrows(([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Not yet implemented");
 
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], (NSUInteger)0, @"Should be first element");
-
-    XCTAssertThrows([intArray.intArray JSONString], @"Not yet implemented");
 
     // test standalone with literals
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
@@ -178,7 +175,7 @@
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    company.employees = (RLMArray<EmployeeObject> *)[EmployeeObject allObjects];
+    [company.employees addObjectsFromArray:[EmployeeObject allObjects]];
     [company.employees removeObjectAtIndex:1];
 
     // test standalone
@@ -288,6 +285,39 @@
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
+}
+
+- (void)testSortByMultipleColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a1 = [DogObject createInDefaultRealmWithObject:@[@"a", @1]];
+    DogObject *a2 = [DogObject createInDefaultRealmWithObject:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithObject:@[@"b", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithObject:@[@"b", @2]];
+
+    DogArrayObject *array = [DogArrayObject createInDefaultRealmWithObject:@[@[a1, a2, b1, b2]]];
+    [realm commitWriteTransaction];
+
+    bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
+        RLMResults *actual = [array.dogs sortedResultsUsingDescriptors:sort];
+
+        return [actual[0] isEqualToObject:dogs[0]]
+            && [actual[1] isEqualToObject:dogs[1]]
+            && [actual[2] isEqualToObject:dogs[2]]
+            && [actual[3] isEqualToObject:dogs[3]];
+    };
+
+    // Check each valid sort
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @YES], @[a1, a2, b1, b2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @NO], @[a2, a1, b2, b1]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @YES], @[b1, b2, a1, a2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @NO], @[b2, b1, a2, a1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @YES], @[a1, b1, a2, b2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
 }
 
 @end

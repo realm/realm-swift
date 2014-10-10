@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
+#import "RLMResults.h"
 #import "RLMObjectSchema.h"
 
 @interface RLMRealm (Dynamic)
@@ -37,11 +38,11 @@
 
  @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
 
- @return    An RLMArray of all objects in this realm of the given type.
+ @return    An RLMResults of all objects in this realm of the given type.
 
  @see       RLMObject allObjects
  */
-- (RLMArray *)allObjects:(NSString *)className;
+- (RLMResults *)allObjects:(NSString *)className;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -51,11 +52,11 @@
  @param className       The type of objects you are looking for (name of the class).
  @param predicateFormat The predicate format string which can accept variable arguments.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -65,11 +66,11 @@
  @param className   The type of objects you are looking for (name of the class).
  @param predicate   The predicate to filter the objects.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 /**
  Create an RLMObject of type `className` in the Realm with a given object.

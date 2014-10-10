@@ -213,8 +213,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqualObjects(soUsingDictionary.name, @"Susi", @"Name should be Susi");
     XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
     XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
-    
-    XCTAssertThrowsSpecificNamed([soInit JSONString], NSException, @"RLMNotImplementedException", @"Not yet implemented");
 }
 
 -(void)testObjectInitWithObjectTypeArray
@@ -231,7 +229,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm addObject:obj1];
     [realm commitWriteTransaction];
     
-    RLMArray *all = [EmployeeObject allObjects];
+    RLMResults *all = [EmployeeObject allObjects];
     EmployeeObject *fromRealm = all.firstObject;
     
     XCTAssertEqualObjects(fromRealm.name, @"Peter", @"Names should be equal");
@@ -257,7 +255,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm addObject:obj1];
     [realm commitWriteTransaction];
     
-    RLMArray *all = [EmployeeObject allObjects];
+    RLMResults *all = [EmployeeObject allObjects];
     EmployeeObject *fromRealm = all.firstObject;
     
     XCTAssertEqualObjects(fromRealm.name, @"Susi", @"Names should be equal");
@@ -458,7 +456,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm commitWriteTransaction];
 
     // ensure creation in proper table
-    RLMArray *results = StringSubclassObject.allObjects;
+    RLMResults *results = StringSubclassObject.allObjects;
     XCTAssertEqual(1U, results.count);
     XCTAssertEqual(1U, StringObject.allObjects.count);
 
@@ -559,7 +557,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // Test allObject for DefaultObject
     NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
-    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    RLMResults *allObjects = [DefaultObject allObjectsInRealm:realm];
     for (NSUInteger i = 0; i < keys.count; ++i) {
         DefaultObject *object = allObjects[i];
         for (NSUInteger j = 0; j < keys.count; ++j) {
@@ -592,7 +590,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // Test allObject for DefaultObject
     NSDictionary *defaultValues = [DefaultObject defaultPropertyValues];
-    RLMArray *allObjects = [DefaultObject allObjectsInRealm:realm];
+    RLMResults *allObjects = [DefaultObject allObjectsInRealm:realm];
     for (NSUInteger i = 0; i < keys.count; ++i) {
         DefaultObject *object = allObjects[i];
         for (NSUInteger j = 0; j < keys.count; ++j) {
@@ -1018,7 +1016,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm beginWriteTransaction];
 
     [PrimaryStringObject createOrUpdateInDefaultRealmWithObject:@[@"string", @1]];
-    RLMArray *objects = [PrimaryStringObject allObjects];
+    RLMResults *objects = [PrimaryStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
 

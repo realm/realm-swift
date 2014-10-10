@@ -115,12 +115,12 @@ class SwiftRealmTests: SwiftTestCase {
     func testUpdatingSortedArrayAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
         let objs = SwiftIntObject.allObjectsInRealm(realm)
-        let objects = SwiftIntObject.allObjectsInRealm(realm).arraySortedByProperty("intCol", ascending: true)
+        let objects = SwiftIntObject.allObjectsInRealm(realm).sortedResultsUsingProperty("intCol", ascending: true)
         let updateComplete = expectationWithDescription("background update complete")
 
         let token = realm.addNotificationBlock() { (_, _) in
             XCTAssertEqual(objs.count, 2)
-            XCTAssertEqual(objs.arraySortedByProperty("intCol", ascending: true).count, 2)
+            XCTAssertEqual(objs.sortedResultsUsingProperty("intCol", ascending: true).count, 2)
             XCTAssertEqual(objects.count, 2)
             updateComplete.fulfill()
         }

@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObject, RLMArray, RLMRealm, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
 @interface RLMRealm : NSObject
 /**---------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@
 /**
  Obtains an instance of the default Realm.
 
- The default Realm is used by the `RLMObject` and `RLMArray` class methods
+ The default Realm is used by the `RLMObject` class methods
  which do not take a `RLMRealm` parameter, but is otherwise not special. The
  default Realm is persisted as default.realm under the Documents directory of
  your Application on iOS, and in your application's Application Support
@@ -103,7 +103,7 @@
  the data to last. Realm's internal cache of `RLMRealm`s will not keep the
  in-memory Realm alive across cycles of the run loop, so without a strong
  reference to the `RLMRealm` a new Realm will be created each time. Note that
- `RLMObject`s and `RLMArray`s that refer to objects persisted in a Realm have a
+ `RLMObject`s, `RLMArray`s, and `RLMResults` that refer to objects persisted in a Realm have a
  strong reference to the relevant `RLMRealm`, as do `RLMNotifcationToken`s.
 
  @warning This must be called before any Realm instances are obtained. An
@@ -248,7 +248,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Disabling this on an `RLMRealm` without any strong references to it will not
  have any effect, and it will switch back to YES the next time the `RLMRealm`
  object is created. This is normally irrelevant as it means that there is
- nothing to refresh (as persisted `RLMObject`s and `RLMArray`s have strong
+ nothing to refresh (as persisted `RLMObject`s, `RLMArray`s, and `RLMResults` have strong
  references to the containing `RLMRealm`), but it means that setting
  `RLMRealm.defaultRealm.autorefresh = NO` in
  `application:didFinishLaunchingWithOptions:` and only later storing Realm
@@ -287,7 +287,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  This is the equivalent of `addObject:` except for an array of objects.
 
- @param array  `NSArray` or `RLMArray` of `RLMObject`s (or subclasses) to be added to this Realm.
+ @param array  `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to this Realm.
 
  @see   addObject:
  */
@@ -311,7 +311,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  This is the equivalent of `addOrUpdateObject:` except for an array of objects.
 
- @param array  `NSArray` or `RLMArray` of `RLMObject`s (or subclasses) to be added to this Realm.
+ @param array  `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to this Realm.
 
  @see   addOrUpdateObject:
  */
@@ -325,9 +325,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)deleteObject:(RLMObject *)object;
 
 /**
- Delete an `NSArray` or `RLMArray` of objects from this Realm.
+ Delete an `NSArray`, `RLMArray`, or `RLMResults` of objects from this Realm.
 
- @param array  `RLMArray` or `NSArray` of `RLMObject`s to be deleted.
+ @param array  `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s to be deleted.
  */
 - (void)deleteObjects:(id)array;
 

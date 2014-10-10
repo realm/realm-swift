@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
+#import "RLMResults.h"
 
 #import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
@@ -39,23 +40,8 @@
     NSString *_objectClassName;
 }
 
-/**
- Initialize a standalone RLMArray.
- 
- @warning Realm arrays are typed. You must specify an RLMObject class name
- during initialization and can only add objects of this type to the array.
- 
- @param objectClassName     The class name of the RLMObjects this RLMArray will hold.
- 
- @return                    An initialized RLMArray instance.
- */
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-
-// designated initializer for RLMArray subclasses
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName;
-
-// create standalone array variant
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;
+// initializer
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
@@ -79,17 +65,34 @@
 
 
 //
-// TableView backed RLMArray subclass
+// RLMResults private methods
 //
-@interface RLMArrayTableView : RLMArray
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   query:(std::unique_ptr<tightdb::Query>)query
-                                   realm:(RLMRealm *)realm;
+@interface RLMResults () {
+    @protected
+    // accessor ivars
+    RLMRealm *_realm;
+    NSString *_objectClassName;
+}
 
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::TableView)view
-                                   realm:(RLMRealm *)realm;
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
+                                     realm:(RLMRealm *)realm;
 
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                      view:(tightdb::TableView)view
+                                     realm:(RLMRealm *)realm;
+- (void)deleteObjectsFromRealm;
+@end
+
+
+//
+// RLMResults subclass used when a TableView can't be created - this is used
+// for readonly realms where we can't create an underlying table class for a
+// type, and we need to return a functioal RLMResults instance which is always empty.
+//
+@interface RLMEmptyResults : RLMResults
++ (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName
+                                          realm:(RLMRealm *)realm;
 @end
 
 //
