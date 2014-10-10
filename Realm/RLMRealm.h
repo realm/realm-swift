@@ -287,8 +287,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  This is the equivalent of `addObject:` except for an array of objects.
 
- @param array  `NSArray`, `RLMArray`, `RLMResults`, or another container type that conforms to `NSFastEnumeration`
-                containing objects to be added to this Realm.
+ @param array   An enumerable object such as NSArray or RLMResults which contains objects to be added to
+                this Realm.
 
  @see   addObject:
  */
