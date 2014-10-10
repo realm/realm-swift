@@ -179,7 +179,7 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     return RLMCreateObjectAccessor(_realm, _objectClassName, _backingView.get_source_ndx(index));
 }
 
-- (NSArray *)objectsInRange:(NSRange)range {
+- (NSArray *)arrayWithRange:(NSRange)range {
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
     for (NSUInteger i = 0; i < range.length; i++) {
         [array addObject:[self objectAtIndex:range.location + i]];

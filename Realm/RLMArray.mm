@@ -110,7 +110,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [_backingArray objectAtIndex:index];
 }
 
-- (NSArray *)objectsInRange:(NSRange)range {
+- (NSArray *)arrayWithRange:(NSRange)range {
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
     for (NSUInteger i = 0; i < range.length; i++) {
         [array addObject:[self objectAtIndex:range.location + i]];

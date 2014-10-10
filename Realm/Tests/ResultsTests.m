@@ -265,7 +265,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
 }
 
-- (void)testObjectsInRange
+- (void)testArrayWithRange
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -277,19 +277,19 @@
 
     // test TableView RLMArray
     RLMResults *results = [EmployeeObject allObjects];
-    NSArray *sub = [results objectsInRange:NSMakeRange(0, 3)];
+    NSArray *sub = [results arrayWithRange:NSMakeRange(0, 3)];
     XCTAssertEqual(sub.count, 3U);
     XCTAssertEqualObjects([sub[0] name], @"Joe");
     XCTAssertEqualObjects([sub[2] name], @"Jill");
 
-    sub = [results objectsInRange:NSMakeRange(1, 1)];
+    sub = [results arrayWithRange:NSMakeRange(1, 1)];
     XCTAssertEqual(sub.count, 1U);
     XCTAssertEqualObjects([sub[0] name], @"John");
 
-    sub = [results objectsInRange:NSMakeRange(1, 0)];
+    sub = [results arrayWithRange:NSMakeRange(1, 0)];
     XCTAssertEqual(sub.count, 0U);
 
-    XCTAssertThrows([results objectsInRange:NSMakeRange(1, 3)]);
+    XCTAssertThrows([results arrayWithRange:NSMakeRange(1, 3)]);
 }
 
 - (void)testIndexOfObjectWhere

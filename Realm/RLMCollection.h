@@ -23,7 +23,7 @@
 @required
 
 - (id)objectAtIndex:(NSUInteger)index;
-- (NSArray *)objectsInRange:(NSRange)range;
+- (NSArray *)arrayWithRange:(NSRange)range;
 
 - (id)firstObject;
 - (id)lastObject;

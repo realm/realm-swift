@@ -73,14 +73,13 @@
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
- Returns an NSArray of objects from the given range, creating all
- accessors in the range as needed.
+ Returns an NSArray of objects in the given range.
 
  @param range   The range of objects to return.
 
  @return An NSArray of objects in the given range.
  */
-- (NSArray *)objectsInRange:(NSRange)range;
+- (NSArray *)arrayWithRange:(NSRange)range;
 
 /**
  Returns the first object in the array.

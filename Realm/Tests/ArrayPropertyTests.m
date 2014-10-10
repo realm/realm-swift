@@ -264,7 +264,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
 }
 
-- (void)testObjectsInRange
+- (void)testArrayWithRange
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -276,19 +276,19 @@
     [realm commitWriteTransaction];
 
     // test TableView RLMArray
-    NSArray *sub = [comp.employees objectsInRange:NSMakeRange(0, 3)];
+    NSArray *sub = [comp.employees arrayWithRange:NSMakeRange(0, 3)];
     XCTAssertEqual(sub.count, 3U);
     XCTAssertEqualObjects([sub[0] name], @"Joe");
     XCTAssertEqualObjects([sub[2] name], @"Jill");
 
-    sub = [comp.employees objectsInRange:NSMakeRange(1, 1)];
+    sub = [comp.employees arrayWithRange:NSMakeRange(1, 1)];
     XCTAssertEqual(sub.count, 1U);
     XCTAssertEqualObjects([sub[0] name], @"John");
 
-    sub = [comp.employees objectsInRange:NSMakeRange(1, 0)];
+    sub = [comp.employees arrayWithRange:NSMakeRange(1, 0)];
     XCTAssertEqual(sub.count, 0U);
 
-    XCTAssertThrows([comp.employees objectsInRange:NSMakeRange(1, 3)]);
+    XCTAssertThrows([comp.employees arrayWithRange:NSMakeRange(1, 3)]);
 }
 
 - (void)testFastEnumeration
