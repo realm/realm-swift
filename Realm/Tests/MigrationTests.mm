@@ -46,6 +46,12 @@ extern "C" {
 @interface MigrationTests : RLMTestCase
 @end
 
+// FIXME - remove private api once we support deleting objects
+//         inside migrations
+@interface RLMMigration ()
+@property (nonatomic, strong) RLMRealm *realm;
+@end
+
 @implementation MigrationTests
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
@@ -219,6 +225,41 @@ extern "C" {
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
+- (void)testDuplicatePrimaryKeyMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm commitWriteTransaction];
+
+    // apply migration
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()
+                                       withBlock:^NSUInteger(__unused RLMMigration *migration,
+                                                             __unused NSUInteger oldSchemaVersion) { return 1; }],
+                    @"Migration should throw due to duplicate primary keys)");
+
+
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()
+                       withBlock:^NSUInteger(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                           NSMutableSet *seen = [NSMutableSet set];
+                           NSMutableArray *toDelete = [NSMutableArray array];
+                           [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+                               if ([seen containsObject:newObject[@"intCol"]]) {
+                                   [toDelete addObject:newObject];
+                               }
+                               [seen addObject:newObject[@"intCol"]];
+                           }];
+                           [migration.realm deleteObjects:toDelete];
+                           return 1;
+                       }];
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
