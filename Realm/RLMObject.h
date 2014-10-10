@@ -20,7 +20,7 @@
 #import <Realm/RLMConstants.h>
 
 @class RLMRealm;
-@class RLMArray;
+@class RLMResults;
 @class RLMObjectSchema;
 
 /**
@@ -234,7 +234,7 @@
 + (NSDictionary *)defaultPropertyValues;
 
 /**
- Implement to designate a property as the primary key for a RLMObject subclass. Only properties of
+ Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
 
@@ -259,18 +259,18 @@
 /**
  Get all objects of this type from the default Realm.
  
- @return    An RLMArray of all objects of this type in the default Realm.
+ @return    An RLMResults of all objects of this type in the default Realm.
  */
-+ (RLMArray *)allObjects;
++ (RLMResults *)allObjects;
 
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
  @param predicateFormat The predicate format string which can accept variable arguments.
  
- @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
+ @return    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...;
++ (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 
 /**
@@ -278,9 +278,9 @@
 
  @param predicate   The predicate to filter the objects.
 
- @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
+ @return    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
  */
-+ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
++ (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get the single object with the given primary key from the default Realm.
@@ -307,9 +307,9 @@
 
  @param realm   The Realm instance to query.
 
- @return        An RLMArray of all objects of this type in the specified Realm.
+ @return        An RLMResults of all objects of this type in the specified Realm.
  */
-+ (RLMArray *)allObjectsInRealm:(RLMRealm *)realm;
++ (RLMResults *)allObjectsInRealm:(RLMRealm *)realm;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.
@@ -317,9 +317,9 @@
  @param predicateFormat The predicate format string which can accept variable arguments.
  @param realm           The Realm instance to query.
 
- @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
+ @return    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
  */
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.
@@ -327,9 +327,9 @@
  @param predicate   The predicate to filter the objects.
  @param realm       The Realm instance to query.
 
- @return    An RLMArray of objects of the subclass type in the specified Realm that match the given predicate
+ @return    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
  */
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
 
 /**
  Get the single object with the given primary key from the specified Realm.
@@ -346,7 +346,7 @@
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
 
 /**
- Returns YES if another RLMObject points to the same object in a RLMRealm. For RLMObject types
+ Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types
  with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
 
@@ -371,17 +371,6 @@
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
 #pragma mark -
-
-/**---------------------------------------------------------------------------------------
- *  @name Serializing Objects to JSON
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Returns this object represented as a JSON string.
- 
- @return    JSON string representation of this object.
- */
-- (NSString *)JSONString;
 
 @end
 

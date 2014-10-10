@@ -52,7 +52,7 @@
 }
 @end
 
-// A weak holder for a RLMRealm to allow calling performSelector:onThread: without
+// A weak holder for an RLMRealm to allow calling performSelector:onThread: without
 // a strong reference to the realm
 @interface RLMWeakNotifier : NSObject
 @property (nonatomic, weak) RLMRealm *realm;
@@ -543,7 +543,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMAddObjectToRealm(object, self);
 }
 
-- (void)addObjectsFromArray:(id)array {
+- (void)addObjects:(id<NSFastEnumeration>)array {
     for (RLMObject *obj in array) {
         [self addObject:obj];
     }
@@ -582,26 +582,30 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // call deleteObjectsFromRealm for our RLMArray
         [rlmArray deleteObjectsFromRealm];
     }
+    else if (RLMResults *rlmResults = RLMDynamicCast<RLMResults>(array)) {
+        // call deleteObjectsFromRealm for our RLMResults
+        [rlmResults deleteObjectsFromRealm];
+    }
     else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray or NSArray of RLMObjects" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects" userInfo:nil];
     }
 }
 
-- (RLMArray *)allObjects:(NSString *)objectClassName {
+- (RLMResults *)allObjects:(NSString *)objectClassName {
     return RLMGetObjects(self, objectClassName, nil);
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
+- (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objects:objectClassName where:predicateFormat args:args];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
+- (RLMResults *)objects:(NSString *)objectClassName where:(NSString *)predicateFormat args:(va_list)args {
     return [self objects:objectClassName withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (RLMArray *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
+- (RLMResults *)objects:(NSString *)objectClassName withPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(self, objectClassName, predicate);
 }
 

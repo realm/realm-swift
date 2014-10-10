@@ -151,39 +151,39 @@
     }
 }
 
-+ (RLMArray *)allObjects {
++ (RLMResults *)allObjects {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil);
 }
 
-+ (RLMArray *)allObjectsInRealm:(RLMRealm *)realm {
++ (RLMResults *)allObjectsInRealm:(RLMRealm *)realm {
     return RLMGetObjects(realm, self.className, nil);
 }
 
-+ (RLMArray *)objectsWhere:(NSString *)predicateFormat, ... {
++ (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
-+ (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
++ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args {
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-+(RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ... {
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ... {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objectsInRealm:realm where:predicateFormat args:args];
 }
 
-+(RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args {
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args {
     return [self objectsInRealm:realm withPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-+ (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate {
++ (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, predicate);
 }
 
-+(RLMArray *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate {
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate {
     return RLMGetObjects(realm, self.className, predicate);
 }
 
@@ -193,11 +193,6 @@
 
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey {
     return RLMGetObject(realm, self.className, primaryKey);
-}
-
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
 }
 
 // overridden at runtime per-class for performance

@@ -58,17 +58,6 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqual(totalSum, 100, "total sum should be 100")
     }
 
-    func testReadOnly() {
-        let realm = realmWithTestPath()
-        
-        realm.beginWriteTransaction()
-        let obj = SwiftStringObject.createInRealm(realm, withObject: ["name"])
-        realm.commitWriteTransaction()
-        
-        let array = SwiftStringObject.allObjectsInRealm(realm)
-        XCTAssertTrue(array.readOnly, "Array returned from query should be readonly")
-    }
-
     func testObjectAggregate() {
         let realm = realmWithTestPath()
         
@@ -222,7 +211,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         let company = SwiftCompanyObject()
         realm.addObject(company)
-        company.employees = SwiftEmployeeObject.allObjectsInRealm(realm)
+        company.employees.addObjects(SwiftEmployeeObject.allObjectsInRealm(realm))
         
         realm.commitWriteTransaction()
         
@@ -294,17 +283,6 @@ class SwiftArrayTests: SwiftTestCase {
         }
 
         XCTAssertEqual(totalSum, 100, "total sum should be 100")
-    }
-
-    func testReadOnly_objc() {
-        let realm = realmWithTestPath()
-
-        realm.beginWriteTransaction()
-        let obj = StringObject.createInRealm(realm, withObject: ["name"])
-        realm.commitWriteTransaction()
-
-        let array = StringObject.allObjectsInRealm(realm)
-        XCTAssertTrue(array.readOnly, "Array returned from query should be readonly")
     }
 
     func testObjectAggregate_objc() {
@@ -454,7 +432,7 @@ class SwiftArrayTests: SwiftTestCase {
         let company = CompanyObject()
         company.name = "name"
         realm.addObject(company)
-        company.employees = EmployeeObject.allObjectsInRealm(realm)
+        company.employees.addObjects(EmployeeObject.allObjectsInRealm(realm))
 
         realm.commitWriteTransaction()
 
@@ -524,8 +502,8 @@ class SwiftArrayTests: SwiftTestCase {
         makeEmployee(realm, 40, "C", true)
         realm.commitWriteTransaction()
 
-        let sortedByAge = EmployeeObject.allObjectsInRealm(realm).arraySortedByProperty("age", ascending: true)
-        let sortedByName = sortedByAge.arraySortedByProperty("name", ascending: false)
+        let sortedByAge = EmployeeObject.allObjectsInRealm(realm).sortedResultsUsingProperty("age", ascending: true)
+        let sortedByName = sortedByAge.sortedResultsUsingProperty("name", ascending: false)
 
         XCTAssertEqual(20, (sortedByAge[0] as EmployeeObject).age)
         XCTAssertEqual(40, (sortedByName[0] as EmployeeObject).age)

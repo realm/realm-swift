@@ -17,10 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMQueryUtil.hpp"
-#import "RLMUtil.hpp"
-#import "RLMProperty_Private.h"
+#import "RLMArray.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
+#import "RLMProperty_Private.h"
+#import "RLMUtil.hpp"
 
 #include <tightdb.hpp>
 using namespace tightdb;
@@ -638,6 +639,27 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
     }
 }
 
+RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
+    // validate
+    RLMProperty *prop = schema[propName];
+    RLMPrecondition(prop, @"Invalid sort column", @"Column named '%@' not found.", prop);
+
+    switch (prop.type) {
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeString:
+            break;
+
+        default:
+            @throw RLMPredicateException(@"Invalid sort column type",
+                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
+    }
+    return prop;
+}
+
 } // namespace
 
 void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, RLMSchema *schema,
@@ -659,33 +681,21 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, 
                     (int)validateMessage.size(), validateMessage.c_str());
 }
 
-void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSString *property, BOOL ascending)
-{
-    if (!property || property.length == 0) {
-        return;
-    }
+void RLMGetColumnIndices(RLMObjectSchema *schema, NSArray *properties,
+                         std::vector<size_t> &columns, std::vector<bool> &order) {
+    columns.reserve(properties.count);
+    order.reserve(properties.count);
 
-    RLMProperty *prop = RLMValidatedPropertyForSort(schema, property);
-    view.sort(prop.column, ascending);
+    for (RLMSortDescriptor *descriptor in properties) {
+        columns.push_back(RLMValidatedPropertyForSort(schema, descriptor.property).column);
+        order.push_back(descriptor.ascending);
+    }
 }
 
-RLMProperty *RLMValidatedPropertyForSort(RLMObjectSchema *schema, NSString *propName) {
-    // validate
-    RLMProperty *prop = schema[propName];
-    RLMPrecondition(prop, @"Invalid sort column", @"Column named '%@' not found.", prop);
-
-    switch (prop.type) {
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeString:
-            break;
-
-        default:
-            @throw RLMPredicateException(@"Invalid sort column type",
-                                         @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
-    }
-    return prop;
+void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties)
+{
+    std::vector<size_t> columns;
+    std::vector<bool> order;
+    RLMGetColumnIndices(schema, properties, columns, order);
+    view.sort(move(columns), move(order));
 }

@@ -80,7 +80,7 @@
     [realm commitWriteTransaction];
 
     // test again after write transaction
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
@@ -104,7 +104,7 @@
     [realm commitWriteTransaction];
 
     // delete objects
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
     [realm beginWriteTransaction];
     [realm deleteObjects:objects];
@@ -303,7 +303,7 @@
     [realm transactionWithBlock:^{
         [StringObject createInRealm:realm withObject:@[@"b"]];
     }];
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
@@ -597,7 +597,7 @@
 
     PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string", @1]];
     [realm addOrUpdateObject:obj];
-    RLMArray *objects = [PrimaryStringObject allObjects];
+    RLMResults *objects = [PrimaryStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
 
