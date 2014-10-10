@@ -211,7 +211,7 @@ class SwiftArrayTests: SwiftTestCase {
 
         let company = SwiftCompanyObject()
         realm.addObject(company)
-        company.employees.addObjectsFromArray(SwiftEmployeeObject.allObjectsInRealm(realm))
+        company.employees.addObjects(SwiftEmployeeObject.allObjectsInRealm(realm))
         
         realm.commitWriteTransaction()
         
@@ -432,7 +432,7 @@ class SwiftArrayTests: SwiftTestCase {
         let company = CompanyObject()
         company.name = "name"
         realm.addObject(company)
-        company.employees.addObjectsFromArray(EmployeeObject.allObjectsInRealm(realm))
+        company.employees.addObjects(EmployeeObject.allObjectsInRealm(realm))
 
         realm.commitWriteTransaction()
 

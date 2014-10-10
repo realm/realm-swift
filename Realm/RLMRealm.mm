@@ -543,7 +543,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMAddObjectToRealm(object, self);
 }
 
-- (void)addObjectsFromArray:(id)array {
+- (void)addObjects:(id<NSFastEnumeration>)array {
     for (RLMObject *obj in array) {
         [self addObject:obj];
     }

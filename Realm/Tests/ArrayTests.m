@@ -284,7 +284,7 @@
     
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    [company.employees addObjectsFromArray:[EmployeeObject allObjects]];
+    [company.employees addObjects:[EmployeeObject allObjects]];
     [realm addObject:company];
     
     [realm commitWriteTransaction];
