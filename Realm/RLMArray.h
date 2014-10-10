@@ -113,9 +113,10 @@
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An NSArray, RLMArray or RLMResults of objects of the class contained by this RLMArray.
+ @param objects     An enumerable object such as NSArray or RLMResults which contains objects of the
+                    same class as this RLMArray.
  */
-- (void)addObjectsFromArray:(id)objects;
+- (void)addObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Inserts an object at the given index.

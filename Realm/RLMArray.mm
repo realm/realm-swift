@@ -62,7 +62,7 @@
     return nil;
 }
 
-- (void)addObjectsFromArray:(id)objects {
+- (void)addObjects:(id<NSFastEnumeration>)objects {
     for (id obj in objects) {
         [self addObject:obj];
     }

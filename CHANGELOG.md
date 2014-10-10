@@ -8,6 +8,8 @@
   change was made to support diverging apis and the future addition of change notifications
   for queries.
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
+* `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
+  and now accepts any container class which implements `NSFastEnumeration`
 
 ### Enhancements
 

@@ -449,7 +449,7 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
         return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
             RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
-            [standaloneAr addObjectsFromArray:ar];
+            [standaloneAr addObjects:ar];
             RLMSuperSet(obj, propName, standaloneAr);
         });
     }

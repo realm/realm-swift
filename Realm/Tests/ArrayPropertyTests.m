@@ -92,7 +92,7 @@
     StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
-    [obj.array addObjectsFromArray:@[child2, child1]];
+    [obj.array addObjects:@[child2, child1]];
     [realm commitWriteTransaction];
     
     RLMResults *children = [StringObject allObjectsInRealm:realm];
@@ -175,7 +175,7 @@
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    [company.employees addObjectsFromArray:[EmployeeObject allObjects]];
+    [company.employees addObjects:[EmployeeObject allObjects]];
     [company.employees removeObjectAtIndex:1];
 
     // test standalone
