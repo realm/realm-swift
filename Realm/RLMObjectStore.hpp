@@ -61,4 +61,9 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
 //
 
 // Create accessors
-RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index);
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained NSString *objectClassName,
+                                   NSUInteger index);
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained RLMObjectSchema *objectSchema,
+                                   NSUInteger index);

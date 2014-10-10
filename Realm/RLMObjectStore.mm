@@ -440,15 +440,17 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 }
 
 // Create accessor and register with realm
-RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained NSString *objectClassName,
+                                   NSUInteger index) {
     RLMCheckThread(realm);
-
-    RLMObjectSchema *objectSchema = realm.schema[objectClassName];
-    
-    // get accessor for the object class
-    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
-    tightdb::Table &table = *objectSchema->_table;
-    accessor->_row = table[index];
-    return accessor;
+    return RLMCreateObjectAccessor(realm, realm.schema[objectClassName], index);
 }
 
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained RLMObjectSchema *objectSchema,
+                                   NSUInteger index) {
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+    accessor->_row = (*objectSchema->_table)[index];
+    return accessor;
+}
