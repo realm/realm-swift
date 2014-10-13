@@ -22,9 +22,10 @@
 #import "RLMArrayNode.h"
 
 @class RLMObjectNode;
+@class RLMResults;
 @interface RLMClassNode : RLMTypeNode
 
-@property (nonatomic) RLMArray *allObjects;
+@property (nonatomic) RLMResults *allObjects;
 
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object;
 
