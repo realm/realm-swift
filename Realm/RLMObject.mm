@@ -223,10 +223,10 @@
         return @"<Maximum depth exceeded>";
     }
 
-    NSString *baseClassName = self.objectSchema.className;
+    RLMObjectSchema *objectSchema = self.objectSchema;
+    NSString *baseClassName = objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
-    RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
-    
+
     for (RLMProperty *property in objectSchema.properties) {
         id object = self[property.name];
         NSString *sub;
@@ -239,7 +239,7 @@
         [mString appendFormat:@"\t%@ = %@;\n", property.name, sub];
     }
     [mString appendString:@"}"];
-    
+
     return [NSString stringWithString:mString];
 }
 
