@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMInstanceTableViewController.h"
+#import <Foundation/Foundation.h>
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
@@ -37,6 +38,8 @@
 #import "objc/objc-class.h"
 
 #import "RLMDescriptions.h"
+
+NSString * const kRLMObjectType = @"RLMObjectType";
 
 @interface RLMObject ()
 
@@ -82,6 +85,9 @@
     
     realmDescriptions = [[RLMDescriptions alloc] init];
     
+    [self.tableView registerForDraggedTypes:@[kRLMObjectType]];
+    [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
+
     awake = YES;
 }
 
@@ -156,6 +162,130 @@
     }
     
     return self.displayedType.instanceCount;
+}
+
+- (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+    if (self.realmIsLocked || !self.displaysArray) {
+        return NO;
+    }
+    
+    NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
+    [pboard declareTypes:@[kRLMObjectType] owner:self];
+    [pboard setData:indexSetData forType:kRLMObjectType];
+    
+    return YES;
+}
+
+- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
+{
+    if (operation == NSTableViewDropAbove) {
+        return NSDragOperationMove;
+    }
+    
+    return NSDragOperationNone;
+}
+
+-(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
+}
+
+- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)destination dropOperation:(NSTableViewDropOperation)operation
+{
+    if (self.realmIsLocked || !self.displaysArray) {
+        return NO;
+    }
+    
+    // Check that the dragged item is of correct type
+    NSArray *supportedTypes = @[kRLMObjectType];
+    NSPasteboard *draggingPasteboard = [info draggingPasteboard];
+    NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
+    
+    if ([availableType compare:kRLMObjectType] == NSOrderedSame) {
+        NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
+        NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
+        
+        [self.parentWindowController moveRowsInArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
+        [self moveRowsInRealmFrom:rowIndexes to:destination];
+        
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    if (self.displaysArray && [self.displayedType isEqualTo:arrayNode]) {
+        [self moveRowsFrom:sourceIndexes to:destination inRealm:NO];
+    }
+}
+
+- (void)moveRowsInRealmFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    [self moveRowsFrom:sourceIndexes to:destination inRealm:YES];
+}
+
+- (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination inRealm:(BOOL)inRealm
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    // Move indexset into mutable array
+    NSMutableArray *sources = [NSMutableArray array];
+    [sourceIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [sources addObject:@(idx)];
+    }];
+    
+    if (inRealm) {
+        [realm beginWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+    }
+    
+    // Iterate through the array, representing source row indices
+    for (NSUInteger i = 0; i < sources.count; i++) {
+        NSUInteger source = [sources[i] unsignedIntegerValue];
+        
+        // Perform the move
+        if (inRealm) {
+            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+        }
+        else {
+            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
+            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
+        }
+        
+        //Iterate through the remaining source row indices in the array
+        for (NSUInteger j = i + 1; j < sources.count; j++) {
+            NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
+            // Everything right of the destination is shifted right
+            if (sourceIndexToModify > destination) {
+                sources[j] = @([sources[j] unsignedIntegerValue] + 1);
+            }
+            // Everything right of the current source is shifted left
+            if (sourceIndexToModify > source) {
+                sources[j] = @([sources[j] unsignedIntegerValue] - 1);
+            }
+        }
+        // If the move was from higher index to lower, shift destination right
+        if (source > destination) {
+            destination++;
+        }
+    }
+    
+    if (inRealm) {
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView endUpdates];
+        
+        // Recalculate the row indices in the zeroth column
+        for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
+            NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
+            RLMTableCellView *cell = [rowView viewAtColumn:0];
+            cell.textField.stringValue = [@(k) stringValue];
+        }
+    }
 }
 
 #pragma mark - RLMTableView Data Source

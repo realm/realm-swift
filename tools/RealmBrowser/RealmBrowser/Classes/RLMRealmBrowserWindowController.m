@@ -39,9 +39,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 @interface RLMRealmBrowserWindowController()<NSWindowDelegate>
 
-@property (weak) IBOutlet NSSplitView *splitView;
+@property (atomic, weak) IBOutlet NSSplitView *splitView;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
-@property (weak) IBOutlet NSToolbarItem *lockRealmButton;
+@property (atomic, weak) IBOutlet NSToolbarItem *lockRealmButton;
 @property (nonatomic, strong) IBOutlet NSSearchField *searchField;
 
 @end
@@ -124,8 +124,15 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     self.tableViewController.realmIsLocked = realmIsLocked;
     self.lockRealmButton.image = [NSImage imageNamed:realmIsLocked ? kRealmLockedImage : kRealmUnlockedImage];
     self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
-
+    
     [self.tableViewController.tableView reloadData];
+}
+
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController moveRowsInArrayNode:arrayNode from:sourceIndexes to:destination];
+    }
 }
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
