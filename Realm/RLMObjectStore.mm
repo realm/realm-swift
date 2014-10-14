@@ -39,9 +39,11 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
                                      userInfo:nil];
     }
 
+    NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
+
     // check to see if properties are the same
-    for (RLMProperty *schemaProp in objectSchema.properties) {
-        RLMProperty *tableProp = tableSchema[schemaProp.name];
+    for (RLMProperty *tableProp in tableSchema.properties) {
+        RLMProperty *schemaProp = objectSchema[tableProp.name];
         if (![tableProp.name isEqualToString:schemaProp.name]) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Existing property does not match interface - migration required"
@@ -73,7 +75,11 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
 
         // align
         schemaProp.column = tableProp.column;
+        [properties addObject:schemaProp];
     }
+
+    // ensure the order of the properties matches the column order in the table
+    objectSchema.properties = properties;
 }
 
 // create a column for a property in a table

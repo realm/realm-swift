@@ -17,6 +17,9 @@
 
 ### Bugfixes
 
+* Fix exceptions when trying to set `RLMObject` properties after rearranging
+  the properties in a `RLMObject` subclass.
+
 0.86.3 Release notes (2014-10-09)
 =============================================================
 
