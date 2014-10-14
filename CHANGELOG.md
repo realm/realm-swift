@@ -10,11 +10,13 @@
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
+* BOOL/bool and int properties (of any size) can now be indexed.
 
 ### Enhancements
 
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
 * Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+* Add support for indexing `int` and `bool` properties.
 
 ### Bugfixes
 

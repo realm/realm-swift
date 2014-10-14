@@ -96,12 +96,16 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
         default: {
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
             if (prop.attributes & RLMPropertyAttributeIndexed) {
-                // FIXME - support other types
-                if (prop.type != RLMPropertyTypeString) {
-                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
-                }
-                else {
-                    table.add_search_index(prop.column);
+                switch (prop.type) {
+                    // Core currently supports Date as well, but won't be able
+                    // to if we switch to storing dates as doubles
+                    case RLMPropertyTypeBool:
+                    case RLMPropertyTypeInt:
+                    case RLMPropertyTypeString:
+                        table.add_search_index(prop.column);
+                        break;
+                    default:
+                        NSLog(@"RLMPropertyAttributeIndexed only supported for string, int and bool properties");
                 }
             }
         }
