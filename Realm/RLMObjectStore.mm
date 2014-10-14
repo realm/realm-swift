@@ -28,49 +28,34 @@
 #import <objc/runtime.h>
 
 static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
-    // FIXME - this method should calculate all mismatched columns, and missing/extra columns, and include
-    //         all of this information in a single exception
-    // FIXME - verify property attributes
-
-    // check count
-    if (tableSchema.properties.count != objectSchema.properties.count) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Column count does not match interface - migration required"
-                                     userInfo:nil];
-    }
-
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
+    NSMutableArray *exceptionMessages = [NSMutableArray array];
 
     // check to see if properties are the same
     for (RLMProperty *tableProp in tableSchema.properties) {
         RLMProperty *schemaProp = objectSchema[tableProp.name];
-        if (![tableProp.name isEqualToString:schemaProp.name]) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Existing property does not match interface - migration required"
-                                         userInfo:@{@"property num": @(tableProp.column),
-                                                    @"existing property name": tableProp.name,
-                                                    @"new property name": schemaProp.name}];
+        if (!schemaProp) {
+            [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is missing from latest object model.", tableProp.name]];
+            continue;
         }
         if (tableProp.type != schemaProp.type) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Property types do not match - migration required"
-                                         userInfo:@{@"property name": tableProp.name,
-                                                    @"existing property type": RLMTypeToString(tableProp.type),
-                                                    @"new property type": RLMTypeToString(schemaProp.type)}];
+            [exceptionMessages addObject:[NSString stringWithFormat:@"Property types for '%@' property do not match. Old type '%@', new type '%@'.",
+                                          tableProp.name, RLMTypeToString(tableProp.type), RLMTypeToString(schemaProp.type)]];
+            continue;
         }
         if (tableProp.type == RLMPropertyTypeObject || tableProp.type == RLMPropertyTypeArray) {
             if (![tableProp.objectClassName isEqualToString:schemaProp.objectClassName]) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"Property objectClass does not match - migration required"
-                                             userInfo:@{@"property name": tableProp.name,
-                                                        @"existign objectClass": tableProp.objectClassName,
-                                                        @"new property name": schemaProp.objectClassName}];
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Target object type for property '%@' does not match. Old type '%@', new type '%@'.",
+                                              tableProp.name, tableProp.objectClassName, schemaProp.objectClassName]];
             }
         }
         if (tableProp.isPrimary != schemaProp.isPrimary) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Property primary key designation does not match - migration required"
-                                         userInfo:@{@"property name": tableProp.name}];
+            if (tableProp.isPrimary) {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is no longer a primary key.", tableProp.name]];
+            }
+            else {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made a primary key.", tableProp.name]];
+            }
         }
 
         // align
@@ -78,6 +63,20 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
         [properties addObject:schemaProp];
     }
 
+    // check for new missing properties
+    for (RLMProperty *schemaProp in objectSchema.properties) {
+        if (!tableSchema[schemaProp.name]) {
+            [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been added to latest object model.", schemaProp.name]];
+        }
+    }
+
+    // throw if errors
+    if (exceptionMessages.count) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:[NSString stringWithFormat:@"Migration is required for object type '%@' due to the following errors:\n- %@",
+                                               objectSchema.className, [exceptionMessages componentsJoinedByString:@"\n- "]]
+                                     userInfo:nil];
+    }
     // ensure the order of the properties matches the column order in the table
     objectSchema.properties = properties;
 }

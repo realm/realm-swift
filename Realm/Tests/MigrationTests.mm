@@ -253,6 +253,17 @@ extern "C" {
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
+- (void)testVersionNumberCanStaySameWhenAddingObjectSchema {
+    @autoreleasepool {
+        // create realm with old schema and populate
+        RLMRealm *realm = [self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:MigrationObject.class]];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationObject.className withObject:@[@1, @"1"]];
+        [realm commitWriteTransaction];
+    }
+    XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath()]);
+}
+
 - (void)testRearrangeProperties {
     // create realm with the properties reversed
     @autoreleasepool {
