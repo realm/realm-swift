@@ -242,26 +242,23 @@ extern "C" {
     [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
     [realm commitWriteTransaction];
 
-    // apply migration
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()
-                                       withBlock:^NSUInteger(__unused RLMMigration *migration,
-                                                             __unused NSUInteger oldSchemaVersion) { return 1; }],
-                    @"Migration should throw due to duplicate primary keys)");
+    // apply bad migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
 
-
-    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()
-                       withBlock:^NSUInteger(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-                           NSMutableSet *seen = [NSMutableSet set];
-                           NSMutableArray *toDelete = [NSMutableArray array];
-                           [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
-                               if ([seen containsObject:newObject[@"intCol"]]) {
-                                   [toDelete addObject:newObject];
-                               }
-                               [seen addObject:newObject[@"intCol"]];
-                           }];
-                           [migration.realm deleteObjects:toDelete];
-                           return 1;
-                       }];
+    // apply good migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+       NSMutableSet *seen = [NSMutableSet set];
+       NSMutableArray *toDelete = [NSMutableArray array];
+       [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+           if ([seen containsObject:newObject[@"intCol"]]) {
+               [toDelete addObject:newObject];
+           }
+           [seen addObject:newObject[@"intCol"]];
+       }];
+       [migration.realm deleteObjects:toDelete];
+    }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
