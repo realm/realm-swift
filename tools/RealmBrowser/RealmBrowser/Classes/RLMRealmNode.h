@@ -30,7 +30,7 @@
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
 
-- (RLMArray *)allObjects:(NSString *)className;
+- (RLMResults *)allObjects:(NSString *)className;
 
 @end
 

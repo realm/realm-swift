@@ -24,7 +24,7 @@
 @class RLMObjectNode;
 @interface RLMClassNode : RLMTypeNode
 
-@property (nonatomic) RLMArray *allObjects;
+@property (nonatomic) RLMResults *allObjects;
 
 - (RLMObjectNode *)displayChildObject:(RLMObject *)object;
 
