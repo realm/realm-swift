@@ -371,6 +371,25 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
+- (NSError *)drop {
+    if (![NSRunLoop currentRunLoop]) {
+        @throw [NSException exceptionWithName:@"realm:runloop_exception"
+                                       reason:[NSString stringWithFormat:@"%@ \
+                                               can only be called from a thread with a runloop.",
+                                               NSStringFromSelector(_cmd)] userInfo:nil];
+    }
+
+    if (self.inWriteTransaction) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Can't drop realm while in a write transaction."
+                                     userInfo:nil];
+    }
+
+    NSError *error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:self.path error: &error];
+    return error;
+}
+
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
     CheckReadWrite(self, @"Read-only Realms do not change and do not have change notifications");

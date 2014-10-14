@@ -143,6 +143,15 @@
  */
 + (NSString *)defaultRealmPath;
 
+/**---------------------------------------------------------------------------------------
+ *  @name Drop Realm
+ * ---------------------------------------------------------------------------------------
+ */
+/**
+ Drop this realm.
+ */
+- (NSError *)drop;
+
 #pragma mark - Notifications
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
