@@ -17,6 +17,7 @@
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
 * Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
 * Add support for indexing `int` and `bool` properties.
+* Automatically index primary key properties.
 
 ### Bugfixes
 

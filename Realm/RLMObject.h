@@ -237,6 +237,7 @@
  Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+ The primary key property is automatically indexed.
 
  @return    Name of the property designated as the primary key.
  */

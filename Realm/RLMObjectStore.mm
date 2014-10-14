@@ -190,13 +190,13 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initialize
             if (objectSchema.primaryKeyProperty != nil) {
                 // if there is a primary key set, check if it is the same as the old key
                 if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
-                    RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
+                    RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema);
                     changed = true;
                 }
             }
             else if (tableSchema.primaryKeyProperty) {
                 // there is no primary key, so if thre was one nil out
-                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema);
                 changed = true;
             }
         }
@@ -232,32 +232,84 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 }
 
 template<typename F>
-static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMSetFlag options, bool &created) {
-    // try to get existing row if updating
-    size_t rowIndex = tightdb::not_found;
+static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMSetFlag options) {
     tightdb::Table &table = *schema->_table;
     RLMProperty *primaryProperty = schema.primaryKeyProperty;
-    if ((options & RLMSetFlagUpdateOrCreate) && primaryProperty) {
-        // get primary value
-        id primaryValue = primaryValueGetter(primaryProperty);
-        
-        // search for existing object based on primary key type
+    if (!primaryProperty) {
+        return table.add_empty_row();
+    }
+
+    id primaryValue = primaryValueGetter(primaryProperty);
+
+    // try to get existing row if updating
+    size_t rowIndex = tightdb::not_found;
+    if (options & RLMSetFlagUpdateOrCreate) {
         if (primaryProperty.type == RLMPropertyTypeString) {
-            rowIndex = table.find_first_string(primaryProperty.column, RLMStringDataWithNSString(primaryValue));
+            rowIndex = table.find_pkey_string(RLMStringDataWithNSString(primaryValue)).get_index();
         }
         else {
-            rowIndex = table.find_first_int(primaryProperty.column, [primaryValue longLongValue]);
+            rowIndex = table.find_pkey_int([primaryValue longLongValue]).get_index();
+        }
+
+        if (rowIndex != tightdb::not_found) {
+            return rowIndex;
         }
     }
 
-    // if no existing, create row
-    created = NO;
-    if (rowIndex == tightdb::not_found) {
-        rowIndex = table.add_empty_row();
-        created = YES;
+    // Can't use add_empty_row because a row may already exist with 0/"" in the
+    // primary key column which will immediately fail uniqueness.
+    // Instead make a row with everything but the primary key "empty", since we
+    // can't set all columns for reals now (linklist has to happen after
+    // insert_done() and mixed would involve a lot of duplicated code), and
+    // setting only the ones we can gets really awkward.
+    rowIndex = table.size();
+    for (RLMProperty *prop in schema.properties) {
+        NSUInteger col = prop.column;
+        switch (prop.type) {
+            case RLMPropertyTypeAny:
+                table.insert_mixed(col, table.size(), tightdb::Mixed(false));
+                break;
+            case RLMPropertyTypeArray:
+                table.insert_linklist(col, table.size());
+                break;
+            case RLMPropertyTypeBool:
+                table.insert_bool(col, rowIndex, false);
+                break;
+            case RLMPropertyTypeData:
+                table.insert_binary(col, rowIndex, tightdb::BinaryData(0, 0));
+                break;
+            case RLMPropertyTypeDate:
+                table.insert_datetime(col, table.size(), 0);
+                break;
+            case RLMPropertyTypeDouble:
+                table.insert_double(col, table.size(), 0.0);
+                break;
+            case RLMPropertyTypeFloat:
+                table.insert_float(col, table.size(), 0.0f);
+                break;
+            case RLMPropertyTypeInt:
+                if (prop == primaryProperty) {
+                    table.insert_int(col, rowIndex, [primaryValue longLongValue]);
+                }
+                else {
+                    table.insert_int(col, rowIndex, 0);
+                }
+                break;
+            case RLMPropertyTypeObject:
+                table.insert_link(col, table.size(), tightdb::npos);
+                break;
+            case RLMPropertyTypeString:
+                if (prop == primaryProperty) {
+                    table.insert_string(col, table.size(), RLMStringDataWithNSString(primaryValue));
+                }
+                else {
+                    table.insert_string(col, table.size(), tightdb::StringData(0, 0));
+                }
+                break;
+        }
     }
 
-    // get accessor
+    table.insert_done();
     return rowIndex;
 }
 
@@ -288,9 +340,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
     object.realm = realm;
 
     // get or create row
-    bool created;
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
+    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options)];
 
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
@@ -310,8 +361,8 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
 
         // set in table with out validation
         // skip primary key when updating since it doesn't change
-        if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, options | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+        if (!prop.isPrimary) {
+            RLMDynamicSet(object, prop, value, options);
         }
     }
 
@@ -334,18 +385,16 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         array = RLMValidatedArrayForObjectSchema(value, objectSchema, schema);
 
         // get or create our accessor
-        bool created;
         auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options)];
 
         // populate
         NSArray *props = objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             RLMProperty *prop = props[i];
             // skip primary key when updating since it doesn't change
-            if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, array[i],
-                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+            if (!prop.isPrimary) {
+                RLMDynamicSet(object, prop, array[i], options | RLMSetFlagUpdateOrCreate);
             }
         }
     }
@@ -354,16 +403,14 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
 
         // get or create our accessor
-        bool created;
         auto primaryGetter = [=](RLMProperty *p) { return dict[p.name]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options)];
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {
             // skip primary key when updating since it doesn't change
-            if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name],
-                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+            if (!prop.isPrimary) {
+                RLMDynamicSet(object, prop, dict[prop.name], options | RLMSetFlagUpdateOrCreate);
             }
         }
     }
@@ -433,7 +480,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     size_t row = tightdb::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
         if (NSString *str = RLMDynamicCast<NSString>(key)) {
-            row = objectSchema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
+            row = objectSchema->_table->find_pkey_string(RLMStringDataWithNSString(str)).get_index();
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
@@ -443,7 +490,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     }
     else {
         if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
-            row = objectSchema->_table->find_first_int(primaryProperty.column, number.longLongValue);
+            row = objectSchema->_table->find_pkey_int(number.longLongValue).get_index();
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
