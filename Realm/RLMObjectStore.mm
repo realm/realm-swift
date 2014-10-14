@@ -380,6 +380,15 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     object.realm = nil;
 }
 
+void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
+    RLMVerifyInWriteTransaction(realm);
+
+    // clear table for each object schema
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        objectSchema->_table->clear();
+    }
+}
+
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
     RLMCheckThread(realm);
 

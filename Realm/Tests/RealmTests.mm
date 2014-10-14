@@ -617,4 +617,27 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testDeleteAllObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, OwnerObject.allObjects.count);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(NO, obj.deletedFromRealm);
+
+    XCTAssertThrows([realm deleteAllObjects]);
+
+    [realm transactionWithBlock:^{
+        [realm deleteAllObjects];
+        XCTAssertEqual(YES, obj.deletedFromRealm);
+    }];
+
+    XCTAssertEqual(0U, OwnerObject.allObjects.count);
+    XCTAssertEqual(0U, DogObject.allObjects.count);
+}
+
+
 @end

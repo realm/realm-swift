@@ -46,6 +46,9 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObject *object);
 
+// deletes all objects from a realm
+void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
+
 // get objects of a given class
 RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate);
 

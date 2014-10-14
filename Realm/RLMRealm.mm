@@ -591,6 +591,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
+- (void)deleteAllObjects {
+    RLMDeleteAllObjectsFromRealm(self);
+}
+
 - (RLMResults *)allObjects:(NSString *)objectClassName {
     return RLMGetObjects(self, objectClassName, nil);
 }
