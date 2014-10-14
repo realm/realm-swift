@@ -41,13 +41,13 @@
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 
-@interface RLMObject ()
+@interface RLMRealm ()
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
-                defaultValues:(BOOL)useDefaults;
+- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
 
 @end
+
+
 
 @implementation RLMInstanceTableViewController {
     BOOL awake;
@@ -204,7 +204,10 @@ NSString * const kRLMObjectType = @"RLMObjectType";
         NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
         
+        // Performs the move visually in all relevant windows
         [self.parentWindowController moveRowsInArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
+
+        // Performs the move in the realm
         [self moveRowsInRealmFrom:rowIndexes to:destination];
         
         return YES;
@@ -215,6 +218,7 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
 {
+    // Check if this window is showing the arraynode that is to be rearranged visually
     if (self.displaysArray && [self.displayedType isEqualTo:arrayNode]) {
         [self moveRowsFrom:sourceIndexes to:destination inRealm:NO];
     }
@@ -278,13 +282,16 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     }
     else {
         [self.tableView endUpdates];
-        
-        // Recalculate the row indices in the zeroth column
-        for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
-            NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
-            RLMTableCellView *cell = [rowView viewAtColumn:0];
-            cell.textField.stringValue = [@(k) stringValue];
-        }
+        [self updateArrayIndexColumn];
+    }
+}
+
+-(void)updateArrayIndexColumn
+{
+    for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
+        NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
+        RLMTableCellView *cell = [rowView viewAtColumn:0];
+        cell.textField.stringValue = [@(k) stringValue];
     }
 }
 
@@ -475,28 +482,9 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (void)addRows:(NSIndexSet *)rowIndexes
 {
-    if (self.realmIsLocked) {
-        return;
+    if (!self.realmIsLocked) {
+        [self createObjectsForRows:rowIndexes insertIntoArray:NO];
     }
-    
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMObjectSchema *objectSchema = [realm.schema schemaForClassName:self.displayedType.name];
-    
-    [realm beginWriteTransaction];
-    
-    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
-    
-    for (int i = 0; i < rowsToAdd; i++) {
-        RLMObject *object = [[RLMObject alloc] initWithRealm:nil schema:objectSchema defaultValues:NO];
-
-        [realm addObject:object];
-        for (RLMProperty *property in objectSchema.properties) {
-            object[property.name] = [self defaultValueForPropertyType:property.type];
-        }
-    }
-    
-    [realm commitWriteTransaction];
-    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes
@@ -521,35 +509,9 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (void)insertRows:(NSIndexSet *)rowIndexes
 {
-    if (self.realmIsLocked || !self.displaysArray) {
-        return;
+    if (!self.realmIsLocked) {
+        [self createObjectsForRows:rowIndexes insertIntoArray:YES];
     }
-
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    RLMTypeNode *displayedType = self.displayedType;
-    RLMObjectSchema *objectSchema = displayedType.schema;
-    
-    NSUInteger rowsToInsert = MAX(rowIndexes.count, 1);
-    NSUInteger rowToInsertAt = rowIndexes.firstIndex;
-    
-    if (rowToInsertAt == -1) {
-        rowToInsertAt = 0;
-    }
-    
-    [realm beginWriteTransaction];
-    
-    for (int i = 0; i < rowsToInsert; i++) {
-        RLMObject *object = [[RLMObject alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
-        
-        for (RLMProperty *property in objectSchema.properties) {
-            object[property.name] = [self defaultValueForPropertyType:property.type];
-        }
-        [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
-    }
-
-    [realm commitWriteTransaction];
-    
-    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)removeRows:(NSIndexSet *)rowIndexes
@@ -618,7 +580,7 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     [self.parentWindowController newWindowWithNavigationState:state];
 }
 
-#pragma mark - Private Methods - RLMTableView Delegate
+#pragma mark - Private Methods - RLMTableView Delegate Helpers
 
 - (NSDictionary *)defaultValuesForProperties:(NSArray *)properties
 {
@@ -656,7 +618,7 @@ NSString * const kRLMObjectType = @"RLMObjectType";
             return [NSDate date];
             
         case RLMPropertyTypeData:
-            return @"<Data>";
+            return [@"<Data>" dataUsingEncoding:NSUTF8StringEncoding];
             
         case RLMPropertyTypeAny:
             return @"<Any>";
@@ -717,6 +679,39 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     [realm commitWriteTransaction];
     
     [self.parentWindowController reloadAllWindows];
+}
+
+- (void)createObjectsForRows:(NSIndexSet *)rowIndexes insertIntoArray:(BOOL)performInsert
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
+    for (RLMProperty *property in self.displayedType.schema.properties) {
+        objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
+    }
+    
+    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
+    NSUInteger rowToInsertAt = rowIndexes.count > 0 ? rowIndexes.lastIndex : self.displayedType.instanceCount;
+    
+    [realm beginWriteTransaction];
+    [self.tableView beginUpdates];
+    
+    for (int i = 0; i < rowsToAdd; i++) {
+        RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+        [realm addObject:object];
+        if (performInsert && [self.displayedType isKindOfClass:[RLMArrayNode class]]) {
+            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
+        }
+    }
+    
+    [self.tableView insertRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(rowToInsertAt, rowsToAdd)] withAnimation:NSTableViewAnimationEffectGap];
+    
+    [realm commitWriteTransaction];
+    [self.tableView endUpdates];
+    
+    [self updateArrayIndexColumn];
+
+//    [self.parentWindowController reloadAllWindows];
 }
 
 #pragma mark - Mouse Handling

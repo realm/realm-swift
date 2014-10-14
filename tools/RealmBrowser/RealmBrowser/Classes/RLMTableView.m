@@ -291,6 +291,14 @@
     // Menu items that do require editing
     
     // Menu items that make sense without a row selected
+    
+    if (self.realmDelegate.displaysArray) {
+        [self.menu addItem:insertIntoArrayItem];
+    }
+    else {
+        [self.menu addItem:addRowItem];
+    }
+    
     if (self.selectedRowIndexes.count == 0) {
         return;
     }
