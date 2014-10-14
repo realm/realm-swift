@@ -332,6 +332,12 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 - (void)deleteObjects:(id)array;
 
+/**
+ Deletes all objects in this Realm.
+ */
+- (void)deleteAllObjects;
+
+
 #pragma mark - Migrations
 
 /**
