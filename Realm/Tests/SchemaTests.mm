@@ -17,21 +17,152 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <XCTest/XCTest.h>
+
 #import "RLMTestCase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+
+#import <objc/runtime.h>
+
+@interface SchemaTestClassBase : RLMObject
+@property IntObject *baseCol;
+@end
+@implementation SchemaTestClassBase
+@end
+
+@interface SchemaTestClassFirstChild : SchemaTestClassBase
+@property IntObject *firstChildCol;
+@end
+@implementation SchemaTestClassFirstChild
+@end
+
+@interface SchemaTestClassSecondChild : SchemaTestClassBase
+@property IntObject *secondChildCol;
+@end
+@implementation SchemaTestClassSecondChild
+@end
+
+RLM_ARRAY_TYPE(SchemaTestClassBase)
+RLM_ARRAY_TYPE(SchemaTestClassFirstChild)
+RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
+
+@interface SchemaTestClassLink : RLMObject
+@property SchemaTestClassBase *base;
+@property SchemaTestClassFirstChild *child;
+@property SchemaTestClassSecondChild *secondChild;
+
+@property RLMArray<SchemaTestClassBase> *baseArray;
+@property RLMArray<SchemaTestClassFirstChild> *childArray;
+@property RLMArray<SchemaTestClassSecondChild> *secondChildArray;
+@end
+@implementation SchemaTestClassLink
+@end
 
 @interface SchemaTests : RLMTestCase
-
 @end
 
 @implementation SchemaTests
 
+- (void)testInheritanceInitialization
+{
+    Class testClasses[] = {
+        [SchemaTestClassBase class],
+        [SchemaTestClassFirstChild class],
+        [SchemaTestClassSecondChild class],
+        [SchemaTestClassLink class],
+        [IntObject class]
+    };
+
+    auto pred = ^(Class lft, Class rgt) {
+        return (uintptr_t)lft < (uintptr_t)rgt;
+    };
+
+    auto checkSchema = ^(RLMSchema *schema, NSString *className, NSDictionary *properties) {
+        RLMObjectSchema *objectSchema = schema[className];
+        XCTAssertEqualObjects(className, objectSchema.className);
+        XCTAssertEqualObjects(className, [objectSchema.standaloneClass className]);
+        XCTAssertEqualObjects(className, [objectSchema.accessorClass className]);
+
+        XCTAssertEqual(objectSchema.properties.count, properties.count);
+        for (NSString *propName in properties) {
+            XCTAssertEqualObjects(properties[propName], [objectSchema[propName] objectClassName]);
+        }
+    };
+
+    // Test each permutation of loading orders and verify that all properties
+    // are initialized correctly
+    std::sort(testClasses, std::end(testClasses), pred);
+    do @autoreleasepool {
+        // Clean up any existing overridden things
+        for (Class cls : testClasses) {
+            NSString *className = NSStringFromClass(cls);
+            if (Class subclass = NSClassFromString([@"RLMAccessor_" stringByAppendingString:className])) {
+                objc_disposeClassPair(subclass);
+            }
+            if (Class subclass = NSClassFromString([@"RLMStandalone_" stringByAppendingString:className])) {
+                objc_disposeClassPair(subclass);
+            }
+
+            // Ensure that the className method isn't used during schema init
+            // as it may not be overriden yet
+            Class metaClass = objc_getMetaClass(className.UTF8String);
+            IMP imp = imp_implementationWithBlock(^{ return nil; });
+            class_replaceMethod(metaClass, @selector(className), imp, "@:");
+            class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@:");
+        }
+
+        NSMutableArray *objectSchemas = [NSMutableArray arrayWithCapacity:4U];
+        for (Class cls : testClasses) {
+            [objectSchemas addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
+        }
+
+        RLMSchema *schema = [[RLMSchema alloc] init];
+        schema.objectSchema = objectSchemas;
+
+        for (RLMObjectSchema *objectSchema in objectSchemas) {
+            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+        }
+
+        // Verify that each class has the correct properties and className
+        // for generated subclasses
+        checkSchema(schema, @"SchemaTestClassBase", @{@"baseCol": @"IntObject"});
+        checkSchema(schema, @"SchemaTestClassFirstChild", @{@"baseCol": @"IntObject",
+                                                            @"firstChildCol": @"IntObject"});
+        checkSchema(schema, @"SchemaTestClassSecondChild", @{@"baseCol": @"IntObject",
+                                                            @"secondChildCol": @"IntObject"});
+        checkSchema(schema, @"SchemaTestClassLink", @{@"base": @"SchemaTestClassBase",
+                                                      @"baseArray": @"SchemaTestClassBase",
+                                                      @"child": @"SchemaTestClassFirstChild",
+                                                      @"childArray": @"SchemaTestClassFirstChild",
+                                                      @"secondChild": @"SchemaTestClassSecondChild",
+                                                      @"secondChildArray": @"SchemaTestClassSecondChild"});
+
+        for (Class cls : testClasses) {
+            NSString *className = NSStringFromClass(cls);
+
+            // Restore the className method
+            Class metaClass = objc_getMetaClass(className.UTF8String);
+            IMP imp = imp_implementationWithBlock(^{ return className; });
+            class_replaceMethod(metaClass, @selector(className), imp, "@:");
+        }
+
+        // Test creating objects of each class
+        [self.class deleteFiles];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        [realm beginWriteTransaction];
+        [SchemaTestClassBase createInRealm:realm withObject:@{@"baseCol": @[@0]}];
+        [SchemaTestClassFirstChild createInRealm:realm withObject:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
+        [SchemaTestClassSecondChild createInRealm:realm withObject:@{@"baseCol": @[@0], @"secondChildCol": @[@0]}];
+        [realm commitWriteTransaction];
+    } while (std::next_permutation(testClasses, std::end(testClasses), pred));
+}
+
 - (void)testObjectSchema
 {
     // Setting up some test data
-    
+
     // Due to the automatic initialization of a new realm with all visible classes inheriting from
     // RLMObject, it's difficult to define test cases that verify the absolute correctness of a
     // realm's current type catalogue unless its expected configuration is known at compile time

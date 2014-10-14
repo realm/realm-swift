@@ -140,6 +140,8 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @property int age;
 @end
 
+RLM_ARRAY_TYPE(DogObject)
+
 #pragma mark OwnerObject
 
 @interface OwnerObject : RLMObject

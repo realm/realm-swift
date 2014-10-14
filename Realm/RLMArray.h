@@ -17,28 +17,24 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMCollection.h>
 
-@class RLMObject, RLMRealm;
+@class RLMObject, RLMRealm, RLMResults;
 
 /**
  
- RLMArray is the primary container type in Realm.
+ RLMArray is the container type in Realm used to define to-many relationships.
+
  Unlike an NSArray, RLMArrays hold a single type, specified by the `objectClassName` property.
  This is referred to in these docs as the “type” of the array.
  
- RLMArrays can be queried with the same predicates as RLMObject and RLMRealm,
- so you can easily chain queries to further filter query results.
- 
- RLMArrays fulfill 2 primary purposes:
- 
- - Hold the results of a query. Using one of the query methods on RLMRealm or RLMObject will return a typed RLMArray of results.
- - Allow the declaration of one-to-many relationships. See RLMObject class documentation for details.
- 
+ RLMArrays can be queried with the same predicates as RLMObject and RLMResults.
+
  RLMArrays cannot be created directly. RLMArray properties on RLMObjects are
  lazily created when accessed, or can be obtained by querying a Realm.
  */
 
-@interface RLMArray : NSObject<NSFastEnumeration>
+@interface RLMArray : NSObject<RLMCollection, NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
  *  @name RLMArray Properties
@@ -54,12 +50,6 @@
  The class name (i.e. type) of the RLMObjects contained in this RLMArray.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
-
-/**
- Indicates if the RLMArray is readOnly. 
- YES for RLMArray instances returned from predicate queries and object enumeration.
- */
-@property (nonatomic, readonly, getter = isReadOnly) BOOL readOnly;
 
 /**
  The Realm in which this array is persisted. Returns nil for standalone arrays.
@@ -123,9 +113,10 @@
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An NSArray or RLMArray of objects of the class contained by this RLMArray.
+ @param objects     An enumerable object such as NSArray or RLMResults which contains objects of the
+                    same class as this RLMArray.
  */
-- (void)addObjectsFromArray:(id)objects;
+- (void)addObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Inserts an object at the given index.
@@ -216,108 +207,39 @@
  
  @param predicateFormat The predicate format string which can accept variable arguments.
  
- @return                An RLMArray of objects that match the given predicate
+ @return                An RLMResults of objects that match the given predicate
  */
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
  @param predicate   The predicate to filter the objects.
  
- @return            An RLMArray of objects that match the given predicate
+ @return            An RLMResults of objects that match the given predicate
  */
-- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Get a sorted RLMArray from an existing RLMArray
+ Get a sorted RLMResults from an RLMArray
  
  @param property    The property name to sort by.
  @param ascending   The direction to sort by.
  
- @return    An RLMArray sorted by the specified property.
+ @return    An RLMResults sorted by the specified property.
  */
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+
+/**
+ Get a sorted RLMResults from an RLMArray
+
+ @param properties  An array of `RLMSortDescriptor`s to sort by.
+
+ @return    An RLMResults sorted by the specified properties.
+ */
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 
 #pragma mark -
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Aggregating Property Values
- *  ---------------------------------------------------------------------------------------
- */
-
-/**
- Returns the minimum (lowest) value of the given property
-
- NSNumber *min = [array minOfProperty:@"age"];
-
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
-
- @param property The property to look for a minimum on. Only properties of type int, float, double and NSDate are supported.
-
- @return The minimum value for the property amongst objects in an RLMArray.
- */
--(id)minOfProperty:(NSString *)property;
-
-/**
- Returns the maximum (highest) value of the given property of objects in an RLMArray
-
- NSNumber *max = [array maxOfProperty:@"age"];
-
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
-
- @param property The property to look for a maximum on. Only properties of type int, float, double and NSDate are supported.
-
- @return The maximum value for the property amongst objects in an RLMArray
- */
--(id)maxOfProperty:(NSString *)property;
-
-/**
- Returns the sum of the given property for objects in an RLMArray.
- 
- NSNumber *sum = [array sumOfProperty:@"age"];
- 
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to calculate sum on. Only properties of type int, float and double are supported.
- 
- @return The sum of the given property over all objects in an RLMArray.
- */
--(NSNumber *)sumOfProperty:(NSString *)property;
-
-/**
- Returns the average of a given property for objects in an RLMArray.
- 
- NSNumber *average = [table averageOfProperty:@"age"];
- 
- @warning You cannot use this method on RLMObject, RLMArray, and NSData properties.
- 
- @param property The property to calculate average on. Only properties of type int, float and double are supported.
- 
- @return    The average for the given property amongst objects in an RLMArray. This will be of type double for both
-            float and double properties.
- */
--(NSNumber *)averageOfProperty:(NSString *)property;
-
-
-#pragma mark -
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Serializing an Array to JSON
- *  ---------------------------------------------------------------------------------------
- */
-/**
- Returns the RLMArray and the RLMObjects it contains as a JSON string.
- 
- @return    JSON string representation of this RLMArray.
- */
-- (NSString *)JSONString;
-
-
-#pragma mark -
-
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
@@ -340,6 +262,36 @@
  RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
  */
 + (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
+
+@end
+
+/**
+ An RLMSortDescriptor stores a property name and a sort order for use with
+ `sortedResultsUsingDescriptors:`. It is similar to NSSortDescriptor, but supports
+ only the subset of functionality which can be efficiently run by the query
+ engine. RLMSortDescriptor instances are immutable.
+ */
+@interface RLMSortDescriptor : NSObject
+
+/**
+ The name of the property which this sort descriptor orders results by.
+ */
+@property (nonatomic, readonly) NSString *property;
+
+/**
+ Whether this descriptor sorts in ascending or descending order.
+ */
+@property (nonatomic, readonly) BOOL ascending;
+
+/**
+ Returns a new sort descriptor for the given property name and order.
+ */
++ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
+
+/**
+ Returns a copy of the receiver with the sort order reversed.
+ */
+- (instancetype)reversedSortDescriptor;
 
 @end
 

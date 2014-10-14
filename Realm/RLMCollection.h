@@ -16,24 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+@class RLMResults, RLMObject;
 
-#import "RLMTypeNode.h"
-#import "RLMArrayNode.h"
+@protocol RLMCollection <NSFastEnumeration>
 
-@class RLMObjectNode;
-@interface RLMClassNode : RLMTypeNode
+@required
 
-@property (nonatomic) RLMResults *allObjects;
-
-- (RLMObjectNode *)displayChildObject:(RLMObject *)object;
-
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result;
-
-- (void)removeAllChildNodes;
-
-- (void)removeDisplayingOfArrayAtIndex:(NSUInteger)index;
-
-- (void)removeDisplayingOfArrayFromObjectAtIndex:(NSUInteger)index;
+- (id)objectAtIndex:(NSUInteger)index;
+- (id)firstObject;
+- (id)lastObject;
+- (NSUInteger)indexOfObject:(RLMObject *)object;
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 @end

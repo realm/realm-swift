@@ -82,7 +82,10 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 + (void)tearDown
 {
     [super tearDown];
+    [self deleteFiles];
+}
 
++ (void)deleteFiles {
     // Clear cache
     [RLMRealm clearRealmCache];
     

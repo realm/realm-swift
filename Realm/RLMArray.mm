@@ -27,26 +27,20 @@
 @synthesize realm = _realm;
 @synthesize objectClassName = _objectClassName;
 
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone {
+    self = [super init];
+    if (self) {
+        _objectClassName = objectClassName;
+        if (standalone) {
+            _backingArray = [[NSMutableArray alloc] init];
+        }
+    }
+    return self;
+}
+
+// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
-    self = [super init];
-    if (self) {
-        _objectClassName = objectClassName;
-        _backingArray = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName {
-    self = [super init];
-    if (self) {
-        _objectClassName = objectClassName;
-    }
-    return self;
-
-}
-
-- (BOOL)isReadOnly {
-    return NO;
+    return [self initWithObjectClassName:objectClassName standalone:YES];
 }
 
 //
@@ -68,7 +62,7 @@
     return nil;
 }
 
-- (void)addObjectsFromArray:(id)objects {
+- (void)addObjects:(id<NSFastEnumeration>)objects {
     for (id obj in objects) {
         [self addObject:obj];
     }
@@ -110,12 +104,6 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
                                        reason:@"Object type does not match RLMArray"
                                      userInfo:nil];
     }
-}
-
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName {
-    RLMArray *ar = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-    ar->_backingArray = [NSMutableArray array];
-    return ar;
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
@@ -168,52 +156,39 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 // Methods unsupported on standalone RLMArray instances
 //
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat, ...
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...
 {
     va_list args;
     RLM_VARARG(predicateFormat, args);
     return [self objectsWhere:predicateFormat args:args];
 }
 
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)objectsWithPredicate:(NSPredicate *)predicate
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
+{
+    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
+}
+
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
+                                   reason:@"This method can only be called on RLMArray instances retrieved from an RLMRealm" userInfo:nil];
 }
 
--(id)minOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(id)maxOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(NSNumber *)sumOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
-
--(NSNumber *)averageOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"This method can only be called in RLMArray instances retrieved from an RLMRealm" userInfo:nil];
-}
+#pragma GCC diagnostic pop
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...
 {
@@ -230,19 +205,12 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate
 {
-    RLMArray *objects = [self objectsWithPredicate:predicate];
+    RLMResults *objects = [self objectsWithPredicate:predicate];
     if ([objects count] == 0) {
         return NSNotFound;
     }
     return [self indexOfObject:[objects firstObject]];
 }
-#pragma GCC diagnostic pop
-
-- (NSString *)JSONString {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Method not implemented" userInfo:nil];
-}
-
 
 #pragma mark - Superclass Overrides
 
@@ -285,6 +253,25 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
     [mString appendFormat:@"\n)"];
     return [NSString stringWithString:mString];
+}
+
+@end
+
+@interface RLMSortDescriptor ()
+@property (nonatomic, strong) NSString *property;
+@property (nonatomic, assign) BOOL ascending;
+@end
+
+@implementation RLMSortDescriptor
++ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending {
+    RLMSortDescriptor *desc = [[RLMSortDescriptor alloc] init];
+    desc->_property = propertyName;
+    desc->_ascending = ascending;
+    return desc;
+}
+
+- (instancetype)reversedSortDescriptor {
+    return [self.class sortDescriptorWithProperty:_property ascending:!_ascending];
 }
 
 @end

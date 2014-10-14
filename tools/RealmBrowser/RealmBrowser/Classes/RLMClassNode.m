@@ -23,7 +23,7 @@
 
 // private redeclaration
 @interface RLMRealm ()
-- (RLMArray *)allObjects:(NSString *)className;
+- (RLMResults *)allObjects:(NSString *)className;
 @end
 
 
@@ -118,7 +118,7 @@
     return result;
 }
 
-- (RLMArray *)allObjects
+- (RLMResults *)allObjects
 {
     if (!_allObjects) {
         _allObjects = [self.realm allObjects:self.schema.className];

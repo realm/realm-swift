@@ -39,9 +39,11 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
                                      userInfo:nil];
     }
 
+    NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
+
     // check to see if properties are the same
-    for (RLMProperty *schemaProp in objectSchema.properties) {
-        RLMProperty *tableProp = tableSchema[schemaProp.name];
+    for (RLMProperty *tableProp in tableSchema.properties) {
+        RLMProperty *schemaProp = objectSchema[tableProp.name];
         if (![tableProp.name isEqualToString:schemaProp.name]) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Existing property does not match interface - migration required"
@@ -73,7 +75,11 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
 
         // align
         schemaProp.column = tableProp.column;
+        [properties addObject:schemaProp];
     }
+
+    // ensure the order of the properties matches the column order in the table
+    objectSchema.properties = properties;
 }
 
 // create a column for a property in a table
@@ -215,7 +221,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on a RLMRealm instance first."
+                                       reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
                                      userInfo:nil];
     }
     RLMCheckThread(realm);
@@ -374,7 +380,16 @@ void RLMDeleteObjectFromRealm(RLMObject *object) {
     object.realm = nil;
 }
 
-RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
+void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
+    RLMVerifyInWriteTransaction(realm);
+
+    // clear table for each object schema
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        objectSchema->_table->clear();
+    }
+}
+
+RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
     RLMCheckThread(realm);
 
     // create view from table and predicate
@@ -382,16 +397,16 @@ RLMArray *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate 
     if (!objectSchema->_table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
-        return [RLMArray standaloneArrayWithObjectClassName:objectClassName];
+        return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
     }
     tightdb::Query query = objectSchema->_table->where();
     RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
     
     // create and populate array
-    __autoreleasing RLMArray * array = [RLMArrayTableView arrayWithObjectClassName:objectClassName
-                                                                             query:std::make_unique<Query>(query)
-                                                                             realm:realm];
-    return array;
+    __autoreleasing RLMResults * results = [RLMResults resultsWithObjectClassName:objectClassName
+                                                                            query:std::make_unique<Query>(query)
+                                                                            realm:realm];
+    return results;
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {

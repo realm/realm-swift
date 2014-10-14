@@ -43,8 +43,8 @@
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
 
     RLMRealm *realm = [self realmWithTestPath];
-    RLMArray *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
-    RLMArray *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
     XCTAssertEqual(owners.count, 1U);
     XCTAssertEqual(dogs.count, 1U);
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -66,8 +66,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
 
-    RLMArray *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
-    RLMArray *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
     XCTAssertEqual(owners.count, 1U);
     XCTAssertEqual(dogs.count, 0U);
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -164,7 +164,7 @@
     [realm addObject:obj1];
     [realm commitWriteTransaction];
 
-    RLMArray *results = [CircleObject allObjects];
+    RLMResults *results = [CircleObject allObjects];
     XCTAssertEqualObjects(@"a", [results[0] data]);
     XCTAssertEqualObjects(@"b", [results[1] data]);
 }

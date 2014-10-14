@@ -159,7 +159,9 @@ extern "C" {
     // verify migration
     realm = [self realmWithTestPath];
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
-    XCTAssertThrows(mig1[@"deletedCol"], @"Deleted column should no longer be accessible.");
+    XCTAssertThrows(mig1[@"oldIntCol"], @"Deleted column should no longer be accessible.");
+    XCTAssertEqual(0U, [mig1.objectSchema.properties[0] column]);
+    XCTAssertEqual(1U, [mig1.objectSchema.properties[1] column]);
 }
 
 - (void)testChangePropertyType {
@@ -249,6 +251,31 @@ extern "C" {
         }];
     }];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
+}
+
+- (void)testRearrangeProperties {
+    // create realm with the properties reversed
+    @autoreleasepool {
+        RLMSchema *schema = [[RLMSchema sharedSchema] copy];
+        RLMObjectSchema *objectSchema = schema[@"CircleObject"];
+        objectSchema.properties = @[objectSchema.properties[1], objectSchema.properties[0]];
+
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+        [realm beginWriteTransaction];
+        [realm createObject:CircleObject.className withObject:@[NSNull.null, @"data"]];
+        [realm commitWriteTransaction];
+    }
+
+    // migration should not be requried
+    RLMRealm *realm = nil;
+    XCTAssertNoThrow(realm = [self realmWithTestPath]);
+
+    // accessors should work
+    CircleObject *obj = [[CircleObject allObjectsInRealm:realm] firstObject];
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow(obj.data = @"new data");
+    XCTAssertNoThrow(obj.next = obj);
+    [realm commitWriteTransaction];
 }
 
 @end

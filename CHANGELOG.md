@@ -2,6 +2,27 @@
 =============================================================
 
 ### API breaking changes
+* RLMArray has been split into two classes, `RLMArray` and `RLMResults`. RLMArray is
+  used for object properties as in previous releases. Moving forward all methods used to
+  enumerate, query, and sort objects return an instance of a new class `RLMResults`. This
+  change was made to support diverging apis and the future addition of change notifications
+  for queries.
+* `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
+* `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
+  and now accepts any container class which implements `NSFastEnumeration`
+
+### Enhancements
+
+* Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
+* Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+
+### Bugfixes
+
+* Fix exceptions when trying to set `RLMObject` properties after rearranging
+  the properties in a `RLMObject` subclass.
+
+0.86.3 Release notes (2014-10-09)
+=============================================================
 
 ### Enhancements
 

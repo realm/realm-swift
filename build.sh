@@ -303,6 +303,7 @@ case "$COMMAND" in
         sh build.sh docs
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
+        sh build.sh browser "$XCMODE"
         exit 0
         ;;
 

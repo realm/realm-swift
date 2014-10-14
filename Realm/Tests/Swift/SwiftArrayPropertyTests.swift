@@ -105,7 +105,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let child1 = SwiftStringObject.createInRealm(realm, withObject: ["a"])
         let child2 = SwiftStringObject()
         child2.stringCol = "b"
-        obj.array.addObjectsFromArray([child2, child1])
+        obj.array.addObjects([child2, child1])
         realm.commitWriteTransaction()
 
         let children = SwiftStringObject.allObjectsInRealm(realm)
@@ -218,7 +218,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let child1 = StringObject.createInRealm(realm, withObject: ["a"])
         let child2 = StringObject()
         child2.stringCol = "b"
-        obj.array.addObjectsFromArray([child2, child1])
+        obj.array.addObjects([child2, child1])
         realm.commitWriteTransaction()
 
         let children = StringObject.allObjectsInRealm(realm)
