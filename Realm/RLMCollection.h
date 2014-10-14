@@ -23,15 +23,21 @@
 @required
 
 - (id)objectAtIndex:(NSUInteger)index;
+- (NSArray *)arrayWithRange:(NSRange)range;
+
 - (id)firstObject;
 - (id)lastObject;
+
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
+
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 @end

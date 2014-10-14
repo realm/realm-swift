@@ -70,6 +70,15 @@
 - (id)objectAtIndex:(NSUInteger)index;
 
 /**
+ Returns an NSArray of objects in the given range.
+
+ @param range   The range of objects to return.
+
+ @return An NSArray of objects in the given range.
+ */
+- (NSArray *)arrayWithRange:(NSRange)range;
+
+/**
  Returns the first object in the results.
 
  Returns `nil` if called on an empty RLMResults.

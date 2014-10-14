@@ -110,6 +110,14 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [_backingArray objectAtIndex:index];
 }
 
+- (NSArray *)arrayWithRange:(NSRange)range {
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:range.length];
+    for (NSUInteger i = 0; i < range.length; i++) {
+        [array addObject:[self objectAtIndex:range.location + i]];
+    }
+    return array;
+}
+
 - (NSUInteger)count {
     return _backingArray.count;
 }

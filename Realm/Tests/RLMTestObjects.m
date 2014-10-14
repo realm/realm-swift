@@ -64,22 +64,17 @@
 #pragma mark - Real Life Objects
 #pragma mark -
 
-#pragma mark EmployeeObject
-
 @implementation EmployeeObject
 @end
-
-#pragma mark CompanyObject
 
 @implementation CompanyObject
 @end
 
-#pragma mark DogObject
-
 @implementation DogObject
 @end
 
-#pragma mark OwnerObject
+@implementation DogArrayObject
+@end
 
 @implementation OwnerObject
 @end
@@ -87,46 +82,29 @@
 #pragma mark - Specific Use Objects
 #pragma mark -
 
-#pragma mark MixedObject
-
 @implementation MixedObject
 @end
-
-#pragma mark CustomAccessorsObject
 
 @implementation CustomAccessorsObject
 @end
 
-#pragma mark BaseClassStringObject
-
 @implementation BaseClassStringObject
 @end
-
-#pragma mark CircleObject
 
 @implementation CircleObject
 @end
 
-#pragma mark CircleArrayObject
-
 @implementation CircleArrayObject
 @end
-
-#pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject
 @end
 
-#pragma mark DynamicObject
-
 @implementation DynamicObject
 @end
 
-#pragma mark AggregateObject
-
 @implementation AggregateObject
 @end
-
 
 @implementation PrimaryStringObject
 + (NSString *)primaryKey {

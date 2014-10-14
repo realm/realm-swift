@@ -13,7 +13,10 @@
 
 ### Enhancements
 
-* Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
+* Added support for sorting `RLMArray`s and `RLMResults` by multiple columns using a new method
+  `sortedResultsUsingDescriptors:`
+* Added a method `arrayWithRange:` to `RLMResults` and `RLMArray` to get a range of objects as 
+  an NSArray.
 
 ### Bugfixes
 
