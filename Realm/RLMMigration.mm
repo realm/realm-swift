@@ -76,17 +76,17 @@
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
     if (objects && oldObjects) {
-        for (NSUInteger i = 0; i < oldObjects.count; i++) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], objects[i]);
         }
     }
     else if (objects) {
-        for (NSUInteger i = 0; i < objects.count; i++) {
+        for (long i = objects.count - 1; i >= 0; i--) {
             block(nil, objects[i]);
         }
     }
     else if (oldObjects) {
-        for (NSUInteger i = 0; i < oldObjects.count; i++) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], nil);
         }
     }
@@ -139,15 +139,25 @@
         // apply block and set new schema version
         NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
         block(self, oldVersion);
-        RLMRealmSetSchemaVersion(_realm, newVersion);
 
         // verify uniqueness for any new unique columns before committing
         [self verifyPrimaryKeyUniqueness];
+
+        // update new version
+        RLMRealmSetSchemaVersion(_realm, newVersion);
     }
     @finally {
         // end transaction
         [_realm commitWriteTransaction];
     }
+}
+
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object {
+    return [_realm createObject:className withObject:object];
+}
+
+- (void)deleteObject:(RLMObject *)object {
+    [_realm deleteObject:object];
 }
 
 @end

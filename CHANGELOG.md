@@ -7,6 +7,10 @@
   enumerate, query, and sort objects return an instance of a new class `RLMResults`. This
   change was made to support diverging apis and the future addition of change notifications
   for queries.
+* The api for migrations has changed. You now call `setSchemaVersion:withMigrationBlock:` to
+  register a global migration block and associated version. This block is applied to Realms as
+  needed when opened for Realms at a previous version. The block can be applied manually if
+  desired by called `migrateRealmAtPath`.
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
@@ -14,12 +18,16 @@
 ### Enhancements
 
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
-* Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+* Added method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+* Added method `createObject:withObject:` which allows object creation during migrations.
+* Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 
 ### Bugfixes
 
 * Fix exceptions when trying to set `RLMObject` properties after rearranging
   the properties in a `RLMObject` subclass.
+* Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
+  the newly created Realm can be initialized with an incorrect schema version.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================

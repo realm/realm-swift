@@ -46,12 +46,6 @@ extern "C" {
 @interface MigrationTests : RLMTestCase
 @end
 
-// FIXME - remove private api once we support deleting objects
-//         inside migrations
-@interface RLMMigration ()
-@property (nonatomic, strong) RLMRealm *realm;
-@end
-
 @implementation MigrationTests
 
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
@@ -248,17 +242,37 @@ extern "C" {
 
     // apply good migration
     [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
-       NSMutableSet *seen = [NSMutableSet set];
-       NSMutableArray *toDelete = [NSMutableArray array];
-       [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+        NSMutableSet *seen = [NSMutableSet set];
+        __block bool duplicateDeleted = false;
+        [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
            if ([seen containsObject:newObject[@"intCol"]]) {
-               [toDelete addObject:newObject];
+               duplicateDeleted = true;
+               [migration deleteObject:newObject];
            }
-           [seen addObject:newObject[@"intCol"]];
-       }];
-       [migration.realm deleteObjects:toDelete];
+           else {
+               [seen addObject:newObject[@"intCol"]];
+           }
+        }];
+        XCTAssertEqual(true, duplicateDeleted);
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+
+    // make sure deletion occurred
+    XCTAssertEqual(1U, [[MigrationPrimaryKeyObject allObjectsInRealm:[RLMRealm realmWithPath:RLMTestRealmPath()]] count]);
+}
+
+- (void)testAddObjectDuringMigration {
+    // initialize realm
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration createObject:StringObject.className withObject:@[@"string"]];
+    }];
+
+    // implicit migration
+    XCTAssertEqual(1U, StringObject.allObjects.count);
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
