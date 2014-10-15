@@ -31,7 +31,9 @@
 //
 // RLMArray implementation
 //
-@implementation RLMArrayLinkView 
+@implementation RLMArrayLinkView  {
+    tightdb::LinkViewRef _backingLinkView;
+}
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view

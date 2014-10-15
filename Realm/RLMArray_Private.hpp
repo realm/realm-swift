@@ -52,12 +52,7 @@
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray {
-    // FIXME - make private once we have self updating accessors - for
-    //         now this gets set externally
-    @public
-    tightdb::LinkViewRef _backingLinkView;
-}
+@interface RLMArrayLinkView : RLMArray
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                     view:(tightdb::LinkViewRef)view
                                    realm:(RLMRealm *)realm;

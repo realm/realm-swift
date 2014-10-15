@@ -268,7 +268,7 @@ extern "C" {
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
-- (void)testVersionNumberMustNotDecrease {
+- (void)testMigrationIsAppliedWhenNeeded {
     @autoreleasepool {
         // make string an int
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
@@ -283,13 +283,24 @@ extern "C" {
         [realm commitWriteTransaction];
     }
 
+    __block bool migrationApplied = false;
     [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration enumerateObjects:MigrationObject.className block:^(RLMObject *, RLMObject *newObject) {
             newObject[@"stringCol"] = @"";
         }];
+        migrationApplied = true;
     }];
-    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 
+    // migration should be applied when opening realm
+    [RLMRealm realmWithPath:RLMTestRealmPath()];
+    XCTAssertEqual(true, migrationApplied);
+
+    // applying migration at same version is no-op
+    migrationApplied = false;
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    XCTAssertEqual(false, migrationApplied);
+
+    // test version cant go down
     [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
@@ -303,14 +314,6 @@ extern "C" {
         [realm commitWriteTransaction];
     }
     XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath()]);
-}
-
-- (void)testInvalidRealmVersion {
-    // FIXME - ondisk version > current version
-}
-
-- (void)testMigrationIsAppliedWhenNeeded {
-    // FIXME
 }
 
 - (void)testRearrangeProperties {

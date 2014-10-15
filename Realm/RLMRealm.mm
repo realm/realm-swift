@@ -376,7 +376,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                     createTablesInTransaction(realm, [RLMSchema sharedSchema]);
                 }
                 else {
-                    [RLMRealm migrateRealmAtPath:realm.path];
+                    [RLMRealm migrateRealm:realm];
                 }
             }
 
@@ -649,9 +649,19 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     s_migrationBlock = block;
 }
 
-+ (NSError *)migrateRealmAtPath:(NSString *)realmPath{
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath {
     NSError *error;
-    RLMMigration *migration = [RLMMigration migrationAtPath:realmPath error:&error];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmPath readOnly:NO dynamic:YES schema:nil error:&error];
+    if (error) {
+        return error;
+    }
+
+    return [self migrateRealm:realm];
+}
+
++ (NSError *)migrateRealm:(RLMRealm *)realm {
+    NSError *error;
+    RLMMigration *migration = [RLMMigration migrationForRealm:realm error:&error];
     if (error) {
         return error;
     }
