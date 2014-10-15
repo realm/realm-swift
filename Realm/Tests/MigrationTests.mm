@@ -268,7 +268,7 @@ extern "C" {
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
-- (void)testVersionNumberMustIncreaseWithSchemaChanges {
+- (void)testVersionNumberMustNotDecrease {
     @autoreleasepool {
         // make string an int
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
@@ -283,11 +283,14 @@ extern "C" {
         [realm commitWriteTransaction];
     }
 
-    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
         [migration enumerateObjects:MigrationObject.className block:^(RLMObject *, RLMObject *newObject) {
             newObject[@"stringCol"] = @"";
         }];
     }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+
+    [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
@@ -299,7 +302,15 @@ extern "C" {
         [realm createObject:MigrationObject.className withObject:@[@1, @"1"]];
         [realm commitWriteTransaction];
     }
-    XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath()]);
+    XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath()]);
+}
+
+- (void)testInvalidRealmVersion {
+    // FIXME - ondisk version > current version
+}
+
+- (void)testMigrationIsAppliedWhenNeeded {
+    // FIXME
 }
 
 - (void)testRearrangeProperties {

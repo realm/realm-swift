@@ -107,13 +107,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
     }
 }
 
-void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSchema) {
-    if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Cannot open an uninitialized realm in read-only mode"
-                                     userInfo:nil];
-    }
-
+void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = [targetSchema copy];
 
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
@@ -121,83 +115,69 @@ void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSche
         objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className);
         if (objectSchema->_table) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
-            RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+            if (verify) {
+                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+            }
         }
         objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
     }
 }
 
-void RLMRealmInitializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema) {
-    [realm beginWriteTransaction];
-
-    @try {
-        // check to see if this is the first time loading this realm
-        bool firstInitialization = RLMRealmSchemaVersion(realm) == RLMNotVersioned;
-        if (firstInitialization) {
-            // set initial version
-            RLMRealmSetSchemaVersion(realm, 0);
-        }
-
-        // set the schema, mutating if we are initializing the db for the first time
-        RLMRealmSetSchema(realm, targetSchema, firstInitialization);
-    }
-    @finally {
-        // FIXME: should rollback on exceptions rather than commit once that's implemented
-        [realm commitWriteTransaction];
-    }
-}
-
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initializeSchema) {
+void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
     realm.schema = [targetSchema copy];
 
+    // first pass to create missing tables
     bool changed = false;
-    if (initializeSchema) {
-        // first pass to create missing tables
-        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-            bool created = false;
-            objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className, created);
-            changed |= created;
+    NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        bool created = false;
+        objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className, created);
+        changed |= created;
+
+        // we will modify tables for any new objectSchema (table was created) or for all if updateExisting is true
+        if (updateExisting || created) {
+            [objectSchemaToUpdate addObject:objectSchema];
         }
+    }
 
-        // second pass adds/removes columns appropriately
-        for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-            RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
+    // second pass adds/removes columns for objectSchemaToUpdate
+    for (RLMObjectSchema *objectSchema in objectSchemaToUpdate) {
+        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
 
-            // add missing columns
-            for (RLMProperty *prop in objectSchema.properties) {
-                // add any new properties (new name or different type)
-                if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
-                    RLMCreateColumn(realm, *objectSchema->_table, prop);
-                    changed = true;
-                }
-            }
-
-            // remove extra columns
-            for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
-                RLMProperty *prop = tableSchema.properties[i];
-                if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
-                    objectSchema->_table->remove_column(prop.column);
-                    changed = true;
-                }
-            }
-
-            // update table metadata
-            if (objectSchema.primaryKeyProperty != nil) {
-                // if there is a primary key set, check if it is the same as the old key
-                if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
-                    RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
-                    changed = true;
-                }
-            }
-            else if (tableSchema.primaryKeyProperty) {
-                // there is no primary key, so if thre was one nil out
-                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+        // add missing columns
+        for (RLMProperty *prop in objectSchema.properties) {
+            // add any new properties (new name or different type)
+            if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
+                RLMCreateColumn(realm, *objectSchema->_table, prop);
                 changed = true;
             }
         }
 
-        // FIXME - remove deleted tables
+        // remove extra columns
+        for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
+            RLMProperty *prop = tableSchema.properties[i];
+            if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
+                objectSchema->_table->remove_column(prop.column);
+                changed = true;
+            }
+        }
+
+        // update table metadata
+        if (objectSchema.primaryKeyProperty != nil) {
+            // if there is a primary key set, check if it is the same as the old key
+            if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
+                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
+                changed = true;
+            }
+        }
+        else if (tableSchema.primaryKeyProperty) {
+            // there is no primary key, so if thre was one nil out
+            RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+            changed = true;
+        }
     }
+
+    // FIXME - remove deleted tables
 
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         // cache table instances on objectSchema
@@ -212,8 +192,6 @@ bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initialize
         //         us to have multiple accessors for each type/instance combination
         objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
     }
-
-    return changed;
 }
 
 static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {

@@ -57,7 +57,7 @@
     // create read only realm used during migration with current on disk schema
     migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO error:error];
     if (migration->_oldRealm) {
-        RLMRealmInitializeReadOnlyWithSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
+        RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
     }
     if (error && *error) {
         return nil;
@@ -132,7 +132,7 @@
 
     @try {
         // add new tables/columns for the current shared schema
-        bool changed = RLMRealmSetSchema(_realm, [RLMSchema sharedSchema], true);
+        RLMRealmCreateTables(_realm, [RLMSchema sharedSchema], true);
 
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
@@ -143,13 +143,6 @@
         NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
         block(self, oldVersion);
         RLMRealmSetSchemaVersion(_realm, newVersion);
-
-        // make sure a new version was provided if changes were made
-        if (changed && oldVersion >= newVersion) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Migration block should return a higher version after a schema update"
-                                         userInfo:@{@"path" : _realm.path}];
-        }
 
         // verify uniqueness for any new unique columns before committing
         [self verifyPrimaryKeyUniqueness];
