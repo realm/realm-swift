@@ -29,7 +29,12 @@ public class ListBase: RLMListBase, Printable {
 public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Properties
 
-    public var realm: Realm { return Realm(rlmRealm: _rlmArray.realm) }
+    public var realm: Realm? {
+        if _rlmArray.realm == nil {
+            return nil
+        }
+        return Realm(rlmRealm: _rlmArray.realm)
+    }
 
     // MARK: Initializers
 
@@ -44,15 +49,15 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Index Retrieval
 
     public func indexOf(object: T) -> UInt? {
-        return _rlmArray.indexOfObject(object)
+        return notFoundToNil(_rlmArray.indexOfObject(object))
     }
 
     public func indexOf(predicate: NSPredicate) -> UInt? {
-        return _rlmArray.indexOfObjectWithPredicate(predicate)
+        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(predicate))
     }
 
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> UInt? {
-        return _rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args))
+        return notFoundToNil(_rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args)))
     }
 
     // MARK: Object Retrieval
@@ -139,5 +144,14 @@ public final class List<T: Object>: ListBase, SequenceType {
     
     public func replace(index: UInt, object: T) {
         _rlmArray.replaceObjectAtIndex(index, withObject: object)
+    }
+
+    // MARK: Private stuff
+
+    private func notFoundToNil(index: UInt) -> UInt? {
+        if index == UInt(NSNotFound) {
+            return nil
+        }
+        return index
     }
 }
