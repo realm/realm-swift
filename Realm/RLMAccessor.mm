@@ -56,20 +56,6 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_int(colIndex, val);
 }
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *propName, long long val) {
-    RLMVerifyInWriteTransaction(obj);
-    size_t row = obj->_row.get_table()->find_first_int(colIndex, val);
-    if (row == obj->_row.get_index()) {
-        return;
-    }
-    if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%lld' for property '%@'",
-                            val, propName];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
-    }
-    obj->_row.set_int(colIndex, val);
-}
-
 // float getter/setter
 static inline float RLMGetFloat(__unsafe_unretained RLMObject *obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
@@ -108,20 +94,6 @@ static inline NSString *RLMGetString(__unsafe_unretained RLMObject *obj, NSUInte
 static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, __unsafe_unretained NSString *val) {
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
-}
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInteger colIndex, NSString *propName,
-                                      __unsafe_unretained NSString *val) {
-    RLMVerifyInWriteTransaction(obj);
-    tightdb::StringData str = RLMStringDataWithNSString(val);
-    size_t row = obj->_row.get_table()->find_first_string(colIndex, str);
-    if (row == obj->_row.get_index()) {
-        return;
-    }
-    if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'", propName, val];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
-    }
-    obj->_row.set_string(colIndex, str);
 }
 
 // date getter/setter
@@ -611,61 +583,63 @@ void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val) {
                                      userInfo:@{@"Property name:" : propName ?: @"nil",
                                                 @"Value": val ? [val description] : @"nil"}];
     }
-    RLMDynamicSet(obj, prop, val, prop.isPrimary ? RLMSetFlagEnforceUnique : 0);
+    RLMDynamicSet(obj, prop, val, 0);
 }
 
 void RLMDynamicSet(__unsafe_unretained RLMObject *obj, __unsafe_unretained RLMProperty *prop,
                    __unsafe_unretained id val, RLMSetFlag options) {
     NSUInteger col = prop.column;
-    switch (accessorCodeForType(prop.objcType, prop.type)) {
-        case 's':
-        case 'i':
-        case 'l':
-        case 'q':
-            if (options & RLMSetFlagEnforceUnique) {
-                RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
-            }
-            else {
+    try {
+        switch (accessorCodeForType(prop.objcType, prop.type)) {
+            case 's':
+            case 'i':
+            case 'l':
+            case 'q':
                 RLMSetValue(obj, col, [val longLongValue]);
-            }
-            break;
-        case 'f':
-            RLMSetValue(obj, col, [val floatValue]);
-            break;
-        case 'd':
-            RLMSetValue(obj, col, [val doubleValue]);
-            break;
-        case 'B':
-        case 'c':
-            RLMSetValue(obj, col, (bool)[val boolValue]);
-            break;
-        case 'S':
-            if (options & RLMSetFlagEnforceUnique) {
-                RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
-            }
-            else {
+                break;
+            case 'f':
+                RLMSetValue(obj, col, [val floatValue]);
+                break;
+            case 'd':
+                RLMSetValue(obj, col, [val doubleValue]);
+                break;
+            case 'B':
+            case 'c':
+                RLMSetValue(obj, col, (bool)[val boolValue]);
+                break;
+            case 'S':
                 RLMSetValue(obj, col, (NSString *)val);
-            }
-            break;
-        case 'a':
-            RLMSetValue(obj, col, (NSDate *)val);
-            break;
-        case 'e':
-            RLMSetValue(obj, col, (NSData *)val);
-            break;
-        case 'k':
-            RLMSetValue(obj, col, (RLMObject *)val, options);
-            break;
-        case 't':
-            RLMSetValue(obj, col, (RLMArray *)val, options);
-            break;
-        case '@':
-            RLMSetValue(obj, col, val);
-            break;
-        default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
+                break;
+            case 'a':
+                RLMSetValue(obj, col, (NSDate *)val);
+                break;
+            case 'e':
+                RLMSetValue(obj, col, (NSData *)val);
+                break;
+            case 'k':
+                RLMSetValue(obj, col, (RLMObject *)val, options);
+                break;
+            case 't':
+                RLMSetValue(obj, col, (RLMArray *)val, options);
+                break;
+            case '@':
+                RLMSetValue(obj, col, val);
+                break;
+            default:
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Invalid accessor code"
+                                             userInfo:nil];
+        }
+    }
+    catch (const LogicError &e) {
+        if (e.what() == tightdb::LogicError::unique_constraint_violation) {
+            NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%@' for property '%@'",
+                                val, prop.name];
+            @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        }
+        else {
+            throw;
+        }
     }
 }
 

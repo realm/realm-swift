@@ -95,37 +95,6 @@
     }
 }
 
-- (void)verifyPrimaryKeyUniqueness {
-    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-        // if we have a new primary key not equal to our old one, verify uniqueness
-        RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
-        RLMProperty *oldPrimaryProperty = [[_oldRealm.schema schemaForClassName:objectSchema.className] primaryKeyProperty];
-        if (primaryProperty && primaryProperty != oldPrimaryProperty) {
-            // FIXME: replace with count of distinct once we support indexing
-
-            // FIXME: support other types
-            tightdb::TableRef &table = objectSchema->_table;
-            NSUInteger count = table->size();
-            if (primaryProperty.type == RLMPropertyTypeString) {
-                for (NSUInteger i = 0; i < count; i++) {
-                    if (table->count_string(primaryProperty.column, table->get_string(primaryProperty.column, i)) > 1) {
-                        NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
-                    }
-                }
-            }
-            else {
-                for (NSUInteger i = 0; i < count; i++) {
-                    if (table->count_int(primaryProperty.column, table->get_int(primaryProperty.column, i)) > 1) {
-                        NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
-                    }
-                }
-            }
-        }
-    }
-}
-
 - (void)migrateWithBlock:(RLMMigrationBlock)block {
     // start write transaction
     [_realm beginWriteTransaction];
@@ -137,6 +106,9 @@
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
             objectSchema.primaryKeyProperty.isPrimary = NO;
+            if (objectSchema->_table->has_primary_key()) {
+                objectSchema->_table->remove_primary_key();
+            }
         }
 
         // apply block and set new schema version
@@ -151,8 +123,24 @@
                                          userInfo:@{@"path" : _realm.path}];
         }
 
-        // verify uniqueness for any new unique columns before committing
-        [self verifyPrimaryKeyUniqueness];
+        // re-enable the primary keys
+        for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+            if (RLMProperty *primary = objectSchema.primaryKeyProperty) {
+                primary.isPrimary = YES;
+
+                // should already have it, but may not if coming from an older
+                // version of Realm
+                if (!objectSchema->_table->has_search_index(primary.column)) {
+                    objectSchema->_table->add_search_index(primary.column);
+                }
+
+                if (!objectSchema->_table->try_add_primary_key(primary.column)) {
+                    NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.",
+                                        primary.name];
+                    @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                }
+            }
+        }
     }
     @finally {
         // end transaction

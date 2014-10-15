@@ -89,8 +89,7 @@
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
-                // FIXME - re-enable when we have core suppport
-                //attr = attr | RLMPropertyAttributeIndexed;
+                prop.attributes |= RLMPropertyAttributeIndexed;
                 schema.primaryKeyProperty = prop;
                 break;
             }

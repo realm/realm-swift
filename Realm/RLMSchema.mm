@@ -16,10 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMSchema_Private.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -179,13 +180,16 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
     return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
 }
 
-void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey) {
+void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, RLMObjectSchema *objectSchema) {
     tightdb::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
     if (table->get_column_count() == 0) {
         // create columns
         table->add_column(tightdb::type_String, c_primaryKeyObjectClassColumnName);
         table->add_column(tightdb::type_String, c_primaryKeyPropertyNameColumnName);
     }
+
+    NSString *objectClass = objectSchema.className;
+    NSString *primaryKey = objectSchema.primaryKeyProperty.name;
 
     // get row or create if new object and populate
     size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, RLMStringDataWithNSString(objectClass));
@@ -194,12 +198,18 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
         table->set_string(c_primaryKeyObjectClassColumnIndex, row, RLMStringDataWithNSString(objectClass));
     }
 
+    // remove existing primary key
+    if (objectSchema->_table->has_primary_key()) {
+        objectSchema->_table->remove_primary_key();
+    }
+
     // set if changing, or remove if setting to nil
     if (primaryKey == nil && row != tightdb::not_found) {
         table->remove(row);
     }
     else {
         table->set_string(c_primaryKeyPropertyNameColumnIndex, row, RLMStringDataWithNSString(primaryKey));
+        objectSchema->_table->try_add_primary_key(objectSchema.primaryKeyProperty.column);
     }
 }
 

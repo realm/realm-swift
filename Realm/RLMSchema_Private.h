@@ -58,7 +58,7 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
 
 // sets primary key property for object class
 // must be in write transaction to set
-void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey);
+void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, RLMObjectSchema *objectSchema);
 
 
 //

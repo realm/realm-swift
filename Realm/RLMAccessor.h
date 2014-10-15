@@ -37,8 +37,6 @@ id RLMDynamicGet(RLMObject *obj, NSString *propName);
 
 // Options for RLMDynamicSet
 typedef NS_OPTIONS(NSUInteger, RLMSetFlag) {
-    // Verify that no existing row has the same value for this property
-    RLMSetFlagEnforceUnique = 1 << 0,
     // If the property is a link or array property, upsert the linked objects
     // if they have a primary key, and insert them otherwise.
     RLMSetFlagUpdateOrCreate = 1 << 1,
