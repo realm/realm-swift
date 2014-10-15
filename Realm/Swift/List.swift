@@ -76,36 +76,18 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     // MARK: Subarray Retrieval
 
-    public func filter(predicateFormat: String, _ args: CVarArgType...) -> List<T> {
-        return List<T>(_rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
+    public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
+        return Results<T>(_rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
     }
 
-    public func filter(predicate: NSPredicate) -> List<T> {
-        return List<T>(_rlmArray.objectsWithPredicate(predicate))
+    public func filter(predicate: NSPredicate) -> Results<T> {
+        return Results<T>(_rlmArray.objectsWithPredicate(predicate))
     }
 
     // MARK: Sorting
 
-    public func sorted(property: String, ascending: Bool = true) -> List<T> {
-        return List<T>(_rlmArray.arraySortedByProperty(property, ascending: ascending))
-    }
-
-    // MARK: Aggregate Operations
-
-    public func min<U: Sortable>(property: String) -> U {
-        return _rlmArray.minOfProperty(property) as U
-    }
-
-    public func max<U: Sortable>(property: String) -> U {
-        return _rlmArray.maxOfProperty(property) as U
-    }
-
-    public func sum(property: String) -> Double {
-        return _rlmArray.sumOfProperty(property) as Double
-    }
-
-    public func average(property: String) -> Double {
-        return _rlmArray.averageOfProperty(property) as Double
+    public func sorted(property: String, ascending: Bool = true) -> Results<T> {
+        return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
     }
 
     // MARK: Sequence Support
@@ -127,12 +109,10 @@ public final class List<T: Object>: ListBase, SequenceType {
         _rlmArray.addObject(object)
     }
 
-    public func append(objects: [T]) {
-        _rlmArray.addObjectsFromArray(objects)
-    }
-
-    public func append(list: List<T>) {
-        _rlmArray.addObjectsFromArray(list._rlmArray)
+    public func append<S where S: SequenceType>(objects: S) {
+        for obj in objects {
+            _rlmArray.addObject(obj as T)
+        }
     }
 
     public func insert(object: T, atIndex index: UInt) {

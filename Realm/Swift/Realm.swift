@@ -26,8 +26,8 @@ public func migrateRealm(path: String = defaultRealmPath(), block: MigrationBloc
 
 // MARK: Object Retrieval
 
-public func objects<T: Object>(type: T.Type) -> List<T> {
-    return List<T>(T.allObjectsInRealm(RLMRealm.defaultRealm()))
+public func objects<T: Object>(type: T.Type) -> Results<T> {
+    return Results<T>(T.allObjectsInRealm(RLMRealm.defaultRealm()))
 }
 
 // MARK: Default Realm Helpers
@@ -97,11 +97,13 @@ public class Realm {
     }
 
     public func add(objects: [Object]) {
-        rlmRealm.addObjectsFromArray(objects)
+        rlmRealm.addObjects(objects)
     }
 
-    public func add(objects: List<Object>) {
-        rlmRealm.addObjectsFromArray(objects)
+    public func add<S where S: SequenceType>(objects: S) {
+        for obj in objects {
+            rlmRealm.addObject(obj as RLMObject)
+        }
     }
 
     public func delete(object: Object) {
@@ -128,8 +130,8 @@ public class Realm {
 
     // MARK: Object Retrieval
 
-    public func objects<T: Object>(type: T.Type) -> List<T> {
-        return List<T>(T.allObjectsInRealm(rlmRealm))
+    public func objects<T: Object>(type: T.Type) -> Results<T> {
+        return Results<T>(T.allObjectsInRealm(rlmRealm))
     }
 }
 
