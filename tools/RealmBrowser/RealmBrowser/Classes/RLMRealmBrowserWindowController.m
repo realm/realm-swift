@@ -128,6 +128,22 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self.tableViewController.tableView reloadData];
 }
 
+#pragma mark - Public methods - Rearranging arrays
+
+- (void)removeRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController removeRowsInArrayNode:arrayNode at:rowIndexes];
+    }
+}
+
+- (void)insertNewRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController insertNewRowsInArrayNode:arrayNode at:rowIndexes];
+    }
+}
+
 - (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {

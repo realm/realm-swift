@@ -41,12 +41,16 @@
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 
+typedef NS_ENUM(int32_t, RLMUpdateType) {
+    RLMUpdateTypeRealm,
+    RLMUpdateTypeTableView
+};
+
 @interface RLMRealm ()
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object;
 
 @end
-
 
 
 @implementation RLMInstanceTableViewController {
@@ -208,91 +212,12 @@ NSString * const kRLMObjectType = @"RLMObjectType";
         [self.parentWindowController moveRowsInArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
 
         // Performs the move in the realm
-        [self moveRowsInRealmFrom:rowIndexes to:destination];
+        [self moveRowsFrom:rowIndexes to:destination updating:RLMUpdateTypeTableView];
         
         return YES;
     }
     
     return NO;
-}
-
-- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
-{
-    // Check if this window is showing the arraynode that is to be rearranged visually
-    if (self.displaysArray && [self.displayedType isEqualTo:arrayNode]) {
-        [self moveRowsFrom:sourceIndexes to:destination inRealm:NO];
-    }
-}
-
-- (void)moveRowsInRealmFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
-{
-    [self moveRowsFrom:sourceIndexes to:destination inRealm:YES];
-}
-
-- (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination inRealm:(BOOL)inRealm
-{
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    
-    // Move indexset into mutable array
-    NSMutableArray *sources = [NSMutableArray array];
-    [sourceIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-        [sources addObject:@(idx)];
-    }];
-    
-    if (inRealm) {
-        [realm beginWriteTransaction];
-    }
-    else {
-        [self.tableView beginUpdates];
-    }
-    
-    // Iterate through the array, representing source row indices
-    for (NSUInteger i = 0; i < sources.count; i++) {
-        NSUInteger source = [sources[i] unsignedIntegerValue];
-        
-        // Perform the move
-        if (inRealm) {
-            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
-        }
-        else {
-            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
-            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
-        }
-        
-        //Iterate through the remaining source row indices in the array
-        for (NSUInteger j = i + 1; j < sources.count; j++) {
-            NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
-            // Everything right of the destination is shifted right
-            if (sourceIndexToModify > destination) {
-                sources[j] = @([sources[j] unsignedIntegerValue] + 1);
-            }
-            // Everything right of the current source is shifted left
-            if (sourceIndexToModify > source) {
-                sources[j] = @([sources[j] unsignedIntegerValue] - 1);
-            }
-        }
-        // If the move was from higher index to lower, shift destination right
-        if (source > destination) {
-            destination++;
-        }
-    }
-    
-    if (inRealm) {
-        [realm commitWriteTransaction];
-    }
-    else {
-        [self.tableView endUpdates];
-        [self updateArrayIndexColumn];
-    }
-}
-
--(void)updateArrayIndexColumn
-{
-    for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
-        NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
-        RLMTableCellView *cell = [rowView viewAtColumn:0];
-        cell.textField.stringValue = [@(k) stringValue];
-    }
 }
 
 #pragma mark - RLMTableView Data Source
@@ -483,7 +408,6 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 - (void)addRows:(NSIndexSet *)rowIndexes
 {
     if (!self.realmIsLocked) {
-        [self createObjectsForRows:rowIndexes insertIntoArray:NO];
     }
 }
 
@@ -509,9 +433,12 @@ NSString * const kRLMObjectType = @"RLMObjectType";
 
 - (void)insertRows:(NSIndexSet *)rowIndexes
 {
-    if (!self.realmIsLocked) {
-        [self createObjectsForRows:rowIndexes insertIntoArray:YES];
+    if (self.realmIsLocked || !self.displaysArray) {
+        return;
     }
+    
+    [self.parentWindowController insertNewRowsInArrayNode:(RLMArrayNode *)self.displayedType at:rowIndexes];
+    [self insertNewRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
 }
 
 - (void)removeRows:(NSIndexSet *)rowIndexes
@@ -681,8 +608,49 @@ NSString * const kRLMObjectType = @"RLMObjectType";
     [self.parentWindowController reloadAllWindows];
 }
 
-- (void)createObjectsForRows:(NSIndexSet *)rowIndexes insertIntoArray:(BOOL)performInsert
+#pragma mark - Rearranging objects in arrays - Public methods
+
+- (void)removeRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
+    // Check if this window is showing the arraynode that is to be rearranged visually
+    if ([self.displayedType isEqualTo:arrayNode]) {
+        [self removeRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
+    }
+}
+
+- (void)insertNewRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    // Check if this window is showing the arraynode that is to be rearranged visually
+    if ([self.displayedType isEqualTo:arrayNode]) {
+        [self insertNewRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
+    }
+}
+
+- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    // Check if this window is showing the arraynode that is to be rearranged visually
+    if ([self.displayedType isEqualTo:arrayNode]) {
+        [self moveRowsFrom:sourceIndexes to:destination updating:RLMUpdateTypeRealm];
+    }
+}
+
+#pragma mark - Rearranging objects in arrays - Private methods
+
+// Removing
+- (void)removeRowsAt:(NSIndexSet *)rowIndexes updating:(RLMUpdateType)updateType
+{
+    
+}
+
+// Inserting
+- (void)insertNewRowsAt:(NSIndexSet *)rowIndexes updating:(RLMUpdateType)updateType
+{
+    NSLog(@"insertNewRowsAt (%@): %@", updateType == RLMUpdateTypeRealm ? @"Realm" : @"TableView", rowIndexes);
+
+    if (rowIndexes.count == 0) {
+        rowIndexes = [NSIndexSet indexSetWithIndex:0];
+    }
+
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     
     NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
@@ -690,29 +658,133 @@ NSString * const kRLMObjectType = @"RLMObjectType";
         objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
     }
     
-    NSUInteger rowsToAdd = MAX(rowIndexes.count, 1);
-    NSUInteger rowToInsertAt = rowIndexes.count > 0 ? rowIndexes.lastIndex : self.displayedType.instanceCount;
+    // Start updating
+    if (updateType == RLMUpdateTypeRealm) {
+        [realm beginWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+    }
     
-    [realm beginWriteTransaction];
-    [self.tableView beginUpdates];
+    // Loop through rows where insertion takes place
+//    NSMutableArray *destinations = [NSMutableArray array];
+    if (updateType == RLMUpdateTypeRealm) {
+        [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
+            RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+            [realm addObject:object];
+            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:idx];
+        }];
+        
+//        [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+//            [destinations addObject:@(idx)];
+//        }];
+//        
+//        NSLog(@"--destinations: %@", destinations);
+//
+//        for (int i = 0; i < destinations.count; i++) {
+//            RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+//            [realm addObject:object];
+//            NSUInteger destination = [destinations[i] unsignedIntegerValue];
+//            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:destination];
+//            
+//            // Modify the remaining destination indices that are to the right of the one just inserted
+//            for (NSUInteger j = i + 1; j < destinations.count; j++) {
+//                NSUInteger destinationIndexToModify = [destinations[j] unsignedIntegerValue];
+//
+//                // If the index is on the right of destination, it is shifted right
+//                if (destinationIndexToModify > destination) {
+//                    destinationIndexToModify++;
+//                }
+//                destinations[j] = @(destinationIndexToModify);
+//            }
+//            
+//            NSLog(@"--destinations after inserting at %lu: %@", destination, destinations);
+//        }
+    }
+    else {
+        [self.tableView insertRowsAtIndexes:rowIndexes withAnimation:NSTableViewAnimationEffectGap];
+    }
     
-    for (int i = 0; i < rowsToAdd; i++) {
-        RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
-        [realm addObject:object];
-        if (performInsert && [self.displayedType isKindOfClass:[RLMArrayNode class]]) {
-            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:rowToInsertAt];
+    // Commit updates
+    if (updateType == RLMUpdateTypeRealm) {
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView endUpdates];
+        [self updateArrayIndexColumn];
+    }
+}
+
+// Moving
+- (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination updating:(RLMUpdateType)updateType
+{
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    // Move indexset into mutable array
+    NSMutableArray *sources = [NSMutableArray array];
+    [sourceIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [sources addObject:@(idx)];
+    }];
+    
+    if (updateType == RLMUpdateTypeRealm) {
+        [realm beginWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+    }
+    
+    // Iterate through the array, representing source row indices
+    for (NSUInteger i = 0; i < sources.count; i++) {
+        NSUInteger source = [sources[i] unsignedIntegerValue];
+        
+        // Perform the move
+        if (updateType == RLMUpdateTypeRealm) {
+            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+        }
+        else {
+            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
+            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
+        }
+        
+        //Iterate through the remaining source row indices in the array
+        for (NSUInteger j = i + 1; j < sources.count; j++) {
+            NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
+            // Everything right of the destination is shifted right
+            if (sourceIndexToModify > destination) {
+                sourceIndexToModify++;
+            }
+            // Everything right of the current source is shifted left
+            if (sourceIndexToModify > source) {
+                sourceIndexToModify--;
+            }
+            sources[j] = @(sourceIndexToModify);
+        }
+        // If the move was from higher index to lower, shift destination right
+        if (source > destination) {
+            destination++;
         }
     }
     
-    [self.tableView insertRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(rowToInsertAt, rowsToAdd)] withAnimation:NSTableViewAnimationEffectGap];
-    
-    [realm commitWriteTransaction];
-    [self.tableView endUpdates];
-    
-    [self updateArrayIndexColumn];
-
-//    [self.parentWindowController reloadAllWindows];
+    if (updateType == RLMUpdateTypeRealm) {
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView endUpdates];
+        [self updateArrayIndexColumn];
+    }
 }
+
+#pragma mark - Rearranging objects - Helper methods
+
+-(void)updateArrayIndexColumn
+{
+    for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
+        NSTableRowView *rowView = [self.tableView rowViewAtRow:k makeIfNecessary:NO];
+        RLMTableCellView *cell = [rowView viewAtColumn:0];
+        cell.textField.stringValue = [@(k) stringValue];
+    }
+}
+
 
 #pragma mark - Mouse Handling
 
