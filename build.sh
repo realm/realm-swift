@@ -37,6 +37,7 @@ command:
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
+  ios-dynamic [xcmode]:    builds iOS dynamic framework for iOS 8
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -220,6 +221,18 @@ case "$COMMAND" in
 
     "ios")
         xcrealm "-scheme iOS -configuration Release-Combined"
+        exit 0
+        ;;
+
+    "ios-dynamic")
+        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
+        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
+
+        mkdir -p build/ios-dynamic
+        rm -rf build/ios-dynamic/Realm.framework
+        cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework build/ios-dynamic
+        cp build/DerivedData/Realm/Build/Products/Release-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/ios-dynamic/Realm.framework/Modules/Realm.swiftmodule/
+        xcrun lipo -create "build/DerivedData/Realm/Build/Products/Release-iphonesimulator/Realm.framework/Realm" "build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework/Realm" -output "build/ios-dynamic/Realm.framework/Realm"
         exit 0
         ;;
 
