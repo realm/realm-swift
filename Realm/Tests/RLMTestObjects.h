@@ -177,7 +177,7 @@ RLM_ARRAY_TYPE(DogObject)
 
 @interface BaseClassStringObject : RLMObject
 
-@property NSInteger intCol;
+@property int intCol;
 
 @end
 
@@ -219,7 +219,7 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface DynamicObject : RLMObject
 
 @property NSString *stringCol;
-@property NSInteger intCol;
+@property int intCol;
 
 @end
 
