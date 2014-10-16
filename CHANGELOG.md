@@ -8,6 +8,10 @@
   enumerate, query, and sort objects return an instance of a new class `RLMResults`. This
   change was made to support diverging apis and the future addition of change notifications
   for queries.
+* The api for migrations has changed. You now call `setSchemaVersion:withMigrationBlock:` to
+  register a global migration block and associated version. This block is applied to Realms as
+  needed when opened for Realms at a previous version. The block can be applied manually if
+  desired by calling `migrateRealmAtPath:`.
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
@@ -15,7 +19,9 @@
 ### Enhancements
 
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
-* Add method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+* Added method `deleteAllObjects` on `RLMRealm` to clear a Realm.
+* Added method `createObject:withObject:` on `RLMMigration` which allows object creation during migrations.
+* Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 * Updating to core library version 0.85.0.
 * Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
 
@@ -27,6 +33,8 @@
 * Fix crash when querying indexed `NSString` properties.
 * Fixed an issue which prevented in-memory Realms from being used accross multiple threads.
 * Preserve the sort order when querying a sorted `RLMResults`.
+* Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
+  the newly created Realm can be initialized with an incorrect schema version.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================
@@ -41,7 +49,6 @@
   (as it was previously).
 * Fix another bug which would sometimes result in subclassing RLMObject
   subclasses not working.
-
 
 0.86.2 Release notes (2014-10-06)
 =============================================================

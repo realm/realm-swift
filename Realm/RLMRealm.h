@@ -353,25 +353,25 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @return    Schema version number for the `RLMRealm` after completing the
             migration. Must be greater than `oldSchemaVersion`.
  */
-typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
+typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
 /**
- Performs a migration on the default Realm.
+ Specify a schema version and an associated migration block which is applied when
+ opening any Realm with and old schema version.
 
  Before you can open an existing `RLMRealm` which has a different on-disk schema
- from the schema defined in your object interfaces, you must supply a migration
+ from the schema defined in your object interfaces you must provide a migration 
  block which converts from the disk schema to your current object schema. At the
  minimum your migration block must initialize any properties which were added to
- existing objects without defaults and return a new schema version which is
- higher than the version of the on-disk schema.
+ existing objects without defaults and ensure uniqueness if a primary key
+ property is added to an existing object.
 
- You should always call this method on startup if you have any migrations that
- may need to be run. Realm will not call your migration block if the schema of
- the file on disk matches your currently defined object schema. Calling this
- method after the `defaultRealm` has been created will throw an exception.
+ You should call this method before accessing any `RLMRealm` instances which
+ require migration. After registering your migration block Realm will call your 
+ block automatically as needed.
 
- @warning Unsuccessful migrations will throw exceptions. This will happen in the
- following cases:
+ @warning Unsuccessful migrations will throw exceptions when the migration block
+ is applied. This will happen in the following cases:
 
  - The migration block was run and returns a schema version which is not higher
    than the previous schema version.
@@ -379,32 +379,28 @@ typedef NSUInteger (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldS
    during the migration. You are required to either supply a default value or to
    manually populate added properties during a migration.
 
- Migrations which fail for other reasons (such as filesystem errors) will return
- a `NSError` object which describes the error.
-
+ @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
  @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
-+ (NSError *)migrateDefaultRealmWithBlock:(RLMMigrationBlock)block;
++ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
 
 /**
- Performs a migration on a Realm at a path.
+ Performs the registered migration block on a Realm at the given path.
 
- Like `migrateDefaultRealmWithBlock:`, but for a Realm at a given path rather than
- the default Realm. This must be called before you first open a Realm at the
- given path, but you may open Realms at other paths first.
+ This method is called automatically when opening a Realm for the first time and does
+ not need to be called explicitly. You can choose to call this method to control 
+ exactly when and how migrations are performed.
 
  @param realmPath   The path of the Realm to migrate.
- @param block       The block which migrates the Realm to the current version.
  @return            The error that occurred while applying the migration if any.
 
  @see               RLMMigration
- @see               migrateDefaultRealmWithBlock:
+ @see               setSchemaVersion:withMigrationBlock:
  */
-+ (NSError *)migrateRealmAtPath:(NSString *)realmPath withBlock:(RLMMigrationBlock)block;
-
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath;
 
 #pragma mark -
 

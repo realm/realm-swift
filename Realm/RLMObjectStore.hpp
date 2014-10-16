@@ -23,18 +23,15 @@
 // Table modifications
 //
 
-// update tables in realm to the targetSchema and set schema on realm
-// returns true if modifications were made
-// NOTE: must be called from within write transaction if initializeSchema is true
-bool RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool initializeSchema = false);
+// sets a realm's schema to a copy of targetSchema
+// caches table accessors on each objectSchema
+void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns = true);
 
-// initialize a realm if needed with the given schema
-// for uninitialized dbs, the initial version is set and tables are created for the target schema
-// existing dbs are validated against the target schema
-void RLMRealmInitializeWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
+// sets a realm's schema to a copy of targetSchema and creates/updates tables
+// if update existing is true, updates existing tables, otherwise validates existing tables
+// NOTE: must be called from within write transaction
+void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
-// initialize a read-only realm with the given schema
-void RLMRealmInitializeReadOnlyWithSchema(RLMRealm *realm, RLMSchema *targetSchema);
 
 //
 // Adding, Removing, Getting Objects

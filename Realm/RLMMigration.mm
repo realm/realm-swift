@@ -47,19 +47,16 @@
 
 @implementation RLMMigration
 
-+ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error {
++ (instancetype)migrationForRealm:(RLMRealm *)realm error:(NSError **)error {
     RLMMigration *migration = [RLMMigration new];
     
     // create rw realm to migrate with current on disk table
-    migration->_realm = [RLMRealm realmWithPath:path readOnly:NO inMemory:NO dynamic:YES schema:nil error:error];
-    if (error && *error) {
-        return nil;
-    }
+    migration->_realm = realm;
     
     // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:path readOnly:NO inMemory:NO error:error];
+    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path readOnly:NO inMemory:NO error:error];
     if (migration->_oldRealm) {
-        RLMRealmInitializeReadOnlyWithSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
+        RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
     }
     if (error && *error) {
         return nil;
@@ -81,17 +78,17 @@
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
     if (objects && oldObjects) {
-        for (NSUInteger i = 0; i < oldObjects.count; i++) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], objects[i]);
         }
     }
     else if (objects) {
-        for (NSUInteger i = 0; i < objects.count; i++) {
+        for (long i = objects.count - 1; i >= 0; i--) {
             block(nil, objects[i]);
         }
     }
     else if (oldObjects) {
-        for (NSUInteger i = 0; i < oldObjects.count; i++) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], nil);
         }
     }
@@ -126,13 +123,13 @@
     }
 }
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block {
+- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion {
     // start write transaction
     [_realm beginWriteTransaction];
 
     @try {
         // add new tables/columns for the current shared schema
-        bool changed = RLMRealmSetSchema(_realm, [RLMSchema sharedSchema], true);
+        RLMRealmCreateTables(_realm, [RLMSchema sharedSchema], true);
 
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
@@ -141,23 +138,26 @@
 
         // apply block and set new schema version
         NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
-        NSUInteger newVersion = block(self, oldVersion);
-        RLMRealmSetSchemaVersion(_realm, newVersion);
-
-        // make sure a new version was provided if changes were made
-        if (changed && oldVersion >= newVersion) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Migration block should return a higher version after a schema update"
-                                         userInfo:@{@"path" : _realm.path}];
-        }
+        block(self, oldVersion);
 
         // verify uniqueness for any new unique columns before committing
         [self verifyPrimaryKeyUniqueness];
+
+        // update new version
+        RLMRealmSetSchemaVersion(_realm, newVersion);
     }
     @finally {
         // end transaction
         [_realm commitWriteTransaction];
     }
+}
+
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object {
+    return [_realm createObject:className withObject:object];
+}
+
+- (void)deleteObject:(RLMObject *)object {
+    [_realm deleteObject:object];
 }
 
 @end

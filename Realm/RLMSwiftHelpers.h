@@ -20,7 +20,7 @@
 #import "RLMObject.h"
 
 @interface RLMRealm (Swift)
-+ (void)clearRealmCache;
++ (void)resetRealmState;
 @end
 
 @interface RLMArray (Swift)

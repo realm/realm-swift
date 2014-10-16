@@ -63,8 +63,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInte
         return;
     }
     if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%lld' for property '%@'",
-                            val, propName];
+        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%lld'.", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     obj->_row.set_int(colIndex, val);
@@ -118,7 +117,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInte
         return;
     }
     if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'", propName, val];
+        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     obj->_row.set_string(colIndex, str);

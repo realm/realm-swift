@@ -57,13 +57,33 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  Enumerates objects of a given type in this Realm, providing both the old and new versions of each object.
  Objects properties can be accessed using keyed subscripting.
  
- @param className   The name of the RLMObject subclass to retrieve on eg. <code>MyClass.className</code>.
+ @param className   The name of the RLMObject class to enumerate.
  
  @warning   All objects returned are of a type specific to the current migration and should not be casted
             to className. Instead you should access them as RLMObjects and use keyed subscripting to access
             properties.
  */
 - (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block;
+
+/**
+ Create an RLMObject of type `className` in the Realm being migrated.
+
+ @param className   The name of the RLMObject class to create.
+ @param object      The value used to populate the created object. This can be any key/value coding compliant
+                    object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                    an NSArray with one object for each persisted property. An exception will be
+                    thrown if any required properties are not present and no default is set.
+
+                    When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
+ */
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object;
+
+/**
+ Delete an object from a Realm during a migration. This can be called within `enumerateObjects:block:`.
+
+ @param object  Object to be deleted from the Realm being migrated.
+ */
+- (void)deleteObject:(RLMObject *)object;
 
 @end
 

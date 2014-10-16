@@ -25,7 +25,7 @@
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
-+ (void)clearRealmCache;
++ (void)resetRealmState;
 @end
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
@@ -88,7 +88,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 + (void)deleteFiles {
     // Clear cache
-    [RLMRealm clearRealmCache];
+    [RLMRealm resetRealmState];
     
     // Delete Realm files
     RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
