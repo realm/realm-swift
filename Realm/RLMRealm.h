@@ -362,7 +362,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  from the schema defined in your object interfaces you must provide a migration 
  block which converts from the disk schema to your current object schema. At the
  minimum your migration block must initialize any properties which were added to
- existing objects without defaults and ensure uniequeness if a primary key 
+ existing objects without defaults and ensure uniqueness if a primary key
  property is added to an existing object.
 
  You should call this method before accessing any `RLMRealm` instances which

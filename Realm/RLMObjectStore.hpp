@@ -28,7 +28,7 @@
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns = true);
 
 // sets a realm's schema to a copy of targetSchema and creates/updates tables
-// if update exising is true, updates existing tables, otherwise validates existing tables
+// if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
