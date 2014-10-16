@@ -648,7 +648,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:realmPath readOnly:NO dynamic:YES schema:nil error:&error];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmPath readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error];
     if (error) {
         return error;
     }
