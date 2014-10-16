@@ -178,14 +178,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 _readGroup = make_unique<Group>(path.UTF8String);
                 _group = _readGroup.get();
             }
-            else if (inMemory) {
-                _sharedGroup = make_unique<SharedGroup>(path.UTF8String, false, SharedGroup::durability_MemOnly);
-                _group = &const_cast<Group&>(_sharedGroup->begin_read());
-            }
             else {
                 _writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
                 _replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
-                _sharedGroup = make_unique<SharedGroup>(*_replication);
+                SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
+                                                                     SharedGroup::durability_Full;
+                _sharedGroup = make_unique<SharedGroup>(*_replication, durability);
                 _group = &const_cast<Group&>(_sharedGroup->begin_read());
             }
         }
