@@ -24,6 +24,7 @@
   the properties in a `RLMObject` subclass.
 * Fix crash on IN query with several thousand items.
 * Fix crash when querying indexed `NSString` properties.
+* Fixed an issue which prevented in-memory Realms from being used accross multiple threads.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================
