@@ -10,7 +10,7 @@
 * The api for migrations has changed. You now call `setSchemaVersion:withMigrationBlock:` to
   register a global migration block and associated version. This block is applied to Realms as
   needed when opened for Realms at a previous version. The block can be applied manually if
-  desired by called `migrateRealmAtPath`.
+  desired by called `migrateRealmAtPath:`.
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
