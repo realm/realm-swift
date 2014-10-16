@@ -445,26 +445,28 @@
     XCTAssertTrue(notificationFired);
 }
 
-- (void)testRealmInMemory
+- (void)testInMemoryRealm
 {
-    RLMRealm *realmWithFile = [RLMRealm defaultRealm];
-    [realmWithFile beginWriteTransaction];
-    [StringObject createInRealm:realmWithFile withObject:@[@"a"]];
-    [realmWithFile commitWriteTransaction];
-    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
-}
+    RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
 
-- (void)testRealmInMemory2
-{
-    [RLMRealm useInMemoryDefaultRealm];
+    [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
+        RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
+        [inMemoryRealm beginWriteTransaction];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"a"]];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"b"]];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"c"]];
+        XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+        [inMemoryRealm commitWriteTransaction];
+    }];
 
-    RLMRealm *realmInMemory = [RLMRealm defaultRealm];
-    [realmInMemory beginWriteTransaction];
-    [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"b"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([StringObject objectsInRealm:realmInMemory withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
-    [realmInMemory commitWriteTransaction];
+    XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+
+    // make sure we can have another
+    RLMRealm *anotherInMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier2"];
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:anotherInMemoryRealm].count);
+
+    // make sure we can't open disk-realm at same path
+    XCTAssertThrows([RLMRealm realmWithPath:anotherInMemoryRealm.path], @"Should throw");
 }
 
 - (void)testRealmFileAccess

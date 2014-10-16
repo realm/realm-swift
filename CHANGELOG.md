@@ -2,6 +2,7 @@
 =============================================================
 
 ### API breaking changes
+
 * RLMArray has been split into two classes, `RLMArray` and `RLMResults`. RLMArray is
   used for object properties as in previous releases. Moving forward all methods used to
   enumerate, query, and sort objects return an instance of a new class `RLMResults`. This
@@ -19,13 +20,17 @@
 
 * Add support for sorting `RLMArray`s by multiple columns with `sortedResultsUsingDescriptors:`
 * Added method `deleteAllObjects` on `RLMRealm` to clear a Realm.
-* Added method `createObject:withObject:` which allows object creation during migrations.
+* Added method `createObject:withObject:` on `RLMMigration` which allows object creation during migrations.
 * Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
+* Updating to core library version 0.85.0.
 
 ### Bugfixes
 
 * Fix exceptions when trying to set `RLMObject` properties after rearranging
   the properties in a `RLMObject` subclass.
+* Fix crash on IN query with several thousand items.
+* Fix crash when querying indexed `NSString` properties.
+* Fixed an issue which prevented in-memory Realms from being used accross multiple threads.
 * Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
   the newly created Realm can be initialized with an incorrect schema version.
 
