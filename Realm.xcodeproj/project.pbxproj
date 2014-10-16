@@ -26,7 +26,6 @@
 		02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3F04EA2F1992BEE400C2CE2E /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
 		3F20DA2219BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F20DA2319BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */; };
@@ -972,7 +971,6 @@
 				3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */,
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
-				3F04EA2F1992BEE400C2CE2E /* PerformanceTests.m in Sources */,
 				E856D21C195615A900FB2FCF /* PropertyTypeTest.mm in Sources */,
 				E856D21D195615A900FB2FCF /* QueryTests.m in Sources */,
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
