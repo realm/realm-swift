@@ -774,4 +774,15 @@
     XCTAssertTrue([array.intArray[0] isEqualToObject:obj1]);
 }
 
+- (void)testRollbackTransactionWithBlock
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+        [realm cancelWriteTransaction];
+    }];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
 @end
