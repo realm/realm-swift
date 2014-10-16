@@ -19,21 +19,12 @@
 #import "RLMArray.h"
 #import "RLMResults.h"
 
-#import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
 #import <tightdb/query.hpp>
 
-//
 // RLMArray private properties/ivars for all subclasses
-//
-// NOTE: We put all sublass properties in the same class to keep
-//       the ivar layout the same - this allows us to switch implementations
-//       after creation
 @interface RLMArray () {
-  @private
-    // array for standalone
-    NSMutableArray *_backingArray;
   @protected
     // accessor ivars
     RLMRealm *_realm;
@@ -62,23 +53,17 @@
 //
 // RLMResults private methods
 //
-@interface RLMResults () {
-    @protected
-    // accessor ivars
-    RLMRealm *_realm;
-    NSString *_objectClassName;
-}
-
+@interface RLMResults ()
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
                                      query:(std::unique_ptr<tightdb::Query>)query
                                      realm:(RLMRealm *)realm;
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
                                       view:(tightdb::TableView)view
                                      realm:(RLMRealm *)realm;
 - (void)deleteObjectsFromRealm;
 @end
-
 
 //
 // RLMResults subclass used when a TableView can't be created - this is used
@@ -105,6 +90,3 @@
 // Reallocate the array if it is not already the given size
 - (void)resize:(NSUInteger)size;
 @end
-
-
-

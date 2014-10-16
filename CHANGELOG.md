@@ -23,6 +23,7 @@
 * Added method `createObject:withObject:` on `RLMMigration` which allows object creation during migrations.
 * Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 * Updating to core library version 0.85.0.
+* Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
 
 ### Bugfixes
 
@@ -31,6 +32,7 @@
 * Fix crash on IN query with several thousand items.
 * Fix crash when querying indexed `NSString` properties.
 * Fixed an issue which prevented in-memory Realms from being used accross multiple threads.
+* Preserve the sort order when querying a sorted `RLMResults`.
 * Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
   the newly created Realm can be initialized with an incorrect schema version.
 

@@ -84,10 +84,14 @@
     [realm commitWriteTransaction];
 
     // query on realm
-    XCTAssertEqual([realm objects:[PersonObject className] where:@"age > 28"].count, 2U, @"Expecting 2 results");
+    XCTAssertEqual([PersonObject objectsInRealm:realm where:@"age > 28"].count, 2U, @"Expecting 2 results");
 
     // query on realm with order
-    RLMResults *results = [[realm objects:[PersonObject className] where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
+
+    // query on sorted results
+    results = [[[PersonObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"age" ascending:YES] objectsWhere:@"age > 28"];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -332,10 +336,10 @@
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
 
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @((long)1), @1, stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @((long)2), @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @((long)3), @"mixed", stringObj]]];
-    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @((long)3.3), @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], date1, @YES, @1, @1, stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@YES, @2, @2.0f, @2.0, @"b", [@"b" dataUsingEncoding:NSUTF8StringEncoding], date2, @YES, @2, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @3, @3.0f, @3.0, @"c", [@"c" dataUsingEncoding:NSUTF8StringEncoding], date3, @YES, @3, @"mixed", stringObj]]];
+    [arrayOfAll.array addObject:[AllTypesObject createInRealm:realm withObject:@[@NO, @33, @3.3f, @3.3, @"cc", [@"cc" dataUsingEncoding:NSUTF8StringEncoding], date33, @NO, @3, @"mixed", stringObj]]];
 
     [realm commitWriteTransaction];
 
@@ -357,6 +361,36 @@
         [realm deleteObject:arrayOfAll.array.lastObject];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"c");
+}
+
+- (void)testQueryingSortedQueryPreservesOrder {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 5; ++i) {
+        [IntObject createInRealm:realm withObject:@[@(i)]];
+    }
+
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"name", @[], [IntObject allObjects]]];
+    [realm commitWriteTransaction];
+
+    RLMResults *asc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:YES];
+    RLMResults *desc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:NO];
+
+    // sanity check; would work even without sort order being preserved
+    XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+
+    // check query on allObjects and query on query
+    XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
+
+    // same thing but on an linkview
+    asc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:YES];
+    desc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:NO];
+
+    XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
 }
 
 - (void)testDynamicQueryInvalidClass
@@ -1504,7 +1538,6 @@
 
 - (void)testArrayIn
 {
-
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
@@ -1531,6 +1564,92 @@
     XCTAssertEqual(1U, [[PersonObject objectsWhere:@"name == 'Ari'"] count]);
     XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age == 29"] count]);
     XCTAssertEqual(0U, [[[PersonObject objectsWhere:@"name == 'Ari'"] objectsWhere:@"age == 29"] count]);
+}
+
+- (void)testLinkViewQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [CompanyObject createInRealm:realm
+                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                                                      @{@"name": @"Joe",  @"age": @40, @"hired": @YES},
+                                                      @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
+    [realm commitWriteTransaction];
+
+    CompanyObject *co = [CompanyObject allObjects][0];
+    XCTAssertEqual(1U, [co.employees objectsWhere:@"hired = NO"].count);
+    XCTAssertEqual(2U, [co.employees objectsWhere:@"hired = YES"].count);
+    XCTAssertEqual(1U, [co.employees objectsWhere:@"hired = YES AND age = 40"].count);
+    XCTAssertEqual(0U, [co.employees objectsWhere:@"hired = YES AND age = 30"].count);
+    XCTAssertEqual(3U, [co.employees objectsWhere:@"hired = YES OR age = 30"].count);
+    XCTAssertEqual(1U, [[co.employees objectsWhere:@"hired = YES"] objectsWhere:@"name = 'Joe'"].count);
+}
+
+- (void)testLinkViewQueryLifetime {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [CompanyObject createInRealm:realm
+                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                                                      @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
+    [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    RLMResults *subarray = nil;
+    @autoreleasepool {
+        __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
+        subarray = [co.employees objectsWhere:@"age = 40"];
+        XCTAssertEqual(0U, subarray.count);
+    }
+
+    [realm beginWriteTransaction];
+    @autoreleasepool {
+        __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
+        [co.employees addObject:[EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}]];
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, subarray.count);
+    XCTAssertEqualObjects(@"Joe", subarray[0][@"name"]);
+}
+
+- (void)testLinkViewQueryLiveUpdate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [CompanyObject createInRealm:realm
+                      withObject:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                                                      @{@"name": @"Jill",  @"age": @40, @"hired": @YES}]]];
+    EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [realm commitWriteTransaction];
+
+    CompanyObject *co = CompanyObject.allObjects.firstObject;
+    RLMResults *basic = [co.employees objectsWhere:@"age = 40"];
+    RLMResults *sort = [co.employees sortedResultsUsingProperty:@"name" ascending:YES];
+    RLMResults *sortQuery = [[co.employees sortedResultsUsingProperty:@"name" ascending:YES] objectsWhere:@"age = 40"];
+    RLMResults *querySort = [[co.employees objectsWhere:@"age = 40"] sortedResultsUsingProperty:@"name" ascending:YES];
+
+    XCTAssertEqual(1U, basic.count);
+    XCTAssertEqual(2U, sort.count);
+    XCTAssertEqual(1U, sortQuery.count);
+    XCTAssertEqual(1U, querySort.count);
+
+    XCTAssertEqualObjects(@"Jill", [[basic lastObject] name]);
+    XCTAssertEqualObjects(@"Jill", [[sortQuery lastObject] name]);
+    XCTAssertEqualObjects(@"Jill", [[querySort lastObject] name]);
+
+    [realm beginWriteTransaction];
+    [co.employees addObject:eo];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(2U, basic.count);
+    XCTAssertEqual(3U, sort.count);
+    XCTAssertEqual(2U, sortQuery.count);
+    XCTAssertEqual(2U, querySort.count);
+
+    XCTAssertEqualObjects(@"Joe", [[basic lastObject] name]);
+    XCTAssertEqualObjects(@"Joe", [[sortQuery lastObject] name]);
+    XCTAssertEqualObjects(@"Joe", [[querySort lastObject] name]);
 }
 
 @end

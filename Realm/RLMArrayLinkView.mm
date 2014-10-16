@@ -31,7 +31,7 @@
 //
 // RLMArray implementation
 //
-@implementation RLMArrayLinkView  {
+@implementation RLMArrayLinkView {
     tightdb::LinkViewRef _backingLinkView;
 }
 
@@ -232,7 +232,22 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     RLMGetColumnIndices(_realm.schema[_objectClassName], properties, columns, order);
 
     tightdb::TableView const &tv = _backingLinkView->get_sorted_view(move(columns), move(order));
-    return [RLMResults resultsWithObjectClassName:self.objectClassName view:tv realm:_realm];
+    auto query = std::make_unique<tightdb::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                                 query:move(query)
+                                                  view:tv
+                                                 realm:_realm];
+
+}
+
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
+    RLMLinkViewArrayValidateAttached(self);
+
+    tightdb::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
+    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:std::make_unique<tightdb::Query>(query)
+                                            realm:_realm];
 }
 
 @end
