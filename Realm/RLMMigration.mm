@@ -25,6 +25,8 @@
 #import "RLMObjectStore.hpp"
 #import "RLMArray.h"
 
+#import <tightdb/table_view.hpp>
+
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call
 // beginWriteTransaction on it as that would make no sense.
@@ -107,11 +109,9 @@
             tightdb::TableRef &table = objectSchema->_table;
             NSUInteger count = table->size();
             if (primaryProperty.type == RLMPropertyTypeString) {
-                for (NSUInteger i = 0; i < count; i++) {
-                    if (table->count_string(primaryProperty.column, table->get_string(primaryProperty.column, i)) > 1) {
-                        NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
-                    }
+                if (table->get_distinct_view(primaryProperty.column).size() != count) {
+                    NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
+                    @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
                 }
             }
             else {

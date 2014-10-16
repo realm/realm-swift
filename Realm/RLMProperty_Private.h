@@ -34,6 +34,7 @@
 // private setters
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
+@property (nonatomic, readwrite) RLMPropertyAttributes attributes;
 
 // private properties
 @property (nonatomic, copy) NSString *objcRawType;
