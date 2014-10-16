@@ -2,6 +2,7 @@
 =============================================================
 
 ### API breaking changes
+
 * RLMArray has been split into two classes, `RLMArray` and `RLMResults`. RLMArray is
   used for object properties as in previous releases. Moving forward all methods used to
   enumerate, query, and sort objects return an instance of a new class `RLMResults`. This
@@ -20,6 +21,8 @@
 
 * Fix exceptions when trying to set `RLMObject` properties after rearranging
   the properties in a `RLMObject` subclass.
+* Fix crash on IN query with several thousand items.
+* Fix crash when querying indexed `NSString` properties.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================
