@@ -74,7 +74,7 @@ __attribute__((noreturn)) void throw_objc_exception(exception &ex) {
 }
 
 // create NSError from c++ exception
-static NSError *make_realm_error(RLMError code, exception &ex) {
+NSError *make_realm_error(RLMError code, exception &ex) {
     NSMutableDictionary *details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
     [details setValue:@(code) forKey:@"Error Code"];
@@ -90,14 +90,14 @@ NSMutableDictionary *s_realmsPerPath;
 //  rather than by the path (since the path is not a reliable identifier). This requires additional support
 //  from the core library though, because the inode,device number pair needs to be taken from the open file
 //  (to avoid race conditions).
-static RLMRealm *cachedRealm(NSString *path) {
+RLMRealm *cachedRealm(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectForKey:@(threadID)];
     }
 }
 
-static void cacheRealm(RLMRealm *realm, NSString *path) {
+void cacheRealm(RLMRealm *realm, NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         if (!s_realmsPerPath[path]) {
@@ -107,13 +107,13 @@ static void cacheRealm(RLMRealm *realm, NSString *path) {
     }
 }
 
-static NSArray *realmsAtPath(NSString *path) {
+NSArray *realmsAtPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].allObjects;
     }
 }
 
-static void clearRealmCache() {
+void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
         for (NSMapTable *map in s_realmsPerPath.allValues) {
             [map removeAllObjects];
@@ -122,7 +122,7 @@ static void clearRealmCache() {
     }
 }
 
-static void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
+void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     [realm beginWriteTransaction];
 
     @try {
@@ -137,8 +137,7 @@ static void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) 
     }
 }
 
-NSString *s_defaultRealmPath = nil;
-NSArray *s_objectDescriptors = nil;
+static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
 
