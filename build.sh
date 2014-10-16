@@ -228,11 +228,12 @@ case "$COMMAND" in
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
 
+        srcdir="build/DerivedData/Realm/Build/Products/Release-dynamic"
         mkdir -p build/ios-dynamic
         rm -rf build/ios-dynamic/Realm.framework
-        cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework build/ios-dynamic
-        cp build/DerivedData/Realm/Build/Products/Release-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/ios-dynamic/Realm.framework/Modules/Realm.swiftmodule/
-        xcrun lipo -create "build/DerivedData/Realm/Build/Products/Release-iphonesimulator/Realm.framework/Realm" "build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework/Realm" -output "build/ios-dynamic/Realm.framework/Realm"
+        cp -R $srcdir-iphoneos/Realm.framework build/ios-dynamic
+        cp $srcdir-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/ios-dynamic/Realm.framework/Modules/Realm.swiftmodule/
+        xcrun lipo -create "$srcdir-iphonesimulator/Realm.framework/Realm" "$srcdir-iphoneos/Realm.framework/Realm" -output "build/ios-dynamic/Realm.framework/Realm"
         exit 0
         ;;
 
