@@ -490,32 +490,34 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             throw_objc_exception(ex);
         }
     } else {
-       @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing writetransaction" userInfo:nil];
+       @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing write transaction" userInfo:nil];
     }
 }
 
 - (void)transactionWithBlock:(void(^)(void))block {
     [self beginWriteTransaction];
     block();
-    [self commitWriteTransaction];
+    if (_inWriteTransaction) {
+        [self commitWriteTransaction];
+    }
 }
 
-/*
-- (void)rollbackWriteTransaction {
-    if (self.transactionMode == RLMTransactionModeWrite) {
-        try {
-            _sharedGroup->rollback();
-            _writeGroup = NULL;
+- (void)cancelWriteTransaction {
+    CheckReadWrite(self);
+    RLMCheckThread(self);
 
-            [self beginReadTransaction];
+    if (self.inWriteTransaction) {
+        try {
+            LangBindHelper::rollback_and_continue_as_read(*_sharedGroup);
+            _inWriteTransaction = NO;
         }
         catch (std::exception& ex) {
             throw_objc_exception(ex);
         }
     } else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't roll-back a non-existing writetransaction" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't cancel a non-existing write transaction" userInfo:nil];
     }
-}*/
+}
 
 - (void)dealloc {
     if (_inWriteTransaction) {

@@ -24,6 +24,7 @@
 * Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 * Updating to core library version 0.85.0.
 * Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
+* Add `cancelWriteTransaction` to revert all changes made in a write transaction and end the transaction.
 
 ### Bugfixes
 

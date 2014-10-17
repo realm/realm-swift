@@ -641,5 +641,148 @@
     XCTAssertEqual(0U, DogObject.allObjects.count);
 }
 
+- (void)testRollbackInsert
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(createdObject.isDeletedFromRealm);
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testRollbackDelete
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *objectToDelete = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:objectToDelete];
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(objectToDelete.isDeletedFromRealm);
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testRollbackModify
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *objectToModify = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    objectToModify.intCol = 1;
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(0, objectToModify.intCol);
+}
+
+- (void)testRollbackLink
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *obj1 = [CircleObject createInRealm:realm withObject:@[@"1", NSNull.null]];
+    CircleObject *obj2 = [CircleObject createInRealm:realm withObject:@[@"2", NSNull.null]];
+    [realm commitWriteTransaction];
+
+    // Link to existing persisted
+    [realm beginWriteTransaction];
+    obj1.next = obj2;
+    [realm cancelWriteTransaction];
+
+    XCTAssertNil(obj1.next);
+
+    // Link to standalone
+    [realm beginWriteTransaction];
+    CircleObject *obj3 = [[CircleObject alloc] init];
+    obj3.data = @"3";
+    obj1.next = obj3;
+    [realm cancelWriteTransaction];
+
+    XCTAssertNil(obj1.next);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm].count);
+
+    // Remove link
+    [realm beginWriteTransaction];
+    obj1.next = obj2;
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    obj1.next = nil;
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue([obj1.next isEqualToObject:obj2]);
+
+    // Modify link
+    [realm beginWriteTransaction];
+    CircleObject *obj4 = [CircleObject createInRealm:realm withObject:@[@"4", NSNull.null]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    obj1.next = obj4;
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue([obj1.next isEqualToObject:obj2]);
+}
+
+- (void)testRollbackLinkList
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@0]];
+    IntObject *obj2 = [IntObject createInRealm:realm withObject:@[@1]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[obj1]]];
+    [realm commitWriteTransaction];
+
+    // Add existing persisted
+    [realm beginWriteTransaction];
+    [array.intArray addObject:obj2];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+
+    // Add standalone
+    [realm beginWriteTransaction];
+    [array.intArray addObject:[[IntObject alloc] init]];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+    XCTAssertEqual(2U, [IntObject allObjectsInRealm:realm].count);
+
+    // Remove
+    [realm beginWriteTransaction];
+    [array.intArray removeObjectAtIndex:0];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+
+    // Modify
+    [realm beginWriteTransaction];
+    array.intArray[0] = obj2;
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+    XCTAssertTrue([array.intArray[0] isEqualToObject:obj1]);
+}
+
+- (void)testRollbackTransactionWithBlock
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+        [realm cancelWriteTransaction];
+    }];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
 
 @end
