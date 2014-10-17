@@ -35,6 +35,7 @@
 * Preserve the sort order when querying a sorted `RLMResults`.
 * Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
   the newly created Realm can be initialized with an incorrect schema version.
+* Fix crash in `RLMSuperSet` when assigning to a `RLMArray` property on a standalone object.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================

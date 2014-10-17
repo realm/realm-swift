@@ -417,7 +417,7 @@ static id RLMSuperGet(RLMObject *obj, NSString *propName) {
 
 // call setter for superclass for property at colIndex
 static void RLMSuperSet(RLMObject *obj, NSString *propName, id val) {
-    typedef id (*setter_type)(RLMObject *, SEL, RLMArray *ar);
+    typedef void (*setter_type)(RLMObject *, SEL, RLMArray *ar);
     RLMProperty *prop = obj.objectSchema[propName];
     Class superClass = class_getSuperclass(obj.class);
     setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:prop.setterSel];
