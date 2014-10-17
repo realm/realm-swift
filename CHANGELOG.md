@@ -24,6 +24,7 @@
 * Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 * Updating to core library version 0.85.0.
 * Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
+* Support for partial updates when calling `createOrUpdateWithObject:` and `addOrUpdateObject:`
 
 ### Bugfixes
 

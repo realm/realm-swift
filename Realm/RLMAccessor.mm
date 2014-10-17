@@ -223,8 +223,10 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
     // remove all old
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
-    for (RLMObject *link in val) {
-        linkView->add(RLMAddLinkedObject(link, obj.realm, options));
+    if ((id)val != NSNull.null) {
+        for (RLMObject *link in val) {
+            linkView->add(RLMAddLinkedObject(link, obj.realm, options));
+        }
     }
 }
 
@@ -448,7 +450,9 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
         return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
             RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
-            [standaloneAr addObjects:ar];
+            if ((id)ar != NSNull.null) {
+                [standaloneAr addObjects:ar];
+            }
             RLMSuperSet(obj, propName, standaloneAr);
         });
     }
