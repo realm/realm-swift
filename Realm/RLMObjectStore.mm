@@ -333,9 +333,9 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {
-            // skip primary key when updating since it doesn't change
+            // skip missing properties and primary key when updating since it doesn't change
             id propValue = dict[prop.name];
-            if (propValue) {
+            if (propValue && (created || !prop.isPrimary)) {
                 RLMDynamicSet(object, prop, propValue,
                               options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
             }
