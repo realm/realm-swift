@@ -29,13 +29,19 @@
     BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+
     NSMenuItem *clickLockItem;
-    NSMenuItem *addRowItem;
+
+    NSMenuItem *deleteObjectItem;
+    NSMenuItem *addObjectItem;
+
+    NSMenuItem *removeFromArrayItem;
     NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
-    NSMenuItem *removeFromArrayItem;
+    
     NSMenuItem *removeLinkToObjectItem;
     NSMenuItem *removeLinkToArrayItem;
+    
     NSMenuItem *openArrayInNewWindowItem;
 }
 
@@ -84,48 +90,59 @@
 
     unichar backspaceKey = NSBackspaceCharacter;
     NSString *backspaceString = [NSString stringWithCharacters:&backspaceKey length:1];
-
+    
+    // This single menu item alerts the user that the realm is locked for editing
     clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit"
                                                action:nil
                                         keyEquivalent:@""];
     clickLockItem.tag = 99;
+    
+    // Operations on objects in class tables
+    deleteObjectItem = [[NSMenuItem alloc] initWithTitle:@"Delete objects"
+                                                  action:@selector(deleteObjectsAction:)
+                                           keyEquivalent:@""];
+    deleteObjectItem.tag = 200;
 
-    addRowItem = [[NSMenuItem alloc] initWithTitle:@"Add row"
-                                            action:@selector(selectedAddRow:)
-                                     keyEquivalent:@"+"];
-    addRowItem.tag = 5;
+    addObjectItem = [[NSMenuItem alloc] initWithTitle:@"Add new objects"
+                                               action:@selector(addObjectsAction:)
+                                        keyEquivalent:@""];
+    addObjectItem.tag = 201;
+
+    // Operations on objects in arrays
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array"
+                                                     action:@selector(removeRowsFromArrayAction:)
+                                              keyEquivalent:backspaceString];
+    removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask;
+    removeFromArrayItem.tag = 210;
     
-    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Delete row"
-                                               action:@selector(selectedDeleteRow:)
+    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array and delete"
+                                               action:@selector(deleteRowsFromArrayAction:)
                                         keyEquivalent:backspaceString];
-    deleteRowItem.tag = 6;
+    deleteRowItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
+    deleteRowItem.tag = 211;
     
-    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array"
-                                                     action:@selector(selectedInsertRow:)
+    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Add new objects to array"
+                                                     action:@selector(addRowsToArrayAction:)
                                               keyEquivalent:@"+"];
     insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
-    insertIntoArrayItem.tag = 9;
-
-    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array"
-                                                     action:@selector(selectedRemoveRow:)
-                                              keyEquivalent:backspaceString];
-    removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
-    removeFromArrayItem.tag = 10;
-
-    removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
-                                                       action:@selector(selectedRemoveObjectLink:)
-                                              keyEquivalent:@""];
-    removeLinkToObjectItem.tag = 11;
-
-    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
-                                                     action:@selector(selectedRemoveArrayLink:)
-                                              keyEquivalent:@""];
-    removeLinkToArrayItem.tag = 12;
+    insertIntoArrayItem.tag = 212;
     
+    // Operations on links in cells
+    removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
+                                                       action:@selector(removeObjectLinksAction:)
+                                                keyEquivalent:@""];
+    removeLinkToObjectItem.tag = 220;
+    
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
+                                                       action:@selector(removeArrayLinksAction:)
+                                                keyEquivalent:@""];
+    removeLinkToArrayItem.tag = 221;
+    
+    // Open array in new window
     openArrayInNewWindowItem = [[NSMenuItem alloc] initWithTitle:@"Open array in new window"
-                                                          action:@selector(openArrayInNewWindow:)
+                                                          action:@selector(openArrayInNewWindowAction:)
                                                    keyEquivalent:@""];
-    openArrayInNewWindowItem.tag = 20;
+    openArrayInNewWindowItem.tag = 230;
 }
 
 #pragma mark - NSResponder Overrides
@@ -210,20 +227,29 @@
 
 -(void)keyDown:(NSEvent *)theEvent
 {
-    if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
-        if (theEvent.keyCode == 27) {
-            [self selectedAddRow:theEvent];
+    BOOL pressedPlus = theEvent.keyCode == 27;
+    BOOL pressedBackspace = theEvent.keyCode == 51;
+    
+    BOOL pressedCmdShift = theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask;
+    BOOL pressedCmd = theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask;
+    
+    if (self.realmDelegate.displaysArray) {
+        if (pressedCmd && pressedBackspace) {
+            [self removeRowsFromArrayAction:theEvent];
         }
-        else if (theEvent.keyCode == 51) {
-            [self selectedDeleteRow:theEvent];
+        else if (pressedCmdShift && pressedBackspace) {
+            [self deleteRowsFromArrayAction:theEvent];
+        }
+        else if (pressedCmd && pressedPlus) {
+            [self addRowsToArrayAction:theEvent];
         }
     }
-    else if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask) {
-        if (theEvent.keyCode == 27) {
-            [self selectedInsertRow:theEvent];
+    else {
+        if (pressedCmdShift && pressedBackspace) {
+            [self deleteObjectsAction:theEvent];
         }
-        else if (theEvent.keyCode == 51) {
-            [self selectedRemoveRow:theEvent];
+        else if (pressedCmd && pressedPlus) {
+            [self addObjectsAction:theEvent];
         }
     }
     
@@ -232,40 +258,53 @@
 
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    BOOL canEditRows = !self.realmDelegate.realmIsLocked;
-    BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
+    BOOL nonemptySelection = self.selectedRowIndexes.count > 0;
+    BOOL multipleSelection = self.selectedRowIndexes.count > 1;
+    BOOL unlocked = !self.realmDelegate.realmIsLocked;
     BOOL displaysArray = self.realmDelegate.displaysArray;
 
+    NSString *numberModifier = multipleSelection ? @"s" : @"";
+    
     switch (menuItem.tag) {
-        case 1: // Tools -> Add row
-        case 5: // Context -> Add row
-            menuItem.title = multipleRows ? @"Add objects" : @"Add object";
-            return canEditRows && !displaysArray;
-            
-        case 2: // Tools -> Delete row
-        case 6: // Context -> Delete row
-            menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
-            return canDeleteRows;
-
-        case 9: // Context -> Insert row into array
-            menuItem.title = multipleRows ? @"Insert objects into array" : @"Insert object into array";
-            return canEditRows && displaysArray;
-
-        case 10: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
-            return canDeleteRows && displaysArray;
-
-        case 11: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to objects" : @"Remove link to object";
-            return YES;
-
-        case 12: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to arrays" : @"Remove link to array";
-            return YES;
-
         case 99: // Context -> Click lock icon to edit
             return NO;
+
+        case 100: // Edit -> Delete object
+        case 200: // Context -> Delete object
+            menuItem.title = [NSString stringWithFormat:@"Delete object%@", numberModifier];
+            return nonemptySelection && unlocked && !displaysArray;
+
+        case 101: // Edit -> Add object
+        case 201: // Context -> Add object
+            menuItem.title = [NSString stringWithFormat:@"Add new object%@", numberModifier];
+            return unlocked && !displaysArray;
+            
+        case 110: // Edit -> Remove object from array
+        case 210: // Context -> Remove object from array
+            menuItem.title = [NSString stringWithFormat:@"Remove object%@ from array", numberModifier];
+            return unlocked && nonemptySelection && displaysArray;
+
+        case 111: // Edit -> Remove object from array and delete
+        case 211: // Context -> Remove object from array and delete
+            menuItem.title = [NSString stringWithFormat:@"Remove object%@ from array and delete", numberModifier];
+            return unlocked && nonemptySelection && displaysArray;
+
+        case 112: // Edit -> Insert object into array
+        case 212: // Context -> Insert object into array
+            menuItem.title = [NSString stringWithFormat:@"Add new object%@ to array", numberModifier];
+            return unlocked && displaysArray;
+            
+        case 220: // Context -> Remove links to object
+            menuItem.title = [NSString stringWithFormat:@"Remove link%@ to object%@", numberModifier, numberModifier];
+            return unlocked && nonemptySelection;
+
+        case 221: // Context -> Remove links to array
+            menuItem.title = [NSString stringWithFormat:@"Remove link%@ to array%@", numberModifier, numberModifier];
+            return unlocked && nonemptySelection;
+
+        case 230: // Context -> Open array in new window
+            menuItem.title = @"Open array in new window";
+            return YES;
 
         default:
             return YES;
@@ -278,42 +317,46 @@
 {
     [self.menu removeAllItems];
     
-    // Menu items that do not require editing
+    // Menu items that are independent on the realm lock
     if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
         [self.menu addItem:openArrayInNewWindowItem];
     }
 
+    // If it is locked, show the unlock hint menu item and return
     if (self.realmDelegate.realmIsLocked) {
         [self.menu addItem:clickLockItem];
         return;
     }
     
-    // Menu items that do require editing
-    
-    // Menu items that make sense without a row selected
-    
+    // Below, only menu items that do require editing
+
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:insertIntoArrayItem];
     }
     else {
-        [self.menu addItem:addRowItem];
+        [self.menu addItem:addObjectItem];
     }
     
     if (self.selectedRowIndexes.count == 0) {
         return;
     }
     
-    // Menu items that make sense only with a row selected
-    [self.menu addItem:deleteRowItem];
-
+    // Below, only menu items that make sense with a row selected
+    
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:removeFromArrayItem];
+        [self.menu addItem:deleteRowItem];
+    }
+    else {
+        [self.menu addItem:deleteObjectItem];
     }
 
     if (self.clickedColumn == -1) {
         return;
     }
     
+    // Below, only menu items that make sense when clicking in a column
+
     if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
         [self.menu addItem:removeLinkToObjectItem];
     }
@@ -324,49 +367,64 @@
 
 #pragma mark - First Responder User Actions
 
-- (IBAction)selectedAddRow:(id)sender
+// Delete selected objects
+- (IBAction)deleteObjectsAction:(id)sender
 {
-    if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate addRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate deleteObjects:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedDeleteRow:(id)sender
+// Add objects of the current type, according to number of selected rows
+- (IBAction)addObjectsAction:(id)sender
 {
-    if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate deleteRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate addNewObjects:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedRemoveRow:(id)sender
+// Remove selected objects from array, keeping the objects
+- (IBAction)removeRowsFromArrayAction:(id)sender
 {
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeRows:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedInsertRow:(id)sender
+// Remove selected objects from array and delete the objects
+- (IBAction)deleteRowsFromArrayAction:(id)sender
 {
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate insertRows:self.selectedRowIndexes];
+        [self.realmDelegate deleteRows:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedRemoveObjectLink:(id)sender
+// Create and insert objects at the selected rows
+- (IBAction)addRowsToArrayAction:(id)sender
+{
+    if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate addNewRows:self.selectedRowIndexes];
+    }
+}
+
+// Set object links in the clicked column to [NSNull null] at the selected rows
+- (IBAction)removeObjectLinksAction:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
 }
 
-- (IBAction)selectedRemoveArrayLink:(id)sender
+// Make array links in the clicked column, at selected rows, empty
+- (IBAction)removeArrayLinksAction:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
 }
 
-- (IBAction)openArrayInNewWindow:(id)sender
+// Opens the array in the current cell in a new window
+- (IBAction)openArrayInNewWindowAction:(id)sender
 {
     [self.realmDelegate openArrayInNewWindowAtRow:self.clickedRow column:self.clickedColumn];
 }

@@ -141,6 +141,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
         [wc.tableViewController insertNewRowsInArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
     }
 }
 

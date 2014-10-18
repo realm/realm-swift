@@ -208,11 +208,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
         
+        // Performs the move in the realm
+        [self moveRowsFrom:rowIndexes to:destination updating:RLMUpdateTypeRealm];
+
         // Performs the move visually in all relevant windows
         [self.parentWindowController moveRowsInArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
-
-        // Performs the move in the realm
-        [self moveRowsFrom:rowIndexes to:destination updating:RLMUpdateTypeTableView];
         
         return YES;
     }
@@ -405,10 +405,68 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 #pragma mark - RLMTableView Delegate
 
-- (void)addRows:(NSIndexSet *)rowIndexes
+// Asking the delegate about the state
+- (BOOL)displaysArray
 {
-    if (!self.realmIsLocked) {
+    return ([self.displayedType isMemberOfClass:[RLMArrayNode class]]);
+}
+
+// Asking the delegate about the contents
+- (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
+{
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
+    
+    if (column == -1) {
+        return NO;
     }
+    
+    if ([self propertyTypeForColumn:column] != RLMPropertyTypeObject) {
+        return NO;
+    }
+    
+    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
+}
+
+- (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
+{
+    NSInteger propertyIndex = [self propertyIndexForColumn:column];
+    
+    if (column == -1) {
+        return NO;
+    }
+    
+    if ([self propertyTypeForColumn:column] != RLMPropertyTypeArray) {
+        return NO;
+    }
+    
+    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
+}
+
+// RLMObject operations (when showing class table)
+- (void)addNewObjects:(NSIndexSet *)rowIndexes
+{
+    
+}
+
+- (void)deleteObjects:(NSIndexSet *)rowIndexes
+{
+    
+}
+
+// RLMArray operations
+- (void)removeRows:(NSIndexSet *)rowIndexes
+{
+    if (self.realmIsLocked || !self.displaysArray) {
+        return;
+    }
+    
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    [realm beginWriteTransaction];
+    [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
+        [(RLMArrayNode *)self.displayedType removeInstanceAtIndex:idx];
+    }];
+    [realm commitWriteTransaction];
+    [self.parentWindowController reloadAllWindows];
 }
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes
@@ -431,64 +489,20 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [self.parentWindowController reloadAllWindows];
 }
 
-- (void)insertRows:(NSIndexSet *)rowIndexes
+- (void)addNewRows:(NSIndexSet *)rowIndexes
 {
     if (self.realmIsLocked || !self.displaysArray) {
         return;
     }
     
-    [self.parentWindowController insertNewRowsInArrayNode:(RLMArrayNode *)self.displayedType at:rowIndexes];
     [self insertNewRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
+    [self.parentWindowController insertNewRowsInArrayNode:(RLMArrayNode *)self.displayedType at:rowIndexes];
 }
 
-- (void)removeRows:(NSIndexSet *)rowIndexes
-{
-    if (self.realmIsLocked || !self.displaysArray) {
-        return;
-    }
-
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    [realm beginWriteTransaction];
-    [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
-        [(RLMArrayNode *)self.displayedType removeInstanceAtIndex:idx];
-    }];
-    [realm commitWriteTransaction];
-    [self.parentWindowController reloadAllWindows];
-}
-
-- (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
-{
-    NSInteger propertyIndex = [self propertyIndexForColumn:column];
-
-    if (column == -1) {
-        return NO;
-    }
-
-    if ([self propertyTypeForColumn:column] != RLMPropertyTypeObject) {
-        return NO;
-    }
-    
-    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
-}
-
+// Operations on links in cells
 - (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
 {
     [self removeContentsAtRows:rowIndexes column:columnIndex];
-}
-
-- (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
-{
-    NSInteger propertyIndex = [self propertyIndexForColumn:column];
-
-    if (column == -1) {
-        return NO;
-    }
-    
-    if ([self propertyTypeForColumn:column] != RLMPropertyTypeArray) {
-        return NO;
-    }
-
-    return [self cellsAreNonEmptyInRows:rowIndexes propertyColumn:propertyIndex];
 }
 
 - (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex
@@ -496,6 +510,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [self removeContentsAtRows:rowIndexes column:columnIndex];
 }
 
+// Opening an array in a new window
 - (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)column
 {
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
@@ -614,7 +629,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 {
     // Check if this window is showing the arraynode that is to be rearranged visually
     if ([self.displayedType isEqualTo:arrayNode]) {
-        [self removeRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
+        [self removeRowsAt:rowIndexes updating:RLMUpdateTypeTableView];
     }
 }
 
@@ -622,7 +637,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 {
     // Check if this window is showing the arraynode that is to be rearranged visually
     if ([self.displayedType isEqualTo:arrayNode]) {
-        [self insertNewRowsAt:rowIndexes updating:RLMUpdateTypeRealm];
+        [self insertNewRowsAt:rowIndexes updating:RLMUpdateTypeTableView];
     }
 }
 
@@ -630,7 +645,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 {
     // Check if this window is showing the arraynode that is to be rearranged visually
     if ([self.displayedType isEqualTo:arrayNode]) {
-        [self moveRowsFrom:sourceIndexes to:destination updating:RLMUpdateTypeRealm];
+        [self moveRowsFrom:sourceIndexes to:destination updating:RLMUpdateTypeTableView];
     }
 }
 
@@ -639,77 +654,78 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 // Removing
 - (void)removeRowsAt:(NSIndexSet *)rowIndexes updating:(RLMUpdateType)updateType
 {
+    if (rowIndexes.count == 0) {
+        rowIndexes = [NSIndexSet indexSetWithIndex:0];
+    }
     
+    if (updateType == RLMUpdateTypeRealm) {
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        
+        NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
+        for (RLMProperty *property in self.displayedType.schema.properties) {
+            objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+        
+        [realm beginWriteTransaction];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
+                RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+                [realm addObject:object];
+                [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:range.location];
+            }
+        }];
+        
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            NSIndexSet *indexSetForRange = [NSIndexSet indexSetWithIndexesInRange:range];
+            [self.tableView insertRowsAtIndexes:indexSetForRange withAnimation:NSTableViewAnimationEffectGap];
+        }];
+        
+        [self.tableView endUpdates];
+        [self updateArrayIndexColumn];
+    }
 }
 
 // Inserting
 - (void)insertNewRowsAt:(NSIndexSet *)rowIndexes updating:(RLMUpdateType)updateType
 {
-    NSLog(@"insertNewRowsAt (%@): %@", updateType == RLMUpdateTypeRealm ? @"Realm" : @"TableView", rowIndexes);
-
     if (rowIndexes.count == 0) {
         rowIndexes = [NSIndexSet indexSetWithIndex:0];
     }
-
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     
-    NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
-    for (RLMProperty *property in self.displayedType.schema.properties) {
-        objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
-    }
-    
-    // Start updating
     if (updateType == RLMUpdateTypeRealm) {
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        
+        NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
+        for (RLMProperty *property in self.displayedType.schema.properties) {
+            objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+        
         [realm beginWriteTransaction];
-    }
-    else {
-        [self.tableView beginUpdates];
-    }
-    
-    // Loop through rows where insertion takes place
-//    NSMutableArray *destinations = [NSMutableArray array];
-    if (updateType == RLMUpdateTypeRealm) {
-        [rowIndexes enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger idx, BOOL *stop) {
-            RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
-            [realm addObject:object];
-            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:idx];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
+                RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+                [realm addObject:object];
+                [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:range.location];
+            }
         }];
         
-//        [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-//            [destinations addObject:@(idx)];
-//        }];
-//        
-//        NSLog(@"--destinations: %@", destinations);
-//
-//        for (int i = 0; i < destinations.count; i++) {
-//            RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
-//            [realm addObject:object];
-//            NSUInteger destination = [destinations[i] unsignedIntegerValue];
-//            [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:destination];
-//            
-//            // Modify the remaining destination indices that are to the right of the one just inserted
-//            for (NSUInteger j = i + 1; j < destinations.count; j++) {
-//                NSUInteger destinationIndexToModify = [destinations[j] unsignedIntegerValue];
-//
-//                // If the index is on the right of destination, it is shifted right
-//                if (destinationIndexToModify > destination) {
-//                    destinationIndexToModify++;
-//                }
-//                destinations[j] = @(destinationIndexToModify);
-//            }
-//            
-//            NSLog(@"--destinations after inserting at %lu: %@", destination, destinations);
-//        }
-    }
-    else {
-        [self.tableView insertRowsAtIndexes:rowIndexes withAnimation:NSTableViewAnimationEffectGap];
-    }
-    
-    // Commit updates
-    if (updateType == RLMUpdateTypeRealm) {
         [realm commitWriteTransaction];
     }
     else {
+        [self.tableView beginUpdates];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            NSIndexSet *indexSetForRange = [NSIndexSet indexSetWithIndexesInRange:range];
+            [self.tableView insertRowsAtIndexes:indexSetForRange withAnimation:NSTableViewAnimationEffectGap];
+        }];
+        
         [self.tableView endUpdates];
         [self updateArrayIndexColumn];
     }
@@ -1062,13 +1078,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     
     [NSCursor pop];
     linkCursorDisplaying = NO;
-}
-
-#pragma mark - Private Methods - Setters/Getters
-
-- (BOOL)displaysArray
-{
-    return ([self.displayedType isMemberOfClass:[RLMArrayNode class]]);
 }
 
 #pragma mark - Private Methods - Convenience
