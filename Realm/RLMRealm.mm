@@ -362,8 +362,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 // advance read in case another instance initialized the schema
                 LangBindHelper::advance_read(*realm->_sharedGroup, *realm->_writeLogs);
 
-                // if we have a cached realm on another thread, copy and verify without a transaction
-                RLMRealmSetSchema(realm, [realms[0] schema]);
+                // if we have a cached realm on another thread, copy without a transaction
+                RLMRealmSetSchema(realm, [realms[0] schema], false);
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
