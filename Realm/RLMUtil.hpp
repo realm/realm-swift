@@ -40,9 +40,10 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema);
 NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
 // throws if the values in dict or properties in a kvc object are not valid for the given schema
-// inserts default values for missing properties
+// inserts default values for missing properties when allowMissing is false
+// throws for missing properties when allowMissing is false
 // returns dictionary with default values and allocates child objects when applicable
-NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema);
+NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing = false);
 
 // C version of isKindOfClass
 static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {

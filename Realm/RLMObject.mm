@@ -60,7 +60,12 @@
         // assume our object is an NSDictionary or a an object with kvc properties
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
-            [self setValue:dict[name] forKeyPath:name];
+            id val = dict[name];
+            // strip out NSNull before passing values to standalone setters
+            if (val == NSNull.null) {
+                val = nil;
+            }
+            [self setValue:val forKeyPath:name];
         }
     }
 

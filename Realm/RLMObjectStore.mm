@@ -323,19 +323,20 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         }
     }
     else {
-        // assume dictionary or object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema);
-
         // get or create our accessor
         bool created;
-        auto primaryGetter = [=](RLMProperty *p) { return dict[p.name]; };
+        auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
         object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+
+        // assume dictionary or object with kvc properties
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created);
 
         // populate
         for (RLMProperty *prop in objectSchema.properties) {
-            // skip primary key when updating since it doesn't change
-            if (created || !prop.isPrimary) {
-                RLMDynamicSet(object, prop, dict[prop.name],
+            // skip missing properties and primary key when updating since it doesn't change
+            id propValue = dict[prop.name];
+            if (propValue && (created || !prop.isPrimary)) {
+                RLMDynamicSet(object, prop, propValue,
                               options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
             }
         }

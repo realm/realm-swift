@@ -27,6 +27,7 @@
 * Add `cancelWriteTransaction` to revert all changes made in a write transaction and end the transaction.
 * Make creating `RLMRealm` instances on background threads when an instance
   exists on another thread take a fifth of the time.
+* Support for partial updates when calling `createOrUpdateWithObject:` and `addOrUpdateObject:`
 
 ### Bugfixes
 
