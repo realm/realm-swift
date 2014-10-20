@@ -29,6 +29,7 @@
 * Make creating `RLMRealm` instances on background threads when an instance
   exists on another thread take a fifth of the time.
 * Support for partial updates when calling `createOrUpdateWithObject:` and `addOrUpdateObject:`
+* Re-enable Swift support on OS X
 
 ### Bugfixes
 
