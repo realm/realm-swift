@@ -37,7 +37,7 @@ class SwiftMixedTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let objects = MixedObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, 5, "5 rows expected")
+        XCTAssertEqual(objects.count, UInt(5), "5 rows expected")
         XCTAssertTrue(objects[0].isKindOfClass(MixedObject.self), "MixedObject expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isKindOfClass(NSString.self), "NSString expected")
         XCTAssertTrue((objects[0] as MixedObject)["other"].isEqual("Jens"), "'Jens' expected")
@@ -47,7 +47,7 @@ class SwiftMixedTests: SwiftTestCase {
         // XCTAssertEqual(((objects[1] as MixedObject)["other"] as NSNumber).longLongValue, 10, "'10' expected")
 
         XCTAssertTrue((objects[1] as MixedObject)["other"].isKindOfClass(NSNumber.self), "NSNumber expected")
-        XCTAssertEqual(((objects[1] as MixedObject)["other"] as NSNumber).floatValue, 3.1, "'3.1' expected")
+        XCTAssertEqual(((objects[1] as MixedObject)["other"] as NSNumber).floatValue, Float(3.1), "'3.1' expected")
 
         XCTAssertTrue((objects[2] as MixedObject)["other"].isKindOfClass(NSNumber.self), "NSNumber expected")
         XCTAssertEqual(((objects[2] as MixedObject)["other"] as NSNumber).doubleValue, 3.1, "'3.1' expected")

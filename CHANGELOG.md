@@ -15,6 +15,7 @@
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
+* Building with Swift support now requires Xcode 6.1
 
 ### Enhancements
 
