@@ -37,6 +37,10 @@
 * Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
   the newly created Realm can be initialized with an incorrect schema version.
 * Fix crash in `RLMSuperSet` when assigning to a `RLMArray` property on a standalone object.
+* Add an error message when the protocol for an `RLMArray` property is not a
+  valid object type.
+* Add an error message when an `RLMObject` subclass is defined nested within
+  another Swift class.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================
