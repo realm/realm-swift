@@ -87,9 +87,6 @@
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
     self.menu = rightClickMenu;
     self.menu.delegate = self;
-
-    unichar backspaceKey = NSBackspaceCharacter;
-    NSString *backspaceString = [NSString stringWithCharacters:&backspaceKey length:1];
     
     // This single menu item alerts the user that the realm is locked for editing
     clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit"
@@ -111,20 +108,17 @@
     // Operations on objects in arrays
     removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array"
                                                      action:@selector(removeRowsFromArrayAction:)
-                                              keyEquivalent:backspaceString];
-    removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask;
+                                              keyEquivalent:@""];
     removeFromArrayItem.tag = 210;
     
     deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array and delete"
                                                action:@selector(deleteRowsFromArrayAction:)
-                                        keyEquivalent:backspaceString];
-    deleteRowItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
+                                        keyEquivalent:@""];
     deleteRowItem.tag = 211;
     
     insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Add new objects to array"
                                                      action:@selector(addRowsToArrayAction:)
-                                              keyEquivalent:@"+"];
-    insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
+                                              keyEquivalent:@""];
     insertIntoArrayItem.tag = 212;
     
     // Operations on links in cells
@@ -133,7 +127,7 @@
                                                 keyEquivalent:@""];
     removeLinkToObjectItem.tag = 220;
     
-    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Make array empty"
                                                        action:@selector(removeArrayLinksAction:)
                                                 keyEquivalent:@""];
     removeLinkToArrayItem.tag = 221;
@@ -225,37 +219,6 @@
     }
 }
 
--(void)keyDown:(NSEvent *)theEvent
-{
-    BOOL pressedPlus = theEvent.keyCode == 27;
-    BOOL pressedBackspace = theEvent.keyCode == 51;
-    
-    BOOL pressedCmdShift = theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask;
-    BOOL pressedCmd = theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask;
-    
-    if (self.realmDelegate.displaysArray) {
-        if (pressedCmd && pressedBackspace) {
-            [self removeRowsFromArrayAction:theEvent];
-        }
-        else if (pressedCmdShift && pressedBackspace) {
-            [self deleteRowsFromArrayAction:theEvent];
-        }
-        else if (pressedCmd && pressedPlus) {
-            [self addRowsToArrayAction:theEvent];
-        }
-    }
-    else {
-        if (pressedCmdShift && pressedBackspace) {
-            [self deleteObjectsAction:theEvent];
-        }
-        else if (pressedCmd && pressedPlus) {
-            [self addObjectsAction:theEvent];
-        }
-    }
-    
-    [self interpretKeyEvents:@[theEvent]];
-}
-
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     BOOL nonemptySelection = self.selectedRowIndexes.count > 0;
@@ -299,7 +262,7 @@
             return unlocked && nonemptySelection;
 
         case 221: // Context -> Remove links to array
-            menuItem.title = [NSString stringWithFormat:@"Remove link%@ to array%@", numberModifier, numberModifier];
+            menuItem.title = [NSString stringWithFormat:@"Make array%@ empty", numberModifier];
             return unlocked && nonemptySelection;
 
         case 230: // Context -> Open array in new window
@@ -370,6 +333,7 @@
 // Delete selected objects
 - (IBAction)deleteObjectsAction:(id)sender
 {
+    NSLog(@"deleteObjectsAction");
     if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate deleteObjects:self.selectedRowIndexes];
     }
@@ -378,6 +342,7 @@
 // Add objects of the current type, according to number of selected rows
 - (IBAction)addObjectsAction:(id)sender
 {
+    NSLog(@"addObjectsAction");
     if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate addNewObjects:self.selectedRowIndexes];
     }
@@ -386,6 +351,7 @@
 // Remove selected objects from array, keeping the objects
 - (IBAction)removeRowsFromArrayAction:(id)sender
 {
+    NSLog(@"removeRowsFromArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeRows:self.selectedRowIndexes];
     }
@@ -394,6 +360,7 @@
 // Remove selected objects from array and delete the objects
 - (IBAction)deleteRowsFromArrayAction:(id)sender
 {
+    NSLog(@"deleteRowsFromArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate deleteRows:self.selectedRowIndexes];
     }
@@ -402,6 +369,7 @@
 // Create and insert objects at the selected rows
 - (IBAction)addRowsToArrayAction:(id)sender
 {
+    NSLog(@"addRowsToArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate addNewRows:self.selectedRowIndexes];
     }
@@ -410,6 +378,7 @@
 // Set object links in the clicked column to [NSNull null] at the selected rows
 - (IBAction)removeObjectLinksAction:(id)sender
 {
+    NSLog(@"removeObjectLinksAction");
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
@@ -418,6 +387,7 @@
 // Make array links in the clicked column, at selected rows, empty
 - (IBAction)removeArrayLinksAction:(id)sender
 {
+    NSLog(@"removeArrayLinksAction");
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }

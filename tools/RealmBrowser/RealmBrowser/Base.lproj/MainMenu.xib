@@ -132,7 +132,6 @@
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="deleteObjectsAction:" target="-1" id="ONd-wB-hIM"/>
                                 </connections>
@@ -147,6 +146,7 @@ CA
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="removeRowsFromArrayAction:" target="-1" id="0zM-g2-uNZ"/>
                                 </connections>
@@ -155,12 +155,13 @@ CA
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="deleteRowsFromArrayAction:" target="-1" id="cOY-tf-Nwc"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Add new objects to array" tag="112" keyEquivalent="+" id="NDc-iI-dKd">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="addRowsToArrayAction:" target="-1" id="v6Y-zi-8rX"/>
                                 </connections>

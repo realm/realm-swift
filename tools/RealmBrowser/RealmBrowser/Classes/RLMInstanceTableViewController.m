@@ -443,12 +443,12 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 }
 
 // RLMObject operations (when showing class table)
-- (void)addNewObjects:(NSIndexSet *)rowIndexes
+- (void)deleteObjects:(NSIndexSet *)rowIndexes
 {
     
 }
 
-- (void)deleteObjects:(NSIndexSet *)rowIndexes
+- (void)addNewObjects:(NSIndexSet *)rowIndexes
 {
     
 }
@@ -456,7 +456,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 // RLMArray operations
 - (void)removeRows:(NSIndexSet *)rowIndexes
 {
-    if (self.realmIsLocked || !self.displaysArray) {
+    if (!self.displaysArray) {
         return;
     }
     
@@ -471,7 +471,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes
 {
-    if (self.realmIsLocked) {
+    if (!self.displaysArray) {
         return;
     }
 
@@ -491,7 +491,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)addNewRows:(NSIndexSet *)rowIndexes
 {
-    if (self.realmIsLocked || !self.displaysArray) {
+    if (!self.displaysArray) {
         return;
     }
     
@@ -731,7 +731,48 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     }
 }
 
+- (void)insertNewRowsAt:(NSIndexSet *)rowIndexes updating:(RLMUpdateType)updateType
+{
+    if (rowIndexes.count == 0) {
+        rowIndexes = [NSIndexSet indexSetWithIndex:0];
+    }
+    
+    if (updateType == RLMUpdateTypeRealm) {
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        
+        NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
+        for (RLMProperty *property in self.displayedType.schema.properties) {
+            objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
+        }
+        
+        [realm beginWriteTransaction];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
+                RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+                [realm addObject:object];
+                [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:range.location];
+            }
+        }];
+        
+        [realm commitWriteTransaction];
+    }
+    else {
+        [self.tableView beginUpdates];
+        
+        [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
+            NSIndexSet *indexSetForRange = [NSIndexSet indexSetWithIndexesInRange:range];
+            [self.tableView insertRowsAtIndexes:indexSetForRange withAnimation:NSTableViewAnimationEffectGap];
+        }];
+        
+        [self.tableView endUpdates];
+        [self updateArrayIndexColumn];
+    }
+}
+
+
 // Moving
+// This method handles updating both realm and tableview, because there is a lot of shared logic.
 - (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination updating:(RLMUpdateType)updateType
 {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
