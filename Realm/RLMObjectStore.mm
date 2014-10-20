@@ -113,13 +113,13 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         // read-only realms may be missing tables entirely
         objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className);
-        if (objectSchema->_table) {
+        if (objectSchema->_table && verify) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
-            if (verify) {
-                RLMVerifyAndAlignColumns(tableSchema, objectSchema);
-            }
+            RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
-        objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+        if (!objectSchema.accessorClass) {
+            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+        }
     }
 }
 

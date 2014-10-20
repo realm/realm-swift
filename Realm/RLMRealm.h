@@ -221,6 +221,32 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
+ Revert all writes made in the current write transaction and end the transaction.
+
+ This rolls back all objects in the Realm to the state they were in at the
+ beginning of the write transaction, and then ends the transaction.
+
+ This does not reattach deleted accessors. Any `RLMObject`s which were added to
+ the Realm will become deleted objects rather than switching back to standalone
+ objects. Given the following code:
+
+     ObjectType *oldObject = [[ObjectType objectsWhere:@"..."] firstObject];
+     ObjectType *newObject = [[ObjectType alloc] init];
+
+     [realm beginWriteTransaction];
+     [realm addObject:newObject];
+     [realm deleteObject:oldObject];
+     [realm cancelWriteTransaction];
+
+ Both `oldObject` and `newObject` will return `YES` for `isDeletedFromRealm`,
+ but re-running the query which provided `oldObject` will once again return
+ the valid object.
+
+ Calling this when not in a write transaction will throw an exception.
+ */
+- (void)cancelWriteTransaction;
+
+/**
  Helper to perform a block within a transaction.
  */
 - (void)transactionWithBlock:(void(^)(void))block;

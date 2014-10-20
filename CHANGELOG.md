@@ -24,6 +24,9 @@
 * Added method `deleteObject:` on `RLMMigration` which allows object deletion during migrations.
 * Updating to core library version 0.85.0.
 * Implement `objectsWhere:` and `objectsWithPredicate:` for array properties.
+* Add `cancelWriteTransaction` to revert all changes made in a write transaction and end the transaction.
+* Make creating `RLMRealm` instances on background threads when an instance
+  exists on another thread take a fifth of the time.
 * Support for partial updates when calling `createOrUpdateWithObject:` and `addOrUpdateObject:`
 
 ### Bugfixes
@@ -37,6 +40,10 @@
 * Fixed an issue with migrations where if a Realm file is deleted after a Realm is initialized,
   the newly created Realm can be initialized with an incorrect schema version.
 * Fix crash in `RLMSuperSet` when assigning to a `RLMArray` property on a standalone object.
+* Add an error message when the protocol for an `RLMArray` property is not a
+  valid object type.
+* Add an error message when an `RLMObject` subclass is defined nested within
+  another Swift class.
 
 0.86.3 Release notes (2014-10-09)
 =============================================================
