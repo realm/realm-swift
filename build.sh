@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.84.0
+    REALM_CORE_VERSION=0.85.0
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -303,6 +303,7 @@ case "$COMMAND" in
         sh build.sh docs
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
+        sh build.sh browser "$XCMODE"
         exit 0
         ;;
 

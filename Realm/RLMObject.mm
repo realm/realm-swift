@@ -60,7 +60,12 @@
         // assume our object is an NSDictionary or a an object with kvc properties
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
         for (NSString *name in dict) {
-            [self setValue:dict[name] forKeyPath:name];
+            id val = dict[name];
+            // strip out NSNull before passing values to standalone setters
+            if (val == NSNull.null) {
+                val = nil;
+            }
+            [self setValue:val forKeyPath:name];
         }
     }
 
@@ -223,10 +228,10 @@
         return @"<Maximum depth exceeded>";
     }
 
-    NSString *baseClassName = self.objectSchema.className;
+    RLMObjectSchema *objectSchema = self.objectSchema;
+    NSString *baseClassName = objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
-    RLMObjectSchema *objectSchema = self.realm.schema[baseClassName];
-    
+
     for (RLMProperty *property in objectSchema.properties) {
         id object = self[property.name];
         NSString *sub;
@@ -239,7 +244,7 @@
         [mString appendFormat:@"\t%@ = %@;\n", property.name, sub];
     }
     [mString appendString:@"}"];
-    
+
     return [NSString stringWithString:mString];
 }
 

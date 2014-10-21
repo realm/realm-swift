@@ -25,6 +25,7 @@
 // full constructor
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
@@ -76,9 +77,9 @@
  Create an RLMObject of type `className` in the Realm with a given object.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
- object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
- an NSArray with one object for each persisted property. An exception will be
- thrown if all required properties are not present or no default is provided.
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if any required properties are not present and no default is set.
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  */

@@ -34,7 +34,7 @@
 @interface RLMResults : NSObject<RLMCollection, NSFastEnumeration>
 
 /**---------------------------------------------------------------------------------------
- *  @name RLMArray Properties
+ *  @name RLMResults Properties
  *  ---------------------------------------------------------------------------------------
  */
 
@@ -234,13 +234,13 @@
 
 /**
  -[RLMResults init] is not available because RLMResults cannot be created directly.
- RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ RLMResults can be obtained by querying a Realm.
  */
 - (instancetype)init __attribute__((unavailable("RLMResults cannot be created directly")));
 
 /**
  +[RLMResults new] is not available because RLMResults cannot be created directly.
- RLMArray properties on RLMObjects are lazily created when accessed, or can be obtained by querying a Realm.
+ RLMResults can be obtained by querying a Realm.
  */
 + (instancetype)new __attribute__((unavailable("RLMResults cannot be created directly")));
 

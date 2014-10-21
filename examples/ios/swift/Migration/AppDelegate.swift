@@ -57,6 +57,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()
 
+        // copy over old data files for migration
+        let defaultPath = RLMRealm.defaultRealmPath()
+        let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
+
+        let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
+        NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
+        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
+
         // define a migration block
         // you can define this inline, but we will reuse this to migrate realm files from multiple versions
         // to the most current version of our data model
@@ -80,26 +88,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-
-            // return the new schema version
-            return 2
+            println("Migration complete.")
         }
-
-        //
-        // Migrate the default realm over multiple data model versions
-        //
-        let defaultPath = RLMRealm.defaultRealmPath()
-        let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
-
-        // copy over old data file for v0 data model
-        let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
-        NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
-
-        // migrate default realm at v0 data model to the current version
-        RLMRealm.migrateDefaultRealmWithBlock(migrationBlock)
+        RLMRealm.setSchemaVersion(3, withMigrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
+        // migration is performed implicitly on Realm access
         println("Migrated objects in the default Realm: \(Person.allObjects())")
 
         //
@@ -115,14 +109,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
 
-        // migrate realms at custom paths
-        RLMRealm.migrateRealmAtPath(realmv1Path, withBlock: migrationBlock)
-        RLMRealm.migrateRealmAtPath(realmv2Path, withBlock: migrationBlock)
+        // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
+        RLMRealm.migrateRealmAtPath(realmv1Path)
 
         // print out all migrated objects in the migrated realms
-        let realmv1 = RLMRealm.realmWithPath(realmv1Path, readOnly: false, error: nil)
+        let realmv1 = RLMRealm(path: realmv1Path, readOnly: false, error: nil)
         println("Migrated objects in the Realm migrated from v1: \(Person.allObjectsInRealm(realmv1))")
-        let realmv2 = RLMRealm.realmWithPath(realmv2Path, readOnly: false, error: nil)
+        let realmv2 = RLMRealm(path: realmv2Path, readOnly: false, error: nil)
         println("Migrated objects in the Realm migrated from v2: \(Person.allObjectsInRealm(realmv2))")
 
         return true

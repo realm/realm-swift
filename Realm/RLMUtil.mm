@@ -179,18 +179,26 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
-NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema) {
+NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
-        // set out object to validated input or default value
         id obj = (isDict || [value respondsToSelector:NSSelectorFromString(prop.name)]) ? [value valueForKey:prop.name] : nil;
-        obj = obj && obj != NSNull.null ? obj : defaults[prop.name];
-        obj = RLMValidatedObjectForProperty(obj, prop, schema);
-        if (obj)
-            outDict[prop.name] = obj;
+
+        // get default for nil object
+        if (!obj && !allowMissing) {
+            obj = defaults[prop.name];
+        }
+
+        // validate if object is not nil, or for nil if we don't allow missing values
+        if (obj || !allowMissing) {
+            if (!obj) {
+                obj = NSNull.null;
+            }
+            outDict[prop.name] = RLMValidatedObjectForProperty(obj, prop, schema);
+        }
     }
     return outDict;
 }

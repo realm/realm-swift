@@ -113,9 +113,9 @@
  the object with the given object.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
- object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
- an NSArray with one object for each persisted property. An exception will be
- thrown if all required properties are not present or no default is provided.
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if any required properties are not present and no default is set.
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
@@ -133,7 +133,7 @@
  @param object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
-                thrown if all required properties are not present or no default is provided.
+                thrown if any required properties are not present and no default is set.
                 
                 When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  
@@ -149,9 +149,9 @@
  is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
- object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
- an NSArray with one object for each persisted property. An exception will be
- thrown if all required properties are not present or no default is provided.
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if any required properties are not present and no default is set.
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
@@ -168,9 +168,9 @@
 
  @param realm   The Realm in which this object is persisted.
  @param object  The object used to populate the object. This can be any key/value coding compliant
- object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
- an NSArray with one object for each persisted property. An exception will be
- thrown if all required properties are not present or no default is provided.
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if any required properties are not present and no default is set.
 
  When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
 
@@ -237,6 +237,7 @@
  Implement to designate a property as the primary key for an RLMObject subclass. Only properties of
  type RLMPropertyTypeString and RLMPropertyTypeInt can be designated as the primary key. Primary key 
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+ Indexes are created automatically for string primary key properties.
 
  @return    Name of the property designated as the primary key.
  */

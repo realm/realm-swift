@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Foundation
 
 class SwiftDynamicTests: SwiftTestCase {
 
@@ -25,7 +26,7 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withObject: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withObject: ["column2", 2])
@@ -33,25 +34,25 @@ class SwiftDynamicTests: SwiftTestCase {
         }
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm.self), "realm should be of class RLMDynamicRealm")
+        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm))
 
         // verify schema
         let dynSchema = dyrealm.schema[SwiftDynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
-        XCTAssertEqual(dynSchema.properties.count, 2, "SwiftDynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
-        XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
+        XCTAssertEqual(dynSchema.properties.count, Int(2))
+        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol")
+        XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int)
 
         // verify object type
         let array = SwiftDynamicObject.allObjectsInRealm(dyrealm)
-        XCTAssertEqual(array.count, 2, "Array should have 2 elements")
-        XCTAssertEqual(array.objectClassName!, SwiftDynamicObject.className()!, "Array class should by a dynamic object class")
+        XCTAssertEqual(array.count, UInt(2))
+        XCTAssertEqual(array.objectClassName!, SwiftDynamicObject.className()!)
     }
 
     func testDynamicProperties() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
             SwiftDynamicObject.createInRealm(realm, withObject: ["column1", 1])
             SwiftDynamicObject.createInRealm(realm, withObject: ["column2", 2])
@@ -62,8 +63,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")
 
-        XCTAssertEqual((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
-        XCTAssertEqual((array[1] as RLMObject)["stringCol"] as String, "column2", "Second object should have column value column2")
+        XCTAssertTrue((array[0] as RLMObject)["intCol"] as NSNumber == 1)
+        XCTAssertTrue((array[1] as RLMObject)["stringCol"] as String == "column2")
     }
 
     // FIXME: Uncomment once Swift-defined models support RLMPropertyTypeAny
@@ -78,7 +79,7 @@ class SwiftDynamicTests: SwiftTestCase {
 //
 //        autoreleasepool {
 //            // open realm in autoreleasepool to create tables and then dispose
-//            let realm = self.realmWithTestPath()
+//            let realm =.realmWithTestPath()
 //            realm.beginWriteTransaction()
 //            SwiftAllTypesObject.createInRealm(realm, withObject: obj1)
 //            SwiftAllTypesObject.createInRealm(realm, withObject: obj2)
@@ -88,21 +89,21 @@ class SwiftDynamicTests: SwiftTestCase {
 //        // verify properties
 //        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
 //        let array = dyrealm.allObjects(SwiftAllTypesObject.className())
-//        XCTAssertEqual(array.count, 2, "Should have 2 objects")
+//        XCTAssertEqual(array.count, UInt(2))
 //
 //        let schema = dyrealm.schema[SwiftAllTypesObject.className()]
 //        for idx in 0..<10 {
 //            let propName = schema.properties[idx].name
-//            XCTAssertEqual(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject, "Invalid property value")
-//            XCTAssertEqual(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject, "Invalid property value")
+//            XCTAssertEqual(obj1[idx], (array[0] as RLMObject)[propName] as? NSObject)
+//            XCTAssertEqual(obj2[idx], (array[1] as RLMObject)[propName] as? NSObject)
 //        }
 //
 //        // check sub object type
-//        XCTAssertEqual((schema.properties[10] as RLMProperty).objectClassName, "StringObject", "Sub-object type in schema should be 'StringObject'")
+//        XCTAssertTrue((schema.properties[10] as RLMProperty).objectClassName == "StringObject")
 //
 //        // check object equality
 //        XCTAssertNil((array[0] as RLMObject)["objectCol"], "object should be nil")
-//        XCTAssertEqual(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject, "string", "Child object should have string value 'column'")
+//        XCTAssertTrue(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as? NSObject == "string")
 //    }
 
     // Objective-C models
@@ -110,7 +111,7 @@ class SwiftDynamicTests: SwiftTestCase {
     func testDynamicRealmExists_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withObject: ["column1", 1])
             DynamicObject.createInRealm(realm, withObject: ["column2", 2])
@@ -118,25 +119,25 @@ class SwiftDynamicTests: SwiftTestCase {
         }
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         XCTAssertNotNil(dyrealm, "realm should not be nil")
-        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm.self), "realm should be of class RLMDynamicRealm")
+        XCTAssertTrue(dyrealm.isKindOfClass(RLMRealm), "realm should be of class RLMDynamicRealm")
 
         // verify schema
         let dynSchema = dyrealm.schema[DynamicObject.className()]
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
-        XCTAssertEqual(dynSchema.properties.count, 2, "DynamicObject should have 2 properties")
-        XCTAssertEqual(dynSchema.properties[0].name!, "stringCol", "Invalid property name")
-        XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int, "Invalid type")
+        XCTAssertTrue(dynSchema.properties.count == 2)
+        XCTAssertTrue(dynSchema.properties[0].name! == "stringCol")
+        XCTAssertTrue((dynSchema.properties[1] as RLMProperty).type == RLMPropertyType.Int)
 
         // verify object type
         let array = DynamicObject.allObjectsInRealm(dyrealm)
-        XCTAssertEqual(array.count, 2, "Array should have 2 elements")
-        XCTAssertEqual(array.objectClassName!, DynamicObject.className()!, "Array class should by a dynamic object class")
+        XCTAssertEqual(array.count, UInt(2))
+        XCTAssertEqual(array.objectClassName!, DynamicObject.className()!)
     }
 
     func testDynamicProperties_objc() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm.realmWithPath(testRealmPath(), readOnly: false, error: nil)
+            let realm = RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
             realm.beginWriteTransaction()
             DynamicObject.createInRealm(realm, withObject: ["column1", 1])
             DynamicObject.createInRealm(realm, withObject: ["column2", 2])
@@ -147,18 +148,42 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("DynamicObject")
 
-        XCTAssertEqual((array[0] as RLMObject)["intCol"] as NSNumber, 1, "First object should have column value 1")
-        XCTAssertEqual((array[1] as RLMObject)["stringCol"] as String, "column2", "Second object should have column value column2")
+        XCTAssertTrue((array[0] as RLMObject)["intCol"] as NSNumber == 1)
+        XCTAssertTrue((array[1] as RLMObject)["stringCol"] as String == "column2")
+    }
+
+    // these helper functions make the below test not take five minutes to compile
+    // I suspect a type inference bug
+    func Ni(x: Int) -> AnyObject {
+        return NSNumber(integer: x)
+    }
+
+    func Nb(x: Bool) -> AnyObject {
+        return NSNumber(bool: x)
+    }
+
+    func Nd(x: Double) -> AnyObject {
+        return NSNumber(double: x)
+    }
+
+    func Nf(x: Float) -> AnyObject {
+        return NSNumber(float: x)
     }
 
     func testDynamicTypes_objc() {
         let date = NSDate(timeIntervalSince1970: 100000)
-        let obj1 = [true, 1, 1.1 as Float, 1.11, "string", "a".dataUsingEncoding(NSUTF8StringEncoding)!, date, true, 11, 0, NSNull()] as NSArray
+        let data = "a".dataUsingEncoding(NSUTF8StringEncoding)!
+        let obj1 = [Nb(true), Ni(1), Nf(1.1), Nd(1.11), "string" as NSString,
+            data as AnyObject, date, Nb(true),
+            Ni(11), Ni(0), NSNull()] as NSArray
 
         let obj = StringObject()
         obj.stringCol = "string"
 
-        let obj2 = [false, 2, 2.2 as Float, 2.22, "string2", "b".dataUsingEncoding(NSUTF8StringEncoding)!, date, false, 22, date, obj] as NSArray
+        let data2 = "b".dataUsingEncoding(NSUTF8StringEncoding)!
+        let obj2 = [Nb(false), Ni(2), Nf(2.2), Nd(2.22), "string2" as NSString,
+            data2 as AnyObject, date, Nb(false),
+            Ni(22), date, obj] as NSArray
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
@@ -172,20 +197,20 @@ class SwiftDynamicTests: SwiftTestCase {
         // verify properties
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects(AllTypesObject.className())
-        XCTAssertEqual(array.count, 2, "Should have 2 objects")
+        XCTAssertEqual(array.count, UInt(2))
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
-            let propName = schema.properties[idx].name
-            XCTAssertTrue(obj1[idx].isEqual((array[0] as RLMObject)[propName]), "Invalid property value")
-            XCTAssertTrue(obj2[idx].isEqual((array[1] as RLMObject)[propName]), "Invalid property value")
+            let prop = schema.properties[idx] as RLMProperty
+            XCTAssertTrue(obj1[idx].isEqual((array[0] as RLMObject)[prop.name]))
+            XCTAssertTrue(obj2[idx].isEqual((array[1] as RLMObject)[prop.name]))
         }
 
         // check sub object type
-        XCTAssertEqual((schema.properties[10] as RLMProperty).objectClassName!, "StringObject", "Sub-object type in schema should be 'StringObject'")
+        XCTAssertTrue((schema.properties[10] as RLMProperty).objectClassName! == "StringObject")
 
         // check object equality
         XCTAssertNil((array[0] as RLMObject)["objectCol"], "object should be nil")
-        XCTAssertEqual(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as String, "string", "Child object should have string value 'column'")
+        XCTAssertTrue(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as String == "string")
     }
 }

@@ -18,6 +18,13 @@
 
 import XCTest
 import Realm
+import Foundation
+
+class OuterClass {
+    class InnerClass {
+
+    }
+}
 
 class SwiftObjectInterfaceTests: SwiftTestCase {
 
@@ -42,16 +49,18 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         obj.arrayCol.addObject(obj.objectCol)
         realm.commitWriteTransaction()
 
+        let data = NSString(string: "abcd").dataUsingEncoding(NSUTF8StringEncoding)
+
         let firstObj = SwiftObject.allObjectsInRealm(realm).firstObject() as SwiftObject
         XCTAssertEqual(firstObj.boolCol, true, "should be true")
         XCTAssertEqual(firstObj.intCol, 1234, "should be 1234")
-        XCTAssertEqual(firstObj.floatCol, 1.1, "should be 1.1")
+        XCTAssertEqual(firstObj.floatCol, Float(1.1), "should be 1.1")
         XCTAssertEqual(firstObj.doubleCol, 2.2, "should be 2.2")
         XCTAssertEqual(firstObj.stringCol, "abcd", "should be abcd")
-        XCTAssertEqual(firstObj.binaryCol!, "abcd".dataUsingEncoding(NSUTF8StringEncoding)!, "should be abcd data")
+        XCTAssertEqual(firstObj.binaryCol!, data!)
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
-        XCTAssertEqual(obj.arrayCol.count, 1, "array count should be 1")
+        XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
         XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
     }
 
@@ -61,16 +70,18 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.addObject(SwiftObject())
         realm.commitWriteTransaction()
 
+        let data = NSString(string: "a").dataUsingEncoding(NSUTF8StringEncoding)
+
         let firstObj = SwiftObject.allObjectsInRealm(realm).firstObject() as SwiftObject
         XCTAssertEqual(firstObj.boolCol, false, "should be false")
         XCTAssertEqual(firstObj.intCol, 123, "should be 123")
-        XCTAssertEqual(firstObj.floatCol, 1.23, "should be 1.23")
+        XCTAssertEqual(firstObj.floatCol, Float(1.23), "should be 1.23")
         XCTAssertEqual(firstObj.doubleCol, 12.3, "should be 12.3")
         XCTAssertEqual(firstObj.stringCol, "a", "should be a")
-        XCTAssertEqual(firstObj.binaryCol!, "a".dataUsingEncoding(NSUTF8StringEncoding)!, "should be a data")
+        XCTAssertEqual(firstObj.binaryCol!, data!)
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
-        XCTAssertEqual(firstObj.arrayCol.count, 0, "array count should be zero")
+        XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
     }
 
     func testOptionalSwiftProperties() {
@@ -101,7 +112,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         let ca = CustomAccessorsObject.createInRealm(realm, withObject: ["name", 2])
         XCTAssertEqual(ca.name!, "name", "name property should be name.")
         ca.age = 99
-        XCTAssertEqual(ca.age, 99, "age property should be 99")
+        XCTAssertEqual(ca.age, Int32(99), "age property should be 99")
         realm.commitWriteTransaction()
     }
 
@@ -116,7 +127,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let objectFromRealm = BaseClassStringObject.allObjectsInRealm(realm)[0] as BaseClassStringObject
-        XCTAssertEqual(objectFromRealm.intCol, 1, "Should be 1")
+        XCTAssertEqual(objectFromRealm.intCol, Int32(1), "Should be 1")
         XCTAssertEqual(objectFromRealm.stringCol!, "stringVal", "Should be stringVal")
     }
 
@@ -125,16 +136,37 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.beginWriteTransaction()
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 1])
         let objects = SwiftPrimaryStringObject.allObjects();
-        XCTAssertEqual(objects.count, 1, "Should have 1 object");
+        XCTAssertEqual(objects.count, UInt(1), "Should have 1 object");
         XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 1, "Value should be 1");
 
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["stringCol": "string2", "intCol": 2])
-        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+        XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
 
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 3])
-        XCTAssertEqual(objects.count, 2, "Should have 2 objects")
+        XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
         XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
 
         realm.commitWriteTransaction()
     }
+
+    // if this fails (and you haven't changed the test module name), the checks
+    // for swift class names and the demangling logic need to be updated
+    func testNSStringFromClassDemangledTopLevelClassNames() {
+#if os(iOS)
+        XCTAssertEqual(NSStringFromClass(OuterClass), "iOS_Tests.OuterClass")
+#else
+        XCTAssertEqual(NSStringFromClass(OuterClass), "OSX_Tests.OuterClass")
+#endif
+    }
+
+    // if this fails (and you haven't changed the test module name), the prefix
+    // check in RLMSchema initialization needs to be updated
+    func testNestedClassNameMangling() {
+#if os(iOS)
+        XCTAssertEqual(NSStringFromClass(OuterClass.InnerClass.self), "_TtCC9iOS_Tests10OuterClass10InnerClass")
+#else
+        XCTAssertEqual(NSStringFromClass(OuterClass.InnerClass.self), "_TtCC9OSX_Tests10OuterClass10InnerClass")
+#endif
+    }
+
 }

@@ -63,8 +63,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInte
         return;
     }
     if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting primary key with existing value '%lld' for property '%@'",
-                            val, propName];
+        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%lld'.", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     obj->_row.set_int(colIndex, val);
@@ -118,7 +117,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObject *obj, NSUInte
         return;
     }
     if (row != tightdb::not_found) {
-        NSString *reason = [NSString stringWithFormat:@"Setting unique property '%@' with existing value '%@'", propName, val];
+        NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     obj->_row.set_string(colIndex, str);
@@ -224,8 +223,10 @@ static inline void RLMSetValue(__unsafe_unretained RLMObject *obj, NSUInteger co
     // remove all old
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
-    for (RLMObject *link in val) {
-        linkView->add(RLMAddLinkedObject(link, obj.realm, options));
+    if ((id)val != NSNull.null) {
+        for (RLMObject *link in val) {
+            linkView->add(RLMAddLinkedObject(link, obj.realm, options));
+        }
     }
 }
 
@@ -418,7 +419,7 @@ static id RLMSuperGet(RLMObject *obj, NSString *propName) {
 
 // call setter for superclass for property at colIndex
 static void RLMSuperSet(RLMObject *obj, NSString *propName, id val) {
-    typedef id (*setter_type)(RLMObject *, SEL, RLMArray *ar);
+    typedef void (*setter_type)(RLMObject *, SEL, RLMArray *ar);
     RLMProperty *prop = obj.objectSchema[propName];
     Class superClass = class_getSuperclass(obj.class);
     setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:prop.setterSel];
@@ -449,7 +450,9 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
         return imp_implementationWithBlock(^(RLMObject *obj, id<NSFastEnumeration> ar) {
             // make copy when setting (as is the case for all other variants)
             RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName standalone:YES];
-            [standaloneAr addObjects:ar];
+            if ((id)ar != NSNull.null) {
+                [standaloneAr addObjects:ar];
+            }
             RLMSuperSet(obj, propName, standaloneAr);
         });
     }
