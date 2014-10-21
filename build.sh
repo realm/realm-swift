@@ -449,6 +449,9 @@ case "$COMMAND" in
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
+
+        cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+        DYLD_FRAMEWORK_PATH=. ./JSONImport
         ;;
 
     "package-ios")
@@ -569,7 +572,7 @@ EOF
             ln -s $WORKSPACE/tightdb_objc .
 
             sh ../tightdb_objc/build.sh package-test-examples
-        )
+        ) || exit 1
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
