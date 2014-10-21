@@ -1149,7 +1149,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
         [realm addObject:obj];
     }];
 
-    XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"invalidProperty"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:StringObject.className forProperty:@"stringCol"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:OwnerObject.className forProperty:@"dog"]);
     XCTAssertThrows([obj linkingObjectsOfClass:@"invalidClassName" forProperty:@"stringObjectCol"]);
     XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
 

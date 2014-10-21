@@ -274,6 +274,12 @@
         @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid property '%@'", property] userInfo:nil];
     }
 
+    if (![prop.objectClassName isEqualToString:_objectSchema.className]) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:[NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]
+                                     userInfo:nil];
+    }
+
     Table &table = *schema->_table.get();
     size_t col = prop.column;
     NSUInteger count = _row.get_backlink_count(table, col);
