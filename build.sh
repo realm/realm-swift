@@ -435,6 +435,9 @@ case "$COMMAND" in
         ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
         unzip realm-obj-examples.zip
 
+        mkdir -p Swift
+        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift Swift
+
         rm *.zip
         cd examples
 
@@ -442,6 +445,10 @@ case "$COMMAND" in
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
         ;;
 
     "package-ios")
