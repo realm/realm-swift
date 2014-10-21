@@ -15,6 +15,7 @@
 * `arraySortedByProperty:ascending:` was renamed to `sortedResultsUsingProperty:ascending`
 * `addObjectsFromArray:` on both `RLMRealm` and `RLMArray` has been renamed to `addObjects:`
   and now accepts any container class which implements `NSFastEnumeration`
+* Building with Swift support now requires Xcode 6.1
 
 ### Enhancements
 
@@ -28,6 +29,7 @@
 * Make creating `RLMRealm` instances on background threads when an instance
   exists on another thread take a fifth of the time.
 * Support for partial updates when calling `createOrUpdateWithObject:` and `addOrUpdateObject:`
+* Re-enable Swift support on OS X
 
 ### Bugfixes
 
