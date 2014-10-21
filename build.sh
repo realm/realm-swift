@@ -305,8 +305,10 @@ case "$COMMAND" in
         sh build.sh examples "$XCMODE"
         sh build.sh browser "$XCMODE"
 
-        cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
-        DYLD_FRAMEWORK_PATH=. ./JSONImport
+        (
+            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
 
         exit 0
         ;;
@@ -454,8 +456,10 @@ case "$COMMAND" in
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
 
-        cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
-        DYLD_FRAMEWORK_PATH=. ./JSONImport
+        (
+            cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
         ;;
 
     "package-ios")
