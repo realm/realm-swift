@@ -252,7 +252,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         path = [path stringByAppendingPathComponent:identifier];
 
         // create directory
-        [[NSFileManager defaultManager] createDirectoryAtPath:[path stringByDeletingLastPathComponent]
+        [[NSFileManager defaultManager] createDirectoryAtPath:path
                                   withIntermediateDirectories:YES
                                                    attributes:nil
                                                         error:nil];
