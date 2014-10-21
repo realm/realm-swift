@@ -113,9 +113,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         RLMRealm.migrateRealmAtPath(realmv1Path)
 
         // print out all migrated objects in the migrated realms
-        let realmv1 = RLMRealm.realmWithPath(realmv1Path, readOnly: false, error: nil)
+        let realmv1 = RLMRealm(path: realmv1Path, readOnly: false, error: nil)
         println("Migrated objects in the Realm migrated from v1: \(Person.allObjectsInRealm(realmv1))")
-        let realmv2 = RLMRealm.realmWithPath(realmv2Path, readOnly: false, error: nil)
+        let realmv2 = RLMRealm(path: realmv2Path, readOnly: false, error: nil)
         println("Migrated objects in the Realm migrated from v2: \(Person.allObjectsInRealm(realmv2))")
 
         return true
