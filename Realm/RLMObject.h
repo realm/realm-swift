@@ -85,7 +85,7 @@
  
  @see [RLMRealm addObject:]:
  */
--(instancetype)init;
+- (instancetype)init;
 
 
 /**
@@ -121,7 +121,7 @@
 
  @see   defaultPropertyValues
  */
-+(instancetype)createInDefaultRealmWithObject:(id)object;
++ (instancetype)createInDefaultRealmWithObject:(id)object;
 
 /**
  Create an RLMObject in a Realm with a given object.
@@ -139,7 +139,7 @@
  
  @see   defaultPropertyValues
  */
-+(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
++ (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
 
 /**
  Create or update an RLMObject in the default Realm with a given object.
@@ -157,7 +157,7 @@
 
  @see   defaultPropertyValues, primaryKey
  */
-+(instancetype)createOrUpdateInDefaultRealmWithObject:(id)object;
++ (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object;
 
 /**
  Create or update an RLMObject with a given object.
@@ -176,7 +176,7 @@
 
  @see   defaultPropertyValues, primaryKey
  */
-+(instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object;
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)object;
 
 /**
  The Realm in which this object is persisted. Returns nil for standalone objects.
@@ -345,6 +345,17 @@
  @see       -primaryKey
  */
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
+
+/**
+ Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
+ be used to get the inverse relatshionship value for `RLMObject` and `RLMArray` properties.
+
+ @param className   The type of object on which the relationship to query is defined.
+ @param property    The name of the property which defines the relationship.
+
+ @return    An NSArray of objects of type `className` which have this object as thier value for the `property` property.
+ */
+- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
 /**
  Returns YES if another RLMObject points to the same object in an RLMRealm. For RLMObject types
