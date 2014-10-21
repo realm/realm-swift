@@ -304,6 +304,10 @@ case "$COMMAND" in
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
         sh build.sh browser "$XCMODE"
+
+        cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+        DYLD_FRAMEWORK_PATH=. ./JSONImport
+
         exit 0
         ;;
 
