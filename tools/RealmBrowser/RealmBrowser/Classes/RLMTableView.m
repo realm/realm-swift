@@ -60,7 +60,7 @@
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
     
-    [self createContextMenu];
+    [self createContextMenuItems];
 }
 
 - (void)dealloc
@@ -82,7 +82,7 @@
 
 #pragma mark - Private Methods - NSObject Overrides
 
--(void)createContextMenu
+-(void)createContextMenuItems
 {
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
     self.menu = rightClickMenu;
@@ -137,6 +137,61 @@
                                                           action:@selector(openArrayInNewWindowAction:)
                                                    keyEquivalent:@""];
     openArrayInNewWindowItem.tag = 230;
+}
+
+#pragma mark - NSMenu Delegate
+
+// Called on the context menu before displaying
+-(void)menuNeedsUpdate:(NSMenu *)menu
+{
+    [self.menu removeAllItems];
+    
+    // Menu items that are independent on the realm lock
+    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:openArrayInNewWindowItem];
+    }
+    
+    // If it is locked, show the unlock hint menu item and return
+    if (self.realmDelegate.realmIsLocked) {
+        [self.menu addItem:clickLockItem];
+        return;
+    }
+    
+    // Below, only menu items that do require editing
+    
+    if (self.realmDelegate.displaysArray) {
+        [self.menu addItem:insertIntoArrayItem];
+    }
+    else {
+        [self.menu addItem:addObjectItem];
+    }
+    
+    if (self.selectedRowIndexes.count == 0) {
+        return;
+    }
+    
+    // Below, only menu items that make sense with a row selected
+    
+    if (self.realmDelegate.displaysArray) {
+        [self.menu addItem:removeFromArrayItem];
+        [self.menu addItem:deleteRowItem];
+    }
+    else {
+        [self.menu addItem:deleteObjectItem];
+    }
+    
+    if (self.clickedColumn == -1) {
+        return;
+    }
+    
+    // Below, only menu items that make sense when clicking in a column
+    
+    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToObjectItem];
+    }
+    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToArrayItem];
+    }
 }
 
 #pragma mark - NSResponder Overrides
@@ -274,66 +329,11 @@
     }
 }
 
-#pragma mark - NSMenu Delegate
-
--(void)menuNeedsUpdate:(NSMenu *)menu
-{
-    [self.menu removeAllItems];
-    
-    // Menu items that are independent on the realm lock
-    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:openArrayInNewWindowItem];
-    }
-
-    // If it is locked, show the unlock hint menu item and return
-    if (self.realmDelegate.realmIsLocked) {
-        [self.menu addItem:clickLockItem];
-        return;
-    }
-    
-    // Below, only menu items that do require editing
-
-    if (self.realmDelegate.displaysArray) {
-        [self.menu addItem:insertIntoArrayItem];
-    }
-    else {
-        [self.menu addItem:addObjectItem];
-    }
-    
-    if (self.selectedRowIndexes.count == 0) {
-        return;
-    }
-    
-    // Below, only menu items that make sense with a row selected
-    
-    if (self.realmDelegate.displaysArray) {
-        [self.menu addItem:removeFromArrayItem];
-        [self.menu addItem:deleteRowItem];
-    }
-    else {
-        [self.menu addItem:deleteObjectItem];
-    }
-
-    if (self.clickedColumn == -1) {
-        return;
-    }
-    
-    // Below, only menu items that make sense when clicking in a column
-
-    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:removeLinkToObjectItem];
-    }
-    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:removeLinkToArrayItem];
-    }
-}
-
 #pragma mark - First Responder User Actions
 
 // Delete selected objects
 - (IBAction)deleteObjectsAction:(id)sender
 {
-    NSLog(@"deleteObjectsAction");
     if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate deleteObjects:self.selectedRowIndexes];
     }
@@ -342,7 +342,6 @@
 // Add objects of the current type, according to number of selected rows
 - (IBAction)addObjectsAction:(id)sender
 {
-    NSLog(@"addObjectsAction");
     if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate addNewObjects:self.selectedRowIndexes];
     }
@@ -351,7 +350,6 @@
 // Remove selected objects from array, keeping the objects
 - (IBAction)removeRowsFromArrayAction:(id)sender
 {
-    NSLog(@"removeRowsFromArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeRows:self.selectedRowIndexes];
     }
@@ -360,7 +358,6 @@
 // Remove selected objects from array and delete the objects
 - (IBAction)deleteRowsFromArrayAction:(id)sender
 {
-    NSLog(@"deleteRowsFromArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate deleteRows:self.selectedRowIndexes];
     }
@@ -369,7 +366,6 @@
 // Create and insert objects at the selected rows
 - (IBAction)addRowsToArrayAction:(id)sender
 {
-    NSLog(@"addRowsToArrayAction");
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate addNewRows:self.selectedRowIndexes];
     }
@@ -378,7 +374,6 @@
 // Set object links in the clicked column to [NSNull null] at the selected rows
 - (IBAction)removeObjectLinksAction:(id)sender
 {
-    NSLog(@"removeObjectLinksAction");
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
@@ -387,7 +382,6 @@
 // Make array links in the clicked column, at selected rows, empty
 - (IBAction)removeArrayLinksAction:(id)sender
 {
-    NSLog(@"removeArrayLinksAction");
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }

@@ -32,8 +32,9 @@
 @property (nonatomic) BOOL realmIsLocked;
 @property (nonatomic) BOOL displaysArray;
 
--(void)removeRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes;
--(void)insertNewRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes;
--(void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination;
+-(void)removeRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes;
+-(void)deleteRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes;
+-(void)insertNewRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes;
+-(void)moveRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination;
 
 @end

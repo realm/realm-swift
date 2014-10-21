@@ -130,25 +130,34 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 #pragma mark - Public methods - Rearranging arrays
 
-- (void)removeRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+- (void)removeRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController removeRowsInArrayNode:arrayNode at:rowIndexes];
-    }
-}
-
-- (void)insertNewRowsInArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
-{
-    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController insertNewRowsInArrayNode:arrayNode at:rowIndexes];
+        [wc.tableViewController removeRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
         [wc.outlineViewController.tableView reloadData];
     }
 }
 
-- (void)moveRowsInArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+- (void)deleteRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController moveRowsInArrayNode:arrayNode from:sourceIndexes to:destination];
+        [wc.tableViewController deleteRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
+    }
+}
+
+- (void)insertNewRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController insertNewRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
+    }
+}
+
+- (void)moveRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController moveRowsInTableViewForArrayNode:arrayNode from:sourceIndexes to:destination];
     }
 }
 
