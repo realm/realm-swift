@@ -20,19 +20,19 @@ import XCTest
 import Realm
 import RealmSwift
 
-func testRealmPath() -> String {
+private func testRealmPath() -> String {
     return realmPathForFile("test.realm")
 }
 
-func realmPathForFile(fileName: String) -> String {
+private func realmPathForFile(fileName: String) -> String {
     return defaultRealmPath().stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
 }
 
-func realmLockPath(path: String) -> String {
-    return path.stringByAppendingPathComponent(".lock")
+private func realmLockPath(path: String) -> String {
+    return path + ".lock"
 }
 
-func deleteRealmFilesAtPath(path: String) {
+private func deleteRealmFilesAtPath(path: String) {
     let fileManager = NSFileManager.defaultManager()
     if fileManager.fileExistsAtPath(path) {
         let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
@@ -46,26 +46,26 @@ func deleteRealmFilesAtPath(path: String) {
     }
 }
 
-class SwiftTestCase: XCTestCase {
+private func deleteRealmFiles() {
+    RLMRealm.resetRealmState()
+    deleteRealmFilesAtPath(defaultRealmPath())
+    deleteRealmFilesAtPath(testRealmPath())
+}
 
+class SwiftTestCase: XCTestCase {
     func realmWithTestPath() -> Realm {
         return Realm(path: testRealmPath())
     }
 
-    override func setUp() {
-        super.setUp()
+    override func invokeTest() {
+        deleteRealmFiles()
 
-        // Delete realm files
-        deleteRealmFilesAtPath(defaultRealmPath())
-        deleteRealmFilesAtPath(testRealmPath())
-    }
+        autoreleasepool {
+            self.setUp()
+            self.invocation.invoke()
+            self.tearDown()
+        }
 
-    override func tearDown() {
-        super.tearDown()
-
-        // Delete realm files
-        RLMRealm.resetRealmState()
-        deleteRealmFilesAtPath(defaultRealmPath())
-        deleteRealmFilesAtPath(testRealmPath())
+        deleteRealmFiles()
     }
 }
