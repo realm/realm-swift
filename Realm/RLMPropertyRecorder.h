@@ -18,13 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMListBase.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMPropertyRecorder.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
+@interface RLMPropertyRecorder : NSProxy
++ (id)recorderForClass:(Class)cls;
++ (NSString *)propertyNameFromRecorder:(id)recorder;
+@end

@@ -116,6 +116,22 @@ public final class Results<T: Object>: Printable, SequenceType {
         return rlmResults.averageOfProperty(property) as AnyObject as U
     }
 
+    public func min<U: MinMaxType>(block: (T) -> U) -> U {
+        return rlmResults.minOfProperty(getPropertyName(block)) as U
+    }
+
+    public func max<U: MinMaxType>(block: (T) -> U) -> U {
+        return rlmResults.maxOfProperty(getPropertyName(block)) as U
+    }
+
+    public func sum<U: AddableType>(block: (T) -> U) -> U {
+        return rlmResults.sumOfProperty(getPropertyName(block)) as AnyObject as U
+    }
+
+    public func average<U: AddableType>(block: (T) -> U) -> U {
+        return rlmResults.averageOfProperty(getPropertyName(block)) as AnyObject as U
+    }
+
     // MARK: Sequence Support
 
     public func generate() -> GeneratorOf<T> {
@@ -136,5 +152,11 @@ public final class Results<T: Object>: Printable, SequenceType {
             return nil
         }
         return index
+    }
+
+    private func getPropertyName<U>(block: (T) -> U) -> String {
+        let recorder: AnyObject = RLMPropertyRecorder.recorderForClass(T.self as Object.Type)
+        block(unsafeBitCast(recorder, T.self))
+        return RLMPropertyRecorder.propertyNameFromRecorder(recorder)
     }
 }
