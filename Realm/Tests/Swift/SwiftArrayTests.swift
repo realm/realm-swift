@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 
 class SwiftArrayTests: SwiftTestCase {
-    
+
     func testFastEnumeration() {
         let realm = realmWithTestPath()
 
@@ -43,7 +43,7 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWrite()
 
         let results = realm.objects(SwiftAggregateObject).filter("intCol < 100")
-        XCTAssertEqual(results.count, 10, "10 objects added")
+        XCTAssertEqual(results.count, UInt(10), "10 objects added")
 
         var totalSum = 0
         for obj in results {
@@ -54,12 +54,12 @@ class SwiftArrayTests: SwiftTestCase {
 
     func testObjectAggregate() {
         let realm = realmWithTestPath()
-        
+
         realm.beginWrite()
-        
+
         let dateMinInput = NSDate()
         let dateMaxInput = dateMinInput.dateByAddingTimeInterval(1000)
-        
+
         SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
         SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
@@ -70,7 +70,7 @@ class SwiftArrayTests: SwiftTestCase {
         SwiftAggregateObject.createInRealm(realm, withObject: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
         SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
         SwiftAggregateObject.createInRealm(realm, withObject: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        
+
         realm.commitWrite()
 
         let noArray = realm.objects(SwiftAggregateObject).filter("boolCol == false")
@@ -84,7 +84,7 @@ class SwiftArrayTests: SwiftTestCase {
         // Test float sum
         XCTAssertEqualWithAccuracy(noArray.sum("floatCol"), 0, 0.1, "Sum should be 0.0")
         XCTAssertEqualWithAccuracy(yesArray.sum("floatCol"), 7.2, 0.1, "Sum should be 7.2")
-        
+
         // Test double sum
         XCTAssertEqualWithAccuracy(noArray.sum("doubleCol"), 10, 0.1, "Sum should be 10.0")
         XCTAssertEqualWithAccuracy(yesArray.sum("doubleCol"), 0, 0.1, "Sum should be 0.0")
@@ -97,7 +97,7 @@ class SwiftArrayTests: SwiftTestCase {
         // Test float average
         XCTAssertEqualWithAccuracy(noArray.average("floatCol"), 0, 0.1, "Average should be 0.0")
         XCTAssertEqualWithAccuracy(yesArray.average("floatCol"), 1.2, 0.1, "Average should be 1.2")
-        
+
         // Test double average
         XCTAssertEqualWithAccuracy(noArray.average("doubleCol"), 2.5, 0.1, "Average should be 2.5")
         XCTAssertEqualWithAccuracy(yesArray.average("doubleCol"), 0, 0.1, "Average should be 0.0")
@@ -106,15 +106,15 @@ class SwiftArrayTests: SwiftTestCase {
         // Test int min
         XCTAssertEqual(noArray.min("intCol") as Int, 1, "Minimum should be 1")
         XCTAssertEqual(yesArray.min("intCol") as Int, 0, "Minimum should be 0")
-        
+
         // Test float min
-        XCTAssertEqualWithAccuracy(noArray.min("floatCol") as Float, 0, 0.1, "Minimum should be 0.0f")
-        XCTAssertEqualWithAccuracy(yesArray.min("floatCol") as Float, 1.2, 0.1, "Minimum should be 1.2f")
-        
+        XCTAssertEqualWithAccuracy(noArray.min("floatCol") as Float, Float(0), 0.1, "Minimum should be 0.0f")
+        XCTAssertEqualWithAccuracy(yesArray.min("floatCol") as Float, Float(1.2), 0.1, "Minimum should be 1.2f")
+
         // Test double min
         XCTAssertEqualWithAccuracy(noArray.min("doubleCol") as Double, 2.5, 0.1, "Minimum should be 1.5")
         XCTAssertEqualWithAccuracy(yesArray.min("doubleCol") as Double, 0, 0.1, "Minimum should be 0.0")
-        
+
         // Test date min
         var dateMinOutput = noArray.min("dateCol") as NSDate
         XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, "Minimum should be dateMaxInput")
@@ -127,9 +127,9 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertEqual(yesArray.max("intCol") as Int, 0, "Maximum should be 0")
 
         // Test float max
-        XCTAssertEqualWithAccuracy(noArray.max("floatCol") as Float, 0, 0.1, "Maximum should be 0.0f")
-        XCTAssertEqualWithAccuracy(yesArray.max("floatCol") as Float, 1.2, 0.1, "Maximum should be 1.2f")
-        
+        XCTAssertEqualWithAccuracy(noArray.max("floatCol") as Float, Float(0), 0.1, "Maximum should be 0.0f")
+        XCTAssertEqualWithAccuracy(yesArray.max("floatCol") as Float, Float(1.2), 0.1, "Maximum should be 1.2f")
+
         // Test double max
         XCTAssertEqualWithAccuracy(noArray.max("doubleCol") as Double, 2.5, 0.1, "Maximum should be 3.5")
         XCTAssertEqualWithAccuracy(yesArray.max("doubleCol") as Double, 0, 0.1, "Maximum should be 0.0")
@@ -169,24 +169,24 @@ class SwiftArrayTests: SwiftTestCase {
 
     func testDeleteLinksAndObjectsInArray() {
         let realm = realmWithTestPath()
-        
+
         realm.beginWrite()
-        
+
         let po1 = SwiftEmployeeObject()
         po1.age = 40
         po1.name = "Joe"
         po1.hired = true
-        
+
         let po2 = SwiftEmployeeObject()
         po2.age = 30
         po2.name = "John"
         po2.hired = false
-        
+
         let po3 = SwiftEmployeeObject()
         po3.age = 25
         po3.name = "Jill"
         po3.hired = true
-        
+
         realm.add(po1)
         realm.add(po2)
         realm.add(po3)
@@ -196,15 +196,15 @@ class SwiftArrayTests: SwiftTestCase {
         company.employees.append(realm.objects(SwiftEmployeeObject))
 
         realm.commitWrite()
-        
+
         let peopleInCompany = company.employees
-        XCTAssertEqual(peopleInCompany.count, 3, "No links should have been deleted")
-        
+        XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
+
         realm.beginWrite()
         peopleInCompany.remove(1) // Should delete link to employee
         realm.commitWrite()
-        
-        XCTAssertEqual(peopleInCompany.count, 2, "link deleted when accessing via links")
+
+        XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
         var test = peopleInCompany[0]
         XCTAssertEqual(test.age, po1.age, "Should be equal")
@@ -220,13 +220,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.beginWrite()
         peopleInCompany.removeLast()
-        XCTAssertEqual(peopleInCompany.count, 1, "1 remaining link")
+        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 remaining link")
         peopleInCompany.replace(0, object: po2)
-        XCTAssertEqual(peopleInCompany.count, 1, "1 link replaced")
+        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 link replaced")
         peopleInCompany.insert(po1, atIndex: 0)
-        XCTAssertEqual(peopleInCompany.count, 2, "2 links")
+        XCTAssertEqual(peopleInCompany.count, UInt(2), "2 links")
         peopleInCompany.removeAll()
-        XCTAssertEqual(peopleInCompany.count, 0, "0 remaining links")
+        XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
         realm.commitWrite()
     }
 }

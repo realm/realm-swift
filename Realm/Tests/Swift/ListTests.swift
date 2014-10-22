@@ -38,34 +38,34 @@ class ListTests: SwiftTestCase {
             realm.beginWrite()
         }
 
-        XCTAssertEqual(0, array.array.count)
+        XCTAssertEqual(UInt(0), array.array.count)
         XCTAssertNil(array.array.first())
         XCTAssertNil(array.array.last())
         XCTAssertFalse(array.array.description.isEmpty)
 
         array.array.append(str1)
-        XCTAssertEqual(1, array.array.count)
+        XCTAssertEqual(UInt(1), array.array.count)
         XCTAssertEqual("1", array.array[0].stringCol)
         XCTAssertEqual("1", array.array.first()!.stringCol)
         XCTAssertEqual("1", array.array.last()!.stringCol)
 
         array.array.insert(str2, atIndex: 0)
-        XCTAssertEqual(2, array.array.count)
+        XCTAssertEqual(UInt(2), array.array.count)
         XCTAssertEqual("2", array.array[0].stringCol)
         XCTAssertEqual("2", array.array.first()!.stringCol)
         XCTAssertEqual("1", array.array.last()!.stringCol)
 
         array.array.removeLast()
-        XCTAssertEqual(1, array.array.count)
+        XCTAssertEqual(UInt(1), array.array.count)
         XCTAssertEqual("2", array.array[0].stringCol)
         XCTAssertEqual("2", array.array.first()!.stringCol)
         XCTAssertEqual("2", array.array.last()!.stringCol)
 
         array.array.removeAll()
-        XCTAssertEqual(0, array.array.count)
+        XCTAssertEqual(UInt(0), array.array.count)
 
         array.array.append([str1, str2])
-        XCTAssertEqual(2, array.array.count)
+        XCTAssertEqual(UInt(2), array.array.count)
         XCTAssertEqual("1", array.array[0].stringCol)
         XCTAssertEqual("1", array.array.first()!.stringCol)
         XCTAssertEqual("2", array.array.last()!.stringCol)
@@ -81,8 +81,8 @@ class ListTests: SwiftTestCase {
             i += 1
         }
 
-        XCTAssertEqual(0, array.array.indexOf(str1)!)
-        XCTAssertEqual(1, array.array.indexOf(str2)!)
+        XCTAssertEqual(UInt(0), array.array.indexOf(str1)!)
+        XCTAssertEqual(UInt(1), array.array.indexOf(str2)!)
 
         // not implemented for standalone
         if realm != nil {
@@ -102,20 +102,20 @@ class ListTests: SwiftTestCase {
 //        }
 
         array.array.remove(str1)
-        XCTAssertEqual(1, array.array.count)
+        XCTAssertEqual(UInt(1), array.array.count)
         XCTAssertEqual("2", array.array[0].stringCol)
         XCTAssertEqual("2", array.array.first()!.stringCol)
         XCTAssertEqual("2", array.array.last()!.stringCol)
         XCTAssertNil(array.array.indexOf(str1))
 
         array.array.replace(0, object: str1)
-        XCTAssertEqual(1, array.array.count)
+        XCTAssertEqual(UInt(1), array.array.count)
         XCTAssertEqual("1", array.array[0].stringCol)
         XCTAssertEqual("1", array.array.first()!.stringCol)
         XCTAssertEqual("1", array.array.last()!.stringCol)
 
         array.array[0] = str2
-        XCTAssertEqual(1, array.array.count)
+        XCTAssertEqual(UInt(1), array.array.count)
         XCTAssertEqual("2", array.array[0].stringCol)
         XCTAssertEqual("2", array.array.first()!.stringCol)
         XCTAssertEqual("2", array.array.last()!.stringCol)
@@ -125,7 +125,7 @@ class ListTests: SwiftTestCase {
         // verify all the stuff we just did was actually persisted
         if let realm = realm {
             let fetchedArray = realm.objects(SwiftArrayPropertyObject).first()!
-            XCTAssertEqual(1, fetchedArray.array.count)
+            XCTAssertEqual(UInt(1), fetchedArray.array.count)
         }
     }
 

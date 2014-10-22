@@ -18,12 +18,6 @@
 
 import Realm
 
-// MARK: Migrations
-
-public func migrateRealm(path: String = defaultRealmPath(), block: MigrationBlock) {
-    RLMRealm.migrateRealmAtPath(path, withBlock: rlmMigrationBlockFromMigrationBlock(block))
-}
-
 // MARK: Object Retrieval
 
 public func objects<T: Object>(type: T.Type) -> Results<T> {
@@ -67,7 +61,7 @@ public class Realm {
     }
 
     public convenience init(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
-        self.init(rlmRealm: RLMRealm.realmWithPath(path, readOnly: readonly, error: error))
+        self.init(rlmRealm: RLMRealm(path: path, readOnly: readonly, error: error))
     }
 
     // MARK: Transactions
@@ -146,6 +140,6 @@ public typealias NotificationBlock = (notification: Notification, realm: Realm) 
 
 func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-        return notificationBlock(notification: Notification.fromRaw(rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
+        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
     }
 }
