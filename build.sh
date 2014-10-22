@@ -149,6 +149,7 @@ download_core() {
     fi
     (
         cd "${TMP_DIR}"
+        rm -rf core
         unzip "${CORE_ZIP}"
         mv core core-${REALM_CORE_VERSION}
     )
