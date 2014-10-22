@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Throw an exception when passing an array containing a
+  non-RLMObject to -[RLMRealm addObjects:].
+
+
 0.87.0 Release notes (2014-10-21)
 =============================================================
 
