@@ -754,7 +754,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"../../build/DerivedData/Realm/Build/Products/Release",
+					../../build/DerivedData/Realm/Build/Products/Release,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmBrowser/RealmBrowser-Prefix.pch";
@@ -765,6 +765,7 @@
 				INFOPLIST_FILE = "RealmBrowser/RealmBrowser-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "Realm Browser";
 				WRAPPER_EXTENSION = app;
 			};
@@ -778,7 +779,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"../../build/DerivedData/Realm/Build/Products/Release",
+					../../build/DerivedData/Realm/Build/Products/Release,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmBrowser/RealmBrowser-Prefix.pch";
@@ -789,6 +790,7 @@
 				INFOPLIST_FILE = "RealmBrowser/RealmBrowser-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "Realm Browser";
 				WRAPPER_EXTENSION = app;
 			};

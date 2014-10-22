@@ -1105,5 +1105,4 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     return self.displaysArray ? column - 1 : column;
 }
 
-
 @end
