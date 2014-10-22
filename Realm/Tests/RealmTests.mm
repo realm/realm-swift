@@ -19,7 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
+#import "RLMRealm_Dynamic.h"
 
 #import <libkern/OSAtomic.h>
 
@@ -80,7 +80,7 @@
     [realm commitWriteTransaction];
 
     // test again after write transaction
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
 
@@ -104,7 +104,7 @@
     [realm commitWriteTransaction];
 
     // delete objects
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)3, @"Expecting 3 objects");
     [realm beginWriteTransaction];
     [realm deleteObjects:objects];
@@ -303,7 +303,7 @@
     [realm transactionWithBlock:^{
         [StringObject createInRealm:realm withObject:@[@"b"]];
     }];
-    RLMArray *objects = [StringObject allObjectsInRealm:realm];
+    RLMResults *objects = [StringObject allObjectsInRealm:realm];
     XCTAssertEqual(objects.count, (NSUInteger)1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
@@ -445,26 +445,28 @@
     XCTAssertTrue(notificationFired);
 }
 
-- (void)testRealmInMemory
+- (void)testInMemoryRealm
 {
-    RLMRealm *realmWithFile = [RLMRealm defaultRealm];
-    [realmWithFile beginWriteTransaction];
-    [StringObject createInRealm:realmWithFile withObject:@[@"a"]];
-    [realmWithFile commitWriteTransaction];
-    XCTAssertThrows([RLMRealm useInMemoryDefaultRealm], @"Realm instances already created");
-}
+    RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
 
-- (void)testRealmInMemory2
-{
-    [RLMRealm useInMemoryDefaultRealm];
+    [self waitForNotification:RLMRealmDidChangeNotification realm:inMemoryRealm block:^{
+        RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
+        [inMemoryRealm beginWriteTransaction];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"a"]];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"b"]];
+        [StringObject createInRealm:inMemoryRealm withObject:@[@"c"]];
+        XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+        [inMemoryRealm commitWriteTransaction];
+    }];
 
-    RLMRealm *realmInMemory = [RLMRealm defaultRealm];
-    [realmInMemory beginWriteTransaction];
-    [StringObject createInRealm:realmInMemory withObject:@[@"a"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"b"]];
-    [StringObject createInRealm:realmInMemory withObject:@[@"c"]];
-    XCTAssertEqual([StringObject objectsInRealm:realmInMemory withPredicate:nil].count, (NSUInteger)3, @"Expecting 3 objects");
-    [realmInMemory commitWriteTransaction];
+    XCTAssertEqual(3U, [StringObject allObjectsInRealm:inMemoryRealm].count);
+
+    // make sure we can have another
+    RLMRealm *anotherInMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier2"];
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:anotherInMemoryRealm].count);
+
+    // make sure we can't open disk-realm at same path
+    XCTAssertThrows([RLMRealm realmWithPath:anotherInMemoryRealm.path], @"Should throw");
 }
 
 - (void)testRealmFileAccess
@@ -558,7 +560,7 @@
         RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[@"a"]);
+        [realm createObject:StringObject.className withObject:@[@"a"]];
         [realm commitWriteTransaction];
     }
 
@@ -583,7 +585,7 @@
         RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
-        RLMCreateObjectInRealmWithValue(realm, StringObject.className, @[]);
+        [realm createObject:StringObject.className withObject:@[]];
         [realm commitWriteTransaction];
     }
 
@@ -597,7 +599,7 @@
 
     PrimaryStringObject *obj = [[PrimaryStringObject alloc] initWithObject:@[@"string", @1]];
     [realm addOrUpdateObject:obj];
-    RLMArray *objects = [PrimaryStringObject allObjects];
+    RLMResults *objects = [PrimaryStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
 
@@ -615,6 +617,172 @@
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
 
     [realm commitWriteTransaction];
+}
+
+- (void)testDeleteAllObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, OwnerObject.allObjects.count);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(NO, obj.deletedFromRealm);
+
+    XCTAssertThrows([realm deleteAllObjects]);
+
+    [realm transactionWithBlock:^{
+        [realm deleteAllObjects];
+        XCTAssertEqual(YES, obj.deletedFromRealm);
+    }];
+
+    XCTAssertEqual(0U, OwnerObject.allObjects.count);
+    XCTAssertEqual(0U, DogObject.allObjects.count);
+}
+
+- (void)testRollbackInsert
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(createdObject.isDeletedFromRealm);
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testRollbackDelete
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *objectToDelete = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:objectToDelete];
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue(objectToDelete.isDeletedFromRealm);
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testRollbackModify
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *objectToModify = [IntObject createInRealm:realm withObject:@[@0]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    objectToModify.intCol = 1;
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(0, objectToModify.intCol);
+}
+
+- (void)testRollbackLink
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    CircleObject *obj1 = [CircleObject createInRealm:realm withObject:@[@"1", NSNull.null]];
+    CircleObject *obj2 = [CircleObject createInRealm:realm withObject:@[@"2", NSNull.null]];
+    [realm commitWriteTransaction];
+
+    // Link to existing persisted
+    [realm beginWriteTransaction];
+    obj1.next = obj2;
+    [realm cancelWriteTransaction];
+
+    XCTAssertNil(obj1.next);
+
+    // Link to standalone
+    [realm beginWriteTransaction];
+    CircleObject *obj3 = [[CircleObject alloc] init];
+    obj3.data = @"3";
+    obj1.next = obj3;
+    [realm cancelWriteTransaction];
+
+    XCTAssertNil(obj1.next);
+    XCTAssertEqual(2U, [CircleObject allObjectsInRealm:realm].count);
+
+    // Remove link
+    [realm beginWriteTransaction];
+    obj1.next = obj2;
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    obj1.next = nil;
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue([obj1.next isEqualToObject:obj2]);
+
+    // Modify link
+    [realm beginWriteTransaction];
+    CircleObject *obj4 = [CircleObject createInRealm:realm withObject:@[@"4", NSNull.null]];
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    obj1.next = obj4;
+    [realm cancelWriteTransaction];
+
+    XCTAssertTrue([obj1.next isEqualToObject:obj2]);
+}
+
+- (void)testRollbackLinkList
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    IntObject *obj1 = [IntObject createInRealm:realm withObject:@[@0]];
+    IntObject *obj2 = [IntObject createInRealm:realm withObject:@[@1]];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[obj1]]];
+    [realm commitWriteTransaction];
+
+    // Add existing persisted
+    [realm beginWriteTransaction];
+    [array.intArray addObject:obj2];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+
+    // Add standalone
+    [realm beginWriteTransaction];
+    [array.intArray addObject:[[IntObject alloc] init]];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+    XCTAssertEqual(2U, [IntObject allObjectsInRealm:realm].count);
+
+    // Remove
+    [realm beginWriteTransaction];
+    [array.intArray removeObjectAtIndex:0];
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+
+    // Modify
+    [realm beginWriteTransaction];
+    array.intArray[0] = obj2;
+    [realm cancelWriteTransaction];
+
+    XCTAssertEqual(1U, array.intArray.count);
+    XCTAssertTrue([array.intArray[0] isEqualToObject:obj1]);
+}
+
+- (void)testRollbackTransactionWithBlock
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+        [realm cancelWriteTransaction];
+    }];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
 @end

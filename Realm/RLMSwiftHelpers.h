@@ -20,21 +20,29 @@
 #import "RLMObject.h"
 
 @interface RLMRealm (Swift)
-+ (void)clearRealmCache;
++ (void)resetRealmState;
 @end
 
 @interface RLMArray (Swift)
 
+// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-- (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+
+@end
+
+@interface RLMResults (Swift)
+
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 @end
 
 @interface RLMObject (Swift)
 
-+ (RLMArray *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-+ (RLMArray *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 
 @end

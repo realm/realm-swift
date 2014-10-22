@@ -21,10 +21,11 @@
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
-+ (void)clearRealmCache;
++ (void)resetRealmState;
 @end
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
@@ -82,9 +83,12 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 + (void)tearDown
 {
     [super tearDown];
+    [self deleteFiles];
+}
 
++ (void)deleteFiles {
     // Clear cache
-    [RLMRealm clearRealmCache];
+    [RLMRealm resetRealmState];
     
     // Delete Realm files
     RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
@@ -106,11 +110,11 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:NO schema:schema error:nil];
+    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO inMemory:NO dynamic:NO schema:schema error:nil];
 }
 
 - (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES schema:schema error:nil];
+    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
 }
 
 @end

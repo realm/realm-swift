@@ -24,8 +24,8 @@
 @property (nonatomic, strong) RLMRealm *oldRealm;
 @property (nonatomic, strong) RLMRealm *realm;
 
-+ (instancetype)migrationAtPath:(NSString *)path error:(NSError **)error;
++ (instancetype)migrationForRealm:(RLMRealm *)realm error:(NSError **)error;
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block;
+- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion;
 
 @end

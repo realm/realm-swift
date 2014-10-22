@@ -48,7 +48,7 @@
 
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
-    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
+    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     for (RLMProperty *prop in properties) {
         map[prop.name] = prop;
     }
@@ -89,8 +89,10 @@
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
-                // FIXME - re-enable when we have core suppport
-                //attr = attr | RLMPropertyAttributeIndexed;
+                 // FIXME - enable for ints when we have core suppport
+                if (prop.type == RLMPropertyTypeString) {
+                    prop.attributes |= RLMPropertyAttributeIndexed;
+                }
                 schema.primaryKeyProperty = prop;
                 break;
             }
@@ -211,10 +213,15 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
-    schema.properties = self.properties;
-    schema.objectClass = self.objectClass;
-    schema.className = self.className;
-    schema.primaryKeyProperty = schema[_primaryKeyProperty.name];
+    schema->_properties = _properties;
+    schema->_propertiesByName = _propertiesByName;
+    schema->_objectClass = _objectClass;
+    schema->_className = _className;
+    schema->_objectClass = _objectClass;
+    schema->_accessorClass = _accessorClass;
+    schema->_standaloneClass = _standaloneClass;
+    schema.primaryKeyProperty = _primaryKeyProperty;
+    // _table not copied as it's tightdb::Group-specific
     return schema;
 }
 

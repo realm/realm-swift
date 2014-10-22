@@ -132,6 +132,13 @@
                 _objectClassName = [[NSString alloc] initWithBytes:code + arrayPrefixLen
                                                             length:strlen(code + arrayPrefixLen) - 2 // drop trailing >"
                                                           encoding:NSUTF8StringEncoding];
+
+                Class cls = [RLMSchema classForString:_objectClassName];
+                if (!RLMIsSubclass(cls, RLMObject.class)) {
+                    @throw [NSException exceptionWithName:@"RLMException"
+                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. The protocol for an RLMArray property must be defined with RLM_ARRAY_TYPE. See http://realm.io/docs/cocoa/latest/api/Protocols/RLM_ARRAY_TYPE.html for more information.", self.objectClassName]
+                                                 userInfo:nil];
+                }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
                 @throw [NSException exceptionWithName:@"RLMException"
@@ -156,7 +163,7 @@
                 }
 
                 _type = RLMPropertyTypeObject;
-                _objectClassName = [cls className];
+                _objectClassName = className;
             }
             return YES;
         }

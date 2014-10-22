@@ -31,12 +31,14 @@
 //
 // RLMArray implementation
 //
-@implementation RLMArrayLinkView 
+@implementation RLMArrayLinkView {
+    tightdb::LinkViewRef _backingLinkView;
+}
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(tightdb::LinkViewRef)view
                                          realm:(RLMRealm *)realm {
-    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initViewWithObjectClassName:objectClassName];
+    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName standalone:NO];
     ar->_backingLinkView = view;
     ar->_realm = realm;
     return ar;
@@ -62,7 +64,7 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(RLMArrayLinkView *
     }
 }
 static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
-    NSString *objectClassName = [obj.class className];
+    NSString *objectClassName = obj.objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
                                      userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
@@ -185,13 +187,6 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     _backingLinkView->set(index, object->_row.get_index());
 }
 
-- (NSString *)JSONString {
-    RLMLinkViewArrayValidateAttached(self);
-
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
-}
-
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMLinkViewArrayValidateAttached(self);
@@ -228,19 +223,31 @@ static inline void RLMValidateObjectClass(RLMObject *obj, NSString *expected) {
     self->_backingLinkView->remove_all_target_rows();
 }
 
-- (RLMArray *)arraySortedByProperty:(NSString *)property ascending:(BOOL)ascending
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
 {
     RLMLinkViewArrayValidateAttached(self);
-    
-    // validate sort criteria
-    RLMProperty *prop = RLMValidatedPropertyForSort(_realm.schema[self.objectClassName], property);
-    
-    // apply order
-    tightdb::TableView const &tv = _backingLinkView->get_sorted_view(prop.column, ascending);
-    RLMArrayTableView *ar = [RLMArrayTableView arrayWithObjectClassName:self.objectClassName
-                                                                   view:tv
-                                                                  realm:_realm];
-    return ar;
+
+    std::vector<size_t> columns;
+    std::vector<bool> order;
+    RLMGetColumnIndices(_realm.schema[_objectClassName], properties, columns, order);
+
+    tightdb::TableView const &tv = _backingLinkView->get_sorted_view(move(columns), move(order));
+    auto query = std::make_unique<tightdb::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                                 query:move(query)
+                                                  view:tv
+                                                 realm:_realm];
+
+}
+
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
+    RLMLinkViewArrayValidateAttached(self);
+
+    tightdb::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
+    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    return [RLMResults resultsWithObjectClassName:self.objectClassName
+                                            query:std::make_unique<tightdb::Query>(query)
+                                            realm:_realm];
 }
 
 @end

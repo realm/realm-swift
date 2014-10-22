@@ -183,7 +183,7 @@
         return nil;
     }
     
-    RLMArray *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
+    RLMResults *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
     switch (type) {
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
@@ -783,7 +783,7 @@
             
             for (RLMClassNode *classNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClasses) {
                 if ([classNode.name isEqualToString:linkedObjectSchema.className]) {
-                    RLMArray *allInstances = [linkedObject.realm allObjects:linkedObjectSchema.className];
+                    RLMResults *allInstances = [linkedObject.realm allObjects:linkedObjectSchema.className];
                     NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
                     
                     RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:classNode index:objectIndex];

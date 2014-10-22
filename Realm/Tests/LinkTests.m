@@ -43,8 +43,8 @@
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
 
     RLMRealm *realm = [self realmWithTestPath];
-    RLMArray *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
-    RLMArray *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
     XCTAssertEqual(owners.count, 1U);
     XCTAssertEqual(dogs.count, 1U);
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -66,8 +66,8 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
 
-    RLMArray *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
-    RLMArray *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *owners = [OwnerObject objectsInRealm:realm withPredicate:nil];
+    RLMResults *dogs = [DogObject objectsInRealm:realm withPredicate:nil];
     XCTAssertEqual(owners.count, 1U);
     XCTAssertEqual(dogs.count, 0U);
     XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
@@ -150,7 +150,23 @@
     [realm commitWriteTransaction];
 
     XCTAssertThrows([OwnerObject objectsInRealm:realm where:@"dog.dogName.first = 'Fifo'"], @"3 levels of relationship");
+}
 
+- (void)testBidirectionalRelationship {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    CircleObject *obj0 = [[CircleObject alloc] initWithObject:@[@"a", NSNull.null]];
+    CircleObject *obj1 = [[CircleObject alloc] initWithObject:@[@"b", obj0]];
+    obj0.next = obj1;
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj0];
+    [realm addObject:obj1];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [CircleObject allObjects];
+    XCTAssertEqualObjects(@"a", [results[0] data]);
+    XCTAssertEqualObjects(@"b", [results[1] data]);
 }
 
 // FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects

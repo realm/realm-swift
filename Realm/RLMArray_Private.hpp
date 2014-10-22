@@ -17,45 +17,22 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
+#import "RLMResults.h"
 
-#import <tightdb/row.hpp>
 #import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
 #import <tightdb/query.hpp>
 
-//
 // RLMArray private properties/ivars for all subclasses
-//
-// NOTE: We put all sublass properties in the same class to keep
-//       the ivar layout the same - this allows us to switch implementations
-//       after creation
 @interface RLMArray () {
-  @private
-    // array for standalone
-    NSMutableArray *_backingArray;
   @protected
     // accessor ivars
     RLMRealm *_realm;
     NSString *_objectClassName;
 }
 
-/**
- Initialize a standalone RLMArray.
- 
- @warning Realm arrays are typed. You must specify an RLMObject class name
- during initialization and can only add objects of this type to the array.
- 
- @param objectClassName     The class name of the RLMObjects this RLMArray will hold.
- 
- @return                    An initialized RLMArray instance.
- */
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-
-// designated initializer for RLMArray subclasses
-- (instancetype)initViewWithObjectClassName:(NSString *)objectClassName;
-
-// create standalone array variant
-+ (instancetype)standaloneArrayWithObjectClassName:(NSString *)objectClassName;
+// initializer
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
@@ -66,12 +43,7 @@
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray {
-    // FIXME - make private once we have self updating accessors - for
-    //         now this gets set externally
-    @public
-    tightdb::LinkViewRef _backingLinkView;
-}
+@interface RLMArrayLinkView : RLMArray
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
                                     view:(tightdb::LinkViewRef)view
                                    realm:(RLMRealm *)realm;
@@ -79,17 +51,28 @@
 
 
 //
-// TableView backed RLMArray subclass
+// RLMResults private methods
 //
-@interface RLMArrayTableView : RLMArray
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                   query:(std::unique_ptr<tightdb::Query>)query
-                                   realm:(RLMRealm *)realm;
+@interface RLMResults ()
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
+                                     realm:(RLMRealm *)realm;
 
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::TableView)view
-                                   realm:(RLMRealm *)realm;
++ (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
+                                     query:(std::unique_ptr<tightdb::Query>)query
+                                      view:(tightdb::TableView)view
+                                     realm:(RLMRealm *)realm;
+- (void)deleteObjectsFromRealm;
+@end
 
+//
+// RLMResults subclass used when a TableView can't be created - this is used
+// for readonly realms where we can't create an underlying table class for a
+// type, and we need to return a functional RLMResults instance which is always empty.
+//
+@interface RLMEmptyResults : RLMResults
++ (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName
+                                          realm:(RLMRealm *)realm;
 @end
 
 //
@@ -107,6 +90,3 @@
 // Reallocate the array if it is not already the given size
 - (void)resize:(NSUInteger)size;
 @end
-
-
-

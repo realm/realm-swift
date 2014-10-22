@@ -16,13 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+@class RLMResults, RLMObject;
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
+@protocol RLMCollection <NSFastEnumeration>
+
+@required
+
+- (id)objectAtIndex:(NSUInteger)index;
+- (id)firstObject;
+- (id)lastObject;
+- (NSUInteger)indexOfObject:(RLMObject *)object;
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
+- (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
+
+@end

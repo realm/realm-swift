@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = RLMArray(objectClassName: DemoObject.className())
+    var array = DemoObject.allObjects()
     var notificationToken: RLMNotificationToken?
 
     override func viewDidLoad() {
@@ -72,7 +72,7 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
 
         let object = array[UInt(indexPath.row)] as DemoObject
-        cell.textLabel?.text = object.title
+        cell.textLabel.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
         return cell
@@ -90,7 +90,7 @@ class TableViewController: UITableViewController {
     // Actions
 
     func reloadData() {
-        array = DemoObject.allObjects().arraySortedByProperty("date", ascending: true)
+        array = DemoObject.allObjects().sortedResultsUsingProperty("date", ascending: true)
         tableView.reloadData()
     }
 

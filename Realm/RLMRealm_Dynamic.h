@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
+#import "RLMResults.h"
 #import "RLMObjectSchema.h"
 
 @interface RLMRealm (Dynamic)
@@ -24,6 +25,7 @@
 // full constructor
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
@@ -37,11 +39,11 @@
 
  @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
 
- @return    An RLMArray of all objects in this realm of the given type.
+ @return    An RLMResults of all objects in this realm of the given type.
 
  @see       RLMObject allObjects
  */
-- (RLMArray *)allObjects:(NSString *)className;
+- (RLMResults *)allObjects:(NSString *)className;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -51,11 +53,11 @@
  @param className       The type of objects you are looking for (name of the class).
  @param predicateFormat The predicate format string which can accept variable arguments.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate from the this Realm.
@@ -65,11 +67,23 @@
  @param className   The type of objects you are looking for (name of the class).
  @param predicate   The predicate to filter the objects.
 
- @return    An RLMArray of results matching the given predicate.
+ @return    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
+- (RLMResults *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
+
+/**
+ Create an RLMObject of type `className` in the Realm with a given object.
+
+ @param object  The object used to populate the object. This can be any key/value coding compliant
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if any required properties are not present and no default is set.
+
+ When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
+ */
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object;
 
 @end
 

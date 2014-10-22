@@ -27,7 +27,7 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMArray *emptyPeople = [EmployeeObject allObjects];
+    RLMResults *emptyPeople = [EmployeeObject allObjects];
     
     // Enum for zero rows added
     for (EmployeeObject *row in emptyPeople) {
@@ -49,7 +49,7 @@
     [realm commitWriteTransaction];
 
     // Get all objects
-    RLMArray *people = [EmployeeObject allObjects];
+    RLMResults *people = [EmployeeObject allObjects];
     
     // Iterate using for...in
     NSUInteger index = 0;
@@ -63,10 +63,10 @@
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"hired = YES && age BETWEEN {20, 30}"];
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:pred];
     
-    // Do a query, and get all matches as RLMArray
-    RLMArray *res = [EmployeeObject objectsWithPredicate:pred];
+    // Do a query, and get all matches as RLMResults
+    RLMResults *res = [EmployeeObject objectsWithPredicate:pred];
     
-    // Iterate over the resulting RLMArray
+    // Iterate over the resulting RLMResults
     index = 0;
     for (EmployeeObject *row in res) {
         XCTAssertEqualObjects(row.name, filteredArray[index][@"name"], @"Name in iteration should be equal to what was set.");

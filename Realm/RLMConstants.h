@@ -137,7 +137,7 @@ typedef NS_ENUM(NSString, RLMRealmNotification) {
  */
     RLMRealmDidChangeNotification,
 /**
- Posted by RLMRealm when a write transaction has been committed to a RLMRealm on
+ Posted by RLMRealm when a write transaction has been committed to an RLMRealm on
  a different thread for the same file. This is not posted if
  [autorefresh]([RLMRealm autorefresh]) is enabled or if the RLMRealm is
  refreshed before the notifcation has a chance to run.
