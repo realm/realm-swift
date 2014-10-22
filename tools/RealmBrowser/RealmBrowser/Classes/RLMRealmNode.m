@@ -44,6 +44,7 @@
 {
     _realm = [RLMRealm realmWithPath:_url
                             readOnly:NO
+                            inMemory:NO
                              dynamic:YES
                               schema:nil
                                error:error];

@@ -252,7 +252,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         path = [path stringByAppendingPathComponent:identifier];
 
         // create directory
-        [[NSFileManager defaultManager] createDirectoryAtPath:[path stringByDeletingLastPathComponent]
+        [[NSFileManager defaultManager] createDirectoryAtPath:path
                                   withIntermediateDirectories:YES
                                                    attributes:nil
                                                         error:nil];
@@ -574,6 +574,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)addObjects:(id<NSFastEnumeration>)array {
     for (RLMObject *obj in array) {
+        if (![obj isKindOfClass:[RLMObject class]]) {
+            NSString *msg = [NSString stringWithFormat:@"Cannot insert objects of type %@ with addObjects:. Only RLMObjects are supported.", NSStringFromClass(obj.class)];
+            @throw [NSException exceptionWithName:@"RLMException" reason:msg userInfo:nil];
+        }
         [self addObject:obj];
     }
 }

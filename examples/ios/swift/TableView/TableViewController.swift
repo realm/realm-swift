@@ -72,7 +72,7 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
 
         let object = array[UInt(indexPath.row)] as DemoObject
-        cell.textLabel?.text = object.title
+        cell.textLabel.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
         return cell

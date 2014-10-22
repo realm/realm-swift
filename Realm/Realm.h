@@ -21,11 +21,8 @@
 #import <Realm/RLMArray.h>
 #import <Realm/RLMMigration.h>
 #import <Realm/RLMObject.h>
-#import <Realm/RLMResults.h>
 #import <Realm/RLMPlatform.h>
 #import <Realm/RLMRealm.h>
+#import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
-
-#if defined(__IPHONE_8_0) && TARGET_OS_IPHONE
 #import <Realm/RLMSwiftHelpers.h>
-#endif
