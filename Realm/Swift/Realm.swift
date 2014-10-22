@@ -60,6 +60,10 @@ public class Realm {
         self.init(path: path, readOnly: false, error: nil)
     }
 
+    public convenience init(inMemoryIdentifier: String) {
+        self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
+    }
+
     public convenience init(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
         self.init(rlmRealm: RLMRealm(path: path, readOnly: readonly, error: error))
     }
@@ -96,6 +100,16 @@ public class Realm {
         }
     }
 
+    public func addOrUpdate(object: Object) {
+        rlmRealm.addOrUpdateObject(object)
+    }
+
+    public func addOrUpdate<S where S: SequenceType>(objects: S) {
+        for obj in objects {
+            rlmRealm.addOrUpdateObject(obj as RLMObject)
+        }
+    }
+
     public func delete(object: Object) {
         rlmRealm.deleteObject(object)
     }
@@ -106,6 +120,10 @@ public class Realm {
 
     public func delete(objects: List<Object>) {
         rlmRealm.deleteObjects(objects)
+    }
+
+    public func deleteAll() {
+        rlmRealm.deleteAllObjects()
     }
 
     // MARK: Notifications
