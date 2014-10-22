@@ -26,6 +26,7 @@
 
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
                        schema:(RLMSchema *)customSchema
                         error:(NSError **)outError;
