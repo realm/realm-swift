@@ -51,10 +51,9 @@ NSString * const kUTF8TestString = @"值значен™👍☞⎠‱௹♣︎☐
     UTF8Object *obj1 = [[UTF8Object allObjectsInRealm:realm] firstObject];
     XCTAssertEqualObjects(obj1.柱колоéнǢкƱаم, kUTF8TestString, @"Storing and retrieving a string with UTF8 content should work");
 
-    // Test fails because of rdar://17735684
-    // NSPredicate does not support UTF8 keypaths
-//    UTF8Object *obj2 = [[StringObject objectsInRealm:realm where:@"柱колоéнǢкƱаم == %@", kUTF8TestString] firstObject];
-//    XCTAssertEqualObjects(obj1, obj2, @"Querying a realm searching for a string with UTF8 content should work");
+    UTF8Object *obj2 = [[UTF8Object objectsInRealm:realm where:@"%K == %@",
+                         @"柱колоéнǢкƱаم", kUTF8TestString] firstObject];
+    XCTAssertTrue([obj1 isEqualToObject:obj2]);
 }
 
 @end
