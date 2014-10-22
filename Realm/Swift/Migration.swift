@@ -18,32 +18,37 @@
 
 import Realm
 
-// MARK: Migration Block
+public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
 
-public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> UInt
+public func setSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
+    RLMRealm.setSchemaVersion(schemaVersion, withMigrationBlock: {
+        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
+    })
+}
 
-func rlmMigrationBlockFromMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
-    return { rlmMigration, oldSchemaVersion in
-        return migrationBlock(migration: Migration(rlmMigration: rlmMigration), oldSchemaVersion: oldSchemaVersion)
-    }
+public func migrationRealm(path: String) -> NSError? {
+    return RLMRealm.migrateRealmAtPath(path)
 }
 
 public class Migration {
-    // MARK: Properties
-
-    var rlmMigration: RLMMigration
     public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
-    // MARK: Initializers
-
-    init(rlmMigration: RLMMigration) {
-        self.rlmMigration = rlmMigration
-    }
-
-    // MARK: Enumerate
-
     public func enumerate(objectClassName: String, block: ObjectMigrationBlock) {
         rlmMigration.enumerateObjects(objectClassName, block: block)
+    }
+
+    public func create(className: String, withObject object: AnyObject) -> RLMObject {
+        return rlmMigration.createObject(className, withObject: object)
+    }
+
+    public func delete(object: RLMObject) {
+        rlmMigration.deleteObject(object)
+    }
+
+    private var rlmMigration: RLMMigration
+
+    init(_ rlmMigration: RLMMigration) {
+        self.rlmMigration = rlmMigration
     }
 }
