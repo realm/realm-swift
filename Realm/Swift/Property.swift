@@ -16,14 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+import Realm
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
-#import <Realm/RLMListBase.h>
+// MARK: Equatable
+
+public func ==(lhs: Property, rhs: Property) -> Bool {
+    return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
+}
+
+public class Property: Equatable {
+    // MARK: Properties
+
+    var rlmProperty: RLMProperty
+    public var name: String { return rlmProperty.name }
+    public var type: PropertyType { return rlmProperty.type }
+    public var attributes: PropertyAttributes { return rlmProperty.attributes }
+    public var objectClassName: String { return rlmProperty.objectClassName }
+
+    // MARK: Initializers
+
+    init(rlmProperty: RLMProperty) {
+        self.rlmProperty = rlmProperty
+    }
+}

@@ -16,33 +16,33 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+import RealmSwift
 
-class SwiftStringObject: RLMObject {
+class SwiftStringObject: Object {
     dynamic var stringCol = ""
 }
 
-class SwiftBoolObject: RLMObject {
+class SwiftBoolObject: Object {
     dynamic var boolCol = false
 }
 
-class SwiftIntObject: RLMObject {
+class SwiftIntObject: Object {
     dynamic var intCol = 0
 }
 
-class SwiftObject: RLMObject {
+class SwiftObject: Object {
     dynamic var boolCol = false
     dynamic var intCol = 123
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
     dynamic var stringCol = "a"
-    dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)
+    dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol = SwiftBoolObject()
-    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    let arrayCol = List<SwiftBoolObject>()
 }
 
-class SwiftOptionalObject: RLMObject {
+class SwiftOptionalObject: Object {
     // FIXME: Support all optional property types
 //    dynamic var optBoolCol: Bool?
 //    dynamic var optIntCol: Int?
@@ -52,19 +52,19 @@ class SwiftOptionalObject: RLMObject {
 //    dynamic var optBinaryCol: NSData?
 //    dynamic var optDateCol: NSDate?
     dynamic var optObjectCol: SwiftBoolObject?
-//    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+//    let arrayCol = List<SwiftBoolObject>()
 }
 
-class SwiftDogObject: RLMObject {
+class SwiftDogObject: Object {
     dynamic var dogName = ""
 }
 
-class SwiftOwnerObject: RLMObject {
+class SwiftOwnerObject: Object {
     dynamic var name = ""
     dynamic var dog = SwiftDogObject()
 }
 
-class SwiftAggregateObject: RLMObject {
+class SwiftAggregateObject: Object {
     dynamic var intCol = 0
     dynamic var floatCol = 0 as Float
     dynamic var doubleCol = 0.0
@@ -72,38 +72,42 @@ class SwiftAggregateObject: RLMObject {
     dynamic var dateCol = NSDate()
 }
 
-class SwiftAllIntSizesObject: RLMObject {
+class SwiftAllIntSizesObject: Object {
     dynamic var int16 : Int16 = 0
     dynamic var int32 : Int32 = 0
     dynamic var int64 : Int64 = 0
 }
 
-class SwiftEmployeeObject: RLMObject {
+class SwiftEmployeeObject: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var hired = false
 }
 
-class SwiftCompanyObject: RLMObject {
-    dynamic var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
+class SwiftCompanyObject: Object {
+    let employees = List<SwiftEmployeeObject>()
 }
 
-class SwiftArrayPropertyObject: RLMObject {
+class SwiftArrayPropertyObject: Object {
     dynamic var name = ""
-    dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())
-    dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    let array = List<SwiftStringObject>()
+    let intArray = List<SwiftIntObject>()
 }
 
-class SwiftDynamicObject: RLMObject {
+class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
+    let boolArray = List<SwiftBoolObject>()
+}
+
+class SwiftDynamicObject: Object {
     dynamic var stringCol = "a"
     dynamic var intCol = 0
 }
 
-class SwiftUTF8Object: RLMObject {
+class SwiftUTF8Object: Object {
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
-class SwiftIgnoredPropertiesObject: RLMObject {
+class SwiftIgnoredPropertiesObject: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var runtimeProperty: AnyObject?
@@ -111,10 +115,9 @@ class SwiftIgnoredPropertiesObject: RLMObject {
     override class func ignoredProperties() -> [AnyObject]! {
         return ["runtimeProperty"]
     }
-
 }
 
-class SwiftPrimaryStringObject: RLMObject {
+class SwiftPrimaryStringObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 

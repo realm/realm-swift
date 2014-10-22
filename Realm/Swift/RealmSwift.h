@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
-#import <Realm/RLMListBase.h>
+//! Project version number for RealmSwift.
+FOUNDATION_EXPORT double RealmSwiftVersionNumber;
+
+//! Project version string for RealmSwift.
+FOUNDATION_EXPORT const unsigned char RealmSwiftVersionString[];
+
+// In this header, you should import all the public headers of your framework using statements like #import <RealmSwift/PublicHeader.h>
+
+

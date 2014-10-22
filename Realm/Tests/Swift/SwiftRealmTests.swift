@@ -17,53 +17,49 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmSwift
 
 class SwiftRealmTests: SwiftTestCase {
-
-    // No models
 
     func testRealmExists() {
         var realm = realmWithTestPath()
         XCTAssertNotNil(realm, "realm should not be nil");
-        XCTAssertTrue((realm as AnyObject) is RLMRealm, "realm should be of class RLMRealm")
+        XCTAssertTrue((realm as AnyObject) is Realm, "realm should be of class Realm")
     }
 
     func testDefaultRealmPath() {
-        XCTAssertEqual(RLMRealm.defaultRealm().path!, RLMRealm.defaultRealmPath(), "Default Realm path should be correct.")
+        XCTAssertEqual(defaultRealm().path, defaultRealmPath(), "Default Realm path should be correct.")
     }
 
     func testEmptyWriteTransaction() {
         var realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        realm.commitWriteTransaction()
+        realm.beginWrite()
+        realm.commitWrite()
     }
-
-    // Swift models
 
     func testRealmAddAndRemoveObjects() {
         var realm = realmWithTestPath()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         SwiftStringObject.createInRealm(realm, withObject: ["a"])
         SwiftStringObject.createInRealm(realm, withObject: ["b"])
         SwiftStringObject.createInRealm(realm, withObject: ["c"])
-        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
-        realm.commitWriteTransaction()
+        XCTAssertEqual(realm.objects(SwiftStringObject).count, UInt(3), "Expecting 3 objects")
+        realm.commitWrite()
 
         // test again after write transaction
-        var objects = SwiftStringObject.allObjectsInRealm(realm)
+        var objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, UInt(3), "Expecting 3 objects")
-        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
+        XCTAssertEqual(objects[0].stringCol, "a", "Expecting column to be 'a'")
 
-        realm.beginWriteTransaction()
-        realm.deleteObject(objects[2] as SwiftStringObject)
-        realm.deleteObject(objects[0] as SwiftStringObject)
-        XCTAssertEqual(SwiftStringObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 object")
-        realm.commitWriteTransaction()
+        realm.beginWrite()
+        realm.delete(objects[2])
+        realm.delete(objects[0])
+        XCTAssertEqual(realm.objects(SwiftStringObject).count, UInt(1), "Expecting 1 object")
+        realm.commitWrite()
 
-        objects = SwiftStringObject.allObjectsInRealm(realm)
+        objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, UInt(1), "Expecting 1 object")
-        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqual(objects[0].stringCol, "b", "Expecting column to be 'b'")
     }
 
     func testRealmIsUpdatedAfterBackgroundUpdate() {
@@ -71,74 +67,74 @@ class SwiftRealmTests: SwiftTestCase {
 
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectationWithDescription("notification fired")
-        let token = realm.addNotificationBlock { note, realm in
+        let token = realm.addNotificationBlock { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
         }
 
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
-            realm.beginWriteTransaction()
+            realm.beginWrite()
             SwiftStringObject.createInRealm(realm, withObject: ["string"])
-            realm.commitWriteTransaction()
+            realm.commitWrite()
         }
-        waitForExpectationsWithTimeout(2.0, handler: nil)
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
 
         // get object
-        let objects = SwiftStringObject.allObjectsInRealm(realm)
+        let objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
     }
 
     func testRealmIgnoresProperties() {
         let realm = realmWithTestPath()
 
         let object = SwiftIgnoredPropertiesObject()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         object.name = "@fz"
         object.age = 31
-        realm.addObject(object)
-        realm.commitWriteTransaction()
+        realm.add(object)
+        realm.commitWrite()
 
         // This shouldn't do anything.
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         object.runtimeProperty = NSObject()
-        realm.commitWriteTransaction()
+        realm.commitWrite()
 
-        let objects = SwiftIgnoredPropertiesObject.allObjectsInRealm(realm)
+        let objects = realm.objects(SwiftIgnoredPropertiesObject)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type SwiftIgnoredPropertiesObject")
-        XCTAssertNil((objects[0] as SwiftIgnoredPropertiesObject).runtimeProperty, "Ignored property should be nil")
-        XCTAssertEqual((objects[0] as SwiftIgnoredPropertiesObject).name, "@fz", "Value of the name column doesn't match the assigned one.")
+        XCTAssertNil(objects[0].runtimeProperty, "Ignored property should be nil")
+        XCTAssertEqual(objects[0].name, "@fz", "Value of the name column doesn't match the assigned one.")
     }
 
     func testUpdatingSortedArrayAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
-        let objs = SwiftIntObject.allObjectsInRealm(realm)
-        let objects = SwiftIntObject.allObjectsInRealm(realm).sortedResultsUsingProperty("intCol", ascending: true)
+        let objs = realm.objects(SwiftIntObject)
+        let objects = objs.sorted("intCol")
         let updateComplete = expectationWithDescription("background update complete")
 
-        let token = realm.addNotificationBlock() { (_, _) in
+        let token = realm.addNotificationBlock { _, _ in
             XCTAssertEqual(objs.count, UInt(2))
-            XCTAssertEqual(objs.sortedResultsUsingProperty("intCol", ascending: true).count, UInt(2))
+            XCTAssertEqual(objs.sorted("intCol").count, UInt(2))
             XCTAssertEqual(objects.count, UInt(2))
             updateComplete.fulfill()
         }
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+        dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
-            realm.transactionWithBlock() {
+            realm.write {
                 var obj = SwiftIntObject()
-                obj.intCol = 2;
-                realm.addObject(obj)
+                obj.intCol = 2
+                realm.add(obj)
 
                 obj = SwiftIntObject()
-                obj.intCol = 1;
-                realm.addObject(obj)
+                obj.intCol = 1
+                realm.add(obj)
             }
         }
 
-        waitForExpectationsWithTimeout(2.0, handler: nil)
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
     }
 
@@ -146,7 +142,7 @@ class SwiftRealmTests: SwiftTestCase {
         let realm = realmWithTestPath()
 
         let notificationFired = expectationWithDescription("notification fired")
-        let token = realm.addNotificationBlock { note, realm in
+        let token = realm.addNotificationBlock { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
         }
@@ -154,106 +150,19 @@ class SwiftRealmTests: SwiftTestCase {
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
             let obj = SwiftStringObject(object: ["string"])
-            realm.beginWriteTransaction()
-            realm.addObject(obj)
-            realm.commitWriteTransaction()
+            realm.write { realm.add(obj) }
 
-            let objects = SwiftStringObject.allObjectsInRealm(realm)
+            let objects = realm.objects(SwiftStringObject)
             XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-            XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+            XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
         }
 
-        waitForExpectationsWithTimeout(2.0, handler: nil)
+        waitForExpectationsWithTimeout(2, handler: nil)
         realm.removeNotification(token)
 
         // get object
-        let objects = SwiftStringObject.allObjectsInRealm(realm)
+        let objects = realm.objects(SwiftStringObject)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type RLMTestObject")
-        XCTAssertEqual((objects[0] as SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
-    }
-
-    // Objective-C models
-
-    func testRealmAddAndRemoveObjects_objc() {
-        var realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        StringObject.createInRealm(realm, withObject: ["a"])
-        StringObject.createInRealm(realm, withObject: ["b"])
-        StringObject.createInRealm(realm, withObject: ["c"])
-        XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, UInt(3), "Expecting 3 objects")
-        realm.commitWriteTransaction()
-
-        // test again after write transaction
-        var objects = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, UInt(3), "Expecting 3 objects")
-        XCTAssertEqual((objects[0] as StringObject).stringCol!, "a", "Expecting column to be 'a'")
-
-        realm.beginWriteTransaction()
-        realm.deleteObject(objects[2] as StringObject)
-        realm.deleteObject(objects[0] as StringObject)
-        XCTAssertEqual(StringObject.allObjectsInRealm(realm).count, UInt(1), "Expecting 1 object")
-        realm.commitWriteTransaction()
-
-        objects = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, UInt(1), "Expecting 1 object")
-        XCTAssertEqual((objects[0] as StringObject).stringCol!, "b", "Expecting column to be 'b'")
-    }
-
-    func testRealmIsUpdatedAfterBackgroundUpdate_objc() {
-        let realm = realmWithTestPath()
-
-        // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectationWithDescription("notification fired")
-        let token = realm.addNotificationBlock { note, realm in
-            XCTAssertNotNil(realm, "Realm should not be nil")
-            if note == RLMRealmDidChangeNotification {
-                notificationFired.fulfill()
-            }
-        }
-
-        dispatch_async(dispatch_queue_create("background", nil)) {
-            let realm = self.realmWithTestPath()
-            realm.beginWriteTransaction()
-            StringObject.createInRealm(realm, withObject: ["string"])
-            realm.commitWriteTransaction()
-        }
-        waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
-
-        // get object
-        let objects = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-        XCTAssertEqual((objects[0] as StringObject).stringCol!, "string", "Value of first column should be 'string'")
-    }
-
-    func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate_objc() {
-        let realm = realmWithTestPath()
-
-        // we have two notifications, one for opening the realm, and a second when performing our transaction
-        let notificationFired = expectationWithDescription("notification fired")
-        let token = realm.addNotificationBlock { note, realm in
-            XCTAssertNotNil(realm, "Realm should not be nil")
-            notificationFired.fulfill()
-        }
-
-        dispatch_async(dispatch_queue_create("background", nil)) {
-            let realm = self.realmWithTestPath()
-            let obj = StringObject(object: ["string"])
-            realm.transactionWithBlock() {
-                realm.addObject(obj)
-            }
-
-            let objects = StringObject.allObjectsInRealm(realm)
-            XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-            XCTAssertEqual((objects[0] as StringObject).stringCol!, "string", "Value of first column should be 'string'")
-        }
-
-        waitForExpectationsWithTimeout(2.0, handler: nil)
-        realm.removeNotification(token)
-
-        // get object
-        let objects = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type RLMTestObject")
-        XCTAssertEqual((objects[0] as StringObject).stringCol!, "string", "Value of first column should be 'string'")
+        XCTAssertEqual(objects[0].stringCol, "string", "Value of first column should be 'string'")
     }
 }

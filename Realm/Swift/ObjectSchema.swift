@@ -16,14 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+import Realm
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
-#import <Realm/RLMListBase.h>
+public class ObjectSchema {
+    // MARK: Properties
+
+    var rlmObjectSchema: RLMObjectSchema
+    public var className: String { return rlmObjectSchema.className }
+    public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+
+    // MARK: Initializers
+
+    init(rlmObjectSchema: RLMObjectSchema) {
+        self.rlmObjectSchema = rlmObjectSchema
+    }
+
+    // MARK: Property Retrieval
+
+    public subscript(propertyName: String) -> Property {
+        return Property(rlmProperty: rlmObjectSchema[className])
+    }
+}

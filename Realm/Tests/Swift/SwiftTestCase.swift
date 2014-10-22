@@ -18,29 +18,21 @@
 
 import XCTest
 import Realm
+import RealmSwift
 
-func testRealmPath() -> String {
+private func testRealmPath() -> String {
     return realmPathForFile("test.realm")
 }
 
-func defaultRealmPath() -> String {
-    return realmPathForFile("default.realm")
+private func realmPathForFile(fileName: String) -> String {
+    return defaultRealmPath().stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
 }
 
-func realmPathForFile(fileName: String) -> String {
-    #if os(iOS)
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
-        return (paths[0] as String) + "/" + fileName
-    #else
-        return fileName
-    #endif
-}
-
-func realmLockPath(path: String) -> String {
+private func realmLockPath(path: String) -> String {
     return path + ".lock"
 }
 
-func deleteRealmFilesAtPath(path: String) {
+private func deleteRealmFilesAtPath(path: String) {
     let fileManager = NSFileManager.defaultManager()
     if fileManager.fileExistsAtPath(path) {
         let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
@@ -54,36 +46,26 @@ func deleteRealmFilesAtPath(path: String) {
     }
 }
 
-func realmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), readOnly: false, inMemory: false, dynamic: false, schema: schema, error: nil)
-}
-
-func dynamicRealmWithTestPathAndSchema(schema: RLMSchema?) -> RLMRealm {
-    return RLMRealm(path: testRealmPath(), readOnly: false, inMemory: false, dynamic: true, schema: schema, error: nil)
+private func deleteRealmFiles() {
+    RLMRealm.resetRealmState()
+    deleteRealmFilesAtPath(defaultRealmPath())
+    deleteRealmFilesAtPath(testRealmPath())
 }
 
 class SwiftTestCase: XCTestCase {
-
-    func realmWithTestPath() -> RLMRealm {
-        return RLMRealm(path: testRealmPath(), readOnly: false, error: nil)
+    func realmWithTestPath() -> Realm {
+        return Realm(path: testRealmPath())
     }
 
-    override func setUp() {
-        super.setUp()
+    override func invokeTest() {
+        deleteRealmFiles()
 
-        // Delete realm files
-        deleteRealmFilesAtPath(defaultRealmPath())
-        deleteRealmFilesAtPath(testRealmPath())
-    }
+        autoreleasepool {
+            self.setUp()
+            self.invocation.invoke()
+            self.tearDown()
+        }
 
-    override func tearDown() {
-        super.tearDown()
-
-        // Reset Realm cache
-        RLMRealm.resetRealmState()
-
-        // Delete realm files
-        deleteRealmFilesAtPath(defaultRealmPath())
-        deleteRealmFilesAtPath(testRealmPath())
+        deleteRealmFiles()
     }
 }

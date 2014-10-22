@@ -17,67 +17,39 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmSwift
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
 class SwiftUnicodeTests: SwiftTestCase {
-
-    // Swift models
-
     func testUTF8StringContents() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        SwiftStringObject.createInRealm(realm, withObject: [utf8TestString])
-        realm.commitWriteTransaction()
 
-        let obj1 = SwiftStringObject.allObjectsInRealm(realm).firstObject() as SwiftStringObject
-        XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
+        realm.write {
+            _  = SwiftStringObject.createInRealm(realm, withObject: [utf8TestString])
+        }
 
-        let obj2 = SwiftStringObject.objectsInRealm(realm, "stringCol == %@", utf8TestString).firstObject() as SwiftStringObject
-        XCTAssertTrue(obj1.isEqualToObject(obj2), "Querying a realm searching for a string with UTF8 content should work")
+        let obj1 = realm.objects(SwiftStringObject).first()!
+        XCTAssertEqual(obj1.stringCol, utf8TestString)
+
+        let obj2 = realm.objects(SwiftStringObject).filter("stringCol == %@", utf8TestString).first()!
+        XCTAssertEqual(obj1, obj2)
+        XCTAssertEqual(obj2.stringCol, utf8TestString)
+
+        XCTAssertEqual(UInt(0), realm.objects(SwiftStringObject).filter("stringCol != %@", utf8TestString).count)
     }
 
     func testUTF8PropertyWithUTF8StringContents() {
         let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        SwiftUTF8Object.createInRealm(realm, withObject: [utf8TestString])
-        realm.commitWriteTransaction()
+        realm.write {
+            _ = SwiftUTF8Object.createInRealm(realm, withObject: [utf8TestString])
+        }
 
-        let obj1 = SwiftUTF8Object.allObjectsInRealm(realm).firstObject() as SwiftUTF8Object
+        let obj1 = realm.objects(SwiftUTF8Object).first()!
         XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
 
         // Test fails because of rdar://17735684
-//        let obj2 = SwiftUTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم👍 == %@", utf8TestString).firstObject() as SwiftUTF8Object
-//        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
-    }
-
-    // Objective-C models
-
-    func testUTF8StringContents_objc() {
-        let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        StringObject.createInRealm(realm, withObject: [utf8TestString])
-        realm.commitWriteTransaction()
-
-        let obj1 = StringObject.allObjectsInRealm(realm).firstObject() as StringObject
-        XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
-
-        let obj2 = StringObject.objectsInRealm(realm, "stringCol == %@", utf8TestString).firstObject() as StringObject
-        XCTAssertTrue(obj1.isEqualToObject(obj2), "Querying a realm searching for a string with UTF8 content should work")
-    }
-
-    func testUTF8PropertyWithUTF8StringContents_objc() {
-        let realm = realmWithTestPath()
-        realm.beginWriteTransaction()
-        UTF8Object.createInRealm(realm, withObject: [utf8TestString])
-        realm.commitWriteTransaction()
-
-        let obj1 = UTF8Object.allObjectsInRealm(realm).firstObject() as UTF8Object
-        XCTAssertEqual(obj1.柱колоéнǢкƱаم, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
-
-        // Test fails because of rdar://17735684
-//        let obj2 = UTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم == %@", utf8TestString).firstObject() as UTF8Object
-//        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+        let obj2 = realm.objects(SwiftUTF8Object).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString).first()!
+        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 }

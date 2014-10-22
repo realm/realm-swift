@@ -25,6 +25,7 @@
 
 @interface RLMArray (Swift)
 
+- (instancetype)initWithObjectClass:(Class)objectClass;
 // FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
@@ -41,6 +42,8 @@
 @end
 
 @interface RLMObject (Swift)
+
+- (instancetype)initWithRealm:(RLMRealm *)realm schema:(RLMObjectSchema *)schema defaultValues:(BOOL)useDefaults;
 
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;

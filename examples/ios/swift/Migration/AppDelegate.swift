@@ -17,11 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
 // Old data models
 /* V0
-class Person: RLMObject {
+class Person: Object {
     dynamic var firstName = ""
     dynamic var lastName = ""
     dynamic var age = 0
@@ -29,22 +29,22 @@ class Person: RLMObject {
 */
 
 /* V1
-class Person: RLMObject {
+class Person: Object {
     dynamic var fullName = ""        // combine firstName and lastName into single field
     dynamic var age = 0
 }
 */
 
 /* V2 */
-class Pet: RLMObject {
+class Pet: Object {
     dynamic var name = ""
     dynamic var type = ""
 }
 
-class Person: RLMObject {
+class Person: Object {
     dynamic var fullName = ""
     dynamic var age = 0
-    dynamic var pets = RLMArray(objectClassName: Pet.className())
+    dynamic var pets = ArrayProperty(Pet)
 }
 
 @UIApplicationMain
@@ -68,9 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // define a migration block
         // you can define this inline, but we will reuse this to migrate realm files from multiple versions
         // to the most current version of our data model
-        let migrationBlock: RLMMigrationBlock = { migration, oldSchemaVersion in
+        let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
             if oldSchemaVersion < 1 {
-                migration.enumerateObjects(Person.className()) { oldObject, newObject in
+                migration.enumerate(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
                         let firstName = oldObject["firstName"] as String
@@ -80,21 +80,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
             if oldSchemaVersion < 2 {
-                migration.enumerateObjects(Person.className()) { oldObject, newObject in
+                migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
                     if newObject["fullName"] as String == "JP McDonald" {
                         let jpsDog = Pet(object: ["Jimbo", "dog"])
-                        newObject["pets"].addObject(jpsDog)
+                        (newObject["pets"] as ArrayProperty).list(Pet).append(jpsDog)
                     }
                 }
             }
             println("Migration complete.")
         }
-        RLMRealm.setSchemaVersion(3, withMigrationBlock: migrationBlock)
+        setSchemaVersion(3, withMigrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
-        println("Migrated objects in the default Realm: \(Person.allObjects())")
+        println("Migrated objects in the default Realm: \(objects(Person))")
 
         //
         // Migrate a realms at a custom paths
@@ -110,13 +110,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
 
         // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
-        RLMRealm.migrateRealmAtPath(realmv1Path)
+        migrateRealm(path: realmv1Path)
 
         // print out all migrated objects in the migrated realms
-        let realmv1 = RLMRealm(path: realmv1Path, readOnly: false, error: nil)
-        println("Migrated objects in the Realm migrated from v1: \(Person.allObjectsInRealm(realmv1))")
-        let realmv2 = RLMRealm(path: realmv2Path, readOnly: false, error: nil)
-        println("Migrated objects in the Realm migrated from v2: \(Person.allObjectsInRealm(realmv2))")
+        println("Migrated objects in the Realm migrated from v1: \(Realm(path: realmv1Path).objects(Person))")
+        println("Migrated objects in the Realm migrated from v2: \(Realm(path: realmv2Path).objects(Person))")
 
         return true
     }
