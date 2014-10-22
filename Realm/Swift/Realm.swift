@@ -90,10 +90,6 @@ public class Realm {
         rlmRealm.addObject(object)
     }
 
-    public func add(objects: [Object]) {
-        rlmRealm.addObjects(objects)
-    }
-
     public func add<S where S: SequenceType>(objects: S) {
         for obj in objects {
             rlmRealm.addObject(obj as RLMObject)
