@@ -18,6 +18,25 @@
 
 import Realm
 
+// Types which can be used for min()/max()
+public protocol MinMaxType {}
+extension Double: MinMaxType {}
+extension Float: MinMaxType {}
+extension Int16: MinMaxType {}
+extension Int32: MinMaxType {}
+extension Int64: MinMaxType {}
+extension Int: MinMaxType {}
+extension NSDate: MinMaxType {}
+
+// Types which can be used for average/sum
+public protocol AddableType {}
+extension Double: AddableType {}
+extension Float: AddableType {}
+extension Int16: AddableType {}
+extension Int32: AddableType {}
+extension Int64: AddableType {}
+extension Int: AddableType {}
+
 public final class Results<T: Object>: Printable, SequenceType {
     let rlmResults: RLMResults
 
@@ -36,15 +55,15 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Index Retrieval
 
     public func indexOf(object: T) -> UInt? {
-        return rlmResults.indexOfObject(object)
+        return notFoundToNil(rlmResults.indexOfObject(object))
     }
 
     public func indexOf(predicate: NSPredicate) -> UInt? {
-        return rlmResults.indexOfObjectWithPredicate(predicate)
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
     }
 
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> UInt? {
-        return rlmResults.indexOfObjectWhere(predicateFormat, args: getVaList(args))
+        return notFoundToNil(rlmResults.indexOfObjectWhere(predicateFormat, args: getVaList(args)))
     }
 
     // MARK: Object Retrieval
@@ -81,20 +100,20 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Aggregate Operations
 
-    public func min<U: Sortable>(property: String) -> U {
+    public func min<U: MinMaxType>(property: String) -> U {
         return rlmResults.minOfProperty(property) as U
     }
 
-    public func max<U: Sortable>(property: String) -> U {
+    public func max<U: MinMaxType>(property: String) -> U {
         return rlmResults.maxOfProperty(property) as U
     }
 
-    public func sum(property: String) -> Double {
-        return rlmResults.sumOfProperty(property) as Double
+    public func sum<U: AddableType>(property: String) -> U {
+        return rlmResults.sumOfProperty(property) as AnyObject as U
     }
 
-    public func average(property: String) -> Double {
-        return rlmResults.averageOfProperty(property) as Double
+    public func average<U: AddableType>(property: String) -> U {
+        return rlmResults.averageOfProperty(property) as AnyObject as U
     }
 
     // MARK: Sequence Support
@@ -108,5 +127,14 @@ public final class Results<T: Object>: Printable, SequenceType {
                 return self.rlmResults[i++] as? T
             }
         }
+    }
+
+    // MARK: Private stuff
+
+    private func notFoundToNil(index: UInt) -> UInt? {
+        if index == UInt(NSNotFound) {
+            return nil
+        }
+        return index
     }
 }
