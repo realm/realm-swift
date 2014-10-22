@@ -25,6 +25,7 @@
 
 @interface RLMArray (Swift)
 
+- (instancetype)initWithObjectClass:(Class)objectClass;
 // FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 

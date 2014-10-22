@@ -39,7 +39,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Initializers
 
     public override init() {
-        super.init(array: RLMArray(objectClassName: demangleClassName(NSStringFromClass(T))))
+        super.init(array: RLMArray(objectClass: T.self))
     }
 
     init(_ rlmArray: RLMArray) {
