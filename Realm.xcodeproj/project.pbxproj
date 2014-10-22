@@ -193,7 +193,6 @@
 		E8B24B8719DC92FE00B0101E /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E61A4019DBD9BE00D5D1E4 /* SwiftLinkTests.swift */; };
 		E8B24B8819DC92FF00B0101E /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E61A4019DBD9BE00D5D1E4 /* SwiftLinkTests.swift */; };
 		E8B24B8B19DC954A00B0101E /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E61A3E19DBD9BE00D5D1E4 /* SwiftArrayTests.swift */; };
-		E8BFA08719DBB491000A108F /* SwiftDemangling.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BFA08619DBB491000A108F /* SwiftDemangling.swift */; };
 		E8BFA08919DBB60A000A108F /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BFA08819DBB60A000A108F /* libc++.dylib */; };
 		E8D89B9E1955FC6D00CF2B9A /* Realm.h in Headers */ = {isa = PBXBuildFile; fileRef = E8D89B9D1955FC6D00CF2B9A /* Realm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8D89BA41955FC6D00CF2B9A /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8D89B981955FC6D00CF2B9A /* Realm.framework */; };
@@ -398,7 +397,6 @@
 		E8951F01196C96DE00D6461C /* RLMRealm_Dynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Dynamic.h; sourceTree = "<group>"; };
 		E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPredicateUtil.h; sourceTree = "<group>"; };
 		E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPredicateUtil.m; sourceTree = "<group>"; };
-		E8BFA08619DBB491000A108F /* SwiftDemangling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDemangling.swift; sourceTree = "<group>"; };
 		E8BFA08819DBB60A000A108F /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		E8D89B981955FC6D00CF2B9A /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
@@ -512,7 +510,6 @@
 				E86C4F7B19DBB29B000CDC28 /* RealmSwift.h */,
 				3F6B891C19EF0A35004E8EA8 /* Results.swift */,
 				E86C4FAA19DBB3ED000CDC28 /* Schema.swift */,
-				E8BFA08619DBB491000A108F /* SwiftDemangling.swift */,
 			);
 			name = Swift;
 			path = Realm/Swift;
@@ -1140,7 +1137,6 @@
 				E86C4FA919DBB3E5000CDC28 /* Realm.swift in Sources */,
 				3F6B891D19EF0A36004E8EA8 /* Results.swift in Sources */,
 				E86C4FAB19DBB3ED000CDC28 /* Schema.swift in Sources */,
-				E8BFA08719DBB491000A108F /* SwiftDemangling.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
