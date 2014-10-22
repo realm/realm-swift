@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Added method `-linkingObjectsOfClass:forProperty:` to RLMObject to expose inverse
+  relashinships/backlinks.
 
 ### Bugfixes
 

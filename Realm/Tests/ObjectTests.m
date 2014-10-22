@@ -1138,4 +1138,38 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
 }
 
+- (void)testBacklinks {
+    StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+
+    // calling on standalone should throw
+    XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
+
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm transactionWithBlock:^{
+        [realm addObject:obj];
+    }];
+
+    XCTAssertThrows([obj linkingObjectsOfClass:StringObject.className forProperty:@"stringCol"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:OwnerObject.className forProperty:@"dog"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:@"invalidClassName" forProperty:@"stringObjectCol"]);
+    XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+    [realm transactionWithBlock:^{
+        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithObject:@[obj, @[]]];
+        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+        lObj.stringObjectCol = nil;
+        XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+        [lObj.stringObjectArrayCol addObject:obj];
+        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
+        [lObj.stringObjectArrayCol addObject:obj];
+        XCTAssertEqual(2U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
+
+        [realm deleteObject:obj];
+        XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
+    }];
+
+}
+
 @end
