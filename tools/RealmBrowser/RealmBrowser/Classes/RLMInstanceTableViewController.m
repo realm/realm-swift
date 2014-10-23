@@ -316,12 +316,12 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
             NSString *string = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
-            
             badgeCellView.textField.editable = NO;
 
             badgeCellView.badge.hidden = NO;
             badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", [(RLMArray *)propertyValue count]];
             [badgeCellView.badge.cell setHighlightsBy:0];
+            [badgeCellView sizeToFit];
             
             cellView = badgeCellView;
             
@@ -381,9 +381,9 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         }
     }
     
-    if (type != RLMPropertyTypeArray) {
-        cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
-    }
+//    if (type != RLMPropertyTypeArray) {
+//        cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
+//    }
 
     return cellView;
 }
