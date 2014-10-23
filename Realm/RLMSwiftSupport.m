@@ -18,6 +18,8 @@
 
 #import "RLMSwiftSupport.h"
 
+#import "RLMSwiftSupport.h"
+
 @implementation RLMSwiftSupport
 
 + (BOOL)isSwiftClassName:(NSString *)className {

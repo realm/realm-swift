@@ -198,6 +198,22 @@ class ResultsTests: SwiftTestCase {
         XCTAssertEqual(Double(1.665), results.average("doubleCol") as Double)
     }
 
+    func testMinBlock() {
+        let results = getAggregateableResults()
+        XCTAssertEqual(1, results.min { $0.intCol })
+        XCTAssertEqual(Float(1.1), results.min { $0.floatCol })
+        XCTAssertEqual(Double(1.11), results.min { $0.doubleCol })
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min { $0.dateCol })
+    }
+
+    func testMaxBlock() {
+        let results = getAggregateableResults()
+        XCTAssertEqual(2, results.max { $0.intCol })
+        XCTAssertEqual(Float(2.2), results.max { $0.floatCol })
+        XCTAssertEqual(Double(2.22), results.max { $0.doubleCol })
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max { $0.dateCol })
+    }
+
     func testFastEnumeration() {
         var str = ""
         for obj in results {
