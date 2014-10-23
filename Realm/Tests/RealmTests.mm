@@ -785,4 +785,19 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
+- (void)testAddObjectsFromArray
+{
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows(([realm addObjects:@[@[@"Rex", @10]]]),
+                    @"should reject non-RLMObject in array");
+
+    DogObject *dog = [DogObject new];
+    dog.dogName = @"Rex";
+    dog.age = 10;
+    XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
+    XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
+}
+
 @end

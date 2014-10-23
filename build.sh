@@ -149,6 +149,7 @@ download_core() {
     fi
     (
         cd "${TMP_DIR}"
+        rm -rf core
         unzip "${CORE_ZIP}"
         mv core core-${REALM_CORE_VERSION}
     )
@@ -304,6 +305,12 @@ case "$COMMAND" in
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
         sh build.sh browser "$XCMODE"
+
+        (
+            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
+
         exit 0
         ;;
 
@@ -435,6 +442,9 @@ case "$COMMAND" in
         ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
         unzip realm-obj-examples.zip
 
+        mkdir -p Swift
+        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift Swift
+
         rm *.zip
         cd examples
 
@@ -442,6 +452,15 @@ case "$COMMAND" in
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
+
+        (
+            cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
         ;;
 
     "package-ios")
@@ -562,7 +581,7 @@ EOF
             ln -s $WORKSPACE/tightdb_objc .
 
             sh ../tightdb_objc/build.sh package-test-examples
-        )
+        ) || exit 1
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
