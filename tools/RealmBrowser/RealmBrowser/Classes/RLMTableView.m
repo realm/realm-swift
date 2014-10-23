@@ -19,6 +19,8 @@
 #import "RLMTableView.h"
 #import "RLMTableColumn.h"
 #import "RLMArrayNode.h"
+#import "RLMTableHeaderCell.h"
+#import "RLMDescriptions.h"
 
 @interface RLMTableView()<NSMenuDelegate>
 
@@ -26,7 +28,6 @@
 
 @implementation RLMTableView {
     NSTrackingArea *trackingArea;
-    BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
 
@@ -50,13 +51,12 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-
+    
     int options = NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited
     | NSTrackingMouseMoved | NSTrackingCursorUpdate;
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:options owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
     
-    mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
     
@@ -198,7 +198,9 @@
 
 - (void)cursorUpdate:(NSEvent *)event
 {
-    // Note: This method is left empty intentionally. It avoids cursor events to be passed on up
+    [self mouseMoved: event];
+    
+    // Note: This method is left mostly empty on purpose. It avoids cursor events to be passed on up
     //       the responder chain where it potentially could reach a displayed tool-tip view, which
     //       will undo any modification to the cursor image dome by the application. This "fix" is
     //       in order to circumvent a bug in OS X version prior to 10.10 Yosemite not honouring
@@ -206,47 +208,34 @@
     //       IMPORTANT: Must NOT be deleted!!!
 }
 
-- (void)mouseEntered:(NSEvent*)event
-{
-    mouseOverView = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(mouseDidEnterView:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterView:self];
-    }
-}
-
 - (void)mouseMoved:(NSEvent *)event
 {
-    id myDelegate = [self delegate];
-    
-    if (!myDelegate) {
+    if (!self.delegate) {
         return; // No delegate, no need to track the mouse.
     }
+        
+    currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 
-    if (mouseOverView) {
-        currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
-		
-        if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
-            return;
-        }
-        else {
-            if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
-            }
-
-            CGRect cellRect = [self rectOfLocation:previousMouseLocation];
-            [self setNeedsDisplayInRect:cellRect];
-
-            previousMouseLocation = currentMouseLocation;
-
-            if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
-            }
-        }
-
-        CGRect cellRect = [self rectOfLocation:currentMouseLocation];
-        [self setNeedsDisplayInRect:cellRect];
+    if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
+        return;
     }
+    else {
+        if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
+        }
+        
+        CGRect cellRect = [self rectOfLocation:previousMouseLocation];
+        [self setNeedsDisplayInRect:cellRect];
+        
+        previousMouseLocation = currentMouseLocation;
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
+        }
+    }
+    
+    CGRect cellRect = [self rectOfLocation:currentMouseLocation];
+    [self setNeedsDisplayInRect:cellRect];
 }
 
 -(void)rightMouseDown:(NSEvent *)theEvent
@@ -260,9 +249,7 @@
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
-{
-    mouseOverView = NO;
-    
+{    
     CGRect cellRect = [self rectOfLocation:currentMouseLocation];
     [self setNeedsDisplayInRect:cellRect];
     
@@ -407,7 +394,7 @@
 
 #pragma mark - Public Methods
 
-- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode
 {
     while (self.numberOfColumns > 0) {
         [self removeTableColumn:[self.tableColumns lastObject]];
@@ -415,14 +402,25 @@
     
     [self reloadData];
 
+    NSRect frame = self.headerView.frame;
+    frame.size.height = 36;
+    self.headerView.frame = frame;
+    
     [self beginUpdates];
     // If array, add extra first column with numbers
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
         tableColumn.propertyType = RLMPropertyTypeInt;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:@"#"];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = @"";
+        headerCell.secondLine = @"#";
+        tableColumn.headerCell = headerCell;
+
         tableColumn.headerToolTip = @"Order of object within array";
+        
+        [self addTableColumn:tableColumn];
     }
     
     // ... and add new columns matching the structure of the new realm table.
@@ -433,9 +431,15 @@
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
         
         tableColumn.propertyType = propertyColumn.type;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = propertyColumn.name;
+        headerCell.secondLine = [RLMDescriptions nameOfProperty:propertyColumn.property];
+        tableColumn.headerCell = headerCell;
+        
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
+        [self addTableColumn:tableColumn];
     }
     
     [self endUpdates];

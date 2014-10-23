@@ -21,22 +21,22 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES" unifiedTitleAndToolbar="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="500" y="485" width="977" height="564"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
+            <rect key="contentRect" x="500" y="485" width="977" height="476"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
-                <rect key="frame" x="0.0" y="0.0" width="977" height="564"/>
+                <rect key="frame" x="0.0" y="0.0" width="977" height="476"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView focusRingType="none" placeholderIntrinsicWidth="977" placeholderIntrinsicHeight="300" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IXc-8a-g01" userLabel="Left-Right Split">
-                        <rect key="frame" x="0.0" y="0.0" width="977" height="564"/>
+                        <rect key="frame" x="0.0" y="0.0" width="977" height="476"/>
                         <subviews>
                             <customView focusRingType="none" id="wGq-XQ-Lyz" userLabel="Outline">
-                                <rect key="frame" x="0.0" y="0.0" width="236" height="564"/>
+                                <rect key="frame" x="0.0" y="0.0" width="236" height="476"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView appearanceType="aqua" borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MSf-82-x0U" userLabel="OutlineScroll">
-                                        <rect key="frame" x="0.0" y="0.0" width="236" height="564"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="236" height="476"/>
                                         <clipView key="contentView" focusRingType="none" drawsBackground="NO" id="udQ-xx-2L4">
                                             <rect key="frame" x="0.0" y="0.0" width="236" height="564"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -125,12 +125,12 @@
                                     <constraint firstItem="MSf-82-x0U" firstAttribute="top" secondItem="wGq-XQ-Lyz" secondAttribute="top" id="po8-mG-pzB"/>
                                 </constraints>
                             </customView>
-                            <customView id="XsG-4h-zWh" userLabel="Main">
-                                <rect key="frame" x="237" y="0.0" width="740" height="564"/>
+                            <customView id="XsG-4h-zWh" userLabel="MainTableView">
+                                <rect key="frame" x="237" y="0.0" width="740" height="476"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3b6-BA-X5L" userLabel="MainScroll">
-                                        <rect key="frame" x="0.0" y="0.0" width="740" height="564"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="740" height="476"/>
                                         <clipView key="contentView" focusRingType="none" id="kRO-aN-FFM">
                                             <rect key="frame" x="0.0" y="17" width="740" height="547"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -491,6 +491,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
+            <point key="canvasLocation" x="420.5" y="343"/>
         </window>
         <customObject id="hSp-0t-Gbg" customClass="RLMTypeOutlineViewController">
             <connections>

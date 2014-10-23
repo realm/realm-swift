@@ -106,7 +106,7 @@
                                                 <action selector="saveJavaModels:" target="-1" id="6op-mb-kj6"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Save Objective C definitions..." id="yRS-DK-aHw">
+                                        <menuItem title="Save Objective-C definitions..." id="yRS-DK-aHw">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="saveObjcModels:" target="-1" id="6Rj-7H-W6J"/>
