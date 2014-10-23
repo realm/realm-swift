@@ -23,6 +23,7 @@
 
 const NSUInteger kMaxNumberOfRowsToConsider = 50;
 const CGFloat kMaxColumnWidth = 200.0;
+const CGFloat kMinColumnWidth = 25.0;
 
 - (CGFloat)sizeThatFitsWithLimit:(BOOL)limited
 {
@@ -69,7 +70,7 @@ const CGFloat kMaxColumnWidth = 200.0;
     maxWidth = MAX(maxWidth + 10.0f, headerSize.width*1.1);
     
     if (limited) {
-        maxWidth = MIN(maxWidth, kMaxColumnWidth);
+        maxWidth = MAX(kMinColumnWidth, MIN(maxWidth, kMaxColumnWidth));
     }
     
     return maxWidth;

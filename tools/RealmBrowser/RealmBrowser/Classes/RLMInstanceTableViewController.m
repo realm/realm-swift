@@ -54,6 +54,13 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 @end
 
 
+@interface RLMInstanceTableViewController ()
+
+@property (nonatomic) RLMPopupViewController *popupController;
+
+@end
+
+
 @implementation RLMInstanceTableViewController {
     BOOL awake;
     BOOL linkCursorDisplaying;
@@ -93,6 +100,9 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [self.tableView registerForDraggedTypes:@[kRLMObjectType]];
     [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
 
+    self.popupController = [[RLMPopupViewController alloc] initWithNibName:@"RLMPopupViewController" bundle:nil];
+    [self.popupController setupFromWindow:self.parentWindowController.window];
+    
     awake = YES;
 }
 
@@ -796,7 +806,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     }
 }
 
-#pragma mark - Mouse Handling
+#pragma mark - RLMTableView Delegate Methods - Mouse Handling
 
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location
 {
@@ -853,10 +863,10 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
                                                                         realm:realm];
     
     NSRect cellFrame = [self.tableView frameOfCellAtColumn:location.column row:location.row];
-    NSPoint cellCenter = NSMakePoint(NSMidX(cellFrame), NSMidY(cellFrame));
+    cellFrame = [self.tableView convertRect:cellFrame toView:nil];
+    cellFrame = [self.tableView.window convertRectToScreen:cellFrame];
     
-    cellCenter = [self.tableView convertPoint:cellCenter toView:nil];
-    cellCenter = [self.tableView.window convertBaseToScreen:cellCenter];
+    NSPoint cellCenter = NSMakePoint(NSMidX(cellFrame), NSMidY(cellFrame));
     
     self.popupController.arrayNode = arrayNode;
     self.popupController.displayPoint = cellCenter;
