@@ -63,6 +63,7 @@
             if ([realmNode connect:&error]) {
                 NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                 [documentController noteNewRecentDocumentURL:absoluteURL];
+                [[[self windowControllers] lastObject] realmDidLoad];
             }
         });
     }
