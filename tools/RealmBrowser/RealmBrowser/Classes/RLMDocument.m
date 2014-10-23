@@ -58,11 +58,17 @@
         RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
         self.presentedRealm  = realmNode;
         
+        NSArray *wcs = self.windowControllers;
+
         dispatch_async(dispatch_get_main_queue(), ^{
             NSError *error;
             if ([realmNode connect:&error]) {
                 NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                 [documentController noteNewRecentDocumentURL:absoluteURL];
+                
+                for (RLMRealmBrowserWindowController *windowController in wcs) {
+                    [windowController realmDidLoad];
+                }
             }
         });
     }
