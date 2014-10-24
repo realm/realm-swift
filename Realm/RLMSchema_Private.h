@@ -35,7 +35,7 @@ extern const NSUInteger RLMNotVersioned;
 
 inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
-        return [tableName substringFromIndex:6];
+        return [tableName substringFromIndex:c_objectTableNamePrefix.length];
     }
     return nil;
 }
