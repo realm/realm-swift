@@ -800,6 +800,42 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testCreateInRealmReusesExistingObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInDefaultRealmWithObject:@[@"name", dog]];
+    XCTAssertTrue([owner.dog isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+
+    DogArrayObject *dogArray = [DogArrayObject createInDefaultRealmWithObject:@[@[dog]]];
+    XCTAssertTrue([dogArray.dogs[0] isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmCopiesFromOtherRealm {
+    RLMRealm *realm1 = [RLMRealm defaultRealm];
+    RLMRealm *realm2 = [self realmWithTestPath];
+    [realm1 beginWriteTransaction];
+    [realm2 beginWriteTransaction];
+
+    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInRealm:realm2 withObject:@[@"name", dog]];
+    XCTAssertFalse([owner.dog isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(1U, [DogObject allObjectsInRealm:realm2].count);
+
+    DogArrayObject *dogArray = [DogArrayObject createInRealm:realm2 withObject:@[@[dog]]];
+    XCTAssertFalse([dogArray.dogs[0] isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(2U, [DogObject allObjectsInRealm:realm2].count);
+
+    [realm1 commitWriteTransaction];
+    [realm2 commitWriteTransaction];
+}
 
 - (void)testCreateInRealmWithMissingValue
 {
