@@ -27,27 +27,47 @@ property_types = {
     9: 'float',
 }
 
-def to_str(val):
-    return val.GetProcess().ReadCStringFromMemory(val.GetValueAsUnsigned(), 1024, lldb.SBError())
+def cache_lookup(cache, key, generator):
+    value = cache.get(key, None)
+    if not value:
+        value = generator(key)
+        cache[key] = value
+    return value
 
-cached_schemas = {}
+ivar_cache = {}
+def get_ivar(obj, addr, ivar):
+    def get_offset(ivar):
+        class_name, ivar_name = ivar.split('.')
+        frame = obj.GetThread().GetSelectedFrame()
+        ptr = frame.EvaluateExpression("&(({} *)0)->_{}".format(class_name, ivar_name))
+        return (ptr.GetValueAsUnsigned(), ptr.deref.size)
+
+    offset, size = cache_lookup(ivar_cache, ivar, get_offset)
+    return obj.GetProcess().ReadUnsignedFromMemory(int(addr) + offset, size, lldb.SBError())
 
 class SyntheticChildrenProvider(object):
     def _eval(self, expr):
         frame = self.obj.GetThread().GetSelectedFrame()
         return frame.EvaluateExpression(expr)
 
+    def _get_ivar(self, addr, ivar):
+        return get_ivar(self.obj, addr, ivar)
+
+    def _to_str(self, val):
+        return self.obj.GetProcess().ReadCStringFromMemory(val, 1024, lldb.SBError())
+
+schema_cache = {}
 class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, obj, _):
         self.obj = obj
-        objectSchema = self._eval("((RLMObject *){})->_objectSchema".format(self.obj.GetAddress())).GetValueAsUnsigned()
+        objectSchema = self._get_ivar(self.obj.GetAddress(), 'RLMObject.objectSchema')
 
-        self.props = cached_schemas.get(objectSchema, None)
-        if not self.props:
-            properties = self._eval("((RLMObjectSchema *){})->_properties".format(objectSchema)).GetValueAsUnsigned()
+        def get_schema(objectSchema):
+            properties = self._get_ivar(objectSchema, 'RLMObjectSchema.properties')
             count = self._eval("(NSUInteger)[((NSArray *){}) count]".format(properties)).GetValueAsUnsigned()
-            self.props = [self._get_prop(properties, i) for i in range(count)]
-            cached_schemas[objectSchema] = self.props
+            return [self._get_prop(properties, i) for i in range(count)]
+
+        self.props = cache_lookup(schema_cache, objectSchema, get_schema)
 
     def num_children(self):
         return len(self.props)
@@ -68,15 +88,23 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
 
     def _get_prop(self, props, i):
         prop = self._eval("(NSUInteger)[((NSArray *){}) objectAtIndex:{}]".format(props, i)).GetValueAsUnsigned()
-        name = to_str(self._eval("[((RLMProperty *){})->_name UTF8String]".format(prop)))
-        type = self._eval("((RLMProperty *){})->_type".format(prop)).GetValueAsUnsigned()
+        name = self._to_str(self._eval('[(NSString *){} UTF8String]'.format(self._get_ivar(prop, "RLMProperty.name"))).GetValueAsUnsigned())
+        type = self._get_ivar(prop, 'RLMProperty.type')
         getter = "({})[(id){} {}]".format(property_types.get(type, 'id'), self.obj.GetAddress(), name)
         return name, getter
 
+class_name_cache = {}
 def RLMArray_SummaryProvider(obj, _):
-    className = to_str(eval_objc(obj, "(const char *)[(NSString *)[(RLMArray *){} objectClassName] UTF8String]"))
-    count = eval_objc(obj, "(NSUInteger)[(RLMArray *){} count]").GetValueAsUnsigned()
-    return "({}[{}])".format(className, count)
+    frame = obj.GetThread().GetSelectedFrame()
+
+    class_name_ptr = get_ivar(obj, obj.GetAddress(), 'RLMArray.objectClassName')
+    def get_class_name(ptr):
+        utf8_addr = frame.EvaluateExpression('(const char *)[(NSString *){} UTF8String]'.format(class_name_ptr)).GetValueAsUnsigned()
+        return obj.GetProcess().ReadCStringFromMemory(utf8_addr, 1024, lldb.SBError())
+
+    class_name = cache_lookup(class_name_cache, class_name_ptr, get_class_name)
+    count = frame.EvaluateExpression('(NSUInteger)[(RLMArray *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
+    return "({}[{}])".format(class_name, count)
 
 class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
