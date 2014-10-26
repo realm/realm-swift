@@ -182,10 +182,17 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
+    NSDictionary *keyMapping = [objectSchema.objectClass objectPropertyKeyPathMapping];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
         id obj = (isDict || [value respondsToSelector:NSSelectorFromString(prop.name)]) ? [value valueForKey:prop.name] : nil;
+        
+        // get value under the mapped property
+        NSString *mappedProp = keyMapping[prop.name];
+        if (!obj) {
+            obj = (isDict || [value respondsToSelector:NSSelectorFromString(mappedProp)]) ? [value valueForKeyPath:mappedProp] : nil;
+        }
 
         // get default for nil object
         if (!obj && !allowMissing) {
