@@ -19,7 +19,6 @@
 #import "RLMInstanceTableViewController.h"
 #import <Foundation/Foundation.h>
 
-#import "RLMPopupViewController.h"
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
@@ -822,71 +821,17 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     }
     else if (propertyNode.type == RLMPropertyTypeArray) {
         [self enableLinkCursor];
-        [self updatePopupLocation:location];
-        [self showPopupWindowAfterDelay];
     }
 }
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
 {
-    [self hidePopupWindowAfterDelay];
     [self disableLinkCursor];
 }
 
 - (void)mouseDidExitView:(RLMTableView *)view
 {
-    [self hidePopupWindowAfterDelay];
     [self disableLinkCursor];
-}
-
-#pragma mark - Private Methods - Mouse Handling
-
-- (void)updatePopupLocation:(RLMTableLocation)location
-{
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    
-    NSInteger propertyIndex = [self propertyIndexForColumn:location.column];
-    RLMClassProperty *propertyNode = self.displayedType.propertyColumns[propertyIndex];
-    RLMObject *referringInstance = [self.displayedType instanceAtIndex:location.row];
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithReferringProperty:propertyNode.property
-                                                                     onObject:referringInstance
-                                                                        realm:realm];
-    
-    NSRect cellFrame = [self.tableView frameOfCellAtColumn:location.column row:location.row];
-    NSPoint cellCenter = NSMakePoint(NSMidX(cellFrame), NSMidY(cellFrame));
-    
-    cellCenter = [self.tableView convertPoint:cellCenter toView:nil];
-    cellCenter = [self.tableView.window convertBaseToScreen:cellCenter];
-    
-    self.popupController.arrayNode = arrayNode;
-    self.popupController.displayPoint = cellCenter;
-}
-
--(void)hidePopupWindowAfterDelay
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showPopupWindow) object:nil];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hidePopupWindow) object:nil];
-    [self performSelector:@selector(hidePopupWindow) withObject:nil afterDelay:0.1];
-}
-
--(void)hidePopupWindow
-{
-    [self.popupController hideWindow];
-}
-
--(void)showPopupWindowAfterDelay
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showPopupWindow) object:nil];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hidePopupWindow) object:nil];
-    CGFloat delay = self.popupController.showingWindow ? 0.1 : 0.25;
-    [self performSelector:@selector(showPopupWindow) withObject:nil afterDelay:delay];
-}
-
--(void)showPopupWindow
-{
-    [self disableLinkCursor];
-    [self.popupController showWindow];
-    [self.popupController updateTableView];
 }
 
 #pragma mark - Public Methods - NSTableView Event Handling
