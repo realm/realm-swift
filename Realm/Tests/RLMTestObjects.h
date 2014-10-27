@@ -142,6 +142,11 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 RLM_ARRAY_TYPE(DogObject)
 
+@interface DogArrayObject : RLMObject
+@property RLMArray<DogObject> *dogs;
+@end
+
+
 #pragma mark OwnerObject
 
 @interface OwnerObject : RLMObject

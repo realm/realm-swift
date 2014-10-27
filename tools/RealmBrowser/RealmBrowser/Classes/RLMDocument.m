@@ -59,7 +59,7 @@
         self.presentedRealm  = realmNode;
         
         NSArray *wcs = self.windowControllers;
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             NSError *error;
             if ([realmNode connect:&error]) {
