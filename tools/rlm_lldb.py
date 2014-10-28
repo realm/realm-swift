@@ -105,7 +105,7 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
 
 class_name_cache = {}
 def get_object_class_name(frame, obj, addr, ivar):
-    class_name_ptr = get_ivar(obj, addr, 'RLMResults.objectClassName')
+    class_name_ptr = get_ivar(obj, addr, ivar)
     def get_class_name(ptr):
         utf8_addr = frame.EvaluateExpression('(const char *)[(NSString *){} UTF8String]'.format(class_name_ptr)).GetValueAsUnsigned()
         return obj.GetProcess().ReadCStringFromMemory(utf8_addr, 1024, lldb.SBError())
