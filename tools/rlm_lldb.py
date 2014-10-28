@@ -18,7 +18,10 @@
 
 import lldb
 
-# command script import /src/rlm_lldb.py --allow-reload
+# Load with:
+# command script import [Realm path]/tools/rlm_lldb.py --allow-reload
+# To load automatically, add that line to your .lldbinit file (which you will
+# have to create if you have not set up any previous lldb scripts)
 
 property_types = {
     0: 'int64_t',
