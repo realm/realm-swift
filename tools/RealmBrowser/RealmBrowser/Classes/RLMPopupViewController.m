@@ -20,6 +20,9 @@
 #import "RLMNumberTableCellView.h"
 #import "RLMImageTableCellView.h"
 
+#import "RLMRealmBrowserWindowController.h"
+#import "RLMInstanceTableViewController.h"
+
 #import "RLMTableHeaderCell.h"
 
 @interface RLMPopupViewController () <NSTableViewDelegate, NSTableViewDataSource>
@@ -28,6 +31,9 @@
 @property (nonatomic) IBOutlet NSTableView *tableView;
 
 @property (nonatomic) RLMPopupWindow *popupWindow;
+@property (nonatomic) NSTrackingArea *trackingArea;
+
+@property (weak, nonatomic) RLMInstanceTableViewController *owningTableViewController;
 
 @end
 
@@ -46,9 +52,20 @@
 
 -(void)setupFromWindow:(NSWindow *)parentWindow
 {
-    self.popupWindow = [[RLMPopupWindow alloc] initWithView:self.view inWindow:self.tableView.window];
+    self.popupWindow = [[RLMPopupWindow alloc] initWithView:self.view];
     self.popupWindow.alphaValue = 0.0;
     [parentWindow addChildWindow:self.popupWindow ordered:NSWindowAbove];
+    
+    RLMRealmBrowserWindowController *wc = parentWindow.windowController;
+    self.owningTableViewController = wc.tableViewController;
+}
+
+- (void)createTrackingArea
+{
+    int opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways | NSTrackingInVisibleRect);
+    self.trackingArea = [[NSTrackingArea alloc] initWithRect:[self.popupWindow.contentView bounds] options:opts owner:self userInfo:nil];
+    
+    [self.popupWindow.contentView addTrackingArea:self.trackingArea];
 }
 
 #pragma mark - Public Methods
@@ -132,12 +149,16 @@
     self.popupWindow.animator.alphaValue = 1.0;
     [self.popupWindow makeKeyAndOrderFront:self];
     self.showingWindow = YES;
+    [self createTrackingArea];
 }
 
 - (void)hideWindow
 {
     self.popupWindow.animator.alphaValue = 0.0;
     self.showingWindow = NO;
+    for (NSTrackingArea *trackingArea in [self.popupWindow.contentView trackingAreas]) {
+        [self.popupWindow.contentView removeTrackingArea:trackingArea];
+    }
 }
 
 #pragma mark - NSTableView Delegate
@@ -222,6 +243,10 @@
     }
 }
 
+#pragma mark - Mouse Handling
+-(void)mouseExited:(NSEvent *)theEvent
+{
+    [self.owningTableViewController mouseDidLeaveCellOrView];
+}
+
 @end
-
-

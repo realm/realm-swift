@@ -83,6 +83,8 @@ typedef struct {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
 
+- (void)mouseDidLeaveCellOrView;
+
 - (void)rightClickedHeaderColumn:(NSUInteger)column;
 
 - (void)rightClickedLocation:(RLMTableLocation)location;

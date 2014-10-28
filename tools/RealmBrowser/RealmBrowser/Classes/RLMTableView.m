@@ -249,7 +249,7 @@
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
-{    
+{
     CGRect cellRect = [self rectOfLocation:currentMouseLocation];
     [self setNeedsDisplayInRect:cellRect];
     

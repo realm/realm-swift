@@ -32,7 +32,7 @@ const CGFloat cornerRadius = 30.0;
 
 @implementation RLMPopupWindow
 
--(instancetype)initWithView:(NSView *)view inWindow:(NSWindow *)window
+-(instancetype)initWithView:(NSView *)view
 {
     CGFloat commonMargin = viewMargin + cornerRadius;
     NSRect contentRect = NSInsetRect(view.bounds, -commonMargin, -commonMargin);
@@ -49,8 +49,6 @@ const CGFloat cornerRadius = 30.0;
         [self useOptimizedDrawing:YES];
         
         [self.contentView addSubview:view];
-
-        self.parentWindow = window;
         self.view = view;
 
         self.borderColor = [NSColor grayColor];

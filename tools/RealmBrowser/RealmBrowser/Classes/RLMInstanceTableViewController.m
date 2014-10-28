@@ -824,6 +824,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
     if (!propertyValue) {
         [self disableLinkCursor];
+        [self mouseDidLeaveCellOrView];
         return;
     }
 
@@ -839,13 +840,19 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location
 {
-    [self hidePopupWindowAfterDelay];
-    [self disableLinkCursor];
+    [self mouseDidLeaveCellOrView];
 }
 
 - (void)mouseDidExitView:(RLMTableView *)view
 {
-    [self hidePopupWindowAfterDelay];
+    [self mouseDidLeaveCellOrView];
+}
+
+-(void)mouseDidLeaveCellOrView
+{
+    if (self.popupController.showingWindow) {
+        [self hidePopupWindowAfterDelay];
+    }
     [self disableLinkCursor];
 }
 
@@ -867,7 +874,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     cellFrame = [self.tableView.window convertRectToScreen:cellFrame];
     
     NSPoint cellCenter = NSMakePoint(NSMidX(cellFrame), NSMidY(cellFrame));
-    
     self.popupController.arrayNode = arrayNode;
     self.popupController.displayPoint = cellCenter;
 }
@@ -890,6 +896,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hidePopupWindow) object:nil];
     CGFloat delay = self.popupController.showingWindow ? 0.1 : 0.25;
     [self performSelector:@selector(showPopupWindow) withObject:nil afterDelay:delay];
+    self.popupController.showingWindow = YES;
 }
 
 -(void)showPopupWindow
