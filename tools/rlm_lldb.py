@@ -18,9 +18,9 @@
 
 import lldb
 
-# Load with:
+# In the lldb shell, load with:
 # command script import [Realm path]/tools/rlm_lldb.py --allow-reload
-# To load automatically, add that line to your .lldbinit file (which you will
+# To load automatically, add that line to your ~/.lldbinit file (which you will
 # have to create if you have not set up any previous lldb scripts)
 
 property_types = {
