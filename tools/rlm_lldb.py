@@ -133,6 +133,8 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
         self.addr = self.obj.GetAddress()
 
     def num_children(self):
+        if not self.count:
+            self.count = self._eval("(NSUInteger)[(RLMArray *){} count]".format(self.addr)).GetValueAsUnsigned()
         return self.count
 
     def has_children(self):
@@ -146,7 +148,7 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
         return self.obj.CreateValueFromData('[' + str(index) + ']', value.GetData(), value.GetType())
 
     def update(self):
-        self.count = self._eval("(NSUInteger)[(RLMArray *){} count]".format(self.addr)).GetValueAsUnsigned()
+        self.count = None
 
 def __lldb_init_module(debugger, _):
     debugger.HandleCommand('type summary add RLMArray -F rlm_lldb.RLMArray_SummaryProvider')
