@@ -131,7 +131,9 @@
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
 
 /**
- Removes an object at a given index. This object is only removed from the RLMArray, it is not deleted from the database.
+ Removes an object at a given index. 
+ 
+ This object is only removed from the RLMArray. It is not deleted from the database.
  
  Throws an exception when called with an index greater than the number of objects in this RLMArray.
 
@@ -142,14 +144,18 @@
 - (void)removeObjectAtIndex:(NSUInteger)index;
 
 /**
- Removes the last object in an RLMArray. This object is only removed from the RLMArray, it is not deleted from the database.
+ Removes the last object in an RLMArray. 
+ 
+ This object is only removed from the RLMArray. It is not deleted from the database.
  
  @warning This method can only be called during a write transaction.
 */
 - (void)removeLastObject;
 
 /**
- Removes all objects from an RLMArray. They are not deleted from the database.
+ Removes all objects from an RLMArray. 
+ 
+ These objects are only removed from the RLMArray. They are not deleted from the database.
  
  @warning This method can only be called during a write transaction.
  */
