@@ -136,7 +136,7 @@
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsSubclass(cls, RLMObject.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type, RLMArrays can only contain objects of subclasses of RLMObject. The protocol for an RLMArray property must be defined with RLM_ARRAY_TYPE. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
