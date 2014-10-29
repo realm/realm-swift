@@ -236,7 +236,6 @@ extern "C" {
 - (void)testStringPrimaryKeyMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
-    objectSchema.primaryKeyProperty.attributes = 0;
     objectSchema.primaryKeyProperty.isPrimary = NO;
     objectSchema.primaryKeyProperty = nil;
 
@@ -259,6 +258,8 @@ extern "C" {
 - (void)testStringPrimaryKeyNoIndexMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
+
+    // create without search index
     objectSchema.primaryKeyProperty.attributes = 0;
 
     // create realm with old schema and populate
