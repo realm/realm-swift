@@ -64,6 +64,10 @@ class SyntheticChildrenProvider(object):
     def _to_str(self, val):
         return self.obj.GetProcess().ReadCStringFromMemory(val, 1024, lldb.SBError())
 
+    def _value_from_ivar(self, ivar):
+        offset, ivar_type, _ = get_ivar_info(self.obj, 'RLMObject.' + ivar)
+        return self.obj.CreateChildAtOffset(ivar, offset, ivar_type)
+
 schema_cache = {}
 class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, obj, _):
@@ -93,6 +97,10 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         return True
 
     def get_child_index(self, name):
+        if name == 'realm':
+            return 0
+        if name == 'objectSchema':
+            return 1
         return next(i for i, (prop_name, _) in enumerate(self.props) if prop_name == name)
 
     def get_child_at_index(self, index):
@@ -114,10 +122,6 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         type = self._get_ivar(prop, 'RLMProperty.type')
         getter = "({})[(id){} {}]".format(property_types.get(type, 'id'), self.obj.GetAddress(), name)
         return name, getter
-
-    def _value_from_ivar(self, ivar):
-        offset, ivar_type, _ = get_ivar_info(self.obj, 'RLMObject.' + ivar)
-        return self.obj.CreateChildAtOffset(ivar, offset, ivar_type)
 
 class_name_cache = {}
 def get_object_class_name(frame, obj, addr, ivar):
@@ -154,17 +158,21 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def num_children(self):
         if not self.count:
             self.count = self._eval("(NSUInteger)[(RLMArray *){} count]".format(self.addr)).GetValueAsUnsigned()
-        return self.count
+        return self.count + 1
 
     def has_children(self):
         return True
 
     def get_child_index(self, name):
-        return int(name.lstrip('[').rstrip(']'))
+        if name == 'realm':
+            return 0
+        return int(name.lstrip('[').rstrip(']')) + 1
 
     def get_child_at_index(self, index):
-        value = self._eval('(id)[(id){} objectAtIndex:{}]'.format(self.addr, index))
-        return self.obj.CreateValueFromData('[' + str(index) + ']', value.GetData(), value.GetType())
+        if index == 0:
+            return self._value_from_ivar('realm')
+        value = self._eval('(id)[(id){} objectAtIndex:{}]'.format(self.addr, index - 1))
+        return self.obj.CreateValueFromData('[' + str(index - 1) + ']', value.GetData(), value.GetType())
 
     def update(self):
         self.count = None
