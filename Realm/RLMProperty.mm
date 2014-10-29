@@ -136,13 +136,13 @@
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsSubclass(cls, RLMObject.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. The protocol for an RLMArray property must be defined with RLM_ARRAY_TYPE. See http://realm.io/docs/cocoa/latest/api/Protocols/RLM_ARRAY_TYPE.html for more information.", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type, RLMArrays can only contain objects of subclasses of RLMObject. The protocol for an RLMArray property must be defined with RLM_ARRAY_TYPE. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
                                                  userInfo:nil];
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
                 @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/latest/api/Constants/RLMPropertyType.html for all supported types."]
+                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]
                                              userInfo:nil];
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
@@ -158,7 +158,7 @@
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsSubclass(cls, RLMObject.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/latest/api/Classes/RLMObject.html for more information.", self.objectClassName]
+                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", self.objectClassName]
                                                  userInfo:nil];
                 }
 
