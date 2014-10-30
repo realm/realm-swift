@@ -985,6 +985,8 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)rightClickedLocation:(RLMTableLocation)location
 {
+    [self mouseDidLeaveCellOrView];
+
     NSUInteger row = location.row;
 
     if (row >= self.displayedType.instanceCount || RLMTableLocationRowIsUndefined(location)) {
@@ -1001,6 +1003,8 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)userClicked:(NSTableView *)sender
 {
+    [self mouseDidLeaveCellOrView];
+
     if (self.tableView.selectedRowIndexes.count > 1) {
         return;
     }
