@@ -381,9 +381,9 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         }
     }
     
-//    if (type != RLMPropertyTypeArray) {
-//        cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
-//    }
+    if (type != RLMPropertyTypeArray) {
+        cellView.toolTip = [realmDescriptions tooltipForPropertyValue:propertyValue ofType:type];
+    }
 
     return cellView;
 }
@@ -848,9 +848,15 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [self mouseDidLeaveCellOrView];
 }
 
+- (BOOL)mouseIsInPopup
+{
+    NSPoint mouse = [NSEvent mouseLocation];
+    return [NSWindow windowNumberAtPoint:mouse belowWindowWithWindowNumber:0] == self.popupController.view.window.windowNumber;
+}
+
 -(void)mouseDidLeaveCellOrView
 {
-    if (self.popupController.showingWindow) {
+    if (self.popupController.showingWindow && ![self mouseIsInPopup]) {
         [self hidePopupWindowAfterDelay];
     }
     [self disableLinkCursor];
@@ -901,7 +907,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 -(void)showPopupWindow
 {
-    [self disableLinkCursor];
     [self.popupController showWindow];
     [self.popupController updateTableView];
 }
