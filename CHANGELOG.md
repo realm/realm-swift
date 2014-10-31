@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
   in a database created using an older versions (0.86.3 and earlier).
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
+* Fixed an issue where the default realm file could sometimes not be created on OS X.
 
 
 0.87.0 Release notes (2014-10-21)
