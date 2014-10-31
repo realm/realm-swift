@@ -40,7 +40,7 @@
 
 #import "RLMDescriptions.h"
 
-NSString * const kRLMObjectType = @"RLMObjectType";
+NSString *const kRLMObjectType = @"RLMObjectType";
 
 typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMUpdateTypeRealm,
@@ -97,7 +97,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     
     realmDescriptions = [[RLMDescriptions alloc] init];
     
-    [self.tableView registerForDraggedTypes:@[kRLMObjectType]];
     [self.tableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
 
     self.popupController = [[RLMPopupViewController alloc] initWithNibName:@"RLMPopupViewController" bundle:nil];
@@ -120,6 +119,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [super performUpdateUsingState:newState oldState:oldState];
     
     [self.tableView setAutosaveTableColumns:NO];
+    [self.tableView unregisterDraggedTypes];
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     
@@ -139,6 +139,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         self.displayedType = arrayNode;
         [self.realmTableView setupColumnsWithType:arrayNode];
         [self setSelectionIndex:arrayState.arrayIndex];
+        
+        NSString *dragType = [self dragTypeForClassName:arrayNode.schema.className];
+        NSLog(@"REG TABLE: %@", dragType);
+        
+        [self.tableView registerForDraggedTypes:@[dragType]];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
         RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
@@ -171,56 +176,70 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView != self.tableView) {
-        return 0;
-    }
-    
     return self.displayedType.instanceCount;
 }
 
+// Called before dragging starts
+-(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
+}
+
+// Pastes data into pasteboard when dragging begins
 - (BOOL)tableView:(NSTableView *)aTableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    if (self.realmIsLocked || !self.displaysArray) {
+    if (self.realmIsLocked) {
         return NO;
     }
     
+    if (!self.displaysArray) {
+        
+    }
+    
+    NSString *dragType = [self dragTypeForClassName:self.displayedType.schema.className];
     NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
-    [pboard declareTypes:@[kRLMObjectType] owner:self];
-    [pboard setData:indexSetData forType:kRLMObjectType];
+    [pboard declareTypes:@[dragType] owner:self];
+    [pboard setData:indexSetData forType:dragType];
+    NSLog(@"REG PASTEBOARD: %@", dragType);
     
     return YES;
 }
 
-- (NSDragOperation)tableView:(NSTableView *)aTableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
+// If dragged types match, this gets called to decide if dragged object should be accepted
+- (NSDragOperation)tableView:(NSTableView *)aTableView
+                validateDrop:(id<NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
+       proposedDropOperation:(NSTableViewDropOperation)operation
 {
-    if (operation == NSTableViewDropAbove) {
+    if (self.displaysArray && operation == NSTableViewDropAbove) {
         return NSDragOperationMove;
     }
     
     return NSDragOperationNone;
 }
 
--(void)tableView:(NSTableView *)tableView draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint forRowIndexes:(NSIndexSet *)rowIndexes {
-}
-
-- (BOOL)tableView:(NSTableView *)aTableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)destination dropOperation:(NSTableViewDropOperation)operation
+// Receive a dragging operation
+- (BOOL)tableView:(NSTableView *)aTableView
+       acceptDrop:(id<NSDraggingInfo>)info
+              row:(NSInteger)destination
+    dropOperation:(NSTableViewDropOperation)operation
 {
     if (self.realmIsLocked || !self.displaysArray) {
         return NO;
     }
     
     // Check that the dragged item is of correct type
-    NSArray *supportedTypes = @[kRLMObjectType];
+    NSString *dragType = [self dragTypeForClassName:self.displayedType.schema.className];
+    
+    NSArray *supportedTypes = @[dragType];
     NSPasteboard *draggingPasteboard = [info draggingPasteboard];
     NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
     
-    if ([availableType compare:kRLMObjectType] == NSOrderedSame) {
-        NSData *rowIndexData = [draggingPasteboard dataForType:kRLMObjectType];
+    if ([availableType compare:dragType] == NSOrderedSame) {
+        NSData *rowIndexData = [draggingPasteboard dataForType:dragType];
         NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
         
         // Performs the move in the realm
         [self moveRowsInRealmFrom:rowIndexes to:destination];
-
+        
         // Performs the move visually in all relevant windows
         [self.parentWindowController moveRowsInTableViewForArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
         
@@ -287,10 +306,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-    if (tableView != self.tableView) {
-        return nil;
-    }
-    
     NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
@@ -355,10 +370,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
         case RLMPropertyTypeObject: {
             RLMLinkTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"LinkCell" owner:self];
+            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
+            
             NSString *string = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             linkCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
-            
             linkCellView.textField.editable = NO;
             
             cellView = linkCellView;
@@ -386,6 +402,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     }
 
     return cellView;
+}
+
+- (NSString *)dragTypeForClassName:(NSString *)className
+{
+    return [NSString stringWithFormat:@"%@.%@", kRLMObjectType, className];
 }
 
 #pragma mark - RLMTableView Delegate

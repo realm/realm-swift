@@ -18,6 +18,8 @@
 
 #import "RLMTableCellView.h"
 
-@interface RLMLinkTableCellView : RLMTableCellView
+@interface RLMLinkTableCellView : RLMTableCellView <NSDraggingDestination>
+
+@property (nonatomic) NSString *dragType;
 
 @end
