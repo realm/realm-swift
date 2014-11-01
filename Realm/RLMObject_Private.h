@@ -26,6 +26,10 @@
   @public
     tightdb::Row _row;
     RLMRealm *_realm;
+    // objectSchema is a cached pointer to an object stored in the RLMSchema
+    // owned by _realm, so it's guaranteed to stay alive as long as this object
+    // without retaining it (and retaining it makes iteration slower)
+    __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm

@@ -10,8 +10,8 @@
 * Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
   another file.
 * Add support for case insensitive string queries on array properties.
-* Make fast enumeration of `RLMArray` and `RLMResults` ~10% faster and
-  `objectAtIndex:` ~25% faster.
+* Make fast enumeration of `RLMArray` and `RLMResults` ~30% faster and
+  `objectAtIndex:` ~55% faster.
 
 ### Bugfixes
 
