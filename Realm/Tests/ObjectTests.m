@@ -960,6 +960,21 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertNoThrow(obj.description);
 }
 
+- (void)testDebugSummary
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *obj = [EmployeeObject createInRealm:realm withObject:@[@"Peter", @30, @YES]];
+
+    // Normal objects just fall back to the default summary
+    XCTAssertNil(RLMDebugSummaryHelper(obj));
+
+    [realm deleteObject:obj];
+    XCTAssertEqualObjects(RLMDebugSummaryHelper(obj), @"[Deleted object]");
+    [realm commitWriteTransaction];
+}
+
 #pragma mark - Indexing Tests
 
 - (void)testIndex

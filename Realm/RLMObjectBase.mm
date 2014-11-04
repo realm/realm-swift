@@ -226,6 +226,13 @@
     return [NSString stringWithString:mString];
 }
 
+- (NSString *)debugSummary {
+    if (self.isInvalidated) {
+        return @"[Deleted object]";
+    }
+    return nil;
+}
+
 - (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
     return self.class == self.objectSchema.accessorClass && !_row.is_attached();

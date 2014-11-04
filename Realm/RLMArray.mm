@@ -211,6 +211,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [self indexOfObject:[objects firstObject]];
 }
 
+- (NSString *)debugSummary {
+    return [NSString stringWithFormat:@"(%@[%zu])", _objectClassName, (size_t)self.count];
+}
+
 #pragma mark - Superclass Overrides
 
 - (NSString *)description

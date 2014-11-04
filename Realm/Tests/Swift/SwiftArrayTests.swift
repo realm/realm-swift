@@ -186,6 +186,25 @@ class SwiftArrayTests: SwiftTestCase {
         XCTAssertTrue((description as NSString).rangeOfString("12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMArray")
     }
 
+    func testStandaloneArrayDebugSummary() {
+        let co = SwiftCompanyObject()
+        co.employees.addObject(SwiftEmployeeObject())
+        XCTAssertEqual(RLMDebugSummaryHelper(co.employees), "(SwiftEmployeeObject[1])");
+    }
+
+    func testPersistedArrayDebugSummary() {
+        let co = SwiftCompanyObject()
+        let eo = SwiftEmployeeObject()
+        eo.name = ""
+        co.employees.addObject(eo)
+
+        RLMRealm.defaultRealm().transactionWithBlock {
+            RLMRealm.defaultRealm().addObject(co)
+        }
+
+        XCTAssertEqual(RLMDebugSummaryHelper(co.employees), "(SwiftEmployeeObject[1])");
+    }
+
     func testDeleteLinksAndObjectsInArray() {
         let realm = realmWithTestPath()
 

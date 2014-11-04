@@ -18,6 +18,7 @@
 
 #import <Realm/RLMArray.h>
 #import <Realm/RLMObject.h>
+#import <Realm/RLMDebugSupport.h>
 
 @interface RLMRealm (Swift)
 + (void)resetRealmState;

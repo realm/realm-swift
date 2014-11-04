@@ -410,6 +410,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self descriptionWithMaxDepth:5];
 }
 
+- (NSString *)debugSummary {
+    if (!_viewCreated) {
+        return [@"Unevaluated query on " stringByAppendingString:_objectClassName];
+    }
+
+    return [NSString stringWithFormat:@"(%@[%zu])", _objectClassName, (size_t)self.count];
+}
+
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
     if (depth == 0) {
         return @"<Maximum depth exceeded>";

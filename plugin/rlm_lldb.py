@@ -123,11 +123,6 @@ class SyntheticChildrenProvider(object):
         offset, ivar_type, _ = get_ivar_info(self.obj, 'RLMObject._' + ivar)
         return self.obj.CreateChildAtOffset(ivar, offset, ivar_type)
 
-def RLMObject_SummaryProvider(obj, _):
-    if is_object_deleted(obj):
-        return '[Deleted object]'
-    return None
-
 schema_cache = {}
 class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, obj, _):
@@ -185,32 +180,18 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         getter = "({})[(id){} {}]".format(property_types.get(type, 'id'), self.obj.GetAddress(), name)
         return name, getter
 
-class_name_cache = {}
-def get_object_class_name(frame, obj, addr, ivar):
-    class_name_ptr = get_ivar(obj, addr, ivar)
-    def get_class_name(ptr):
-        utf8_addr = frame.EvaluateExpression('(const char *)[(NSString *){} UTF8String]'.format(class_name_ptr)).GetValueAsUnsigned()
-        return obj.GetProcess().ReadCStringFromMemory(utf8_addr, 1024, lldb.SBError())
+def unsigned(value):
+    data = value.data
+    if data.GetByteSize() == 4:
+        return value.data.GetUnsignedInt32(lldb.SBError(), 0)
+    return value.data.GetUnsignedInt64(lldb.SBError(), 0)
 
-    return cache_lookup(class_name_cache, class_name_ptr, get_class_name)
-
-def RLMArray_SummaryProvider(obj, _):
+def RLM_SummaryProvider(obj, _):
     frame = obj.GetThread().GetSelectedFrame()
-    class_name = get_object_class_name(frame, obj, obj.GetAddress(), 'RLMArray._objectClassName')
-    count = frame.EvaluateExpression('(NSUInteger)[(RLMArray *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
-    return "({}[{}])".format(class_name, count)
-
-def RLMResults_SummaryProvider(obj, _):
-    frame = obj.GetThread().GetSelectedFrame()
-    addr = int(str(obj.GetAddress()), 16)
-    class_name = get_object_class_name(frame, obj, addr, 'RLMResults._objectClassName')
-
-    view_created = get_ivar(obj, addr, 'RLMResults._viewCreated')
-    if not view_created:
-        return 'Unevaluated query on ' + class_name
-
-    count = frame.EvaluateExpression('(NSUInteger)[(RLMResults *){} count]'.format(obj.GetAddress())).GetValueAsUnsigned()
-    return "({}[{}])".format(class_name, count)
+    addr = unsigned(frame.EvaluateExpression('RLMDebugSummary({})'.format(obj.GetAddress())))
+    if addr == 0:
+        return None
+    return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
 
 class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
@@ -242,10 +223,10 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
         self.count = None
 
 def __lldb_init_module(debugger, _):
-    debugger.HandleCommand('type summary add RLMArray -F rlm_lldb.RLMArray_SummaryProvider')
-    debugger.HandleCommand('type summary add RLMArrayLinkView -F rlm_lldb.RLMArray_SummaryProvider')
-    debugger.HandleCommand('type summary add RLMResults -F rlm_lldb.RLMResults_SummaryProvider')
-    debugger.HandleCommand('type summary add -x RLMAccessor_ -F rlm_lldb.RLMObject_SummaryProvider')
+    debugger.HandleCommand('type summary add RLMArray -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add RLMArrayLinkView -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add RLMResults -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add -x RLMAccessor_ -F rlm_lldb.RLM_SummaryProvider')
 
     debugger.HandleCommand('type synthetic add RLMArray --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
     debugger.HandleCommand('type synthetic add RLMArrayLinkView --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')

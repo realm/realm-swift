@@ -222,4 +222,14 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 #endif
     }
 
+    func testDebugSummary() {
+        let realm = RLMRealm.defaultRealm()
+        realm.transactionWithBlock { () -> Void in
+            let eo = SwiftEmployeeObject.createInDefaultRealmWithObject(["Peter", 30, true])
+            XCTAssertNil(RLMDebugSummaryHelper(eo))
+
+            realm.deleteObject(eo)
+            XCTAssertEqual(RLMDebugSummaryHelper(eo), "[Deleted object]")
+        }
+    }
 }

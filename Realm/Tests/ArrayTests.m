@@ -18,6 +18,8 @@
 
 #import "RLMTestCase.h"
 
+#import "RLMDebugSupport.h"
+
 #import <libkern/OSAtomic.h>
 #import <mach/mach.h>
 
@@ -273,6 +275,37 @@
     XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound, @"property values should be displayed when calling \"description\" on RLMResults");
 
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound, @"'912 rows more' should be displayed when calling \"description\" on RLMResults");
+}
+
+- (void)testStandaloneArrayDebugSummary
+{
+    CompanyObject *co = [[CompanyObject alloc] init];
+    [co.employees addObject:[[EmployeeObject alloc] init]];
+
+    XCTAssertEqualObjects(RLMDebugSummaryHelper(co.employees), @"(EmployeeObject[1])");
+}
+
+- (void)testPersistedArrayDebugSummary
+{
+    CompanyObject *co = [[CompanyObject alloc] init];
+    co.name = @"";
+    EmployeeObject *eo = [[EmployeeObject alloc] init];
+    eo.name = @"";
+    [co.employees addObject:eo];
+
+    [RLMRealm.defaultRealm transactionWithBlock:^{
+        [RLMRealm.defaultRealm addObject:co];
+    }];
+
+    XCTAssertEqualObjects(RLMDebugSummaryHelper(co.employees), @"(EmployeeObject[1])");
+}
+
+- (void)testResultsDebugSummary
+{
+    RLMResults *r = [EmployeeObject allObjects];
+    XCTAssertEqualObjects(RLMDebugSummaryHelper(r), @"Unevaluated query on EmployeeObject");
+    (void)[r firstObject];
+    XCTAssertEqualObjects(RLMDebugSummaryHelper(r), @"(EmployeeObject[0])");
 }
 
 - (void)testDeleteLinksAndObjectsInArray
