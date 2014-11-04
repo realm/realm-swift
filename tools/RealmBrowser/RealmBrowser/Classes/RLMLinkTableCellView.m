@@ -58,7 +58,7 @@
     }
     
     self.attributedStringValue = self.textField.attributedStringValue;
-    self.textField.stringValue = @"Update";
+    self.textField.stringValue = @"Update link";
     
     return NSDragOperationAll;
 }

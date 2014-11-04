@@ -57,6 +57,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 @interface RLMInstanceTableViewController ()
 
 @property (nonatomic) RLMPopupViewController *popupController;
+@property (nonatomic, readonly) RLMObjectPasteboard *objectPasteboard;
 
 @end
 
@@ -190,17 +191,30 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         return NO;
     }
     
-    if (!self.displaysArray) {
-        
-    }
-    
     NSString *dragType = [self dragTypeForClassName:self.displayedType.schema.className];
     NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes];
     [pboard declareTypes:@[dragType] owner:self];
     [pboard setData:indexSetData forType:dragType];
-    NSLog(@"REG PASTEBOARD: %@", dragType);
+    NSLog(@"COPY: PASTEBOARD TYPE: %@", dragType);
+
+    if (self.displaysArray) {
+        NSLog(@"--Array");
+        self.objectPasteboard.containingArray = (RLMArrayNode *)self.displayedType;
+    }
+    
+    [self.objectPasteboard.objects removeAllObjects];
+    
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        RLMObject *object = [self.displayedType instanceAtIndex:idx];
+        [self.objectPasteboard.objects addObject:object];
+    }];
     
     return YES;
+}
+
+-(RLMObjectPasteboard *)objectPasteboard
+{
+    return self.parentWindowController.modelDocument.presentedRealm.objectPasteboard;
 }
 
 // If dragged types match, this gets called to decide if dragged object should be accepted
@@ -233,20 +247,39 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     NSPasteboard *draggingPasteboard = [info draggingPasteboard];
     NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
     
-    if ([availableType compare:dragType] == NSOrderedSame) {
-        NSData *rowIndexData = [draggingPasteboard dataForType:dragType];
-        NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
-        
+    if ([availableType compare:dragType] != NSOrderedSame) {
+        return NO;
+    }
+
+    NSData *rowIndexData = [draggingPasteboard dataForType:dragType];
+    NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchiveObjectWithData:rowIndexData];
+    
+    RLMArrayNode *arrayNode = (RLMArrayNode *)self.displayedType;
+    
+    // If pasting from the same array, do move animation and use only indices, not objects
+    if ([self.objectPasteboard.containingArray isEqualTo:arrayNode]) {
         // Performs the move in the realm
         [self moveRowsInRealmFrom:rowIndexes to:destination];
         
         // Performs the move visually in all relevant windows
         [self.parentWindowController moveRowsInTableViewForArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
-        
-        return YES;
+    }
+    else {
+        NSLog(@"not from same array: %@ != %@", self.objectPasteboard.containingArray, self.displayedType);
+
+        RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        [realm beginWriteTransaction];
+        for (RLMObject *object in self.objectPasteboard.objects.reverseObjectEnumerator) {
+            [arrayNode insertInstance:object atIndex:destination];
+        }
+        [realm commitWriteTransaction];
+
+        NSRange destinationRange = NSMakeRange(destination, rowIndexes.count);
+        NSIndexSet *destinationIndexSet = [NSIndexSet indexSetWithIndexesInRange:destinationRange];
+        [self.parentWindowController insertNewRowsInTableViewForArrayNode:arrayNode at:destinationIndexSet];
     }
     
-    return NO;
+    return YES;
 }
 
 #pragma mark - RLMTableView Data Source
