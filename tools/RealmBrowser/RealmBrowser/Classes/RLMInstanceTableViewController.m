@@ -54,7 +54,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 @end
 
 
-@interface RLMInstanceTableViewController ()
+@interface RLMInstanceTableViewController ()<RLMTableCellViewDelegate>
 
 @property (nonatomic) RLMPopupViewController *popupController;
 @property (nonatomic, readonly) RLMObjectPasteboard *objectPasteboard;
@@ -204,10 +204,16 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     
     [self.objectPasteboard.objects removeAllObjects];
     
+    // TODO: Remove this deletion!!!
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    [realm beginWriteTransaction];
+    
     [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         RLMObject *object = [self.displayedType instanceAtIndex:idx];
         [self.objectPasteboard.objects addObject:object];
+        [realm deleteObject:object];
     }];
+    [realm commitWriteTransaction];
     
     return YES;
 }
@@ -263,23 +269,34 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         
         // Performs the move visually in all relevant windows
         [self.parentWindowController moveRowsInTableViewForArrayNode:(RLMArrayNode *)self.displayedType from:rowIndexes to:destination];
+        
+        return YES;
     }
-    else {
+    else { // From other array, or table. Use objects in object pasteboard
         NSLog(@"not from same array: %@ != %@", self.objectPasteboard.containingArray, self.displayedType);
 
         RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+        NSUInteger objectsInserted = 0;
+
         [realm beginWriteTransaction];
         for (RLMObject *object in self.objectPasteboard.objects.reverseObjectEnumerator) {
-            [arrayNode insertInstance:object atIndex:destination];
+            if (![object isDeletedFromRealm]) {
+                [arrayNode insertInstance:object atIndex:destination];
+                objectsInserted++;
+            }
         }
         [realm commitWriteTransaction];
 
-        NSRange destinationRange = NSMakeRange(destination, rowIndexes.count);
+        if (objectsInserted == 0) {
+            return NO;
+        }
+        
+        NSRange destinationRange = NSMakeRange(destination, objectsInserted);
         NSIndexSet *destinationIndexSet = [NSIndexSet indexSetWithIndexesInRange:destinationRange];
         [self.parentWindowController insertNewRowsInTableViewForArrayNode:arrayNode at:destinationIndexSet];
+
+        return YES;
     }
-    
-    return YES;
 }
 
 #pragma mark - RLMTableView Data Source
@@ -404,6 +421,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         case RLMPropertyTypeObject: {
             RLMLinkTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"LinkCell" owner:self];
             linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
+            linkCellView.delegate = self;
             
             NSString *string = [realmDescriptions printablePropertyValue:propertyValue ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
@@ -631,24 +649,60 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (void)removeContentsAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
 {
+    [self setContentsTo:nil atRows:rowIndexes column:column];
+}
+
+- (BOOL)setContentsTo:(id)value atRows:(NSIndexSet *)rowIndexes column:(NSInteger)column
+{
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     RLMClassProperty *classProperty = self.displayedType.propertyColumns[propertyIndex];
     
-    id newValue = [NSNull null];
-    if (classProperty.property.type == RLMPropertyTypeArray) {
-        newValue = @[];
+    if (!value) {
+        if (classProperty.property.type == RLMPropertyTypeArray) {
+            value = @[];
+        }
+        else if (classProperty.property.type == RLMPropertyTypeObject) {
+            value = [NSNull null];
+        }
+        else {
+            return NO;
+        }
+    }
+    
+    if ([value isMemberOfClass:[RLMObject class]] && [(RLMObject *)value isDeletedFromRealm]) {
+        NSLog(@"object deleted: %@", value);
+        
+        return NO;
     }
     
     [realm beginWriteTransaction];
     [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop) {
         RLMObject *selectedInstance = [self.displayedType instanceAtIndex:rowIndex];
-        selectedInstance[classProperty.name] = newValue;
+        selectedInstance[classProperty.name] = value;
     }];
     [realm commitWriteTransaction];
-    
+
+    NSDate *before = [NSDate date];
     [self.parentWindowController reloadAllWindows];
+    NSLog(@"RELOAD: time taken: %.2fms", 1000*[[NSDate date]timeIntervalSinceDate:before]);
+    
+    return YES;
+}
+
+#pragma mark - RLMTableViewCell Delegate
+
+-(BOOL)performDragOperationToCell:(id<NSDraggingInfo>)sender
+{
+    NSPoint localPointInTable = [self.tableView convertPoint:sender.draggingLocation fromView:nil];
+    
+    NSInteger row = [self.tableView rowAtPoint:localPointInTable];
+    NSInteger column = [self.tableView columnAtPoint:localPointInTable];
+
+    RLMObject *object = [self.objectPasteboard.objects firstObject];
+    
+    return [self setContentsTo:object atRows:[NSIndexSet indexSetWithIndex:row] column:column];
 }
 
 #pragma mark - Rearranging objects in arrays - Public methods

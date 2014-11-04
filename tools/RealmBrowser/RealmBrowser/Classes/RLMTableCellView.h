@@ -18,11 +18,20 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class RLMTableCellView;
+@protocol RLMTableCellViewDelegate <NSObject>
+
+-(BOOL)performDragOperationToCell:(id<NSDraggingInfo>)sender;
+
+@end
+
+
 @class RLMTextField;
 @interface RLMTableCellView : NSTableCellView
 
--(NSSize)sizeThatFits;
-
 @property (nonatomic, readonly) RLMTextField *realmTextField;
+@property (weak, nonatomic) id<RLMTableCellViewDelegate> delegate;
+
+-(NSSize)sizeThatFits;
 
 @end

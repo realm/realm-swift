@@ -79,7 +79,12 @@
 {
     NSLog(@"--perform");
     self.textField.attributedStringValue = self.attributedStringValue;
-    return YES;
+    
+    BOOL success = [self.delegate performDragOperationToCell:sender];
+    
+    NSLog(@"drag operation %@", success ? @"succeeded" : @"failed");
+    
+    return success;
 }
 
 @end
