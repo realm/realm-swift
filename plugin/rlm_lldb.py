@@ -197,16 +197,19 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
         self.obj = valobj
         self.addr = self.obj.GetAddress()
+        self.type = self.obj.target.FindFirstType('id')
 
     def num_children(self):
         if not self.count:
-            self.count = self._eval("(NSUInteger)[(RLMArray *){} count]".format(self.addr)).GetValueAsUnsigned()
-        return self.count + 1
+            self.count = unsigned(self._eval("RLMDebugArrayCount({})".format(self.addr)))
+        return self.count
 
     def has_children(self):
         return True
 
     def get_child_index(self, name):
+        if name == 'Some' or name == 'value':
+            return None
         if name == 'realm':
             return 0
         if not name.startswith('['):
@@ -214,10 +217,9 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
         return int(name.lstrip('[').rstrip(']')) + 1
 
     def get_child_at_index(self, index):
-        if index == 0:
-            return self._value_from_ivar('realm')
-        value = self._eval('(id)[(id){} objectAtIndex:{}]'.format(self.addr, index - 1))
-        return self.obj.CreateValueFromData('[' + str(index - 1) + ']', value.GetData(), value.GetType())
+        key = 'realm' if index == 0 else '[' + str(index - 1) + ']'
+        value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(self.addr, index))
+        return self.obj.CreateValueFromData(key, value.GetData(), self.type)
 
     def update(self):
         self.count = None

@@ -90,8 +90,8 @@ class SwiftCompanyObject: RLMObject {
 
 class SwiftArrayPropertyObject: RLMObject {
     dynamic var name = ""
-    dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())
-    dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())!
+    dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())!
 }
 
 class SwiftDynamicObject: RLMObject {

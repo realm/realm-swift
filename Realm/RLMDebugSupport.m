@@ -18,6 +18,8 @@
 
 #import "RLMDebugSupport.h"
 
+#import "RLMArray.h"
+
 @interface NSObject (RLMDebugSupport)
 - (NSString *)debugSummary;
 @end
@@ -42,4 +44,18 @@ NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj) {
     // wants an API that's really awkward from obj-c and Swift
     uintptr_t str = RLMDebugSummary((uintptr_t)obj);
     return str ? [NSString stringWithUTF8String:(const char *)str] : nil;
+}
+
+NSUInteger RLMDebugArrayCount(uintptr_t obj) {
+    return [(__bridge id)(void *)obj count] + 1;
+}
+
+id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index) {
+    RLMArray *array = (__bridge id)(void *)obj;
+    if (index == 0) {
+        return array.realm;
+    }
+
+    __autoreleasing RLMObject *o = array[index - 1];
+    return o;
 }

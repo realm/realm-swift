@@ -20,3 +20,6 @@
 
 uintptr_t RLMDebugSummary(uintptr_t obj);
 NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj);
+
+NSUInteger RLMDebugArrayCount(uintptr_t obj);
+id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index);
