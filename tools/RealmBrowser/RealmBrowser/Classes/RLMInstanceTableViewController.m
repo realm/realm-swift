@@ -696,16 +696,47 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 // Moving
 - (void)moveRowsInRealmFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
 {
-    [self moveRowsFrom:sourceIndexes to:destination updating:RLMUpdateTypeRealm];
+    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
+    
+    NSMutableArray *sources = [self arrayWithIndexSet:sourceIndexes];
+    
+    [realm beginWriteTransaction];
+    
+    // Iterate through the array, representing source row indices
+    for (NSUInteger i = 0; i < sources.count; i++) {
+        NSUInteger source = [sources[i] unsignedIntegerValue];
+        
+        [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+        
+        [self updateSourceIndices:sources afterIndex:i withSource:source destination:&destination];
+    }
+    
+    [realm commitWriteTransaction];
 }
 
 - (void)moveRowsInTableViewFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
 {
-    [self moveRowsFrom:sourceIndexes to:destination updating:RLMUpdateTypeTableView];
+    NSMutableArray *sources = [self arrayWithIndexSet:sourceIndexes];
+    
+    [self.tableView beginUpdates];
+    
+    // Iterate through the array, representing source row indices
+    for (NSUInteger i = 0; i < sources.count; i++) {
+        NSUInteger source = [sources[i] unsignedIntegerValue];
+        
+        NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
+        [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
+
+        [self updateSourceIndices:sources afterIndex:i withSource:source destination:&destination];
+    }
+    
+    [self.tableView endUpdates];
+    [self updateArrayIndexColumn];
 }
 
 #pragma mark - Rearranging objects - Helper methods
 
+// Updates the index column in arrays after rearranging rows
 -(void)updateArrayIndexColumn
 {
     for (NSUInteger k = 0; k < self.tableView.numberOfRows; k++) {
@@ -736,62 +767,37 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [realm commitWriteTransaction];
 }
 
-// This method handles updating both realm and tableview, because there is a lot of shared logic.
-- (void)moveRowsFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination updating:(RLMUpdateType)updateType
+-(NSMutableArray *)arrayWithIndexSet:(NSIndexSet *)indexSet
 {
-    RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-    
-    // Move indexset into mutable array
     NSMutableArray *sources = [NSMutableArray array];
-    [sourceIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         [sources addObject:@(idx)];
     }];
     
-    if (updateType == RLMUpdateTypeRealm) {
-        [realm beginWriteTransaction];
-    }
-    else {
-        [self.tableView beginUpdates];
-    }
-    
-    // Iterate through the array, representing source row indices
-    for (NSUInteger i = 0; i < sources.count; i++) {
-        NSUInteger source = [sources[i] unsignedIntegerValue];
-        
-        // Perform the move
-        if (updateType == RLMUpdateTypeRealm) {
-            [(RLMArrayNode *)self.displayedType moveInstanceFromIndex:source toIndex:destination];
+    return sources;
+}
+
+-(void)updateSourceIndices:(NSMutableArray *)sources
+                afterIndex:(NSUInteger)i
+                withSource:(NSUInteger)source
+               destination:(NSUInteger *)destination
+{
+    for (NSUInteger j = i + 1; j < sources.count; j++) {
+        NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
+        // Everything right of the destination is shifted right
+        if (sourceIndexToModify > *destination) {
+            sourceIndexToModify++;
         }
-        else {
-            NSInteger tableViewDestination = destination > source ? destination - 1 : destination;
-            [self.tableView moveRowAtIndex:source toIndex:tableViewDestination];
+        // Everything right of the current source is shifted left
+        if (sourceIndexToModify > source) {
+            sourceIndexToModify--;
         }
-        
-        // Iterate through the remaining source row indices in the array
-        for (NSUInteger j = i + 1; j < sources.count; j++) {
-            NSUInteger sourceIndexToModify = [sources[j] unsignedIntegerValue];
-            // Everything right of the destination is shifted right
-            if (sourceIndexToModify > destination) {
-                sourceIndexToModify++;
-            }
-            // Everything right of the current source is shifted left
-            if (sourceIndexToModify > source) {
-                sourceIndexToModify--;
-            }
-            sources[j] = @(sourceIndexToModify);
-        }
-        // If the move was from higher index to lower, shift destination right
-        if (source > destination) {
-            destination++;
-        }
+        sources[j] = @(sourceIndexToModify);
     }
     
-    if (updateType == RLMUpdateTypeRealm) {
-        [realm commitWriteTransaction];
-    }
-    else {
-        [self.tableView endUpdates];
-        [self updateArrayIndexColumn];
+    // If the move was from higher index to lower, shift destination right
+    if (source > *destination) {
+        (*destination)++;
     }
 }
 
