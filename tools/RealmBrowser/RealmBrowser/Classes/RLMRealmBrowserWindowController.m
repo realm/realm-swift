@@ -145,6 +145,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
             [wc.tableViewController deleteRowsInTableViewAt:rowIndexes];
         }
+        else {
+            [wc reloadAfterEdit];
+        }
         [wc.outlineViewController.tableView reloadData];
     }
 }
@@ -154,6 +157,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
         if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
             [wc.tableViewController insertNewRowsInTableViewAt:rowIndexes];
+        }
+        else {
+            [wc reloadAfterEdit];
         }
         [wc.outlineViewController.tableView reloadData];
     }
