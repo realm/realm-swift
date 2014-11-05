@@ -40,6 +40,9 @@
 #import "RLMDescriptions.h"
 
 NSString * const kRLMObjectType = @"RLMObjectType";
+const NSInteger NOT_A_COLUMN = -1;
+const NSInteger NOT_A_ROW = -1;
+const NSInteger ARRAY_GUTTER_INDEX = -1;
 
 typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMUpdateTypeRealm,
@@ -284,7 +287,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
     // Array gutter
-    if (propertyIndex == -1) {
+    if (propertyIndex == ARRAY_GUTTER_INDEX) {
         RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"IndexCell" owner:self];
         basicCellView.textField.stringValue = [@(rowIndex) stringValue];
         basicCellView.textField.editable = NO;
@@ -388,9 +391,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 // Asking the delegate about the contents
 - (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
-    if (column == -1) {
-        return NO;
-    }
+    NSAssert(column != NOT_A_COLUMN, @"This method can only be used with an actual column index");
     
     if ([self propertyTypeForColumn:column] != RLMPropertyTypeObject) {
         return NO;
@@ -403,11 +404,9 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 {
+    NSAssert(column != NOT_A_COLUMN, @"This method can only be used with an actual column index");
+
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
-    
-    if (column == -1) {
-        return NO;
-    }
     
     if ([self propertyTypeForColumn:column] != RLMPropertyTypeArray) {
         return NO;
@@ -904,7 +903,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     NSInteger column = self.tableView.clickedColumn;
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
-    if (row == -1 || propertyIndex < 0) {
+    if (row == NOT_A_ROW || propertyIndex < 0) {
         return;
     }
     
@@ -953,7 +952,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     NSInteger column = self.tableView.clickedColumn;
     NSInteger propertyIndex = [self propertyIndexForColumn:column];
     
-    if (row == -1 || propertyIndex < 0 || self.realmIsLocked) {
+    if (row == NOT_A_ROW || propertyIndex < 0 || self.realmIsLocked) {
         return;
     }
     

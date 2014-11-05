@@ -22,6 +22,8 @@
 #import "RLMTableHeaderCell.h"
 #import "RLMDescriptions.h"
 
+const NSInteger NOT_A_COLUMN = -1;
+
 @interface RLMTableView()<NSMenuDelegate>
 
 @end
@@ -180,7 +182,7 @@
         [self.menu addItem:deleteObjectItem];
     }
     
-    if (self.clickedColumn == -1) {
+    if (self.clickedColumn == NOT_A_COLUMN) {
         return;
     }
     
