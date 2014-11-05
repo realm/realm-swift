@@ -40,9 +40,9 @@
 #import "RLMDescriptions.h"
 
 NSString * const kRLMObjectType = @"RLMObjectType";
-const NSInteger NOT_A_COLUMN = -1;
-const NSInteger NOT_A_ROW = -1;
-const NSInteger ARRAY_GUTTER_INDEX = -1;
+static const NSInteger NOT_A_COLUMN = -1;
+static const NSInteger NOT_A_ROW = -1;
+static const NSInteger ARRAY_GUTTER_INDEX = -1;
 
 typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMUpdateTypeRealm,

@@ -26,14 +26,6 @@
 
 @implementation RLMDocument
 
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-    }
-    return self;
-}
-
 - (instancetype)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     if (self = [super init]) {

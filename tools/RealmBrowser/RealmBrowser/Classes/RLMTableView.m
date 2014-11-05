@@ -148,8 +148,10 @@ const NSInteger NOT_A_COLUMN = -1;
 {
     [self.menu removeAllItems];
     
+    BOOL actualColumn = self.clickedColumn != NOT_A_COLUMN;
+    
     // Menu items that are independent on the realm lock
-    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+    if (actualColumn && [self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
         [self.menu addItem:openArrayInNewWindowItem];
     }
     
@@ -182,7 +184,7 @@ const NSInteger NOT_A_COLUMN = -1;
         [self.menu addItem:deleteObjectItem];
     }
     
-    if (self.clickedColumn == NOT_A_COLUMN) {
+    if (!actualColumn) {
         return;
     }
     
