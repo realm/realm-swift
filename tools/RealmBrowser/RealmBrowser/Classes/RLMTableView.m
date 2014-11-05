@@ -416,8 +416,8 @@
         headerCell.wraps = YES;
         headerCell.firstLine = @"";
         headerCell.secondLine = @"#";
-        tableColumn.headerCell = headerCell;
 
+        tableColumn.headerCell = headerCell;
         tableColumn.headerToolTip = @"Order of object within array";
         
         [self addTableColumn:tableColumn];

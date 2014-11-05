@@ -132,7 +132,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)removeRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController removeRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
+            [wc.tableViewController removeRowsInTableViewAt:rowIndexes];
+        }
         [wc.outlineViewController.tableView reloadData];
     }
 }
@@ -140,7 +142,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)deleteRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController deleteRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
+            [wc.tableViewController deleteRowsInTableViewAt:rowIndexes];
+        }
         [wc.outlineViewController.tableView reloadData];
     }
 }
@@ -148,7 +152,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)insertNewRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController insertNewRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
+            [wc.tableViewController insertNewRowsInTableViewAt:rowIndexes];
+        }
         [wc.outlineViewController.tableView reloadData];
     }
 }
@@ -156,9 +162,13 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)moveRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
 {
     for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
-        [wc.tableViewController moveRowsInTableViewForArrayNode:arrayNode from:sourceIndexes to:destination];
+        if ([wc.tableViewController.displayedType isEqualTo:arrayNode]) {
+            [wc.tableViewController moveRowsInTableViewFrom:sourceIndexes to:destination];
+        }
     }
 }
+
+#pragma mark - Public methods - Navigation
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
 {

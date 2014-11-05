@@ -586,40 +586,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     [self.parentWindowController reloadAllWindows];
 }
 
-#pragma mark - Rearranging objects in arrays - Public methods
-
-- (void)removeRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
-{
-    // Check if this window is showing the arraynode that is to be rearranged visually
-    if ([self.displayedType isEqualTo:arrayNode]) {
-        [self removeRowsInTableViewAt:rowIndexes];
-    }
-}
-
-- (void)deleteRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
-{
-    // Check if this window is showing the arraynode that is to be rearranged visually
-    if ([self.displayedType isEqualTo:arrayNode]) {
-        [self deleteRowsInTableViewAt:rowIndexes];
-    }
-}
-
-- (void)insertNewRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
-{
-    // Check if this window is showing the arraynode that is to be rearranged visually
-    if ([self.displayedType isEqualTo:arrayNode]) {
-        [self insertNewRowsInTableViewAt:rowIndexes];
-    }
-}
-
-- (void)moveRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)indexes to:(NSUInteger)destination
-{
-    // Check if this window is showing the arraynode that is to be rearranged visually
-    if ([self.displayedType isEqualTo:arrayNode]) {
-        [self moveRowsInTableViewFrom:indexes to:destination];
-    }
-}
-
 #pragma mark - Rearranging objects in arrays - Private methods
 
 // Removing
