@@ -20,10 +20,6 @@
 
 #import <libkern/OSAtomic.h>
 
-@interface DogArrayObject : RLMObject
-@property RLMArray<DogObject> *dogs;
-@end
-
 @implementation DogArrayObject
 @end
 

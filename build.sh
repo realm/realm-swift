@@ -37,6 +37,7 @@ command:
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
+  ios-dynamic [xcmode]:    builds iOS dynamic framework for iOS 8
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -88,6 +89,24 @@ xc() {
 xcrealm() {
     PROJECT=Realm.xcodeproj
     xc "-project $PROJECT $@"
+}
+
+build_fat() {
+    target="$1"
+    build_prefix="$2"
+    out_dir="$3"
+
+    xcrealm "-scheme '$target' -configuration Release -sdk iphoneos"
+    xcrealm "-scheme '$target' -configuration Release -sdk iphonesimulator"
+
+    srcdir="build/DerivedData/Realm/Build/Products/Release-dynamic"
+    mkdir -p build/$out_dir
+    rm -rf build/$out_dir/Realm.framework
+    cp -R $build_prefix-iphoneos/Realm.framework build/$out_dir
+    if [ -d build/$out_dir/Realm.framework/Modules/Realm.swiftmodule ]; then
+        cp $build_prefix-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/$out_dir/Realm.framework/Modules/Realm.swiftmodule/
+    fi
+    xcrun lipo -create "$build_prefix-iphonesimulator/Realm.framework/Realm" "$build_prefix-iphoneos/Realm.framework/Realm" -output "build/$out_dir/Realm.framework/Realm"
 }
 
 ######################################
@@ -149,6 +168,7 @@ download_core() {
     fi
     (
         cd "${TMP_DIR}"
+        rm -rf core
         unzip "${CORE_ZIP}"
         mv core core-${REALM_CORE_VERSION}
     )
@@ -218,7 +238,12 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        xcrealm "-scheme iOS -configuration Release-Combined"
+        build_fat iOS build/DerivedData/Realm/Build/Products/Release ios
+        exit 0
+        ;;
+
+    "ios-dynamic")
+        build_fat 'iOS 8' build/DerivedData/Realm/Build/Products/Release-dynamic ios-dynamic
         exit 0
         ;;
 
@@ -267,7 +292,9 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xcrealm "-scheme iOS -configuration Release-Combined -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -282,6 +309,8 @@ case "$COMMAND" in
 
     "test-ios-debug")
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealm "-scheme 'iOS 8' -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -304,6 +333,12 @@ case "$COMMAND" in
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
         sh build.sh browser "$XCMODE"
+
+        (
+            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
+
         exit 0
         ;;
 
@@ -435,6 +470,9 @@ case "$COMMAND" in
         ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
         unzip realm-obj-examples.zip
 
+        mkdir -p Swift
+        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift Swift
+
         rm *.zip
         cd examples
 
@@ -442,6 +480,15 @@ case "$COMMAND" in
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
+
+        (
+            cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            DYLD_FRAMEWORK_PATH=. ./JSONImport
+        ) || exit 1
         ;;
 
     "package-ios")
@@ -562,7 +609,7 @@ EOF
             ln -s $WORKSPACE/tightdb_objc .
 
             sh ../tightdb_objc/build.sh package-test-examples
-        )
+        ) || exit 1
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser

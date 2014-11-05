@@ -800,6 +800,42 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm commitWriteTransaction];
 }
 
+- (void)testCreateInRealmReusesExistingObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInDefaultRealmWithObject:@[@"name", dog]];
+    XCTAssertTrue([owner.dog isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+
+    DogArrayObject *dogArray = [DogArrayObject createInDefaultRealmWithObject:@[@[dog]]];
+    XCTAssertTrue([dogArray.dogs[0] isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+
+    [realm commitWriteTransaction];
+}
+
+- (void)testCreateInRealmCopiesFromOtherRealm {
+    RLMRealm *realm1 = [RLMRealm defaultRealm];
+    RLMRealm *realm2 = [self realmWithTestPath];
+    [realm1 beginWriteTransaction];
+    [realm2 beginWriteTransaction];
+
+    DogObject *dog = [DogObject createInDefaultRealmWithObject:@[@"Fido", @5]];
+    OwnerObject *owner = [OwnerObject createInRealm:realm2 withObject:@[@"name", dog]];
+    XCTAssertFalse([owner.dog isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(1U, [DogObject allObjectsInRealm:realm2].count);
+
+    DogArrayObject *dogArray = [DogArrayObject createInRealm:realm2 withObject:@[@[dog]]];
+    XCTAssertFalse([dogArray.dogs[0] isEqualToObject:dog]);
+    XCTAssertEqual(1U, DogObject.allObjects.count);
+    XCTAssertEqual(2U, [DogObject allObjectsInRealm:realm2].count);
+
+    [realm1 commitWriteTransaction];
+    [realm2 commitWriteTransaction];
+}
 
 - (void)testCreateInRealmWithMissingValue
 {
@@ -1136,6 +1172,40 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     // object with key exists
     XCTAssertEqualObjects(strObj, [PrimaryStringObject objectForPrimaryKey:@"key"]);
     XCTAssertEqualObjects(intObj, [PrimaryIntObject objectForPrimaryKey:@0]);
+}
+
+- (void)testBacklinks {
+    StringObject *obj = [[StringObject alloc] initWithObject:@[@"string"]];
+
+    // calling on standalone should throw
+    XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
+
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm transactionWithBlock:^{
+        [realm addObject:obj];
+    }];
+
+    XCTAssertThrows([obj linkingObjectsOfClass:StringObject.className forProperty:@"stringCol"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:OwnerObject.className forProperty:@"dog"]);
+    XCTAssertThrows([obj linkingObjectsOfClass:@"invalidClassName" forProperty:@"stringObjectCol"]);
+    XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+    [realm transactionWithBlock:^{
+        StringLinkObject *lObj = [StringLinkObject createInDefaultRealmWithObject:@[obj, @[]]];
+        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+        lObj.stringObjectCol = nil;
+        XCTAssertEqual(0U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"] count]);
+
+        [lObj.stringObjectArrayCol addObject:obj];
+        XCTAssertEqual(1U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
+        [lObj.stringObjectArrayCol addObject:obj];
+        XCTAssertEqual(2U, [[obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectArrayCol"] count]);
+
+        [realm deleteObject:obj];
+        XCTAssertThrows([obj linkingObjectsOfClass:StringLinkObject.className forProperty:@"stringObjectCol"]);
+    }];
+
 }
 
 @end

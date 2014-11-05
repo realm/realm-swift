@@ -43,6 +43,16 @@ extern "C" {
 }
 @end
 
+@interface MigrationStringPrimaryKeyObject : RLMObject
+@property NSString * stringCol;
+@end
+
+@implementation MigrationStringPrimaryKeyObject
++ (NSString *)primaryKey {
+    return @"stringCol";
+}
+@end
+
 @interface MigrationTests : RLMTestCase
 @end
 
@@ -218,6 +228,51 @@ extern "C" {
         __block int objectID = 0;
         [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
             newObject[@"intCol"] = @(objectID++);
+        }];
+    }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
+- (void)testStringPrimaryKeyMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"1"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"2"]];
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration enumerateObjects:@"MigrationStringPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+            newObject[@"stringCol"] = [[NSUUID UUID] UUIDString];
+        }];
+    }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
+- (void)testStringPrimaryKeyNoIndexMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
+
+    // create without search index
+    objectSchema.primaryKeyProperty.attributes = 0;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"1"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"2"]];
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration enumerateObjects:@"MigrationStringPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+            newObject[@"stringCol"] = [[NSUUID UUID] UUIDString];
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
