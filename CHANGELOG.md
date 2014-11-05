@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* Fix for crash due to missing search index when migrating an object with a string primary key
+  in a database created using an older versions (0.86.3 and earlier).
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
 * Fix for crash when deleting an object from multiple threads.
