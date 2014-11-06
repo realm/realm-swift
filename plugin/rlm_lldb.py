@@ -193,16 +193,29 @@ def RLM_SummaryProvider(obj, _):
         return None
     return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
 
+ivar_offset_cache = {}
+def get_ivars(obj, *args):
+    type_name = obj.type.name
+    ivars = ivar_offset_cache.get(type_name, None)
+    if not ivars:
+        ivars = {}
+        for ivar in args:
+            ivars[ivar] = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
+                'RLMDebugGetIvarOffset({}, "{}")'.format(obj.GetAddress(), ivar)))
+        ivar_offset_cache[type_name] = ivars
+    return ivars
+
 class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
         self.obj = valobj
         self.addr = self.obj.GetAddress()
         self.type = self.obj.target.FindFirstType('id')
+        self.ivars = get_ivars(valobj, '_realm')
 
     def num_children(self):
         if not self.count:
             self.count = unsigned(self._eval("RLMDebugArrayCount({})".format(self.addr)))
-        return self.count
+        return self.count + 1
 
     def has_children(self):
         return True
@@ -217,8 +230,11 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
         return int(name.lstrip('[').rstrip(']')) + 1
 
     def get_child_at_index(self, index):
-        key = 'realm' if index == 0 else '[' + str(index - 1) + ']'
-        value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(self.addr, index))
+        if index == 0:
+            return self.obj.CreateChildAtOffset('realm', self.ivars['_realm'], self.type)
+
+        key = '[' + str(index - 1) + ']'
+        value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(self.addr, index - 1))
         return self.obj.CreateValueFromData(key, value.GetData(), self.type)
 
     def update(self):

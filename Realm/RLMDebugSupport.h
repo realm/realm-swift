@@ -23,3 +23,5 @@ NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj);
 
 NSUInteger RLMDebugArrayCount(uintptr_t obj);
 id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index);
+
+size_t RLMDebugGetIvarOffset(uintptr_t obj, const char *name);

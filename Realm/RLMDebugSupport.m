@@ -20,6 +20,8 @@
 
 #import "RLMArray.h"
 
+#import <objc/runtime.h>
+
 @interface NSObject (RLMDebugSupport)
 - (NSString *)debugSummary;
 @end
@@ -47,15 +49,17 @@ NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj) {
 }
 
 NSUInteger RLMDebugArrayCount(uintptr_t obj) {
-    return [(__bridge id)(void *)obj count] + 1;
+    return [(__bridge id)(void *)obj count];
 }
 
 id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index) {
     RLMArray *array = (__bridge id)(void *)obj;
-    if (index == 0) {
-        return array.realm;
-    }
-
-    __autoreleasing RLMObject *o = array[index - 1];
+    __autoreleasing RLMObject *o = array[index];
     return o;
+}
+
+size_t RLMDebugGetIvarOffset(uintptr_t obj, const char *name) {
+    Ivar ivar = class_getInstanceVariable([(__bridge id)(void *)obj class], name);
+    assert(ivar);
+    return ivar_getOffset(ivar);
 }
