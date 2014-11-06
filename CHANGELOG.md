@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
   in a database created using an older versions (0.86.3 and earlier).
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
+* Fix for crash when deleting an object from multiple threads.
 
 
 0.87.0 Release notes (2014-10-21)

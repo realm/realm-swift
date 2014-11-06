@@ -348,11 +348,17 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     return object;
 }
 
-void RLMDeleteObjectFromRealm(RLMObject *object) {
+void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm) {
+    if (realm != object.realm) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Unable to delete an object not persisted in this Realm." userInfo:nil];
+    }
     RLMVerifyInWriteTransaction(object.realm);
 
     // move last row to row we are deleting
-    object->_row.get_table()->move_last_over(object->_row.get_index());
+    if (object->_row.is_attached()) {
+        object->_row.get_table()->move_last_over(object->_row.get_index());
+    }
 
     // set realm to nil
     object.realm = nil;

@@ -95,6 +95,29 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testRemoveNonpersistedObject {
+    RLMRealm *realm = [self realmWithTestPath];
+    StringObject *obj = [[StringObject alloc] initWithObject:@[@"a"]];
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows([realm deleteObject:obj]);
+    obj = [StringObject createInRealm:realm withObject:@[@"b"]];
+    [realm commitWriteTransaction];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        RLMObject *obj = [[StringObject allObjectsInRealm:realm] firstObject];
+        [realm beginWriteTransaction];
+        [realm deleteObject:obj];
+        XCTAssertThrows([realm deleteObject:obj]);
+        [realm commitWriteTransaction];
+    }];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:obj];
+    [realm commitWriteTransaction];
+}
+
 - (void)testRealmBatchRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
