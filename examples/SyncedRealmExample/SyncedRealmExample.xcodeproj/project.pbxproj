@@ -15,6 +15,8 @@
 		22396B0E1A0CCB8400AF8112 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22396B0C1A0CCB8400AF8112 /* LaunchScreen.xib */; };
 		22396B1A1A0CCB8400AF8112 /* SyncedRealmExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22396B191A0CCB8400AF8112 /* SyncedRealmExampleTests.m */; };
 		22396B281A0CE6B200AF8112 /* ESSettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22396B271A0CE6B200AF8112 /* ESSettingsTableViewController.m */; };
+		22A543301A0D116200517A80 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A5432F1A0D116200517A80 /* Realm.framework */; };
+		22A543321A0D117600517A80 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A543311A0D117600517A80 /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +45,8 @@
 		22396B191A0CCB8400AF8112 /* SyncedRealmExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncedRealmExampleTests.m; sourceTree = "<group>"; };
 		22396B261A0CE6B200AF8112 /* ESSettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESSettingsTableViewController.h; sourceTree = "<group>"; };
 		22396B271A0CE6B200AF8112 /* ESSettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ESSettingsTableViewController.m; sourceTree = "<group>"; };
+		22A5432F1A0D116200517A80 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../../../../Library/Developer/Xcode/DerivedData/Realm-fdewzcqkfmsxdtddertvpepkpuad/Build/Products/Debug-iphonesimulator/Realm.framework"; sourceTree = "<group>"; };
+		22A543311A0D117600517A80 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +54,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A543321A0D117600517A80 /* libc++.dylib in Frameworks */,
+				22A543301A0D116200517A80 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +72,7 @@
 		22396AEE1A0CCB8400AF8112 = {
 			isa = PBXGroup;
 			children = (
+				22A543311A0D117600517A80 /* libc++.dylib */,
 				22396AF91A0CCB8400AF8112 /* SyncedRealmExample */,
 				22396B161A0CCB8400AF8112 /* SyncedRealmExampleTests */,
 				22396AF81A0CCB8400AF8112 /* Products */,
@@ -101,6 +108,7 @@
 		22396AFA1A0CCB8400AF8112 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22A5432F1A0D116200517A80 /* Realm.framework */,
 				22396AFB1A0CCB8400AF8112 /* Info.plist */,
 				22396AFC1A0CCB8400AF8112 /* main.m */,
 			);
@@ -351,6 +359,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-fdewzcqkfmsxdtddertvpepkpuad/Build/Products/Debug-iphonesimulator",
+				);
 				INFOPLIST_FILE = SyncedRealmExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -361,6 +373,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-fdewzcqkfmsxdtddertvpepkpuad/Build/Products/Debug-iphonesimulator",
+				);
 				INFOPLIST_FILE = SyncedRealmExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
