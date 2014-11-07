@@ -323,8 +323,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // when the upload in progress is in conflict with somebody elses
     // transaction, and in that case the received transaction log
     // would be corrupt from our point of view.
-    if (lastVersionUploaded < currentVersion)
+    typedef unsigned long long ulonglong;
+    if (lastVersionUploaded < currentVersion) {
+        NSLog(@"Skipping initialal blocking sync with server due to pending uploads (%llu<%llu)",
+              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
         return;
+    }
 
     int maxRetries = 16;
     int numRetries = 0;
@@ -332,7 +336,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     for (;;) {
         __block NSMutableArray *responseData = [NSMutableArray array];
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        typedef unsigned long long ulonglong;
         NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.serverBaseURL, ulonglong(currentVersion)];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
         request.HTTPMethod = @"POST";
