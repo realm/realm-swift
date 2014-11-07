@@ -466,29 +466,13 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        ( mkdir ios; cd ios; unzip ../realm-framework-ios.zip )
-        ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
-        unzip realm-obj-examples.zip
+        VERSION=$(sh build.sh get-version)
+        unzip realm-cocoa-${VERSION}.zip
 
-        mkdir -p Swift
-        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift Swift
-
-        rm *.zip
-        cd examples
-
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
-
-        (
-            cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
-            DYLD_FRAMEWORK_PATH=. ./JSONImport
-        ) || exit 1
+        cd realm-cocoa-${VERSION}
+        sh build.sh examples "$XCMODE"
+        cd ..
+        rm -rf realm-cocoa-${VERSION}
         ;;
 
     "package-ios")
@@ -599,24 +583,15 @@ EOF
         sh tightdb_objc/build.sh package-examples
         cp tightdb_objc/realm-obj-examples.zip .
 
-        echo 'Testing packaged examples'
-        (
-            mkdir -p examples-test
-            cd examples-test
-            cp ../realm-framework-ios.zip .
-            cp ../realm-framework-osx.zip .
-            cp ../realm-obj-examples.zip .
-            ln -s $WORKSPACE/tightdb_objc .
-
-            sh ../tightdb_objc/build.sh package-test-examples
-        ) || exit 1
-
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
         cp tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release/realm-browser.zip .
 
         echo 'Building final release package'
         sh tightdb_objc/build.sh package-release
+
+        echo 'Testing packaged examples'
+        sh tightdb_objc/build.sh package-test-examples
 
         ;;
 
