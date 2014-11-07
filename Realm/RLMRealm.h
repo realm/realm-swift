@@ -576,6 +576,10 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key;
 
+#pragma mark - Sync demo
+
+@property (atomic) NSString *serverBaseURL; // E.g. https://realm.foo.com/realm
+
 #pragma mark -
 
 //---------------------------------------------------------------------------------------
