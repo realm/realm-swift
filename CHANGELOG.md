@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.87.3 Release notes (2014-11-06)
 =============================================================
 
 ### API breaking changes
@@ -8,7 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Added method `-linkingObjectsOfClass:forProperty:` to RLMObject to expose inverse
-  relashinships/backlinks.
+  relashionships/backlinks.
 
 ### Bugfixes
 
