@@ -314,6 +314,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
     Replication::version_type lastVersionUploaded, lastVersionAvailable;
     lastVersionUploaded = transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
+    // FIXME: We really should get 1 from
+    // Replication::get_last_version_synced() in this case.
+    if (lastVersionUploaded == 0)
+        lastVersionUploaded = 1;
     TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
     Replication::version_type currentVersion = LangBindHelper::get_current_version(sharedGroup);
     TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
