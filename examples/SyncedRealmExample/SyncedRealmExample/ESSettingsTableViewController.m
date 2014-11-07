@@ -7,15 +7,14 @@
 //
 
 #import "ESSettingsTableViewController.h"
+#import <Realm/Realm.h>
 
-@class RLMRealm;
 @interface ESSettingsTableViewController () <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *serverField;
 @property (weak, nonatomic) IBOutlet UITextField *portField;
 @property (weak, nonatomic) IBOutlet UITextField *realmField;
 
-@property (nonatomic) NSString *serverUrl;
 @property (nonatomic) RLMRealm *realm;
 
 @end
@@ -24,6 +23,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+//    NSArray *components = [self.realm.serverBaseURL componentsSeparatedByString:@":"];
+    NSArray *components = [@"http://213.232.213.1:344" componentsSeparatedByString:@":"];
+    
+    NSAssert(components.count == 3, @"Something is wrong with the serverBase string");
+    
+    self.serverField.placeholder = [components[1] substringFromIndex:2];
+    self.portField.placeholder = components[2];
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -34,15 +41,16 @@
 
 -(void)updateSettings:(UITextField *)textField
 {
-    if (textField == self.serverField) {
-    } else if (textField == self.portField) {
-        
-    } else if (textField == self.realmField) {
-        
+    if (textField == self.realmField) {
+//        self.realm.name = self.realmField.text;
     }
-    
-    self.serverUrl = [NSString stringWithFormat:@"http://%@:%@", self.serverField.text, self.portField.text];
-
+    else {
+        NSString *server = self.serverField.text.length > 0 ? self.serverField.text : self.serverField.placeholder;
+        NSString *port = self.portField.text.length > 0 ? self.portField.text : self.portField.placeholder;
+        self.realm.serverBaseURL = [NSString stringWithFormat:@"http://%@:%@", server, port];
+        
+        NSLog(@"serverBaseURL: %@", [NSString stringWithFormat:@"http://%@:%@", server, port]);
+    }
 }
 
 - (void)didReceiveMemoryWarning {
