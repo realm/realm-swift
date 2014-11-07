@@ -137,9 +137,12 @@ void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     }
 }
 
+
 static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
+
+NSMutableArray *s_uploadToServerInProgress = [NSMutableArray arrayWithObject:@NO];
 
 } // anonymous namespace
 
@@ -150,7 +153,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     NSThread *_thread;
     NSMapTable *_notificationHandlers;
 
-    std::unique_ptr<LangBindHelper::TransactLogRegistry> _writeLogs;
     std::unique_ptr<Replication> _replication;
     std::unique_ptr<SharedGroup> _sharedGroup;
 
@@ -161,6 +163,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     Group *_group;
     BOOL _readOnly;
     BOOL _inMemory;
+
+    NSURLSession *_URLSession;
 }
 
 + (BOOL)isCoreDebug {
@@ -188,6 +192,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         _readOnly = readonly;
         _inMemory = inMemory;
         _autorefresh = YES;
+        _serverBaseURL = @"http://192.168.1.50:8080"; // Kristains workstation
 
         try {
             if (readonly) {
@@ -195,7 +200,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 _group = _readGroup.get();
             }
             else {
-                _writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
                 _replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
@@ -282,6 +286,133 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     return [self realmWithPath:[RLMRealm writeablePathForFile:identifier] readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
 }
 
+
+- (void)initialBlockingSyncWithServer {
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.name = @"io.Realm.sync";
+
+    // Emphemeral config disables everything that would result in data being automatically saved to disk
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+
+    // Disable caching
+    config.URLCache = nil;
+    config.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+
+    config.HTTPShouldUsePipelining = YES;
+
+    _URLSession = [NSURLSession sessionWithConfiguration:config
+                                                 delegate:nil
+                                            delegateQueue:queue];
+
+    // At the present time we need to apply foreign transaction logs
+    // via a special SharedGroup instance on which replication is not
+    // enabled. This is necessary because some (not all) of the
+    // actions taken during transaction log application submits new
+    // entries to a new transaction log.
+    UniquePtr<Replication> transactLogRegistry(makeWriteLogCollector(self.path.UTF8String));
+    SharedGroup sharedGroup(self.path.UTF8String);
+
+    Replication::version_type lastVersionUploaded, lastVersionAvailable;
+    lastVersionUploaded = transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
+    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
+    Replication::version_type currentVersion = LangBindHelper::get_current_version(sharedGroup);
+    TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
+
+    // Never ask for next transaction log while upload is in
+    // progress. If we do that, we risk getting something back even
+    // when the upload in progress is in conflict with somebody elses
+    // transaction, and in that case the received transaction log
+    // would be corrupt from our point of view.
+    if (lastVersionUploaded < currentVersion)
+        return;
+
+    int maxRetries = 16;
+    int numRetries = 0;
+    __block NSMutableArray *upToDate = [NSMutableArray arrayWithObject:@NO];
+    for (;;) {
+        __block NSMutableArray *responseData = [NSMutableArray array];
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        typedef unsigned long long ulonglong;
+        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.serverBaseURL, ulonglong(currentVersion)];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        request.HTTPMethod = @"POST";
+        [[_URLSession dataTaskWithRequest:request
+                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+
+                    if (error) {
+                        NSLog(@"HTTP receive request failed (1)");
+                    }
+                    else if (((NSHTTPURLResponse *)response).statusCode != 200) {
+                        NSLog(@"HTTP receive request failed (2)");
+                    }
+                    else {
+                        // FIXME: Using the MIME type in this way is
+                        // not reliable as it may in general be
+                        // modified in complicated ways by various
+                        // involved HTTP agents.
+                        if (!response.MIMEType) {
+                            NSLog(@"HTTP receive request failed (3)");
+                        }
+                        else if ([response.MIMEType isEqualToString:@"text/plain"]) {
+                            NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
+                                                                          length:10
+                                                                    freeWhenDone:NO];
+                            if ([data isEqualToData:upToDateString]) {
+                                upToDate[0] = @YES;
+                            }
+                            else {
+                                NSLog(@"HTTP receive request failed (4)");
+                            }
+                        }
+                        else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
+                            // Assuming that `data` needs to be copied
+                            // here to make it available outside the
+                            // completion handler.
+                            responseData[0] = [data copy];
+                        }
+                    }
+                    dispatch_semaphore_signal(semaphore);
+                }] resume];
+
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+
+        if (((NSNumber *)upToDate[0]).boolValue)
+            break;
+
+        if (!responseData.firstObject) {
+            if (numRetries == maxRetries)
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Too many HTTP request failures"
+                                             userInfo:nil];
+            ++numRetries;
+            continue;
+        }
+
+        // Apply transaction log via the special SharedGroup instance
+        Replication::version_type receivedVersion = currentVersion + 1;
+        NSData *data = responseData.firstObject;
+        {
+            WriteTransaction transact(sharedGroup);
+            Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
+            try {
+                Replication::apply_transact_log(input, transact.get_group()); // Throws
+            }
+            catch (Replication::BadTransactLog&) {
+                ++numRetries;
+                continue;
+            }
+            BinaryData transactLog((const char *)data.bytes, size_t(data.length));
+            @synchronized(s_uploadToServerInProgress) {
+                transactLogRegistry->submit_transact_log(transactLog);
+                transactLogRegistry->set_last_version_synced(receivedVersion);
+            }
+        }
+        currentVersion = receivedVersion;
+        numRetries = 0;
+    }
+}
+
+
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                      inMemory:(BOOL)inMemory
@@ -360,12 +491,33 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // advance read in case another instance initialized the schema
-                LangBindHelper::advance_read(*realm->_sharedGroup, *realm->_writeLogs);
+                LangBindHelper::advance_read(*realm->_sharedGroup);
 
                 // if we have a cached realm on another thread, copy without a transaction
                 RLMRealmSetSchema(realm, [realms[0] schema], false);
             }
             else {
+                // Synchronize with server and block here until
+                // synchronization is complete.
+                //
+                // This is done to ensure that only one client submits
+                // a transaction that creates the schema for
+                // compile-time specified Realm classes. If all
+                // clients did that, there would be an immediate need
+                // for conflict resolution, but in the first (proto)
+                // implementation of client-server synchronization,
+                // conflict resolution will not be available.
+                //
+                // This kind of blocking is obviously not good enough,
+                // especially when it occurs on the main thread, so
+                // some kind of nonblocking alternative has to be
+                // found.
+                //
+                // When transaction merging becomes possible, this
+                // problem disappears completely, becasue then all the
+                // initial schema creating transactions can be merged.
+                [realm initialBlockingSyncWithServer];
+
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
                 if (s_currentSchemaVersion == schemaVersion || schemaVersion == RLMNotVersioned) {
@@ -380,6 +532,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             cacheRealm(realm, path);
         }
     }
+
+    [realm resumeUploadToServer];
 
     return realm;
 }
@@ -397,6 +551,77 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                                      userInfo:nil];
     }
 }
+
+
+- (void)resumeUploadToServer {
+    Replication::version_type lastVersionUploaded, lastVersionAvailable;
+
+    @synchronized(s_uploadToServerInProgress) {
+        if (((NSNumber *)s_uploadToServerInProgress[0]).boolValue)
+            return;
+
+        lastVersionUploaded = _replication->get_last_version_synced(&lastVersionAvailable);
+        if (lastVersionUploaded == lastVersionAvailable)
+            return;
+
+        s_uploadToServerInProgress[0] = @YES;
+    }
+
+    BinaryData transact_log;
+    _replication->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
+    NSData *data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
+    [self uploadToServer:data version:lastVersionUploaded+1 numRetries:0];
+}
+
+
+- (void)uploadToServer:(NSData *)data version:(Replication::version_type)version numRetries:(int)numRetries {
+    int maxRetries = 16;
+    typedef unsigned long long ulonglong;
+    NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.serverBaseURL, ulonglong(version)];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod = @"POST";
+    [[_URLSession uploadTaskWithRequest:request
+                               fromData:data
+                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                if (error) {
+                    NSLog(@"HTTP send request failed (1)");
+                }
+                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
+                    NSLog(@"HTTP send request failed (2)");
+                }
+                else {
+                    // FIXME: Using the MIME type in this way is
+                    // not reliable as it may in general be
+                    // modified in complicated ways by various
+                    // involved HTTP agents.
+                    if (!response.MIMEType) {
+                        NSLog(@"HTTP send request failed (3)");
+                    }
+                    else if ([response.MIMEType isEqualToString:@"text/plain"]) {
+                        NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"ok"
+                                                                      length:2
+                                                                freeWhenDone:NO];
+                        if ([data isEqualToData:upToDateString]) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                    _replication->set_last_version_synced(version);
+                                    @synchronized(s_uploadToServerInProgress) {
+                                        s_uploadToServerInProgress[0] = @NO;
+                                    }
+                                    [self resumeUploadToServer];
+                                });
+                            return;
+                        }
+                        NSLog(@"HTTP send request failed (4)");
+                    }
+                }
+                if (numRetries == maxRetries)
+                    return;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self uploadToServer:data version:version numRetries:numRetries+1];
+                    });
+            }] resume];
+}
+
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
@@ -442,7 +667,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // announce the change after promoting
             bool announce = _sharedGroup->has_changed();
 
-            LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
+            LangBindHelper::promote_to_write(*_sharedGroup);
 
             if (announce) {
                 [self sendNotifications:RLMRealmDidChangeNotification];
@@ -485,6 +710,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
+
+            [self resumeUploadToServer];
         }
         catch (std::exception& ex) {
             throw_objc_exception(ex);
@@ -532,7 +759,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     try {
         if (_sharedGroup->has_changed()) { // Throws
             if (_autorefresh) {
-                LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+                LangBindHelper::advance_read(*_sharedGroup);
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
             else {
@@ -557,7 +784,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     try {
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
-            LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+            LangBindHelper::advance_read(*_sharedGroup);
             [self sendNotifications:RLMRealmDidChangeNotification];
             return YES;
         }
