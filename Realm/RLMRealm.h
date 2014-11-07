@@ -431,7 +431,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
 #pragma mark - Sync demo
 
-@property (atomic) NSString *serverBaseURL; // E.g. https://realm.foo.com/realm
+@property (atomic) NSString *serverBaseURL; // E.g. http://187.56.46.23:123
 
 
 #pragma mark -

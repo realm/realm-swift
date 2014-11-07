@@ -15,8 +15,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *portField;
 @property (weak, nonatomic) IBOutlet UITextField *realmField;
 
-@property (nonatomic) NSURL *serverUrl;
-@property (nonatomic) NSUInteger portNumber;
+@property (nonatomic) NSString *serverUrl;
 @property (nonatomic) RLMRealm *realm;
 
 @end
@@ -36,12 +35,14 @@
 -(void)updateSettings:(UITextField *)textField
 {
     if (textField == self.serverField) {
-        
     } else if (textField == self.portField) {
         
     } else if (textField == self.realmField) {
         
     }
+    
+    self.serverUrl = [NSString stringWithFormat:@"http://%@:%@", self.serverField.text, self.portField.text];
+
 }
 
 - (void)didReceiveMemoryWarning {
