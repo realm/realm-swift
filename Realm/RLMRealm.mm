@@ -323,8 +323,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // when the upload in progress is in conflict with somebody elses
     // transaction, and in that case the received transaction log
     // would be corrupt from our point of view.
-    if (lastVersionUploaded < currentVersion)
+    typedef unsigned long long ulonglong;
+    if (lastVersionUploaded < currentVersion) {
+        NSLog(@"Skipping initialal blocking sync with server due to pending uploads (%llu<%llu)",
+              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
         return;
+    }
 
     int maxRetries = 16;
     int numRetries = 0;
@@ -332,7 +336,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     for (;;) {
         __block NSMutableArray *responseData = [NSMutableArray array];
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        typedef unsigned long long ulonglong;
         NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.serverBaseURL, ulonglong(currentVersion)];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
         request.HTTPMethod = @"POST";
@@ -611,13 +614,20 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                                 });
                             return;
                         }
+                        NSData *conflictString = [NSData dataWithBytesNoCopy:(void *)"conflict"
+                                                                      length:8
+                                                                freeWhenDone:NO];
+                        if ([data isEqualToData:conflictString])
+                            @throw [NSException exceptionWithName:@"RLMException"
+                                                           reason:@"Conflicting transaction detected"
+                                                         userInfo:nil];
                         NSLog(@"HTTP send request failed (4)");
                     }
                 }
                 if (numRetries == maxRetries)
                     return;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self uploadToServer:data version:version numRetries:numRetries+1];
+                        [self uploadToServer:data version:version numRetries:numRetries+1];
                     });
             }] resume];
 }
