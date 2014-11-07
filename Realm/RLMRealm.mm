@@ -314,10 +314,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
     Replication::version_type lastVersionUploaded, lastVersionAvailable;
     lastVersionUploaded = transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
-    // FIXME: We really should get 1 from
-    // Replication::get_last_version_synced() in this case.
-    if (lastVersionUploaded == 0)
-        lastVersionUploaded = 1;
     TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
     Replication::version_type currentVersion = LangBindHelper::get_current_version(sharedGroup);
     TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
@@ -618,13 +614,20 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                                 });
                             return;
                         }
+                        NSData *conflictString = [NSData dataWithBytesNoCopy:(void *)"conflict"
+                                                                      length:8
+                                                                freeWhenDone:NO];
+                        if ([data isEqualToData:conflictString])
+                            @throw [NSException exceptionWithName:@"RLMException"
+                                                           reason:@"Conflicting transaction detected"
+                                                         userInfo:nil];
                         NSLog(@"HTTP send request failed (4)");
                     }
                 }
                 if (numRetries == maxRetries)
                     return;
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self uploadToServer:data version:version numRetries:numRetries+1];
+                        [self uploadToServer:data version:version numRetries:numRetries+1];
                     });
             }] resume];
 }
