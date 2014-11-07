@@ -108,7 +108,32 @@ def is_object_deleted(obj):
             obj.target.addr_size, lldb.SBError())
     return ptr == 0
 
+def unsigned(value):
+    data = value.data
+    if data.GetByteSize() == 4:
+        return value.data.GetUnsignedInt32(lldb.SBError(), 0)
+    return value.data.GetUnsignedInt64(lldb.SBError(), 0)
+
+ivar_offset_cache = {}
+def get_ivars(obj, *args):
+    def get_offset(type_name):
+        ivars = {}
+        for ivar in args:
+            ivars[ivar] = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
+                'RLMDebugGetIvarOffset({}, "_{}")'.format(obj.GetAddress(), ivar)))
+        return ivars
+
+    return cache_lookup(ivar_offset_cache, obj.type.name, get_offset)
+
+type_cache = {}
+def get_type(obj, name):
+    return cache_lookup(type_cache, name, lambda name: obj.target.FindFirstType(name))
+
 class SyntheticChildrenProvider(object):
+    def __init__(self, obj, *ivars):
+        self.obj = obj
+        self.ivars = get_ivars(obj, *ivars)
+
     def _eval(self, expr):
         frame = self.obj.GetThread().GetSelectedFrame()
         return frame.EvaluateExpression(expr)
@@ -120,23 +145,19 @@ class SyntheticChildrenProvider(object):
         return self.obj.GetProcess().ReadCStringFromMemory(val, 1024, lldb.SBError())
 
     def _value_from_ivar(self, ivar):
-        offset, ivar_type, _ = get_ivar_info(self.obj, 'RLMObject._' + ivar)
-        return self.obj.CreateChildAtOffset(ivar, offset, ivar_type)
+        return self.obj.CreateChildAtOffset(ivar, self.ivars[ivar], get_type(self.obj, 'id'))
 
 schema_cache = {}
 class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, obj, _):
-        self.obj = obj
+        super(RLMObject_SyntheticChildrenProvider, self).__init__(obj,
+                'objectSchema', 'realm')
 
         if not obj.GetAddress() or is_object_deleted(obj):
             self.props = []
             return
 
         object_schema = self._get_ivar(self.obj.GetAddress(), 'RLMObject._objectSchema')
-
-        self.bool_type = obj.GetTarget().FindFirstType('BOOL')
-        self.realm_type = obj.GetTarget().FindFirstType('RLMRealm')
-        self.object_schema_type = obj.GetTarget().FindFirstType('RLMObjectSchema')
 
         def get_schema(object_schema):
             properties = self._get_ivar(object_schema, 'RLMObjectSchema._properties')
@@ -180,12 +201,6 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         getter = "({})[(id){} {}]".format(property_types.get(type, 'id'), self.obj.GetAddress(), name)
         return name, getter
 
-def unsigned(value):
-    data = value.data
-    if data.GetByteSize() == 4:
-        return value.data.GetUnsignedInt32(lldb.SBError(), 0)
-    return value.data.GetUnsignedInt64(lldb.SBError(), 0)
-
 def RLM_SummaryProvider(obj, _):
     frame = obj.GetThread().GetSelectedFrame()
     addr = unsigned(frame.EvaluateExpression('RLMDebugSummary({})'.format(obj.GetAddress())))
@@ -193,24 +208,11 @@ def RLM_SummaryProvider(obj, _):
         return None
     return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
 
-ivar_offset_cache = {}
-def get_ivars(obj, *args):
-    type_name = obj.type.name
-    ivars = ivar_offset_cache.get(type_name, None)
-    if not ivars:
-        ivars = {}
-        for ivar in args:
-            ivars[ivar] = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
-                'RLMDebugGetIvarOffset({}, "{}")'.format(obj.GetAddress(), ivar)))
-        ivar_offset_cache[type_name] = ivars
-    return ivars
-
 class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
-        self.obj = valobj
+        super(RLMArray_SyntheticChildrenProvider, self).__init__(valobj, 'realm')
         self.addr = self.obj.GetAddress()
-        self.type = self.obj.target.FindFirstType('id')
-        self.ivars = get_ivars(valobj, '_realm')
+        self.type = get_type(self.obj, 'id')
 
     def num_children(self):
         if not self.count:
@@ -231,7 +233,7 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
 
     def get_child_at_index(self, index):
         if index == 0:
-            return self.obj.CreateChildAtOffset('realm', self.ivars['_realm'], self.type)
+            return self._value_from_ivar('realm')
 
         key = '[' + str(index - 1) + ']'
         value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(self.addr, index - 1))
