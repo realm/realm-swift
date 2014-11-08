@@ -341,6 +341,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertThrows([[EmployeeObject alloc] initWithObject:nil], @"Not an array or dictionary");
 }
 
+- (void)testObjectInitWithKeyPathMapping {
+    NSDictionary *attrs = @{@"id": @"123",
+                            @"user": @{@"first": @"John",
+                                       @"last": @"Doe"}};
+    
+    XCTAssertNoThrow([[UserKeyPathObject alloc] initWithObject:attrs]);
+}
 
 - (void)testObjectSubscripting
 {

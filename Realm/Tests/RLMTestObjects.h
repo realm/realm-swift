@@ -250,4 +250,9 @@ RLM_ARRAY_TYPE(CircleObject);
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
+#pragma mark KeyPathObject
 
+@interface UserKeyPathObject : RLMObject
+@property(nonatomic, strong) NSString *userId;
+@property(nonatomic, strong) NSString *firstName;
+@end

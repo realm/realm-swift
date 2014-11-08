@@ -134,6 +134,11 @@
     return nil;
 }
 
+// default object property key path mapping implementation
++ (NSDictionary *)objectPropertyKeyPathMapping {
+    return nil;
+}
+
 // default primaryKey implementation
 + (NSString *)primaryKey {
     return nil;

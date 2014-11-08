@@ -251,6 +251,16 @@
  */
 + (NSArray *)ignoredProperties;
 
+/**
+ @brief Implement to specify how properties map to key paths in the initWithObject: attributes parameter.
+ This dictionary is consulted if no attribute is found for a given property name. The dictionary can
+ contain key path format mapping for cases where you need to collapse an object - e.g. property of
+ firstName mapped to user.firstName.
+ 
+ @see [RLMObject initWithObject:]
+ @return    NSDictionary specifying property key path mapping.
+ */
++ (NSDictionary *)objectPropertyKeyPathMapping;
 
 /**---------------------------------------------------------------------------------------
  *  @name Getting & Querying Objects from the Default Realm
