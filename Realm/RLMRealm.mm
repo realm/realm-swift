@@ -599,7 +599,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    RLMDeleteObjectFromRealm(object);
+    RLMDeleteObjectFromRealm(object, self);
 }
 
 - (void)deleteObjects:(id)array {
@@ -607,7 +607,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // for arrays and standalone delete each individually
         for (id obj in nsArray) {
             if ([obj isKindOfClass:RLMObject.class]) {
-                RLMDeleteObjectFromRealm(obj);
+                RLMDeleteObjectFromRealm(obj, self);
             }
         }
     }

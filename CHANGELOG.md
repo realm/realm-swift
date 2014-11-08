@@ -1,4 +1,20 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.87.4 Release notes (2014-11-07)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix browser location in release zip.
+
+
+0.87.3 Release notes (2014-11-06)
 =============================================================
 
 ### API breaking changes
@@ -8,12 +24,15 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Added method `-linkingObjectsOfClass:forProperty:` to RLMObject to expose inverse
-  relashinships/backlinks.
+  relationships/backlinks.
 
 ### Bugfixes
 
+* Fix for crash due to missing search index when migrating an object with a string primary key
+  in a database created using an older versions (0.86.3 and earlier).
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
+* Fix for crash when deleting an object from multiple threads.
 
 
 0.87.0 Release notes (2014-10-21)
