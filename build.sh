@@ -442,11 +442,10 @@ case "$COMMAND" in
     # Release packaging
     ######################################
     "package-browser")
-        mkdir -p test-reports
-        cd tightdb_objc/tools/RealmBrowser
-        xcodebuild -project RealmBrowser.xcodeproj -scheme RealmBrowser -IDECustomDerivedDataLocation=../../build/DerivedData -configuration Release clean build CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
-        cd ${WORKSPACE}/tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release
-        zip -r realm-browser.zip Realm\ Browser.app
+        cd tightdb_objc
+        sh build.sh browser "$XCMODE"
+        BROWSER_PATH=${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release/Realm\ Browser.app
+        zip -r ${WORKSPACE}/realm-browser.zip "${BROWSER_PATH}"
         ;;
 
     "package-docs")
@@ -466,13 +465,14 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        VERSION=$(sh build.sh get-version)
-        unzip realm-cocoa-${VERSION}.zip
+        VERSION=$(file realm-cocoa-*.zip | grep -o '\d*\.\d*\.\d*')
+        unzip realm-cocoa-*.zip
 
+        cp $0 realm-cocoa-${VERSION}
         cd realm-cocoa-${VERSION}
         sh build.sh examples "$XCMODE"
         cd ..
-        rm -rf realm-cocoa-${VERSION}
+        rm -rf realm-cocoa-*
         ;;
 
     "package-ios")
@@ -564,11 +564,11 @@ EOF
         git clone $REALM_SOURCE tightdb_objc
 
         echo 'Packaging iOS'
-        sh tightdb_objc/build.sh package-ios
+        sh tightdb_objc/build.sh package-ios "$XCMODE"
         cp tightdb_objc/build/ios/realm-framework-ios.zip .
 
         echo 'Packaging OS X'
-        sh tightdb_objc/build.sh package-osx
+        sh tightdb_objc/build.sh package-osx "$XCMODE"
         cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
 
         echo 'Packaging docs'
@@ -580,18 +580,17 @@ EOF
         git clean -xfd
         cd ../..
 
-        sh tightdb_objc/build.sh package-examples
+        sh tightdb_objc/build.sh package-examples "$XCMODE"
         cp tightdb_objc/realm-obj-examples.zip .
 
         echo 'Packaging browser'
-        sh tightdb_objc/build.sh package-browser
-        cp tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release/realm-browser.zip .
+        sh tightdb_objc/build.sh package-browser "$XCMODE"
 
         echo 'Building final release package'
         sh tightdb_objc/build.sh package-release
 
         echo 'Testing packaged examples'
-        sh tightdb_objc/build.sh package-test-examples
+        sh tightdb_objc/build.sh package-test-examples "$XCMODE"
 
         ;;
 
