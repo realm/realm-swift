@@ -1,3 +1,21 @@
+0.87.4 Release notes (2014-11-07)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix browser location in release zip.
+
+
 0.87.3 Release notes (2014-11-06)
 =============================================================
 

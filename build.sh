@@ -444,8 +444,8 @@ case "$COMMAND" in
     "package-browser")
         cd tightdb_objc
         sh build.sh browser "$XCMODE"
-        BROWSER_PATH=${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release/Realm\ Browser.app
-        zip -r ${WORKSPACE}/realm-browser.zip "${BROWSER_PATH}"
+        cd ${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
+        zip -r realm-browser.zip Realm\ Browser.app
         ;;
 
     "package-docs")
