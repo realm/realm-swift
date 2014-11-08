@@ -8,7 +8,7 @@
 ### Enhancements
 
 * Added method `-linkingObjectsOfClass:forProperty:` to RLMObject to expose inverse
-  relashionships/backlinks.
+  relationships/backlinks.
 
 ### Bugfixes
 
