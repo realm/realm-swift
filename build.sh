@@ -446,6 +446,7 @@ case "$COMMAND" in
         sh build.sh browser "$XCMODE"
         cd ${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
         zip -r realm-browser.zip Realm\ Browser.app
+        mv realm-browser.zip ${WORKSPACE}
         ;;
 
     "package-docs")
