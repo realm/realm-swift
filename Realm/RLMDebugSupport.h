@@ -18,10 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-uintptr_t RLMDebugSummary(uintptr_t obj);
+uintptr_t RLMDebugSummary(__unsafe_unretained id obj);
 NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj);
 
-NSUInteger RLMDebugArrayCount(uintptr_t obj);
-id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index);
+NSUInteger RLMDebugArrayCount(__unsafe_unretained id obj);
+id RLMDebugArrayChildAtIndex(__unsafe_unretained id obj, NSUInteger index);
 
-size_t RLMDebugGetIvarOffset(uintptr_t obj, const char *name);
+size_t RLMDebugGetIvarOffset(__unsafe_unretained id obj, const char *name);

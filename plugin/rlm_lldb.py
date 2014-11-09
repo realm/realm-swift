@@ -114,13 +114,16 @@ def unsigned(value):
         return value.data.GetUnsignedInt32(lldb.SBError(), 0)
     return value.data.GetUnsignedInt64(lldb.SBError(), 0)
 
+def path(obj):
+    return obj.path.replace('.Some', '!')
+
 ivar_offset_cache = {}
 def get_ivars(obj, *args):
     def get_offset(type_name):
         ivars = {}
         for ivar in args:
             ivars[ivar] = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
-                'RLMDebugGetIvarOffset({}, "_{}")'.format(obj.GetAddress(), ivar)))
+                'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar)))
         return ivars
 
     return cache_lookup(ivar_offset_cache, obj.type.name, get_offset)
@@ -202,8 +205,8 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         return name, getter
 
 def RLM_SummaryProvider(obj, _):
-    frame = obj.GetThread().GetSelectedFrame()
-    addr = unsigned(frame.EvaluateExpression('RLMDebugSummary({})'.format(obj.GetAddress())))
+    frame = obj.thread.GetSelectedFrame()
+    addr = unsigned(frame.EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
     if addr == 0:
         return None
     return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
@@ -211,12 +214,11 @@ def RLM_SummaryProvider(obj, _):
 class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def __init__(self, valobj, _):
         super(RLMArray_SyntheticChildrenProvider, self).__init__(valobj, 'realm')
-        self.addr = self.obj.GetAddress()
         self.type = get_type(self.obj, 'id')
 
     def num_children(self):
         if not self.count:
-            self.count = unsigned(self._eval("RLMDebugArrayCount({})".format(self.addr)))
+            self.count = unsigned(self._eval("RLMDebugArrayCount({})".format(path(self.obj))))
         return self.count + 1
 
     def has_children(self):
@@ -236,7 +238,7 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
             return self._value_from_ivar('realm')
 
         key = '[' + str(index - 1) + ']'
-        value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(self.addr, index - 1))
+        value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(path(self.obj), index - 1))
         return self.obj.CreateValueFromData(key, value.GetData(), self.type)
 
     def update(self):
@@ -251,4 +253,4 @@ def __lldb_init_module(debugger, _):
     debugger.HandleCommand('type synthetic add RLMArray --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
     debugger.HandleCommand('type synthetic add RLMArrayLinkView --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
     debugger.HandleCommand('type synthetic add RLMResults --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
-    debugger.HandleCommand('type synthetic add -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')
+    # debugger.HandleCommand('type synthetic add -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')

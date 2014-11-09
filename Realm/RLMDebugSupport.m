@@ -26,40 +26,41 @@
 - (NSString *)debugSummary;
 @end
 
-uintptr_t RLMDebugSummary(uintptr_t obj) {
+uintptr_t RLMDebugSummary(__unsafe_unretained id obj) {
     // This is of course not remotely thread-safe, but the debug script isn't
     // (and can't be) multithreaded
     static char buffer[1024];
     @autoreleasepool {
-        NSString *str = [(__bridge id)(void *)obj debugSummary];
+        NSString *str = [obj debugSummary];
         if (!str) {
             return 0;
         }
-        strlcpy(buffer, str.UTF8String, sizeof(buffer));
+        NSUInteger used = 0;
+        [str getBytes:buffer
+            maxLength:sizeof(buffer) - 1 usedLength:&used
+             encoding:NSUTF8StringEncoding options:0
+                range:NSMakeRange(0, str.length) remainingRange:0];
+        buffer[used] = 0;
     }
     return (uintptr_t)buffer;
 }
 
 NSString *RLMDebugSummaryHelper(__unsafe_unretained id obj) {
-    // This is needlessly roundabout, but the point is to have the tests hit
-    // the same function that the python script uses, and the python script
-    // wants an API that's really awkward from obj-c and Swift
-    uintptr_t str = RLMDebugSummary((uintptr_t)obj);
+    uintptr_t str = RLMDebugSummary(obj);
     return str ? [NSString stringWithUTF8String:(const char *)str] : nil;
 }
 
-NSUInteger RLMDebugArrayCount(uintptr_t obj) {
-    return [(__bridge id)(void *)obj count];
+NSUInteger RLMDebugArrayCount(__unsafe_unretained id obj) {
+    return [obj count];
 }
 
-id RLMDebugArrayChildAtIndex(uintptr_t obj, NSUInteger index) {
-    RLMArray *array = (__bridge id)(void *)obj;
-    __autoreleasing RLMObject *o = array[index];
+id RLMDebugArrayChildAtIndex(__unsafe_unretained id obj, NSUInteger index) {
+    __autoreleasing RLMObject *o = obj[index];
     return o;
 }
 
-size_t RLMDebugGetIvarOffset(uintptr_t obj, const char *name) {
-    Ivar ivar = class_getInstanceVariable([(__bridge id)(void *)obj class], name);
+size_t RLMDebugGetIvarOffset(__unsafe_unretained id obj, const char *name) {
+    Ivar ivar = class_getInstanceVariable([obj class], name);
     assert(ivar);
     return ivar_getOffset(ivar);
 }
