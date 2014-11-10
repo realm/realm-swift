@@ -625,6 +625,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                     }
                 }
                 if (numRetries == maxRetries)
+                    NSLog(@"Too many failed HTTP send requests, giving up");
                     return;
                 dispatch_async(dispatch_get_main_queue(), ^{
                         [self uploadToServer:data version:version numRetries:numRetries+1];
