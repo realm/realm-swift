@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+@class RLMRealm;
 @interface ESSettingsTableViewController : UITableViewController
+
+-(void)realmDidLoad:(RLMRealm *)realm;
 
 @end
