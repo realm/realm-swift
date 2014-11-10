@@ -39,7 +39,6 @@
     //    if (realm.name) {
     //        self.realmField.placeholder = realm.name;
     //    }
-
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
