@@ -382,36 +382,35 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         if (((NSNumber *)upToDate[0]).boolValue)
             break;
 
-        if (!responseData.firstObject) {
-            if (numRetries == maxRetries)
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"Too many HTTP request failures"
-                                             userInfo:nil];
-            ++numRetries;
-            continue;
+        if (responseData.firstObject) {
+            Replication::version_type receivedVersion = currentVersion + 1;
+            NSLog(@"Received transaction log %llu -> %llu", ulonglong(receivedVersion-1), ulonglong(receivedVersion));
+            // Apply transaction log via the special SharedGroup instance
+            NSData *data = responseData.firstObject;
+            {
+                WriteTransaction transact(sharedGroup);
+                Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
+                try {
+                    Replication::apply_transact_log(input, transact.get_group()); // Throws
+                    BinaryData transactLog((const char *)data.bytes, size_t(data.length));
+                    @synchronized(s_uploadToServerInProgress) {
+                        transactLogRegistry->submit_transact_log(transactLog);
+                        transactLogRegistry->set_last_version_synced(receivedVersion);
+                    }
+                    currentVersion = receivedVersion;
+                    numRetries = 0;
+                    continue;
+                }
+                catch (Replication::BadTransactLog&) {}
+                NSLog(@"Bad transaction log received");
+            }
         }
 
-        // Apply transaction log via the special SharedGroup instance
-        Replication::version_type receivedVersion = currentVersion + 1;
-        NSData *data = responseData.firstObject;
-        {
-            WriteTransaction transact(sharedGroup);
-            Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-            try {
-                Replication::apply_transact_log(input, transact.get_group()); // Throws
-            }
-            catch (Replication::BadTransactLog&) {
-                ++numRetries;
-                continue;
-            }
-            BinaryData transactLog((const char *)data.bytes, size_t(data.length));
-            @synchronized(s_uploadToServerInProgress) {
-                transactLogRegistry->submit_transact_log(transactLog);
-                transactLogRegistry->set_last_version_synced(receivedVersion);
-            }
-        }
-        currentVersion = receivedVersion;
-        numRetries = 0;
+        if (numRetries == maxRetries)
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Too many HTTP request failures"
+                                         userInfo:nil];
+        ++numRetries;
     }
 }
 
