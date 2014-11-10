@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		223368391A10F2E600A8C82A /* UIColor+ChatColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 223368381A10F2E600A8C82A /* UIColor+ChatColors.m */; };
 		22396AFD1A0CCB8400AF8112 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22396AFC1A0CCB8400AF8112 /* main.m */; };
 		22396B001A0CCB8400AF8112 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22396AFF1A0CCB8400AF8112 /* AppDelegate.m */; };
 		22396B061A0CCB8400AF8112 /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22396B051A0CCB8400AF8112 /* SecondViewController.m */; };
@@ -30,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		223368371A10F2E600A8C82A /* UIColor+ChatColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+ChatColors.h"; sourceTree = "<group>"; };
+		223368381A10F2E600A8C82A /* UIColor+ChatColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+ChatColors.m"; sourceTree = "<group>"; };
 		22396AF71A0CCB8400AF8112 /* SyncedRealmExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SyncedRealmExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22396AFB1A0CCB8400AF8112 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22396AFC1A0CCB8400AF8112 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 			children = (
 				22396AFE1A0CCB8400AF8112 /* AppDelegate.h */,
 				22396AFF1A0CCB8400AF8112 /* AppDelegate.m */,
+				223368371A10F2E600A8C82A /* UIColor+ChatColors.h */,
+				223368381A10F2E600A8C82A /* UIColor+ChatColors.m */,
 				22396B261A0CE6B200AF8112 /* ESSettingsTableViewController.h */,
 				22396B271A0CE6B200AF8112 /* ESSettingsTableViewController.m */,
 				22396B041A0CCB8400AF8112 /* SecondViewController.h */,
@@ -235,6 +240,7 @@
 				22396B281A0CE6B200AF8112 /* ESSettingsTableViewController.m in Sources */,
 				22396B061A0CCB8400AF8112 /* SecondViewController.m in Sources */,
 				22396B001A0CCB8400AF8112 /* AppDelegate.m in Sources */,
+				223368391A10F2E600A8C82A /* UIColor+ChatColors.m in Sources */,
 				22396AFD1A0CCB8400AF8112 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
