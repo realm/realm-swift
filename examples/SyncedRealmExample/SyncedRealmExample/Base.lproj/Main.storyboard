@@ -21,7 +21,7 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Lb6-iI-QZG" id="3js-CI-Fo2">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Server" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ziw-A4-dfR">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Host" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ziw-A4-dfR">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -132,9 +132,9 @@
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Settings" image="first" id="5Bt-3x-vGX"/>
                     <connections>
+                        <outlet property="hostField" destination="saS-sd-FSk" id="Tzw-Fh-J8Z"/>
                         <outlet property="portField" destination="ZPz-H1-6XJ" id="vpe-MQ-Nxh"/>
                         <outlet property="realmField" destination="AOq-av-jKg" id="Zl2-tY-slV"/>
-                        <outlet property="serverField" destination="saS-sd-FSk" id="McY-pW-OOa"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SdG-vJ-8Qt" userLabel="First Responder" sceneMemberID="firstResponder"/>

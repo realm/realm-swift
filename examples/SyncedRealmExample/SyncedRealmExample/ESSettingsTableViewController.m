@@ -11,9 +11,11 @@
 
 @interface ESSettingsTableViewController () <UITextFieldDelegate>
 
-@property (weak, nonatomic) IBOutlet UITextField *serverField;
+@property (weak, nonatomic) IBOutlet UITextField *hostField;
 @property (weak, nonatomic) IBOutlet UITextField *portField;
 @property (weak, nonatomic) IBOutlet UITextField *realmField;
+
+@property (nonatomic) NSString *urlScheme;
 
 @property (nonatomic) RLMRealm *realm;
 
@@ -24,13 +26,24 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-//    NSArray *components = [self.realm.serverBaseURL componentsSeparatedByString:@":"];
-    NSArray *components = [@"http://213.232.213.1:344" componentsSeparatedByString:@":"];
+}
+
+-(void)realmDidLoad:(RLMRealm *)realm
+{
+    if (realm.serverBaseURL) {
+        NSURLComponents *components = [[NSURLComponents alloc] initWithString:realm.serverBaseURL];
+//        NSURLComponents *components = [[NSURLComponents alloc] initWithString:@"http://213.232.213.1:344"];
+
+        self.urlScheme = [components scheme];
+        self.hostField.placeholder = [components host];
+        self.portField.placeholder = [[components port] stringValue];
+    }
     
-    NSAssert(components.count == 3, @"Something is wrong with the serverBase string");
+//    if (realm.name) {
+//        self.realmField.placeholder = realm.name;
+//    }
     
-    self.serverField.placeholder = [components[1] substringFromIndex:2];
-    self.portField.placeholder = components[2];
+    self.realm = realm;
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -39,18 +52,17 @@
     return NO;
 }
 
--(void)updateSettings:(UITextField *)textField
+-(void)updateSettings
 {
-    if (textField == self.realmField) {
-//        self.realm.name = self.realmField.text;
-    }
-    else {
-        NSString *server = self.serverField.text.length > 0 ? self.serverField.text : self.serverField.placeholder;
-        NSString *port = self.portField.text.length > 0 ? self.portField.text : self.portField.placeholder;
-        self.realm.serverBaseURL = [NSString stringWithFormat:@"http://%@:%@", server, port];
-        
-        NSLog(@"serverBaseURL: %@", [NSString stringWithFormat:@"http://%@:%@", server, port]);
-    }
+    NSURLComponents *components = [[NSURLComponents alloc] init];
+    components.host = self.hostField.text.length > 0 ? self.hostField.text : self.hostField.placeholder;
+    NSString *port = self.portField.text.length > 0 ? self.portField.text : self.portField.placeholder;
+    components.port = @([port integerValue]);
+    components.scheme = self.urlScheme;
+    
+    self.realm.serverBaseURL = components.string;
+    
+    //        self.realm.name = self.realmField.text;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -59,58 +71,6 @@
 }
 
 #pragma mark - Table view data source
-
-//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-//    return 1;
-//}
-//
-//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-//    return 3;
-//}
-
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
-    
-    // Configure the cell...
-    
-    return cell;
-}
-*/
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 /*
 #pragma mark - Navigation
