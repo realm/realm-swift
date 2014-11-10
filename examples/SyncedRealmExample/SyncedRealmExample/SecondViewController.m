@@ -39,6 +39,14 @@
     self.notificationToken = [realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
         [self messageChanged];
     }];
+    
+    [realm beginWriteTransaction];
+    if (!self.message) {
+        ESMessage *newMessage = [[ESMessage alloc] initWithObject:@[[NSDate date], @"Message"]];
+        [realm addObject:newMessage];
+    }
+    [realm commitWriteTransaction];
+
     [self messageChanged];
 }
 
@@ -74,20 +82,7 @@
 
 -(ESMessage *)message
 {
-    RLMResults *messages = [ESMessage allObjects];
-    
-    ESMessage *message = messages.firstObject;
-    
-    if (!message) {
-        ESMessage *newMessage = [[ESMessage alloc] initWithObject:@[[NSDate date], @"Message"]];
-        
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        [realm beginWriteTransaction];
-        [realm addObject:newMessage];
-        [realm commitWriteTransaction];
-    }
-    
-    return message;
+    return [ESMessage allObjects].firstObject;
 }
 
 - (void)dealloc
