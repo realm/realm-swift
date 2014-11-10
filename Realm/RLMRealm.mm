@@ -390,8 +390,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             {
                 WriteTransaction transact(sharedGroup);
                 Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
+                ostream* applyLog = 0;
+                applyLog = &cerr;
                 try {
-                    Replication::apply_transact_log(input, transact.get_group()); // Throws
+                    Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
                     BinaryData transactLog((const char *)data.bytes, size_t(data.length));
                     @synchronized(s_uploadToServerInProgress) {
                         transactLogRegistry->submit_transact_log(transactLog);
