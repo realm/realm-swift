@@ -26,24 +26,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-}
-
--(void)realmDidLoad:(RLMRealm *)realm
-{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
     if (realm.serverBaseURL) {
         NSURLComponents *components = [[NSURLComponents alloc] initWithString:realm.serverBaseURL];
-//        NSURLComponents *components = [[NSURLComponents alloc] initWithString:@"http://213.232.213.1:344"];
-
+        
         self.urlScheme = [components scheme];
         self.hostField.placeholder = [components host];
         self.portField.placeholder = [[components port] stringValue];
     }
     
-//    if (realm.name) {
-//        self.realmField.placeholder = realm.name;
-//    }
-    
-    self.realm = realm;
+    //    if (realm.name) {
+    //        self.realmField.placeholder = realm.name;
+    //    }
+
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
