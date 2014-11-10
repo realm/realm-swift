@@ -27,6 +27,7 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include <sstream>
 #include <exception>
 
 #include <tightdb/version.hpp>
@@ -390,10 +391,11 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             {
                 WriteTransaction transact(sharedGroup);
                 Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-                ostream* applyLog = 0;
-                applyLog = &cerr;
+                ostringstream applyLog;
+                ostream *applyLog2 = 0;
+                applyLog2 = &applyLog;
                 try {
-                    Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                    Replication::apply_transact_log(input, transact.get_group(), applyLog2); // Throws
                     BinaryData transactLog((const char *)data.bytes, size_t(data.length));
                     @synchronized(s_uploadToServerInProgress) {
                         transactLogRegistry->submit_transact_log(transactLog);
@@ -404,7 +406,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                     continue;
                 }
                 catch (Replication::BadTransactLog&) {}
-                NSLog(@"Bad transaction log received");
+                string applyLog3 = applyLog.str();
+                StringData applyLog4(applyLog3.data(), applyLog3.size());
+                NSString *applyLog5 = RLMStringDataToNSString(applyLog4);
+                NSLog(@"Bad transaction log received: %@", applyLog5);
             }
         }
 
