@@ -391,11 +391,11 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             {
                 WriteTransaction transact(sharedGroup);
                 Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-                ostringstream applyLog;
-                ostream *applyLog2 = 0;
-                applyLog2 = &applyLog;
+                ostream *applyLog = 0;
+                applyLog = &cerr;
                 try {
-                    Replication::apply_transact_log(input, transact.get_group(), applyLog2); // Throws
+                    Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                    transact.commit(); // Throws
                     BinaryData transactLog((const char *)data.bytes, size_t(data.length));
                     @synchronized(s_uploadToServerInProgress) {
                         transactLogRegistry->submit_transact_log(transactLog);
@@ -406,10 +406,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                     continue;
                 }
                 catch (Replication::BadTransactLog&) {}
-                string applyLog3 = applyLog.str();
-                StringData applyLog4(applyLog3.data(), applyLog3.size());
-                NSString *applyLog5 = RLMStringDataToNSString(applyLog4);
-                NSLog(@"Bad transaction log received: %@", applyLog5);
+                NSLog(@"Transaction log application failed");
             }
         }
 
