@@ -30,6 +30,10 @@ Using data from FourSquare, this example demonstrates how to populate a Realm wi
 
 This simple app shows how to use an encrypted realm.
 
+### Backlink
+
+This simple app demonstrates how to define models with inverse relationships using `-linkingObjectsOfClass:forProperty:`.
+
 ## iOS (Swift)
 
 In the `ios/swift/RealmExamples.xcodeproj` project, you will find the following examples (Xcode6-Beta6 required):
@@ -53,6 +57,10 @@ This example showcases Realm's migration features.
 ### Encryption
 
 This simple app shows how to use an encrypted realm.
+
+### Backlink
+
+This simple app demonstrates how to define models with inverse relationships using `linkingObjectsOfClass(_:forProperty:)`.
 
 ## iOS (RubyMotion)
 
