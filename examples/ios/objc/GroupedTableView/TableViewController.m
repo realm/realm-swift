@@ -55,9 +55,15 @@ static NSString * const kTableName = @"table";
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
     self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        [weakSelf reloadData];
+        [weakSelf.tableView reloadData];
     }];
-    [self reloadData];
+    self.objectsBySection = [NSMutableArray arrayWithCapacity:3];
+    for (NSString *section in self.sectionTitles) {
+        RLMResults *unsortedObjects = [DemoObject objectsWhere:@"sectionTitle == %@", section];
+        RLMResults *sortedObjects = [unsortedObjects sortedResultsUsingProperty:@"date" ascending:YES];
+        [self.objectsBySection addObject:sortedObjects];
+    }
+    [self.tableView reloadData];
 }
 
 #pragma mark - UI
@@ -121,17 +127,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 #pragma mark - Actions
-
-- (void)reloadData
-{
-    self.objectsBySection = [NSMutableArray arrayWithCapacity:3];
-    for (NSString *section in self.sectionTitles) {
-        RLMResults *unsortedObjects = [DemoObject objectsWhere:@"sectionTitle == %@", section];
-        RLMResults *sortedObjects = [unsortedObjects sortedResultsUsingProperty:@"date" ascending:YES];
-        [self.objectsBySection addObject:sortedObjects];
-    }
-    [self.tableView reloadData];
-}
 
 - (void)backgroundAdd
 {

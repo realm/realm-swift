@@ -49,9 +49,14 @@ class TableViewController: UITableViewController {
 
         // Set realm notification block
         notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
-            self.reloadData()
+            self.tableView.reloadData()
         }
-        reloadData()
+        for section in sectionTitles {
+            let unsortedObjects = DemoObject.objectsWhere("sectionTitle == '\(section)'")
+            let sortedObjects = unsortedObjects.sortedResultsUsingProperty("date", ascending: true)
+            objectsBySection.append(sortedObjects)
+        }
+        tableView.reloadData()
     }
 
     // UI
@@ -98,16 +103,6 @@ class TableViewController: UITableViewController {
     }
 
     // Actions
-
-    func reloadData() {
-        objectsBySection.removeAll(keepCapacity: true)
-        for section in sectionTitles {
-            let unsortedObjects = DemoObject.objectsWhere("sectionTitle == '\(section)'")
-            let sortedObjects = unsortedObjects.sortedResultsUsingProperty("date", ascending: true)
-            objectsBySection.append(sortedObjects)
-        }
-        tableView.reloadData()
-    }
 
     func backgroundAdd() {
         let queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
