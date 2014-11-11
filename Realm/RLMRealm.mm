@@ -325,7 +325,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     // would be corrupt from our point of view.
     typedef unsigned long long ulonglong;
     if (lastVersionUploaded < currentVersion) {
-        NSLog(@"Skipping initial blocking sync with server due to pending uploads (%llu<%llu)",
+        NSLog(@"Skipping initialal blocking sync with server due to pending uploads (%llu<%llu)",
               ulonglong(lastVersionUploaded), ulonglong(currentVersion));
         return;
     }
