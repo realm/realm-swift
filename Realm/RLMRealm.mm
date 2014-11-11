@@ -288,7 +288,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
 
 - (void)initialBlockingSyncWithServer {
-    return;
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     queue.name = @"io.Realm.sync";
 
