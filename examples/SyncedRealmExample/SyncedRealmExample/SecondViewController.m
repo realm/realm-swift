@@ -165,8 +165,12 @@ RLM_ARRAY_TYPE(ESChatMessage)
 -(void)updateStream
 {
     [self.tableView reloadData];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:[self.tableView numberOfSections] - 1];
-    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    
+    NSInteger sectionCount = [self.tableView numberOfSections];
+    if (sectionCount > 0) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1];
+        [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
 }
 
 -(void)messageEntered:(NSString *)content
