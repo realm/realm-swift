@@ -505,6 +505,9 @@ static NSUInteger s_currentSchemaVersion = 0;
                 }
                 if (numRetries == maxRetries) {
                     NSLog(@"nonblockingUpload: Too many failed HTTP requests, giving up");
+                    @synchronized (self) {
+                        _uploadInProgress = false;
+                    }
                     return;
                 }
                 [self nonblockingUpload:data version:version numRetries:numRetries+1];
