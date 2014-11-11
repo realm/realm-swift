@@ -154,20 +154,20 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Type your message" adjustsFontSizeToFit="NO" minimumFontSize="20" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="ydZ-ZO-OfA" customClass="ESTextField">
-                                <rect key="frame" x="16" y="300" width="568" height="40"/>
+                                <rect key="frame" x="16" y="560" width="508" height="40"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="kxJ-p9-EeH"/>
                                 </constraints>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <textInputTraits key="textInputTraits" keyboardAppearance="alert" returnKeyType="send"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences" keyboardAppearance="alert" returnKeyType="send" enablesReturnKeyAutomatically="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="8rJ-Kc-sve" id="bdg-fL-27m"/>
                                 </connections>
                             </textField>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="40" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="fV4-FI-t0i">
-                                <rect key="frame" x="16" y="64" width="568" height="236"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="40" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="fV4-FI-t0i">
+                                <rect key="frame" x="16" y="64" width="568" height="496"/>
                                 <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="tintColor" red="0.98770105838775635" green="0.29202678799629211" blue="0.38261926174163818" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="separatorColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
@@ -199,15 +199,32 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M0o-7f-9N7">
+                                <rect key="frame" x="524" y="560" width="60" height="40"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="TYd-dD-jdS"/>
+                                </constraints>
+                                <state key="normal" title="Close">
+                                    <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="closeTextField:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="v9e-wJ-ZGl"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Djb-ko-YwX" firstAttribute="top" secondItem="ydZ-ZO-OfA" secondAttribute="bottom" constant="260" id="62I-PI-6Vw"/>
+                            <constraint firstItem="Djb-ko-YwX" firstAttribute="top" secondItem="ydZ-ZO-OfA" secondAttribute="bottom" id="62I-PI-6Vw"/>
                             <constraint firstItem="ydZ-ZO-OfA" firstAttribute="leading" secondItem="QS5-Rx-YEW" secondAttribute="leadingMargin" id="7Hu-Gc-zCi"/>
                             <constraint firstItem="ydZ-ZO-OfA" firstAttribute="top" secondItem="fV4-FI-t0i" secondAttribute="bottom" id="AZU-aC-A2T"/>
-                            <constraint firstItem="ydZ-ZO-OfA" firstAttribute="trailing" secondItem="QS5-Rx-YEW" secondAttribute="trailingMargin" id="Pme-Un-hES"/>
+                            <constraint firstItem="M0o-7f-9N7" firstAttribute="leading" secondItem="ydZ-ZO-OfA" secondAttribute="trailing" id="ZrU-zi-yHQ"/>
                             <constraint firstItem="fV4-FI-t0i" firstAttribute="trailing" secondItem="QS5-Rx-YEW" secondAttribute="trailingMargin" id="aLn-Nj-X1K"/>
+                            <constraint firstItem="M0o-7f-9N7" firstAttribute="height" secondItem="ydZ-ZO-OfA" secondAttribute="height" id="ckw-or-bob"/>
+                            <constraint firstItem="M0o-7f-9N7" firstAttribute="trailing" secondItem="QS5-Rx-YEW" secondAttribute="trailingMargin" id="hSg-wG-2Q2"/>
                             <constraint firstItem="fV4-FI-t0i" firstAttribute="leading" secondItem="QS5-Rx-YEW" secondAttribute="leadingMargin" id="kTA-Sl-ZSk"/>
+                            <constraint firstItem="M0o-7f-9N7" firstAttribute="centerY" secondItem="ydZ-ZO-OfA" secondAttribute="centerY" id="lTh-Hr-jqN"/>
                             <constraint firstItem="fV4-FI-t0i" firstAttribute="top" secondItem="L7p-HK-0SC" secondAttribute="top" id="zPk-iL-DZB"/>
                         </constraints>
                     </view>
@@ -220,7 +237,10 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="closeButton" destination="M0o-7f-9N7" id="mNo-Jd-1IA"/>
+                        <outlet property="closeButtonWidth" destination="TYd-dD-jdS" id="sSE-aY-fg5"/>
                         <outlet property="messageField" destination="ydZ-ZO-OfA" id="Drl-XX-mTk"/>
+                        <outlet property="messageFieldMargin" destination="62I-PI-6Vw" id="lHt-KH-0Lx"/>
                         <outlet property="tableView" destination="fV4-FI-t0i" id="XCZ-QY-foD"/>
                     </connections>
                 </viewController>
