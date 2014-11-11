@@ -19,6 +19,7 @@
 #import "RLMDebugSupport.h"
 
 #import "RLMArray.h"
+#import "RLMObjectSchema.h"
 
 #import <objc/runtime.h>
 
@@ -63,4 +64,16 @@ size_t RLMDebugGetIvarOffset(__unsafe_unretained id obj, const char *name) {
     Ivar ivar = class_getInstanceVariable([obj class], name);
     assert(ivar);
     return ivar_getOffset(ivar);
+}
+
+id RLMDebugAddrToObj(uintptr_t ptr) {
+    return (__bridge id)(void *)ptr;
+}
+
+id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key) {
+    return [obj valueForKey:@(key)];
+}
+
+uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj) {
+    return (uintptr_t)[[[(RLMObjectSchema *)obj properties] valueForKey:@"name"] componentsJoinedByString:@" "].UTF8String;
 }

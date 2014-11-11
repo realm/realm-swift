@@ -64,13 +64,6 @@ if __name__ == '__main__':
 
 import lldb
 
-property_types = {
-    0: 'int64_t',
-    10: 'double',
-    1: 'bool',
-    9: 'float',
-}
-
 def cache_lookup(cache, key, generator):
     value = cache.get(key, None)
     if not value:
@@ -96,6 +89,7 @@ def get_ivar(obj, addr, ivar):
 
 object_table_ptr_offset = None
 def is_object_deleted(obj):
+    return False
     addr = int(str(obj.GetAddress()), 16)
     global object_table_ptr_offset
     if not object_table_ptr_offset:
@@ -115,24 +109,36 @@ def unsigned(value):
     return value.data.GetUnsignedInt64(lldb.SBError(), 0)
 
 def path(obj):
-    return obj.path.replace('.Some', '!')
+    p = obj.path
+    # Optionals need to use the expression path or it crashes, but in most
+    # cases the expression path is not even vaguely close to valid syntax,
+    # so we need to use the address
+    if '.Some' in p:
+        return obj.path.replace('.Some', '!')
+    return 'RLMDebugAddrToObj(' + str(obj.GetAddress()) + ')'
 
 ivar_offset_cache = {}
 def get_ivars(obj, *args):
     def get_offset(type_name):
         ivars = {}
         for ivar in args:
-            ivars[ivar] = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
-                'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar)))
+            v = obj.thread.GetSelectedFrame().EvaluateExpression(
+                    'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar))
+            ivars[ivar] = unsigned(v)
         return ivars
 
     return cache_lookup(ivar_offset_cache, obj.type.name, get_offset)
 
 type_cache = {}
 def get_type(obj, name):
-    return cache_lookup(type_cache, name, lambda name: obj.target.FindFirstType(name))
+    def do_get_type(_):
+        t = obj.target.FindFirstType(name)
+        if not t and name.endswith('*'):
+            t = obj.target.FindFirstType(name.rstrip('*')).GetPointerType()
+        return t
+    return cache_lookup(type_cache, name, do_get_type)
 
-class SyntheticChildrenProvider(object):
+class IvarHelper(object):
     def __init__(self, obj, *ivars):
         self.obj = obj
         self.ivars = get_ivars(obj, *ivars)
@@ -145,31 +151,26 @@ class SyntheticChildrenProvider(object):
         return get_ivar(self.obj, addr, ivar)
 
     def _to_str(self, val):
-        return self.obj.GetProcess().ReadCStringFromMemory(val, 1024, lldb.SBError())
+        return self.obj.GetProcess().ReadCStringFromMemory(val, 65536, lldb.SBError())
 
-    def _value_from_ivar(self, ivar):
-        return self.obj.CreateChildAtOffset(ivar, self.ivars[ivar], get_type(self.obj, 'id'))
+    def _value_from_ivar(self, ivar, ivar_type='id'):
+        return self.obj.CreateChildAtOffset(ivar, self.ivars[ivar], get_type(self.obj, ivar_type))
 
 schema_cache = {}
-class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
+class RLMObject_SyntheticChildrenProvider(IvarHelper):
     def __init__(self, obj, _):
-        super(RLMObject_SyntheticChildrenProvider, self).__init__(obj,
-                'objectSchema', 'realm')
+        super(RLMObject_SyntheticChildrenProvider, self).__init__(
+                obj, 'objectSchema', 'realm')
 
         if not obj.GetAddress() or is_object_deleted(obj):
             self.props = []
             return
 
-        object_schema = self._get_ivar(self.obj.GetAddress(), 'RLMObject._objectSchema')
+        object_schema = self._value_from_ivar('objectSchema', 'RLMObjectSchema*').deref
+        def get_schema(_):
+            return self._to_str(unsigned(self._eval('RLMDebugPropertyNames({})'.format(path(object_schema))))).split(' ')
 
-        def get_schema(object_schema):
-            properties = self._get_ivar(object_schema, 'RLMObjectSchema._properties')
-            if not properties:
-                return None
-            count = self._eval("(NSUInteger)[((NSArray *){}) count]".format(properties)).GetValueAsUnsigned()
-            return [self._get_prop(properties, i) for i in range(count)]
-
-        self.props = cache_lookup(schema_cache, object_schema, get_schema)
+        self.props = cache_lookup(schema_cache, str(object_schema.GetAddress()), get_schema)
 
     def num_children(self):
         return len(self.props) + 2
@@ -190,19 +191,12 @@ class RLMObject_SyntheticChildrenProvider(SyntheticChildrenProvider):
         if index == 1:
             return self._value_from_ivar('objectSchema')
 
-        name, getter = self.props[index - 2]
-        value = self._eval(getter)
-        return self.obj.CreateValueFromData(name, value.GetData(), value.GetType())
+        name = self.props[index - 2]
+        value = self._eval('RLMDebugValueForKey({}, "{}")'.format(path(self.obj), name))
+        return self.obj.CreateValueFromData(name, value.GetData(), get_type(self.obj, 'id'))
 
     def update(self):
         pass
-
-    def _get_prop(self, props, i):
-        prop = self._eval("(NSUInteger)[((NSArray *){}) objectAtIndex:{}]".format(props, i)).GetValueAsUnsigned()
-        name = self._to_str(self._eval('[(NSString *){} UTF8String]'.format(self._get_ivar(prop, "RLMProperty._name"))).GetValueAsUnsigned())
-        type = self._get_ivar(prop, 'RLMProperty._type')
-        getter = "({})[(id){} {}]".format(property_types.get(type, 'id'), self.obj.GetAddress(), name)
-        return name, getter
 
 def RLM_SummaryProvider(obj, _):
     frame = obj.thread.GetSelectedFrame()
@@ -211,7 +205,7 @@ def RLM_SummaryProvider(obj, _):
         return None
     return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
 
-class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
+class RLMArray_SyntheticChildrenProvider(IvarHelper):
     def __init__(self, valobj, _):
         super(RLMArray_SyntheticChildrenProvider, self).__init__(valobj, 'realm')
         self.type = get_type(self.obj, 'id')
@@ -253,4 +247,4 @@ def __lldb_init_module(debugger, _):
     debugger.HandleCommand('type synthetic add RLMArray --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
     debugger.HandleCommand('type synthetic add RLMArrayLinkView --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
     debugger.HandleCommand('type synthetic add RLMResults --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
-    # debugger.HandleCommand('type synthetic add -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')
+    debugger.HandleCommand('type synthetic add -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')

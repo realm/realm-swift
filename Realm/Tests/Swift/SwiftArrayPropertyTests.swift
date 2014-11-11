@@ -23,6 +23,45 @@ class SwiftArrayPropertyTests: SwiftTestCase {
 
     // Swift models
 
+    func testStuff() {
+        let realm = realmWithTestPath()
+        realm.transactionWithBlock {
+//            for i in 0...100 {
+                realm.createObject("SwiftStringObject", withObject: [""])
+            ()
+//            }
+        }
+
+        let results = realm.allObjects("SwiftStringObject")
+        results.firstObject()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+        println()
+
+    }
+
     func testBasicArray() {
         let string = SwiftStringObject()
         string.stringCol = "string"
