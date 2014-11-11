@@ -81,6 +81,7 @@ RLM_ARRAY_TYPE(ESChatMessage)
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.contentInset = UIEdgeInsetsMake(70.0, 0.0, 0.0, 0.0);
     
     RLMRealm *realm = [RLMRealm defaultRealm];
     
