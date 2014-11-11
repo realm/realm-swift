@@ -151,6 +151,8 @@ static NSUInteger s_currentSchemaVersion = 0;
 @end
 
 @implementation RLMServerSync {
+    NSString *_path;
+
     NSURLSession *_URLSession;
 
     // At the present time we need to apply foreign transaction logs
@@ -168,6 +170,8 @@ static NSUInteger s_currentSchemaVersion = 0;
     self = [super init];
     if (self) {
         _baseURL = @"http://192.168.1.50:8080"; // Kristains workstation
+
+        _path = path;
 
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         queue.name = @"io.Realm.sync";
@@ -401,6 +405,15 @@ static NSUInteger s_currentSchemaVersion = 0;
                                 _transactLogRegistry->submit_transact_log(transactLog);
                                 _transactLogRegistry->set_last_version_synced(receivedVersion);
                                 [self nonblockingDownload:0];
+
+                                // notify realm istances of changes
+                                NSArray *realms = realmsAtPath(_path);
+                                for (RLMRealm *realm in realms) {
+                                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+                                    [notifier performSelector:@selector(notify)
+                                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
+                                }
+
                                 return;
                             }
                             catch (Replication::BadTransactLog&) {}
