@@ -245,7 +245,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                             upToDate[0] = @YES;
                         }
                         else {
-                            NSLog(@"initialBlockingDownload: HTTP request failed (4)");
+                            NSLog(@"initialBlockingDownload: Unrecognized message from server %@",
+                                  data.description);
                         }
                     }
                     else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
@@ -267,28 +268,35 @@ static NSUInteger s_currentSchemaVersion = 0;
             break;
 
         if (responseData.firstObject) {
-            Replication::version_type receivedVersion = currentVersion + 1;
-            NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu",
-                  ulonglong(receivedVersion-1), ulonglong(receivedVersion));
-            // Apply transaction log via the special SharedGroup instance
             NSData *data = responseData.firstObject;
-            {
-                WriteTransaction transact(*_sharedGroup);
-                Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-                ostream *applyLog = 0;
-                applyLog = &cerr;
-                try {
-                    Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
-                    transact.commit(); // Throws
-                    BinaryData transactLog((const char *)data.bytes, size_t(data.length));
-                    _transactLogRegistry->submit_transact_log(transactLog);
-                    _transactLogRegistry->set_last_version_synced(receivedVersion);
-                    currentVersion = receivedVersion;
-                    numRetries = 0;
-                    continue;
+            if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
+                NSLog(@"initialBlockingDownload: Bad transaction log from server (no leading null character)");
+            }
+            else {
+                Replication::version_type receivedVersion = currentVersion + 1;
+                const char *data2 = (const char *)data.bytes + 1;
+                size_t size = size_t(data.length) - 1;
+                NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu of size %llu",
+                      ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                // Apply transaction log via the special SharedGroup instance
+                {
+                    WriteTransaction transact(*_sharedGroup);
+                    Replication::SimpleInputStream input(data2, size);
+                    ostream *applyLog = 0;
+                    applyLog = &cerr;
+                    try {
+                        Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                        transact.commit(); // Throws
+                        BinaryData transactLog(data2, size);
+                        _transactLogRegistry->submit_transact_log(transactLog);
+                        _transactLogRegistry->set_last_version_synced(receivedVersion);
+                        currentVersion = receivedVersion;
+                        numRetries = 0;
+                        continue;
+                    }
+                    catch (Replication::BadTransactLog&) {}
+                    NSLog(@"initialBlockingDownload: Transaction log application failed");
                 }
-                catch (Replication::BadTransactLog&) {}
-                NSLog(@"initialBlockingDownload: Transaction log application failed");
             }
         }
 
@@ -330,8 +338,8 @@ static NSUInteger s_currentSchemaVersion = 0;
     // view.
     typedef unsigned long long ulonglong;
     if (lastVersionUploaded < currentVersion) {
-        NSLog(@"nonblockingDownload: Skipping due to pending uploads (%llu<%llu)",
-              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
+//        NSLog(@"nonblockingDownload: Skipping due to pending uploads (%llu<%llu)",
+//              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
         [self rescheduleNonblockingDownload];
         return;
     }
@@ -366,32 +374,39 @@ static NSUInteger s_currentSchemaVersion = 0;
                     NSLog(@"nonlockingDownload: HTTP request failed (4)");
                 }
                 else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
-                    Replication::version_type receivedVersion = originalVersion + 1;
-                    NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu",
-                          ulonglong(receivedVersion-1), ulonglong(receivedVersion));
-                    @synchronized (self) {
-                        WriteTransaction transact(*_sharedGroup);
-                        Replication::version_type newCurrentVersion = LangBindHelper::get_current_version(*_sharedGroup);
-                        if (newCurrentVersion != originalVersion) {
-                            NSLog(@"nonblockingDownload: Dropping received transaction log due to advance of local version %llu", ulonglong(newCurrentVersion));
-                            [self rescheduleNonblockingDownload];
-                            return;
-                        }
-                        Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-                        ostream *applyLog = 0;
-                        applyLog = &cerr;
-                        try {
-                            Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
-                            transact.commit(); // Throws
-                            BinaryData transactLog((const char *)data.bytes, size_t(data.length));
-                            _transactLogRegistry->submit_transact_log(transactLog);
-                            _transactLogRegistry->set_last_version_synced(receivedVersion);
-                            [self nonblockingDownload:0];
-                            return;
-                        }
-                        catch (Replication::BadTransactLog&) {}
+                    if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
+                        NSLog(@"nonblockingDownload: Bad transaction log from server (no leading null character)");
                     }
-                    NSLog(@"nonlockingDownload: Transaction log application failed");
+                    else {
+                        const char *data2 = (const char *)data.bytes + 1;
+                        size_t size = size_t(data.length) - 1;
+                        Replication::version_type receivedVersion = originalVersion + 1;
+                        NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu of size %llu",
+                              ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                        @synchronized (self) {
+                            WriteTransaction transact(*_sharedGroup);
+                            Replication::version_type newCurrentVersion = LangBindHelper::get_current_version(*_sharedGroup);
+                            if (newCurrentVersion != originalVersion) {
+                                NSLog(@"nonblockingDownload: Dropping received transaction log due to advance of local version %llu", ulonglong(newCurrentVersion));
+                                [self rescheduleNonblockingDownload];
+                                return;
+                            }
+                            Replication::SimpleInputStream input(data2, size);
+                            ostream *applyLog = 0;
+                            applyLog = &cerr;
+                            try {
+                                Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                                transact.commit(); // Throws
+                                BinaryData transactLog(data2, size);
+                                _transactLogRegistry->submit_transact_log(transactLog);
+                                _transactLogRegistry->set_last_version_synced(receivedVersion);
+                                [self nonblockingDownload:0];
+                                return;
+                            }
+                            catch (Replication::BadTransactLog&) {}
+                        }
+                        NSLog(@"nonlockingDownload: Transaction log application failed");
+                    }
                 }
                 else {
                     NSLog(@"nonblockingDownload: Unexpected MIME type in HTTP response '%@'",
@@ -407,7 +422,7 @@ static NSUInteger s_currentSchemaVersion = 0;
 
 - (void)resumeNonblockingUpload {
     Replication::version_type lastVersionUploaded, lastVersionAvailable;
-
+    NSData *data;
     @synchronized (self) {
         if (_uploadInProgress)
             return;
@@ -416,13 +431,18 @@ static NSUInteger s_currentSchemaVersion = 0;
         if (lastVersionUploaded == lastVersionAvailable)
             return;
 
+        BinaryData transact_log;
+        _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
+        data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
+
         _uploadInProgress = true;
     }
 
-    BinaryData transact_log;
-    _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
-    NSData *data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
-    [self nonblockingUpload:data version:lastVersionUploaded+1 numRetries:0];
+    Replication::version_type version = lastVersionUploaded+1;
+    typedef unsigned long long ulonglong;
+    NSLog(@"Sending transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
+
+    [self nonblockingUpload:data version:version numRetries:0];
 }
 
 - (void)nonblockingUpload:(NSData *)data version:(Replication::version_type)version
@@ -456,6 +476,7 @@ static NSUInteger s_currentSchemaVersion = 0;
                         @synchronized (self) {
                             _transactLogRegistry->set_last_version_synced(version);
                             _uploadInProgress = false;
+                            NSLog(@"Server received transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
                         }
                         [self resumeNonblockingUpload];
                         return;
