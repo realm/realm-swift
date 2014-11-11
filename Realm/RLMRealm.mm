@@ -303,11 +303,15 @@ static NSUInteger s_currentSchemaVersion = 0;
                 }
             }
         }
-
-        if (numRetries == maxRetries)
+        if (numRetries == maxRetries) {
+            NSLog(@"initialBlockingDownload: Too many failed HTTP requests, giving up");
+            break;
+/*
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Too many HTTP request failures"
                                          userInfo:nil];
+*/
+        }
         ++numRetries;
     }
 }
