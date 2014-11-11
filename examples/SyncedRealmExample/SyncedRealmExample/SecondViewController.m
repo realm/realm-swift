@@ -56,8 +56,12 @@ RLM_ARRAY_TYPE(ESChatMessage)
 
 @interface SecondViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
 
-@property (weak, nonatomic) IBOutlet ESTextField *messageField;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet ESTextField *messageField;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageFieldMargin;
+
+@property (weak, nonatomic) IBOutlet UIButton *closeButton;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *closeButtonWidth;
 
 @property (nonatomic, readonly) ESChatRoom *chatRoom;
 @property (nonatomic) RLMNotificationToken *notificationToken;
@@ -92,6 +96,9 @@ RLM_ARRAY_TYPE(ESChatMessage)
     }];
     
     [self updateStream];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChange:) name:UIKeyboardWillChangeFrameNotification object:nil];
+    [self toggleCloseButtonVisibility:NO];
 }
 
 # pragma mark - Table View Datasource
@@ -141,12 +148,16 @@ RLM_ARRAY_TYPE(ESChatMessage)
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    NSLog(@"textField should return");
-
     [self messageEntered:textField.text];
-//    [textField resignFirstResponder];
     
     return NO;
+}
+
+# pragma mark - Action Methods
+
+-(IBAction)closeTextField:(UIButton *)sender
+{
+    [self.messageField resignFirstResponder];
 }
 
 # pragma mark - Private Methods
@@ -160,8 +171,6 @@ RLM_ARRAY_TYPE(ESChatMessage)
 
 -(void)messageEntered:(NSString *)content
 {
-    NSLog(@"message entered: %@", content);
-
     ESChatMessage *message = [[ESChatMessage alloc] init];
     message.timestamp = [NSDate date];
     message.content = content;
@@ -173,6 +182,43 @@ RLM_ARRAY_TYPE(ESChatMessage)
     [realm commitWriteTransaction];
     
     self.messageField.text = @"";
+}
+
+# pragma mark - Private Methods - Keyboard Handling
+
+- (void)keyboardWillChange:(NSNotification *)notification {
+    CGRect initialRect = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+    CGFloat initialHeight = self.view.frame.size.height - [self.view convertRect:initialRect fromView:nil].origin.y;
+    
+    CGRect keyboardRect = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGFloat newHeight = self.view.frame.size.height - [self.view convertRect:keyboardRect fromView:nil].origin.y;
+    
+    CGPoint offset = self.tableView.contentOffset;
+    offset.y += newHeight - initialHeight;
+    self.tableView.contentOffset = offset;
+    
+    self.messageFieldMargin.constant = newHeight;
+    [self toggleCloseButtonVisibility:(newHeight > 0.0)];
+    
+    [self.view setNeedsUpdateConstraints];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
+    [UIView setAnimationCurve:[notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue]];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [self.view layoutIfNeeded];
+    [UIView commitAnimations];
+}
+
+-(void)toggleCloseButtonVisibility:(BOOL)on
+{
+    if (on) {
+        self.closeButtonWidth.constant = 60.0;
+        self.closeButton.titleLabel.alpha = 1.0;
+    }
+    else {
+        self.closeButtonWidth.constant = 0.0;
+        self.closeButton.titleLabel.alpha = 0.0;
+    }
 }
 
 # pragma mark - Convenience Methods
