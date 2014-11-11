@@ -404,16 +404,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                                 BinaryData transactLog(data2, size);
                                 _transactLogRegistry->submit_transact_log(transactLog);
                                 _transactLogRegistry->set_last_version_synced(receivedVersion);
+                                [RLMRealm notifyRealmsAtPath:_path exceptRealm:nil];
                                 [self nonblockingDownload:0];
-
-                                // notify realm istances of changes
-                                NSArray *realms = realmsAtPath(_path);
-                                for (RLMRealm *realm in realms) {
-                                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                                    [notifier performSelector:@selector(notify)
-                                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                                }
-
                                 return;
                             }
                             catch (Replication::BadTransactLog&) {}
@@ -876,15 +868,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
 
-            // notify other realm istances of changes
-            NSArray *realms = realmsAtPath(_path);
-            for (RLMRealm *realm in realms) {
-                if (![realm isEqual:self]) {
-                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                    [notifier performSelector:@selector(notify)
-                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                }
-            }
+            // notify other realm instances of changes
+            [RLMRealm notifyRealmsAtPath:_path exceptRealm:self];
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
@@ -896,6 +881,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         }
     } else {
        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing write transaction" userInfo:nil];
+    }
+}
+
++ (void)notifyRealmsAtPath:(NSString *)path exceptRealm:(RLMRealm *)exceptRealm {
+    NSArray *realms = realmsAtPath(path);
+    for (RLMRealm *realm in realms) {
+        // FIXME: Why is this not just a pointer comparison?
+        if (exceptRealm && [realm isEqual:exceptRealm])
+            continue;
+        RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+        [notifier performSelector:@selector(notify)
+                         onThread:realm->_thread withObject:nil waitUntilDone:NO];
     }
 }
 
