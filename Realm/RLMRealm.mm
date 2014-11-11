@@ -27,6 +27,7 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
+#include <sstream>
 #include <exception>
 
 #include <tightdb/version.hpp>
@@ -142,9 +143,370 @@ static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
 
-NSMutableArray *s_uploadToServerInProgress = [NSMutableArray arrayWithObject:@NO];
-
 } // anonymous namespace
+
+
+@interface RLMServerSync : NSObject 
+@property (atomic) NSString *baseURL; // E.g. http://187.56.46.23:123
+@end
+
+@implementation RLMServerSync {
+    NSString *_path;
+
+    NSURLSession *_URLSession;
+
+    // At the present time we need to apply foreign transaction logs
+    // via a special SharedGroup instance on which replication is not
+    // enabled. This is necessary because some (not all) of the
+    // actions taken during transaction log application submits new
+    // entries to a new transaction log.
+    unique_ptr<Replication> _transactLogRegistry;
+    unique_ptr<SharedGroup> _sharedGroup;
+
+    bool _uploadInProgress;
+}
+
+- (instancetype)initWithPath:(NSString *)path {
+    self = [super init];
+    if (self) {
+        _baseURL = @"http://192.168.1.50:8080"; // Kristains workstation
+
+        _path = path;
+
+        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        queue.name = @"io.Realm.sync";
+
+        // Emphemeral config disables everything that would result in data being automatically saved to disk
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+
+        // Disable caching
+        config.URLCache = nil;
+        config.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+
+        config.HTTPShouldUsePipelining = YES;
+
+        _URLSession = [NSURLSession sessionWithConfiguration:config
+                                                    delegate:nil
+                                               delegateQueue:queue];
+
+        _transactLogRegistry.reset(makeWriteLogCollector(path.UTF8String));
+        _sharedGroup.reset(new SharedGroup(path.UTF8String));
+
+        _uploadInProgress = false;
+    }
+    return self;
+}
+
+- (void)initialBlockingDownload {
+    Replication::version_type lastVersionUploaded, lastVersionAvailable;
+    lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
+    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
+    Replication::version_type currentVersion = LangBindHelper::get_current_version(*_sharedGroup);
+    TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
+
+    // Never ask for next transaction log that is newer than one
+    // beyong the last version uploaded. If we do that, we risk
+    // getting something back even when the upload in progress is in
+    // conflict with somebody elses transaction, and in that case the
+    // received transaction log would be corrupt from our point of
+    // view.
+    typedef unsigned long long ulonglong;
+    if (lastVersionUploaded < currentVersion) {
+        NSLog(@"initialBlockingDownload: Skipping due to pending uploads (%llu<%llu)",
+              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
+        return;
+    }
+
+    int maxRetries = 16;
+    int numRetries = 0;
+    __block NSMutableArray *upToDate = [NSMutableArray arrayWithObject:@NO];
+    for (;;) {
+        __block NSMutableArray *responseData = [NSMutableArray array];
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.baseURL, ulonglong(currentVersion)];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        request.HTTPMethod = @"POST";
+        [[_URLSession dataTaskWithRequest:request
+                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                    if (error) {
+                        NSLog(@"initialBlockingDownload: HTTP request failed (1)");
+                    }
+                    else if (((NSHTTPURLResponse *)response).statusCode != 200) {
+                        NSLog(@"initialBlockingDownload: HTTP request failed (2)");
+                    }
+                    else if (!response.MIMEType) {
+                        // FIXME: Using the MIME type in this way is
+                        // not reliable as it may in general be
+                        // modified in complicated ways by various
+                        // involved HTTP agents.
+                        NSLog(@"initialBlockingDownload: HTTP request failed (3)");
+                    }
+                    else if ([response.MIMEType isEqualToString:@"text/plain"]) {
+                        NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
+                                                                      length:10
+                                                                freeWhenDone:NO];
+                        if ([data isEqualToData:upToDateString]) {
+                            upToDate[0] = @YES;
+                        }
+                        else {
+                            NSLog(@"initialBlockingDownload: Unrecognized message from server %@",
+                                  data.description);
+                        }
+                    }
+                    else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
+                        // Assuming that `data` needs to be copied
+                        // here to make it available outside the
+                        // completion handler.
+                        responseData[0] = [data copy];
+                    }
+                    else {
+                        NSLog(@"initialBlockingDownload: Unexpected MIME type in HTTP response '%@'",
+                              response.MIMEType);
+                    }
+                    dispatch_semaphore_signal(semaphore);
+                }] resume];
+
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+
+        if (((NSNumber *)upToDate[0]).boolValue)
+            break;
+
+        if (responseData.firstObject) {
+            NSData *data = responseData.firstObject;
+            if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
+                NSLog(@"initialBlockingDownload: Bad transaction log from server (no leading null character)");
+            }
+            else {
+                Replication::version_type receivedVersion = currentVersion + 1;
+                const char *data2 = (const char *)data.bytes + 1;
+                size_t size = size_t(data.length) - 1;
+                NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu of size %llu",
+                      ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                // Apply transaction log via the special SharedGroup instance
+                {
+                    WriteTransaction transact(*_sharedGroup);
+                    Replication::SimpleInputStream input(data2, size);
+                    ostream *applyLog = 0;
+                    applyLog = &cerr;
+                    try {
+                        Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                        transact.commit(); // Throws
+                        BinaryData transactLog(data2, size);
+                        _transactLogRegistry->submit_transact_log(transactLog);
+                        _transactLogRegistry->set_last_version_synced(receivedVersion);
+                        currentVersion = receivedVersion;
+                        numRetries = 0;
+                        continue;
+                    }
+                    catch (Replication::BadTransactLog&) {}
+                    NSLog(@"initialBlockingDownload: Transaction log application failed");
+                }
+            }
+        }
+
+        if (numRetries == maxRetries)
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Too many HTTP request failures"
+                                         userInfo:nil];
+        ++numRetries;
+    }
+}
+
+- (void)rescheduleNonblockingDownload {
+    // FIXME: Does dispatch_get_main_queue() imply that the block is
+    // going to be executed by the main thread? Such a constraint is
+    // not required. Any thread would suffice.
+
+    // Schedule server download request roughly 10 times per second
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC/10), dispatch_get_main_queue(), ^{
+            [self nonblockingDownload:0];
+        });
+}
+
+- (void)nonblockingDownload:(int)numRetries {
+    int maxRetries = 16;
+
+    Replication::version_type currentVersion, lastVersionUploaded, lastVersionAvailable;
+    @synchronized (self) {
+        currentVersion = LangBindHelper::get_current_version(*_sharedGroup);
+        lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
+    }
+    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
+    TIGHTDB_ASSERT(currentVersion <= lastVersionAvailable);
+
+    // Never ask for next transaction log that is newer than one
+    // beyong the last version uploaded. If we do that, we risk
+    // getting something back even when the upload in progress is in
+    // conflict with somebody elses transaction, and in that case the
+    // received transaction log would be corrupt from our point of
+    // view.
+    typedef unsigned long long ulonglong;
+    if (lastVersionUploaded < currentVersion) {
+//        NSLog(@"nonblockingDownload: Skipping due to pending uploads (%llu<%llu)",
+//              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
+        [self rescheduleNonblockingDownload];
+        return;
+    }
+
+    NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.baseURL, ulonglong(currentVersion)];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod = @"POST";
+    Replication::version_type originalVersion = currentVersion;
+    [[_URLSession dataTaskWithRequest:request
+                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                if (error) {
+                    NSLog(@"nonblockingDownload: HTTP request failed (1)");
+                }
+                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
+                    NSLog(@"nonblockingDownload: HTTP request failed (2)");
+                }
+                else if (!response.MIMEType) {
+                    // FIXME: Using the MIME type in this way is
+                    // not reliable as it may in general be
+                    // modified in complicated ways by various
+                    // involved HTTP agents.
+                    NSLog(@"nonlockingDownload: HTTP request failed (3)");
+                }
+                else if ([response.MIMEType isEqualToString:@"text/plain"]) {
+                    NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
+                                                                  length:10
+                                                            freeWhenDone:NO];
+                    if ([data isEqualToData:upToDateString]) {
+                        [self rescheduleNonblockingDownload];
+                        return;
+                    }
+                    NSLog(@"nonlockingDownload: HTTP request failed (4)");
+                }
+                else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
+                    if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
+                        NSLog(@"nonblockingDownload: Bad transaction log from server (no leading null character)");
+                    }
+                    else {
+                        const char *data2 = (const char *)data.bytes + 1;
+                        size_t size = size_t(data.length) - 1;
+                        Replication::version_type receivedVersion = originalVersion + 1;
+                        NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu of size %llu",
+                              ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                        @synchronized (self) {
+                            WriteTransaction transact(*_sharedGroup);
+                            Replication::version_type newCurrentVersion = LangBindHelper::get_current_version(*_sharedGroup);
+                            if (newCurrentVersion != originalVersion) {
+                                NSLog(@"nonblockingDownload: Dropping received transaction log due to advance of local version %llu", ulonglong(newCurrentVersion));
+                                [self rescheduleNonblockingDownload];
+                                return;
+                            }
+                            Replication::SimpleInputStream input(data2, size);
+                            ostream *applyLog = 0;
+                            applyLog = &cerr;
+                            try {
+                                Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                                transact.commit(); // Throws
+                                BinaryData transactLog(data2, size);
+                                _transactLogRegistry->submit_transact_log(transactLog);
+                                _transactLogRegistry->set_last_version_synced(receivedVersion);
+                                [RLMRealm notifyRealmsAtPath:_path exceptRealm:nil];
+                                [self nonblockingDownload:0];
+                                return;
+                            }
+                            catch (Replication::BadTransactLog&) {}
+                        }
+                        NSLog(@"nonlockingDownload: Transaction log application failed");
+                    }
+                }
+                else {
+                    NSLog(@"nonblockingDownload: Unexpected MIME type in HTTP response '%@'",
+                          response.MIMEType);
+                }
+                if (numRetries == maxRetries) {
+                    NSLog(@"nonblockingDownload: Too many failed HTTP requests, giving up");
+                    return;
+                }
+                [self nonblockingDownload:numRetries+1];
+            }] resume];
+}
+
+- (void)resumeNonblockingUpload {
+    Replication::version_type lastVersionUploaded, lastVersionAvailable;
+    NSData *data;
+    @synchronized (self) {
+        if (_uploadInProgress)
+            return;
+
+        lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
+        if (lastVersionUploaded == lastVersionAvailable)
+            return;
+
+        BinaryData transact_log;
+        _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
+        data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
+
+        _uploadInProgress = true;
+    }
+
+    Replication::version_type version = lastVersionUploaded+1;
+    typedef unsigned long long ulonglong;
+    NSLog(@"Sending transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
+
+    [self nonblockingUpload:data version:version numRetries:0];
+}
+
+- (void)nonblockingUpload:(NSData *)data version:(Replication::version_type)version
+               numRetries:(int)numRetries {
+    int maxRetries = 16;
+    typedef unsigned long long ulonglong;
+    NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.baseURL, ulonglong(version)];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod = @"POST";
+    [[_URLSession uploadTaskWithRequest:request
+                               fromData:data
+                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                if (error) {
+                    NSLog(@"nonblockingUpload: HTTP request failed (1)");
+                }
+                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
+                    NSLog(@"nonblockingUpload: HTTP request failed (2)");
+                }
+                else if (!response.MIMEType) {
+                    // FIXME: Using the MIME type in this way is
+                    // not reliable as it may in general be
+                    // modified in complicated ways by various
+                    // involved HTTP agents.
+                    NSLog(@"nonblockingUpload: HTTP request failed (3)");
+                }
+                else if ([response.MIMEType isEqualToString:@"text/plain"]) {
+                    NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"ok"
+                                                                  length:2
+                                                            freeWhenDone:NO];
+                    if ([data isEqualToData:upToDateString]) {
+                        @synchronized (self) {
+                            _transactLogRegistry->set_last_version_synced(version);
+                            _uploadInProgress = false;
+                            NSLog(@"Server received transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
+                        }
+                        [self resumeNonblockingUpload];
+                        return;
+                    }
+                    NSData *conflictString = [NSData dataWithBytesNoCopy:(void *)"conflict"
+                                                                  length:8
+                                                            freeWhenDone:NO];
+                    if ([data isEqualToData:conflictString])
+                        @throw [NSException exceptionWithName:@"RLMException"
+                                                       reason:@"Conflicting transaction detected"
+                                                     userInfo:nil];
+                    NSLog(@"nonblockingUpload: HTTP request failed (4)");
+                }
+                else {
+                    NSLog(@"nonblockingUpload: Unexpected MIME type in HTTP response '%@'",
+                          response.MIMEType);
+                }
+                if (numRetries == maxRetries) {
+                    NSLog(@"nonblockingUpload: Too many failed HTTP requests, giving up");
+                    return;
+                }
+                [self nonblockingUpload:data version:version numRetries:numRetries+1];
+            }] resume];
+}
+@end
 
 NSString * const c_defaultRealmFileName = @"default.realm";
 
@@ -164,7 +526,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     BOOL _readOnly;
     BOOL _inMemory;
 
-    NSURLSession *_URLSession;
+    RLMServerSync *_serverSync;
 }
 
 + (BOOL)isCoreDebug {
@@ -192,7 +554,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         _readOnly = readonly;
         _inMemory = inMemory;
         _autorefresh = YES;
-        _serverBaseURL = @"http://192.168.1.50:8080"; // Kristains workstation
 
         try {
             if (readonly) {
@@ -287,136 +648,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 
-- (void)initialBlockingSyncWithServer {
-    return;
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.name = @"io.Realm.sync";
-
-    // Emphemeral config disables everything that would result in data being automatically saved to disk
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-
-    // Disable caching
-    config.URLCache = nil;
-    config.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-
-    config.HTTPShouldUsePipelining = YES;
-
-    _URLSession = [NSURLSession sessionWithConfiguration:config
-                                                 delegate:nil
-                                            delegateQueue:queue];
-
-    // At the present time we need to apply foreign transaction logs
-    // via a special SharedGroup instance on which replication is not
-    // enabled. This is necessary because some (not all) of the
-    // actions taken during transaction log application submits new
-    // entries to a new transaction log.
-    UniquePtr<Replication> transactLogRegistry(makeWriteLogCollector(self.path.UTF8String));
-    SharedGroup sharedGroup(self.path.UTF8String);
-
-    Replication::version_type lastVersionUploaded, lastVersionAvailable;
-    lastVersionUploaded = transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
-    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
-    Replication::version_type currentVersion = LangBindHelper::get_current_version(sharedGroup);
-    TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
-
-    // Never ask for next transaction log while upload is in
-    // progress. If we do that, we risk getting something back even
-    // when the upload in progress is in conflict with somebody elses
-    // transaction, and in that case the received transaction log
-    // would be corrupt from our point of view.
-    typedef unsigned long long ulonglong;
-    if (lastVersionUploaded < currentVersion) {
-        NSLog(@"Skipping initial blocking sync with server due to pending uploads (%llu<%llu)",
-              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
-        return;
-    }
-
-    int maxRetries = 16;
-    int numRetries = 0;
-    __block NSMutableArray *upToDate = [NSMutableArray arrayWithObject:@NO];
-    for (;;) {
-        __block NSMutableArray *responseData = [NSMutableArray array];
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.serverBaseURL, ulonglong(currentVersion)];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-        request.HTTPMethod = @"POST";
-        [[_URLSession dataTaskWithRequest:request
-                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-
-                    if (error) {
-                        NSLog(@"HTTP receive request failed (1)");
-                    }
-                    else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                        NSLog(@"HTTP receive request failed (2)");
-                    }
-                    else {
-                        // FIXME: Using the MIME type in this way is
-                        // not reliable as it may in general be
-                        // modified in complicated ways by various
-                        // involved HTTP agents.
-                        if (!response.MIMEType) {
-                            NSLog(@"HTTP receive request failed (3)");
-                        }
-                        else if ([response.MIMEType isEqualToString:@"text/plain"]) {
-                            NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
-                                                                          length:10
-                                                                    freeWhenDone:NO];
-                            if ([data isEqualToData:upToDateString]) {
-                                upToDate[0] = @YES;
-                            }
-                            else {
-                                NSLog(@"HTTP receive request failed (4)");
-                            }
-                        }
-                        else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
-                            // Assuming that `data` needs to be copied
-                            // here to make it available outside the
-                            // completion handler.
-                            responseData[0] = [data copy];
-                        }
-                    }
-                    dispatch_semaphore_signal(semaphore);
-                }] resume];
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-
-        if (((NSNumber *)upToDate[0]).boolValue)
-            break;
-
-        if (!responseData.firstObject) {
-            if (numRetries == maxRetries)
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"Too many HTTP request failures"
-                                             userInfo:nil];
-            ++numRetries;
-            continue;
-        }
-
-        // Apply transaction log via the special SharedGroup instance
-        Replication::version_type receivedVersion = currentVersion + 1;
-        NSData *data = responseData.firstObject;
-        {
-            WriteTransaction transact(sharedGroup);
-            Replication::SimpleInputStream input((const char *)data.bytes, size_t(data.length));
-            try {
-                Replication::apply_transact_log(input, transact.get_group()); // Throws
-            }
-            catch (Replication::BadTransactLog&) {
-                ++numRetries;
-                continue;
-            }
-            BinaryData transactLog((const char *)data.bytes, size_t(data.length));
-            @synchronized(s_uploadToServerInProgress) {
-                transactLogRegistry->submit_transact_log(transactLog);
-                transactLogRegistry->set_last_version_synced(receivedVersion);
-            }
-        }
-        currentVersion = receivedVersion;
-        numRetries = 0;
-    }
-}
-
-
 + (instancetype)realmWithPath:(NSString *)path
                      readOnly:(BOOL)readonly
                      inMemory:(BOOL)inMemory
@@ -499,8 +730,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
                 // if we have a cached realm on another thread, copy without a transaction
                 RLMRealmSetSchema(realm, [realms[0] schema], false);
+
+                realm->_serverSync = ((RLMRealm *)realms[0])->_serverSync;
             }
             else {
+                realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path];
+
                 // Synchronize with server and block here until
                 // synchronization is complete.
                 //
@@ -520,7 +755,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 // When transaction merging becomes possible, this
                 // problem disappears completely, becasue then all the
                 // initial schema creating transactions can be merged.
-                [realm initialBlockingSyncWithServer];
+                [realm->_serverSync initialBlockingDownload];
 
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
@@ -530,6 +765,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 else {
                     [RLMRealm migrateRealm:realm];
                 }
+
+                [realm->_serverSync rescheduleNonblockingDownload];
             }
 
             // cache only realms using a shared schema
@@ -537,7 +774,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         }
     }
 
-    [realm resumeUploadToServer];
+    [realm->_serverSync resumeNonblockingUpload];
 
     return realm;
 }
@@ -555,86 +792,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
                                      userInfo:nil];
     }
 }
-
-
-- (void)resumeUploadToServer {
-    Replication::version_type lastVersionUploaded, lastVersionAvailable;
-
-    @synchronized(s_uploadToServerInProgress) {
-        if (((NSNumber *)s_uploadToServerInProgress[0]).boolValue)
-            return;
-
-        lastVersionUploaded = _replication->get_last_version_synced(&lastVersionAvailable);
-        if (lastVersionUploaded == lastVersionAvailable)
-            return;
-
-        s_uploadToServerInProgress[0] = @YES;
-    }
-
-    BinaryData transact_log;
-    _replication->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
-    NSData *data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
-    [self uploadToServer:data version:lastVersionUploaded+1 numRetries:0];
-}
-
-
-- (void)uploadToServer:(NSData *)data version:(Replication::version_type)version numRetries:(int)numRetries {
-    int maxRetries = 16;
-    typedef unsigned long long ulonglong;
-    NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.serverBaseURL, ulonglong(version)];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    request.HTTPMethod = @"POST";
-    [[_URLSession uploadTaskWithRequest:request
-                               fromData:data
-                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                if (error) {
-                    NSLog(@"HTTP send request failed (1)");
-                }
-                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                    NSLog(@"HTTP send request failed (2)");
-                }
-                else {
-                    // FIXME: Using the MIME type in this way is
-                    // not reliable as it may in general be
-                    // modified in complicated ways by various
-                    // involved HTTP agents.
-                    if (!response.MIMEType) {
-                        NSLog(@"HTTP send request failed (3)");
-                    }
-                    else if ([response.MIMEType isEqualToString:@"text/plain"]) {
-                        NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"ok"
-                                                                      length:2
-                                                                freeWhenDone:NO];
-                        if ([data isEqualToData:upToDateString]) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                    _replication->set_last_version_synced(version);
-                                    @synchronized(s_uploadToServerInProgress) {
-                                        s_uploadToServerInProgress[0] = @NO;
-                                    }
-                                    [self resumeUploadToServer];
-                                });
-                            return;
-                        }
-                        NSData *conflictString = [NSData dataWithBytesNoCopy:(void *)"conflict"
-                                                                      length:8
-                                                                freeWhenDone:NO];
-                        if ([data isEqualToData:conflictString])
-                            @throw [NSException exceptionWithName:@"RLMException"
-                                                           reason:@"Conflicting transaction detected"
-                                                         userInfo:nil];
-                        NSLog(@"HTTP send request failed (4)");
-                    }
-                }
-                if (numRetries == maxRetries) {
-                    NSLog(@"Too many failed HTTP send requests, giving up");
-                    return;
-                }
-                dispatch_async(dispatch_get_main_queue(), ^{
-                        [self uploadToServer:data version:version numRetries:numRetries+1];
-                    });
-            }] resume];
-}
-
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     RLMCheckThread(self);
@@ -711,26 +868,31 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
 
-            // notify other realm istances of changes
-            NSArray *realms = realmsAtPath(_path);
-            for (RLMRealm *realm in realms) {
-                if (![realm isEqual:self]) {
-                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                    [notifier performSelector:@selector(notify)
-                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                }
-            }
+            // notify other realm instances of changes
+            [RLMRealm notifyRealmsAtPath:_path exceptRealm:self];
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
 
-            [self resumeUploadToServer];
+            [_serverSync resumeNonblockingUpload];
         }
         catch (std::exception& ex) {
             throw_objc_exception(ex);
         }
     } else {
        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing write transaction" userInfo:nil];
+    }
+}
+
++ (void)notifyRealmsAtPath:(NSString *)path exceptRealm:(RLMRealm *)exceptRealm {
+    NSArray *realms = realmsAtPath(path);
+    for (RLMRealm *realm in realms) {
+        // FIXME: Why is this not just a pointer comparison?
+        if (exceptRealm && [realm isEqual:exceptRealm])
+            continue;
+        RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+        [notifier performSelector:@selector(notify)
+                         onThread:realm->_thread withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -928,6 +1090,13 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMCreateObjectInRealmWithValue(self, className, object);
 }
 
+- (NSString *)serverBaseURL {
+    return _serverSync.baseURL;
+}
+
+- (void)setServerBaseURL:(NSString *)newValue {
+    _serverSync.baseURL = newValue;
+}
 @end
 
 @implementation RLMWeakNotifier
