@@ -143,17 +143,19 @@ static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
 
+NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
+
 } // anonymous namespace
 
 
-@interface RLMServerSync : NSObject 
+@interface RLMServerSync : NSObject
 @property (atomic) NSString *baseURL; // E.g. http://187.56.46.23:123
 @end
 
 @implementation RLMServerSync {
     NSString *_path;
 
-    NSURLSession *_URLSession;
+    NSURLSession *_urlSession;
 
     // At the present time we need to apply foreign transaction logs
     // via a special SharedGroup instance on which replication is not
@@ -176,8 +178,10 @@ static NSUInteger s_currentSchemaVersion = 0;
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         queue.name = @"io.Realm.sync";
 
-        // Emphemeral config disables everything that would result in data being automatically saved to disk
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        // Emphemeral config disables everything that would result in
+        // data being automatically saved to disk
+        NSURLSessionConfiguration *config =
+            [NSURLSessionConfiguration ephemeralSessionConfiguration];
 
         // Disable caching
         config.URLCache = nil;
@@ -185,7 +189,7 @@ static NSUInteger s_currentSchemaVersion = 0;
 
         config.HTTPShouldUsePipelining = YES;
 
-        _URLSession = [NSURLSession sessionWithConfiguration:config
+        _urlSession = [NSURLSession sessionWithConfiguration:config
                                                     delegate:nil
                                                delegateQueue:queue];
 
@@ -223,10 +227,12 @@ static NSUInteger s_currentSchemaVersion = 0;
     for (;;) {
         __block NSMutableArray *responseData = [NSMutableArray array];
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.baseURL, ulonglong(currentVersion)];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu",
+                                  self.baseURL, ulonglong(currentVersion)];
+        NSMutableURLRequest *request =
+            [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
         request.HTTPMethod = @"POST";
-        [[_URLSession dataTaskWithRequest:request
+        [[_urlSession dataTaskWithRequest:request
                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                     if (error) {
                         NSLog(@"initialBlockingDownload: HTTP request failed (1)");
@@ -260,8 +266,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                         responseData[0] = [data copy];
                     }
                     else {
-                        NSLog(@"initialBlockingDownload: Unexpected MIME type in HTTP response '%@'",
-                              response.MIMEType);
+                        NSLog(@"initialBlockingDownload: Unexpected MIME type "
+                              "in HTTP response '%@'", response.MIMEType);
                     }
                     dispatch_semaphore_signal(semaphore);
                 }] resume];
@@ -274,14 +280,16 @@ static NSUInteger s_currentSchemaVersion = 0;
         if (responseData.firstObject) {
             NSData *data = responseData.firstObject;
             if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
-                NSLog(@"initialBlockingDownload: Bad transaction log from server (no leading null character)");
+                NSLog(@"initialBlockingDownload: Bad transaction log from server "
+                      "(no leading null character)");
             }
             else {
                 Replication::version_type receivedVersion = currentVersion + 1;
                 const char *data2 = (const char *)data.bytes + 1;
                 size_t size = size_t(data.length) - 1;
-                NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu of size %llu",
-                      ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu "
+                      "of size %llu", ulonglong(receivedVersion-1), ulonglong(receivedVersion),
+                      ulonglong(size));
                 // Apply transaction log via the special SharedGroup instance
                 {
                     WriteTransaction transact(*_sharedGroup);
@@ -289,7 +297,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                     ostream *applyLog = 0;
                     applyLog = &cerr;
                     try {
-                        Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                        Replication::apply_transact_log(input, transact.get_group(),
+                                                        applyLog); // Throws
                         transact.commit(); // Throws
                         BinaryData transactLog(data2, size);
                         _transactLogRegistry->submit_transact_log(transactLog);
@@ -352,11 +361,12 @@ static NSUInteger s_currentSchemaVersion = 0;
         return;
     }
 
-    NSString *url = [NSString stringWithFormat:@"%@/receive/%llu", self.baseURL, ulonglong(currentVersion)];
+    NSString *url = [NSString stringWithFormat:@"%@/receive/%llu",
+                              self.baseURL, ulonglong(currentVersion)];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     request.HTTPMethod = @"POST";
     Replication::version_type originalVersion = currentVersion;
-    [[_URLSession dataTaskWithRequest:request
+    [[_urlSession dataTaskWithRequest:request
                       completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
                     NSLog(@"nonblockingDownload: HTTP request failed (1)");
@@ -383,19 +393,24 @@ static NSUInteger s_currentSchemaVersion = 0;
                 }
                 else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
                     if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
-                        NSLog(@"nonblockingDownload: Bad transaction log from server (no leading null character)");
+                        NSLog(@"nonblockingDownload: Bad transaction log from server "
+                              "(no leading null character)");
                     }
                     else {
                         const char *data2 = (const char *)data.bytes + 1;
                         size_t size = size_t(data.length) - 1;
                         Replication::version_type receivedVersion = originalVersion + 1;
-                        NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu of size %llu",
-                              ulonglong(receivedVersion-1), ulonglong(receivedVersion), ulonglong(size));
+                        NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu "
+                              "of size %llu", ulonglong(receivedVersion-1),
+                              ulonglong(receivedVersion), ulonglong(size));
                         @synchronized (self) {
                             WriteTransaction transact(*_sharedGroup);
-                            Replication::version_type newCurrentVersion = LangBindHelper::get_current_version(*_sharedGroup);
+                            Replication::version_type newCurrentVersion =
+                                LangBindHelper::get_current_version(*_sharedGroup);
                             if (newCurrentVersion != originalVersion) {
-                                NSLog(@"nonblockingDownload: Dropping received transaction log due to advance of local version %llu", ulonglong(newCurrentVersion));
+                                NSLog(@"nonblockingDownload: Dropping received transaction log "
+                                      "due to advance of local version %llu",
+                                      ulonglong(newCurrentVersion));
                                 [self rescheduleNonblockingDownload];
                                 return;
                             }
@@ -403,7 +418,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                             ostream *applyLog = 0;
                             applyLog = &cerr;
                             try {
-                                Replication::apply_transact_log(input, transact.get_group(), applyLog); // Throws
+                                Replication::apply_transact_log(input, transact.get_group(),
+                                                                applyLog); // Throws
                                 transact.commit(); // Throws
                                 BinaryData transactLog(data2, size);
                                 _transactLogRegistry->submit_transact_log(transactLog);
@@ -441,7 +457,8 @@ static NSUInteger s_currentSchemaVersion = 0;
             return;
 
         BinaryData transact_log;
-        _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1, &transact_log);
+        _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1,
+                                                 &transact_log);
         data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
 
         _uploadInProgress = true;
@@ -461,7 +478,7 @@ static NSUInteger s_currentSchemaVersion = 0;
     NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.baseURL, ulonglong(version)];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     request.HTTPMethod = @"POST";
-    [[_URLSession uploadTaskWithRequest:request
+    [[_urlSession uploadTaskWithRequest:request
                                fromData:data
                       completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
@@ -485,7 +502,8 @@ static NSUInteger s_currentSchemaVersion = 0;
                         @synchronized (self) {
                             _transactLogRegistry->set_last_version_synced(version);
                             _uploadInProgress = false;
-                            NSLog(@"Server received transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
+                            NSLog(@"Server received transaction log %llu -> %llu",
+                                  ulonglong(version-1), ulonglong(version));
                         }
                         [self resumeNonblockingUpload];
                         return;
@@ -741,7 +759,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 realm->_serverSync = ((RLMRealm *)realms[0])->_serverSync;
             }
             else {
-                realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path];
+                NSString *serverBaseURL;
+                @synchronized (s_serverBaseURLS) {
+                    serverBaseURL = s_serverBaseURLS[realm.path];
+                }
+                if (serverBaseURL)
+                    realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path];
 
                 // Synchronize with server and block here until
                 // synchronization is complete.
@@ -1097,12 +1120,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMCreateObjectInRealmWithValue(self, className, object);
 }
 
-- (NSString *)serverBaseURL {
-    return _serverSync.baseURL;
-}
-
-- (void)setServerBaseURL:(NSString *)newValue {
-    _serverSync.baseURL = newValue;
++ (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL {
+    @synchronized (s_serverBaseURLS) {
+        s_serverBaseURLS[path] = serverBaseURL;
+    }
 }
 @end
 

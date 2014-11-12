@@ -18,11 +18,11 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    NSLog(@"realm: %@", realm.path);
+    NSString *path = [RLMRealm defaultRealmPath];
+    [RLMRealm enableServerSyncOnPath:path serverBaseURL:@"http://192.168.1.50:8080"]; // Kristains workstation
+//    RLMRealm *realm = [RLMRealm realmWithPath:path];
+    NSLog(@"realm: %@", path);
 
-    
     // Override point for customization after application launch.
     return YES;
 }

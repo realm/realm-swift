@@ -431,7 +431,16 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
 #pragma mark - Sync demo
 
-@property NSString *serverBaseURL; // E.g. http://187.56.46.23:123
+/**
+ Enable server synchronozation for the Realm at the specified
+ path. Must be called prior to requesting any accessor object
+ (RLMRealm) for that Realm.
+
+ @param serverBaseURL E.g. https://realm.foo.com/my_realm, where
+ `my_realm` is the name of the Realm at \a path as known to the
+ server.
+*/
++ (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL;
 
 
 #pragma mark -
