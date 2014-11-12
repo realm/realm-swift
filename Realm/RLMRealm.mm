@@ -327,10 +327,10 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
 - (void)rescheduleNonblockingDownload {
     // Schedule server download request roughly 10 times per second
-    [self rescheduleNonblockingDownload:100 numRetries:0];
+    [self rescheduleNonblockingDownload:100 numFastRetries:0];
 }
 
-- (void)rescheduleNonblockingDownload:(int)msecDelay numRetries:(int)numFastRetries {
+- (void)rescheduleNonblockingDownload:(int)msecDelay numFastRetries:(int)numFastRetries {
     // FIXME: Does dispatch_get_main_queue() imply that the block is
     // going to be executed by the main thread? Such a constraint is
     // not required. Any thread would suffice.
@@ -475,18 +475,17 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
     typedef unsigned long long ulonglong;
     NSLog(@"Sending transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
 
-    [self nonblockingUpload:data version:version numRetries:0];
+    [self nonblockingUpload:data version:version numFastRetries:0];
 }
 
 - (void)rescheduleNonblockingUpload:(NSData *)data version:(Replication::version_type)version
-                          msecDelay:(int)msecDelay numRetries:(int)numFastRetries {
+                          msecDelay:(int)msecDelay numFastRetries:(int)numFastRetries {
     // FIXME: Does dispatch_get_main_queue() imply that the block is
     // going to be executed by the main thread? Such a constraint is
     // not required. Any thread would suffice.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, int64_t(msecDelay)*1000),
                    dispatch_get_main_queue(), ^{
-                       [self nonblockingDownload:data version:version
-                                  numFastRetries:numFastRetries];
+                       [self nonblockingUpload:data version:version numFastRetries:numFastRetries];
                    });
 }
 
