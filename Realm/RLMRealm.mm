@@ -331,10 +331,11 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 }
 
 - (void)rescheduleNonblockingDownload:(int)msecDelay numFastRetries:(int)numFastRetries {
+    int64_t nsecDelay = int64_t(msecDelay)*1000000L;
     // FIXME: Does dispatch_get_main_queue() imply that the block is
     // going to be executed by the main thread? Such a constraint is
     // not required. Any thread would suffice.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, int64_t(msecDelay)*1000),
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, nsecDelay),
                    dispatch_get_main_queue(), ^{
                        [self nonblockingDownload:numFastRetries];
                    });
@@ -480,10 +481,11 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
 - (void)rescheduleNonblockingUpload:(NSData *)data version:(Replication::version_type)version
                           msecDelay:(int)msecDelay numFastRetries:(int)numFastRetries {
+    int64_t nsecDelay = int64_t(msecDelay)*1000000L;
     // FIXME: Does dispatch_get_main_queue() imply that the block is
     // going to be executed by the main thread? Such a constraint is
     // not required. Any thread would suffice.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, int64_t(msecDelay)*1000),
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, nsecDelay),
                    dispatch_get_main_queue(), ^{
                        [self nonblockingUpload:data version:version numFastRetries:numFastRetries];
                    });
