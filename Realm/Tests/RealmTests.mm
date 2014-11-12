@@ -823,4 +823,37 @@
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
 }
 
+- (void)testWriteCopyOfRealm
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    XCTAssertNil([realm writeCopyToPath:RLMTestRealmPath()]);
+    RLMRealm *copy = [self realmWithTestPath];
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+}
+
+- (void)testCannotOverwriteWithWriteCopy
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    XCTAssertNotNil([realm writeCopyToPath:RLMTestRealmPath()]);
+}
+
+- (void)testWritingCopyUsesWriteTransactionInProgress
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+
+        XCTAssertNil([realm writeCopyToPath:RLMTestRealmPath()]);
+        RLMRealm *copy = [self realmWithTestPath];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+    }];
+}
 @end

@@ -1,3 +1,19 @@
+0.88.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
+  another file.
+
+### Bugfixes
+
+* None.
+
 0.87.4 Release notes (2014-11-07)
 =============================================================
 
@@ -12,7 +28,6 @@
 ### Bugfixes
 
 * Fix browser location in release zip.
-
 
 0.87.3 Release notes (2014-11-06)
 =============================================================
@@ -33,7 +48,6 @@
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
 * Fix for crash when deleting an object from multiple threads.
-
 
 0.87.0 Release notes (2014-10-21)
 =============================================================
