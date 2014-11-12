@@ -25,9 +25,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    /*
     RLMRealm *realm = [RLMRealm defaultRealm];
-    
+
     if (realm.serverBaseURL) {
         NSURLComponents *components = [[NSURLComponents alloc] initWithString:realm.serverBaseURL];
         
@@ -35,6 +36,7 @@
         self.hostField.placeholder = [components host];
         self.portField.placeholder = [[components port] stringValue];
     }
+     */
     
     //    if (realm.name) {
     //        self.realmField.placeholder = realm.name;
@@ -55,7 +57,7 @@
     components.port = @([port integerValue]);
     components.scheme = self.urlScheme;
     
-    self.realm.serverBaseURL = components.string;
+//    self.realm.serverBaseURL = components.string;
     
     //        self.realm.name = self.realmField.text;
 }
