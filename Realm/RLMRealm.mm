@@ -235,17 +235,19 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
         [[_urlSession dataTaskWithRequest:request
                         completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                     if (error) {
-                        NSLog(@"initialBlockingDownload: HTTP request failed (1)");
+                        NSLog(@"initialBlockingDownload: HTTP request failed: %@", error);
                     }
                     else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                        NSLog(@"initialBlockingDownload: HTTP request failed (2)");
+                        NSLog(@"initialBlockingDownload: HTTP request failed with status %ld",
+                              long(((NSHTTPURLResponse *)response).statusCode));
                     }
                     else if (!response.MIMEType) {
                         // FIXME: Using the MIME type in this way is
                         // not reliable as it may in general be
                         // modified in complicated ways by various
                         // involved HTTP agents.
-                        NSLog(@"initialBlockingDownload: HTTP request failed (3)");
+                        NSLog(@"initialBlockingDownload: HTTP request failed: "
+                              "No MIME type in response");
                     }
                     else if ([response.MIMEType isEqualToString:@"text/plain"]) {
                         NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
@@ -374,17 +376,18 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
     [[_urlSession dataTaskWithRequest:request
                       completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
-                    NSLog(@"nonblockingDownload: HTTP request failed (1)");
+                    NSLog(@"nonblockingDownload: HTTP request failed: %@", error);
                 }
                 else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                    NSLog(@"nonblockingDownload: HTTP request failed (2)");
+                    NSLog(@"nonblockingDownload: HTTP request failed with status %ld",
+                          long(((NSHTTPURLResponse *)response).statusCode));
                 }
                 else if (!response.MIMEType) {
                     // FIXME: Using the MIME type in this way is
                     // not reliable as it may in general be
                     // modified in complicated ways by various
                     // involved HTTP agents.
-                    NSLog(@"nonlockingDownload: HTTP request failed (3)");
+                    NSLog(@"nonlockingDownload: HTTP request failed: No MIME type in response");
                 }
                 else if ([response.MIMEType isEqualToString:@"text/plain"]) {
                     NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
@@ -394,7 +397,8 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                         [self rescheduleNonblockingDownload];
                         return;
                     }
-                    NSLog(@"nonlockingDownload: HTTP request failed (4)");
+                    NSLog(@"nonblockingDownload: Unrecognized message from server %@",
+                          data.description);
                 }
                 else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
                     if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
