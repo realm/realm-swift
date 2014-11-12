@@ -168,10 +168,10 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
     bool _uploadInProgress;
 }
 
-- (instancetype)initWithPath:(NSString *)path {
+- (instancetype)initWithPath:(NSString *)path baseURL:(NSString *)baseURL {
     self = [super init];
     if (self) {
-        _baseURL = @"http://192.168.1.50:8080"; // Kristains workstation
+        _baseURL = baseURL;
 
         _path = path;
 
@@ -763,8 +763,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 @synchronized (s_serverBaseURLS) {
                     serverBaseURL = s_serverBaseURLS[realm.path];
                 }
-                if (serverBaseURL)
-                    realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path];
+                if (serverBaseURL) {
+                    realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path
+                                                                     baseURL:serverBaseURL];
+                }
 
                 // Synchronize with server and block here until
                 // synchronization is complete.
