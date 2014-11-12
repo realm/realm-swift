@@ -26,6 +26,15 @@
 		0295B90119D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90219D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
+		E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
+		E879D9D11A12AA120035E2EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
+		E879D9D21A12AA120035E2EB /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		E879D9E21A12AA400035E2EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E879D9DC1A12AA400035E2EB /* AppDelegate.m */; };
+		E879D9E31A12AA400035E2EB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E879D9DD1A12AA400035E2EB /* Images.xcassets */; };
+		E879D9E51A12AA400035E2EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E879D9DF1A12AA400035E2EB /* main.m */; };
+		E879D9E61A12AA400035E2EB /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E879D9E11A12AA400035E2EB /* TableViewController.m */; };
 		E8AB71DD19BA503500F3EDB4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		E8AB71DE19BA503500F3EDB4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E8AB71DF19BA503500F3EDB4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -73,6 +82,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E879D9C81A12AA120035E2EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
+			remoteInfo = Realm;
+		};
 		E8BDBFCF1A11727800450CFF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
@@ -119,6 +135,14 @@
 
 /* Begin PBXFileReference section */
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/ios/Realm.framework; sourceTree = "<group>"; };
+		E879D9D81A12AA120035E2EB /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E879D9DB1A12AA400035E2EB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E879D9DC1A12AA400035E2EB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E879D9DD1A12AA400035E2EB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E879D9DE1A12AA400035E2EB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E879D9DF1A12AA400035E2EB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E879D9E01A12AA400035E2EB /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewController.h; sourceTree = "<group>"; };
+		E879D9E11A12AA400035E2EB /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewController.m; sourceTree = "<group>"; };
 		E8AB71A919BA502500F3EDB4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E8AB71AD19BA502500F3EDB4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -167,6 +191,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E879D9CD1A12AA120035E2EB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */,
+				E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */,
+				E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */,
+				E879D9D11A12AA120035E2EB /* Foundation.framework in Frameworks */,
+				E879D9D21A12AA120035E2EB /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8AB71D919BA503500F3EDB4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -242,11 +278,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E879D9DA1A12AA400035E2EB /* GroupedTableView */ = {
+			isa = PBXGroup;
+			children = (
+				E879D9DB1A12AA400035E2EB /* AppDelegate.h */,
+				E879D9DC1A12AA400035E2EB /* AppDelegate.m */,
+				E879D9DD1A12AA400035E2EB /* Images.xcassets */,
+				E879D9DE1A12AA400035E2EB /* Info.plist */,
+				E879D9DF1A12AA400035E2EB /* main.m */,
+				E879D9E01A12AA400035E2EB /* TableViewController.h */,
+				E879D9E11A12AA400035E2EB /* TableViewController.m */,
+			);
+			path = GroupedTableView;
+			sourceTree = "<group>";
+		};
 		E8AB719D19BA502500F3EDB4 = {
 			isa = PBXGroup;
 			children = (
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
+				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
 				E8F70E9619BA508B006F60D5 /* TableView */,
 				E8F70EA319BA5093006F60D5 /* REST */,
@@ -265,6 +316,7 @@
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
 				E8AB729419BA504900F3EDB4 /* REST.app */,
 				E8BDBFA11A116FAC00450CFF /* Backlink.app */,
+				E879D9D81A12AA120035E2EB /* GroupedTableView.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -361,6 +413,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E879D9C61A12AA120035E2EB /* GroupedTableView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E879D9D51A12AA120035E2EB /* Build configuration list for PBXNativeTarget "GroupedTableView" */;
+			buildPhases = (
+				E879D9C91A12AA120035E2EB /* Sources */,
+				E879D9CD1A12AA120035E2EB /* Frameworks */,
+				E879D9D31A12AA120035E2EB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E879D9C71A12AA120035E2EB /* PBXTargetDependency */,
+			);
+			name = GroupedTableView;
+			productName = TableView;
+			productReference = E879D9D81A12AA120035E2EB /* GroupedTableView.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E8AB71DB19BA503500F3EDB4 /* Simple */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8AB720019BA503500F3EDB4 /* Build configuration list for PBXNativeTarget "Simple" */;
@@ -495,6 +565,7 @@
 			targets = (
 				E8BDBFA01A116FAC00450CFF /* Backlink */,
 				E8AB723719BA504000F3EDB4 /* Encryption */,
+				E879D9C61A12AA120035E2EB /* GroupedTableView */,
 				E8AB720919BA503B00F3EDB4 /* Migration */,
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
@@ -505,6 +576,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E879D9D31A12AA120035E2EB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E879D9E31A12AA400035E2EB /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8AB720819BA503B00F3EDB4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -544,6 +623,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E879D9C91A12AA120035E2EB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E879D9E51A12AA400035E2EB /* main.m in Sources */,
+				E879D9E61A12AA400035E2EB /* TableViewController.m in Sources */,
+				E879D9E21A12AA400035E2EB /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8AB71D819BA503500F3EDB4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -604,6 +693,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E879D9C71A12AA120035E2EB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8F70EC719BA51B1006F60D5 /* Realm */;
+			targetProxy = E879D9C81A12AA120035E2EB /* PBXContainerItemProxy */;
+		};
 		E8BDBFD01A11727800450CFF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E8F70EC719BA51B1006F60D5 /* Realm */;
@@ -637,6 +731,38 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		E879D9D61A12AA120035E2EB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_NAME = GroupedTableView;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		E879D9D71A12AA120035E2EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_NAME = GroupedTableView;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		E8AB71D019BA502500F3EDB4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -922,6 +1048,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E879D9D51A12AA120035E2EB /* Build configuration list for PBXNativeTarget "GroupedTableView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E879D9D61A12AA120035E2EB /* Debug */,
+				E879D9D71A12AA120035E2EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E8AB71A119BA502500F3EDB4 /* Build configuration list for PBXProject "RealmExamples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -983,6 +1118,7 @@
 				E8BDBFC21A116FAC00450CFF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8F70EC819BA51B1006F60D5 /* Build configuration list for PBXAggregateTarget "Realm" */ = {
 			isa = XCConfigurationList;

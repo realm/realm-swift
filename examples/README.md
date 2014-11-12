@@ -18,6 +18,10 @@ You can add rows by tapping the add button and remove rows by swiping right-to-l
 
 The application also demonstrates how to import data in a background thread.
 
+### GroupedTableView
+
+A sample app to demonstrate how to use Realm to populate a table view with sections.
+
 ### Migration
 
 This example showcases Realm's migration features.
@@ -49,6 +53,10 @@ This app demonstrates how Realm can be the data source for UITableViews.
 You can add rows by tapping the add button and remove rows by swiping right-to-left.
 
 The application also demonstrates how to import data in a background thread.
+
+### GroupedTableView
+
+A sample app to demonstrate how to use Realm to populate a table view with sections.
 
 ### Migration
 
