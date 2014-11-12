@@ -326,18 +326,22 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 }
 
 - (void)rescheduleNonblockingDownload {
+    // Schedule server download request roughly 10 times per second
+    [self rescheduleNonblockingDownload:100 numRetries:0];
+}
+
+- (void)rescheduleNonblockingDownload:(int)msecDelay numRetries:(int)numFastRetries {
     // FIXME: Does dispatch_get_main_queue() imply that the block is
     // going to be executed by the main thread? Such a constraint is
     // not required. Any thread would suffice.
-
-    // Schedule server download request roughly 10 times per second
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC/10), dispatch_get_main_queue(), ^{
-            [self nonblockingDownload:0];
-        });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, int64_t(msecDelay)*1000),
+                   dispatch_get_main_queue(), ^{
+                       [self nonblockingDownload:numFastRetries];
+                   });
 }
 
-- (void)nonblockingDownload:(int)numRetries {
-    int maxRetries = 16;
+- (void)nonblockingDownload:(int)numFastRetries {
+    int maxFastRetries = 16;
 
     Replication::version_type currentVersion, lastVersionUploaded, lastVersionAvailable;
     @synchronized (self) {
@@ -437,11 +441,14 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                     NSLog(@"nonblockingDownload: Unexpected MIME type in HTTP response '%@'",
                           response.MIMEType);
                 }
-                if (numRetries == maxRetries) {
-                    NSLog(@"nonblockingDownload: Too many failed HTTP requests, giving up");
+                if (numFastRetries == maxFastRetries) {
+                    NSLog(@"nonblockingDownload: Too many failed HTTP requests, "
+                          "waiting 10 seconds");
+                    [self rescheduleNonblockingDownload:10000 numFastRetries:numFastRetries];
                     return;
                 }
-                [self nonblockingDownload:numRetries+1];
+                // Try again in one second
+                [self rescheduleNonblockingDownload:1000 numFastRetries:numFastRetries+1];
             }] resume];
 }
 
@@ -471,9 +478,21 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
     [self nonblockingUpload:data version:version numRetries:0];
 }
 
+- (void)rescheduleNonblockingUpload:(NSData *)data version:(Replication::version_type)version
+                          msecDelay:(int)msecDelay numRetries:(int)numFastRetries {
+    // FIXME: Does dispatch_get_main_queue() imply that the block is
+    // going to be executed by the main thread? Such a constraint is
+    // not required. Any thread would suffice.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, int64_t(msecDelay)*1000),
+                   dispatch_get_main_queue(), ^{
+                       [self nonblockingDownload:data version:version
+                                  numFastRetries:numFastRetries];
+                   });
+}
+
 - (void)nonblockingUpload:(NSData *)data version:(Replication::version_type)version
-               numRetries:(int)numRetries {
-    int maxRetries = 16;
+               numFastRetries:(int)numFastRetries {
+    int maxFastRetries = 16;
     typedef unsigned long long ulonglong;
     NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.baseURL, ulonglong(version)];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
@@ -521,14 +540,15 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                     NSLog(@"nonblockingUpload: Unexpected MIME type in HTTP response '%@'",
                           response.MIMEType);
                 }
-                if (numRetries == maxRetries) {
-                    NSLog(@"nonblockingUpload: Too many failed HTTP requests, giving up");
-                    @synchronized (self) {
-                        _uploadInProgress = false;
-                    }
+                if (numFastRetries == maxFastRetries) {
+                    NSLog(@"nonblockingUpload: Too many failed HTTP requests, waiting 10 seconds");
+                    [self rescheduleNonblockingUpload:data version:version msecDelay:10000
+                                       numFastRetries:numFastRetries];
                     return;
                 }
-                [self nonblockingUpload:data version:version numRetries:numRetries+1];
+                // Try again in one second
+                [self rescheduleNonblockingUpload:data version:version msecDelay:1000
+                                   numFastRetries:numFastRetries+1];
             }] resume];
 }
 @end
