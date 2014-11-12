@@ -198,7 +198,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
+                                       reason:@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
                                      userInfo:nil];
     }
     RLMCheckThread(realm);
