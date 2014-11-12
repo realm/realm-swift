@@ -65,7 +65,7 @@ extern "C" {
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self dynamicRealmWithTestPathAndSchema:schema];
+    return [self realmWithTestPathAndSchema:schema];
 }
 
 - (void)testSchemaVersion {
@@ -344,7 +344,7 @@ extern "C" {
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
-    @autoreleasepool { [self dynamicRealmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
+    @autoreleasepool { [self realmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
 
     [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);

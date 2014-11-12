@@ -94,6 +94,26 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
+ Obtains an `RLMRealm` instance persisted to an encrypted file.
+
+ The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
+ but otherwise they behave like normal persisted Realms.
+
+ @param path        Path to the file you want the data saved in.
+ @param key         64-byte key to use to encrypt the data.
+ @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
+
+ @return An encrypted `RLMRealm` instance.
+ */
++ (instancetype)encryptedRealmWithPath:(NSString *)path
+                                   key:(NSData *)key
+                              readOnly:(BOOL)readonly
+                                 error:(NSError **)error;
+
+/**
  Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
  used to create this instance can be used to access the same in-memory Realm from
  multiple threads.
@@ -474,6 +494,17 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  @see               setSchemaVersion:withMigrationBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath;
+
+/**
+ Performs the registered migration block on an encrypted Realm at the given path.
+
+ As `migrateRealmAtPath:`, but for encrypted realms.
+
+ @param realmPath   The path of the Realm to migrate.
+ @param key         64-byte encryption key.
+ @return            The error that occurred while applying the migration, if any.
+ */
++ (NSError *)migrateEncryptedRealmAtPath:(NSString *)realmPath key:(NSData *)key;
 
 #pragma mark -
 
