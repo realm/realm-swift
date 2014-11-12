@@ -502,17 +502,18 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                                fromData:data
                       completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
-                    NSLog(@"nonblockingUpload: HTTP request failed (1)");
+                    NSLog(@"nonblockingUpload: HTTP request failed: %@", error);
                 }
                 else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                    NSLog(@"nonblockingUpload: HTTP request failed (2)");
+                    NSLog(@"nonblockingUpload: HTTP request failed with status %ld",
+                          long(((NSHTTPURLResponse *)response).statusCode));
                 }
                 else if (!response.MIMEType) {
                     // FIXME: Using the MIME type in this way is
                     // not reliable as it may in general be
                     // modified in complicated ways by various
                     // involved HTTP agents.
-                    NSLog(@"nonblockingUpload: HTTP request failed (3)");
+                    NSLog(@"nonblockingUpload: HTTP request failed: No MIME type in response");
                 }
                 else if ([response.MIMEType isEqualToString:@"text/plain"]) {
                     NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"ok"
@@ -535,7 +536,7 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                         @throw [NSException exceptionWithName:@"RLMException"
                                                        reason:@"Conflicting transaction detected"
                                                      userInfo:nil];
-                    NSLog(@"nonblockingUpload: HTTP request failed (4)");
+                    NSLog(@"nonblockingUpload: Unrecognized response from server %@", data.description);
                 }
                 else {
                     NSLog(@"nonblockingUpload: Unexpected MIME type in HTTP response '%@'",
