@@ -55,7 +55,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 @end
 
-
 @implementation RLMInstanceTableViewController {
     BOOL awake;
     BOOL linkCursorDisplaying;

@@ -123,6 +123,7 @@
 		22A55FEA19D18BA8009178BC /* RLMObjectNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMObjectNode.m; path = Classes/RLMObjectNode.m; sourceTree = "<group>"; };
 		22A55FEF19D19842009178BC /* RLMDescriptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptions.h; path = Classes/RLMDescriptions.h; sourceTree = "<group>"; };
 		22A55FF019D19842009178BC /* RLMDescriptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDescriptions.m; path = Classes/RLMDescriptions.m; sourceTree = "<group>"; };
+		22B0FB531A0BC420008E4ED1 /* RLMBrowser_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMBrowser_private.h; path = Classes/RLMBrowser_private.h; sourceTree = "<group>"; };
 		22D28EA51993AAAB00497FD3 /* RLMNumberTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNumberTableCellView.h; path = Classes/RLMNumberTableCellView.h; sourceTree = "<group>"; };
 		22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNumberTableCellView.m; path = Classes/RLMNumberTableCellView.m; sourceTree = "<group>"; };
 		22D3AC8819CC5D710042C1B2 /* RLMModelExporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMModelExporter.h; path = Classes/RLMModelExporter.h; sourceTree = "<group>"; };
@@ -224,6 +225,7 @@
 				8474E2B919544D8700BCA755 /* UI */,
 				84A34A4D192E19C5005D6CC4 /* RLMApplicationDelegate.h */,
 				84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */,
+				22B0FB531A0BC420008E4ED1 /* RLMBrowser_private.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";

@@ -19,6 +19,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMNavigationStack.h"
 #import "RLMModelExporter.h"
+#import "RLMBrowser_private.h"
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
@@ -28,14 +29,6 @@ NSString * const kRealmKeyIsLockedForRealm = @"LockedRealm:%@";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
-
-@interface RLMRealm (Dynamic)
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
-@end
-
-@interface RLMArray (Private)
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-@end
 
 @interface RLMRealmBrowserWindowController()<NSWindowDelegate>
 
@@ -343,12 +336,12 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
         }
     }
 
-    RLMArray *result;
+    RLMResults *result;
+    
+    NSLog(@"predicate: %@", predicate);
+
     if (predicate.length != 0) {
         result = [realm objects:typeNode.name where:predicate];
-    }
-    else {
-        result = [[RLMArray alloc] initWithObjectClassName:typeNode.name];
     }
 
     RLMQueryNavigationState *state = [[RLMQueryNavigationState alloc] initWithQuery:searchText type:typeNode results:result];

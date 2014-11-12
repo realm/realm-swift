@@ -16,25 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#ifndef RealmBrowser_RLMBrowser_private_h
+#define RealmBrowser_RLMBrowser_private_h
 
-#import "RLMViewController.h"
-#import "RLMTableView.h"
-#import "RLMTextField.h"
-
-@class RLMRealmBrowserWindowController;
-@class RLMArrayNode;
-
-@interface RLMInstanceTableViewController : RLMViewController <RLMTextFieldDelegate, RLMTableViewDelegate, RLMTableViewDataSource>
-
-@property (nonatomic, readonly) RLMTableView *realmTableView;
-
-@property (nonatomic) BOOL realmIsLocked;
-@property (nonatomic) BOOL displaysArray;
-
-- (void)removeRowsInTableViewAt:(NSIndexSet *)rowIndexes;
-- (void)deleteRowsInTableViewAt:(NSIndexSet *)rowIndexes;
-- (void)insertNewRowsInTableViewAt:(NSIndexSet *)rowIndexes;
-- (void)moveRowsInTableViewFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination;
-
+@interface RLMRealm (Dynamic)
+- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 @end
+
+@interface RLMArray (Private)
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
+
+#endif
