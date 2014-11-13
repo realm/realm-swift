@@ -35,6 +35,9 @@
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 - (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
+
++ (void)notifyRealmsAtPath:(NSString *)path exceptRealm:(RLMRealm *)exceptRealm;
+
 @end
 
 // throw an exception if the realm is being used from the wrong thread
