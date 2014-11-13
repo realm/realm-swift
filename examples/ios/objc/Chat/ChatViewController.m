@@ -1,69 +1,37 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  SecondViewController.m
-//  SyncedRealmExample
+// Copyright 2014 Realm Inc.
 //
-//  Created by Gustaf Kugelberg on 07/11/14.
-//  Copyright (c) 2014 UnfairAdvantage. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#import "SecondViewController.h"
+#import "ChatViewController.h"
 #import "UIColor+ChatColors.h"
+#import "Message.h"
+#import "ChatTextField.h"
 #import <Realm/Realm.h>
 
-@interface ESChatMessage : RLMObject
-
-@property NSDate *timestamp;
-@property NSString *content;
-@property NSString *sender;
-
-@end
-RLM_ARRAY_TYPE(ESChatMessage)
-
-
-@implementation ESChatMessage
-@end
-
-
-@interface ESChatRoom : RLMObject
-
-@property RLMArray<ESChatMessage> *messages;
-
-@end
-
-
-@implementation ESChatRoom
-
-@end
-
-
-@interface ESTextField : UITextField
-@end
-
-@implementation ESTextField
-
--(CGRect)textRectForBounds:(CGRect)bounds
-{
-    return CGRectInset(bounds, 15.0, 0.0);
-}
-
--(CGRect)editingRectForBounds:(CGRect)bounds
-{
-    return CGRectInset(bounds, 15.0, 0.0);
-}
-
-@end
-
-
-@interface SecondViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface ChatViewController () <UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet ESTextField *messageField;
+@property (weak, nonatomic) IBOutlet ChatTextField *messageField;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageFieldMargin;
 
 @property (weak, nonatomic) IBOutlet UIButton *closeButton;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *closeButtonWidth;
 
-@property (nonatomic, readonly) ESChatRoom *chatRoom;
+@property (nonatomic, strong) RLMResults *messages;
 @property (nonatomic) RLMNotificationToken *notificationToken;
 @property (nonatomic) NSDateFormatter *dateFormatter;
 
@@ -71,58 +39,51 @@ RLM_ARRAY_TYPE(ESChatMessage)
 
 @end
 
-@implementation SecondViewController
+@implementation ChatViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.vendorid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     self.dateFormatter = [[NSDateFormatter alloc] init];
     self.dateFormatter.dateStyle = NSDateFormatterShortStyle;
     self.dateFormatter.timeStyle = NSDateFormatterShortStyle;
-    
+
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.contentInset = UIEdgeInsetsMake(70.0, 0.0, 0.0, 0.0);
-    
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    
-    [realm beginWriteTransaction];
-    if (!self.chatRoom) {
-        ESChatRoom *chatRoom = [[ESChatRoom alloc] initWithObject:@[@[]]];
-        [realm addObject:chatRoom];
-    }
-    [realm commitWriteTransaction];
-    
-    self.notificationToken = [realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+
+    self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
         [self updateStream];
     }];
-    
+
     [self updateStream];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillChange:) name:UIKeyboardWillChangeFrameNotification object:nil];
-    [self toggleCloseButtonVisibility:NO];
+    [self setCloseButtonVisibility:NO];
 }
 
 # pragma mark - Table View Datasource
 
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.chatRoom.messages.count;
+    return self.messages.count;
 }
 
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return 1;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    ESChatMessage *message = self.chatRoom.messages[indexPath.section];
-    
+    Message *message = self.messages[indexPath.section];
+
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"PinkCell"];
     cell.clipsToBounds = YES;
     cell.textLabel.text = message.content;
     cell.detailTextLabel.text = [self.dateFormatter stringFromDate:message.timestamp];
-    
+
     if ([message.sender isEqualToString:self.vendorid]) {
         cell.contentView.backgroundColor = [UIColor lightGrayColor];
     }
@@ -133,40 +94,29 @@ RLM_ARRAY_TYPE(ESChatMessage)
     return cell;
 }
 
-# pragma mark - Table View Delegate
-
--(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{
-    return 0.0;
-}
-
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-    return 5.0;
-}
-
 # pragma mark - Text Field Delegate
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self messageEntered:textField.text];
-    
+
     return NO;
 }
 
 # pragma mark - Action Methods
 
--(IBAction)closeTextField:(UIButton *)sender
+- (IBAction)closeTextField:(UIButton *)sender
 {
     [self.messageField resignFirstResponder];
 }
 
 # pragma mark - Private Methods
 
--(void)updateStream
+- (void)updateStream
 {
+    self.messages = [Message allObjects];
     [self.tableView reloadData];
-    
+
     NSInteger sectionCount = [self.tableView numberOfSections];
     if (sectionCount > 0) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1];
@@ -174,18 +124,11 @@ RLM_ARRAY_TYPE(ESChatMessage)
     }
 }
 
--(void)messageEntered:(NSString *)content
+- (void)messageEntered:(NSString *)content
 {
-    ESChatMessage *message = [[ESChatMessage alloc] init];
-    message.timestamp = [NSDate date];
-    message.content = content;
-    message.sender = self.vendorid;
-
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    [self.chatRoom.messages addObject:message];
-    [realm commitWriteTransaction];
-    
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        [Message createInDefaultRealmWithObject:@[[NSDate date], content, self.vendorid]];
+    }];
     self.messageField.text = @"";
 }
 
@@ -194,17 +137,17 @@ RLM_ARRAY_TYPE(ESChatMessage)
 - (void)keyboardWillChange:(NSNotification *)notification {
     CGRect initialRect = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     CGFloat initialHeight = self.view.frame.size.height - [self.view convertRect:initialRect fromView:nil].origin.y;
-    
+
     CGRect keyboardRect = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     CGFloat newHeight = self.view.frame.size.height - [self.view convertRect:keyboardRect fromView:nil].origin.y;
-    
+
     CGPoint offset = self.tableView.contentOffset;
     offset.y += newHeight - initialHeight;
     self.tableView.contentOffset = offset;
-    
+
     self.messageFieldMargin.constant = newHeight;
-    [self toggleCloseButtonVisibility:(newHeight > 0.0)];
-    
+    [self setCloseButtonVisibility:(newHeight > 0.0)];
+
     [self.view setNeedsUpdateConstraints];
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
@@ -214,38 +157,10 @@ RLM_ARRAY_TYPE(ESChatMessage)
     [UIView commitAnimations];
 }
 
--(void)toggleCloseButtonVisibility:(BOOL)on
+- (void)setCloseButtonVisibility:(BOOL)on
 {
-    if (on) {
-        self.closeButtonWidth.constant = 60.0;
-        self.closeButton.titleLabel.alpha = 1.0;
-    }
-    else {
-        self.closeButtonWidth.constant = 0.0;
-        self.closeButton.titleLabel.alpha = 0.0;
-    }
-}
-
-# pragma mark - Convenience Methods
-
--(ESChatRoom *)chatRoom
-{
-    return [ESChatRoom allObjects].firstObject;
-}
-
--(NSString *)vendorid
-{
-    if (!_vendorid) {
-        _vendorid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    }
-    return _vendorid;
-}
-
-# pragma mark - Other methods
-
--(void)dealloc
-{
-    [[RLMRealm defaultRealm] removeNotification:self.notificationToken];
+    self.closeButtonWidth.constant = on ? 60 : 0;
+    self.closeButton.titleLabel.alpha = on;
 }
 
 @end
