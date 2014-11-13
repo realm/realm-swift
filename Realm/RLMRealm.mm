@@ -696,25 +696,25 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
     catch (File::PermissionDenied &ex) {
         success = NO;
-        if (error != NULL) {
+        if (error) {
             *error = make_realm_error(RLMErrorFilePermissionDenied, ex);
         }
     }
     catch (File::Exists &ex) {
         success = NO;
-        if (error != NULL) {
+        if (error) {
             *error = make_realm_error(RLMErrorFileExists, ex);
         }
     }
     catch (File::AccessError &ex) {
         success = NO;
-        if (error != NULL) {
+        if (error) {
             *error = make_realm_error(RLMErrorFileAccessError, ex);
         }
     }
     catch (exception &ex) {
         success = NO;
-        if (error != NULL) {
+        if (error) {
             *error = make_realm_error(RLMErrorFail, ex);
         }
     }
