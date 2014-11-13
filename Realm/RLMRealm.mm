@@ -328,8 +328,8 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 }
 
 - (void)rescheduleNonblockingDownload {
-    // Schedule server download request roughly 10 times per second
-    [self rescheduleNonblockingDownload:100 numFastRetries:0];
+    // Schedule server download request roughly 100 times per second
+    [self rescheduleNonblockingDownload:10 numFastRetries:0];
 }
 
 - (void)rescheduleNonblockingDownload:(int)msecDelay numFastRetries:(int)numFastRetries {

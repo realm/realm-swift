@@ -18,6 +18,7 @@
 
 #import "AppDelegate.h"
 #import <Realm/Realm.h>
+#import "DrawView.h"
 
 @implementation AppDelegate
 
@@ -26,6 +27,11 @@
     [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
                        serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
+
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = [[UIViewController alloc] init];
+    self.window.rootViewController.view = [DrawView new];
+    [self.window makeKeyAndVisible];
     return YES;
 }
 

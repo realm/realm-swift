@@ -16,17 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
+#import <UIKit/UIKit.h>
 #import <Realm/Realm.h>
 
-@implementation AppDelegate
+@interface DrawPoint : RLMObject
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
-    return YES;
-}
+@property CGFloat x;
+@property CGFloat y;
 
 @end
+
+RLM_ARRAY_TYPE(DrawPoint)

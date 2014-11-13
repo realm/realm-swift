@@ -16,17 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
+#import <UIKit/UIKit.h>
 #import <Realm/Realm.h>
+#import "DrawPoint.h"
 
-@implementation AppDelegate
+@interface DrawPath : RLMObject
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
-    return YES;
-}
+@property NSString *pathID;
+@property NSString *drawerID;
+@property RLMArray<DrawPoint> *points;
+@property (readonly) UIBezierPath *path;
 
 @end
