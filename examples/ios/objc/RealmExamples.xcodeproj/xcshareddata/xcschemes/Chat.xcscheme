@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E85B1AC91A14455300DF8EEF"
-               BuildableName = "TableView copy.app"
+               BuildableName = "Chat.app"
                BlueprintName = "Chat"
                ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E85B1AC91A14455300DF8EEF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Chat.app"
             BlueprintName = "Chat"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
@@ -52,7 +52,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E85B1AC91A14455300DF8EEF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Chat.app"
             BlueprintName = "Chat"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E85B1AC91A14455300DF8EEF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Chat.app"
             BlueprintName = "Chat"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
