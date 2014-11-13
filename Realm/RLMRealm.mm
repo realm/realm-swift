@@ -1153,6 +1153,26 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         s_serverBaseURLS[path] = serverBaseURL;
     }
 }
+
+- (NSError *)writeCopyToPath:(NSString *)path {
+    try {
+        _group->write(path.UTF8String);
+    }
+    catch (File::PermissionDenied &ex) {
+        return make_realm_error(RLMErrorFilePermissionDenied, ex);
+    }
+    catch (File::Exists &ex) {
+        return make_realm_error(RLMErrorFileExists, ex);
+    }
+    catch (File::AccessError &ex) {
+        return make_realm_error(RLMErrorFileAccessError, ex);
+    }
+    catch (exception &ex) {
+        return make_realm_error(RLMErrorFail, ex);
+    }
+    return nil;
+}
+
 @end
 
 @implementation RLMWeakNotifier
