@@ -16,17 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <UIKit/UIKit.h>
+
 #import "AppDelegate.h"
-#import <Realm/Realm.h>
 
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+int main(int argc, char * argv[])
 {
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
-    return YES;
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
 }
-
-@end

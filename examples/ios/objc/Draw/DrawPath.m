@@ -16,17 +16,32 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
-#import <Realm/Realm.h>
+#import "DrawPath.h"
 
-@implementation AppDelegate
+@implementation DrawPath
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+@dynamic path;
+
+- (UIBezierPath *)path
 {
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
-    return YES;
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    path.lineWidth = 4.0f;
+    NSUInteger index = 0;
+    for (DrawPoint *point in self.points) {
+        CGPoint cgPoint = CGPointMake(point.x, point.y);
+        if (index == 0) {
+            [path moveToPoint:cgPoint];
+        } else {
+            [path addLineToPoint:cgPoint];
+        }
+        index++;
+    }
+    return path;
+}
+
++ (NSString *)primaryKey
+{
+    return @"pathID";
 }
 
 @end

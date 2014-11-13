@@ -17,6 +17,17 @@ Chat app to demonstrate how to use a synced realm. To run, follow these steps:
 * Edit `examples/ios/objc/Chat/AppDelegate.m` to use the IP address or hostname of the computer running the realm server
 * Run the "Chat" scheme
 
+### Draw
+
+Drawing app to demonstrate how to use a synced realm. To run, follow these steps:
+
+* checkout tightdb's [sync-demo branch](https://github.com/tightdb/tightdb/tree/sync-demo)
+* Build tightdb by running `sh build.sh config && sh build.sh build && sh build.sh build-iphone`
+* Move tightdb's `iphone-lib` folder to the root of this repo and rename it to `core`
+* Start the realm server by running `python realm_server.py`
+* Edit `examples/ios/objc/Draw/AppDelegate.m` to use the IP address or hostname of the computer running the realm server
+* Run the "Draw" scheme
+
 ### Simple
 
 This app covers several introductory concepts about Realm. Without any UI distractions, just a little console output.

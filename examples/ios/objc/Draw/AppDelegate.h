@@ -16,17 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
-#import <Realm/Realm.h>
+#import <UIKit/UIKit.h>
 
-@implementation AppDelegate
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
-    return YES;
-}
+@property (strong, nonatomic) UIWindow *window;
 
 @end
