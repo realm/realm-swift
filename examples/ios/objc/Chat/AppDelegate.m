@@ -24,7 +24,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://192.168.1.18:8080"]; // JP's workstation
+                       serverBaseURL:@"http://jp-mbp.local:8080"];
     return YES;
 }
 
