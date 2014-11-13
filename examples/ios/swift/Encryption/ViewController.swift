@@ -91,11 +91,11 @@ class ViewController: UIViewController {
         let keychainIdentifierData = keychainIdentifier.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)
 
         // First check in the keychain for an existing key
-        var query: NSDictionary = [
-            (kSecClass as NSString): kSecClassKey,
-            (kSecAttrApplicationTag as NSString): keychainIdentifierData!,
-            (kSecAttrKeySizeInBits as NSString): 512,
-            (kSecReturnData as NSString): true
+        var query: [NSString: AnyObject] = [
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: keychainIdentifierData!,
+            kSecAttrKeySizeInBits: 512,
+            kSecReturnData: true
         ]
 
         var dataTypeRef: Unmanaged<AnyObject>?
@@ -110,10 +110,10 @@ class ViewController: UIViewController {
 
         // Store the key in the keychain
         query = [
-            (kSecClass as NSString): kSecClassKey,
-            (kSecAttrApplicationTag as NSString): keychainIdentifierData!,
-            (kSecAttrKeySizeInBits as NSString): 512,
-            (kSecValueData as NSString): keyData
+            kSecClass: kSecClassKey,
+            kSecAttrApplicationTag: keychainIdentifierData!,
+            kSecAttrKeySizeInBits: 512,
+            kSecValueData: keyData
         ]
 
         status = SecItemAdd(query, nil)
