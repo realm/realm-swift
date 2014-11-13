@@ -830,7 +830,9 @@
         [IntObject createInRealm:realm withObject:@[@0]];
     }];
 
-    XCTAssertNil([realm writeCopyToPath:RLMTestRealmPath()]);
+    NSError *writeError;
+    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
 }
@@ -842,7 +844,9 @@
         [IntObject createInRealm:realm withObject:@[@0]];
     }];
 
-    XCTAssertNotNil([realm writeCopyToPath:RLMTestRealmPath()]);
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNotNil(writeError);
 }
 
 - (void)testWritingCopyUsesWriteTransactionInProgress
@@ -851,7 +855,9 @@
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withObject:@[@0]];
 
-        XCTAssertNil([realm writeCopyToPath:RLMTestRealmPath()]);
+        NSError *writeError;
+        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+        XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
     }];
