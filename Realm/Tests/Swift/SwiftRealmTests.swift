@@ -108,8 +108,10 @@ class SwiftRealmTests: SwiftTestCase {
 
         let objects = SwiftIgnoredPropertiesObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type SwiftIgnoredPropertiesObject")
-        XCTAssertNil((objects[0] as SwiftIgnoredPropertiesObject).runtimeProperty, "Ignored property should be nil")
-        XCTAssertEqual((objects[0] as SwiftIgnoredPropertiesObject).name, "@fz", "Value of the name column doesn't match the assigned one.")
+        let retrievedObject = objects[0] as SwiftIgnoredPropertiesObject
+        XCTAssertNil(retrievedObject.runtimeProperty, "Ignored property should be nil")
+        XCTAssertEqual(retrievedObject.name, "@fz", "Value of the name column doesn't match the assigned one.")
+        XCTAssertEqual(retrievedObject.objectSchema.properties.count, 2, "Only 'name' and 'age' properties should be detected by Realm")
     }
 
     func testUpdatingSortedArrayAfterBackgroundUpdate() {

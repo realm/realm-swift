@@ -107,11 +107,11 @@ class SwiftIgnoredPropertiesObject: RLMObject {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var runtimeProperty: AnyObject?
-    
+    dynamic var readOnlyProperty: Int { return 0 }
+
     override class func ignoredProperties() -> [AnyObject]! {
         return ["runtimeProperty"]
     }
-
 }
 
 class SwiftPrimaryStringObject: RLMObject {

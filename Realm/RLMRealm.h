@@ -285,6 +285,19 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
+/**
+ Write a compacted copy of the RLMRealm to the given path.
+
+ The destination file cannot already exist.
+
+ Note that if this is called from within a write transaction it writes the
+ *current* data, and not data when the last write transaction was committed.
+
+ @param path Path to save the Realm to.
+ @return The error which occured while saving the Realm, or `nil` on success.
+ */
+- (NSError *)writeCopyToPath:(NSString *)path;
+
 #pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------

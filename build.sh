@@ -361,11 +361,15 @@ case "$COMMAND" in
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration Release build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration Release build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -375,11 +379,15 @@ case "$COMMAND" in
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Debug build ${CODESIGN_PARAMS}"
         xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration Debug build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration Debug build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -443,11 +451,11 @@ case "$COMMAND" in
     # Release packaging
     ######################################
     "package-browser")
-        mkdir -p test-reports
-        cd tightdb_objc/tools/RealmBrowser
-        xcodebuild -project RealmBrowser.xcodeproj -scheme RealmBrowser -IDECustomDerivedDataLocation=../../build/DerivedData -configuration Release clean build CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
-        cd ${WORKSPACE}/tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release
+        cd tightdb_objc
+        sh build.sh browser "$XCMODE"
+        cd ${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
         zip -r realm-browser.zip Realm\ Browser.app
+        mv realm-browser.zip ${WORKSPACE}
         ;;
 
     "package-docs")
@@ -467,29 +475,14 @@ case "$COMMAND" in
         ;;
 
     "package-test-examples")
-        ( mkdir ios; cd ios; unzip ../realm-framework-ios.zip )
-        ( mkdir osx; cd osx; unzip ../realm-framework-osx.zip )
-        unzip realm-obj-examples.zip
+        VERSION=$(file realm-cocoa-*.zip | grep -o '\d*\.\d*\.\d*')
+        unzip realm-cocoa-*.zip
 
-        mkdir -p Swift
-        cp ${WORKSPACE}/tightdb_objc/Realm/Swift/RLMSupport.swift Swift
-
-        rm *.zip
-        cd examples
-
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration Release build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration Release build ${CODESIGN_PARAMS}"
-
-        (
-            cd osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
-            DYLD_FRAMEWORK_PATH=. ./JSONImport
-        ) || exit 1
+        cp $0 realm-cocoa-${VERSION}
+        cd realm-cocoa-${VERSION}
+        sh build.sh examples "$XCMODE"
+        cd ..
+        rm -rf realm-cocoa-*
         ;;
 
     "package-ios")
@@ -581,11 +574,11 @@ EOF
         git clone $REALM_SOURCE tightdb_objc
 
         echo 'Packaging iOS'
-        sh tightdb_objc/build.sh package-ios
+        sh tightdb_objc/build.sh package-ios "$XCMODE"
         cp tightdb_objc/build/ios/realm-framework-ios.zip .
 
         echo 'Packaging OS X'
-        sh tightdb_objc/build.sh package-osx
+        sh tightdb_objc/build.sh package-osx "$XCMODE"
         cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
 
         echo 'Packaging docs'
@@ -597,27 +590,17 @@ EOF
         git clean -xfd
         cd ../..
 
-        sh tightdb_objc/build.sh package-examples
+        sh tightdb_objc/build.sh package-examples "$XCMODE"
         cp tightdb_objc/realm-obj-examples.zip .
 
-        echo 'Testing packaged examples'
-        (
-            mkdir -p examples-test
-            cd examples-test
-            cp ../realm-framework-ios.zip .
-            cp ../realm-framework-osx.zip .
-            cp ../realm-obj-examples.zip .
-            ln -s $WORKSPACE/tightdb_objc .
-
-            sh ../tightdb_objc/build.sh package-test-examples
-        ) || exit 1
-
         echo 'Packaging browser'
-        sh tightdb_objc/build.sh package-browser
-        cp tightdb_objc/build/DerivedData/RealmBrowser/Build/Products/Release/realm-browser.zip .
+        sh tightdb_objc/build.sh package-browser "$XCMODE"
 
         echo 'Building final release package'
         sh tightdb_objc/build.sh package-release
+
+        echo 'Testing packaged examples'
+        sh tightdb_objc/build.sh package-test-examples "$XCMODE"
 
         ;;
 
