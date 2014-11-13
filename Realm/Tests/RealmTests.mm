@@ -616,6 +616,27 @@
                     @"should reject table missing column");
 }
 
+- (void)testMultipleRealms
+{
+    // Create one StringObject in two different realms
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    RLMRealm *testRealm = self.realmWithTestPath;
+    [defaultRealm beginWriteTransaction];
+    [testRealm beginWriteTransaction];
+    [StringObject createInRealm:defaultRealm withObject:@[@"a"]];
+    [StringObject createInRealm:testRealm withObject:@[@"b"]];
+    [testRealm commitWriteTransaction];
+    [defaultRealm commitWriteTransaction];
+
+    // Confirm that objects were added to the correct realms
+    RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
+    RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
+    XCTAssertEqual(defaultObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(testObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
+
 - (void)testAddOrUpdate {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -636,7 +657,7 @@
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object shoudld throw
+    // upsert on non-primary key object should throw
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
 
     [realm commitWriteTransaction];
