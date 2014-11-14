@@ -294,9 +294,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  *current* data, and not data when the last write transaction was committed.
 
  @param path Path to save the Realm to.
- @return The error which occured while saving the Realm, or `nil` on success.
- */
-- (NSError *)writeCopyToPath:(NSString *)path;
+ @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return YES if the realm was copied successfully. Returns NO if an error occurred.
+*/
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
 
 #pragma mark - Accessing Objects
 

@@ -688,23 +688,38 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMCreateObjectInRealmWithValue(self, className, object);
 }
 
-- (NSError *)writeCopyToPath:(NSString *)path {
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+    BOOL success = YES;
+
     try {
         _group->write(path.UTF8String);
     }
     catch (File::PermissionDenied &ex) {
-        return make_realm_error(RLMErrorFilePermissionDenied, ex);
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFilePermissionDenied, ex);
+        }
     }
     catch (File::Exists &ex) {
-        return make_realm_error(RLMErrorFileExists, ex);
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFileExists, ex);
+        }
     }
     catch (File::AccessError &ex) {
-        return make_realm_error(RLMErrorFileAccessError, ex);
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFileAccessError, ex);
+        }
     }
     catch (exception &ex) {
-        return make_realm_error(RLMErrorFail, ex);
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFail, ex);
+        }
     }
-    return nil;
+
+    return success;
 }
 
 @end
