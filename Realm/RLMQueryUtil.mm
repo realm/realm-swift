@@ -163,8 +163,6 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
                     @"NSDiacriticInsensitivePredicateOption not supported for string type");
-    RLMPrecondition(caseSensitive, @"Invalid predicate option",
-                    @"NSCaseInsensitivePredicateOption not supported for queries on linked strings");
 
     tightdb::StringData sd = RLMStringDataWithNSString(value);
     switch (operatorType) {
@@ -175,10 +173,10 @@ void add_string_constraint_to_link_query(tightdb::Query& query,
         case NSContainsPredicateOperatorType:
             @throw RLMPredicateException(@"Invalid type", @"Predicate 'CONTAINS' is not supported");
         case NSEqualToPredicateOperatorType:
-            query.and_query(column == sd);
+            query.and_query(column.equal(sd, caseSensitive));
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.and_query(column != sd);
+            query.and_query(column.not_equal(sd, caseSensitive));
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",

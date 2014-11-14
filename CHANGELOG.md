@@ -9,10 +9,11 @@
 
 * Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
   another file.
+* Add support for case insensitive string queries on array properties.
 
 ### Bugfixes
 
-* None.
+* Fix for crash when running many simultaneous write transactions on background threads.
 
 0.87.4 Release notes (2014-11-07)
 =============================================================

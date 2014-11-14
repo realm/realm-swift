@@ -783,7 +783,7 @@
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'c'"].count);
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH[c] 'C'"].count);
 #else
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'c'"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol ENDSWITH 'a'"]);
 #endif
 }
 
@@ -842,12 +842,8 @@
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'abc'"].count);
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'def'"].count);
 
-#if 0 // FIXME: enable when support is added
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'abc'"].count);
     XCTAssertEqual(1U, [AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'ABC'"].count);
-#else
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol ==[c] 'abc'"]);
-#endif
 
     XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol != 'abc'"].count);
     XCTAssertEqual(0U, [AllTypesObject objectsWhere:@"objectCol.stringCol == 'def'"].count);
@@ -1468,9 +1464,8 @@
     XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"] count]);
     XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"] count]);
     XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"] count]);
-    // FIXME: Shouldn't throw on insensitive link string queries
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"]);
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"] count]);
+    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"] count]);
 
     ////////////////////////
     // Format Predicates
@@ -1531,9 +1526,8 @@
     XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]));
     XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]));
     XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]));
-    // FIXME: Shouldn't throw on insensitive link string queries
-    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
-    XCTAssertThrows(([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
+    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
 }
 
 - (void)testArrayIn
