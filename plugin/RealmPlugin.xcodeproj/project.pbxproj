@@ -248,7 +248,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "python lldb.py";
+			shellScript = "python rlm_lldb.py";
 		};
 /* End PBXShellScriptBuildPhase section */
 
