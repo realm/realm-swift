@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##############################################################################
 #
 # Copyright 2014 Realm Inc.
@@ -16,12 +17,52 @@
 #
 ##############################################################################
 
-import lldb
-
 # In the lldb shell, load with:
-# command script import [Realm path]/tools/rlm_lldb.py --allow-reload
+# command script import [Realm path]/plugin/lldb.py --allow-reload
 # To load automatically, add that line to your ~/.lldbinit file (which you will
-# have to create if you have not set up any previous lldb scripts)
+# have to create if you have not set up any previous lldb scripts), or run this
+# file as a Python script outside of Xcode to install it automatically
+
+if __name__ == '__main__':
+    # Script is being run directly, so install it
+    import errno
+    import shutil
+    import os
+
+    source = os.path.realpath(__file__)
+    destination = os.path.expanduser("~/Library/Application Support/Realm")
+
+    # Copy the file into place
+    try:
+        os.makedirs(destination, 0744)
+    except os.error as e:
+        # It's fine if the directory already exists
+        if e.errno != errno.EEXIST:
+            raise
+
+    shutil.copy2(source, destination + '/rlm_lldb.py')
+
+    # Add it to ~/.lldbinit
+    load_line = 'command script import "~/Library/Application Support/Realm/rlm_lldb.py" --allow-reload\n'
+    is_installed = False
+    try:
+        with open(os.path.expanduser('~/.lldbinit')) as f:
+            for line in f:
+                if line == load_line:
+                    is_installed = True
+                    break
+    except IOError as e:
+        if e.errno != errno.ENOENT:
+            raise
+        # File not existing yet is fine
+
+    if not is_installed:
+        with open(os.path.expanduser('~/.lldbinit'), 'a') as f:
+            f.write(load_line)
+
+    exit(0)
+
+import lldb
 
 property_types = {
     0: 'int64_t',
