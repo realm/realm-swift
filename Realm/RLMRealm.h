@@ -119,6 +119,23 @@
                                  error:(NSError **)error;
 
 /**
+ Set the encryption key to use when opening Realms at a certain path.
+
+ This can be used as an alternative to explicitly passing the key to
+ `encryptedRealmWithPath:key:readOnly:error:` each time a Realm instance is
+ needed. The encryption key will be used any time a Realm is opened with
+ `realmWithPath:` or `defaultRealm`.
+
+ If you do not want Realm to hold on to your encryption keys any longer than
+ needed, then use `encryptedRealmWithPath:key:readOnly:error:` rather than this
+ method.
+
+ @param key     64-byte encryption key to use, or `nil` to unset.
+ @param path    Realm path to set the encryption key for.
+ */
++ (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path;
+
+/**
  Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
  used to create this instance can be used to access the same in-memory Realm from
  multiple threads.

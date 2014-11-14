@@ -88,6 +88,7 @@ NSError *make_realm_error(RLMError code, exception &ex) {
 // Global RLMRealm instance cache
 //
 NSMutableDictionary *s_realmsPerPath;
+NSMutableDictionary *s_keysPerPath;
 
 // FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
 //  rather than by the path (since the path is not a reliable identifier). This requires additional support
@@ -122,6 +123,9 @@ void clearRealmCache() {
             [map removeAllObjects];
         }
         s_realmsPerPath = [NSMutableDictionary dictionary];
+    }
+    @synchronized(s_keysPerPath) {
+        s_keysPerPath = [NSMutableDictionary dictionary];
     }
 }
 
@@ -383,6 +387,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         return realm;
     }
 
+    if (!key) {
+        @synchronized (s_keysPerPath) {
+            key = s_keysPerPath[path];
+        }
+    }
+
     NSError *error = nil;
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory error:&error];
     realm->_dynamic = dynamic;
@@ -455,6 +465,25 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     }
 
     return realm;
+}
+
++ (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
+    if (!key) {
+        @synchronized (s_keysPerPath) {
+            [s_keysPerPath removeObjectForKey:path];
+            return;
+        }
+    }
+
+    if ([key length] != 64) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Encryption key must be exactly 64 bytes"
+                                     userInfo:nil];
+    }
+
+    @synchronized (s_keysPerPath) {
+        s_keysPerPath[path] = key;
+    }
 }
 
 + (void)resetRealmState {
@@ -749,13 +778,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath {
+    NSData *key;
+    @synchronized (s_keysPerPath) {
+        key = s_keysPerPath[realmPath];
+    }
+
     NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithPath:realmPath key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error];
     if (error) {
         return error;
     }
 
-    return [self migrateRealm:realm key:nil];
+    return [self migrateRealm:realm key:key];
 }
 
 + (NSError *)migrateEncryptedRealmAtPath:(NSString *)realmPath key:(NSData *)key {
