@@ -9,7 +9,7 @@
 
 * Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
   another file.
-* Add support for BEGINSWITH, ENDSWITH, CONTAINS, and case insensitive string queries on array properties.
+* Add support for case insensitive string queries on array properties.
 
 ### Bugfixes
 
