@@ -38,7 +38,7 @@
 @end
 
 // throw an exception if the realm is being used from the wrong thread
-inline void RLMCheckThread(RLMRealm *realm) {
+inline void RLMCheckThread(__unsafe_unretained RLMRealm *realm) {
     if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Realm accessed from incorrect thread"
