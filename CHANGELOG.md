@@ -12,6 +12,8 @@
 * Add support for case insensitive string queries on array properties.
 * Make fast enumeration of `RLMArray` and `RLMResults` ~30% faster and
   `objectAtIndex:` ~55% faster.
+* Added a lldb visualizer script for displaying the contents of persisted
+  RLMObjects when debugging.
 
 ### Bugfixes
 

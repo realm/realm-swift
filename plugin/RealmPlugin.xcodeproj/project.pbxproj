@@ -169,6 +169,7 @@
 			buildConfigurationList = 2263AAC919B0A1E6007240D9 /* Build configuration list for PBXNativeTarget "RealmPlugin" */;
 			buildPhases = (
 				22B78EF819B0A3AF00968525 /* Install templates */,
+				3F527BDF1A16C34300CA8B97 /* Install LLDB Script */,
 				2263AAB219B0A1E6007240D9 /* Sources */,
 				2263AAB319B0A1E6007240D9 /* Frameworks */,
 				2263AAB419B0A1E6007240D9 /* Resources */,
@@ -234,6 +235,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd Templates && osascript install_templates_applescript";
+		};
+		3F527BDF1A16C34300CA8B97 /* Install LLDB Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Install LLDB Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "python rlm_lldb.py";
 		};
 /* End PBXShellScriptBuildPhase section */
 
