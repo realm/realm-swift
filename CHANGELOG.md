@@ -9,7 +9,8 @@
 
 * Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
   another file.
-* Add support for case insensitive string queries on array properties.
+* Add support for case insensitive, BEGINSWITH, ENDSWITH and CONTAINS string
+  queries on array properties.
 * Make fast enumeration of `RLMArray` and `RLMResults` ~30% faster and
   `objectAtIndex:` ~55% faster.
 * Added a lldb visualizer script for displaying the contents of persisted
