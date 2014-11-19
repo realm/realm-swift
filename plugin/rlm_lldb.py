@@ -68,7 +68,8 @@ def cache_lookup(cache, key, generator):
     value = cache.get(key, None)
     if not value:
         value = generator(key)
-        cache[key] = value
+        if value:
+            cache[key] = value
     return value
 
 def unsigned(value):
@@ -114,9 +115,11 @@ def get_ivars(obj, *args):
     def get_offset(type_name):
         ivars = {}
         for ivar in args:
-            v = obj.thread.GetSelectedFrame().EvaluateExpression(
-                    'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar))
-            ivars[ivar] = unsigned(v)
+            v = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
+                    'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar)))
+            if v == 0:
+                return None
+            ivars[ivar] = v
         return ivars
 
     return cache_lookup(ivar_offset_cache, obj.type.name, get_offset)
@@ -155,6 +158,10 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
 
         super(RLMObject_SyntheticChildrenProvider, self).__init__(
                 obj, 'objectSchema', 'realm')
+
+        if not self.ivars:
+            self.props = []
+            return
 
         object_schema = self._value_from_ivar('objectSchema', 'RLMObjectSchema*').deref
         def get_schema(_):
@@ -198,14 +205,18 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
         self.type = get_type(self.obj, 'id')
 
     def num_children(self):
+        if not self.ivars:
+            return None
         if not self.count:
             self.count = unsigned(self._eval("RLMDebugArrayCount({})".format(path(self.obj))))
         return self.count + 1
 
     def has_children(self):
-        return True
+        return self.ivars != None
 
     def get_child_index(self, name):
+        if not self.ivars:
+            return None
         if name == 'Some' or name == 'value':
             return None
         if name == 'realm':
@@ -215,6 +226,8 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
         return int(name.lstrip('[').rstrip(']')) + 1
 
     def get_child_at_index(self, index):
+        if not self.ivars:
+            return None
         if index == 0:
             return self._value_from_ivar('realm')
 
