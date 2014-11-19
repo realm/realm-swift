@@ -46,7 +46,7 @@
 
 -(BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index
 {
-    if (index >= [displayedArray count]) {
+    if (index >= [displayedArray count] || !object) {
         return NO;
     }
     

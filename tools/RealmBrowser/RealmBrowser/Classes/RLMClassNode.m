@@ -72,22 +72,16 @@
 
 - (BOOL)isExpandable
 {
-    NSLog(@"%@: isExpandable: %d", self.name, self.displayedItems.count > 0);
-
     return self.displayedItems.count > 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
-    NSLog(@"%@: numberOfChildNodes: %lu", self.name, self.displayedItems.count);
-
     return self.displayedItems.count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
-    NSLog(@"%@: childNodeAtIndex %lu: %@", self.name, index, self.displayedItems[index]);
-
     return self.displayedItems[index];
 }
 

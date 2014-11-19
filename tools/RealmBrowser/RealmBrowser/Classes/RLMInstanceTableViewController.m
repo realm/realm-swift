@@ -37,6 +37,7 @@
 #import "NSColor+ByteSizeFactory.h"
 
 #import "objc/objc-class.h"
+#import "RLMBrowser_private.h"
 
 #import "RLMDescriptions.h"
 
@@ -49,12 +50,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMUpdateTypeRealm,
     RLMUpdateTypeTableView
 };
-
-@interface RLMRealm ()
-
-- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
-
-@end
 
 @implementation RLMInstanceTableViewController {
     BOOL awake;
@@ -236,22 +231,22 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         return nil;
     }
     
-    RLMResults *tvArray = ((RLMClassNode *)self.displayedType).allObjects;
+    RLMResults *results = ((RLMClassNode *)self.displayedType).allObjects;
     switch (type) {
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
             numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
-            NSString *min = [numberFormatter stringFromNumber:[tvArray minOfProperty:propertyName]];
-            NSString *avg = [numberFormatter stringFromNumber:[tvArray averageOfProperty:propertyName]];
-            NSString *max = [numberFormatter stringFromNumber:[tvArray maxOfProperty:propertyName]];
-            NSString *sum = [numberFormatter stringFromNumber:[tvArray sumOfProperty:propertyName]];
+            NSString *min = [numberFormatter stringFromNumber:[results minOfProperty:propertyName]];
+            NSString *avg = [numberFormatter stringFromNumber:[results averageOfProperty:propertyName]];
+            NSString *max = [numberFormatter stringFromNumber:[results maxOfProperty:propertyName]];
+            NSString *sum = [numberFormatter stringFromNumber:[results sumOfProperty:propertyName]];
             
             return [NSString stringWithFormat:@"Minimum: %@\nAverage: %@\nMaximum: %@\nSum: %@", min, avg, max, sum];
         }
         case RLMPropertyTypeDate: {
-            NSString *min = [dateFormatter stringFromDate:[tvArray minOfProperty:propertyName]];
-            NSString *max = [dateFormatter stringFromDate:[tvArray maxOfProperty:propertyName]];
+            NSString *min = [dateFormatter stringFromDate:[results minOfProperty:propertyName]];
+            NSString *max = [dateFormatter stringFromDate:[results maxOfProperty:propertyName]];
             
             return [NSString stringWithFormat:@"Earliest: %@\nLatest: %@", min, max];
         }
@@ -425,17 +420,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 - (void)addNewObjects:(NSIndexSet *)rowIndexes
 {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
-
-    NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
-    for (RLMProperty *property in self.displayedType.schema.properties) {
-        objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
-    }
-    
     NSUInteger objectCount = MAX(rowIndexes.count, 1);
-    
+
     [realm beginWriteTransaction];
     for (NSUInteger i = 0; i < objectCount; i++) {
-        [realm addObject: [realm createObject:self.displayedType.schema.className withObject:objectBlueprint]];
+        [self createObjectInRealm:realm withScheme:self.displayedType.schema];
     }
     [realm commitWriteTransaction];
     
@@ -487,11 +476,55 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 #pragma mark - Private Methods - RLMTableView Delegate Helpers
 
-- (NSDictionary *)defaultValuesForProperties:(NSArray *)properties
+- (RLMObject *)createObjectInRealm:(RLMRealm *)realm withScheme:(RLMObjectSchema *)schema
+{
+    NSMutableDictionary *objectBlueprint = [self defaultValuesForSchema:schema];
+    
+    RLMProperty *primaryKey = schema.primaryKeyProperty;
+    
+    if (primaryKey) {
+        NSDate *before = [NSDate date];
+        for (int i = 0; i < 1000; i++) {
+            id uniqueValue = [self uniqueValueForProperty:primaryKey className:schema.className inRealm:realm];
+            if (!uniqueValue) {
+                return nil;
+            }
+            
+            objectBlueprint[primaryKey.name] = uniqueValue;
+        }
+        NSLog(@"duration: %.2f", [[NSDate date] timeIntervalSinceDate:before]);
+    }
+    
+    return [realm createObject:schema.className withObject:objectBlueprint];
+}
+
+- (id)uniqueValueForProperty:(RLMProperty *)primaryKey className:(NSString *)className inRealm:(RLMRealm *)realm
+{
+    NSUInteger remainingAttempts = 30;
+    
+    while (remainingAttempts > 0) {
+        id uniqueValue;
+        
+        if (primaryKey.type == RLMPropertyTypeInt) {
+            uniqueValue = @(rand());
+        } else if (primaryKey.type == RLMPropertyTypeString) {
+            uniqueValue = [NSString stringWithFormat:@"[PRIMARY KEY] %i", rand() % 100];
+        }
+        
+        if ([[realm objects:className where:@"%K == %@", primaryKey.name, uniqueValue] count] == 0) {
+            return uniqueValue;
+        }
+        
+        remainingAttempts--;
+    }
+    
+    return nil;
+}
+
+- (NSMutableDictionary *)defaultValuesForSchema:(RLMObjectSchema *)schema
 {
     NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
-    
-    for (RLMProperty *property in properties) {
+    for (RLMProperty *property in schema.properties) {
         defaultValues[property.name] = [self defaultValueForPropertyType:property.type];
     }
     
@@ -624,16 +657,11 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     
-    NSMutableDictionary *objectBlueprint = [NSMutableDictionary dictionary];
-    for (RLMProperty *property in self.displayedType.schema.properties) {
-        objectBlueprint[property.name] = [self defaultValueForPropertyType:property.type];
-    }
-    
     [realm beginWriteTransaction];
     
     [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
         for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
-            RLMObject *object = [realm createObject:self.displayedType.schema.className withObject:objectBlueprint];
+            RLMObject *object = [self createObjectInRealm:realm withScheme:self.displayedType.schema];
             [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:range.location];
         }
     }];

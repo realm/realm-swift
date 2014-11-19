@@ -20,7 +20,9 @@
 #define RealmBrowser_RLMBrowser_private_h
 
 @interface RLMRealm (Dynamic)
+- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
 - (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+
 @end
 
 @interface RLMArray (Private)
