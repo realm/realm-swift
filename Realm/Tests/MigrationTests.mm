@@ -61,6 +61,7 @@ extern "C" {
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
     // modify object schema to use RLMObject class (or else bad accessors will get created)
     objectSchema.objectClass = RLMObject.class;
+    objectSchema.accessorClass = RLMObject.class;
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
@@ -386,8 +387,13 @@ extern "C" {
 }
 
 - (void)testRearrangeProperties {
-    // create realm with the properties reversed
     @autoreleasepool {
+        // create object in default realm
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [CircleObject createInDefaultRealmWithObject:@[@"data", NSNull.null]];
+        }];
+
+        // create realm with the properties reversed
         RLMSchema *schema = [[RLMSchema sharedSchema] copy];
         RLMObjectSchema *objectSchema = schema[@"CircleObject"];
         objectSchema.properties = @[objectSchema.properties[1], objectSchema.properties[0]];
@@ -408,6 +414,10 @@ extern "C" {
     XCTAssertNoThrow(obj.data = @"new data");
     XCTAssertNoThrow(obj.next = obj);
     [realm commitWriteTransaction];
+
+    // open the default Realm and make sure accessors with alternate ordering work
+    obj = [[CircleObject allObjects] firstObject];
+    XCTAssertEqualObjects(obj.data, @"data");
 }
 
 @end

@@ -76,6 +76,7 @@
     }
     schema.className = className;
     schema.objectClass = objectClass;
+    schema.accessorClass = RLMObject.class;
 
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
@@ -206,6 +207,7 @@
 
     // for dynamic schema use vanilla RLMObject accessor classes
     schema.objectClass = RLMObject.class;
+    schema.accessorClass = RLMObject.class;
     schema.standaloneClass = RLMObject.class;
 
     return schema;
@@ -223,6 +225,21 @@
     schema.primaryKeyProperty = _primaryKeyProperty;
     // _table not copied as it's tightdb::Group-specific
     return schema;
+}
+
+- (BOOL)isEqualToObjectSchema:(RLMObjectSchema *)objectSchema {
+    if (objectSchema.properties.count != _properties.count) {
+        return NO;
+    }
+
+    // compare ordered list of properties
+    NSArray *otherProperties = objectSchema.properties;
+    for (NSUInteger i = 0; i < _properties.count; i++) {
+        if (![_properties[i] isEqualToProperty:otherProperties[i]]) {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 @end

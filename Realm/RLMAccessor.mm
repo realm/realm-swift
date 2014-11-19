@@ -543,12 +543,6 @@ static Class RLMCreateAccessorClass(Class objectClass,
                                     NSString *accessorClassPrefix,
                                     IMP (*getterGetter)(RLMProperty *, char, NSString *),
                                     IMP (*setterGetter)(RLMProperty *, char)) {
-
-    // if objectClass is RLMObject then don't create custom accessor (only supports dynamic interface)
-    if (objectClass == RLMObject.class) {
-        return objectClass;
-    }
-    
     // throw if no schema, prefix, or object class
     if (!objectClass || !schema || !accessorClassPrefix) {
         @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
@@ -589,9 +583,8 @@ static Class RLMCreateAccessorClass(Class objectClass,
     return accClass;
 }
 
-Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    return RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
-                                  RLMAccessorGetter, RLMAccessorSetter);
+Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix) {
+    return RLMCreateAccessorClass(objectClass, schema, prefix, RLMAccessorGetter, RLMAccessorSetter);
 }
 
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {

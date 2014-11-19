@@ -31,6 +31,7 @@
     mach_port_t _threadID;
 }
 @property (nonatomic, readonly) BOOL inWriteTransaction;
+@property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readonly) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
