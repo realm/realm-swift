@@ -338,8 +338,6 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
     RLMResults *result;
     
-    NSLog(@"predicate: %@", predicate);
-
     if (predicate.length != 0) {
         result = [realm objects:typeNode.name where:predicate];
     }

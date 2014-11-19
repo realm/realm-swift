@@ -29,6 +29,7 @@
 		225443F519E3E6360045996B /* RLMTableHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 225443F419E3E6360045996B /* RLMTableHeaderCell.m */; };
 		22565D6719C1BCF400C8C8EC /* RLMLinkTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */; };
 		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
+		228D1F871A1CAD660028562A /* RLMResultsNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 228D1F861A1CAD660028562A /* RLMResultsNode.m */; };
 		22A55FEB19D18BA8009178BC /* RLMObjectNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FEA19D18BA8009178BC /* RLMObjectNode.m */; };
 		22A55FF119D19842009178BC /* RLMDescriptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FF019D19842009178BC /* RLMDescriptions.m */; };
 		22D28EA71993AAAB00497FD3 /* RLMNumberTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */; };
@@ -119,6 +120,8 @@
 		22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMLinkTableCellView.m; path = Classes/RLMLinkTableCellView.m; sourceTree = "<group>"; };
 		225AAFEA19C09E520023B595 /* RLMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTextField.h; path = Classes/RLMTextField.h; sourceTree = "<group>"; };
 		225AAFEB19C09E520023B595 /* RLMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTextField.m; path = Classes/RLMTextField.m; sourceTree = "<group>"; };
+		228D1F851A1CAD660028562A /* RLMResultsNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMResultsNode.h; path = Classes/RLMResultsNode.h; sourceTree = "<group>"; };
+		228D1F861A1CAD660028562A /* RLMResultsNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMResultsNode.m; path = Classes/RLMResultsNode.m; sourceTree = "<group>"; };
 		22A55FE919D18BA8009178BC /* RLMObjectNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObjectNode.h; path = Classes/RLMObjectNode.h; sourceTree = "<group>"; };
 		22A55FEA19D18BA8009178BC /* RLMObjectNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMObjectNode.m; path = Classes/RLMObjectNode.m; sourceTree = "<group>"; };
 		22A55FEF19D19842009178BC /* RLMDescriptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptions.h; path = Classes/RLMDescriptions.h; sourceTree = "<group>"; };
@@ -289,6 +292,8 @@
 		8474E2BA19544D9B00BCA755 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				228D1F851A1CAD660028562A /* RLMResultsNode.h */,
+				228D1F861A1CAD660028562A /* RLMResultsNode.m */,
 				2249D9B019A62EBD00A31104 /* RLMTableColumn.h */,
 				2249D9B119A62EBD00A31104 /* RLMTableColumn.m */,
 				840F97BE192B7DCE006B591E /* RLMDocument.h */,
@@ -596,6 +601,7 @@
 				84D7990C19388E8900FC76A0 /* RLMClassProperty.m in Sources */,
 				221322FD19954B0A00D25737 /* RLMTableCellView.m in Sources */,
 				22096B2719911F7300233D77 /* RLMBadgeTableCellView.m in Sources */,
+				228D1F871A1CAD660028562A /* RLMResultsNode.m in Sources */,
 				8457294D1962E3860076D4F1 /* RLMTableView.m in Sources */,
 				22A55FF119D19842009178BC /* RLMDescriptions.m in Sources */,
 				84E35A49196AD991007F0344 /* RLMNavigationStack.m in Sources */,

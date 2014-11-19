@@ -23,6 +23,7 @@
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
 #import "RLMArrayNode.h"
+#import "RLMResultsNode.h"
 #import "RLMRealmNode.h"
 
 #import "RLMBadgeTableCellView.h"
@@ -132,13 +133,13 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         [self setSelectionIndex:arrayState.arrayIndex];
     }
     else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
+        RLMQueryNavigationState *queryState = (RLMQueryNavigationState *)newState;
         
-        RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:arrayState.searchText
-                                                               result:arrayState.results
-                                                            andParent:arrayState.selectedType];
-        self.displayedType = arrayNode;
-        [self.realmTableView setupColumnsWithType:arrayNode];
+        RLMResultsNode *resultsNode = [[RLMResultsNode alloc] initWithQuery:queryState.searchText
+                                                                     result:queryState.results
+                                                                  andParent:queryState.selectedType];
+        self.displayedType = resultsNode;
+        [self.realmTableView setupColumnsWithType:resultsNode];
         [self setSelectionIndex:0];
     }
     

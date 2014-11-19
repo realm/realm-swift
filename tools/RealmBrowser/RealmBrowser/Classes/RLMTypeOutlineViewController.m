@@ -23,6 +23,7 @@
 #import "RLMArrayNavigationState.h"
 #import "RLMQueryNavigationState.h"
 #import "RLMObjectNode.h"
+#import "RLMResultsNode.h"
 #import "RLMRealmOutlineNode.h"
 
 @interface RLMTypeOutlineViewController ()
@@ -98,15 +99,10 @@
 
         RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
 
-        RLMArrayNode *arrayNode = [parentClassNode displayChildArrayFromQuery:arrayState.searchText result:arrayState.results];
+        [parentClassNode displayChildResultsFromQuery:arrayState.searchText result:arrayState.results];
 
         [self.classesOutlineView reloadData];
         [self.classesOutlineView expandItem:parentClassNode];
-
-        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
-        if (index != NSNotFound) {
-            [self setSelectionIndex:index];
-        }
     }
 }
 
@@ -202,6 +198,11 @@
 
 -(void)selectedItem:(id<RLMRealmOutlineNode>)item
 {
+    if ([item isKindOfClass:[RLMResultsNode class]]) {
+        return;
+    }
+
+    
     id<RLMRealmOutlineNode> theItem = item;
     
     // If we didn't select an array, we should flatten the outline view

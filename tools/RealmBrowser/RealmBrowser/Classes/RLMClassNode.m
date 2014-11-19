@@ -19,6 +19,9 @@
 #import "RLMClassNode.h"
 
 #import "RLMObjectNode.h"
+#import "RLMArrayNode.h"
+#import "RLMResultsNode.h"
+
 #import "RLMSidebarTableCellView.h"
 
 // private redeclaration
@@ -69,16 +72,22 @@
 
 - (BOOL)isExpandable
 {
+    NSLog(@"%@: isExpandable: %d", self.name, self.displayedItems.count > 0);
+
     return self.displayedItems.count > 0;
 }
 
 - (NSUInteger)numberOfChildNodes
 {
+    NSLog(@"%@: numberOfChildNodes: %lu", self.name, self.displayedItems.count);
+
     return self.displayedItems.count;
 }
 
 - (id<RLMRealmOutlineNode>)childNodeAtIndex:(NSUInteger)index
 {
+    NSLog(@"%@: childNodeAtIndex %lu: %@", self.name, index, self.displayedItems[index]);
+
     return self.displayedItems[index];
 }
 
@@ -146,20 +155,20 @@
     return objectNode;
 }
 
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result
+- (RLMResultsNode *)displayChildResultsFromQuery:(NSString *)searchText result:(RLMResults *)result
 {
     displaysQuery = YES;
-
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:searchText result:result andParent:self];
-
+    
+    RLMResultsNode *resultsNode = [[RLMResultsNode alloc] initWithQuery:searchText result:result andParent:self];
+    
     if (displayedArrays.count == 0) {
-        [displayedArrays addObject:arrayNode];
+        [displayedArrays addObject:resultsNode];
     }
     else {
-        [displayedArrays replaceObjectAtIndex:0 withObject:arrayNode];
+        [displayedArrays replaceObjectAtIndex:0 withObject:resultsNode];
     }
 
-    return arrayNode;
+    return resultsNode;
 }
 
 - (void)removeAllChildNodes
