@@ -87,6 +87,12 @@
  */
 - (id)lastObject;
 
+/**
+ Returns all objects in the results. The returned array is not self-updating.
+
+ @return An NSArray of RLMObjects of the class contained by this RLMResults.
+ */
+- (NSArray *)allObjects;
 
 
 #pragma mark -

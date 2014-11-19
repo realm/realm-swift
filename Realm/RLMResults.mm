@@ -219,6 +219,16 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return nil;
 }
 
+- (NSArray *)allObjects {
+    RLMResultsValidate(self);
+
+    NSMutableArray *objects = [NSMutableArray array];
+    for (RLMObject *object in self) {
+        [objects addObject:object];
+    }
+    return [NSArray arrayWithArray:objects];
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMResultsValidate(self);
