@@ -117,18 +117,18 @@ static void RLMRealmCreateAccessors(RLMSchema *schema) {
         s_accessorSchema = [NSMutableArray new];
     });
     // create accessors for non-dynamic realms
-    RLMSchema *accessorSchema = nil;
-    for (NSUInteger i = 0; i < s_accessorSchema.count; i++) {
-        if ([schema isEqualToSchema:s_accessorSchema[i]]) {
-            accessorSchema = s_accessorSchema[i];
+    RLMSchema *matchingSchema = nil;
+    for (RLMSchema *accessorSchema in s_accessorSchema) {
+        if ([schema isEqualToSchema:accessorSchema]) {
+            matchingSchema = accessorSchema;
             break;
         }
     }
 
-    if (accessorSchema) {
+    if (matchingSchema) {
         // reuse accessors
         for (RLMObjectSchema *objectSchema in schema.objectSchema) {
-            objectSchema.accessorClass = accessorSchema[objectSchema.className].accessorClass;
+            objectSchema.accessorClass = matchingSchema[objectSchema.className].accessorClass;
         }
     }
     else {

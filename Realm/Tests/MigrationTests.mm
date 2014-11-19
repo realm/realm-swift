@@ -416,8 +416,11 @@ extern "C" {
     [realm commitWriteTransaction];
 
     // open the default Realm and make sure accessors with alternate ordering work
-    obj = [[CircleObject allObjects] firstObject];
-    XCTAssertEqualObjects(obj.data, @"data");
+    CircleObject *defaultObj = [[CircleObject allObjects] firstObject];
+    XCTAssertEqualObjects(defaultObj.data, @"data");
+
+    // test object from other realm still works
+    XCTAssertEqualObjects(obj.data, @"new data");
 }
 
 @end
