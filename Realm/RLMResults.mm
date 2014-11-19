@@ -226,7 +226,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     for (RLMObject *object in self) {
         [objects addObject:object];
     }
-    return [NSArray arrayWithArray:objects]
+    return [NSArray arrayWithArray:objects];
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
