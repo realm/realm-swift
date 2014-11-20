@@ -238,13 +238,45 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
     def update(self):
         self.count = None
 
-def __lldb_init_module(debugger, _):
-    debugger.HandleCommand('type summary add RLMArray -F rlm_lldb.RLM_SummaryProvider')
-    debugger.HandleCommand('type summary add RLMArrayLinkView -F rlm_lldb.RLM_SummaryProvider')
-    debugger.HandleCommand('type summary add RLMResults -F rlm_lldb.RLM_SummaryProvider')
-    debugger.HandleCommand('type summary add -x RLMAccessor_ -F rlm_lldb.RLM_SummaryProvider')
+class InitializerHack(object):
+    def __init__(self, obj, _):
+        self.obj = obj
+        self.count = obj.GetNumChildren()
 
-    debugger.HandleCommand('type synthetic add RLMArray --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
-    debugger.HandleCommand('type synthetic add RLMArrayLinkView --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
-    debugger.HandleCommand('type synthetic add RLMResults --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
-    debugger.HandleCommand('type synthetic add -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')
+        obj.target.debugger.HandleCommand('type category delete RealmInit')
+
+        addr = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression('RLMDebugGetSubclassList()'))
+        classes = obj.process.ReadCStringFromMemory(addr, 65536, lldb.SBError())
+        for cls in classes.split(' '):
+            if len(cls):
+                obj.target.debugger.HandleCommand('type summary add -w Realm {} -F rlm_lldb.RLM_SummaryProvider'.format(cls))
+                obj.target.debugger.HandleCommand('type synthetic add -w Realm {} --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider'.format(cls))
+
+    def num_children(self):
+        return self.count
+
+    def has_children(self):
+        return self.count > 0
+
+    def get_child_index(self, name):
+        for i in xrange(self.obj.GetNumChildren()):
+            if self.obj.GetChildAtIndex(i).name == name:
+                return i
+
+    def get_child_at_index(self, index):
+        return self.obj.GetChildAtIndex(index)
+
+def __lldb_init_module(debugger, _):
+    debugger.HandleCommand('type summary add -w Realm RLMArray -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add -w Realm RLMArrayLinkView -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add -w Realm RLMResults -F rlm_lldb.RLM_SummaryProvider')
+    debugger.HandleCommand('type summary add -w Realm -x RLMAccessor_ -F rlm_lldb.RLM_SummaryProvider')
+
+    debugger.HandleCommand('type synthetic add -w Realm RLMArray --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
+    debugger.HandleCommand('type synthetic add -w Realm RLMArrayLinkView --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
+    debugger.HandleCommand('type synthetic add -w Realm RLMResults --python-class rlm_lldb.RLMArray_SyntheticChildrenProvider')
+    debugger.HandleCommand('type synthetic add -w Realm -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')
+
+    debugger.HandleCommand('type synthetic add -w RealmInit -x .* --python-class rlm_lldb.InitializerHack')
+    debugger.HandleCommand('type category enable RealmInit')
+    debugger.HandleCommand('type category enable Realm')

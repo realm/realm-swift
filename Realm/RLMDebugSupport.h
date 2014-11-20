@@ -30,3 +30,5 @@ size_t RLMDebugGetIvarOffset(__unsafe_unretained id obj, const char *name);
 id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key);
 
 uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj);
+
+uintptr_t RLMDebugGetSubclassList(void);

@@ -77,3 +77,27 @@ id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key) {
 uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj) {
     return (uintptr_t)[[[(RLMObjectSchema *)obj properties] valueForKey:@"name"] componentsJoinedByString:@" "].UTF8String;
 }
+
+uintptr_t RLMDebugGetSubclassList(void) {
+    NSMutableString *names = [NSMutableString stringWithCapacity:1024];
+
+    unsigned int numClasses;
+    Class *classes = objc_copyClassList(&numClasses);
+
+    for (unsigned int i = 0; i < numClasses; i++) {
+        const char *name = class_getName(classes[i]);
+        if (strncmp("RLMAccessor_v", name, sizeof("RLMAccessor_v") - 1) == 0 ||
+            strncmp("RLMStandalone_", name, sizeof("RLMStandalone_") - 1) == 0) {
+            continue;
+        }
+        for (Class cls = class_getSuperclass(classes[i]); cls; cls = class_getSuperclass(cls)) {
+            if (cls == RLMObject.class) {
+                [names appendFormat:@"%s ", name];
+                break;
+            }
+        }
+    }
+
+    free(classes);
+    return (uintptr_t)names.UTF8String;
+}
