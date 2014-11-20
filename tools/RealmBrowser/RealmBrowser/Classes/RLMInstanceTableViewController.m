@@ -479,20 +479,15 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 - (RLMObject *)createObjectInRealm:(RLMRealm *)realm withScheme:(RLMObjectSchema *)schema
 {
     NSMutableDictionary *objectBlueprint = [self defaultValuesForSchema:schema];
-    
     RLMProperty *primaryKey = schema.primaryKeyProperty;
     
     if (primaryKey) {
-        NSDate *before = [NSDate date];
-        for (int i = 0; i < 1000; i++) {
-            id uniqueValue = [self uniqueValueForProperty:primaryKey className:schema.className inRealm:realm];
-            if (!uniqueValue) {
-                return nil;
-            }
-            
-            objectBlueprint[primaryKey.name] = uniqueValue;
+        id uniqueValue = [self uniqueValueForProperty:primaryKey className:schema.className inRealm:realm];
+        if (!uniqueValue) {
+            return nil;
         }
-        NSLog(@"duration: %.2f", [[NSDate date] timeIntervalSinceDate:before]);
+        
+        objectBlueprint[primaryKey.name] = uniqueValue;
     }
     
     return [realm createObject:schema.className withObject:objectBlueprint];
@@ -500,21 +495,23 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 - (id)uniqueValueForProperty:(RLMProperty *)primaryKey className:(NSString *)className inRealm:(RLMRealm *)realm
 {
-    NSUInteger remainingAttempts = 30;
+    NSUInteger remainingAttempts = 100;
+    NSUInteger maxBitsUsed = 8;
     
     while (remainingAttempts > 0) {
         id uniqueValue;
         
         if (primaryKey.type == RLMPropertyTypeInt) {
-            uniqueValue = @(rand());
+            u_int32_t maxInt = MIN(1 << maxBitsUsed++, UINT32_MAX);
+            uniqueValue = @(arc4random_uniform(maxInt));
         } else if (primaryKey.type == RLMPropertyTypeString) {
-            uniqueValue = [NSString stringWithFormat:@"[PRIMARY KEY] %i", rand() % 100];
+            uniqueValue = [NSString stringWithFormat:@"[PRIMARY KEY] %i", arc4random_uniform(UINT32_MAX)];
         }
         
         if ([[realm objects:className where:@"%K == %@", primaryKey.name, uniqueValue] count] == 0) {
             return uniqueValue;
         }
-        
+
         remainingAttempts--;
     }
     
