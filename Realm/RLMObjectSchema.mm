@@ -215,14 +215,13 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
-    schema->_properties = _properties;
-    schema->_propertiesByName = _propertiesByName;
+    schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
     schema->_objectClass = _objectClass;
     schema->_className = _className;
     schema->_objectClass = _objectClass;
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
-    schema.primaryKeyProperty = _primaryKeyProperty;
+    schema.primaryKeyProperty = schema[_primaryKeyProperty.name];
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
