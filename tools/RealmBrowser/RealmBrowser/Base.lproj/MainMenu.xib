@@ -180,6 +180,12 @@ CA
                                     <action selector="generatedDemoDatabase:" target="-1" id="jBw-mZ-hAB"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Open new window" id="3ah-Gk-C0K">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openNewFile:" target="PLw-ns-0qo" id="6Lz-lk-Ord"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

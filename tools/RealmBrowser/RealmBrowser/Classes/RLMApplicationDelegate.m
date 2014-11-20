@@ -23,6 +23,11 @@
 
 #import "TestClasses.h"
 
+// New
+
+#import "RLMBMainWindowController.h"
+
+
 const NSUInteger kTopTipDelay = 250;
 const NSUInteger kMaxFilesPerCategory = 7;
 const CGFloat kMenuImageSize = 16;
@@ -49,12 +54,27 @@ NSString *const kDocumentsFolder = @"/Documents";
 @property (nonatomic, strong) NSMetadataQuery *projQuery;
 @property (nonatomic, strong) NSArray *groupedFileItems;
 
+
+// NEW
+
+@property (nonatomic) NSMutableArray *windowControllers;
+
 @end
 
 @implementation RLMApplicationDelegate
 
+- (IBAction)openNewFile:(id)sender
+{
+    RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
+    [self.windowControllers addObject:wc];
+    [wc window];
+}
+
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    self.windowControllers = [NSMutableArray array];
+    return;
+    
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
