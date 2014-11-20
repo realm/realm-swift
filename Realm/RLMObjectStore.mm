@@ -198,7 +198,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can only add an object to a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
+                                       reason:@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
                                      userInfo:nil];
     }
     RLMCheckThread(realm);
@@ -348,11 +348,17 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
     return object;
 }
 
-void RLMDeleteObjectFromRealm(RLMObject *object) {
+void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm) {
+    if (realm != object.realm) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Unable to delete an object not persisted in this Realm." userInfo:nil];
+    }
     RLMVerifyInWriteTransaction(object.realm);
 
     // move last row to row we are deleting
-    object->_row.get_table()->move_last_over(object->_row.get_index());
+    if (object->_row.is_attached()) {
+        object->_row.get_table()->move_last_over(object->_row.get_index());
+    }
 
     // set realm to nil
     object.realm = nil;
@@ -434,15 +440,17 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 }
 
 // Create accessor and register with realm
-RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index) {
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained NSString *objectClassName,
+                                   NSUInteger index) {
     RLMCheckThread(realm);
-
-    RLMObjectSchema *objectSchema = realm.schema[objectClassName];
-    
-    // get accessor for the object class
-    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
-    tightdb::Table &table = *objectSchema->_table;
-    accessor->_row = table[index];
-    return accessor;
+    return RLMCreateObjectAccessor(realm, realm.schema[objectClassName], index);
 }
 
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained RLMObjectSchema *objectSchema,
+                                   NSUInteger index) {
+    RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+    accessor->_row = (*objectSchema->_table)[index];
+    return accessor;
+}

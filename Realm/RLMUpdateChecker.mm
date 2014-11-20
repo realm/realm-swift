@@ -30,13 +30,6 @@ void RLMCheckForUpdates() {
         return;
     }
 
-    // Only check if it's been at least a day since our last check
-    NSUserDefaults *settings = [[NSUserDefaults alloc] initWithSuiteName:@"io.Realm.Realm"];
-    double lastUpdateCheck = [settings doubleForKey:@"Last Update Check"];
-    if (NSDate.timeIntervalSinceReferenceDate - lastUpdateCheck < 24 * 60 * 60) {
-        return;
-    }
-
     auto handler = ^(NSData *data, __unused NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Failed to check for updates to Realm: %@", error);
@@ -47,8 +40,6 @@ void RLMCheckForUpdates() {
         if (![REALM_VERSION isEqualToString:latestVersion]) {
             NSLog(@"Version %@ of Realm is now available: http://static.realm.io/downloads/cocoa/latest", latestVersion);
         }
-
-        [settings setDouble:NSDate.timeIntervalSinceReferenceDate forKey:@"Last Update Check"];
     };
 
     NSString *url = [NSString stringWithFormat:@"http://static.realm.io/update/cocoa?%@", REALM_VERSION];

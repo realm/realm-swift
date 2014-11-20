@@ -599,7 +599,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    RLMDeleteObjectFromRealm(object);
+    RLMDeleteObjectFromRealm(object, self);
 }
 
 - (void)deleteObjects:(id)array {
@@ -607,7 +607,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // for arrays and standalone delete each individually
         for (id obj in nsArray) {
             if ([obj isKindOfClass:RLMObject.class]) {
-                RLMDeleteObjectFromRealm(obj);
+                RLMDeleteObjectFromRealm(obj, self);
             }
         }
     }
@@ -686,6 +686,40 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {
     return RLMCreateObjectInRealmWithValue(self, className, object);
+}
+
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+    BOOL success = YES;
+
+    try {
+        _group->write(path.UTF8String);
+    }
+    catch (File::PermissionDenied &ex) {
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFilePermissionDenied, ex);
+        }
+    }
+    catch (File::Exists &ex) {
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFileExists, ex);
+        }
+    }
+    catch (File::AccessError &ex) {
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFileAccessError, ex);
+        }
+    }
+    catch (exception &ex) {
+        success = NO;
+        if (error) {
+            *error = make_realm_error(RLMErrorFail, ex);
+        }
+    }
+
+    return success;
 }
 
 @end

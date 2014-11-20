@@ -95,6 +95,29 @@
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testRemoveNonpersistedObject {
+    RLMRealm *realm = [self realmWithTestPath];
+    StringObject *obj = [[StringObject alloc] initWithObject:@[@"a"]];
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows([realm deleteObject:obj]);
+    obj = [StringObject createInRealm:realm withObject:@[@"b"]];
+    [realm commitWriteTransaction];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [self realmWithTestPath];
+        RLMObject *obj = [[StringObject allObjectsInRealm:realm] firstObject];
+        [realm beginWriteTransaction];
+        [realm deleteObject:obj];
+        XCTAssertThrows([realm deleteObject:obj]);
+        [realm commitWriteTransaction];
+    }];
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:obj];
+    [realm commitWriteTransaction];
+}
+
 - (void)testRealmBatchRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
@@ -593,6 +616,27 @@
                     @"should reject table missing column");
 }
 
+- (void)testMultipleRealms
+{
+    // Create one StringObject in two different realms
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    RLMRealm *testRealm = self.realmWithTestPath;
+    [defaultRealm beginWriteTransaction];
+    [testRealm beginWriteTransaction];
+    [StringObject createInRealm:defaultRealm withObject:@[@"a"]];
+    [StringObject createInRealm:testRealm withObject:@[@"b"]];
+    [testRealm commitWriteTransaction];
+    [defaultRealm commitWriteTransaction];
+
+    // Confirm that objects were added to the correct realms
+    RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
+    RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
+    XCTAssertEqual(defaultObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(testObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
+}
+
 - (void)testAddOrUpdate {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -613,7 +657,7 @@
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object shoudld throw
+    // upsert on non-primary key object should throw
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
 
     [realm commitWriteTransaction];
@@ -800,4 +844,43 @@
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
 }
 
+- (void)testWriteCopyOfRealm
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNil(writeError);
+    RLMRealm *copy = [self realmWithTestPath];
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+}
+
+- (void)testCannotOverwriteWithWriteCopy
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNotNil(writeError);
+}
+
+- (void)testWritingCopyUsesWriteTransactionInProgress
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+
+        NSError *writeError;
+        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+        XCTAssertNil(writeError);
+        RLMRealm *copy = [self realmWithTestPath];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+    }];
+}
 @end
