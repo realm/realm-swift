@@ -32,7 +32,6 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
 // NOTE: must be called from within write transaction
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
-
 //
 // Adding, Removing, Getting Objects
 //

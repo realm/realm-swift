@@ -19,6 +19,8 @@
 ### Bugfixes
 
 * Fix for crash when running many simultaneous write transactions on background threads.
+* Fix for crashes caused by opening Realms at multiple paths simultaneously which have had
+  properties re-ordered during migration.
 * Don't run the query twice when `firstObject` or `lastObject` are called on an
   `RLMResults` which has not had its results accessed already.
 

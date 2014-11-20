@@ -321,6 +321,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
     NSError *error = nil;
     realm = [[RLMRealm alloc] initWithPath:path readOnly:readonly inMemory:inMemory error:&error];
+    realm->_dynamic = dynamic;
 
     if (error) {
         if (outError) {
@@ -340,6 +341,9 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
     // set the schema
     if (customSchema) {
+        if (!dynamic) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+        }
         createTablesInTransaction(realm, customSchema);
     }
     else if (dynamic) {

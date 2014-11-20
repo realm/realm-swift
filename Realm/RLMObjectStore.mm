@@ -107,6 +107,40 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
     }
 }
 
+
+// Schema used to created generated accessors
+static NSMutableArray *s_accessorSchema;
+
+static void RLMRealmCreateAccessors(RLMSchema *schema) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_accessorSchema = [NSMutableArray new];
+    });
+    // create accessors for non-dynamic realms
+    RLMSchema *matchingSchema = nil;
+    for (RLMSchema *accessorSchema in s_accessorSchema) {
+        if ([schema isEqualToSchema:accessorSchema]) {
+            matchingSchema = accessorSchema;
+            break;
+        }
+    }
+
+    if (matchingSchema) {
+        // reuse accessors
+        for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+            objectSchema.accessorClass = matchingSchema[objectSchema.className].accessorClass;
+        }
+    }
+    else {
+        // create accessors and cache in s_accessorSchema
+        for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+            NSString *prefix = [NSString stringWithFormat:@"RLMAccessor_v%lu_", (unsigned long)s_accessorSchema.count];
+            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, prefix);
+        }
+        [s_accessorSchema addObject:[schema copy]];
+    }
+}
+
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = [targetSchema copy];
 
@@ -117,11 +151,14 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
             RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
-        if (!objectSchema.accessorClass) {
-            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
-        }
+    }
+
+    // create accessors for non-dynamic Realms
+    if (!realm.dynamic) {
+        RLMRealmCreateAccessors(realm.schema);
     }
 }
+
 
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
     realm.schema = [targetSchema copy];
@@ -178,21 +215,20 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
     }
 
     // FIXME - remove deleted tables
-
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         // cache table instances on objectSchema
         objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className);
 
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+    }
 
-        // create accessors
-        // FIXME - we need to generate different accessors keyed by the hash of the objectSchema (to preserve column ordering)
-        //         it's possible to have multiple realms with different on-disk layouts, which requires
-        //         us to have multiple accessors for each type/instance combination
-        objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+    // create accessors for non-dynamic Realms
+    if (!realm.dynamic) {
+        RLMRealmCreateAccessors(realm.schema);
     }
 }
+
 
 static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw

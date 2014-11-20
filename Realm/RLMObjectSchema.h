@@ -55,4 +55,9 @@
  */
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 
+/**
+ Returns YES if equal to objectSchema
+*/
+- (BOOL)isEqualToObjectSchema:(RLMObjectSchema *)objectSchema;
+
 @end
