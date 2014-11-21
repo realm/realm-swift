@@ -23,6 +23,7 @@
   properties re-ordered during migration.
 * Don't run the query twice when `firstObject` or `lastObject` are called on an
   `RLMResults` which has not had its results accessed already.
+* Fix for bug where schema version is 0 for new Realm created at the latest version.
 * Merge native Swift default property values with defaultPropertyValues().
 
 0.87.4 Release notes (2014-11-07)
