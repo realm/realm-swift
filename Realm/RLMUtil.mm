@@ -24,6 +24,7 @@
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty.h"
+#import "RLMSwiftSupport.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
@@ -179,9 +180,24 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
+NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    if (![RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
+        return [objectSchema.objectClass defaultPropertyValues];
+    }
+
+    RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    for (RLMProperty *prop in objectSchema.properties) {
+        if (![defaults.allKeys containsObject:prop.name]) {
+            defaults[prop.name] = defaultObject[prop.name];
+        }
+    }
+    return defaults;
+}
+
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
-    NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
+    NSDictionary *defaults = RLMDefaultValuesForObjectSchema(objectSchema);
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
