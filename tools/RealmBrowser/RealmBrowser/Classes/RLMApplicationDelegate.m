@@ -72,6 +72,7 @@ NSString *const kDocumentsFolder = @"/Documents";
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints"];
     self.windowControllers = [NSMutableArray array];
     return;
     
