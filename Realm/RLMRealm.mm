@@ -339,28 +339,31 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         return nil;
     }
 
-    // set the schema
-    if (customSchema) {
-        if (!dynamic) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+    // we need to protect the realm cache and accessors cache
+    @synchronized(s_realmsPerPath) {
+        // create tables, set schema, and create accessors when needed
+        if (customSchema) {
+            if (!dynamic) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+            }
+            createTablesInTransaction(realm, customSchema);
         }
-        createTablesInTransaction(realm, customSchema);
-    }
-    else if (dynamic) {
-        createTablesInTransaction(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
-    }
-    else if (readonly) {
-        if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Cannot open an uninitialized realm in read-only mode"
-                                         userInfo:nil];
+        else if (dynamic) {
+            createTablesInTransaction(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
         }
-        RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
-        cacheRealm(realm, path);
-    }
-    else {
-        // check cache for existing cached realms with the same path
-        @synchronized(s_realmsPerPath) {
+        else if (readonly) {
+            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Cannot open an uninitialized realm in read-only mode"
+                                             userInfo:nil];
+            }
+            RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
+            RLMRealmCreateAccessors(realm.schema);
+
+            cacheRealm(realm, path);
+        }
+        else {
+            // check cache for existing cached realms with the same path
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // advance read in case another instance initialized the schema
@@ -378,6 +381,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 else {
                     [RLMRealm migrateRealm:realm];
                 }
+
+                RLMRealmCreateAccessors(realm.schema);
             }
 
             // cache only realms using a shared schema
