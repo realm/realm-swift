@@ -180,19 +180,23 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
-NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
-    if (![RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
-        return [objectSchema.objectClass defaultPropertyValues];
-    }
+static NSMutableDictionary *s_defaultValuesMap = [NSMutableDictionary dictionary];
 
-    RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
-    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
-    for (RLMProperty *prop in objectSchema.properties) {
-        if (![defaults.allKeys containsObject:prop.name]) {
-            defaults[prop.name] = defaultObject[prop.name];
+NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    NSString *className = objectSchema.className;
+    if (!s_defaultValuesMap[className]) {
+        NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+        if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
+            RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+            for (RLMProperty *prop in objectSchema.properties) {
+                if (!defaults[prop.name] && defaultObject[prop.name]) {
+                    defaults[prop.name] = defaultObject[prop.name];
+                }
+            }
         }
+        s_defaultValuesMap[className] = defaults;
     }
-    return defaults;
+    return s_defaultValuesMap[className];
 }
 
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
