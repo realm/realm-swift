@@ -144,6 +144,16 @@
  */
 + (NSString *)defaultRealmPath;
 
+/**
+ Set the default Realm path to a given path.
+
+ @param defaultRealmPath    The path to use for the default Realm.
+
+ @see defaultRealm
+ */
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath;
+
+
 #pragma mark - Notifications
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
