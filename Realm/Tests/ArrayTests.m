@@ -41,13 +41,13 @@
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
     
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO,  dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO,  dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO,  dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO,  dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
@@ -91,6 +91,18 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
+
+    count = 0;
+    [realm beginWriteTransaction];
+    for (AggregateObject *ao in result) {
+        XCTAssertNotNil(ao, @"Object is not nil and accessible");
+        ao.intCol = 200;
+        count++;
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(count, 18, @"should have enumerated 18 objects");
+    XCTAssertEqual(result.count, (NSUInteger)0, @"0 objects left");
 }
 
 - (void)testObjectAggregate
