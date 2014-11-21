@@ -285,6 +285,7 @@
     prop->_attributes = _attributes;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
+    prop->_isPrimary = _isPrimary;
     [prop updateAccessors];
     
     return prop;

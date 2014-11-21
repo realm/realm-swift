@@ -51,6 +51,9 @@
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     for (RLMProperty *prop in properties) {
         map[prop.name] = prop;
+        if (prop.isPrimary) {
+            self.primaryKeyProperty = prop;
+        }
     }
     _propertiesByName = map;
     _properties = properties;
@@ -215,13 +218,14 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
-    schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+    schema->_properties = _properties;
+    schema->_propertiesByName = _propertiesByName;
     schema->_objectClass = _objectClass;
     schema->_className = _className;
     schema->_objectClass = _objectClass;
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
-    schema.primaryKeyProperty = schema[_primaryKeyProperty.name];
+    schema.primaryKeyProperty = _primaryKeyProperty;
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
