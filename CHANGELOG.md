@@ -15,6 +15,7 @@
   `objectAtIndex:` ~55% faster.
 * Added a lldb visualizer script for displaying the contents of persisted
   RLMObjects when debugging.
+* Added method `-setDefaultRealmPath:` to change the default Realm path.
 
 ### Bugfixes
 

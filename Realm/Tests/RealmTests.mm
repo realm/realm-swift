@@ -59,7 +59,17 @@
 
 - (void)testDefaultRealmPath
 {
-    XCTAssertEqualObjects([[RLMRealm defaultRealm] path], [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+    NSString *defaultPath = [[RLMRealm defaultRealm] path];
+    @autoreleasepool {
+        XCTAssertEqualObjects(defaultPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+    }
+
+    NSString *newPath = [defaultPath stringByAppendingPathExtension:@"new"];
+    [RLMRealm setDefaultRealmPath:newPath];
+    XCTAssertEqualObjects(newPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+
+    // we have to clean-up since dispatch_once isn't run for each test case
+    [RLMRealm setDefaultRealmPath:defaultPath];
 }
 
 - (void)testRealmPath

@@ -229,9 +229,15 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+        if (!s_defaultRealmPath) {
+            s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+        }
     });
     return s_defaultRealmPath;
+}
+
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath {
+    s_defaultRealmPath = defaultRealmPath;
 }
 
 + (NSString *)writeablePathForFile:(NSString*)fileName
