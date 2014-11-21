@@ -421,6 +421,16 @@ extern "C" {
 
     // test object from other realm still works
     XCTAssertEqualObjects(obj.data, @"new data");
+
+    // verify schema for both objects
+    NSArray *properties = defaultObj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
+    properties = obj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
 }
 
 @end
