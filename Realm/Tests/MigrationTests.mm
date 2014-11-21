@@ -68,6 +68,15 @@ extern "C" {
     return [self dynamicRealmWithTestPathAndSchema:schema];
 }
 
+- (void)testSchemaVersion {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                      __unused NSUInteger oldSchemaVersion) {
+    }];
+
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
+}
+
 - (void)testAddingProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];

@@ -122,12 +122,16 @@ void clearRealmCache() {
     }
 }
 
+static NSString *s_defaultRealmPath = nil;
+static RLMMigrationBlock s_migrationBlock;
+static NSUInteger s_currentSchemaVersion = 0;
+
 void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     [realm beginWriteTransaction];
 
     @try {
         if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-            RLMRealmSetSchemaVersion(realm, 0);
+            RLMRealmSetSchemaVersion(realm, s_currentSchemaVersion);
         }
         RLMRealmCreateTables(realm, targetSchema, false);
     }
@@ -136,10 +140,6 @@ void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
         [realm commitWriteTransaction];
     }
 }
-
-static NSString *s_defaultRealmPath = nil;
-static RLMMigrationBlock s_migrationBlock;
-static NSUInteger s_currentSchemaVersion = 0;
 
 } // anonymous namespace
 
