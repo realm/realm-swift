@@ -32,6 +32,9 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
 // NOTE: must be called from within write transaction
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
+// create or get cached accessors for the given schema
+void RLMRealmCreateAccessors(RLMSchema *schema);
+
 //
 // Adding, Removing, Getting Objects
 //

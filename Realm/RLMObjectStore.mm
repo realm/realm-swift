@@ -111,7 +111,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
 // Schema used to created generated accessors
 static NSMutableArray *s_accessorSchema;
 
-static void RLMRealmCreateAccessors(RLMSchema *schema) {
+void RLMRealmCreateAccessors(RLMSchema *schema) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         s_accessorSchema = [NSMutableArray new];
@@ -151,11 +151,6 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
             RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
-    }
-
-    // create accessors for non-dynamic Realms
-    if (!realm.dynamic) {
-        RLMRealmCreateAccessors(realm.schema);
     }
 }
 
@@ -221,11 +216,6 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
 
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
-    }
-
-    // create accessors for non-dynamic Realms
-    if (!realm.dynamic) {
-        RLMRealmCreateAccessors(realm.schema);
     }
 }
 
