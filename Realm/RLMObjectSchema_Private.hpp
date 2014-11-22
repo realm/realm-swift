@@ -37,6 +37,8 @@
 
 @property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 
+@property (nonatomic, readwrite, strong) NSDictionary *defaultValues;
+
 // returns a cached or new schema for a given object class
 // creates standalone accessor classes for the object schema if create is YES
 +(instancetype)schemaForObjectClass:(Class)objectClass;

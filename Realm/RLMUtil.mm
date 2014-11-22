@@ -180,28 +180,21 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
-static NSMutableDictionary *s_defaultValuesMap = [NSMutableDictionary dictionary];
-
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
-    NSString *className = objectSchema.className;
-    if (!s_defaultValuesMap[className]) {
-        NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
-        if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
-            RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
-            for (RLMProperty *prop in objectSchema.properties) {
-                if (!defaults[prop.name] && defaultObject[prop.name]) {
-                    defaults[prop.name] = defaultObject[prop.name];
-                }
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
+        RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+        for (RLMProperty *prop in objectSchema.properties) {
+            if (!defaults[prop.name] && defaultObject[prop.name]) {
+                defaults[prop.name] = defaultObject[prop.name];
             }
         }
-        s_defaultValuesMap[className] = defaults;
     }
-    return s_defaultValuesMap[className];
+    return defaults;
 }
 
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
-    NSDictionary *defaults = RLMDefaultValuesForObjectSchema(objectSchema);
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
@@ -209,7 +202,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
 
         // get default for nil object
         if (!obj && !allowMissing) {
-            obj = defaults[prop.name];
+            obj = objectSchema.defaultValues[prop.name];
         }
 
         // validate if object is not nil, or for nil if we don't allow missing values
