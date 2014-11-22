@@ -58,9 +58,10 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
             }
         }
 
-        // align
-        schemaProp.column = tableProp.column;
-        [properties addObject:schemaProp];
+        // create new property with aligned column
+        RLMProperty *prop = [schemaProp copy];
+        prop.column = tableProp.column;
+        [properties addObject:prop];
     }
 
     // check for new missing properties
@@ -77,7 +78,8 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
                                                objectSchema.className, [exceptionMessages componentsJoinedByString:@"\n- "]]
                                      userInfo:nil];
     }
-    // ensure the order of the properties matches the column order in the table
+
+    // set new properties array with correct column alignment
     objectSchema.properties = properties;
 }
 
@@ -116,6 +118,7 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
     dispatch_once(&onceToken, ^{
         s_accessorSchema = [NSMutableArray new];
     });
+
     // create accessors for non-dynamic realms
     RLMSchema *matchingSchema = nil;
     for (RLMSchema *accessorSchema in s_accessorSchema) {
