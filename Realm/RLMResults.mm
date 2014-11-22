@@ -145,6 +145,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
     else {
         items = (__bridge id)(void *)state->extra[0];
+        NSUInteger size = items->size;
+        for (NSUInteger i = 0; i < size; i++) {
+            if ([self indexOfObject:items->array[0]] == NSNotFound) {
+                state->state--;
+                state->extra[1]--;
+            }
+        }
         [items resize:len];
     }
 
@@ -166,7 +173,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     state->itemsPtr = buffer;
     state->state = index;
-    state->mutationsPtr = state->extra+1;
+    state->mutationsPtr = &state->extra[2];
     
     return batchCount;
 }
