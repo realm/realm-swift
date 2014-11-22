@@ -75,7 +75,7 @@ id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key) {
 }
 
 uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj) {
-    return (uintptr_t)[[[(RLMObjectSchema *)obj properties] valueForKey:@"name"] componentsJoinedByString:@" "].UTF8String;
+    return (uintptr_t)[[[[obj objectSchema] properties] valueForKey:@"name"] componentsJoinedByString:@" "].UTF8String;
 }
 
 uintptr_t RLMDebugGetSubclassList(void) {

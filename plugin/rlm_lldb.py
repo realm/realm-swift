@@ -165,7 +165,8 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
 
         object_schema = self._value_from_ivar('objectSchema', 'RLMObjectSchema*').deref
         def get_schema(_):
-            return self._to_str(unsigned(self._eval('RLMDebugPropertyNames({})'.format(path(object_schema))))).split(' ')
+            v = self._eval('RLMDebugPropertyNames({})'.format(path(obj)))
+            return self._to_str(unsigned(v)).split(' ')
 
         self.props = cache_lookup(schema_cache, str(object_schema.GetAddress()), get_schema)
 
