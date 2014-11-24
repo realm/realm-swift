@@ -29,8 +29,9 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
 
 // sets a realm's schema to a copy of targetSchema and creates/updates tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
+// returns whether or not any tables were modified
 // NOTE: must be called from within write transaction
-void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
+BOOL RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
