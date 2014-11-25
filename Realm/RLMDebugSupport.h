@@ -27,7 +27,6 @@ NSUInteger RLMDebugArrayCount(__unsafe_unretained id obj);
 id RLMDebugArrayChildAtIndex(__unsafe_unretained id obj, NSUInteger index);
 
 size_t RLMDebugGetIvarOffset(__unsafe_unretained id obj, const char *name);
-id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key);
 
 uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj);
 

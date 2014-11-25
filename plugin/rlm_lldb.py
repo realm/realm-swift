@@ -190,8 +190,10 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('objectSchema', 'RLMObjectSchema*')
 
         name = self.props[index - 2]
-        value = self._eval('RLMDebugValueForKey({}, "{}")'.format(path(self.obj), name))
-        return self.obj.CreateValueFromData(name, value.GetData(), get_type(self.obj, 'id'))
+        v = self.obj.CreateValueFromExpression(name, path(self.obj) + '.' + name)
+        if 'RLMArray' in v.type.name:
+            return self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
+        return v
 
 def RLM_SummaryProvider(obj, _):
     frame = obj.thread.GetSelectedFrame()

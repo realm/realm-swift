@@ -70,10 +70,6 @@ id RLMDebugAddrToObj(uintptr_t ptr) {
     return (__bridge id)(void *)ptr;
 }
 
-id RLMDebugValueForKey(__unsafe_unretained id obj, const char *key) {
-    return [obj valueForKey:@(key)];
-}
-
 uintptr_t RLMDebugPropertyNames(__unsafe_unretained id obj) {
     return (uintptr_t)[[[[obj objectSchema] properties] valueForKey:@"name"] componentsJoinedByString:@" "].UTF8String;
 }
