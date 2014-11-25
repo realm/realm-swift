@@ -256,6 +256,11 @@ class InitializerHack(object):
         obj.target.debugger.HandleCommand('type category delete RealmInit')
 
         addr = unsigned(frame(obj).EvaluateExpression('RLMDebugGetSubclassList()'))
+        if addr == 0:
+            # The first call to EvaluateExpression in a Swift context often
+            # fails with an error in auto-import, but then works every
+            # subsequent time
+            addr = unsigned(frame(obj).EvaluateExpression('RLMDebugGetSubclassList()'))
         classes = obj.process.ReadCStringFromMemory(addr, 65536, lldb.SBError())
         for cls in classes.split(' '):
             if len(cls):
