@@ -245,4 +245,11 @@
     return YES;
 }
 
+- (tightdb::Table *)table {
+    if (!_table) {
+        _table = RLMTableForObjectClass(_realm, _className);
+    }
+    return _table.get();
+}
+
 @end

@@ -904,4 +904,59 @@
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
     }];
 }
+
+- (void)testCanRestartReadTransactionAfterEnd
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    [realm endReadTransaction];
+    IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
+    XCTAssertEqual(obj.intCol, 1);
+}
+
+- (void)testEndReadTransactionDetachesAccessors
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *obj;
+    [realm transactionWithBlock:^{
+        obj = [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    [realm endReadTransaction];
+    XCTAssertTrue(obj.isDeletedFromRealm);
+    XCTAssertThrows([obj intCol]);
+}
+
+- (void)testEndReadTransactionInvalidatesResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    RLMResults *results = [IntObject objectsInRealm:realm where:@"intCol = 1"];
+    XCTAssertEqual([results.firstObject intCol], 1);
+
+    [realm endReadTransaction];
+    XCTAssertThrows([results count]);
+    XCTAssertThrows([results firstObject]);
+}
+
+- (void)testEndReadTransactionInvalidatesArrays
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block ArrayPropertyObject *arrayObject;
+    [realm transactionWithBlock:^{
+        arrayObject = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[@[@1]]]];
+    }];
+
+    RLMArray *array = arrayObject.intArray;
+    XCTAssertEqual(1U, array.count);
+
+    [realm endReadTransaction];
+    XCTAssertThrows([array count]);
+}
 @end

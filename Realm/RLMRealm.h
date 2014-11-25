@@ -309,6 +309,25 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 */
 - (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
 
+/**
+ End the current read transaction, detaching objects read from this RLMRealm.
+
+ Release the read lock on the data accessed by this RLMRealm, so that future
+ write transactions can reuse the space. This method should be called before
+ performing long blocking operations on a thread on which you previously read
+ data from the Realm which you no longer need.
+
+ All object accessors, `RLMResults` and `RLMArray` instances obtained from this
+ `RLMRealm` on the current thread are invalidated, and can not longer be used.
+ The `RLMRealm` itself remains valid, and a new read transaction is implicitly
+ begun the next time data is read from the Realm.
+
+ If the receiver does not currently have a read transaction (either due to
+ having previously called this method or simply not having read any data from
+ the instance) this method is a no-op.
+ */
+- (void)endReadTransaction;
+
 #pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------

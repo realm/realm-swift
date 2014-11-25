@@ -280,12 +280,16 @@
                                      userInfo:nil];
     }
 
-    Table &table = *schema->_table.get();
+    Table *table = schema.table;
+    if (!table) {
+        return @[];
+    }
+
     size_t col = prop.column;
-    NSUInteger count = _row.get_backlink_count(table, col);
+    NSUInteger count = _row.get_backlink_count(*table, col);
     NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(_realm, className, _row.get_backlink(table, col, i))];
+        [links addObject:RLMCreateObjectAccessor(_realm, className, _row.get_backlink(*table, col, i))];
     }
     return [links copy];
 }

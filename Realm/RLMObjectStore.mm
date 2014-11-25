@@ -148,9 +148,10 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = [targetSchema copy];
 
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        objectSchema.realm = realm;
+
         // read-only realms may be missing tables entirely
-        objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className);
-        if (objectSchema->_table && verify) {
+        if (objectSchema.table && verify) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
             RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
@@ -162,12 +163,10 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
     realm.schema = [targetSchema copy];
 
     // first pass to create missing tables
-    bool changed = false;
     NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         bool created = false;
         objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className, created);
-        changed |= created;
 
         // we will modify tables for any new objectSchema (table was created) or for all if updateExisting is true
         if (updateExisting || created) {
@@ -184,7 +183,6 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             // add any new properties (new name or different type)
             if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
                 RLMCreateColumn(realm, *objectSchema->_table, prop);
-                changed = true;
             }
         }
 
@@ -193,7 +191,6 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             RLMProperty *prop = tableSchema.properties[i];
             if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
                 objectSchema->_table->remove_column(prop.column);
-                changed = true;
             }
         }
 
@@ -202,21 +199,18 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             // if there is a primary key set, check if it is the same as the old key
             if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
                 RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
-                changed = true;
             }
         }
         else if (tableSchema.primaryKeyProperty) {
             // there is no primary key, so if thre was one nil out
             RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
-            changed = true;
         }
     }
 
     // FIXME - remove deleted tables
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        // cache table instances on objectSchema
-        objectSchema->_table = RLMTableForObjectClass(realm, objectSchema.className);
 
+    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+        objectSchema.realm = realm;
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
     }
@@ -237,7 +231,7 @@ template<typename F>
 static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMSetFlag options, bool &created) {
     // try to get existing row if updating
     size_t rowIndex = tightdb::not_found;
-    tightdb::Table &table = *schema->_table;
+    tightdb::Table &table = *schema.table;
     RLMProperty *primaryProperty = schema.primaryKeyProperty;
     if ((options & RLMSetFlagUpdateOrCreate) && primaryProperty) {
         // get primary value
@@ -292,7 +286,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
     // get or create row
     bool created;
     auto primaryGetter = [=](RLMProperty *p) { return [object valueForKey:p.getterName]; };
-    object->_row = (*schema->_table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
+    object->_row = (*schema.table)[RLMCreateOrGetRowForObject(schema, primaryGetter, options, created)];
 
     // populate all properties
     for (RLMProperty *prop in schema.properties) {
@@ -338,7 +332,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return array[p.column]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // populate
         NSArray *props = objectSchema.properties;
@@ -355,7 +349,7 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
         // get or create our accessor
         bool created;
         auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
-        object->_row = (*objectSchema->_table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
+        object->_row = (*objectSchema.table)[RLMCreateOrGetRowForObject(objectSchema, primaryGetter, options, created)];
 
         // assume dictionary or object with kvc properties
         NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, objectSchema, schema, !created);
@@ -398,7 +392,7 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
 
     // clear table for each object schema
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        objectSchema->_table->clear();
+        objectSchema.table->clear();
     }
 }
 
@@ -407,12 +401,12 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 
     // create view from table and predicate
     RLMObjectSchema *objectSchema = realm.schema[objectClassName];
-    if (!objectSchema->_table) {
+    if (!objectSchema.table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
         return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
     }
-    tightdb::Query query = objectSchema->_table->where();
+    tightdb::Query query = objectSchema.table->where();
     RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
     
     // create and populate array
@@ -433,7 +427,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         @throw [NSException exceptionWithName:@"RLMException" reason:msg userInfo:nil];
     }
 
-    if (!objectSchema->_table) {
+    if (!objectSchema.table) {
         // read-only realms may be missing tables since we can't add any
         // missing ones on init
         return nil;
@@ -442,7 +436,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     size_t row = tightdb::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
         if (NSString *str = RLMDynamicCast<NSString>(key)) {
-            row = objectSchema->_table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
+            row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
@@ -452,7 +446,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     }
     else {
         if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
-            row = objectSchema->_table->find_first_int(primaryProperty.column, number.longLongValue);
+            row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
         }
         else {
             @throw [NSException exceptionWithName:@"RLMException"
@@ -480,6 +474,6 @@ RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
                                    __unsafe_unretained RLMObjectSchema *objectSchema,
                                    NSUInteger index) {
     RLMObject *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
-    accessor->_row = (*objectSchema->_table)[index];
+    accessor->_row = (*objectSchema.table)[index];
     return accessor;
 }

@@ -99,7 +99,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
     Class accessorClass = _objectSchema.accessorClass;
-    tightdb::Table &table = *_objectSchema->_table;
+    tightdb::Table &table = *_objectSchema.table;
     while (index < count && batchCount < len) {
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema defaultValues:NO];
         accessor->_row = table[_backingLinkView->get(index++).get_index()];
