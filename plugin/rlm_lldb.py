@@ -63,6 +63,7 @@ if __name__ == '__main__':
     exit(0)
 
 import lldb
+import re
 
 def cache_lookup(cache, key, generator):
     value = cache.get(key, None)
@@ -101,14 +102,19 @@ def is_object_deleted(obj):
             obj.target.addr_size, lldb.SBError())
     return ptr == 0
 
-def path(obj):
+def path(obj, obj_type=None):
     p = obj.path
     # Optionals need to use the expression path or it crashes, but in most
     # cases the expression path is not even vaguely close to valid syntax,
     # so we need to use the address
     if '.Some' in p:
         return obj.path.replace('.Some', '!')
-    return 'RLMDebugAddrToObj(' + str(obj.GetAddress()) + ')'
+    if not obj_type:
+        return 'RLMDebugAddrToObj(' + str(obj.GetAddress()) + ')'
+    obj_type = re.sub(r'RLMAccessor_v\d+_([^ ]+)', r'\1', obj_type)
+    if obj.thread.GetSelectedFrame().compile_unit.file.fullpath.endswith('swift'):
+        return '(RLMDebugAddrToObj({}) as {})'.format(str(obj.GetAddress()), obj_type.rstrip(' *'))
+    return '(({})RLMDebugAddrToObj({}))'.format(obj_type, str(obj.GetAddress()))
 
 ivar_offset_cache = {}
 def get_ivars(obj, *args):
@@ -190,7 +196,7 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('objectSchema', 'RLMObjectSchema*')
 
         name = self.props[index - 2]
-        v = self.obj.CreateValueFromExpression(name, path(self.obj) + '.' + name)
+        v = self.obj.CreateValueFromExpression(name, path(self.obj, self.obj.type.name) + '.' + name)
         if 'RLMArray' in v.type.name:
             return self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
         return v
