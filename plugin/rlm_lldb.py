@@ -191,9 +191,9 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
 
     def get_child_at_index(self, index):
         if index == 0:
-            return self._value_from_ivar('realm', 'RLMRealm*')
+            return self._value_from_ivar('realm')
         if index == 1:
-            return self._value_from_ivar('objectSchema', 'RLMObjectSchema*')
+            return self._value_from_ivar('objectSchema')
 
         name = self.props[index - 2]
         v = self.obj.CreateValueFromExpression(name, path(self.obj, self.obj.type.name) + '.' + name)
