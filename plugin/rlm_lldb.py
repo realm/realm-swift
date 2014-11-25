@@ -79,6 +79,9 @@ def unsigned(value):
         return value.data.GetUnsignedInt32(lldb.SBError(), 0)
     return value.data.GetUnsignedInt64(lldb.SBError(), 0)
 
+def frame(obj):
+    # obj.GetSelectedThread() sometimes returns an invalid object for some reason
+    return obj.process.GetSelectedThread().GetSelectedFrame()
 
 object_table_ptr_offset = None
 def is_object_deleted(obj):
@@ -94,7 +97,7 @@ def is_object_deleted(obj):
     addr = int(s, 16)
     global object_table_ptr_offset
     if not object_table_ptr_offset:
-        v = obj.thread.GetSelectedFrame().EvaluateExpression(
+        v = frame(obj).EvaluateExpression(
                 'RLMDebugGetIvarOffset({}, "_row")'.format(path(obj)))
         object_table_ptr_offset = unsigned(v) + field_offset('tightdb::RowBase', 'm_table')
 
@@ -112,7 +115,7 @@ def path(obj, obj_type=None):
     if not obj_type:
         return 'RLMDebugAddrToObj(' + str(obj.GetAddress()) + ')'
     obj_type = re.sub(r'RLMAccessor_v\d+_([^ ]+)', r'\1', obj_type)
-    if obj.thread.GetSelectedFrame().compile_unit.file.fullpath.endswith('swift'):
+    if frame(obj).compile_unit.file.fullpath.endswith('swift'):
         return '(RLMDebugAddrToObj({}) as {})'.format(str(obj.GetAddress()), obj_type.rstrip(' *'))
     return '(({})RLMDebugAddrToObj({}))'.format(obj_type, str(obj.GetAddress()))
 
@@ -121,7 +124,7 @@ def get_ivars(obj, *args):
     def get_offset(type_name):
         ivars = {}
         for ivar in args:
-            v = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression(
+            v = unsigned(frame(obj).EvaluateExpression(
                     'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar)))
             if v == 0:
                 return None
@@ -145,8 +148,7 @@ class IvarHelper(object):
         self.ivars = get_ivars(obj, *ivars)
 
     def _eval(self, expr):
-        frame = self.obj.GetThread().GetSelectedFrame()
-        return frame.EvaluateExpression(expr)
+        return frame(self.obj).EvaluateExpression(expr)
 
     def _to_str(self, val):
         return self.obj.GetProcess().ReadCStringFromMemory(val, 65536, lldb.SBError())
@@ -196,14 +198,13 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('objectSchema')
 
         name = self.props[index - 2]
-        v = self.obj.CreateValueFromExpression(name, path(self.obj, self.obj.type.name) + '.' + name)
+        v = frame(self.obj).EvaluateExpression(path(self.obj, self.obj.type.name) + '.' + name)
         if 'RLMArray' in v.type.name:
             return self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
-        return v
+        return self.obj.CreateValueFromData(name, v.GetData(), v.type)
 
 def RLM_SummaryProvider(obj, _):
-    frame = obj.thread.GetSelectedFrame()
-    addr = unsigned(frame.EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
+    addr = unsigned(frame(obj).EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
     if addr == 0:
         return None
     return obj.GetProcess().ReadCStringFromMemory(addr, 1024, lldb.SBError())
@@ -254,7 +255,7 @@ class InitializerHack(object):
 
         obj.target.debugger.HandleCommand('type category delete RealmInit')
 
-        addr = unsigned(obj.thread.GetSelectedFrame().EvaluateExpression('RLMDebugGetSubclassList()'))
+        addr = unsigned(frame(obj).EvaluateExpression('RLMDebugGetSubclassList()'))
         classes = obj.process.ReadCStringFromMemory(addr, 65536, lldb.SBError())
         for cls in classes.split(' '):
             if len(cls):
