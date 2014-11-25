@@ -83,6 +83,9 @@ def frame(obj):
     # obj.GetSelectedThread() sometimes returns an invalid object for some reason
     return obj.process.GetSelectedThread().GetSelectedFrame()
 
+def address(obj):
+    return obj.GetData().GetAddress(lldb.SBError(), 0)
+
 object_table_ptr_offset = None
 def is_object_deleted(obj):
     def field_offset(type_name, field_name):
@@ -90,11 +93,8 @@ def is_object_deleted(obj):
             if f.name == field_name:
                 return f.byte_offset
 
-    s = str(obj.GetAddress())
-    if s == '':
-        return True
+    addr = address(obj)
 
-    addr = int(s, 16)
     global object_table_ptr_offset
     if not object_table_ptr_offset:
         v = frame(obj).EvaluateExpression(
@@ -105,27 +105,29 @@ def is_object_deleted(obj):
             obj.target.addr_size, lldb.SBError())
     return ptr == 0
 
+def frame_is_swift(obj):
+    return frame(obj).compile_unit.file.fullpath.endswith('swift')
+
 def path(obj, obj_type=None):
-    p = obj.path
-    # Optionals need to use the expression path or it crashes, but in most
-    # cases the expression path is not even vaguely close to valid syntax,
-    # so we need to use the address
-    if '.Some' in p:
-        return obj.path.replace('.Some', '!')
-    if not obj_type:
-        return 'RLMDebugAddrToObj(' + str(obj.GetAddress()) + ')'
-    obj_type = re.sub(r'RLMAccessor_v\d+_([^ ]+)', r'\1', obj_type)
-    if frame(obj).compile_unit.file.fullpath.endswith('swift'):
-        return '(RLMDebugAddrToObj({}) as {})'.format(str(obj.GetAddress()), obj_type.rstrip(' *'))
-    return '(({})RLMDebugAddrToObj({}))'.format(obj_type, str(obj.GetAddress()))
+    if obj_type:
+        obj_type = re.sub(r'RLMAccessor_v\d+_([^ ]+)', r'\1', obj_type)
+        if frame_is_swift(obj):
+            return '(RLMDebugAddrToObj({}) as {})'.format(str(address(obj)), obj_type.rstrip(' *'))
+        return '(({})RLMDebugAddrToObj({}))'.format(obj_type, str(address(obj)))
+    return 'RLMDebugAddrToObj(' + str(address(obj)) + ')'
 
 ivar_offset_cache = {}
 def get_ivars(obj, *args):
     def get_offset(type_name):
         ivars = {}
         for ivar in args:
-            v = unsigned(frame(obj).EvaluateExpression(
-                    'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar)))
+            if obj.GetAddress():
+                v = frame(obj).EvaluateExpression(
+                        'RLMDebugGetIvarOffset({}, "_{}")'.format(path(obj), ivar))
+            else:
+                v = frame(obj).EvaluateExpression(
+                        'RLMDebugGetIvarOffset(RLMDebugAddrToObj({}), "_{}")'.format(address(obj), ivar))
+            v = unsigned(v)
             if v == 0:
                 return None
             ivars[ivar] = v
@@ -160,15 +162,18 @@ class IvarHelper(object):
 schema_cache = {}
 class RLMObject_SyntheticChildrenProvider(IvarHelper):
     def __init__(self, obj, _):
-        if not obj.GetAddress() or is_object_deleted(obj):
-            self.props = []
-            return
+        self.props = []
+        self.ivars = None
+
+        # if is_object_deleted(obj):
+        #     print 'deleted'
+        #     return
 
         super(RLMObject_SyntheticChildrenProvider, self).__init__(
                 obj, 'objectSchema', 'realm')
 
         if not self.ivars:
-            self.props = []
+            print 'no ivars'
             return
 
         object_schema = self._value_from_ivar('objectSchema', 'RLMObjectSchema*').deref
@@ -179,12 +184,14 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
         self.props = cache_lookup(schema_cache, str(object_schema.GetAddress()), get_schema)
 
     def num_children(self):
-        return len(self.props) + 2
+        return len(self.props) + 2 if self.ivars else 0
 
     def has_children(self):
-        return len(self.props) and not is_object_deleted(self.obj)
+        return self.ivars and len(self.props) and not is_object_deleted(self.obj)
 
     def get_child_index(self, name):
+        if not self.ivars:
+            return None
         if name == 'realm':
             return 0
         if name == 'objectSchema':
@@ -192,16 +199,28 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
         return self.props.index(name) + 2
 
     def get_child_at_index(self, index):
+        if not self.ivars or index > len(self.props) + 2:
+            return None
         if index == 0:
             return self._value_from_ivar('realm')
         if index == 1:
             return self._value_from_ivar('objectSchema')
 
         name = self.props[index - 2]
-        v = frame(self.obj).EvaluateExpression(path(self.obj, self.obj.type.name) + '.' + name)
+        if self.obj.thread:
+            # thread isn't set correctly for objects from EvaluateExpression
+            p = path(self.obj, self.obj.type.name) + '.' + name
+            v = self.obj.CreateValueFromExpression(name, p)
+        else:
+            # And this doesn't work for optionals not from EvaluateExpression
+            p = self.obj.path.replace('.Some', '!') + '.' + name
+            v = frame(self.obj).EvaluateExpression(p)
+
         if 'RLMArray' in v.type.name:
-            return self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
-        return self.obj.CreateValueFromData(name, v.GetData(), v.type)
+            v = self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
+        else:
+            v = self.obj.CreateValueFromData(name, v.GetData(), v.type)
+        return v
 
 def RLM_SummaryProvider(obj, _):
     addr = unsigned(frame(obj).EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
@@ -242,8 +261,12 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('realm')
 
         key = '[' + str(index - 1) + ']'
+
+        v = self.obj.CreateValueFromExpression(key, 'RLMDebugArrayChildAtIndex({}, {})'.format(path(self.obj), index - 1))
+
         value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(path(self.obj), index - 1))
-        return self.obj.CreateValueFromData(key, value.GetData(), self.type)
+        data = self.obj.CreateValueFromData(key, value.GetData(), self.type)
+        return data
 
     def update(self):
         self.count = None
@@ -261,6 +284,7 @@ class InitializerHack(object):
             # fails with an error in auto-import, but then works every
             # subsequent time
             addr = unsigned(frame(obj).EvaluateExpression('RLMDebugGetSubclassList()'))
+
         classes = obj.process.ReadCStringFromMemory(addr, 65536, lldb.SBError())
         for cls in classes.split(' '):
             if len(cls):
@@ -293,5 +317,5 @@ def __lldb_init_module(debugger, _):
     debugger.HandleCommand('type synthetic add -w Realm -x RLMAccessor_.* --python-class rlm_lldb.RLMObject_SyntheticChildrenProvider')
 
     debugger.HandleCommand('type synthetic add -w RealmInit -x .* --python-class rlm_lldb.InitializerHack')
-    debugger.HandleCommand('type category enable RealmInit')
-    debugger.HandleCommand('type category enable Realm')
+    debugger.GetCategory('RealmInit').SetEnabled(True)
+    debugger.GetCategory('Realm').SetEnabled(True)
