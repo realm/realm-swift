@@ -228,6 +228,8 @@ class RLMArray_SyntheticChildrenProvider(SyntheticChildrenProvider):
     def get_child_index(self, name):
         if name == 'realm':
             return 0
+        if not name.startswith('['):
+            return None
         return int(name.lstrip('[').rstrip(']')) + 1
 
     def get_child_at_index(self, index):
