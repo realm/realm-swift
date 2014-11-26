@@ -396,7 +396,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             }
 
             // initializing the schema started a read transaction, so end it
-            [realm endReadTransaction];
+            [realm invalidate];
 
             // cache only realms using a shared schema
             cacheRealm(realm, path);
@@ -544,7 +544,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
-- (void)endReadTransaction {
+- (void)invalidate {
     RLMCheckThread(self);
 
     _sharedGroup->end_read();

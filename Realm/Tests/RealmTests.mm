@@ -912,7 +912,7 @@
         [IntObject createInRealm:realm withObject:@[@1]];
     }];
 
-    [realm endReadTransaction];
+    [realm invalidate];
     IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
     XCTAssertEqual(obj.intCol, 1);
 }
@@ -925,7 +925,7 @@
         obj = [IntObject createInRealm:realm withObject:@[@0]];
     }];
 
-    [realm endReadTransaction];
+    [realm invalidate];
     XCTAssertTrue(obj.isDeletedFromRealm);
     XCTAssertThrows([obj intCol]);
 }
@@ -940,7 +940,7 @@
     RLMResults *results = [IntObject objectsInRealm:realm where:@"intCol = 1"];
     XCTAssertEqual([results.firstObject intCol], 1);
 
-    [realm endReadTransaction];
+    [realm invalidate];
     XCTAssertThrows([results count]);
     XCTAssertThrows([results firstObject]);
 }
@@ -956,7 +956,7 @@
     RLMArray *array = arrayObject.intArray;
     XCTAssertEqual(1U, array.count);
 
-    [realm endReadTransaction];
+    [realm invalidate];
     XCTAssertThrows([array count]);
 }
 @end
