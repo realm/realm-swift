@@ -66,6 +66,8 @@ NSString *const kDocumentsFolder = @"/Documents";
 - (IBAction)openNewFile:(id)sender
 {
     RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
+    wc.realm = [RLMRealm defaultRealm];
+    
     [self.windowControllers addObject:wc];
     [wc window];
 }

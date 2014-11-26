@@ -7,16 +7,13 @@
 //
 
 #import "RLMBMainWindowController.h"
-#import "RLMBPaneViewController.h"
-
-#import "RLMBSidebarDataSource.h"
-
 #import <Realm/Realm.h>
+#import "RLMBPaneViewController.h"
+#import "RLMBSidebarCellView.h"
 
-@interface RLMBMainWindowController ()
+@interface RLMBMainWindowController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (weak) IBOutlet NSOutlineView *sideBar;
-@property (nonatomic) RLMBSidebarDataSource *sidebarDataSource;;
 
 @property (weak) IBOutlet NSScrollView *scrollView;
 
@@ -24,8 +21,6 @@
 
 @property (nonatomic) NSMutableArray *panes;
 @property (nonatomic) NSLayoutConstraint *rightMostMarginConstraint;
-
-@property (nonatomic) RLMRealm *realm;
 
 @end
 
@@ -67,6 +62,14 @@
     [self.canvas addSubview:paneVC.view];
     
     paneVC.view.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [paneVC.view addConstraint:[NSLayoutConstraint constraintWithItem:paneVC.view
+                                                            attribute:NSLayoutAttributeHeight
+                                                            relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                               toItem:nil
+                                                            attribute:NSLayoutAttributeNotAnAttribute
+                                                           multiplier:1
+                                                             constant:200]];
     
     [paneVC.view addConstraint:[NSLayoutConstraint constraintWithItem:paneVC.view
                                                             attribute:NSLayoutAttributeWidth
@@ -129,5 +132,32 @@
     
     [self.panes addObject:paneVC];
 }
+
+#pragma mark - Table View Datasource - Sidebar
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    NSLog(@"number of rows: %lu", self.realm.schema.objectSchema.count);
+
+    return self.realm.schema.objectSchema.count;
+}
+
+#pragma mark - Table View Delegate - Sidebar
+
+-(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    RLMBSidebarCellView *cellview = [tableView makeViewWithIdentifier:@"ClassCell" owner:self.owner];
+    RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row];
+    cellview.textField.stringValue = objectSchema.className;
+    cellview.badge.stringValue = @"12";
+    
+    NSLog(@"row %lu: %@", row, objectSchema.className);
+    
+    return cellview;
+}
+
+#pragma mark - Public methods - Property Setters
+
+
 
 @end
