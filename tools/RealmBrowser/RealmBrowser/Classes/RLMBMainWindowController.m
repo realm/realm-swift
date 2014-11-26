@@ -11,15 +11,15 @@
 #import "RLMBPaneViewController.h"
 #import "RLMBSidebarCellView.h"
 
-@interface RLMBMainWindowController () <NSOutlineViewDataSource, NSOutlineViewDelegate>
-
-@property (weak) IBOutlet NSOutlineView *sideBar;
+@interface RLMBMainWindowController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (weak) IBOutlet NSScrollView *scrollView;
 
 @property (nonatomic) NSView *canvas;
 
 @property (nonatomic) NSMutableArray *panes;
+@property (nonatomic) NSUInteger currentPane;
+
 @property (nonatomic) NSLayoutConstraint *rightMostMarginConstraint;
 
 @end
@@ -133,106 +133,70 @@
     [self.panes addObject:paneVC];
 }
 
-#pragma mark - Outline View Datasource - Sidebar
+#pragma mark - Navigation
 
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
-    if (item == nil) {
-        NSLog(@"number of children for nil: 1");
-        return 1;
+- (IBAction)navigateAction:(NSSegmentedControl *)sender {
+    switch (sender.selectedSegment) {
+        case 0:
+            [self scrollTo:self.currentPane - 1];
+            break;
+        case 1:
+            [self scrollTo:self.currentPane + 1];
+            break;
+        default:
+            break;
     }
-    else if ([item isKindOfClass:[RLMSchema class]]) {
-        NSLog(@"number of children for %@: %lu", [item className], ((RLMSchema *)item).objectSchema.count);
-        return ((RLMSchema *)item).objectSchema.count;
-    }
-
-    NSLog(@"number of children for %@: 0", [item className]);
-    return 0;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
+-(void)scrollTo:(NSUInteger)pane
 {
-    if (item == nil) {
-        NSLog(@"child %lu of nil", index);
-        return self.realm.schema;
-    }
-    else if ([item isKindOfClass:[RLMSchema class]]) {
-        NSLog(@"child %lu of: %@", index, item);
-        return ((RLMSchema *)item).objectSchema[index];
-    }
-
-    NSLog(@"?child %lu of: %@", index, item);
-
-    return nil;
-}
-
-#pragma mark - Outline View Delegate - Sidebar
-
--(NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
-{
-    NSLog(@"view for item: %@", item);
+    [NSAnimationContext beginGrouping];
+    [[NSAnimationContext currentContext] setDuration:2.0];
+    NSClipView *clipView = [self.scrollView contentView];
     
-    if ([item isKindOfClass:[RLMSchema class]]) {
-        NSTableCellView *headerCell = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:self];
-        headerCell.textField.stringValue = @"CLASSES";
-        NSLog(@"---view CLASSES: %@", headerCell);
-        
-        return headerCell;
-    }
-    else if ([item isKindOfClass:[RLMObjectSchema class]]) {
-        RLMBSidebarCellView *cellView = [outlineView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
-        RLMObjectSchema *objectSchema = item;
-        cellView.textField.stringValue = objectSchema.className;
-        cellView.badge.stringValue = @"12";
-        
-        NSLog(@"---view %@", objectSchema.className);
+    NSPoint newOrigin = [clipView bounds].origin;
+    newOrigin.x = 100*pane;
+    [[clipView animator] setBoundsOrigin:newOrigin];
+    [NSAnimationContext endGrouping];
+
+    self.currentPane = pane;
+}
+
+#pragma mark - Table View View Datasource - Sidebar
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return self.realm.schema.objectSchema.count + 1;
+}
+
+
+#pragma mark - Table View Delegate - Sidebar
+
+-(BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
+{
+    return row == 0;
+}
+
+-(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    if (row == 0) {
+        NSTableCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarHeaderCell" owner:self];
+        NSString *fileName = [[self.realm.path pathComponents] lastObject];
+        cellView.textField.stringValue = [[fileName stringByDeletingPathExtension] uppercaseString];
         
         return cellView;
     }
+
+    RLMBSidebarCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
+    RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row - 1];
+    cellView.textField.stringValue = objectSchema.className;
+    cellView.badge.stringValue = @"12";
+    cellView.badge.layer.cornerRadius = NSHeight(cellView.badge.frame)/2.0;
+    cellView.badge.layer.cornerRadius = 10;
+    cellView.badge.backgroundColor = [NSColor purpleColor];
     
-    return nil;
+    return cellView;
 }
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
-{
-    NSLog(@"isItemExpandable yes: %@", item);
-    return YES;
-
-    
-    if (item == nil) {
-        NSLog(@"isItemExpandable yes: %@", item);
-        return YES;
-    }
-    else {
-        NSLog(@"isItemExpandable no: %@", item);
-       return NO;
-    }
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
-{
-    return YES;
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowOutlineCellForItem:(id)item
-{
-    return NO;
-}
-
-- (void)outlineViewSelectionDidChange:(NSNotification *)notification
-{
-//    NSOutlineView *outlineView = notification.object;
-//    if (outlineView == self.classesOutlineView) {
-//        NSInteger row = [outlineView selectedRow];
-//        
-//        // The arrays we get from link views are ephemeral, so we
-//        // remove them when any class node is selected
-//        if (row != -1) {
-//            [self selectedItem:[outlineView itemAtRow:row]];
-//        }
-//    }
-}
-
-
 
 #pragma mark - Public methods - Property Setters
 
