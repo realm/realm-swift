@@ -11,7 +11,7 @@
 #import "RLMBPaneViewController.h"
 #import "RLMBSidebarCellView.h"
 
-@interface RLMBMainWindowController () <NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMBMainWindowController () <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
 @property (weak) IBOutlet NSOutlineView *sideBar;
 
@@ -123,7 +123,7 @@
                                                                    attribute:NSLayoutAttributeRight
                                                                    relatedBy:NSLayoutRelationEqual
                                                                       toItem:paneVC.view
-                                                                   attribute:NSLayoutAttributeRight
+                                                                attribute:NSLayoutAttributeRight
                                                                   multiplier:1
                                                                     constant:50];
     
@@ -133,28 +133,106 @@
     [self.panes addObject:paneVC];
 }
 
-#pragma mark - Table View Datasource - Sidebar
+#pragma mark - Outline View Datasource - Sidebar
 
--(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    NSLog(@"number of rows: %lu", self.realm.schema.objectSchema.count);
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
+    if (item == nil) {
+        NSLog(@"number of children for nil: 1");
+        return 1;
+    }
+    else if ([item isKindOfClass:[RLMSchema class]]) {
+        NSLog(@"number of children for %@: %lu", [item className], ((RLMSchema *)item).objectSchema.count);
+        return ((RLMSchema *)item).objectSchema.count;
+    }
 
-    return self.realm.schema.objectSchema.count;
+    NSLog(@"number of children for %@: 0", [item className]);
+    return 0;
 }
 
-#pragma mark - Table View Delegate - Sidebar
-
--(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-    RLMBSidebarCellView *cellview = [tableView makeViewWithIdentifier:@"ClassCell" owner:self.owner];
-    RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row];
-    cellview.textField.stringValue = objectSchema.className;
-    cellview.badge.stringValue = @"12";
-    
-    NSLog(@"row %lu: %@", row, objectSchema.className);
-    
-    return cellview;
+    if (item == nil) {
+        NSLog(@"child %lu of nil", index);
+        return self.realm.schema;
+    }
+    else if ([item isKindOfClass:[RLMSchema class]]) {
+        NSLog(@"child %lu of: %@", index, item);
+        return ((RLMSchema *)item).objectSchema[index];
+    }
+
+    NSLog(@"?child %lu of: %@", index, item);
+
+    return nil;
 }
+
+#pragma mark - Outline View Delegate - Sidebar
+
+-(NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    NSLog(@"view for item: %@", item);
+    
+    if ([item isKindOfClass:[RLMSchema class]]) {
+        NSTableCellView *headerCell = [outlineView makeViewWithIdentifier:@"HeaderCell" owner:self];
+        headerCell.textField.stringValue = @"CLASSES";
+        NSLog(@"---view CLASSES: %@", headerCell);
+        
+        return headerCell;
+    }
+    else if ([item isKindOfClass:[RLMObjectSchema class]]) {
+        RLMBSidebarCellView *cellView = [outlineView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
+        RLMObjectSchema *objectSchema = item;
+        cellView.textField.stringValue = objectSchema.className;
+        cellView.badge.stringValue = @"12";
+        
+        NSLog(@"---view %@", objectSchema.className);
+        
+        return cellView;
+    }
+    
+    return nil;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+    NSLog(@"isItemExpandable yes: %@", item);
+    return YES;
+
+    
+    if (item == nil) {
+        NSLog(@"isItemExpandable yes: %@", item);
+        return YES;
+    }
+    else {
+        NSLog(@"isItemExpandable no: %@", item);
+       return NO;
+    }
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+    return YES;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowOutlineCellForItem:(id)item
+{
+    return NO;
+}
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+//    NSOutlineView *outlineView = notification.object;
+//    if (outlineView == self.classesOutlineView) {
+//        NSInteger row = [outlineView selectedRow];
+//        
+//        // The arrays we get from link views are ephemeral, so we
+//        // remove them when any class node is selected
+//        if (row != -1) {
+//            [self selectedItem:[outlineView itemAtRow:row]];
+//        }
+//    }
+}
+
+
 
 #pragma mark - Public methods - Property Setters
 

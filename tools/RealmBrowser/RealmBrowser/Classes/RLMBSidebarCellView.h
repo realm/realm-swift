@@ -10,6 +10,6 @@
 
 @interface RLMBSidebarCellView : NSTableCellView
 
-@property (strong) IBOutlet NSButton *badge;
+@property (strong) IBOutlet NSTextField *badge;
 
 @end
