@@ -33,6 +33,7 @@
 		22565D6719C1BCF400C8C8EC /* RLMLinkTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */; };
 		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
 		22A4E4491A25F1B900FC1769 /* RLMBSidebarCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A4E4481A25F1B900FC1769 /* RLMBSidebarCellView.m */; };
+		22A4E44F1A27624400FC1769 /* RLMBRootPaneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A4E44E1A27624400FC1769 /* RLMBRootPaneViewController.m */; };
 		22A55FEB19D18BA8009178BC /* RLMObjectNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FEA19D18BA8009178BC /* RLMObjectNode.m */; };
 		22A55FF119D19842009178BC /* RLMDescriptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FF019D19842009178BC /* RLMDescriptions.m */; };
 		22BB41C519F93E3500EE7765 /* RLMClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB41C419F93E3500EE7765 /* RLMClipView.m */; };
@@ -137,6 +138,9 @@
 		225AAFEB19C09E520023B595 /* RLMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTextField.m; path = Classes/RLMTextField.m; sourceTree = "<group>"; };
 		22A4E4471A25F1B900FC1769 /* RLMBSidebarCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBSidebarCellView.h; path = Classes/RLMBSidebarCellView.h; sourceTree = "<group>"; };
 		22A4E4481A25F1B900FC1769 /* RLMBSidebarCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBSidebarCellView.m; path = Classes/RLMBSidebarCellView.m; sourceTree = "<group>"; };
+		22A4E44D1A27624400FC1769 /* RLMBRootPaneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBRootPaneViewController.h; path = Classes/RLMBRootPaneViewController.h; sourceTree = "<group>"; };
+		22A4E44E1A27624400FC1769 /* RLMBRootPaneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBRootPaneViewController.m; path = Classes/RLMBRootPaneViewController.m; sourceTree = "<group>"; };
+		22A4E4501A2763BD00FC1769 /* RLMBHeaders_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMBHeaders_Private.h; path = Classes/RLMBHeaders_Private.h; sourceTree = "<group>"; };
 		22A55FE919D18BA8009178BC /* RLMObjectNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMObjectNode.h; path = Classes/RLMObjectNode.h; sourceTree = "<group>"; };
 		22A55FEA19D18BA8009178BC /* RLMObjectNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMObjectNode.m; path = Classes/RLMObjectNode.m; sourceTree = "<group>"; };
 		22A55FEF19D19842009178BC /* RLMDescriptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptions.h; path = Classes/RLMDescriptions.h; sourceTree = "<group>"; };
@@ -248,6 +252,9 @@
 		22C2C1101A1E11A100B5E64C /* NewBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				22A4E4501A2763BD00FC1769 /* RLMBHeaders_Private.h */,
+				22A4E44D1A27624400FC1769 /* RLMBRootPaneViewController.h */,
+				22A4E44E1A27624400FC1769 /* RLMBRootPaneViewController.m */,
 				22A4E4471A25F1B900FC1769 /* RLMBSidebarCellView.h */,
 				22A4E4481A25F1B900FC1769 /* RLMBSidebarCellView.m */,
 				22E721151A1F596200EE1F95 /* RLMBPaneViewController.h */,
@@ -666,6 +673,7 @@
 				84AA41A91949C99800A50F03 /* RLMTypeNode.m in Sources */,
 				22E721181A1F596200EE1F95 /* RLMBPaneViewController.m in Sources */,
 				22D28EA71993AAAB00497FD3 /* RLMNumberTableCellView.m in Sources */,
+				22A4E44F1A27624400FC1769 /* RLMBRootPaneViewController.m in Sources */,
 				2251D3C719D987F900B09FD0 /* RLMPopupWindow.m in Sources */,
 				22BB41C519F93E3500EE7765 /* RLMClipView.m in Sources */,
 				3615BDB6196FA8BF00E1AE3F /* RLMQueryNavigationState.m in Sources */,

@@ -7,7 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <Realm/Realm.h>
 
 @interface RLMBPaneViewController : NSViewController
+
+@property (weak) IBOutlet NSTextField *classNameLabel;
+@property (weak) IBOutlet NSSearchField *searchField;
+@property (weak) IBOutlet NSTableView *tableView;
 
 @end

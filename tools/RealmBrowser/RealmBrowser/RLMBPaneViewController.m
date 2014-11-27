@@ -8,11 +8,7 @@
 
 #import "RLMBPaneViewController.h"
 
-@interface RLMBPaneViewController () <NSTableViewDataSource>
-
-@property (weak) IBOutlet NSTableView *tableView;
-
-//@property (nonatomic) RLMBNode *node;
+@interface RLMBPaneViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @end
 
@@ -23,11 +19,18 @@
     // Do view setup here.
 }
 
-#pragma mark - NSTableViewDataSource
+#pragma mark - Table View Datasource
 
--(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return 1;
+    return 0;
+}
+
+#pragma mark - Table View Delegate
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    return nil;
 }
 
 @end

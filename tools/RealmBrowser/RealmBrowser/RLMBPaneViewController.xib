@@ -7,6 +7,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMBPaneViewController">
             <connections>
+                <outlet property="classNameLabel" destination="dW1-fU-Pol" id="gmy-aj-WbB"/>
+                <outlet property="searchField" destination="rbA-zd-0Xm" id="IOd-rA-SNH"/>
                 <outlet property="tableView" destination="ic2-Xx-wKL" id="1YA-1a-5xi"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
@@ -42,7 +44,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView id="9og-z3-XGp">
+                                            <tableCellView identifier="Standard" id="9og-z3-XGp">
                                                 <rect key="frame" x="1" y="1" width="116" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -94,6 +96,10 @@
                                         </prototypeCellViews>
                                     </tableColumn>
                                 </tableColumns>
+                                <connections>
+                                    <outlet property="dataSource" destination="-2" id="5uS-R9-zNX"/>
+                                    <outlet property="delegate" destination="-2" id="6b7-mP-nEh"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -149,7 +155,7 @@
                 <constraint firstItem="dW1-fU-Pol" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="mDE-pf-bej"/>
                 <constraint firstItem="rbA-zd-0Xm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="yHo-ce-lQg"/>
             </constraints>
-            <point key="canvasLocation" x="268" y="243"/>
+            <point key="canvasLocation" x="240" y="154"/>
         </customView>
     </objects>
 </document>

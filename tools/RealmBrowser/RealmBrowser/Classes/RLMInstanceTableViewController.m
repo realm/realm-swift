@@ -18,6 +18,7 @@
 
 #import "RLMInstanceTableViewController.h"
 #import <Foundation/Foundation.h>
+#import "RLMBHeaders_Private.h"
 
 #import "RLMPopupViewController.h"
 #import "RLMRealmBrowserWindowController.h"
@@ -46,12 +47,6 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMUpdateTypeRealm,
     RLMUpdateTypeTableView
 };
-
-@interface RLMRealm ()
-
-- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
-
-@end
 
 
 @interface RLMInstanceTableViewController ()<RLMTableCellViewDelegate>

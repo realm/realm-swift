@@ -65,11 +65,16 @@ NSString *const kDocumentsFolder = @"/Documents";
 
 - (IBAction)openNewFile:(id)sender
 {
-    RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
-    wc.realm = [RLMRealm defaultRealm];
-    
-    [self.windowControllers addObject:wc];
-    [wc window];
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    openPanel.allowedFileTypes = @[kRealmFileExension];
+    [openPanel beginWithCompletionHandler:^(NSInteger result) {
+        RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
+        wc.realm = [RLMRealm realmWithPath:openPanel.URL.path];
+        [openPanel orderOut:self];
+        
+        [self.windowControllers addObject:wc];
+        [wc window];
+    }];
 }
 
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
