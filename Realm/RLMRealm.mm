@@ -488,7 +488,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
 
-            // notify other realm istances of changes
+            // notify other realm instances of changes
             NSArray *realms = realmsAtPath(_path);
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
