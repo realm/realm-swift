@@ -917,7 +917,7 @@
     XCTAssertEqual(obj.intCol, 1);
 }
 
-- (void)testEndReadTransactionDetachesAccessors
+- (void)testInvalidateDetachesAccessors
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block IntObject *obj;
@@ -930,7 +930,7 @@
     XCTAssertThrows([obj intCol]);
 }
 
-- (void)testEndReadTransactionInvalidatesResults
+- (void)testInvalidateInvalidatesResults
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
@@ -945,7 +945,7 @@
     XCTAssertThrows([results firstObject]);
 }
 
-- (void)testEndReadTransactionInvalidatesArrays
+- (void)testInvalidateInvalidatesArrays
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block ArrayPropertyObject *arrayObject;

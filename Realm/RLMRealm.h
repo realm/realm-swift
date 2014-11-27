@@ -312,22 +312,21 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Invalidate all RLMObjects and RLMResults read from this Realm.
 
- A RLMRealm holds a read lock on the version of the data accessed by it, so that
- changes made to the Realm on different threads do not modify or delete the data
- seen by this RLMRealm. Calling this method releases the read lock, allowing
- the space used on disk to be reused by later write transactions rather than
- growing the file. This method should be called before performing long blocking
- operations on a background thread on which you previously read data from the
- Realm which you no longer need.
+ An RLMRealm holds a read lock on the version of the data accessed by it, so
+ that changes made to the Realm on different threads do not modify or delete the
+ data seen by this RLMRealm. Calling this method releases the read lock,
+ allowing the space used on disk to be reused by later write transactions rather
+ than growing the file. This method should be called before performing long
+ blocking operations on a background thread on which you previously read data
+ from the Realm which you no longer need.
 
- All object accessors, `RLMResults` and `RLMArray` instances obtained from this
+ All `RLMObject`, `RLMResults` and `RLMArray` instances obtained from this
  `RLMRealm` on the current thread are invalidated, and can not longer be used.
  The `RLMRealm` itself remains valid, and a new read transaction is implicitly
  begun the next time data is read from the Realm.
 
  Calling this method multiple times in a row without reading any data from the
  Realm, or before ever reading any data from the Realm is a no-op.
- the instance) this method is a no-op.
  */
 - (void)invalidate;
 
