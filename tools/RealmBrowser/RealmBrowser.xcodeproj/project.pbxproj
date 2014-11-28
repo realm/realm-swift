@@ -32,6 +32,9 @@
 		225443F519E3E6360045996B /* RLMTableHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 225443F419E3E6360045996B /* RLMTableHeaderCell.m */; };
 		22565D6719C1BCF400C8C8EC /* RLMLinkTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */; };
 		225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 225AAFEB19C09E520023B595 /* RLMTextField.m */; };
+		2273811A1A287E6800D245A8 /* RLMBFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 227381191A287E6800D245A8 /* RLMBFormatter.m */; };
+		2273811D1A288EFE00D245A8 /* RLMBTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273811C1A288EFE00D245A8 /* RLMBTableView.m */; };
+		227381201A289A8E00D245A8 /* RLMBArrayPaneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2273811F1A289A8E00D245A8 /* RLMBArrayPaneViewController.m */; };
 		22A4E4491A25F1B900FC1769 /* RLMBSidebarCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A4E4481A25F1B900FC1769 /* RLMBSidebarCellView.m */; };
 		22A4E44F1A27624400FC1769 /* RLMBRootPaneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A4E44E1A27624400FC1769 /* RLMBRootPaneViewController.m */; };
 		22A55FEB19D18BA8009178BC /* RLMObjectNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A55FEA19D18BA8009178BC /* RLMObjectNode.m */; };
@@ -136,6 +139,12 @@
 		22565D6619C1BCF400C8C8EC /* RLMLinkTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMLinkTableCellView.m; path = Classes/RLMLinkTableCellView.m; sourceTree = "<group>"; };
 		225AAFEA19C09E520023B595 /* RLMTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTextField.h; path = Classes/RLMTextField.h; sourceTree = "<group>"; };
 		225AAFEB19C09E520023B595 /* RLMTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTextField.m; path = Classes/RLMTextField.m; sourceTree = "<group>"; };
+		227381181A287E6800D245A8 /* RLMBFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBFormatter.h; path = Classes/RLMBFormatter.h; sourceTree = "<group>"; };
+		227381191A287E6800D245A8 /* RLMBFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBFormatter.m; path = Classes/RLMBFormatter.m; sourceTree = "<group>"; };
+		2273811B1A288EFE00D245A8 /* RLMBTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBTableView.h; path = Classes/RLMBTableView.h; sourceTree = "<group>"; };
+		2273811C1A288EFE00D245A8 /* RLMBTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBTableView.m; path = Classes/RLMBTableView.m; sourceTree = "<group>"; };
+		2273811E1A289A8E00D245A8 /* RLMBArrayPaneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBArrayPaneViewController.h; path = Classes/RLMBArrayPaneViewController.h; sourceTree = "<group>"; };
+		2273811F1A289A8E00D245A8 /* RLMBArrayPaneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBArrayPaneViewController.m; path = Classes/RLMBArrayPaneViewController.m; sourceTree = "<group>"; };
 		22A4E4471A25F1B900FC1769 /* RLMBSidebarCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBSidebarCellView.h; path = Classes/RLMBSidebarCellView.h; sourceTree = "<group>"; };
 		22A4E4481A25F1B900FC1769 /* RLMBSidebarCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBSidebarCellView.m; path = Classes/RLMBSidebarCellView.m; sourceTree = "<group>"; };
 		22A4E44D1A27624400FC1769 /* RLMBRootPaneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBRootPaneViewController.h; path = Classes/RLMBRootPaneViewController.h; sourceTree = "<group>"; };
@@ -252,6 +261,10 @@
 		22C2C1101A1E11A100B5E64C /* NewBrowser */ = {
 			isa = PBXGroup;
 			children = (
+				2273811B1A288EFE00D245A8 /* RLMBTableView.h */,
+				2273811C1A288EFE00D245A8 /* RLMBTableView.m */,
+				2273811E1A289A8E00D245A8 /* RLMBArrayPaneViewController.h */,
+				2273811F1A289A8E00D245A8 /* RLMBArrayPaneViewController.m */,
 				22A4E4501A2763BD00FC1769 /* RLMBHeaders_Private.h */,
 				22A4E44D1A27624400FC1769 /* RLMBRootPaneViewController.h */,
 				22A4E44E1A27624400FC1769 /* RLMBRootPaneViewController.m */,
@@ -265,6 +278,8 @@
 				22C2C1181A1E384800B5E64C /* RLMBMainWindowController.xib */,
 				22E7211C1A1F81DA00EE1F95 /* RLMBNode.h */,
 				22E7211D1A1F81DA00EE1F95 /* RLMBNode.m */,
+				227381181A287E6800D245A8 /* RLMBFormatter.h */,
+				227381191A287E6800D245A8 /* RLMBFormatter.m */,
 			);
 			name = NewBrowser;
 			sourceTree = "<group>";
@@ -650,14 +665,17 @@
 				22E473791992562400EEF7C9 /* RLMBoolTableCellView.m in Sources */,
 				8474E2BD195452BE00BCA755 /* RLMInstanceTableViewController.m in Sources */,
 				84754ABE193CA4600093604E /* RLMRealmBrowserWindowController.m in Sources */,
+				227381201A289A8E00D245A8 /* RLMBArrayPaneViewController.m in Sources */,
 				225443F519E3E6360045996B /* RLMTableHeaderCell.m in Sources */,
 				22D3AC8A19CC5D710042C1B2 /* RLMModelExporter.m in Sources */,
 				84E0F95C1921F3B900D6CA14 /* main.m in Sources */,
 				84925C61195AD5B000EE27B1 /* NSColor+ByteSizeFactory.m in Sources */,
 				22C2C1191A1E384800B5E64C /* RLMBMainWindowController.m in Sources */,
 				844C34E3194859080027E902 /* TestClasses.m in Sources */,
+				2273811D1A288EFE00D245A8 /* RLMBTableView.m in Sources */,
 				84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */,
 				2251D3CB19D9885800B09FD0 /* RLMPopupViewController.m in Sources */,
+				2273811A1A287E6800D245A8 /* RLMBFormatter.m in Sources */,
 				84446534195891AA00CEEA5B /* RLMViewController.m in Sources */,
 				225AAFEC19C09E520023B595 /* RLMTextField.m in Sources */,
 				84D7990C19388E8900FC76A0 /* RLMClassProperty.m in Sources */,

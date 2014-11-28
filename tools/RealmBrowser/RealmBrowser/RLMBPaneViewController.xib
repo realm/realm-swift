@@ -44,7 +44,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="Standard" id="9og-z3-XGp">
+                                            <tableCellView identifier="BasicCell" id="9og-z3-XGp">
                                                 <rect key="frame" x="1" y="1" width="116" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -97,6 +97,7 @@
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <action selector="userClicked:" target="-2" id="hQc-j8-nLu"/>
                                     <outlet property="dataSource" destination="-2" id="5uS-R9-zNX"/>
                                     <outlet property="delegate" destination="-2" id="6b7-mP-nEh"/>
                                 </connections>

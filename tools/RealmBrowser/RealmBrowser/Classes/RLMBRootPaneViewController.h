@@ -11,8 +11,4 @@
 @class RLMResults;
 @interface RLMBRootPaneViewController : RLMBPaneViewController
 
-@property (nonatomic) RLMResults *objects;
-
-- (void)updateWithRealm:(RLMRealm *)realm objectSchema:(RLMObjectSchema *)objectSchema;
-
 @end

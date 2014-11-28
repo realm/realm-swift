@@ -7,16 +7,20 @@
 //
 
 #import "RLMBMainWindowController.h"
+
 #import <Realm/Realm.h>
+#import "RLMBHeaders_Private.h"
+
 #import "RLMBPaneViewController.h"
 #import "RLMBRootPaneViewController.h"
 
 #import "RLMBSidebarCellView.h"
 
+
 NSString *const kRLMBRightMostConstraint = @"RLMBRightMostConstraint";
 CGFloat const kRLMBPaneMargin = 50;
 
-@interface RLMBMainWindowController () <NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMBMainWindowController () <RLMBCanvasDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property (weak) IBOutlet NSScrollView *scrollView;
 
@@ -75,7 +79,20 @@ CGFloat const kRLMBPaneMargin = 50;
 
 - (void)selectedRow:(NSUInteger)row
 {
-    [self.rootPane updateWithRealm:self.realm objectSchema:self.realm.schema.objectSchema[row - 1]];
+    if (row <= self.realm.schema.objectSchema.count) {
+        RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row - 1];
+        RLMResults *objects = [self.realm allObjects:objectSchema.className];
+        [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
+    }
+}
+
+- (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane
+{
+    [self removePanesAfterPane:pane];
+    
+    RLMBPaneViewController *newPane = [[RLMBPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil];
+    [self addPane:newPane];
+    return newPane;
 }
 
 - (void)addPane:(RLMBPaneViewController *)pane
@@ -87,15 +104,22 @@ CGFloat const kRLMBPaneMargin = 50;
     [self addRightConstraintsTo:pane.view within:self.canvas];
     
     [self.panes addObject:pane];
+    pane.canvasDelegate = self;
 }
 
--(void)removePanes:(NSUInteger)count
+- (void)removePanesAfterPane:(RLMBPaneViewController *)pane
+{
+    while (self.panes.lastObject != pane) {
+        [self removeLastPane];
+    }
+}
+    
+- (void)removeLastPane
 {
     RLMBPaneViewController *paneVC = self.panes.lastObject;
     [paneVC.view removeFromSuperview];
-    [self addRightConstraintsTo:paneVC.view within:self.canvas];
-    
     [self.panes removeLastObject];
+    [self addRightConstraintsTo:[self.panes.lastObject view] within:self.canvas];
 }
 
 #pragma mark - Table View View Datasource - Sidebar
@@ -106,6 +130,14 @@ CGFloat const kRLMBPaneMargin = 50;
 }
 
 #pragma mark - Table View Delegate - Sidebar
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+//    if (self.tableView == notification.object) {
+//        NSInteger selectedIndex = self.tableView.selectedRow;
+//        [self.parentWindowController.currentState updateSelectionToIndex:selectedIndex];
+//    }
+}
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
 {
@@ -140,21 +172,20 @@ CGFloat const kRLMBPaneMargin = 50;
 
 #pragma mark - Navigation
 
--(IBAction)navigateAction:(NSSegmentedControl *)sender {
+- (IBAction)navigateAction:(NSSegmentedControl *)sender {
     switch (sender.selectedSegment) {
         case 0:
             [self scrollToPane:0];
             break;
-        case 1: {
-            [self addPane:[[RLMBPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil]];
-        }
+        case 1:
+            [self scrollToPane:self.panes.count - 1];
             break;
         default:
             break;
     }
 }
 
--(void)scrollToPane:(NSUInteger)index
+- (void)scrollToPane:(NSUInteger)index
 {
     NSView *pane = [self.panes[index] view];
     
@@ -170,7 +201,7 @@ CGFloat const kRLMBPaneMargin = 50;
 
 #pragma mark - Private Methods - Constraints
 
--(void)addSizeConstraintsTo:(NSView *)pane within:(NSView *)canvas
+- (void)addSizeConstraintsTo:(NSView *)pane within:(NSView *)canvas
 {
     pane.translatesAutoresizingMaskIntoConstraints = NO;
     
@@ -207,7 +238,7 @@ CGFloat const kRLMBPaneMargin = 50;
                                                         constant:kRLMBPaneMargin]];
 }
 
--(void)addLeftConstraintsTo:(NSView *)pane after:(NSView *)previousPane within:(NSView *)canvas
+- (void)addLeftConstraintsTo:(NSView *)pane after:(NSView *)previousPane within:(NSView *)canvas
 {
     if (previousPane) {
         [canvas addConstraint:[NSLayoutConstraint constraintWithItem:pane
@@ -229,7 +260,7 @@ CGFloat const kRLMBPaneMargin = 50;
     }
 }
 
--(void)addRightConstraintsTo:(NSView *)pane within:(NSView *)canvas
+- (void)addRightConstraintsTo:(NSView *)pane within:(NSView *)canvas
 {
     NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:canvas
                                                                        attribute:NSLayoutAttributeRight
@@ -242,7 +273,7 @@ CGFloat const kRLMBPaneMargin = 50;
     [canvas addConstraint:rightConstraint];
 }
 
--(NSLayoutConstraint *)constraintWithIdentifier:(NSString *)identifier inView:(NSView *)view
+- (NSLayoutConstraint *)constraintWithIdentifier:(NSString *)identifier inView:(NSView *)view
 {
     for (NSLayoutConstraint *constraint in view.constraints) {
         if ([constraint.identifier isEqualToString:identifier]) {
@@ -254,7 +285,7 @@ CGFloat const kRLMBPaneMargin = 50;
 
 #pragma mark - Private methods - Property Getters
 
--(RLMBRootPaneViewController *)rootPane
+- (RLMBRootPaneViewController *)rootPane
 {
     if (self.panes.count == 0) {
         [self addPane:[[RLMBRootPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil]];
