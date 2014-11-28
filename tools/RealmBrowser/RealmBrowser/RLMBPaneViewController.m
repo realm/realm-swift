@@ -110,6 +110,7 @@
     //        return basicCellView;
     //    }
 }
+
 - (IBAction)userClicked:(NSTableView *)sender
 {
     if (self.tableView.selectedRowIndexes.count > 1) {
@@ -126,30 +127,14 @@
         return;
     }
 
-    NSLog(@"clicked: %lu,%lu", row, column);
-    
     NSInteger propertyIndex = column;
     
     RLMProperty *property = self.objectSchema.properties[propertyIndex];
-    
-    RLMObject *object = self.objects[row];
-    id propertyValue = object[property.name];
+    id propertyValue = self.objects[row][property.name];
     
     if (property.type == RLMPropertyTypeObject) {
         RLMObject *linkedObject = (RLMObject *)propertyValue;
         RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
-        
-        //            for (RLMClassNode *classNode in self.parentWindowController.modelDocument.presentedRealm.topLevelClasses) {
-        //                if ([classNode.name isEqualToString:linkedObjectSchema.className]) {
-        //                    RLMResults *allInstances = [linkedObject.realm allObjects:linkedObjectSchema.className];
-        //                    NSUInteger objectIndex = [allInstances indexOfObject:linkedObject];
-        //
-        //                    RLMNavigationState *state = [[RLMNavigationState alloc] initWithSelectedType:classNode index:objectIndex];
-        //                    [self.parentWindowController addNavigationState:state fromViewController:self];
-        //
-        //                    break;
-        //                }
-        //            }
     }
     else if (property.type == RLMPropertyTypeArray) {
         RLMArray *linkedArray = (RLMArray *)propertyValue;

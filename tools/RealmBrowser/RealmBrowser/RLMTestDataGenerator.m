@@ -70,10 +70,9 @@ const NSUInteger kMaxItemsInTestArray = 12;
 {
     [realm beginWriteTransaction];
     
-    for (NSString *className in self.classNames) {
-        Class class = NSClassFromString(className);
-        
-        for (NSUInteger index = 0; index < objectCount; index++) {
+    for (NSUInteger index = 0; index < objectCount; index++) {
+        for (NSString *className in self.classNames) {
+            Class class = NSClassFromString(className);
             [self randomObjectOfClass:class inRealm:realm];
         }
     }

@@ -79,9 +79,13 @@ CGFloat const kRLMBPaneMargin = 50;
 
 - (void)selectedRow:(NSUInteger)row
 {
+    NSLog(@"classes: %@", self.realm.schema.objectSchema);
+
     if (row <= self.realm.schema.objectSchema.count) {
         RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row - 1];
         RLMResults *objects = [self.realm allObjects:objectSchema.className];
+
+        [self removePanesAfterPane:self.rootPane];
         [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
     }
 }

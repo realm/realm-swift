@@ -342,8 +342,8 @@ NSString *const kDocumentsFolder = @"/Documents";
                 }
             }
             
-            NSArray *classNames = @[[RealmTestClass0 className], [RealmTestClass1 className], [RealmTestClass2 className]];
-            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:1000];
+            NSArray *classNames = @[[RealmTestClassA className], [RealmTestClassB className], [RealmTestClassC className]];
+            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:100];
             
             if (success) {
                 NSAlert *alert = [[NSAlert alloc] init];
