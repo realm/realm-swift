@@ -536,8 +536,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)dealloc {
     if (_inWriteTransaction) {
-        [self commitWriteTransaction];
-        NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
+        [self cancelWriteTransaction];
+        NSLog(@"A transaction was lacking explicit commit/cancel, but has been automatically cancelled.");
     }
 }
 
