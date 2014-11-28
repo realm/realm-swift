@@ -905,7 +905,7 @@
     }];
 }
 
-- (void)testCanRestartReadTransactionAfterEnd
+- (void)testCanRestartReadTransactionAfterInvalidate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
