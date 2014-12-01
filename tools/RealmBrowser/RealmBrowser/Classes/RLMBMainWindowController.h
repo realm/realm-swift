@@ -9,8 +9,9 @@
 #import <Cocoa/Cocoa.h>
 
 @class RLMRealm;
+
 @interface RLMBMainWindowController : NSWindowController
 
-@property (nonatomic) RLMRealm *realm;
+- (void)updateWithRealm:(RLMRealm *)realm;
 
 @end

@@ -22,7 +22,11 @@ CGFloat const kRLMBPaneMargin = 50;
 
 @interface RLMBMainWindowController () <RLMBCanvasDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
+@property (nonatomic) RLMRealm *realm;
+@property (nonatomic) NSMutableArray *objectClasses;
+
 @property (weak) IBOutlet NSScrollView *scrollView;
+@property (weak) IBOutlet NSTableView *sidebarTableView;
 
 @property (nonatomic) NSView *canvas;
 
@@ -73,21 +77,17 @@ CGFloat const kRLMBPaneMargin = 50;
     [self.scrollView.contentView addConstraints:vConstraints];
 }
 
-- (IBAction)clickedSidebar:(NSTableView *)sender {
-    [self selectedRow:sender.selectedRow];
-}
-
-- (void)selectedRow:(NSUInteger)row
+- (void)updateWithRealm:(RLMRealm *)realm
 {
-    NSLog(@"classes: %@", self.realm.schema.objectSchema);
-
-    if (row <= self.realm.schema.objectSchema.count) {
-        RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row - 1];
+    self.realm = realm;
+    
+    NSMutableArray *objectClasses = [NSMutableArray array];
+    for (RLMObjectSchema *objectSchema in self.realm.schema.objectSchema) {
         RLMResults *objects = [self.realm allObjects:objectSchema.className];
-
-        [self removePanesAfterPane:self.rootPane];
-        [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
+        [objectClasses addObject:objects];
     }
+    
+    self.objectClasses = objectClasses;
 }
 
 - (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane
@@ -130,18 +130,10 @@ CGFloat const kRLMBPaneMargin = 50;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return self.realm.schema.objectSchema.count + 1;
+    return self.objectClasses.count + 1;
 }
 
 #pragma mark - Table View Delegate - Sidebar
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-//    if (self.tableView == notification.object) {
-//        NSInteger selectedIndex = self.tableView.selectedRow;
-//        [self.parentWindowController.currentState updateSelectionToIndex:selectedIndex];
-//    }
-}
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
 {
@@ -159,8 +151,9 @@ CGFloat const kRLMBPaneMargin = 50;
     }
     
     RLMBSidebarCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
-    cellView.textField.stringValue = [self classNameForRow:row];
-    cellView.badge.stringValue = @"12";
+    RLMResults *objects = self.objectClasses[row - 1];
+    cellView.textField.stringValue = objects.objectClassName;
+    cellView.badge.stringValue = @(objects.count).stringValue;
 //    cellView.badge.layer.cornerRadius = NSHeight(cellView.badge.frame)/2.0;
 //    cellView.badge.layer.cornerRadius = 10;
 //    cellView.badge.backgroundColor = [NSColor purpleColor];
@@ -168,10 +161,19 @@ CGFloat const kRLMBPaneMargin = 50;
     return cellView;
 }
 
-- (NSString *)classNameForRow:(NSUInteger)row
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    RLMObjectSchema *objectSchema = self.realm.schema.objectSchema[row - 1];
-    return objectSchema.className;
+    if (notification.object == self.sidebarTableView) {
+        NSInteger row = self.sidebarTableView.selectedRow - 1;
+        
+        if (row < self.objectClasses.count && row >= 0) {
+            [self removePanesAfterPane:self.rootPane];
+            
+            RLMResults *objects = self.objectClasses[row];
+            RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
+            [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
+        }
+    }
 }
 
 #pragma mark - Navigation

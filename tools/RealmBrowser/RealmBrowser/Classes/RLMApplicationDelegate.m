@@ -69,7 +69,8 @@ NSString *const kDocumentsFolder = @"/Documents";
     openPanel.allowedFileTypes = @[kRealmFileExension];
     [openPanel beginWithCompletionHandler:^(NSInteger result) {
         RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
-        wc.realm = [RLMRealm realmWithPath:openPanel.URL.path];
+        RLMRealm *realm = [RLMRealm realmWithPath:openPanel.URL.path];
+        [wc updateWithRealm:realm];
         [openPanel orderOut:self];
         
         [self.windowControllers addObject:wc];

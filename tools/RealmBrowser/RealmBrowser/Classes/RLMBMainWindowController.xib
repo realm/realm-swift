@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="RLMBMainWindowController">
             <connections>
                 <outlet property="scrollView" destination="gxa-ZW-9nb" id="MId-83-wP8"/>
+                <outlet property="sidebarTableView" destination="XMT-HJ-0Id" id="MKr-dx-cKX"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -18,7 +19,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="715" height="459"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="715" height="459"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -114,7 +115,6 @@
                                                         </tableColumn>
                                                     </tableColumns>
                                                     <connections>
-                                                        <action selector="clickedSidebar:" target="-2" id="ygH-iZ-Flw"/>
                                                         <outlet property="dataSource" destination="-2" id="n8z-jL-SsM"/>
                                                         <outlet property="delegate" destination="-2" id="ehm-VD-BVS"/>
                                                     </connections>
