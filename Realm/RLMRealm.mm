@@ -537,9 +537,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 - (void)dealloc {
     if (_inWriteTransaction) {
         [self cancelWriteTransaction];
-        NSLog(@"WARNING: An RLMRealm instance was deallocated during a write transaction and all \
-              pending changes have been rolled back. Make sure to retain a reference to the \
-              RLMRealm for the duration of the write transaction.");
+        NSLog(@"WARNING: An RLMRealm instance was deallocated during a write transaction and all "
+              "pending changes have been rolled back. Make sure to retain a reference to the "
+              "RLMRealm for the duration of the write transaction.");
     }
 }
 
