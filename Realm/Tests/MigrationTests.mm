@@ -114,7 +114,7 @@ extern "C" {
     XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
 
     [RLMRealm setSchemaVersion:0 withMigrationBlock:nil];
-    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()])l
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 
