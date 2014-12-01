@@ -689,9 +689,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         [migration migrateWithBlock:s_migrationBlock version:s_currentSchemaVersion];
     }
     else if (schemaVersion > s_currentSchemaVersion && schemaVersion != RLMNotVersioned) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
-                                     userInfo:@{@"path" : migration.realm.path}];
+        if (!s_migrationBlock) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"No migration block specified for a Realm with a schema version greater than 0. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
+                                         userInfo:@{@"path" : migration.realm.path}];
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
+                                         userInfo:@{@"path" : migration.realm.path}];
+        }
     }
 
     // clear cache for future callers
