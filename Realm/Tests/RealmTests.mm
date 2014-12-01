@@ -839,6 +839,17 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
+- (void)testRollbackTransactionWithoutExplicitCommitOrCancel
+{
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:[self realmWithTestPath]].count);
+}
+
 - (void)testAddObjectsFromArray
 {
     RLMRealm *realm = [self realmWithTestPath];
