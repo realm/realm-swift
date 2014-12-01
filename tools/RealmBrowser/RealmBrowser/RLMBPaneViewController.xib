@@ -156,7 +156,7 @@
                 <constraint firstItem="dW1-fU-Pol" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="mDE-pf-bej"/>
                 <constraint firstItem="rbA-zd-0Xm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="yHo-ce-lQg"/>
             </constraints>
-            <point key="canvasLocation" x="240" y="154"/>
+            <point key="canvasLocation" x="187" y="115"/>
         </customView>
     </objects>
 </document>

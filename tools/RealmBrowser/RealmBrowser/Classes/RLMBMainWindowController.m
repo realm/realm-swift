@@ -16,9 +16,13 @@
 
 #import "RLMBSidebarCellView.h"
 
-
 NSString *const kRLMBRightMostConstraint = @"RLMBRightMostConstraint";
-CGFloat const kRLMBPaneMargin = 50;
+NSString *const kRLMBWidthConstraint = @"RLMBWidthConstraint";
+NSString *const kRLMBRightContentsConstraint = @"RLMBRightContentsConstraint";
+NSString *const kRLMBLeftContentsConstraint = @"RLMBLeftContentsConstraint";
+CGFloat const kRLMBPaneMargin = 20;
+CGFloat const kRLMBPaneMMinHeight = 200;
+CGFloat const kRLMBPaneThinWidth = 300;
 
 @interface RLMBMainWindowController () <RLMBCanvasDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
@@ -63,18 +67,17 @@ CGFloat const kRLMBPaneMargin = 50;
     self.scrollView.documentView = self.canvas;
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_canvas);
-    NSArray *hConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_canvas]"
-                                                                    options:0
-                                                                    metrics:nil
-                                                                      views:views];
+    [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_canvas]"
+                                                                                        options:0
+                                                                                        metrics:nil
+                                                                                          views:views]];
     
-    NSArray *vConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_canvas]|"
-                                                                    options:0
-                                                                    metrics:nil
-                                                                      views:views];
+    [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_canvas]|"
+                                                                                        options:0
+                                                                                        metrics:nil
+                                                                                          views:views]];
     
-    [self.scrollView.contentView addConstraints:hConstraints];
-    [self.scrollView.contentView addConstraints:vConstraints];
+    [self updateSidebarHeader];
 }
 
 - (void)updateWithRealm:(RLMRealm *)realm
@@ -88,7 +91,24 @@ CGFloat const kRLMBPaneMargin = 50;
     }
     
     self.objectClasses = objectClasses;
+    
+    [self updateSidebarHeader];
 }
+
+- (void)updateSidebarHeader
+{
+    NSTableColumn *tableColumn = self.sidebarTableView.tableColumns.firstObject;
+    NSString *fileName = [[self.realm.path pathComponents] lastObject];
+    NSTableHeaderCell *cell = tableColumn.headerCell;
+    cell.stringValue = fileName;
+}
+
+/*
+ addPane
+ goBack
+ goForward
+ 
+ */
 
 - (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane
 {
@@ -102,10 +122,21 @@ CGFloat const kRLMBPaneMargin = 50;
 - (void)addPane:(RLMBPaneViewController *)pane
 {
     [self.canvas addSubview:pane.view];
-    [self addSizeConstraintsTo:pane.view within:self.canvas];
-    [self.canvas removeConstraint:[self constraintWithIdentifier:kRLMBRightMostConstraint inView:self.canvas]];
-    [self addLeftConstraintsTo:pane.view after:[self.panes.lastObject view] within:self.canvas];
-    [self addRightConstraintsTo:pane.view within:self.canvas];
+    [self addVerticalConstraintsTo:pane.view within:self.canvas];
+    
+    RLMBPaneViewController *lastPane = self.panes.lastObject;
+    [self addLeftConstraintTo:pane.view after:lastPane.view within:self.canvas];
+    
+    [self removeRightConstraintFrom:self.canvas];
+    [self addRightConstraintTo:pane.view within:self.canvas];
+    
+    NSView *contentView = self.scrollView.contentView;
+//    [self removeConstraintWithIdentifier:kRLMBLeftContentsConstraint inView:contentView];
+//    [self addLeftContentConstraintsTo:lastPane.view within:contentView];
+    
+    [self removeRightContentsConstraintFrom:contentView];
+    [self addWidthConstraintTo:lastPane.view];
+    [self addRightContentConstraintsTo:pane.view within:contentView];
     
     [self.panes addObject:pane];
     pane.canvasDelegate = self;
@@ -123,35 +154,22 @@ CGFloat const kRLMBPaneMargin = 50;
     RLMBPaneViewController *paneVC = self.panes.lastObject;
     [paneVC.view removeFromSuperview];
     [self.panes removeLastObject];
-    [self addRightConstraintsTo:[self.panes.lastObject view] within:self.canvas];
+    [self addRightConstraintTo:[self.panes.lastObject view] within:self.canvas];
 }
 
 #pragma mark - Table View View Datasource - Sidebar
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return self.objectClasses.count + 1;
+    return self.objectClasses.count;
 }
 
 #pragma mark - Table View Delegate - Sidebar
 
-- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
-{
-    return row == 0;
-}
-
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    if (row == 0) {
-        NSTableCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarHeaderCell" owner:self];
-        NSString *fileName = [[self.realm.path pathComponents] lastObject];
-        cellView.textField.stringValue = [[fileName stringByDeletingPathExtension] uppercaseString];
-        
-        return cellView;
-    }
-    
     RLMBSidebarCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
-    RLMResults *objects = self.objectClasses[row - 1];
+    RLMResults *objects = self.objectClasses[row];
     cellView.textField.stringValue = objects.objectClassName;
     cellView.badge.stringValue = @(objects.count).stringValue;
 //    cellView.badge.layer.cornerRadius = NSHeight(cellView.badge.frame)/2.0;
@@ -164,10 +182,13 @@ CGFloat const kRLMBPaneMargin = 50;
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     if (notification.object == self.sidebarTableView) {
-        NSInteger row = self.sidebarTableView.selectedRow - 1;
+        NSInteger row = self.sidebarTableView.selectedRow;
         
         if (row < self.objectClasses.count && row >= 0) {
             [self removePanesAfterPane:self.rootPane];
+            [self removeWidthConstraintFrom:self.rootPane.view];
+            [self removeRightContentsConstraintFrom:self.scrollView.contentView];
+            [self addRightContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
             
             RLMResults *objects = self.objectClasses[row];
             RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
@@ -207,7 +228,7 @@ CGFloat const kRLMBPaneMargin = 50;
 
 #pragma mark - Private Methods - Constraints
 
-- (void)addSizeConstraintsTo:(NSView *)pane within:(NSView *)canvas
+- (void)addVerticalConstraintsTo:(NSView *)pane within:(NSView *)canvas
 {
     pane.translatesAutoresizingMaskIntoConstraints = NO;
     
@@ -217,15 +238,7 @@ CGFloat const kRLMBPaneMargin = 50;
                                                         toItem:nil
                                                      attribute:NSLayoutAttributeNotAnAttribute
                                                     multiplier:1
-                                                      constant:200]];
-    
-    [pane addConstraint:[NSLayoutConstraint constraintWithItem:pane
-                                                     attribute:NSLayoutAttributeWidth
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:nil
-                                                     attribute:NSLayoutAttributeNotAnAttribute
-                                                    multiplier:1
-                                                      constant:300]];
+                                                      constant:kRLMBPaneMMinHeight]];
     
     [canvas addConstraint:[NSLayoutConstraint constraintWithItem:pane
                                                        attribute:NSLayoutAttributeTop
@@ -244,7 +257,7 @@ CGFloat const kRLMBPaneMargin = 50;
                                                         constant:kRLMBPaneMargin]];
 }
 
-- (void)addLeftConstraintsTo:(NSView *)pane after:(NSView *)previousPane within:(NSView *)canvas
+- (void)addLeftConstraintTo:(NSView *)pane after:(NSView *)previousPane within:(NSView *)canvas
 {
     if (previousPane) {
         [canvas addConstraint:[NSLayoutConstraint constraintWithItem:pane
@@ -266,7 +279,24 @@ CGFloat const kRLMBPaneMargin = 50;
     }
 }
 
-- (void)addRightConstraintsTo:(NSView *)pane within:(NSView *)canvas
+//- (void)addLeftContentConstraintsTo:(NSView *)pane within:(NSView *)contentView
+//{
+//    if (!pane) {
+//        return;
+//    }
+//    
+//    NSLayoutConstraint *leftContentConstraint = [NSLayoutConstraint constraintWithItem:pane
+//                                                                             attribute:NSLayoutAttributeLeft
+//                                                                             relatedBy:NSLayoutRelationEqual
+//                                                                                toItem:contentView
+//                                                                             attribute:NSLayoutAttributeLeft
+//                                                                            multiplier:1
+//                                                                              constant:kRLMBPaneMargin];
+//    leftContentConstraint.identifier = kRLMBLeftContentsConstraint;
+//    [contentView addConstraint:leftContentConstraint];
+//}
+
+- (void)addRightConstraintTo:(NSView *)pane within:(NSView *)canvas
 {
     NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:canvas
                                                                        attribute:NSLayoutAttributeRight
@@ -277,6 +307,53 @@ CGFloat const kRLMBPaneMargin = 50;
                                                                         constant:kRLMBPaneMargin];
     rightConstraint.identifier = kRLMBRightMostConstraint;
     [canvas addConstraint:rightConstraint];
+}
+
+- (void)addRightContentConstraintsTo:(NSView *)pane within:(NSView *)contentView
+{
+    NSLayoutConstraint *rightContentConstraint = [NSLayoutConstraint constraintWithItem:contentView
+                                                                              attribute:NSLayoutAttributeRight
+                                                                              relatedBy:NSLayoutRelationEqual
+                                                                                 toItem:pane
+                                                                              attribute:NSLayoutAttributeRight
+                                                                             multiplier:1
+                                                                               constant:kRLMBPaneMargin];
+    rightContentConstraint.identifier = kRLMBRightContentsConstraint;
+    [contentView addConstraint:rightContentConstraint];
+    
+    NSLog(@"pane constraints: %@", pane.constraints);
+}
+
+- (void)addWidthConstraintTo:(NSView *)pane
+{
+    if (!pane) {
+        return;
+    }
+    
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:pane
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:nil
+                                                                       attribute:NSLayoutAttributeNotAnAttribute
+                                                                      multiplier:1
+                                                                        constant:kRLMBPaneThinWidth];
+    widthConstraint.identifier = kRLMBWidthConstraint;
+    [pane addConstraint:widthConstraint];
+}
+
+- (void)removeRightConstraintFrom:(NSView *)view
+{
+    [view removeConstraint:[self constraintWithIdentifier:kRLMBRightMostConstraint inView:view]];
+}
+
+- (void)removeRightContentsConstraintFrom:(NSView *)view
+{
+    [view removeConstraint:[self constraintWithIdentifier:kRLMBRightContentsConstraint inView:view]];
+}
+
+- (void)removeWidthConstraintFrom:(NSView *)view
+{
+    [view removeConstraint:[self constraintWithIdentifier:kRLMBWidthConstraint inView:view]];
 }
 
 - (NSLayoutConstraint *)constraintWithIdentifier:(NSString *)identifier inView:(NSView *)view
