@@ -51,6 +51,9 @@
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     for (RLMProperty *prop in properties) {
         map[prop.name] = prop;
+        if (prop.isPrimary) {
+            self.primaryKeyProperty = prop;
+        }
     }
     _propertiesByName = map;
     _properties = properties;

@@ -3,7 +3,8 @@
 
 ### API breaking changes
 
-* None.
+* Deallocating an RLMRealm instance in a write transaction lacking an explicit
+  commit/cancel will now be automatically cancelled instead of committed.
 
 ### Enhancements
 
@@ -15,6 +16,7 @@
   `objectAtIndex:` ~55% faster.
 * Added a lldb visualizer script for displaying the contents of persisted
   RLMObjects when debugging.
+* Added method `-setDefaultRealmPath:` to change the default Realm path.
 
 ### Bugfixes
 
@@ -24,6 +26,7 @@
 * Don't run the query twice when `firstObject` or `lastObject` are called on an
   `RLMResults` which has not had its results accessed already.
 * Fix for bug where schema version is 0 for new Realm created at the latest version.
+* Fix for error message where no migration block is specified when required.
 * Merge native Swift default property values with defaultPropertyValues().
 
 0.87.4 Release notes (2014-11-07)

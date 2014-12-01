@@ -32,7 +32,6 @@ void RLMCheckForUpdates() {
 
     auto handler = ^(NSData *data, __unused NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Failed to check for updates to Realm: %@", error);
             return;
         }
 

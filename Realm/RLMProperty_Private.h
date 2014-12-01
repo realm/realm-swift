@@ -37,7 +37,6 @@
 @property (nonatomic, readwrite) RLMPropertyAttributes attributes;
 
 // private properties
-@property (nonatomic, copy) NSString *objcRawType;
 @property (nonatomic, assign) char objcType;
 
 // getter and setter names

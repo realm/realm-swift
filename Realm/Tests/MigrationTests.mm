@@ -112,6 +112,9 @@ extern "C" {
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
     XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
+
+    [RLMRealm setSchemaVersion:0 withMigrationBlock:nil];
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 
@@ -430,6 +433,16 @@ extern "C" {
 
     // test object from other realm still works
     XCTAssertEqualObjects(obj.data, @"new data");
+
+    // verify schema for both objects
+    NSArray *properties = defaultObj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
+    properties = obj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
 }
 
 @end

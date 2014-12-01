@@ -229,9 +229,15 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+        if (!s_defaultRealmPath) {
+            s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
+        }
     });
     return s_defaultRealmPath;
+}
+
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath {
+    s_defaultRealmPath = defaultRealmPath;
 }
 
 + (NSString *)writeablePathForFile:(NSString*)fileName
@@ -339,28 +345,31 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         return nil;
     }
 
-    // set the schema
-    if (customSchema) {
-        if (!dynamic) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+    // we need to protect the realm cache and accessors cache
+    @synchronized(s_realmsPerPath) {
+        // create tables, set schema, and create accessors when needed
+        if (customSchema) {
+            if (!dynamic) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+            }
+            createTablesInTransaction(realm, customSchema);
         }
-        createTablesInTransaction(realm, customSchema);
-    }
-    else if (dynamic) {
-        createTablesInTransaction(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
-    }
-    else if (readonly) {
-        if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Cannot open an uninitialized realm in read-only mode"
-                                         userInfo:nil];
+        else if (dynamic) {
+            createTablesInTransaction(realm, [RLMSchema dynamicSchemaFromRealm:realm]);
         }
-        RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
-        cacheRealm(realm, path);
-    }
-    else {
-        // check cache for existing cached realms with the same path
-        @synchronized(s_realmsPerPath) {
+        else if (readonly) {
+            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Cannot open an uninitialized realm in read-only mode"
+                                             userInfo:nil];
+            }
+            RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
+            RLMRealmCreateAccessors(realm.schema);
+
+            cacheRealm(realm, path);
+        }
+        else {
+            // check cache for existing cached realms with the same path
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // advance read in case another instance initialized the schema
@@ -378,6 +387,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 else {
                     [RLMRealm migrateRealm:realm];
                 }
+
+                RLMRealmCreateAccessors(realm.schema);
             }
 
             // cache only realms using a shared schema
@@ -477,7 +488,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // update state and make all objects in this realm read-only
             _inWriteTransaction = NO;
 
-            // notify other realm istances of changes
+            // notify other realm instances of changes
             NSArray *realms = realmsAtPath(_path);
             for (RLMRealm *realm in realms) {
                 if (![realm isEqual:self]) {
@@ -525,8 +536,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)dealloc {
     if (_inWriteTransaction) {
-        [self commitWriteTransaction];
-        NSLog(@"A transaction was lacking explicit commit, but it has been auto committed.");
+        [self cancelWriteTransaction];
+        NSLog(@"WARNING: An RLMRealm instance was deallocated during a write transaction and all "
+              "pending changes have been rolled back. Make sure to retain a reference to the "
+              "RLMRealm for the duration of the write transaction.");
     }
 }
 
@@ -678,9 +691,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         [migration migrateWithBlock:s_migrationBlock version:s_currentSchemaVersion];
     }
     else if (schemaVersion > s_currentSchemaVersion && schemaVersion != RLMNotVersioned) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
-                                     userInfo:@{@"path" : migration.realm.path}];
+        if (!s_migrationBlock) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"No migration block specified for a Realm with a schema version greater than 0. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
+                                         userInfo:@{@"path" : migration.realm.path}];
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
+                                         userInfo:@{@"path" : migration.realm.path}];
+        }
     }
 
     // clear cache for future callers
