@@ -158,7 +158,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
 }
 
 
-void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
+BOOL RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
     realm.schema = [targetSchema copy];
 
     // first pass to create missing tables
@@ -220,6 +220,8 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
     }
+
+    return changed;
 }
 
 
