@@ -5,6 +5,7 @@
 
 * Deallocating an RLMRealm instance in a write transaction lacking an explicit
   commit/cancel will now be automatically cancelled instead of committed.
+* `-[RLMObject isDeletedFromRealm]` has been renamed to `-[RLMObject isInvalidated]`.
 
 ### Enhancements
 

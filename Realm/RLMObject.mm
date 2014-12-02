@@ -217,8 +217,8 @@
 
 - (NSString *)description
 {
-    if (self.isDeletedFromRealm) {
-        return @"[deleted object]";
+    if (self.invalidated) {
+        return @"[invalid object]";
     }
 
     return [self descriptionWithMaxDepth:5];
@@ -249,9 +249,13 @@
     return [NSString stringWithString:mString];
 }
 
-- (BOOL)isDeletedFromRealm {
+- (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
     return self.class == self.objectSchema.accessorClass && !_row.is_attached();
+}
+
+- (BOOL)isDeletedFromRealm {
+    return self.invalidated;
 }
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
@@ -264,7 +268,7 @@
 
     if (!_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted and is no longer valid."
+                                       reason:@"Object is no longer valid."
                                      userInfo:nil];
     }
 

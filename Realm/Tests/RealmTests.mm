@@ -682,13 +682,13 @@
 
     XCTAssertEqual(1U, OwnerObject.allObjects.count);
     XCTAssertEqual(1U, DogObject.allObjects.count);
-    XCTAssertEqual(NO, obj.deletedFromRealm);
+    XCTAssertEqual(NO, obj.invalidated);
 
     XCTAssertThrows([realm deleteAllObjects]);
 
     [realm transactionWithBlock:^{
         [realm deleteAllObjects];
-        XCTAssertEqual(YES, obj.deletedFromRealm);
+        XCTAssertEqual(YES, obj.invalidated);
     }];
 
     XCTAssertEqual(0U, OwnerObject.allObjects.count);
@@ -703,7 +703,7 @@
     IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(createdObject.isDeletedFromRealm);
+    XCTAssertTrue(createdObject.isInvalidated);
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -719,7 +719,7 @@
     [realm deleteObject:objectToDelete];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(objectToDelete.isDeletedFromRealm);
+    XCTAssertTrue(objectToDelete.isInvalidated);
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -926,7 +926,7 @@
     }];
 
     [realm invalidate];
-    XCTAssertTrue(obj.isDeletedFromRealm);
+    XCTAssertTrue(obj.isInvalidated);
     XCTAssertThrows([obj intCol]);
 }
 

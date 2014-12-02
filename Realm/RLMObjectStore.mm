@@ -261,9 +261,9 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
     RLMVerifyInWriteTransaction(realm);
 
     // verify that object is standalone
-    if (object.deletedFromRealm) {
+    if (object.invalidated) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Adding a deleted object to a Realm is not permitted"
+                                       reason:@"Adding a deleted or invalidated object to a Realm is not permitted"
                                      userInfo:nil];
     }
     if (object.realm) {

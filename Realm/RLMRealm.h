@@ -236,9 +236,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  This rolls back all objects in the Realm to the state they were in at the
  beginning of the write transaction, and then ends the transaction.
 
- This does not reattach deleted accessors. Any `RLMObject`s which were added to
- the Realm will become deleted objects rather than switching back to standalone
- objects. Given the following code:
+ This restores the data for deleted objects, but does not re-validated deleted
+ accessor objects. Any `RLMObject`s which were added to the Realm will be
+ invalidated rather than switching back to standalone objects.
+ Given the following code:
 
      ObjectType *oldObject = [[ObjectType objectsWhere:@"..."] firstObject];
      ObjectType *newObject = [[ObjectType alloc] init];
@@ -248,7 +249,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
      [realm deleteObject:oldObject];
      [realm cancelWriteTransaction];
 
- Both `oldObject` and `newObject` will return `YES` for `isDeletedFromRealm`,
+ Both `oldObject` and `newObject` will return `YES` for `isInvalidated`,
  but re-running the query which provided `oldObject` will once again return
  the valid object.
 
@@ -348,8 +349,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  `-[RLMObject createInRealm:withObject]` to insert a copy of a persisted object
  into a different Realm.
 
- The object to be added cannot have been previously deleted from a Realm (i.e.
- `isDeletedFromRealm`) must be false.
+ The object to be added must be valid and cannot have been previously deleted
+ from a Realm (i.e. `isInvalidated`) must be false.
 
  @param object  Object to be added to this Realm.
  */
