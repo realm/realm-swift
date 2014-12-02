@@ -151,7 +151,7 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
         objectSchema.realm = realm;
 
         // read-only realms may be missing tables entirely
-        if (objectSchema.table && verify) {
+        if (verify && objectSchema.table) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
             RLMVerifyAndAlignColumns(tableSchema, objectSchema);
         }
