@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
   due to a migration being needed.
 * Fixed issue where objects with custom getter names couldn't be used to
   initialize other objects.
+* Fixed a major performance regression on queries on string properties.
 
 
 0.88.0 Release notes (2014-12-02)
