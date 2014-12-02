@@ -213,6 +213,9 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
             v = self.obj.CreateValueFromData(name, v.GetData(), v.type)
         return v
 
+    def update(self):
+        return not self.ivars
+
 def RLM_SummaryProvider(obj, _):
     addr = unsigned(frame(obj).EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
     if addr == 0:
@@ -260,6 +263,8 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
         return data
 
     def update(self):
+        if not self.ivars:
+            return True
         self.count = None
 
 class InitializerHack(object):
