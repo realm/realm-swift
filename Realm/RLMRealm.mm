@@ -225,7 +225,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     return self;
 }
 
-- (tightdb::Group *)group {
+- (tightdb::Group *)getOrCreateGroup {
     if (!_group) {
         _group = &const_cast<Group&>(_sharedGroup->begin_read());
     }
@@ -465,7 +465,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             bool announce = _sharedGroup->has_changed();
 
             // begin the read transaction if needed
-            [self group];
+            [self getOrCreateGroup];
 
             LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
 
@@ -602,7 +602,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             }
             else {
                 // Create the read transaction
-                [self group];
+                [self getOrCreateGroup];
             }
             [self sendNotifications:RLMRealmDidChangeNotification];
             return YES;
