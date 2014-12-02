@@ -546,6 +546,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (void)invalidate {
     RLMCheckThread(self);
+    CheckReadWrite(self, @"Cannot invalidate a read-only realm");
 
     _sharedGroup->end_read();
     _group = nullptr;

@@ -326,7 +326,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  begun the next time data is read from the Realm.
 
  Calling this method multiple times in a row without reading any data from the
- Realm, or before ever reading any data from the Realm is a no-op.
+ Realm, or before ever reading any data from the Realm is a no-op. This method
+ cannot be called on a read-only Realm.
  */
 - (void)invalidate;
 

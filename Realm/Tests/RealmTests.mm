@@ -959,4 +959,14 @@
     [realm invalidate];
     XCTAssertThrows([array count]);
 }
+
+- (void)testInvalidteOnReadOnlyRealmIsError
+{
+    @autoreleasepool {
+        // Create the file
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertThrows([realm invalidate]);
+}
 @end
