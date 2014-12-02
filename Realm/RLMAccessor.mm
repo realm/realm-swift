@@ -29,7 +29,7 @@
 static inline void RLMVerifyAttached(__unsafe_unretained RLMObject *obj) {
     if (!obj->_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted and is no longer valid."
+                                       reason:@"Object has been deleted or invalidated."
                                      userInfo:nil];
     }
     RLMCheckThread(obj->_realm);

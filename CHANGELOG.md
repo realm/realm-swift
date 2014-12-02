@@ -5,6 +5,7 @@
 
 * Deallocating an RLMRealm instance in a write transaction lacking an explicit
   commit/cancel will now be automatically cancelled instead of committed.
+* `-[RLMObject isDeletedFromRealm]` has been renamed to `-[RLMObject isInvalidated]`.
 
 ### Enhancements
 
@@ -17,6 +18,7 @@
 * Added a lldb visualizer script for displaying the contents of persisted
   RLMObjects when debugging.
 * Added method `-setDefaultRealmPath:` to change the default Realm path.
+* Add `-[RLMRealm invalidate]` to release data locked by the current thread.
 
 ### Bugfixes
 

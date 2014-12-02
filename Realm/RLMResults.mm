@@ -154,7 +154,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     while (index < count && batchCount < len) {
         // get acessor fot the object class
         RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema defaultValues:NO];
-        accessor->_row = (*_objectSchema->_table)[_backingView.get_source_ndx(index++)];
+        accessor->_row = (*_objectSchema.table)[_backingView.get_source_ndx(index++)];
         items->array[batchCount] = accessor;
         buffer[batchCount] = accessor;
         batchCount++;
