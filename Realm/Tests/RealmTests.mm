@@ -969,4 +969,35 @@
     RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
     XCTAssertThrows([realm invalidate]);
 }
+
+- (void)testRefreshCreatesAReadTransaction
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_group_t group = dispatch_group_create();
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertTrue([realm refresh]);
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    // refresh above should have created a read transaction, so realm should
+    // still only see one object
+    XCTAssertEqual(1U, [IntObject allObjects].count);
+
+    // Just a sanity check
+    XCTAssertTrue([realm refresh]);
+    XCTAssertEqual(2U, [IntObject allObjects].count);
+}
 @end

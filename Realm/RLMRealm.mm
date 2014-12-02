@@ -594,16 +594,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         return NO;
     }
 
-    // FIXME: is this really the correct thing to do? _sharedGroup->has_changed()
-    // will always return true if there is no read transaction.
-    if (!_group) {
-        return NO;
-    }
-
     try {
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
-            LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+            if (_group) {
+                LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+            }
+            else {
+                // Create the read transaction
+                [self group];
+            }
             [self sendNotifications:RLMRealmDidChangeNotification];
             return YES;
         }
