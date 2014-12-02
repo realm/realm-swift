@@ -165,15 +165,13 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
         self.props = []
         self.ivars = None
 
-        # if is_object_deleted(obj):
-        #     print 'deleted'
-        #     return
+        if is_object_deleted(obj):
+            return
 
         super(RLMObject_SyntheticChildrenProvider, self).__init__(
                 obj, 'objectSchema', 'realm')
 
         if not self.ivars:
-            print 'no ivars'
             return
 
         object_schema = self._value_from_ivar('objectSchema', 'RLMObjectSchema*').deref
@@ -207,14 +205,7 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('objectSchema')
 
         name = self.props[index - 2]
-        if self.obj.thread:
-            # thread isn't set correctly for objects from EvaluateExpression
-            p = path(self.obj, self.obj.type.name) + '.' + name
-            v = self.obj.CreateValueFromExpression(name, p)
-        else:
-            # And this doesn't work for optionals not from EvaluateExpression
-            p = self.obj.path.replace('.Some', '!') + '.' + name
-            v = frame(self.obj).EvaluateExpression(p)
+        v = frame(self.obj).EvaluateExpression(path(self.obj, self.obj.type.name) + '.' + name)
 
         if 'RLMArray' in v.type.name:
             v = self.obj.CreateValueFromData(name, v.GetData(), get_type(self.obj, 'id'))
