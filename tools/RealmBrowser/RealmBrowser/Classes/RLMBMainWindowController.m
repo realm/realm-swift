@@ -42,23 +42,20 @@ CGFloat const kRLMBPaneThinWidth = 300;
 
 @implementation RLMBMainWindowController
 
+#pragma mark - Lifetime Methods
+
 - (instancetype)initWithWindow:(NSWindow *)window
 {
     self = [super initWithWindow:window];
     if (self) {
-        [self setup];
+        self.panes = [NSMutableArray array];
     }
     return self;
 }
 
-- (void)setup
-{
-    self.panes = [NSMutableArray array];
-}
-
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
+
     self.window.titleVisibility = NSWindowTitleHidden;
     
     self.canvas = [[NSView alloc] init];
@@ -77,25 +74,80 @@ CGFloat const kRLMBPaneThinWidth = 300;
                                                                                         metrics:nil
                                                                                           views:views]];
     
-    [self updateSidebarHeader];
+    if (self.objectClasses.count > 0) {
+        [self setupSidebarHeader];
+        [self changeRootPane:0];
+    }
 }
+
+#pragma mark - Navigation Action
+
+- (IBAction)navigateAction:(NSSegmentedControl *)sender {
+    switch (sender.selectedSegment) {
+        case 0:
+            [self scrollToPane:0];
+            break;
+        case 1:
+            [self scrollToPane:self.panes.count - 1];
+            break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - Table View View Datasource - Sidebar
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return self.objectClasses.count;
+}
+
+#pragma mark - Table View Delegate - Sidebar
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    RLMBSidebarCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
+    RLMResults *objects = self.objectClasses[row];
+    cellView.textField.stringValue = objects.objectClassName;
+    cellView.badge.stringValue = @(objects.count).stringValue;
+    //    cellView.badge.layer.cornerRadius = NSHeight(cellView.badge.frame)/2.0;
+    //    cellView.badge.layer.cornerRadius = 10;
+    //    cellView.badge.backgroundColor = [NSColor purpleColor];
+    
+    return cellView;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    if (notification.object == self.sidebarTableView) {
+        NSInteger row = self.sidebarTableView.selectedRow;
+        
+        if (row < self.objectClasses.count && row >= 0) {
+            [self changeRootPane:row];
+        }
+    }
+}
+
+#pragma mark - Private Methods - Updating
 
 - (void)updateWithRealm:(RLMRealm *)realm
 {
     self.realm = realm;
-    
+
     NSMutableArray *objectClasses = [NSMutableArray array];
     for (RLMObjectSchema *objectSchema in self.realm.schema.objectSchema) {
         RLMResults *objects = [self.realm allObjects:objectSchema.className];
         [objectClasses addObject:objects];
     }
-    
     self.objectClasses = objectClasses;
     
-    [self updateSidebarHeader];
+    if (self.objectClasses.count > 0 && self.canvas) {
+        [self setupSidebarHeader];
+        [self changeRootPane:0];
+    }
 }
 
-- (void)updateSidebarHeader
+- (void)setupSidebarHeader
 {
     NSTableColumn *tableColumn = self.sidebarTableView.tableColumns.firstObject;
     NSString *fileName = [[self.realm.path pathComponents] lastObject];
@@ -103,12 +155,19 @@ CGFloat const kRLMBPaneThinWidth = 300;
     cell.stringValue = fileName;
 }
 
-/*
- addPane
- goBack
- goForward
- 
- */
+#pragma mark - Private Methods - Pane Handling
+
+-(void)changeRootPane:(NSUInteger)row
+{
+    [self removePanesAfterPane:self.rootPane];
+    [self removeWidthConstraintFrom:self.rootPane.view];
+    [self removeRightContentsConstraintFrom:self.scrollView.contentView];
+    [self addRightContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
+    
+    RLMResults *objects = self.objectClasses[row];
+    RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
+    [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
+}
 
 - (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane
 {
@@ -157,60 +216,7 @@ CGFloat const kRLMBPaneThinWidth = 300;
     [self addRightConstraintTo:[self.panes.lastObject view] within:self.canvas];
 }
 
-#pragma mark - Table View View Datasource - Sidebar
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    return self.objectClasses.count;
-}
-
-#pragma mark - Table View Delegate - Sidebar
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    RLMBSidebarCellView *cellView = [tableView makeViewWithIdentifier:@"SidebarClassCell" owner:self];
-    RLMResults *objects = self.objectClasses[row];
-    cellView.textField.stringValue = objects.objectClassName;
-    cellView.badge.stringValue = @(objects.count).stringValue;
-//    cellView.badge.layer.cornerRadius = NSHeight(cellView.badge.frame)/2.0;
-//    cellView.badge.layer.cornerRadius = 10;
-//    cellView.badge.backgroundColor = [NSColor purpleColor];
-    
-    return cellView;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    if (notification.object == self.sidebarTableView) {
-        NSInteger row = self.sidebarTableView.selectedRow;
-        
-        if (row < self.objectClasses.count && row >= 0) {
-            [self removePanesAfterPane:self.rootPane];
-            [self removeWidthConstraintFrom:self.rootPane.view];
-            [self removeRightContentsConstraintFrom:self.scrollView.contentView];
-            [self addRightContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
-            
-            RLMResults *objects = self.objectClasses[row];
-            RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
-            [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
-        }
-    }
-}
-
-#pragma mark - Navigation
-
-- (IBAction)navigateAction:(NSSegmentedControl *)sender {
-    switch (sender.selectedSegment) {
-        case 0:
-            [self scrollToPane:0];
-            break;
-        case 1:
-            [self scrollToPane:self.panes.count - 1];
-            break;
-        default:
-            break;
-    }
-}
+#pragma mark - Private Methods - Navigation
 
 - (void)scrollToPane:(NSUInteger)index
 {
@@ -320,8 +326,6 @@ CGFloat const kRLMBPaneThinWidth = 300;
                                                                                constant:kRLMBPaneMargin];
     rightContentConstraint.identifier = kRLMBRightContentsConstraint;
     [contentView addConstraint:rightContentConstraint];
-    
-    NSLog(@"pane constraints: %@", pane.constraints);
 }
 
 - (void)addWidthConstraintTo:(NSView *)pane
@@ -366,7 +370,7 @@ CGFloat const kRLMBPaneThinWidth = 300;
     return nil;
 }
 
-#pragma mark - Private methods - Property Getters
+#pragma mark - Private methods - Accessors
 
 - (RLMBRootPaneViewController *)rootPane
 {
