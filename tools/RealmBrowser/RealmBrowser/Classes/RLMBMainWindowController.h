@@ -12,6 +12,6 @@
 
 @interface RLMBMainWindowController : NSWindowController
 
-- (void)updateWithRealm:(RLMRealm *)realm;
+- (void)setupWithRealm:(RLMRealm *)realm;
 
 @end

@@ -35,7 +35,7 @@ CGFloat const kRLMBPaneThinWidth = 300;
 @property (nonatomic) NSView *canvas;
 
 @property (nonatomic) NSMutableArray *panes;
-@property (nonatomic, readonly) RLMBRootPaneViewController *rootPane;
+@property (nonatomic) RLMBRootPaneViewController *rootPane;
 
 @end
 
@@ -64,10 +64,10 @@ CGFloat const kRLMBPaneThinWidth = 300;
     self.scrollView.documentView = self.canvas;
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_canvas);
-    [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_canvas]"
-                                                                                        options:0
-                                                                                        metrics:nil
-                                                                                          views:views]];
+//    [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_canvas]"
+//                                                                                        options:0
+//                                                                                        metrics:nil
+//                                                                                          views:views]];
     
     [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_canvas]|"
                                                                                         options:0
@@ -76,7 +76,8 @@ CGFloat const kRLMBPaneThinWidth = 300;
     
     if (self.objectClasses.count > 0) {
         [self setupSidebarHeader];
-        [self changeRootPane:0];
+        [self setupRootPane];
+        [self showClassInRootPane:0];
     }
 }
 
@@ -123,14 +124,14 @@ CGFloat const kRLMBPaneThinWidth = 300;
         NSInteger row = self.sidebarTableView.selectedRow;
         
         if (row < self.objectClasses.count && row >= 0) {
-            [self changeRootPane:row];
+            [self showClassInRootPane:row];
         }
     }
 }
 
-#pragma mark - Private Methods - Updating
+#pragma mark - Setup Methods
 
-- (void)updateWithRealm:(RLMRealm *)realm
+- (void)setupWithRealm:(RLMRealm *)realm
 {
     self.realm = realm;
 
@@ -143,26 +144,37 @@ CGFloat const kRLMBPaneThinWidth = 300;
     
     if (self.objectClasses.count > 0 && self.canvas) {
         [self setupSidebarHeader];
-        [self changeRootPane:0];
+        [self setupRootPane];
+        [self showClassInRootPane:0];
     }
 }
 
 - (void)setupSidebarHeader
 {
-    NSTableColumn *tableColumn = self.sidebarTableView.tableColumns.firstObject;
     NSString *fileName = [[self.realm.path pathComponents] lastObject];
+    NSTableColumn *tableColumn = self.sidebarTableView.tableColumns.firstObject;
     NSTableHeaderCell *cell = tableColumn.headerCell;
     cell.stringValue = fileName;
 }
 
+- (void)setupRootPane
+{
+    if (!self.rootPane) {
+        self.rootPane = [[RLMBRootPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil];
+        [self addPane:self.rootPane];
+    }
+}
+
 #pragma mark - Private Methods - Pane Handling
 
--(void)changeRootPane:(NSUInteger)row
+- (void)showClassInRootPane:(NSUInteger)row
 {
     [self removePanesAfterPane:self.rootPane];
     [self removeWidthConstraintFrom:self.rootPane.view];
     [self removeRightContentsConstraintFrom:self.scrollView.contentView];
     [self addRightContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
+    [self removeLeftContentsConstraintFrom:self.scrollView.contentView];
+    [self addLeftContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
     
     RLMResults *objects = self.objectClasses[row];
     RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
@@ -190,12 +202,12 @@ CGFloat const kRLMBPaneThinWidth = 300;
     [self addRightConstraintTo:pane.view within:self.canvas];
     
     NSView *contentView = self.scrollView.contentView;
-//    [self removeConstraintWithIdentifier:kRLMBLeftContentsConstraint inView:contentView];
-//    [self addLeftContentConstraintsTo:lastPane.view within:contentView];
+    [self removeLeftContentsConstraintFrom:contentView];
+    [self addLeftContentConstraintsTo:lastPane.view ?: pane.view within:contentView];
     
     [self removeRightContentsConstraintFrom:contentView];
-    [self addWidthConstraintTo:lastPane.view];
     [self addRightContentConstraintsTo:pane.view within:contentView];
+    [self addWidthConstraintTo:lastPane.view];
     
     [self.panes addObject:pane];
     pane.canvasDelegate = self;
@@ -285,22 +297,22 @@ CGFloat const kRLMBPaneThinWidth = 300;
     }
 }
 
-//- (void)addLeftContentConstraintsTo:(NSView *)pane within:(NSView *)contentView
-//{
-//    if (!pane) {
-//        return;
-//    }
-//    
-//    NSLayoutConstraint *leftContentConstraint = [NSLayoutConstraint constraintWithItem:pane
-//                                                                             attribute:NSLayoutAttributeLeft
-//                                                                             relatedBy:NSLayoutRelationEqual
-//                                                                                toItem:contentView
-//                                                                             attribute:NSLayoutAttributeLeft
-//                                                                            multiplier:1
-//                                                                              constant:kRLMBPaneMargin];
-//    leftContentConstraint.identifier = kRLMBLeftContentsConstraint;
-//    [contentView addConstraint:leftContentConstraint];
-//}
+- (void)addLeftContentConstraintsTo:(NSView *)pane within:(NSView *)contentView
+{
+    if (!pane) {
+        return;
+    }
+    
+    NSLayoutConstraint *leftContentConstraint = [NSLayoutConstraint constraintWithItem:pane
+                                                                             attribute:NSLayoutAttributeLeft
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:contentView
+                                                                             attribute:NSLayoutAttributeLeft
+                                                                            multiplier:1
+                                                                              constant:kRLMBPaneMargin];
+    leftContentConstraint.identifier = kRLMBLeftContentsConstraint;
+    [contentView addConstraint:leftContentConstraint];
+}
 
 - (void)addRightConstraintTo:(NSView *)pane within:(NSView *)canvas
 {
@@ -350,6 +362,11 @@ CGFloat const kRLMBPaneThinWidth = 300;
     [view removeConstraint:[self constraintWithIdentifier:kRLMBRightMostConstraint inView:view]];
 }
 
+- (void)removeLeftContentsConstraintFrom:(NSView *)view
+{
+    [view removeConstraint:[self constraintWithIdentifier:kRLMBLeftContentsConstraint inView:view]];
+}
+
 - (void)removeRightContentsConstraintFrom:(NSView *)view
 {
     [view removeConstraint:[self constraintWithIdentifier:kRLMBRightContentsConstraint inView:view]];
@@ -372,13 +389,5 @@ CGFloat const kRLMBPaneThinWidth = 300;
 
 #pragma mark - Private methods - Accessors
 
-- (RLMBRootPaneViewController *)rootPane
-{
-    if (self.panes.count == 0) {
-        [self addPane:[[RLMBRootPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil]];
-    }
-    
-    return self.panes.firstObject;
-}
 
 @end

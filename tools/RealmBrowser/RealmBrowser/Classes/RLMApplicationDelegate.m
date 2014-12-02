@@ -70,7 +70,7 @@ NSString *const kDocumentsFolder = @"/Documents";
     [openPanel beginWithCompletionHandler:^(NSInteger result) {
         RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
         RLMRealm *realm = [RLMRealm realmWithPath:openPanel.URL.path];
-        [wc updateWithRealm:realm];
+        [wc setupWithRealm:realm];
         [openPanel orderOut:self];
         
         [self.windowControllers addObject:wc];
