@@ -144,6 +144,16 @@
  */
 + (NSString *)defaultRealmPath;
 
+/**
+ Set the default Realm path to a given path.
+
+ @param defaultRealmPath    The path to use for the default Realm.
+
+ @see defaultRealm
+ */
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath;
+
+
 #pragma mark - Notifications
 
 typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
@@ -226,9 +236,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  This rolls back all objects in the Realm to the state they were in at the
  beginning of the write transaction, and then ends the transaction.
 
- This does not reattach deleted accessors. Any `RLMObject`s which were added to
- the Realm will become deleted objects rather than switching back to standalone
- objects. Given the following code:
+ This restores the data for deleted objects, but does not re-validated deleted
+ accessor objects. Any `RLMObject`s which were added to the Realm will be
+ invalidated rather than switching back to standalone objects.
+ Given the following code:
 
      ObjectType *oldObject = [[ObjectType objectsWhere:@"..."] firstObject];
      ObjectType *newObject = [[ObjectType alloc] init];
@@ -238,7 +249,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
      [realm deleteObject:oldObject];
      [realm cancelWriteTransaction];
 
- Both `oldObject` and `newObject` will return `YES` for `isDeletedFromRealm`,
+ Both `oldObject` and `newObject` will return `YES` for `isInvalidated`,
  but re-running the query which provided `oldObject` will once again return
  the valid object.
 
@@ -285,6 +296,42 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
+/**
+ Write a compacted copy of the RLMRealm to the given path.
+
+ The destination file cannot already exist.
+
+ Note that if this is called from within a write transaction it writes the
+ *current* data, and not data when the last write transaction was committed.
+
+ @param path Path to save the Realm to.
+ @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return YES if the realm was copied successfully. Returns NO if an error occurred.
+*/
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
+
+/**
+ Invalidate all RLMObjects and RLMResults read from this Realm.
+
+ An RLMRealm holds a read lock on the version of the data accessed by it, so
+ that changes made to the Realm on different threads do not modify or delete the
+ data seen by this RLMRealm. Calling this method releases the read lock,
+ allowing the space used on disk to be reused by later write transactions rather
+ than growing the file. This method should be called before performing long
+ blocking operations on a background thread on which you previously read data
+ from the Realm which you no longer need.
+
+ All `RLMObject`, `RLMResults` and `RLMArray` instances obtained from this
+ `RLMRealm` on the current thread are invalidated, and can not longer be used.
+ The `RLMRealm` itself remains valid, and a new read transaction is implicitly
+ begun the next time data is read from the Realm.
+
+ Calling this method multiple times in a row without reading any data from the
+ Realm, or before ever reading any data from the Realm is a no-op. This method
+ cannot be called on a read-only Realm.
+ */
+- (void)invalidate;
+
 #pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------
@@ -302,8 +349,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  `-[RLMObject createInRealm:withObject]` to insert a copy of a persisted object
  into a different Realm.
 
- The object to be added cannot have been previously deleted from a Realm (i.e.
- `isDeletedFromRealm`) must be false.
+ The object to be added must be valid and cannot have been previously deleted
+ from a Realm (i.e. `isInvalidated`) must be false.
 
  @param object  Object to be added to this Realm.
  */

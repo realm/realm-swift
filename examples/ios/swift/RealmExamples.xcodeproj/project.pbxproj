@@ -33,6 +33,12 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
+		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		E886FB5A1A12A6FC00CB2D0B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91019D1037E0036D6C3 /* Realm.framework */; };
+		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
+		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
+		E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB661A12A73E00CB2D0B /* TableViewController.swift */; };
 		E8CB088219BA6AEE0018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB088019BA6AEE0018434A /* AppDelegate.swift */; };
 		E8CB088A19BA6AF70018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB088519BA6AF70018434A /* AppDelegate.swift */; };
 		E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8CB088619BA6AF70018434A /* default-v0.realm */; };
@@ -42,9 +48,20 @@
 		E8CB089919BA6B080018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB089519BA6B080018434A /* AppDelegate.swift */; };
 		E8CB089A19BA6B080018434A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8CB089619BA6B080018434A /* Images.xcassets */; };
 		E8CB089C19BA6B080018434A /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB089819BA6B080018434A /* TableViewController.swift */; };
+		E8D3F2781A11766A00620884 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D3F2761A11766A00620884 /* AppDelegate.swift */; };
+		E8D3F27A1A11778200620884 /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
+		E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		E8D3F27E1A1177DB00620884 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91019D1037E0036D6C3 /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E886FB531A12A6FC00CB2D0B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
+		};
 		E8AD212019E49249000603D7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E805758D19BA55E600376620 /* Project object */;
@@ -73,12 +90,24 @@
 			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
 			remoteInfo = Realm;
 		};
+		E8D3F27B1A1177C600620884 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0295B90619D103180036D6C3 /* RLMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMSupport.swift; sourceTree = "<group>"; };
 		0295B91019D1037E0036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/ios/Realm.framework; sourceTree = "<group>"; };
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E886FB651A12A73E00CB2D0B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E886FB661A12A73E00CB2D0B /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		E8CB07EF19BA6AB60018434A /* Encryption.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Encryption.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8CB081419BA6ABD0018434A /* Migration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Migration.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8CB083919BA6AC60018434A /* TableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,9 +125,21 @@
 		E8CB089619BA6B080018434A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E8CB089719BA6B080018434A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8CB089819BA6B080018434A /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+		E8D3F2531A11765200620884 /* Backlink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Backlink.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8D3F2761A11766A00620884 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8D3F2771A11766A00620884 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E886FB581A12A6FC00CB2D0B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */,
+				E886FB5A1A12A6FC00CB2D0B /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8CB07EC19BA6AB60018434A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -135,6 +176,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8D3F2501A11765200620884 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */,
+				E8D3F27E1A1177DB00620884 /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -152,7 +202,9 @@
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
+				E8D3F2751A11766A00620884 /* Backlink */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
+				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
 				E8CB088F19BA6B000018434A /* Simple */,
 				E8CB089419BA6B080018434A /* TableView */,
@@ -168,8 +220,21 @@
 				E8CB081419BA6ABD0018434A /* Migration.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
 				E8CB085E19BA6ACA0018434A /* Simple.app */,
+				E8D3F2531A11765200620884 /* Backlink.app */,
+				E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E886FB621A12A73E00CB2D0B /* GroupedTableView */ = {
+			isa = PBXGroup;
+			children = (
+				E886FB631A12A73E00CB2D0B /* AppDelegate.swift */,
+				E886FB641A12A73E00CB2D0B /* Images.xcassets */,
+				E886FB651A12A73E00CB2D0B /* Info.plist */,
+				E886FB661A12A73E00CB2D0B /* TableViewController.swift */,
+			);
+			path = GroupedTableView;
 			sourceTree = "<group>";
 		};
 		E8CB087F19BA6AEE0018434A /* Encryption */ = {
@@ -213,9 +278,36 @@
 			path = TableView;
 			sourceTree = "<group>";
 		};
+		E8D3F2751A11766A00620884 /* Backlink */ = {
+			isa = PBXGroup;
+			children = (
+				E8D3F2761A11766A00620884 /* AppDelegate.swift */,
+				E8D3F2771A11766A00620884 /* Info.plist */,
+			);
+			path = Backlink;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E886FB511A12A6FC00CB2D0B /* GroupedTableView */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E886FB5D1A12A6FC00CB2D0B /* Build configuration list for PBXNativeTarget "GroupedTableView" */;
+			buildPhases = (
+				E886FB541A12A6FC00CB2D0B /* Sources */,
+				E886FB581A12A6FC00CB2D0B /* Frameworks */,
+				E886FB5B1A12A6FC00CB2D0B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E886FB521A12A6FC00CB2D0B /* PBXTargetDependency */,
+			);
+			name = GroupedTableView;
+			productName = TableView;
+			productReference = E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E8CB07EE19BA6AB60018434A /* Encryption */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8CB080E19BA6AB70018434A /* Build configuration list for PBXNativeTarget "Encryption" */;
@@ -286,6 +378,23 @@
 			productReference = E8CB085E19BA6ACA0018434A /* Simple.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E8D3F2521A11765200620884 /* Backlink */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8D3F2731A11765200620884 /* Build configuration list for PBXNativeTarget "Backlink" */;
+			buildPhases = (
+				E8D3F24F1A11765200620884 /* Sources */,
+				E8D3F2501A11765200620884 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8D3F27C1A1177C600620884 /* PBXTargetDependency */,
+			);
+			name = Backlink;
+			productName = Backlink;
+			productReference = E8D3F2531A11765200620884 /* Backlink.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -310,6 +419,9 @@
 					E8CB085D19BA6ACA0018434A = {
 						CreatedOnToolsVersion = 6.0;
 					};
+					E8D3F2521A11765200620884 = {
+						CreatedOnToolsVersion = 6.1;
+					};
 				};
 			};
 			buildConfigurationList = E805759019BA55E600376620 /* Build configuration list for PBXProject "RealmExamples" */;
@@ -325,16 +437,26 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				E8D3F2521A11765200620884 /* Backlink */,
 				E8CB07EE19BA6AB60018434A /* Encryption */,
+				E886FB511A12A6FC00CB2D0B /* GroupedTableView */,
 				E8CB081319BA6ABD0018434A /* Migration */,
-				E8CB083819BA6AC60018434A /* TableView */,
 				E8CB085D19BA6ACA0018434A /* Simple */,
+				E8CB083819BA6AC60018434A /* TableView */,
 				0295B90B19D1034F0036D6C3 /* Realm */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E886FB5B1A12A6FC00CB2D0B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8CB081219BA6ABD0018434A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -372,6 +494,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E886FB541A12A6FC00CB2D0B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */,
+				E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */,
+				E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8CB07EB19BA6AB60018434A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -409,9 +541,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8D3F24F1A11765200620884 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8D3F27A1A11778200620884 /* RLMSupport.swift in Sources */,
+				E8D3F2781A11766A00620884 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E886FB521A12A6FC00CB2D0B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E886FB531A12A6FC00CB2D0B /* PBXContainerItemProxy */;
+		};
 		E8AD212119E49249000603D7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0295B90B19D1034F0036D6C3 /* Realm */;
@@ -431,6 +577,11 @@
 			isa = PBXTargetDependency;
 			target = 0295B90B19D1034F0036D6C3 /* Realm */;
 			targetProxy = E8AD212619E49252000603D7 /* PBXContainerItemProxy */;
+		};
+		E8D3F27C1A1177C600620884 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8D3F27B1A1177C600620884 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -527,6 +678,34 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E886FB5E1A12A6FC00CB2D0B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = GroupedTableView;
+			};
+			name = Debug;
+		};
+		E886FB5F1A12A6FC00CB2D0B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = GroupedTableView;
 			};
 			name = Release;
 		};
@@ -642,6 +821,34 @@
 			};
 			name = Release;
 		};
+		E8D3F26F1A11765200620884 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Backlink/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E8D3F2701A11765200620884 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				INFOPLIST_FILE = Backlink/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -659,6 +866,15 @@
 			buildConfigurations = (
 				E80575AF19BA55E700376620 /* Debug */,
 				E80575B019BA55E700376620 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E886FB5D1A12A6FC00CB2D0B /* Build configuration list for PBXNativeTarget "GroupedTableView" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E886FB5E1A12A6FC00CB2D0B /* Debug */,
+				E886FB5F1A12A6FC00CB2D0B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -695,6 +911,15 @@
 			buildConfigurations = (
 				E8CB087A19BA6ACB0018434A /* Debug */,
 				E8CB087B19BA6ACB0018434A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8D3F2731A11765200620884 /* Build configuration list for PBXNativeTarget "Backlink" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8D3F26F1A11765200620884 /* Debug */,
+				E8D3F2701A11765200620884 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

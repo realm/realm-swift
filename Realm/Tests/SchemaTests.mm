@@ -122,7 +122,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
         schema.objectSchema = objectSchemas;
 
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, @"prefix");
         }
 
         // Verify that each class has the correct properties and className

@@ -32,6 +32,8 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
 // NOTE: must be called from within write transaction
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
 
+// create or get cached accessors for the given schema
+void RLMRealmCreateAccessors(RLMSchema *schema);
 
 //
 // Adding, Removing, Getting Objects
@@ -41,7 +43,7 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options = 0);
 
 // delete an object from its realm
-void RLMDeleteObjectFromRealm(RLMObject *object);
+void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm);
 
 // deletes all objects from a realm
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
@@ -61,4 +63,9 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
 //
 
 // Create accessors
-RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, NSUInteger index);
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained NSString *objectClassName,
+                                   NSUInteger index);
+RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                   __unsafe_unretained RLMObjectSchema *objectSchema,
+                                   NSUInteger index);

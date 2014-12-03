@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = DemoObject.allObjects()
+    var array = DemoObject.allObjects().sortedResultsUsingProperty("date", ascending: true)
     var notificationToken: RLMNotificationToken?
 
     override func viewDidLoad() {
@@ -46,10 +46,10 @@ class TableViewController: UITableViewController {
 
         // Set realm notification block
         notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
-            self.reloadData()
+            self.tableView.reloadData()
         }
 
-        reloadData()
+        tableView.reloadData()
     }
 
     // UI
@@ -57,7 +57,7 @@ class TableViewController: UITableViewController {
     func setupUI() {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
 
-        self.title = "SwiftExample"
+        self.title = "TableView"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: "backgroundAdd")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
     }
@@ -88,11 +88,6 @@ class TableViewController: UITableViewController {
     }
 
     // Actions
-
-    func reloadData() {
-        array = DemoObject.allObjects().sortedResultsUsingProperty("date", ascending: true)
-        tableView.reloadData()
-    }
 
     func backgroundAdd() {
         let queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)

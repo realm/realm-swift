@@ -31,14 +31,15 @@
     mach_port_t _threadID;
 }
 @property (nonatomic, readonly) BOOL inWriteTransaction;
-@property (nonatomic, readonly) tightdb::Group *group;
+@property (nonatomic, readonly) BOOL dynamic;
+@property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 - (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
-inline void RLMCheckThread(RLMRealm *realm) {
+inline void RLMCheckThread(__unsafe_unretained RLMRealm *realm) {
     if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Realm accessed from incorrect thread"
