@@ -39,9 +39,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 
 @interface RLMRealmBrowserWindowController()<NSWindowDelegate>
 
-@property (weak) IBOutlet NSSplitView *splitView;
+@property (atomic, weak) IBOutlet NSSplitView *splitView;
 @property (nonatomic, strong) IBOutlet NSSegmentedControl *navigationButtons;
-@property (weak) IBOutlet NSToolbarItem *lockRealmButton;
+@property (atomic, weak) IBOutlet NSToolbarItem *lockRealmButton;
 @property (nonatomic, strong) IBOutlet NSSearchField *searchField;
 
 @end
@@ -123,8 +123,41 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     self.tableViewController.realmIsLocked = realmIsLocked;
     self.lockRealmButton.image = [NSImage imageNamed:realmIsLocked ? kRealmLockedImage : kRealmUnlockedImage];
     self.lockRealmButton.toolTip = realmIsLocked ? kRealmLockedTooltip : kRealmUnlockedTooltip;
-
+    
     [self.tableViewController.tableView reloadData];
+}
+
+#pragma mark - Public methods - Rearranging arrays
+
+- (void)removeRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController removeRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
+    }
+}
+
+- (void)deleteRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController deleteRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
+    }
+}
+
+- (void)insertNewRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode at:(NSIndexSet *)rowIndexes
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController insertNewRowsInTableViewForArrayNode:arrayNode at:rowIndexes];
+        [wc.outlineViewController.tableView reloadData];
+    }
+}
+
+- (void)moveRowsInTableViewForArrayNode:(RLMArrayNode *)arrayNode from:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination
+{
+    for (RLMRealmBrowserWindowController *wc in [self.modelDocument windowControllers]) {
+        [wc.tableViewController moveRowsInTableViewForArrayNode:arrayNode from:sourceIndexes to:destination];
+    }
 }
 
 - (void)addNavigationState:(RLMNavigationState *)state fromViewController:(RLMViewController *)controller
@@ -154,6 +187,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self.modelDocument addWindowController:wc];
     [self.modelDocument showWindows];
     [wc addNavigationState:state fromViewController:wc.tableViewController];
+
+    [wc.outlineViewController realmDidLoad];
+    wc.window.alphaValue = 1.0;
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons

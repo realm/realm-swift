@@ -43,26 +43,34 @@ typedef struct {
 
 @protocol RLMTableViewDelegate <NSTableViewDelegate>
 
+// Asking the delegate about the state
 - (BOOL)realmIsLocked;
 
 - (BOOL)displaysArray;
 
+// Asking the delegate about the contents
 - (BOOL)containsObjectInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 
 - (BOOL)containsArrayInRows:(NSIndexSet *)rowIndexes column:(NSInteger)column;
 
-- (void)addRows:(NSIndexSet *)rowIndexes;
+// RLMObject operations (when showing class table)
+- (void)addNewObjects:(NSIndexSet *)rowIndexes;
+
+- (void)deleteObjects:(NSIndexSet *)rowIndexes;
+
+// RLMArray operations
+- (void)removeRows:(NSIndexSet *)rowIndexes;
 
 - (void)deleteRows:(NSIndexSet *)rowIndexes;
 
-- (void)removeRows:(NSIndexSet *)rowIndexes;
+- (void)addNewRows:(NSIndexSet *)rowIndexes;
 
-- (void)insertRows:(NSIndexSet *)rowIndexes;
-
+// Operations on links in cells
 - (void)removeObjectLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
 
 - (void)removeArrayLinksAtRows:(NSIndexSet *)rowIndexes column:(NSInteger)columnIndex;
 
+// Opening an array in a new window
 - (void)openArrayInNewWindowAtRow:(NSInteger)row column:(NSInteger)columnIndex;
 
 @optional
@@ -74,6 +82,8 @@ typedef struct {
 - (void)mouseDidEnterCellAtLocation:(RLMTableLocation)location;
 
 - (void)mouseDidExitCellAtLocation:(RLMTableLocation)location;
+
+- (void)mouseDidLeaveCellOrView;
 
 - (void)rightClickedHeaderColumn:(NSUInteger)column;
 
@@ -87,7 +97,7 @@ typedef struct {
 @property (nonatomic, readonly) id<RLMTableViewDelegate> realmDelegate;
 @property (nonatomic, readonly) id<RLMTableViewDataSource> realmDataSource;
 
-- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex;
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode;
 
 - (void)makeColumnsFitContents;
 

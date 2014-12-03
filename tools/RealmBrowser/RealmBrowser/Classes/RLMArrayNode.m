@@ -74,6 +74,45 @@
     return YES;
 }
 
+-(BOOL)moveInstanceFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
+{
+    if (fromIndex >= [displayedArray count] || toIndex > [displayedArray count]) {
+        return NO;
+    }
+    
+    RLMObject *objectToMove = [displayedArray objectAtIndex:fromIndex];
+    
+    [displayedArray removeObjectAtIndex:fromIndex];
+    
+    if (toIndex > fromIndex) {
+        toIndex--;
+    }
+    
+    [displayedArray insertObject:objectToMove atIndex:toIndex];
+    
+    return YES;
+}
+
+-(BOOL)isEqualTo:(id)object
+{
+    if (self == object) {
+        return YES;
+    }
+    
+    RLMArrayNode *otherArrayNode = object;
+    if (self.instanceCount != otherArrayNode.instanceCount) {
+        return NO;
+    }
+    
+    for (int i = 0; i < self.instanceCount; i++) {
+        if (![displayedArray[i] isEqualToObject:[otherArrayNode instanceAtIndex:i]]) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
 #pragma mark - RLMTypeNode Overrides
 
 - (NSString *)name

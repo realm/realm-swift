@@ -117,8 +117,7 @@
     
     for (NSUInteger index = 0; index < classCount; index++) {
         RLMObjectSchema *objectSchema = allObjectSchemas[index];        
-        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema
-                                                               inRealm:_realm];
+        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
         
         [result addObject:tableNode];
     }

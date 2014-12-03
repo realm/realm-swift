@@ -26,6 +26,20 @@
     [self.badge.cell setBezelStyle:NSInlineBezelStyle];
 }
 
+-(void)sizeToFit
+{
+    if (![self.badge isHidden]) {
+        [self.badge sizeToFit];
+        
+        NSRect textFrame = self.textField.frame;
+        NSRect badgeFrame = self.badge.frame;
+        badgeFrame.origin.x = NSWidth(self.frame) - NSWidth(badgeFrame) - 10.0f;
+        self.badge.frame = badgeFrame;
+        textFrame.size.width = NSMinX(badgeFrame) - NSMinX(textFrame);
+        self.textField.frame = textFrame;
+    }
+}
+
 - (void)viewWillDraw
 {
     [super viewWillDraw];
