@@ -275,7 +275,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
         [realm beginWriteTransaction];
         for (RLMObject *object in self.objectPasteboard.objects.reverseObjectEnumerator) {
-            if (![object isDeletedFromRealm]) {
+            if (!object.isInvalidated) {
                 [arrayNode insertInstance:object atIndex:destination];
                 objectsInserted++;
             }
@@ -666,7 +666,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         }
     }
     
-    if ([value isMemberOfClass:[RLMObject class]] && [(RLMObject *)value isDeletedFromRealm]) {
+    if ([value isMemberOfClass:[RLMObject class]] && [(RLMObject *)value isInvalidated]) {
         NSLog(@"object deleted: %@", value);
         
         return NO;

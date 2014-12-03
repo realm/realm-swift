@@ -58,7 +58,9 @@ CGFloat const kRLMBPaneThinWidth = 300;
 - (void)windowDidLoad {
     [super windowDidLoad];
 
-    self.window.titleVisibility = NSWindowTitleHidden;
+    if ([self.window respondsToSelector:@selector(setTitleVisibility:)]) {
+        self.window.titleVisibility = NSWindowTitleHidden;
+    }
     
     self.canvas = [[NSView alloc] init];
     self.canvas.translatesAutoresizingMaskIntoConstraints = NO;
@@ -88,10 +90,10 @@ CGFloat const kRLMBPaneThinWidth = 300;
 - (IBAction)navigateAction:(NSSegmentedControl *)sender {
     switch (sender.selectedSegment) {
         case 0:
-            [self goBackwards];
+            [self focusOnPane:self.focusedPane - 1];
             break;
         case 1:
-            [self goForward];
+            [self focusOnPane:self.focusedPane + 1];
             break;
         default:
             break;
@@ -204,17 +206,9 @@ CGFloat const kRLMBPaneThinWidth = 300;
     [self removeRightConstraintFrom:self.canvas];
     [self addRightConstraintTo:pane.view within:self.canvas];
     
-    NSView *contentView = self.scrollView.contentView;
-    [self removeLeftContentsConstraintFrom:contentView];
-    [self addLeftContentConstraintsTo:lastPane.view ?: pane.view within:contentView];
-    
-    [self removeRightContentsConstraintFrom:contentView];
-    [self addRightContentConstraintsTo:pane.view within:contentView];
-    [self addWidthConstraintTo:lastPane.view];
-    
     pane.canvasDelegate = self;
     [self.panes addObject:pane];
-    self.focusedPane = self.panes.count - 1;
+    [self focusOnPane:self.panes.count - 1];
 }
 
 - (void)removePanesAfterPane:(RLMBPaneViewController *)pane
@@ -234,18 +228,28 @@ CGFloat const kRLMBPaneThinWidth = 300;
 
 #pragma mark - Private Methods - Navigation
 
-- (void)goBackwards
+- (void)focusOnPane:(NSInteger)index
 {
-    if (self.focusedPane > 0) {
-        [self arrangeContentConstraintsWithPaneAtRight:--self.focusedPane];
+    if (index < 0 || index > self.panes.count - 1) {
+        return;
     }
-}
-
-- (void)goForward
-{
-    if (self.focusedPane < self.panes.count - 1) {
-        [self arrangeContentConstraintsWithPaneAtRight:++self.focusedPane];
+    
+    NSView *contentView = self.scrollView.contentView;
+    [self removeLeftContentsConstraintFrom:contentView];
+    [self removeRightContentsConstraintFrom:contentView];
+    
+    RLMBPaneViewController *prevPane = self.panes[MAX(index - 1, 0)];
+    RLMBPaneViewController *thisPane = self.panes[index];
+    
+    [self removeWidthConstraintFrom:thisPane.view];
+    [self removeWidthConstraintFrom:prevPane.view];
+    [self addLeftContentConstraintsTo:prevPane.view within:contentView];
+    [self addRightContentConstraintsTo:thisPane.view within:contentView];
+    
+    if (prevPane != thisPane) {
+        [self addWidthConstraintTo:prevPane.view];
     }
+    self.focusedPane = index;
 }
 
 - (void)scrollToPane:(NSUInteger)index
@@ -263,25 +267,6 @@ CGFloat const kRLMBPaneThinWidth = 300;
 }
 
 #pragma mark - Private Methods - Constraints
-
-- (void)arrangeContentConstraintsWithPaneAtRight:(NSInteger)index
-{
-    NSView *contentView = self.scrollView.contentView;
-    [self removeLeftContentsConstraintFrom:contentView];
-    [self removeRightContentsConstraintFrom:contentView];
-    
-    RLMBPaneViewController *prevPane = self.panes[MAX(index - 1, 0)];
-    RLMBPaneViewController *thisPane = self.panes[index];
-    
-    [self removeWidthConstraintFrom:thisPane.view];
-    [self removeWidthConstraintFrom:prevPane.view];
-    [self addLeftContentConstraintsTo:prevPane.view within:contentView];
-    [self addRightContentConstraintsTo:thisPane.view within:contentView];
-    
-    if (prevPane != thisPane) {
-        [self addWidthConstraintTo:prevPane.view];
-    }
-}
 
 - (void)addVerticalConstraintsTo:(NSView *)pane within:(NSView *)canvas
 {

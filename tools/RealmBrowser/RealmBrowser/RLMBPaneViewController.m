@@ -38,7 +38,6 @@
     [self setupColumnsWithProperties:objectSchema.properties];
     
     [self.tableView reloadData];
-    NSLog(@"objects: %lu", [(id)self.objects count]);
 }
 
 #pragma mark - Table View Setup
@@ -75,7 +74,7 @@
     for (RLMProperty *property in properties) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
         NSString *typeName = [self.formatter typeNameForProperty:property];
-        tableColumn.title = [NSString stringWithFormat:@"%@: %@", property.name, typeName];
+        [tableColumn.headerCell setStringValue:[NSString stringWithFormat:@"%@: %@", property.name, typeName]];
         [tableView addTableColumn:tableColumn];
     }
     
@@ -86,7 +85,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return [(id)self.objects count];
+    return self.objects.count;
 }
 
 #pragma mark - Table View Delegate
@@ -118,7 +117,7 @@
     }
     
     NSInteger row = self.tableView.clickedRow;
-    if (row >= [(id)self.objects count]) {
+    if (row >= self.objects.count) {
         return;
     }
     
@@ -133,8 +132,8 @@
     id propertyValue = self.objects[row][property.name];
     
     if (property.type == RLMPropertyTypeObject) {
-        RLMObject *linkedObject = (RLMObject *)propertyValue;
-        RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
+//        RLMObject *linkedObject = (RLMObject *)propertyValue;
+//        RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
     }
     else if (property.type == RLMPropertyTypeArray) {
         RLMArray *linkedArray = (RLMArray *)propertyValue;
