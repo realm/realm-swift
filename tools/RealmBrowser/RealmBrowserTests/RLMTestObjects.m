@@ -16,21 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMClassNode.h"
-#import "RLMRealmOutlineNode.h"
+#import "RLMTestObjects.h"
 
-@interface RLMRealmNode : NSObject <RLMRealmOutlineNode>
-
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSString *url;
-@property (nonatomic, readonly) NSArray *topLevelClasses;
-
-- (instancetype)initWithName:(NSString *)name url:(NSString *)url;
-
-- (BOOL)connect:(NSError **)error;
-
-- (void)addTable:(RLMClassNode *)table;
-
+@implementation RealmObject1
 @end

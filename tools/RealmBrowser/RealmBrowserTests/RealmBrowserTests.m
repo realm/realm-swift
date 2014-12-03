@@ -17,6 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <XCTest/XCTest.h>
+#import <Realm/Realm.h>
+#import "Realm_Private.h"
+#import "RLMTestDataGenerator.h"
+#import "RLMTestObjects.h"
 
 @interface RealmBrowserTests : XCTestCase
 
@@ -24,21 +28,22 @@
 
 @implementation RealmBrowserTests
 
-- (void)setUp
+- (void)testGenerateDemoDatabase
 {
-    [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
-}
-
-- (void)tearDown
-{
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)testExample
-{
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[NSUUID UUID] UUIDString]];
+    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObject1 className]] objectCount:10];
+    XCTAssertEqual(YES, success);
+    NSError *error = nil;
+    RLMRealm *realm = [RLMRealm realmWithPath:fileURL.path
+                                     readOnly:NO
+                                     inMemory:NO
+                                      dynamic:YES
+                                       schema:nil
+                                        error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(realm);
+    XCTAssertEqual(10, [[realm allObjects:[RealmObject1 className]] count]);
 }
 
 @end

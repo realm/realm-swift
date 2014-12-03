@@ -16,21 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMClassNode.h"
-#import "RLMRealmOutlineNode.h"
+#import <Realm/Realm.h>
 
-@interface RLMRealmNode : NSObject <RLMRealmOutlineNode>
+#ifndef RealmBrowser_Realm_Private_h
+#define RealmBrowser_Realm_Private_h
 
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSString *url;
-@property (nonatomic, readonly) NSArray *topLevelClasses;
+@interface RLMRealm (Dynamic)
 
-- (instancetype)initWithName:(NSString *)name url:(NSString *)url;
++ (instancetype)realmWithPath:(NSString *)path
+                     readOnly:(BOOL)readonly
+                     inMemory:(BOOL)inMemory
+                      dynamic:(BOOL)dynamic
+                       schema:(RLMSchema *)customSchema
+                        error:(NSError **)outError;
 
-- (BOOL)connect:(NSError **)error;
+- (RLMResults *)allObjects:(NSString *)className;
 
-- (void)addTable:(RLMClassNode *)table;
+- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 @end
+
+@interface RLMArray (Private)
+
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+
+@end
+
+#endif

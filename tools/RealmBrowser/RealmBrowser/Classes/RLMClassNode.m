@@ -20,12 +20,7 @@
 
 #import "RLMObjectNode.h"
 #import "RLMSidebarTableCellView.h"
-
-// private redeclaration
-@interface RLMRealm ()
-- (RLMResults *)allObjects:(NSString *)className;
-@end
-
+#import "Realm_Private.h"
 
 @interface RLMClassNode ()
 
