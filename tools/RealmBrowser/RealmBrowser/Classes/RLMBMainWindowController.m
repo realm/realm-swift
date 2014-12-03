@@ -174,16 +174,12 @@ CGFloat const kRLMBPaneThinWidth = 300;
 - (void)showClassInRootPane:(NSUInteger)row
 {
     [self removePanesAfterPane:self.rootPane];
-    [self removeWidthConstraintFrom:self.rootPane.view];
-    [self removeRightContentsConstraintFrom:self.scrollView.contentView];
-    [self addRightContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
-    [self removeLeftContentsConstraintFrom:self.scrollView.contentView];
-    [self addLeftContentConstraintsTo:self.rootPane.view within:self.scrollView.contentView];
     
     RLMResults *objects = self.objectClasses[row];
     RLMObjectSchema *objectSchema = self.realm.schema[objects.objectClassName];
     [self.rootPane updateWithObjects:objects objectSchema:objectSchema];
-    self.focusedPane = 0;
+
+    [self focusOnPane:0];
 }
 
 - (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane
