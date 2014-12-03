@@ -19,19 +19,18 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="715" height="459"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="715" height="459"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <splitView dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="O9l-lx-HiR">
                         <rect key="frame" x="0.0" y="0.0" width="715" height="459"/>
                         <subviews>
                             <customView id="ADY-mM-H0Y" userLabel="Sidebar">
-                                <rect key="frame" x="0.0" y="0.0" width="280" height="459"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="27" horizontalPageScroll="10" verticalLineScroll="27" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="IUZ-GO-IM0">
+                                    <scrollView misplaced="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="27" horizontalPageScroll="10" verticalLineScroll="27" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="IUZ-GO-IM0">
                                         <rect key="frame" x="0.0" y="0.0" width="280" height="459"/>
                                         <clipView key="contentView" misplaced="YES" id="6cC-AR-sCL">
                                             <rect key="frame" x="1" y="0.0" width="238" height="134"/>
@@ -60,8 +59,8 @@
                                                                     <rect key="frame" x="1" y="1" width="277" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mdc-yO-6NF">
-                                                                            <rect key="frame" x="18" y="0.0" width="204" height="17"/>
+                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="mdc-yO-6NF">
+                                                                            <rect key="frame" x="18" y="-1" width="204" height="19"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="Table View Cell" id="2IY-9P-8bR">
                                                                                 <font key="font" metaFont="system" size="16"/>
                                                                                 <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
@@ -123,12 +122,12 @@
                                 </constraints>
                             </customView>
                             <customView id="HCz-an-AoN" userLabel="Canvas">
-                                <rect key="frame" x="281" y="0.0" width="434" height="459"/>
+                                <rect key="frame" x="1" y="0.0" width="714" height="459"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="gxa-ZW-9nb" userLabel="Scroll View">
+                                    <scrollView misplaced="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="gxa-ZW-9nb" userLabel="Scroll View">
                                         <rect key="frame" x="0.0" y="0.0" width="434" height="459"/>
-                                        <clipView key="contentView" id="qVE-Jh-eaF">
+                                        <clipView key="contentView" misplaced="YES" id="qVE-Jh-eaF">
                                             <rect key="frame" x="1" y="1" width="166" height="79"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
