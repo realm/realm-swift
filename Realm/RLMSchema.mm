@@ -226,4 +226,16 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
     return schema;
 }
 
+- (BOOL)isEqualToSchema:(RLMSchema *)schema {
+    if (_objectSchema.count != schema.objectSchema.count) {
+        return NO;
+    }
+    for (RLMObjectSchema *objectSchema in schema.objectSchema) {
+        if (![_objectSchemaByName[objectSchema.className] isEqualToObjectSchema:objectSchema]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 @end

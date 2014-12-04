@@ -31,7 +31,8 @@
     mach_port_t _threadID;
 }
 @property (nonatomic, readonly) BOOL inWriteTransaction;
-@property (nonatomic, readonly) tightdb::Group *group;
+@property (nonatomic, readonly) BOOL dynamic;
+@property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 - (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
