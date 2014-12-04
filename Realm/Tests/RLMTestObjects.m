@@ -143,3 +143,10 @@
     return nil;
 }
 @end
+
+@implementation UserKeyPathObject
++ (NSDictionary *)objectPropertyKeyPathMapping {
+    return @{@"userId": @"id",
+             @"firstName": @"user.first"};
+}
+@end
