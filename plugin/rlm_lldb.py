@@ -86,22 +86,36 @@ def frame(obj):
 def address(obj):
     return obj.GetData().GetAddress(lldb.SBError(), 0)
 
-object_table_ptr_offset = None
-def is_object_deleted(obj):
-    def field_offset(type_name, field_name):
-        for f in obj.target.FindFirstType(type_name).fields:
-            if f.name == field_name:
-                return f.byte_offset
+def field_offset(obj, type_name, field_name):
+    for f in obj.target.FindFirstType(type_name).fields:
+        if f.name == field_name:
+            return f.byte_offset
 
-    addr = address(obj)
+object_table_ptr_offset = None
+def get_object_table_ptr_offset(obj):
+    if object_table_ptr_offset:
+        return object_table_ptr_offset
+
+    v = frame(obj).EvaluateExpression(
+            'RLMDebugGetIvarOffset({}, "_row")'.format(path(obj)))
 
     global object_table_ptr_offset
-    if not object_table_ptr_offset:
-        v = frame(obj).EvaluateExpression(
-                'RLMDebugGetIvarOffset({}, "_row")'.format(path(obj)))
-        object_table_ptr_offset = unsigned(v) + field_offset('tightdb::RowBase', 'm_table')
+    object_table_ptr_offset = unsigned(v) + field_offset(obj, 'tightdb::RowBase', 'm_table')
+    return object_table_ptr_offset
 
-    ptr = obj.GetProcess().ReadUnsignedFromMemory(addr + object_table_ptr_offset,
+m_version_offset = None
+def get_table_version(obj):
+    table = obj.GetProcess().ReadUnsignedFromMemory(
+            address(obj) + get_object_table_ptr_offset(obj),
+            obj.target.addr_size, lldb.SBError())
+    if not m_version_offset:
+        global m_version_offset
+        m_version_offset = field_offset(obj, 'tightdb::Table', 'm_version')
+    return obj.GetProcess().ReadUnsignedFromMemory(table + m_version_offset, 8, lldb.SBError())
+
+def is_object_deleted(obj):
+    ptr = obj.GetProcess().ReadUnsignedFromMemory(
+            address(obj) + get_object_table_ptr_offset(obj),
             obj.target.addr_size, lldb.SBError())
     return ptr == 0
 
@@ -164,6 +178,7 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
     def __init__(self, obj, _):
         self.props = []
         self.ivars = None
+        self.version = None
 
         if is_object_deleted(obj):
             return
@@ -214,7 +229,11 @@ class RLMObject_SyntheticChildrenProvider(IvarHelper):
         return v
 
     def update(self):
-        return not self.ivars
+        if not self.ivars:
+            return True
+        old_version = self.version
+        self.version = get_table_version(self.obj)
+        return old_version == self.version
 
 def RLM_SummaryProvider(obj, _):
     addr = unsigned(frame(obj).EvaluateExpression('RLMDebugSummary({})'.format(path(obj))))
@@ -255,8 +274,6 @@ class RLMArray_SyntheticChildrenProvider(IvarHelper):
             return self._value_from_ivar('realm')
 
         key = '[' + str(index - 1) + ']'
-
-        v = self.obj.CreateValueFromExpression(key, 'RLMDebugArrayChildAtIndex({}, {})'.format(path(self.obj), index - 1))
 
         value = self._eval('RLMDebugArrayChildAtIndex({}, {})'.format(path(self.obj), index - 1))
         data = self.obj.CreateValueFromData(key, value.GetData(), self.type)
