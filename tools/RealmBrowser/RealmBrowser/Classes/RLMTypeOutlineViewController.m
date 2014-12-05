@@ -47,65 +47,6 @@
     }
 }
 
-- (void)performUpdateUsingState:(RLMNavigationState *)newState oldState:(RLMNavigationState *)oldState
-{
-    [super performUpdateUsingState:newState oldState:oldState];
- 
-    if ([oldState isMemberOfClass:[RLMArrayNavigationState class]] || [oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        if ([oldState.selectedType isMemberOfClass:[RLMClassNode class]] && ![newState.selectedType isMemberOfClass:[RLMArrayNode class]]) {
-            [(RLMClassNode *)oldState.selectedType removeAllChildNodes];
-        }
-        [self.tableView reloadData];
-    }
-    
-    if ([newState isMemberOfClass:[RLMNavigationState class]]) {
-        if ([oldState isMemberOfClass:[RLMQueryNavigationState class]] || newState.selectedType != oldState.selectedType) {
-            NSInteger typeIndex = [self.classesOutlineView rowForItem:newState.selectedType];
-            
-            [self setSelectionIndex:typeIndex];
-        }
-    }
-    else if ([newState isMemberOfClass:[RLMArrayNavigationState class]]) {
-        RLMArrayNavigationState *arrayState = (RLMArrayNavigationState *)newState;
-        
-        RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
-        NSInteger selectionIndex = arrayState.selectedInstanceIndex;
-
-        RLMObject *selectedInstance = [parentClassNode instanceAtIndex:selectionIndex];
-        
-        RLMObjectNode *objectNode;
-        
-        if ([oldState isMemberOfClass:[RLMQueryNavigationState class]]) {
-            objectNode = [(RLMClassNode *)oldState.selectedType displayChildObject:selectedInstance];
-        }
-        else {
-            objectNode = [parentClassNode displayChildObject:selectedInstance];
-        }
-
-        RLMArrayNode *arrayNode = [objectNode displayChildArrayFromProperty:arrayState.property object:selectedInstance];
-        objectNode.childNode = arrayNode;
-
-        [self.classesOutlineView reloadData];
-        [self.classesOutlineView expandItem:parentClassNode];
-        [self.classesOutlineView expandItem:objectNode];
-        
-        NSInteger index = [self.classesOutlineView rowForItem:arrayNode];
-        if (index != NSNotFound) {
-            [self setSelectionIndex:index];
-        }
-    }
-    else if ([newState isMemberOfClass:[RLMQueryNavigationState class]]) {
-        RLMQueryNavigationState *arrayState = (RLMQueryNavigationState *)newState;
-
-        RLMClassNode *parentClassNode = (RLMClassNode *)arrayState.selectedType;
-
-        [parentClassNode displayChildResultsFromQuery:arrayState.searchText result:arrayState.results];
-
-        [self.classesOutlineView reloadData];
-        [self.classesOutlineView expandItem:parentClassNode];
-    }
-}
-
 #pragma mark - NSOutlineViewDataSource implementation
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
@@ -202,7 +143,6 @@
         return;
     }
 
-    
     id<RLMRealmOutlineNode> theItem = item;
     
     // If we didn't select an array, we should flatten the outline view

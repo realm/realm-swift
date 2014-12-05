@@ -48,6 +48,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 - (void)windowDidLoad
 {
     navigationStack = [[RLMNavigationStack alloc] init];
+    self.window.alphaValue = 0.0;
 }
 
 #pragma mark - RLMViewController Overrides
@@ -70,6 +71,7 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self.splitView setAutosaveName:[NSString stringWithFormat:kRealmKeyOutlineWidthForRealm, realmPath]];
     
     [self reloadAfterEdit];
+    self.window.alphaValue = 1.0;
 }
 
 #pragma mark - Public methods - Accessors
