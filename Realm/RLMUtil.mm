@@ -24,6 +24,7 @@
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty.h"
+#import "RLMSwiftSupport.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
@@ -179,9 +180,21 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
+NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
+        RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+        for (RLMProperty *prop in objectSchema.properties) {
+            if (!defaults[prop.name] && defaultObject[prop.name]) {
+                defaults[prop.name] = defaultObject[prop.name];
+            }
+        }
+    }
+    return defaults;
+}
+
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
-    NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
@@ -189,7 +202,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
 
         // get default for nil object
         if (!obj && !allowMissing) {
-            obj = defaults[prop.name];
+            obj = objectSchema.defaultValues[prop.name];
         }
 
         // validate if object is not nil, or for nil if we don't allow missing values

@@ -121,6 +121,8 @@
         RLMReplaceClassNameMethod(objectClass, className);
     }
 
+    schema.defaultValues = RLMDefaultValuesForObjectSchema(schema);
+
     return schema;
 }
 
@@ -212,6 +214,7 @@
     schema.objectClass = RLMObject.class;
     schema.accessorClass = RLMObject.class;
     schema.standaloneClass = RLMObject.class;
+    schema.defaultValues = RLMDefaultValuesForObjectSchema(schema);
 
     return schema;
 }
@@ -226,6 +229,7 @@
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
     schema.primaryKeyProperty = _primaryKeyProperty;
+    schema->_defaultValues = _defaultValues;
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
