@@ -223,11 +223,10 @@ const NSUInteger kMaxItemsInTestArray = 12;
 
 -(NSString *)randomString
 {
-    NSArray *names = @[@"John", @"Jane", @"Tom", @"Dick", @"Harry", @"Jack", @"Jill"];
-    NSString *result = names[arc4random_uniform((u_int32_t)names.count)];
+    NSString *result = [[NSUUID UUID] UUIDString];
 
     if (arc4random_uniform(100) == 0) {
-       result = [result stringByPaddingToLength:10000 withString: @" bla" startingAtIndex:0];
+//       result = [result stringByPaddingToLength:10000 withString: @" bla" startingAtIndex:0];
     }
     
     return result;
@@ -263,5 +262,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
 
     return testArray;
 }
+
+
 
 @end

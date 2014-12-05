@@ -36,7 +36,6 @@ const NSInteger NOT_A_COLUMN = -1;
     NSMenuItem *clickLockItem;
 
     NSMenuItem *deleteObjectItem;
-    NSMenuItem *addObjectItem;
 
     NSMenuItem *removeFromArrayItem;
     NSMenuItem *deleteRowItem;
@@ -102,11 +101,6 @@ const NSInteger NOT_A_COLUMN = -1;
                                            keyEquivalent:@""];
     deleteObjectItem.tag = 200;
 
-    addObjectItem = [[NSMenuItem alloc] initWithTitle:@"Add new objects"
-                                               action:@selector(addObjectsAction:)
-                                        keyEquivalent:@""];
-    addObjectItem.tag = 201;
-
     // Operations on objects in arrays
     removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array"
                                                      action:@selector(removeRowsFromArrayAction:)
@@ -165,9 +159,6 @@ const NSInteger NOT_A_COLUMN = -1;
     
     if (self.realmDelegate.displaysArray) {
         [self.menu addItem:insertIntoArrayItem];
-    }
-    else {
-        [self.menu addItem:addObjectItem];
     }
     
     if (self.selectedRowIndexes.count == 0) {
@@ -284,7 +275,7 @@ const NSInteger NOT_A_COLUMN = -1;
             return nonemptySelection && unlocked && !displaysArray;
 
         case 101: // Edit -> Add object
-        case 201: // Context -> Add object
+//        case 201: // Context -> Add object
             menuItem.title = [NSString stringWithFormat:@"Add new object%@", numberModifier];
             return unlocked && !displaysArray;
             
@@ -398,6 +389,19 @@ const NSInteger NOT_A_COLUMN = -1;
 
 #pragma mark - Public Methods
 
+- (void)scrollToRow:(NSInteger)rowIndex
+{
+    NSRect rowRect = [self rectOfRow:rowIndex];
+    NSPoint scrollOrigin = rowRect.origin;
+    NSClipView *clipView = (NSClipView *)[self superview];
+    scrollOrigin.y += MAX(0, round((NSHeight(rowRect) - NSHeight(clipView.frame))*0.5f));
+    NSScrollView *scrollView = (NSScrollView *)[clipView superview];
+    if ([scrollView respondsToSelector:@selector(flashScrollers)]){
+        [scrollView flashScrollers];
+    }
+    [[clipView animator] setBoundsOrigin:scrollOrigin];
+}
+
 - (void)setupColumnsWithType:(RLMTypeNode *)typeNode
 {
     while (self.numberOfColumns > 0) {
@@ -439,7 +443,7 @@ const NSInteger NOT_A_COLUMN = -1;
         RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
         headerCell.wraps = YES;
         headerCell.firstLine = propertyColumn.name;
-        headerCell.secondLine = [RLMDescriptions nameOfProperty:propertyColumn.property];
+        headerCell.secondLine = [RLMDescriptions typeNameOfProperty:propertyColumn.property];
         tableColumn.headerCell = headerCell;
         
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];

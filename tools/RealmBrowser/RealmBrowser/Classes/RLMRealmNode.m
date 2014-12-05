@@ -22,6 +22,7 @@
 
 #import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
+#import "Realm_Private.h"
 
 @implementation RLMRealmNode
 

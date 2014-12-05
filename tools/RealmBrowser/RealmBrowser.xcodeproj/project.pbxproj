@@ -69,16 +69,19 @@
 		84E35A49196AD991007F0344 /* RLMNavigationStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A48196AD991007F0344 /* RLMNavigationStack.m */; };
 		84E35A4D196B021B007F0344 /* RLMArrayNavigationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */; };
 		E80E768019E0738500DCFACC /* Realm.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = E8E3D63D19E0729B00C67D13 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E84EB8201A2FB7F500EB780E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 844C34DE19473D9D0027E902 /* libc++.dylib */; };
+		E84EB8291A2FC38C00EB780E /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E84EB8281A2FC38C00EB780E /* RLMTestObjects.m */; };
+		E87616361A2FCABB00F134C7 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8E3D63D19E0729B00C67D13 /* Realm.framework */; };
 		E8E3D63E19E0729B00C67D13 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8E3D63D19E0729B00C67D13 /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		84E0F9741921F3B900D6CA14 /* PBXContainerItemProxy */ = {
+		E84EB8221A2FB94E00EB780E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 84E0F9441921F3B900D6CA14 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 84E0F94B1921F3B900D6CA14;
-			remoteInfo = RealmVisualEditor;
+			remoteInfo = RealmBrowser;
 		};
 		E87C0B3619E072CD00DD992C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -126,7 +129,6 @@
 		22A55FEA19D18BA8009178BC /* RLMObjectNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMObjectNode.m; path = Classes/RLMObjectNode.m; sourceTree = "<group>"; };
 		22A55FEF19D19842009178BC /* RLMDescriptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptions.h; path = Classes/RLMDescriptions.h; sourceTree = "<group>"; };
 		22A55FF019D19842009178BC /* RLMDescriptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMDescriptions.m; path = Classes/RLMDescriptions.m; sourceTree = "<group>"; };
-		22B0FB531A0BC420008E4ED1 /* RLMBrowser_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMBrowser_private.h; path = Classes/RLMBrowser_private.h; sourceTree = "<group>"; };
 		22D28EA51993AAAB00497FD3 /* RLMNumberTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMNumberTableCellView.h; path = Classes/RLMNumberTableCellView.h; sourceTree = "<group>"; };
 		22D28EA61993AAAB00497FD3 /* RLMNumberTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNumberTableCellView.m; path = Classes/RLMNumberTableCellView.m; sourceTree = "<group>"; };
 		22D3AC8819CC5D710042C1B2 /* RLMModelExporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMModelExporter.h; path = Classes/RLMModelExporter.h; sourceTree = "<group>"; };
@@ -193,6 +195,9 @@
 		84E35A48196AD991007F0344 /* RLMNavigationStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationStack.m; path = Classes/RLMNavigationStack.m; sourceTree = "<group>"; };
 		84E35A4B196B021B007F0344 /* RLMArrayNavigationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArrayNavigationState.h; path = Classes/RLMArrayNavigationState.h; sourceTree = "<group>"; };
 		84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMArrayNavigationState.m; path = Classes/RLMArrayNavigationState.m; sourceTree = "<group>"; };
+		E84EB8261A2FC24500EB780E /* Realm_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Realm_Private.h; path = Classes/Realm_Private.h; sourceTree = "<group>"; };
+		E84EB8271A2FC38C00EB780E /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
+		E84EB8281A2FC38C00EB780E /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		E8E3D63D19E0729B00C67D13 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/DerivedData/Realm/Build/Products/Release/Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -211,6 +216,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E84EB8201A2FB7F500EB780E /* libc++.dylib in Frameworks */,
+				E87616361A2FCABB00F134C7 /* Realm.framework in Frameworks */,
 				84E0F9731921F3B900D6CA14 /* Cocoa.framework in Frameworks */,
 				84E0F9721921F3B900D6CA14 /* XCTest.framework in Frameworks */,
 			);
@@ -228,7 +235,6 @@
 				8474E2B919544D8700BCA755 /* UI */,
 				84A34A4D192E19C5005D6CC4 /* RLMApplicationDelegate.h */,
 				84A34A4E192E19C5005D6CC4 /* RLMApplicationDelegate.m */,
-				22B0FB531A0BC420008E4ED1 /* RLMBrowser_private.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -350,6 +356,7 @@
 		84945D5D1945CC380081C67B /* Aux */ = {
 			isa = PBXGroup;
 			children = (
+				E84EB8261A2FC24500EB780E /* Realm_Private.h */,
 				22A55FEF19D19842009178BC /* RLMDescriptions.h */,
 				22A55FF019D19842009178BC /* RLMDescriptions.m */,
 				84925C64195AE8E800EE27B1 /* UI */,
@@ -430,6 +437,8 @@
 			isa = PBXGroup;
 			children = (
 				84E0F97C1921F3B900D6CA14 /* RealmBrowserTests.m */,
+				E84EB8271A2FC38C00EB780E /* RLMTestObjects.h */,
+				E84EB8281A2FC38C00EB780E /* RLMTestObjects.m */,
 				84E0F9771921F3B900D6CA14 /* Supporting Files */,
 			);
 			path = RealmBrowserTests;
@@ -492,7 +501,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				84E0F9751921F3B900D6CA14 /* PBXTargetDependency */,
+				E84EB8231A2FB94E00EB780E /* PBXTargetDependency */,
 			);
 			name = RealmBrowserTests;
 			productName = RealmVisualEditorTests;
@@ -625,6 +634,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E84EB8291A2FC38C00EB780E /* RLMTestObjects.m in Sources */,
 				84E0F97D1921F3B900D6CA14 /* RealmBrowserTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -632,10 +642,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		84E0F9751921F3B900D6CA14 /* PBXTargetDependency */ = {
+		E84EB8231A2FB94E00EB780E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 84E0F94B1921F3B900D6CA14 /* RealmBrowser */;
-			targetProxy = 84E0F9741921F3B900D6CA14 /* PBXContainerItemProxy */;
+			targetProxy = E84EB8221A2FB94E00EB780E /* PBXContainerItemProxy */;
 		};
 		E87C0B3719E072CD00DD992C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -813,24 +823,18 @@
 		84E0F9841921F3B900D6CA14 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RealmBrowser.app/Contents/MacOS/RealmBrowser";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Realm Browser.app/Contents/MacOS/Realm Browser";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					../../build/DerivedData/Realm/Build/Products/Release,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "RealmVisualEditorTests/RealmBrowserTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks/Realm",
-				);
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				INFOPLIST_FILE = "RealmBrowserTests/RealmBrowserTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RealmBrowserTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -840,20 +844,18 @@
 		84E0F9851921F3B900D6CA14 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RealmBrowser.app/Contents/MacOS/RealmBrowser";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Realm Browser.app/Contents/MacOS/Realm Browser";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					../../build/DerivedData/Realm/Build/Products/Release,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RealmVisualEditor/RealmVisualEditor-Prefix.pch";
-				INFOPLIST_FILE = "RealmVisualEditorTests/RealmBrowserTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Libraries/Realm",
-					"$(PROJECT_DIR)/RealmVisualEditor/Externals/Frameworks/Realm",
-				);
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				INFOPLIST_FILE = "RealmBrowserTests/RealmBrowserTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RealmBrowserTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

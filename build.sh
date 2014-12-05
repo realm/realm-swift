@@ -49,8 +49,9 @@ command:
   test-all [xcmode]:       tests iOS and OS X frameworks with debug and release configurations
   examples [xcmode]:       builds all examples in examples/ in release configuration
   examples-debug [xcmode]: builds all examples in examples/ in debug configuration
-  browser [xcmode]:        builds the RealmBrowser OSX app
-  verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all and examples
+  browser [xcmode]:        builds the Realm Browser OSX app
+  test-browser [xcmode]:   tests the Realm Browser OSX app
+  verify [xcmode]:         cleans, removes docs/output/, then runs docs, test-all, examples & browser
   docs:                    builds docs in docs/output
   get-version:             get the current version
   set-version version:     set the version
@@ -333,6 +334,7 @@ case "$COMMAND" in
         sh build.sh test-all "$XCMODE"
         sh build.sh examples "$XCMODE"
         sh build.sh browser "$XCMODE"
+        sh build.sh test-browser "$XCMODE"
 
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
@@ -395,6 +397,11 @@ case "$COMMAND" in
     ######################################
     "browser")
         xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
+        exit 0
+        ;;
+
+    "test-browser")
+        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser test ${CODESIGN_PARAMS}"
         exit 0
         ;;
 

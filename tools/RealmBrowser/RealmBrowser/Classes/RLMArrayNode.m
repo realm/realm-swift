@@ -85,6 +85,10 @@
 
 -(BOOL)isEqualTo:(id)object
 {
+    if ([object class] != [self class]) {
+        return NO;
+    }
+    
     if (self == object) {
         return YES;
     }

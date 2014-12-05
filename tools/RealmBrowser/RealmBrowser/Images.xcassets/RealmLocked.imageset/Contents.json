@@ -1,17 +1,13 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "mac",
       "scale" : "1x",
       "filename" : "RealmLocked.png"
     },
     {
-      "idiom" : "universal",
+      "idiom" : "mac",
       "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
     }
   ],
   "info" : {

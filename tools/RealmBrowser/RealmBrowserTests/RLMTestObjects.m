@@ -16,17 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RealmBrowser_RLMBrowser_private_h
-#define RealmBrowser_RLMBrowser_private_h
+#import "RLMTestObjects.h"
 
-@interface RLMRealm (Dynamic)
-- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
-- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
-
+@implementation RealmObject1
 @end
-
-@interface RLMArray (Private)
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-@end
-
-#endif

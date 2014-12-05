@@ -25,6 +25,6 @@
 - (BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index;
 - (BOOL)removeInstanceAtIndex:(NSUInteger)index;
 - (BOOL)moveInstanceFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex;
-- (BOOL)isEqualTo:(id)object;
+//- (BOOL)isEqualTo:(id)object;
 
 @end

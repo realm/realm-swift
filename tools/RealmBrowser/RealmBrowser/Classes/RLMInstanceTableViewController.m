@@ -37,9 +37,9 @@
 #import "NSColor+ByteSizeFactory.h"
 
 #import "objc/objc-class.h"
-#import "RLMBrowser_private.h"
 
 #import "RLMDescriptions.h"
+#import "Realm_Private.h"
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 static const NSInteger NOT_A_COLUMN = -1;
@@ -236,7 +236,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
-            numberFormatter.minimumFractionDigits = type == RLMPropertyTypeInt ? 0 : 3;
+            numberFormatter.minimumFractionDigits = (type == RLMPropertyTypeInt) ? 0 : 3;
             NSString *min = [numberFormatter stringFromNumber:[results minOfProperty:propertyName]];
             NSString *avg = [numberFormatter stringFromNumber:[results averageOfProperty:propertyName]];
             NSString *max = [numberFormatter stringFromNumber:[results maxOfProperty:propertyName]];
@@ -422,13 +422,21 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     RLMRealm *realm = self.parentWindowController.modelDocument.presentedRealm.realm;
     NSUInteger objectCount = MAX(rowIndexes.count, 1);
 
+    RLMObject *newObject;
+    
     [realm beginWriteTransaction];
     for (NSUInteger i = 0; i < objectCount; i++) {
-        [self createObjectInRealm:realm withScheme:self.displayedType.schema];
+        newObject = [self.class createObjectInRealm:realm withSchema:self.displayedType.schema];
     }
     [realm commitWriteTransaction];
     
     [self.parentWindowController reloadAllWindows];
+    
+    if (newObject && [self.displayedType isKindOfClass:RLMClassNode.class]) {
+        RLMClassNode *classNode = (RLMClassNode *)self.displayedType;
+        NSUInteger row = [classNode indexOfInstance:newObject];
+        [self.realmTableView scrollToRow:row];
+    }
 }
 
 // RLMArray operations
@@ -476,7 +484,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
 
 #pragma mark - Private Methods - RLMTableView Delegate Helpers
 
-- (RLMObject *)createObjectInRealm:(RLMRealm *)realm withScheme:(RLMObjectSchema *)schema
++ (RLMObject *)createObjectInRealm:(RLMRealm *)realm withSchema:(RLMObjectSchema *)schema
 {
     NSMutableDictionary *objectBlueprint = [self defaultValuesForSchema:schema];
     RLMProperty *primaryKey = schema.primaryKeyProperty;
@@ -493,7 +501,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     return [realm createObject:schema.className withObject:objectBlueprint];
 }
 
-- (id)uniqueValueForProperty:(RLMProperty *)primaryKey className:(NSString *)className inRealm:(RLMRealm *)realm
++ (id)uniqueValueForProperty:(RLMProperty *)primaryKey className:(NSString *)className inRealm:(RLMRealm *)realm
 {
     NSUInteger remainingAttempts = 100;
     NSUInteger maxBitsUsed = 8;
@@ -505,7 +513,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
             u_int32_t maxInt = MIN(1 << maxBitsUsed++, UINT32_MAX);
             uniqueValue = @(arc4random_uniform(maxInt));
         } else if (primaryKey.type == RLMPropertyTypeString) {
-            uniqueValue = [NSString stringWithFormat:@"[PRIMARY KEY] %i", arc4random_uniform(UINT32_MAX)];
+            uniqueValue = [[NSUUID UUID] UUIDString];
         }
         
         if ([[realm objects:className where:@"%K == %@", primaryKey.name, uniqueValue] count] == 0) {
@@ -518,7 +526,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     return nil;
 }
 
-- (NSMutableDictionary *)defaultValuesForSchema:(RLMObjectSchema *)schema
++ (NSMutableDictionary *)defaultValuesForSchema:(RLMObjectSchema *)schema
 {
     NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
     for (RLMProperty *property in schema.properties) {
@@ -528,7 +536,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     return defaultValues;
 }
 
-- (id)defaultValueForPropertyType:(RLMPropertyType)propertyType
++ (id)defaultValueForPropertyType:(RLMPropertyType)propertyType
 {
     switch (propertyType) {
         case RLMPropertyTypeInt:
@@ -658,7 +666,7 @@ typedef NS_ENUM(int32_t, RLMUpdateType) {
     
     [rowIndexes enumerateRangesWithOptions:NSEnumerationReverse usingBlock:^(NSRange range, BOOL *stop) {
         for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
-            RLMObject *object = [self createObjectInRealm:realm withScheme:self.displayedType.schema];
+            RLMObject *object = [self.class createObjectInRealm:realm withSchema:self.displayedType.schema];
             [(RLMArrayNode *)self.displayedType insertInstance:object atIndex:range.location];
         }
     }];
