@@ -1386,6 +1386,16 @@
     XCTAssertEqual(0U, [[PersonObject objectsWhere:@"name == 'Ari' and age > 40"] count]);
 }
 
+- (void)testClass:(Class)class
+       countWhere:(NSString *)predicateString
+  withNormalCount:(NSUInteger)normalCount
+         notCount:(NSUInteger)notCount
+{
+    XCTAssertEqual(normalCount, [[class objectsWhere:predicateString] count]);
+    predicateString = [NSString stringWithFormat:@"NOT(%@)", predicateString];
+    XCTAssertEqual(notCount, [[class objectsWhere:predicateString] count]);
+}
+
 - (void)testINPredicate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1402,31 +1412,31 @@
     ////////////////////////
 
     // BOOL
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"boolCol IN {NO}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {YES}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"boolCol IN {NO, YES}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {NO}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {YES}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {NO, YES}" withNormalCount:1 notCount:0];
 
     // int
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"intCol IN {0, 2, 3}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"intCol IN {1, 2}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {1}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {1, 2}" withNormalCount:1 notCount:0];
 
     // float
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"floatCol IN {0, 2, 3}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"floatCol IN {1, 2}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {1}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {1, 2}" withNormalCount:1 notCount:0];
 
     // double
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"doubleCol IN {0, 2, 3}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"doubleCol IN {1, 2}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {1}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {1, 2}" withNormalCount:1 notCount:0];
 
     // NSString
-    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN {'abc'}"] count]);
-    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'def'}"] count]);
-    XCTAssertEqual(0U, [[StringObject objectsWhere:@"stringCol IN {'ABC'}"] count]);
-    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'abc'}"] count]);
-    XCTAssertEqual(1U, [[StringObject objectsWhere:@"stringCol IN[c] {'ABC'}"] count]);
+    [self testClass:[StringObject class] countWhere:@"stringCol IN {'abc'}" withNormalCount:1 notCount:0];
+    [self testClass:[StringObject class] countWhere:@"stringCol IN {'def'}" withNormalCount:0 notCount:1];
+    [self testClass:[StringObject class] countWhere:@"stringCol IN {'ABC'}" withNormalCount:0 notCount:1];
+    [self testClass:[StringObject class] countWhere:@"stringCol IN[c] {'abc'}" withNormalCount:1 notCount:0];
+    [self testClass:[StringObject class] countWhere:@"stringCol IN[c] {'ABC'}" withNormalCount:1 notCount:0];
 
     // NSData
     // Can't represent NSData with NSPredicate literal. See format predicates below
@@ -1435,25 +1445,25 @@
     // Can't represent NSDate with NSPredicate literal. See format predicates below
 
     // bool
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {YES}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"cBoolCol IN {NO, YES}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {NO}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {YES}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {NO, YES}" withNormalCount:1 notCount:0];
 
     // int64_t
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"longCol IN {0, 2, 3}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"longCol IN {1, 2}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {1}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {1, 2}" withNormalCount:1 notCount:0];
 
     // mixed
     // FIXME: Support IN predicates with mixed properties
     XCTAssertThrows([AllTypesObject objectsWhere:@"mixedCol IN {0, 2, 3}"]);
 
     // string subobject
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'abc'}"] count]);
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'def'}"] count]);
-    XCTAssertEqual(0U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN {'ABC'}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'abc'}"] count]);
-    XCTAssertEqual(1U, [[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] {'ABC'}"] count]);
+    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'abc'}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'def'}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'ABC'}" withNormalCount:0 notCount:1];
+    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN[c] {'abc'}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN[c] {'ABC'}" withNormalCount:1 notCount:0];
 
     ////////////////////////
     // Format Predicates
