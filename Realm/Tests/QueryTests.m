@@ -1387,13 +1387,18 @@
 }
 
 - (void)testClass:(Class)class
-       countWhere:(NSString *)predicateString
   withNormalCount:(NSUInteger)normalCount
          notCount:(NSUInteger)notCount
+            where:(NSString *)predicateFormat, ...
 {
-    XCTAssertEqual(normalCount, [[class objectsWhere:predicateString] count]);
-    predicateString = [NSString stringWithFormat:@"NOT(%@)", predicateString];
-    XCTAssertEqual(notCount, [[class objectsWhere:predicateString] count]);
+    va_list args;
+    va_start(args, predicateFormat);
+    va_end(args);
+    XCTAssertEqual(normalCount, [[class objectsWhere:predicateFormat args:args] count]);
+    predicateFormat = [NSString stringWithFormat:@"NOT(%@)", predicateFormat];
+    va_start(args, predicateFormat);
+    va_end(args);
+    XCTAssertEqual(notCount, [[class objectsWhere:predicateFormat args:args] count]);
 }
 
 - (void)testINPredicate
@@ -1412,31 +1417,31 @@
     ////////////////////////
 
     // BOOL
-    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {NO}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {YES}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"boolCol IN {NO, YES}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"boolCol IN {NO}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"boolCol IN {YES}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"boolCol IN {NO, YES}"];
 
     // int
-    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {1}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"intCol IN {1, 2}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"intCol IN {0, 2, 3}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"intCol IN {1}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"intCol IN {1, 2}"];
 
     // float
-    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {1}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"floatCol IN {1, 2}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"floatCol IN {0, 2, 3}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"floatCol IN {1}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"floatCol IN {1, 2}"];
 
     // double
-    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {1}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"doubleCol IN {1, 2}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"doubleCol IN {0, 2, 3}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"doubleCol IN {1}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"doubleCol IN {1, 2}"];
 
     // NSString
-    [self testClass:[StringObject class] countWhere:@"stringCol IN {'abc'}" withNormalCount:1 notCount:0];
-    [self testClass:[StringObject class] countWhere:@"stringCol IN {'def'}" withNormalCount:0 notCount:1];
-    [self testClass:[StringObject class] countWhere:@"stringCol IN {'ABC'}" withNormalCount:0 notCount:1];
-    [self testClass:[StringObject class] countWhere:@"stringCol IN[c] {'abc'}" withNormalCount:1 notCount:0];
-    [self testClass:[StringObject class] countWhere:@"stringCol IN[c] {'ABC'}" withNormalCount:1 notCount:0];
+    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN {'abc'}"];
+    [self testClass:[StringObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'def'}"];
+    [self testClass:[StringObject class] withNormalCount:0 notCount:1 where:@"stringCol IN {'ABC'}"];
+    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'abc'}"];
+    [self testClass:[StringObject class] withNormalCount:1 notCount:0 where:@"stringCol IN[c] {'ABC'}"];
 
     // NSData
     // Can't represent NSData with NSPredicate literal. See format predicates below
@@ -1445,87 +1450,89 @@
     // Can't represent NSDate with NSPredicate literal. See format predicates below
 
     // bool
-    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {NO}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {YES}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"cBoolCol IN {NO, YES}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"cBoolCol IN {NO}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"cBoolCol IN {YES}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"cBoolCol IN {NO, YES}"];
 
     // int64_t
-    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {0, 2, 3}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {1}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"longCol IN {1, 2}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"longCol IN {0, 2, 3}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"longCol IN {1}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"longCol IN {1, 2}"];
 
     // mixed
     // FIXME: Support IN predicates with mixed properties
     XCTAssertThrows([AllTypesObject objectsWhere:@"mixedCol IN {0, 2, 3}"]);
+    XCTAssertThrows([AllTypesObject objectsWhere:@"NOT(mixedCol IN {0, 2, 3})"]);
 
     // string subobject
-    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'abc'}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'def'}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN {'ABC'}" withNormalCount:0 notCount:1];
-    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN[c] {'abc'}" withNormalCount:1 notCount:0];
-    [self testClass:[AllTypesObject class] countWhere:@"objectCol.stringCol IN[c] {'ABC'}" withNormalCount:1 notCount:0];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"objectCol.stringCol IN {'abc'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"objectCol.stringCol IN {'def'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"objectCol.stringCol IN {'ABC'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"objectCol.stringCol IN[c] {'abc'}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"objectCol.stringCol IN[c] {'ABC'}"];
 
     ////////////////////////
     // Format Predicates
     ////////////////////////
 
     // BOOL
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@YES]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"boolCol IN %@", @[@NO, @YES]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"boolCol IN %@", @[@NO]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"boolCol IN %@", @[@YES]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"boolCol IN %@", @[@NO, @YES]];
 
     // int
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@0, @2, @3]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"intCol IN %@", @[@1, @2]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"intCol IN %@", @[@0, @2, @3]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"intCol IN %@", @[@1]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"intCol IN %@", @[@1, @2]];
 
     // float
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@0, @2, @3]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"floatCol IN %@", @[@1, @2]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"floatCol IN %@", @[@0, @2, @3]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"floatCol IN %@", @[@1]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"floatCol IN %@", @[@1, @2]];
 
     // double
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@0, @2, @3]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"doubleCol IN %@", @[@1, @2]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"doubleCol IN %@", @[@0, @2, @3]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"doubleCol IN %@", @[@1]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"doubleCol IN %@", @[@1, @2]];
 
     // NSString
-    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"abc"]] count]));
-    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"def"]] count]));
-    XCTAssertEqual(0U, ([[StringObject objectsWhere:@"stringCol IN %@", @[@"ABC"]] count]));
-    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"abc"]] count]));
-    XCTAssertEqual(1U, ([[StringObject objectsWhere:@"stringCol IN[c] %@", @[@"ABC"]] count]));
+    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN %@", @[@"abc"]];
+    [self testClass:[StringObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"def"]];
+    [self testClass:[StringObject class] withNormalCount:0U notCount:1U where:@"stringCol IN %@", @[@"ABC"]];
+    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"abc"]];
+    [self testClass:[StringObject class] withNormalCount:1U notCount:0U where:@"stringCol IN[c] %@", @[@"ABC"]];
 
     // NSData
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"binaryCol IN %@", @[[@"" dataUsingEncoding:NSUTF8StringEncoding]]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding]]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"binaryCol IN %@", @[[@"a" dataUsingEncoding:NSUTF8StringEncoding], [@"b" dataUsingEncoding:NSUTF8StringEncoding]]];
 
     // NSDate
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0]]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"dateCol IN %@", @[[NSDate dateWithTimeIntervalSince1970:0], [NSDate dateWithTimeIntervalSince1970:1]]];
 
     // bool
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@YES]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"cBoolCol IN %@", @[@NO, @YES]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"cBoolCol IN %@", @[@NO]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"cBoolCol IN %@", @[@YES]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"cBoolCol IN %@", @[@NO, @YES]];
 
     // int64_t
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@0, @2, @3]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"longCol IN %@", @[@1, @2]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"longCol IN %@", @[@0, @2, @3]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"longCol IN %@", @[@1]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"longCol IN %@", @[@1, @2]];
 
     // mixed
     // FIXME: Support IN predicates with mixed properties
     XCTAssertThrows(([[AllTypesObject objectsWhere:@"mixedCol IN %@", @[@0, @2, @3]] count]));
+    XCTAssertThrows(([[AllTypesObject objectsWhere:@"NOT(mixedCol IN %@)", @[@0, @2, @3]] count]));
 
     // string subobject
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"abc"]] count]));
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"def"]] count]));
-    XCTAssertEqual(0U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN %@", @[@"ABC"]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"abc"]] count]));
-    XCTAssertEqual(1U, ([[AllTypesObject objectsWhere:@"objectCol.stringCol IN[c] %@", @[@"ABC"]] count]));
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"objectCol.stringCol IN %@", @[@"abc"]];
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"objectCol.stringCol IN %@", @[@"def"]];
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"objectCol.stringCol IN %@", @[@"ABC"]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"objectCol.stringCol IN[c] %@", @[@"abc"]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"objectCol.stringCol IN[c] %@", @[@"ABC"]];
 }
 
 - (void)testArrayIn
