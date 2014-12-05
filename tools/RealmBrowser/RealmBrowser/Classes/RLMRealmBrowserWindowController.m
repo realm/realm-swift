@@ -194,6 +194,8 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
 {
     RLMRealmBrowserWindowController *wc = [[RLMRealmBrowserWindowController alloc] initWithWindowNibName:self.windowNibName];
     wc.modelDocument = self.modelDocument;
+    wc.window.alphaValue = 1.0;
+    [wc.outlineViewController realmDidLoad];
     [self.modelDocument addWindowController:wc];
     [self.modelDocument showWindows];
     [wc addNavigationState:state fromViewController:wc.tableViewController];
