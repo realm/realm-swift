@@ -27,6 +27,7 @@ Pod::Spec.new do |s|
   s.source_files            = 'Realm/*.{m,mm}', 'core/**/*.{h,hpp}'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
+  s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '6.0'
   s.ios.vendored_library    = 'core/libtightdb-ios.a'

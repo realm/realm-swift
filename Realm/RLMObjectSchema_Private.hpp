@@ -37,7 +37,10 @@
 
 @property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
 
+// The Realm retains its object schemas, so they need to not retain the Realm
+@property (nonatomic, unsafe_unretained) RLMRealm *realm;
 @property (nonatomic, readwrite, strong) NSDictionary *defaultValues;
+@property (nonatomic, readonly) tightdb::Table *table;
 
 // returns a cached or new schema for a given object class
 // creates standalone accessor classes for the object schema if create is YES

@@ -682,13 +682,13 @@
 
     XCTAssertEqual(1U, OwnerObject.allObjects.count);
     XCTAssertEqual(1U, DogObject.allObjects.count);
-    XCTAssertEqual(NO, obj.deletedFromRealm);
+    XCTAssertEqual(NO, obj.invalidated);
 
     XCTAssertThrows([realm deleteAllObjects]);
 
     [realm transactionWithBlock:^{
         [realm deleteAllObjects];
-        XCTAssertEqual(YES, obj.deletedFromRealm);
+        XCTAssertEqual(YES, obj.invalidated);
     }];
 
     XCTAssertEqual(0U, OwnerObject.allObjects.count);
@@ -703,7 +703,7 @@
     IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(createdObject.isDeletedFromRealm);
+    XCTAssertTrue(createdObject.isInvalidated);
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -719,7 +719,7 @@
     [realm deleteObject:objectToDelete];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(objectToDelete.isDeletedFromRealm);
+    XCTAssertTrue(objectToDelete.isInvalidated);
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -903,5 +903,101 @@
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
     }];
+}
+
+- (void)testCanRestartReadTransactionAfterInvalidate
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    [realm invalidate];
+    IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
+    XCTAssertEqual(obj.intCol, 1);
+}
+
+- (void)testInvalidateDetachesAccessors
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *obj;
+    [realm transactionWithBlock:^{
+        obj = [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    [realm invalidate];
+    XCTAssertTrue(obj.isInvalidated);
+    XCTAssertThrows([obj intCol]);
+}
+
+- (void)testInvalidateInvalidatesResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    RLMResults *results = [IntObject objectsInRealm:realm where:@"intCol = 1"];
+    XCTAssertEqual([results.firstObject intCol], 1);
+
+    [realm invalidate];
+    XCTAssertThrows([results count]);
+    XCTAssertThrows([results firstObject]);
+}
+
+- (void)testInvalidateInvalidatesArrays
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block ArrayPropertyObject *arrayObject;
+    [realm transactionWithBlock:^{
+        arrayObject = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[@[@1]]]];
+    }];
+
+    RLMArray *array = arrayObject.intArray;
+    XCTAssertEqual(1U, array.count);
+
+    [realm invalidate];
+    XCTAssertThrows([array count]);
+}
+
+- (void)testInvalidteOnReadOnlyRealmIsError
+{
+    @autoreleasepool {
+        // Create the file
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertThrows([realm invalidate]);
+}
+
+- (void)testRefreshCreatesAReadTransaction
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_group_t group = dispatch_group_create();
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertTrue([realm refresh]);
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    // refresh above should have created a read transaction, so realm should
+    // still only see one object
+    XCTAssertEqual(1U, [IntObject allObjects].count);
+
+    // Just a sanity check
+    XCTAssertTrue([realm refresh]);
+    XCTAssertEqual(2U, [IntObject allObjects].count);
 }
 @end
