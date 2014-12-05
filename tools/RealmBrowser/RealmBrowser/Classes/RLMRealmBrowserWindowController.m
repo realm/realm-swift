@@ -19,6 +19,7 @@
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMNavigationStack.h"
 #import "RLMModelExporter.h"
+#import "Realm_Private.h"
 
 NSString * const kRealmLockedImage = @"RealmLocked";
 NSString * const kRealmUnlockedImage = @"RealmUnlocked";
@@ -28,14 +29,6 @@ NSString * const kRealmKeyIsLockedForRealm = @"LockedRealm:%@";
 
 NSString * const kRealmKeyWindowFrameForRealm = @"WindowFrameForRealm:%@";
 NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
-
-@interface RLMRealm (Dynamic)
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
-@end
-
-@interface RLMArray (Private)
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-@end
 
 @interface RLMRealmBrowserWindowController()<NSWindowDelegate>
 

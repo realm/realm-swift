@@ -37,6 +37,7 @@
 #import "objc/objc-class.h"
 
 #import "RLMDescriptions.h"
+#import "Realm_Private.h"
 
 @interface RLMObject ()
 
