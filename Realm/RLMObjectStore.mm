@@ -312,6 +312,9 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
 
         // set the ivars for object and array properties to nil as otherwise the
         // accessors retain objects that are no longer accessible via the properties
+        // this is mainly an issue when the object graph being added has cycles,
+        // as it's not obvious that the user has to set the *ivars* to nil to
+        // avoid leaking memory
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
         }
