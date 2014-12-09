@@ -735,8 +735,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         }
     }
 
-    // clear cache for future callers
-    clearRealmCache();
     return nil;
 }
 
