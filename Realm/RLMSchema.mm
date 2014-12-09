@@ -167,15 +167,6 @@ NSUInteger RLMRealmSchemaVersion(RLMRealm *realm) {
 
 void RLMRealmSetSchemaVersion(RLMRealm *realm, NSUInteger version) {
     tightdb::TableRef table = realm.group->get_or_add_table(c_metadataTableName);
-    if (table->get_column_count() == 0) {
-        // create columns
-        table->add_column(tightdb::type_Int, c_versionColumnName);
-
-        // set initial version
-        table->add_empty_row();
-        table->set_int(c_versionColumnIndex, 0, RLMNotVersioned);
-    }
-
     table->set_int(c_versionColumnIndex, 0, version);
 }
 
@@ -191,13 +182,25 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
     return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
 }
 
-void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey) {
+void RLMRealmCreateMetadataTables(RLMRealm *realm) {
     tightdb::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
     if (table->get_column_count() == 0) {
-        // create columns
         table->add_column(tightdb::type_String, c_primaryKeyObjectClassColumnName);
         table->add_column(tightdb::type_String, c_primaryKeyPropertyNameColumnName);
     }
+
+    table = realm.group->get_or_add_table(c_metadataTableName);
+    if (table->get_column_count() == 0) {
+        table->add_column(tightdb::type_Int, c_versionColumnName);
+
+        // set initial version
+        table->add_empty_row();
+        table->set_int(c_versionColumnIndex, 0, RLMNotVersioned);
+    }
+}
+
+void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey) {
+    tightdb::TableRef table = realm.group->get_table(c_primaryKeyTableName);
 
     // get row or create if new object and populate
     size_t row = table->find_first_string(c_primaryKeyObjectClassColumnIndex, RLMStringDataWithNSString(objectClass));

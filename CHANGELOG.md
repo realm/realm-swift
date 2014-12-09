@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Merge native Swift default property values with defaultPropertyValues().
+* Don't leave the database schema partially updated when opening a realm fails
+  due to a migration being needed.
 
 
 0.88.0 Release notes (2014-12-02)
