@@ -16,15 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTypeNode.h"
+#import <Cocoa/Cocoa.h>
 
-@class RLMArrayNode;
-@interface RLMObjectNode : RLMTypeNode
+@interface RLMTableHeaderCell : NSTableHeaderCell
 
-@property (nonatomic) id<RLMRealmOutlineNode> childNode;
-@property (nonatomic) id<RLMRealmOutlineNode> parentNode;
-
-- (instancetype)initWithObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
+@property (nonatomic) NSString *firstLine;
+@property (nonatomic) NSString *secondLine;
 
 @end

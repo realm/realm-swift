@@ -106,7 +106,7 @@
                                                 <action selector="saveJavaModels:" target="-1" id="6op-mb-kj6"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Save Objective C definitions..." id="yRS-DK-aHw">
+                                        <menuItem title="Save Objective-C definitions..." id="yRS-DK-aHw">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="saveObjcModels:" target="-1" id="6Rj-7H-W6J"/>
@@ -124,31 +124,59 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Tools" id="QHR-Bb-K4I">
+                <menuItem title="Edit" id="QHR-Bb-K4I">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Tools" id="y0u-fA-7CK">
+                    <menu key="submenu" title="Edit" id="y0u-fA-7CK">
                         <items>
-                            <menuItem title="Generate demo database" id="sHB-lE-A0K">
+                            <menuItem title="Delete object" tag="100" id="Kvq-ch-tH8">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <connections>
+                                    <action selector="deleteObjectsAction:" target="-1" id="ONd-wB-hIM"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Add new object" tag="101" keyEquivalent="+" id="9cP-yO-4m2">
+                                <connections>
+                                    <action selector="addObjectsAction:" target="-1" id="rvy-Ho-ulx"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="rE6-ne-fLw"/>
+                            <menuItem title="Remove object from array" tag="110" id="XeB-wT-76a">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="removeRowsFromArrayAction:" target="-1" id="0zM-g2-uNZ"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove object from array and delete" tag="111" id="dEm-Cz-ggu">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="deleteRowsFromArrayAction:" target="-1" id="cOY-tf-Nwc"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Add new objects to array" tag="112" keyEquivalent="+" id="NDc-iI-dKd">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="addRowsToArrayAction:" target="-1" id="v6Y-zi-8rX"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Tools" id="VMz-0o-2zQ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Tools" id="wdT-VW-ieg">
+                        <items>
+                            <menuItem title="Generate demo database" id="7kr-9Q-AVq">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="generatedDemoDatabase:" target="-1" id="9cb-1W-suN"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Delete object" tag="2" id="Kvq-ch-tH8">
-                                <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
-                                <connections>
-                                    <action selector="selectedDeleteRow:" target="-1" id="2sn-kO-m78"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Remove object from array" tag="10" id="dEm-Cz-ggu">
-                                <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
-                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
-                                <connections>
-                                    <action selector="selectedRemoveRow:" target="-1" id="RgR-56-sid"/>
+                                    <action selector="generatedDemoDatabase:" target="-1" id="jBw-mZ-hAB"/>
                                 </connections>
                             </menuItem>
                         </items>

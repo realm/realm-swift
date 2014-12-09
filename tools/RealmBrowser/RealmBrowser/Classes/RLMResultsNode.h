@@ -18,13 +18,8 @@
 
 #import "RLMTypeNode.h"
 
-@class RLMArrayNode;
-@interface RLMObjectNode : RLMTypeNode
+@interface RLMResultsNode : RLMTypeNode
 
-@property (nonatomic) id<RLMRealmOutlineNode> childNode;
-@property (nonatomic) id<RLMRealmOutlineNode> parentNode;
-
-- (instancetype)initWithObject:(RLMObject *)object realm:(RLMRealm *)realm;
-- (RLMArrayNode *)displayChildArrayFromProperty:(RLMProperty *)property object:(RLMObject *)object;
+- (instancetype)initWithQuery:(NSString *)searchText result:(RLMResults *)result andParent:(RLMTypeNode *)classNode;
 
 @end

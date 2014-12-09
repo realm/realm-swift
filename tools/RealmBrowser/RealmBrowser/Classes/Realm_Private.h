@@ -29,7 +29,9 @@
 
 - (RLMResults *)allObjects:(NSString *)className;
 
-- (RLMArray *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+
+- (RLMObject *)createObject:(NSString *)className withObject:(id)object;
 
 @end
 
