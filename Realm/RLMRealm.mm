@@ -319,7 +319,11 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     }
 
     // try to reuse existing realm first
-    __autoreleasing RLMRealm *realm = cachedRealm(path);
+    __autoreleasing RLMRealm *realm = nil;
+    if (!dynamic && !customSchema) {
+        realm = cachedRealm(path);
+    }
+
     if (realm) {
         // if already opened with different read permissions then throw
         if (realm->_readOnly != readonly) {
