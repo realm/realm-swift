@@ -169,10 +169,29 @@
     XCTAssertEqualObjects(@"b", [results[1] data]);
 }
 
-// FIXME - disabled until we fix commit log issue which break transacions when leaking realm objects
-/*
-- (void)testCircularLinks
- {
+- (void)testAddingCircularReferenceDoesNotLeakSourceObjects {
+    CircleObject __weak *weakObj0, __weak *weakObj1;
+    @autoreleasepool {
+        CircleObject *obj0 = [[CircleObject alloc] initWithObject:@[@"a", NSNull.null]];
+        CircleObject *obj1 = [[CircleObject alloc] initWithObject:@[@"b", obj0]];
+        obj0.next = obj1;
+
+        weakObj0 = obj0;
+        weakObj1 = obj1;
+
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        [realm addObject:obj0];
+        obj0.next = nil;
+        obj1.next = nil;
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertNil(weakObj0);
+    XCTAssertNil(weakObj1);
+}
+
+- (void)testCircularLinks {
     RLMRealm *realm = [self realmWithTestPath];
 
     CircleObject *obj = [[CircleObject alloc] init];
@@ -184,10 +203,10 @@
     obj.next.data = @"b";
     [realm commitWriteTransaction];
 
-    CircleObject *obj1 = [realm allObjects:CircleObject.className].firstObject;
+    CircleObject *obj1 = [CircleObject allObjectsInRealm:realm].firstObject;
     XCTAssertEqualObjects(obj1.data, @"b", @"data should be 'b'");
     XCTAssertEqualObjects(obj1.data, obj.next.data, @"objects should be equal");
-}*/
+ }
 
 @end
 
