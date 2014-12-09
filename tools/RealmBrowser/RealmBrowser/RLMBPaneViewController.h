@@ -13,7 +13,8 @@
 @class RLMBPaneViewController;
 @protocol RLMBCanvasDelegate <NSObject>
 
-- (RLMBPaneViewController *)addPaneAfterPane:(RLMBPaneViewController *)pane;
+- (void)addPaneWithArray:(RLMArray *)array afterPane:(RLMBPaneViewController *)pane;
+//- (void)toggleWidthOfPane:(RLMBPaneViewController *)pane;
 
 @end
 
@@ -21,6 +22,9 @@
 @interface RLMBPaneViewController : NSViewController
 
 @property (weak, nonatomic) id<RLMBCanvasDelegate> canvasDelegate;
+
+@property (nonatomic) NSLayoutConstraint *widthConstraint;
+@property (nonatomic, readonly) BOOL isWide;
 
 @property (weak) IBOutlet NSTextField *classNameLabel;
 @property (weak) IBOutlet NSSearchField *searchField;

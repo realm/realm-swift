@@ -110,6 +110,12 @@
     //    }
 }
 
+#pragma mark - User Actions
+
+- (IBAction)toggleWidthAction:(NSButton *)sender {
+//    [self.canvasDelegate toggleWidthOfPane:self];
+}
+
 - (IBAction)userClicked:(NSTableView *)sender
 {
     if (self.tableView.selectedRowIndexes.count > 1) {
@@ -136,11 +142,15 @@
 //        RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
     }
     else if (property.type == RLMPropertyTypeArray) {
-        RLMArray *linkedArray = (RLMArray *)propertyValue;
-        RLMObjectSchema *linkedObjectSchema = [linkedArray.realm.schema schemaForClassName:linkedArray.objectClassName];
-        RLMBPaneViewController *pane = [self.canvasDelegate addPaneAfterPane:self];
-        [pane updateWithObjects:linkedArray objectSchema:linkedObjectSchema];
+        [self.canvasDelegate addPaneWithArray:propertyValue afterPane:self];
     }
+}
+
+#pragma mark - Public Methods - Getters
+
+-(BOOL)isWide
+{
+    return self.widthConstraint.multiplier > 0.75;
 }
 
 @end

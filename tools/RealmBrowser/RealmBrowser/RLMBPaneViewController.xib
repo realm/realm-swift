@@ -132,6 +132,9 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="label"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="toggleWidthAction:" target="-2" id="p2B-JV-GR3"/>
+                    </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dW1-fU-Pol">
                     <rect key="frame" x="8" y="332" width="38" height="17"/>
