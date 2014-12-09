@@ -18,9 +18,6 @@
 
 #import <Realm/Realm.h>
 
-#ifndef RealmBrowser_Realm_Private_h
-#define RealmBrowser_Realm_Private_h
-
 @interface RLMRealm (Dynamic)
 
 + (instancetype)realmWithPath:(NSString *)path
@@ -43,5 +40,3 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 
 @end
-
-#endif

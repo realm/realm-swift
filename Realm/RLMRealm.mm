@@ -169,14 +169,17 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (void)initialize {
-    // set up global realm cache
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        RLMCheckForUpdates();
+    static bool initialized;
+    if (initialized) {
+        return;
+    }
+    initialized = true;
 
-        // initilize realm cache
-        clearRealmCache();
-    });
+    // set up global realm cache
+    RLMCheckForUpdates();
+
+    // initilize realm cache
+    clearRealmCache();
 }
 
 - (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error {
@@ -732,8 +735,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         }
     }
 
-    // clear cache for future callers
-    clearRealmCache();
     return nil;
 }
 

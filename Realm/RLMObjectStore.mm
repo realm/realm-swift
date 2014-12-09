@@ -25,7 +25,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMUtil.hpp"
 
-#import <objc/runtime.h>
+#import <objc/message.h>
 
 static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
@@ -308,6 +308,15 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options)
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
             RLMDynamicSet(object, prop, value, options | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+        }
+
+        // set the ivars for object and array properties to nil as otherwise the
+        // accessors retain objects that are no longer accessible via the properties
+        // this is mainly an issue when the object graph being added has cycles,
+        // as it's not obvious that the user has to set the *ivars* to nil to
+        // avoid leaking memory
+        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+            ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
         }
     }
 

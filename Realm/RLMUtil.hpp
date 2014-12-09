@@ -39,6 +39,10 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema);
 // returns array with allocated child objects
 NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema);
 
+// gets default values for the given schema (+defaultPropertyValues)
+// merges with native property defaults if Swift class
+NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
+
 // throws if the values in dict or properties in a kvc object are not valid for the given schema
 // inserts default values for missing properties when allowMissing is false
 // throws for missing properties when allowMissing is false

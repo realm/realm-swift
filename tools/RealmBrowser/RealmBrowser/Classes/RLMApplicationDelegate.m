@@ -324,7 +324,7 @@ NSString *const kDocumentsFolder = @"/Documents";
                 alert.showsHelp = NO;
                 alert.informativeText = @"A demo database has been generated. Would you like to open it?";
                 alert.messageText = @"Open demo database?";
-                [alert addButtonWithTitle:@"OK"];
+                [alert addButtonWithTitle:@"Open"];
                 [alert addButtonWithTitle:@"Cancel"];
                 
                 NSUInteger response = [alert runModal];

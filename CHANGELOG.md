@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Fix a memory leak when circularly linked objects are added to a Realm.
+
+### Bugfixes
+
+* Merge native Swift default property values with defaultPropertyValues().
+
+
 0.88.0 Release notes (2014-12-02)
 =============================================================
 

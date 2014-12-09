@@ -26,6 +26,15 @@ class OuterClass {
     }
 }
 
+class SwiftDefaultObject: RLMObject {
+    dynamic var intCol = 1
+    dynamic var boolCol = true
+
+    override class func defaultPropertyValues() -> [NSObject : AnyObject]! {
+        return ["intCol": 2]
+    }
+}
+
 class SwiftObjectInterfaceTests: SwiftTestCase {
 
     // Swift models
@@ -82,6 +91,17 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
         XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
+    }
+
+    func testMergedDefaultValuesSwiftObject() {
+        let realm = self.realmWithTestPath()
+        realm.beginWriteTransaction()
+        SwiftDefaultObject.createInRealm(realm, withObject: NSDictionary())
+        realm.commitWriteTransaction()
+
+        let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as SwiftDefaultObject
+        XCTAssertEqual(object.intCol, 2, "defaultPropertyValues should override native property default value")
+        XCTAssertEqual(object.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
     }
 
     func testOptionalSwiftProperties() {
