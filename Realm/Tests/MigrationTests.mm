@@ -445,5 +445,11 @@ extern "C" {
     }
 }
 
+- (void)testMigrationDoesNotEffectOtherPaths {
+    RLMRealm *defaultRealm = RLMRealm.defaultRealm;
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    XCTAssertEqual(defaultRealm, RLMRealm.defaultRealm);
+}
+
 @end
 
