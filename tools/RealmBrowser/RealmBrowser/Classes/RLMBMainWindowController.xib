@@ -58,7 +58,7 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="mdc-yO-6NF">
-                                                                    <rect key="frame" x="18" y="-1" width="171" height="19"/>
+                                                                    <rect key="frame" x="18" y="-1" width="184" height="19"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="Table View Cell" id="2IY-9P-8bR">
                                                                         <font key="font" metaFont="system" size="16"/>
                                                                         <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
@@ -66,8 +66,8 @@
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZUF-ZJ-fhq" userLabel="Badge">
-                                                                    <rect key="frame" x="197" y="-3" width="37" height="22"/>
-                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="12" bezelStyle="round" id="fRn-qp-c4c" userLabel="Badge">
+                                                                    <rect key="frame" x="210" y="0.0" width="24" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="center" title="12" drawsBackground="YES" usesSingleLineMode="YES" id="fRn-qp-c4c" userLabel="Badge">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" red="0.99385625119999998" green="0.71936738489999996" blue="0.73074811699999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -121,7 +121,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kfK-Ex-zDe">
-                                            <rect key="frame" x="18" y="43" width="149" height="115"/>
+                                            <rect key="frame" x="69" y="-136" width="196" height="46"/>
                                         </view>
                                     </subviews>
                                 </clipView>
@@ -181,7 +181,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="-739.5" y="-24.5"/>
+            <point key="canvasLocation" x="-774.5" y="-56.5"/>
         </window>
     </objects>
     <resources>

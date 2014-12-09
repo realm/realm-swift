@@ -269,26 +269,24 @@ CGFloat const kRLMBPaneThinWidth = 300;
 
 - (void)makePaneWide:(NSInteger)index
 {
-    NSLog(@"make pane wide: %lu", index);
-
     for (NSInteger i = 0; i < self.panes.count; i++) {
         [self toggleWidthOfPane:self.panes[i] toWide:i == index];
     }
 }
 
-- (void)scrollToPane:(NSUInteger)index
-{
-    NSView *pane = [self.panes[index] view];
-    
-    NSClipView *clipView = self.scrollView.contentView;
-    NSPoint corner;
-    corner.x = NSMaxX(pane.frame) + kRLMBPaneMargin - NSWidth(clipView.bounds);
-    
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.5];
-    [clipView.animator setBoundsOrigin:corner];
-    [NSAnimationContext endGrouping];
-}
+//- (void)scrollToPane:(NSUInteger)index
+//{
+//    NSView *pane = [self.panes[index] view];
+//    
+//    NSClipView *clipView = self.scrollView.contentView;
+//    NSPoint corner;
+//    corner.x = NSMaxX(pane.frame) + kRLMBPaneMargin - NSWidth(clipView.bounds);
+//    
+//    [NSAnimationContext beginGrouping];
+//    [[NSAnimationContext currentContext] setDuration:0.5];
+//    [clipView.animator setBoundsOrigin:corner];
+//    [NSAnimationContext endGrouping];
+//}
 
 #pragma mark - Private Methods - Constraints
 

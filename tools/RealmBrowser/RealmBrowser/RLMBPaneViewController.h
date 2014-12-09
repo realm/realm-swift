@@ -35,7 +35,7 @@
 
 @property (nonatomic) id<RLMCollection> objects;
 
-- (void)setupColumnsWithProperties:(NSArray *)properties;
+//- (void)setupColumnsWithProperties:(NSArray *)properties;
 - (void)updateWithObjects:(id<RLMCollection>)objects objectSchema:(RLMObjectSchema *)objectSchema;
 
 @end

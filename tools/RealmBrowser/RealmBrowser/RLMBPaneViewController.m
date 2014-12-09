@@ -8,6 +8,8 @@
 
 #import "RLMBPaneViewController.h"
 
+#define GUTTER_COLUMN -1
+
 @interface RLMBPaneViewController () <NSTableViewDataSource, NSTableViewDelegate>
 
 @end
@@ -19,7 +21,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.formatter = [RLMBFormatter new];
+        self.formatter = [[RLMBFormatter alloc] initWithOwner:self];
     }
     
     return self;
@@ -53,23 +55,19 @@
     [tableView reloadData];
     
     [tableView beginUpdates];
-    // If array, add extra first column with numbers
-    //    if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
-    //        RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
-    //        tableColumn.propertyType = RLMPropertyTypeInt;
-    //
-    //        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
-    //        headerCell.wraps = YES;
-    //        headerCell.firstLine = @"";
-    //        headerCell.secondLine = @"#";
-    //        tableColumn.headerCell = headerCell;
-    //
-    //        tableColumn.headerToolTip = @"Order of object within array";
-    //
-    //        [self addTableColumn:tableColumn];
-    //    }
+
+    NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:@"#"];
+    gutterColumn.width = 30;
     
-    // ... and add new columns matching the structure of the new realm table.
+//    NSTableHeaderCell *headerCell = gutterColumn.headerCell;
+//    headerCell.wraps = YES;
+//    headerCell.firstLine = @"";
+//    headerCell.secondLine = @"#";
+//    tableColumn.headerCell = headerCell;
+
+//    gutterColumn.headerToolTip = @"Order of object within array";
+    
+    [self.tableView addTableColumn:gutterColumn];
     
     for (RLMProperty *property in properties) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
@@ -92,7 +90,12 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    NSUInteger column = [tableView.tableColumns indexOfObject:tableColumn];
+    NSUInteger column = [self indexOfColumn:tableColumn inTable:tableView];
+    
+    if (column == GUTTER_COLUMN) {
+        return [self.formatter cellViewForGutter:tableView];
+    }
+    
     RLMObject *object = self.objects[row];
     RLMProperty *property = self.objectSchema.properties[column];
     
@@ -108,6 +111,13 @@
     //
     //        return basicCellView;
     //    }
+}
+
+-(NSUInteger)indexOfColumn:(NSTableColumn *)column inTable:(NSTableView *)tableView
+{
+    NSUInteger index = [tableView.tableColumns indexOfObject:column];
+
+    return index - 1;
 }
 
 #pragma mark - User Actions

@@ -19,6 +19,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
 
 @interface RLMBFormatter ()
 
+@property (nonatomic, weak) RLMBPaneViewController *owner;
 @property (nonatomic) NSNumberFormatter *numberFormatter;
 @property (nonatomic) NSDateFormatter *dateFormatter;
 
@@ -29,10 +30,12 @@ const NSUInteger kMaxObjectCharsForTable = 200;
 
 #pragma mark - Lifetime Methods
 
-- (instancetype)init
+- (instancetype)initWithOwner:(RLMBPaneViewController *)owner
 {
     self = [super init];
     if (self) {
+        self.owner = owner;
+        
         self.dateFormatter = [[NSDateFormatter alloc] init];
         self.dateFormatter.dateStyle = NSDateFormatterMediumStyle;
         self.dateFormatter.timeStyle = NSDateFormatterShortStyle;
@@ -44,13 +47,19 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     return self;
 }
 
+- (NSTableCellView *)cellViewForGutter:(NSTableView *)tableView
+{
+    NSTableCellView *gutterCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+    return gutterCellView;
+}
+
 - (NSTableCellView *)tableView:(NSTableView *)tableView cellViewForValue:(id)value type:(RLMPropertyType)type
 {
     NSTableCellView *cellView;
     
     switch (type) {
         case RLMPropertyTypeArray: {
-            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
             NSString *string = [self printablePropertyValue:value ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
@@ -67,7 +76,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeBool: {
-            NSTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            NSTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
             
             boolCellView.textField.stringValue = [(NSNumber *)value boolValue] ? @"YES" : @"NO";
             
@@ -82,7 +91,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
-            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
             numberCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
             //            numberCellView.textField.delegate = self;
             
@@ -95,7 +104,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeObject: {
-            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
 //            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
 //            linkCellView.delegate = self;
             
@@ -113,7 +122,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeString: {
-            NSTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self];
+            NSTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
             basicCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
 //            basicCellView.textField.delegate = self;
 //            basicCellView.textField.editable = !self.realmIsLocked && type != RLMPropertyTypeData;

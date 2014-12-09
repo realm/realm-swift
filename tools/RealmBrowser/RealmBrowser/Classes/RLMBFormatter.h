@@ -9,8 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h> // FIXME
 
+@class RLMBPaneViewController;
 @interface RLMBFormatter : NSObject
 
+- (instancetype)initWithOwner:(RLMBPaneViewController *)owner;
+
+- (NSTableCellView *)cellViewForGutter:(NSTableView *)tableView;
 - (NSTableCellView *)tableView:(NSTableView *)tableView cellViewForValue:(id)value type:(RLMPropertyType)type;
 - (NSString *)typeNameForProperty:(RLMProperty *)property;
 
