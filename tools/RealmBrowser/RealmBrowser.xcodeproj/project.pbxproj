@@ -508,6 +508,9 @@
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Realm inc.";
 				TargetAttributes = {
+					84E0F94B1921F3B900D6CA14 = {
+						DevelopmentTeam = 9GCBJ97HG6;
+					};
 					84E0F96F1921F3B900D6CA14 = {
 						TestTargetID = 84E0F94B1921F3B900D6CA14;
 					};
@@ -762,6 +765,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -786,6 +790,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
