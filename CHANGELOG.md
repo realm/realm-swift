@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Fix a memory leak when circularly linked objects are added to a Realm.
 
 ### Bugfixes
 
