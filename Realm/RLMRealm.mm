@@ -131,15 +131,18 @@ void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     [realm beginWriteTransaction];
 
     @try {
+        RLMRealmCreateMetadataTables(realm);
         if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
             RLMRealmSetSchemaVersion(realm, s_currentSchemaVersion);
         }
         RLMRealmCreateTables(realm, targetSchema, false);
     }
-    @finally {
-        // FIXME: should rollback on exceptions rather than commit once that's implemented
-        [realm commitWriteTransaction];
+    @catch (NSException *) {
+        [realm cancelWriteTransaction];
+        @throw;
     }
+
+    [realm commitWriteTransaction];
 }
 
 } // anonymous namespace
