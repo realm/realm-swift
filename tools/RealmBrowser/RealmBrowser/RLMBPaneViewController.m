@@ -57,6 +57,7 @@
     [tableView beginUpdates];
 
     NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:@"#"];
+    [gutterColumn.headerCell setStringValue:@"#"];
     gutterColumn.width = 30;
     
 //    NSTableHeaderCell *headerCell = gutterColumn.headerCell;
@@ -71,8 +72,11 @@
     
     for (RLMProperty *property in properties) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
+        tableColumn.identifier = property.name;
         NSString *typeName = [self.formatter typeNameForProperty:property];
         [tableColumn.headerCell setStringValue:[NSString stringWithFormat:@"%@: %@", property.name, typeName]];
+        NSLog(@"adding column: %@", [tableColumn.headerCell stringValue]);
+
         [tableView addTableColumn:tableColumn];
     }
     
@@ -90,14 +94,14 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    NSUInteger column = [self indexOfColumn:tableColumn inTable:tableView];
+    NSUInteger index = [self propertyIndexOfColumn:tableColumn inTable:tableView];
     
-    if (column == GUTTER_COLUMN) {
+    if (index == GUTTER_COLUMN) {
         return [self.formatter cellViewForGutter:tableView];
     }
     
     RLMObject *object = self.objects[row];
-    RLMProperty *property = self.objectSchema.properties[column];
+    RLMProperty *property = self.objectSchema.properties[index];
     
     return [self.formatter tableView:tableView cellViewForValue:object[property.name] type:property.type];
     
@@ -113,11 +117,11 @@
     //    }
 }
 
--(NSUInteger)indexOfColumn:(NSTableColumn *)column inTable:(NSTableView *)tableView
+-(NSUInteger)propertyIndexOfColumn:(NSTableColumn *)column inTable:(NSTableView *)tableView
 {
-    NSUInteger index = [tableView.tableColumns indexOfObject:column];
+    NSUInteger columnIndex = [tableView.tableColumns indexOfObject:column];
 
-    return index - 1;
+    return columnIndex - 1;
 }
 
 #pragma mark - User Actions
@@ -138,11 +142,11 @@
     }
     
     NSInteger column = self.tableView.clickedColumn;
-    if (column >= self.objectSchema.properties.count) {
+    if (column > self.objectSchema.properties.count) {
         return;
     }
 
-    NSInteger propertyIndex = column;
+    NSInteger propertyIndex = column - 1;
     
     RLMProperty *property = self.objectSchema.properties[propertyIndex];
     id propertyValue = self.objects[row][property.name];

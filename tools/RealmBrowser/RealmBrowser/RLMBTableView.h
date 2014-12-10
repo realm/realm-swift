@@ -2,7 +2,7 @@
 //  RLMBTableView.h
 //  RealmBrowser
 //
-//  Created by Gustaf Kugelberg on 28/11/14.
+//  Created by Gustaf Kugelberg on 10/12/14.
 //  Copyright (c) 2014 Realm inc. All rights reserved.
 //
 

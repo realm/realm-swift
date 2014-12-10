@@ -49,7 +49,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
 
 - (NSTableCellView *)cellViewForGutter:(NSTableView *)tableView
 {
-    NSTableCellView *gutterCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+    NSTableCellView *gutterCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
     return gutterCellView;
 }
 
@@ -59,7 +59,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     
     switch (type) {
         case RLMPropertyTypeArray: {
-            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
             NSString *string = [self printablePropertyValue:value ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
@@ -72,11 +72,13 @@ const NSUInteger kMaxObjectCharsForTable = 200;
             
             cellView = badgeCellView;
             
+            NSLog(@"(%@) cell: %@", tableView, cellView);
+            
             break;
         }
             
         case RLMPropertyTypeBool: {
-            NSTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+            NSTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
             
             boolCellView.textField.stringValue = [(NSNumber *)value boolValue] ? @"YES" : @"NO";
             
@@ -91,7 +93,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
-            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
             numberCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
             //            numberCellView.textField.delegate = self;
             
@@ -104,7 +106,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeObject: {
-            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
 //            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
 //            linkCellView.delegate = self;
             
