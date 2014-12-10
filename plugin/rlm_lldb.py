@@ -18,7 +18,7 @@
 ##############################################################################
 
 # In the lldb shell, load with:
-# command script import [Realm path]/plugin/lldb.py --allow-reload
+# command script import [Realm path]/plugin/rlm_lldb.py --allow-reload
 # To load automatically, add that line to your ~/.lldbinit file (which you will
 # have to create if you have not set up any previous lldb scripts), or run this
 # file as a Python script outside of Xcode to install it automatically
