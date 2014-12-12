@@ -46,13 +46,12 @@
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NsG-Wm-faf">
-                    <rect key="frame" x="120" y="93" width="240" height="135"/>
-                    <clipView key="contentView" id="Gr8-wT-Q4e">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="286"/>
+                    <clipView key="contentView" misplaced="YES" id="Gr8-wT-Q4e">
                         <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="17D-hI-QKg" viewBased="YES" id="sKP-TK-7ks">
-                                <rect key="frame" x="0.0" y="0.0" width="238" height="134"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -90,7 +89,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn width="116" minWidth="40" maxWidth="1000" id="y7t-6X-JVP">
+                                    <tableColumn width="356" minWidth="40" maxWidth="1000" id="y7t-6X-JVP">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -104,7 +103,7 @@
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
                                             <tableCellView id="1nh-XW-0h9">
-                                                <rect key="frame" x="120" y="1" width="116" height="17"/>
+                                                <rect key="frame" x="120" y="1" width="356" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fGN-yR-2Ax">
@@ -135,7 +134,7 @@
                         <rect key="frame" x="1" y="119" width="223" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="EHg-ND-cMh">
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="EHg-ND-cMh">
                         <rect key="frame" x="224" y="17" width="15" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
@@ -149,16 +148,16 @@
                 <constraint firstItem="0Aw-ru-i6b" firstAttribute="leading" secondItem="rbA-zd-0Xm" secondAttribute="trailing" constant="5" id="20L-gw-Rz7"/>
                 <constraint firstAttribute="trailing" secondItem="0Aw-ru-i6b" secondAttribute="trailing" constant="8" id="K4W-U3-cMT"/>
                 <constraint firstItem="dW1-fU-Pol" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="9" id="KhC-cG-jab"/>
-                <constraint firstAttribute="bottom" secondItem="NsG-Wm-faf" secondAttribute="bottom" constant="93" id="KtC-RM-nD0"/>
+                <constraint firstAttribute="bottom" secondItem="NsG-Wm-faf" secondAttribute="bottom" id="KtC-RM-nD0"/>
                 <constraint firstItem="rbA-zd-0Xm" firstAttribute="leading" secondItem="dW1-fU-Pol" secondAttribute="trailing" constant="8" id="M5z-HM-9Qk"/>
-                <constraint firstItem="NsG-Wm-faf" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="93" id="Mlk-32-p9z"/>
+                <constraint firstItem="NsG-Wm-faf" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="35" id="Mlk-32-p9z"/>
                 <constraint firstItem="0Aw-ru-i6b" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="3" id="Uue-6q-sxP"/>
-                <constraint firstItem="NsG-Wm-faf" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="120" id="enI-r0-cyY"/>
+                <constraint firstItem="NsG-Wm-faf" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="enI-r0-cyY"/>
                 <constraint firstItem="dW1-fU-Pol" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="10" id="mDE-pf-bej"/>
-                <constraint firstAttribute="trailing" secondItem="NsG-Wm-faf" secondAttribute="trailing" constant="120" id="xjb-ne-2gG"/>
+                <constraint firstAttribute="trailing" secondItem="NsG-Wm-faf" secondAttribute="trailing" id="xjb-ne-2gG"/>
                 <constraint firstItem="rbA-zd-0Xm" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="yHo-ce-lQg"/>
             </constraints>
-            <point key="canvasLocation" x="175" y="-111.5"/>
+            <point key="canvasLocation" x="187" y="-612.5"/>
         </customView>
     </objects>
 </document>

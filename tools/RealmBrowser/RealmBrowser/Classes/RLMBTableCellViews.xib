@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="RLMBPaneViewController"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <tableCellView identifier="RLMBBoolCellView2" id="7Rn-Xu-OTo" customClass="RLMBBoolCellView">
+            <rect key="frame" x="0.0" y="0.0" width="139" height="26"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="xrD-5X-VDr">
+                    <rect key="frame" x="-2" y="-2" width="143" height="30"/>
+                    <buttonCell key="cell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="only" state="on" inset="2" id="OVB-Fd-mYB">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstItem="xrD-5X-VDr" firstAttribute="top" secondItem="7Rn-Xu-OTo" secondAttribute="top" id="9g4-5u-8NF"/>
+                <constraint firstItem="xrD-5X-VDr" firstAttribute="leading" secondItem="7Rn-Xu-OTo" secondAttribute="leading" id="GFy-bj-Z0h"/>
+                <constraint firstAttribute="trailing" secondItem="xrD-5X-VDr" secondAttribute="trailing" id="gFi-c9-DxF"/>
+                <constraint firstAttribute="bottom" secondItem="xrD-5X-VDr" secondAttribute="bottom" id="kZ3-rz-KJ6"/>
+            </constraints>
+            <connections>
+                <outlet property="checkBox" destination="xrD-5X-VDr" id="Fto-TB-z69"/>
+            </connections>
+            <point key="canvasLocation" x="269.5" y="70"/>
+        </tableCellView>
+        <tableCellView identifier="RLMBBasicCellView2" id="ylU-Ie-8dU" customClass="RLMBBasicCellView">
+            <rect key="frame" x="0.0" y="0.0" width="154" height="17"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Ugc-3B-m0y">
+                    <rect key="frame" x="-2" y="0.0" width="158" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Basic" id="7yY-Od-XuR">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Ugc-3B-m0y" secondAttribute="trailing" id="A2o-35-Ygp"/>
+                <constraint firstItem="Ugc-3B-m0y" firstAttribute="leading" secondItem="ylU-Ie-8dU" secondAttribute="leading" id="eap-lR-8xE"/>
+                <constraint firstAttribute="bottom" secondItem="Ugc-3B-m0y" secondAttribute="bottom" id="hzm-fq-bla"/>
+                <constraint firstItem="Ugc-3B-m0y" firstAttribute="top" secondItem="ylU-Ie-8dU" secondAttribute="top" id="pdO-32-sHv"/>
+            </constraints>
+            <connections>
+                <outlet property="textField" destination="Ugc-3B-m0y" id="8ye-AA-oe9"/>
+            </connections>
+            <point key="canvasLocation" x="269" y="141.5"/>
+        </tableCellView>
+        <tableCellView identifier="RLMBLinkCellView2" id="kL7-Pf-tp5" customClass="RLMBLinkCellView">
+            <rect key="frame" x="0.0" y="0.0" width="154" height="17"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="9j1-PB-9Xh">
+                    <rect key="frame" x="-2" y="0.0" width="158" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Link" id="5EC-zp-73R">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="selectedMenuItemColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="9j1-PB-9Xh" firstAttribute="top" secondItem="kL7-Pf-tp5" secondAttribute="top" id="OKh-N7-avF"/>
+                <constraint firstItem="9j1-PB-9Xh" firstAttribute="leading" secondItem="kL7-Pf-tp5" secondAttribute="leading" id="gKa-ul-agb"/>
+                <constraint firstAttribute="bottom" secondItem="9j1-PB-9Xh" secondAttribute="bottom" id="i8g-DV-2ip"/>
+                <constraint firstAttribute="trailing" secondItem="9j1-PB-9Xh" secondAttribute="trailing" id="jih-2u-vUT"/>
+            </constraints>
+            <connections>
+                <outlet property="textField" destination="9j1-PB-9Xh" id="CxH-ro-Y6W"/>
+            </connections>
+            <point key="canvasLocation" x="269" y="222.5"/>
+        </tableCellView>
+        <tableCellView identifier="RLMBNumberCellView2" id="S5r-eW-FXM" customClass="RLMBNumberCellView">
+            <rect key="frame" x="0.0" y="0.0" width="159" height="17"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LVi-vS-b8A">
+                    <rect key="frame" x="-2" y="0.0" width="163" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Number" id="Dbn-Gt-B9N">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="LVi-vS-b8A" secondAttribute="trailing" id="MGd-D8-Ayl"/>
+                <constraint firstItem="LVi-vS-b8A" firstAttribute="leading" secondItem="S5r-eW-FXM" secondAttribute="leading" id="WgL-MY-nge"/>
+                <constraint firstItem="LVi-vS-b8A" firstAttribute="top" secondItem="S5r-eW-FXM" secondAttribute="top" id="b5n-mW-T3o"/>
+                <constraint firstAttribute="bottom" secondItem="LVi-vS-b8A" secondAttribute="bottom" id="zms-DB-NFK"/>
+            </constraints>
+            <connections>
+                <outlet property="textField" destination="LVi-vS-b8A" id="Wtm-mL-E59"/>
+            </connections>
+            <point key="canvasLocation" x="279.5" y="321.5"/>
+        </tableCellView>
+    </objects>
+</document>

@@ -8,9 +8,17 @@
 
 #import "RLMBPaneViewController.h"
 
-#define GUTTER_COLUMN -1
-
 @interface RLMBPaneViewController () <NSTableViewDataSource, NSTableViewDelegate>
+
+@property (nonatomic) NSDictionary *properties;
+
+@property (weak) IBOutlet NSTextField *classNameLabel;
+@property (weak) IBOutlet NSSearchField *searchField;
+@property (weak) IBOutlet NSTableView *tableView;
+
+@property (nonatomic) RLMBViewModel *formatter;
+
+@property (nonatomic) RLMObjectSchema *objectSchema;
 
 @end
 
@@ -21,7 +29,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.formatter = [[RLMBFormatter alloc] initWithOwner:self];
+        self.formatter = [[RLMBViewModel alloc] initWithOwner:self];
     }
     
     return self;
@@ -29,12 +37,22 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do view setup here.
+    NSArray *cellNibNames = @[kRLMBGutterCellId, kRLMBBasicCellId, kRLMBLinkCellId, kRLMBBoolCellId, kRLMBNumberCellId];
+    [self registerCellNibsNamed:cellNibNames inTableView:self.tableView];
 }
+
+#pragma mark - Public Methods
 
 - (void)updateWithObjects:(id<RLMCollection>)objects objectSchema:(RLMObjectSchema *)objectSchema
 {
     self.objectSchema = objectSchema;
+    
+    NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+    for (RLMProperty *property in objectSchema.properties) {
+        properties[property.name] = property;
+    }
+    self.properties = properties;
+    
     self.objects = objects;
     self.classNameLabel.stringValue = objectSchema.className;
     [self setupColumnsWithProperties:objectSchema.properties];
@@ -42,7 +60,32 @@
     [self.tableView reloadData];
 }
 
-#pragma mark - Table View Setup
+#pragma mark - User Actions
+
+- (IBAction)editedCheckBox:(NSButton *)sender
+{
+    NSInteger row = [self.tableView rowForView:sender];
+    NSInteger column = [self.tableView columnForView:sender];
+    
+    NSTableColumn *tableColumn = self.tableView.tableColumns[column];
+    NSNumber *value = @((BOOL)(sender.state == NSOnState));
+
+    [self.realmDelegate changeProperty:tableColumn.identifier ofObject:self.objects[row] toValue:value];
+}
+
+#pragma mark - Text Field Delegate
+
+-(BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor
+{
+//    NSLog(@"text should begin editing: %@ -  %@", control, fieldEditor);
+    return YES;
+}
+
+//-(void)controlDidBecomeFirstResponder {
+//    NSLog(@"controlTextDidBeginEditing  %@", obj);
+//}
+
+#pragma mark - Public Methods - Table View Update
 
 - (void)setupColumnsWithProperties:(NSArray *)properties
 {
@@ -56,7 +99,7 @@
     
     [tableView beginUpdates];
 
-    NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:@"#"];
+    NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:kRLMBGutterColumnIdentifier];
     [gutterColumn.headerCell setStringValue:@"#"];
     gutterColumn.width = 30;
     
@@ -73,9 +116,8 @@
     for (RLMProperty *property in properties) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
         tableColumn.identifier = property.name;
-        NSString *typeName = [self.formatter typeNameForProperty:property];
+        NSString *typeName = [RLMBViewModel typeNameForProperty:property];
         [tableColumn.headerCell setStringValue:[NSString stringWithFormat:@"%@: %@", property.name, typeName]];
-        NSLog(@"adding column: %@", [tableColumn.headerCell stringValue]);
 
         [tableView addTableColumn:tableColumn];
     }
@@ -94,34 +136,14 @@
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    NSUInteger index = [self propertyIndexOfColumn:tableColumn inTable:tableView];
-    
-    if (index == GUTTER_COLUMN) {
-        return [self.formatter cellViewForGutter:tableView];
+    if ([tableColumn.identifier isEqualToString:kRLMBGutterColumnIdentifier]) {
+        return [self.formatter cellViewForGutter:tableView row:row];
     }
     
-    RLMObject *object = self.objects[row];
-    RLMProperty *property = self.objectSchema.properties[index];
+    id value = self.objects[row][tableColumn.identifier];
+    RLMProperty *property = self.properties[tableColumn.identifier];
     
-    return [self.formatter tableView:tableView cellViewForValue:object[property.name] type:property.type];
-    
-    //    NSInteger propertyIndex = [self propertyIndexForColumn:column];
-    //
-    //    // Array gutter
-    //    if (propertyIndex == -1) {
-    //        RLMBasicTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"IndexCell" owner:self];
-    //        basicCellView.textField.stringValue = [@(rowIndex) stringValue];
-    //        basicCellView.textField.editable = NO;
-    //
-    //        return basicCellView;
-    //    }
-}
-
--(NSUInteger)propertyIndexOfColumn:(NSTableColumn *)column inTable:(NSTableView *)tableView
-{
-    NSUInteger columnIndex = [tableView.tableColumns indexOfObject:column];
-
-    return columnIndex - 1;
+    return [self.formatter tableView:tableView cellViewForValue:value type:property.type];
 }
 
 #pragma mark - User Actions
@@ -142,13 +164,12 @@
     }
     
     NSInteger column = self.tableView.clickedColumn;
-    if (column > self.objectSchema.properties.count) {
+    if (column > self.properties.count) {
         return;
     }
-
-    NSInteger propertyIndex = column - 1;
     
-    RLMProperty *property = self.objectSchema.properties[propertyIndex];
+    NSTableColumn *tableColumn = self.tableView.tableColumns[column];
+    RLMProperty *property = self.properties[tableColumn.identifier];
     id propertyValue = self.objects[row][property.name];
     
     if (property.type == RLMPropertyTypeObject) {
@@ -157,6 +178,16 @@
     }
     else if (property.type == RLMPropertyTypeArray) {
         [self.canvasDelegate addPaneWithArray:propertyValue afterPane:self];
+    }
+}
+
+#pragma mark - Helper Methods - Table View Setup
+
+- (void)registerCellNibsNamed:(NSArray *)cellNibNames inTableView:(NSTableView *)tableView
+{
+    for (NSString *cellNibName in cellNibNames) {
+        NSNib *cellNib = [[NSNib alloc] initWithNibNamed:cellNibName bundle:nil];
+        [tableView registerNib:cellNib forIdentifier:cellNibName];
     }
 }
 

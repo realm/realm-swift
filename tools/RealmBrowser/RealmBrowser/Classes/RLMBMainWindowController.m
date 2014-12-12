@@ -24,7 +24,7 @@ CGFloat const kRLMBPaneMargin = 20;
 CGFloat const kRLMBPaneMMinHeight = 200;
 CGFloat const kRLMBPaneThinWidth = 300;
 
-@interface RLMBMainWindowController () <RLMBCanvasDelegate, NSTableViewDataSource, NSTableViewDelegate>
+@interface RLMBMainWindowController () <RLMBCanvasDelegate, RLMBRealmDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic) RLMRealm *realm;
 @property (nonatomic) NSMutableArray *objectClasses;
@@ -68,10 +68,6 @@ CGFloat const kRLMBPaneThinWidth = 300;
     self.scrollView.documentView = self.canvas;
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_canvas);
-//    [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_canvas]"
-//                                                                                        options:0
-//                                                                                        metrics:nil
-//                                                                                          views:views]];
     
     [self.scrollView.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_canvas]|"
                                                                                         options:0
@@ -83,6 +79,15 @@ CGFloat const kRLMBPaneThinWidth = 300;
         [self setupRootPane];
         [self showClassInRootPane:0];
     }
+}
+
+#pragma mark - Realm Delegate
+
+- (void)changeProperty:(NSString *)propertyName ofObject:(RLMObject *)object toValue:(id)value
+{
+    [self.realm beginWriteTransaction];
+    object[propertyName] = value;
+    [self.realm commitWriteTransaction];
 }
 
 #pragma mark - Setup Methods
@@ -218,6 +223,7 @@ CGFloat const kRLMBPaneThinWidth = 300;
     [self addRightConstraintTo:pane.view within:self.canvas];
     
     pane.canvasDelegate = self;
+    pane.realmDelegate = self;
     [self.panes addObject:pane];
     [self focusOnPane:self.panes.count - 1];
 }

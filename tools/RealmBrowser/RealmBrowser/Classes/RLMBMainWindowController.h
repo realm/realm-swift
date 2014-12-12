@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class RLMRealm;
+@class RLMObject;
 
 @interface RLMBMainWindowController : NSWindowController
 

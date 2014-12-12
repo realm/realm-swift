@@ -6,18 +6,27 @@
 //  Copyright (c) 2014 Realm inc. All rights reserved.
 //
 
-#import "RLMBFormatter.h"
+#import "RLMBViewModel.h"
+
+#import "RLMBPaneViewController.h"
+#import "RLMBBoolCellView.h"
 
 typedef NS_ENUM(int32_t, RLMBDescriptionFormat) {
     RLMBDescriptionFormatEllipsis,
     RLMBDescriptionFormatFull,
     RLMBDescriptionFormatObject
 };
+NSString *const kRLMBGutterColumnIdentifier = @" #";
+NSString *const kRLMBGutterCellId = @"RLMBGutterCellView";
+NSString *const kRLMBBasicCellId = @"RLMBBasicCellView";
+NSString *const kRLMBNumberCellId = @"RLMBNumberCellView";
+NSString *const kRLMBLinkCellId = @"RLMBLinkCellView";
+NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 
 const NSUInteger kMaxStringCharsInObjectLink = 20;
 const NSUInteger kMaxObjectCharsForTable = 200;
 
-@interface RLMBFormatter ()
+@interface RLMBViewModel ()
 
 @property (nonatomic, weak) RLMBPaneViewController *owner;
 @property (nonatomic) NSNumberFormatter *numberFormatter;
@@ -26,7 +35,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
 @end
 
 
-@implementation RLMBFormatter
+@implementation RLMBViewModel
 
 #pragma mark - Lifetime Methods
 
@@ -47,9 +56,14 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     return self;
 }
 
-- (NSTableCellView *)cellViewForGutter:(NSTableView *)tableView
+#pragma mark - Tableview Data Methods
+
+- (NSTableCellView *)cellViewForGutter:(NSTableView *)tableView row:(NSUInteger)row
 {
-    NSTableCellView *gutterCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
+    NSTableCellView *gutterCellView = [tableView makeViewWithIdentifier:kRLMBGutterCellId owner:self.owner];
+    gutterCellView.textField.stringValue = @(row).stringValue;
+    gutterCellView.textField.editable = NO;
+    
     return gutterCellView;
 }
 
@@ -59,11 +73,12 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     
     switch (type) {
         case RLMPropertyTypeArray: {
-            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
-            NSString *string = [self printablePropertyValue:value ofType:type];
-            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
-            badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
-            badgeCellView.textField.editable = NO;
+            NSTableCellView *badgeCellView = [tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self.owner];
+            badgeCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
+            
+            //            NSString *string = [self printablePropertyValue:value ofType:type];
+//            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+//            badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
             
 //            badgeCellView.badge.hidden = NO;
 //            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", [(RLMArray *)propertyValue count]];
@@ -72,19 +87,12 @@ const NSUInteger kMaxObjectCharsForTable = 200;
             
             cellView = badgeCellView;
             
-            NSLog(@"(%@) cell: %@", tableView, cellView);
-            
             break;
         }
             
         case RLMPropertyTypeBool: {
-            NSTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
-            
-            boolCellView.textField.stringValue = [(NSNumber *)value boolValue] ? @"YES" : @"NO";
-            
-//            RLMBoolTableCellView *boolCellView = [tableView makeViewWithIdentifier:@"BoolCell" owner:self];
-//            boolCellView.checkBox.state = [(NSNumber *)propertyValue boolValue] ? NSOnState : NSOffState;
-//            [boolCellView.checkBox setEnabled:!self.realmIsLocked];
+            RLMBBoolCellView *boolCellView = [tableView makeViewWithIdentifier:kRLMBBoolCellId owner:self.owner];
+            boolCellView.checkBox.state = [(NSNumber *)value boolValue] ? NSOnState : NSOffState;
             
             cellView = boolCellView;
             
@@ -93,12 +101,9 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble: {
-            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
+            NSTableCellView *numberCellView = [tableView makeViewWithIdentifier:kRLMBNumberCellId owner:self.owner];
             numberCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
-            //            numberCellView.textField.delegate = self;
-            
 //            ((RLMNumberTextField *)numberCellView.textField).number = value;
-//            numberCellView.textField.editable = !self.realmIsLocked;
             
             cellView = numberCellView;
             
@@ -106,14 +111,13 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         }
             
         case RLMPropertyTypeObject: {
-            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:@"RLMBLinkCellView" owner:self.owner];
+            NSTableCellView *linkCellView = [tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self.owner];
 //            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
 //            linkCellView.delegate = self;
             
             NSString *string = [self printablePropertyValue:value ofType:type];
             NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
             linkCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
-            linkCellView.textField.editable = NO;
             
             cellView = linkCellView;
             
@@ -124,10 +128,10 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeAny:
         case RLMPropertyTypeDate:
         case RLMPropertyTypeString: {
-            NSTableCellView *basicCellView = [tableView makeViewWithIdentifier:@"BasicCell" owner:self.owner];
+            NSTableCellView *basicCellView = [tableView makeViewWithIdentifier:kRLMBBasicCellId owner:self.owner];
             basicCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
-//            basicCellView.textField.delegate = self;
-//            basicCellView.textField.editable = !self.realmIsLocked && type != RLMPropertyTypeData;
+
+            //            basicCellView.textField.editable = !self.realmIsLocked && type != RLMPropertyTypeData;
             
             cellView = basicCellView;
             
@@ -232,7 +236,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     }
 }
 
-- (NSString *)typeNameForProperty:(RLMProperty *)property
++ (NSString *)typeNameForProperty:(RLMProperty *)property
 {
     switch (property.type) {
         case RLMPropertyTypeInt:
