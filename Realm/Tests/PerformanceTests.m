@@ -265,6 +265,19 @@
     }];
 }
 
+- (void)testSortingAllObjects {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 2000; ++i) {
+        [IntObject createInRealm:realm withObject:@[@(arc4random())]];
+    }
+    [realm commitWriteTransaction];
+
+    [self measureBlock:^{
+        (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"intCol" ascending:YES].lastObject;
+    }];
+}
+
 - (void)testRealmCreation {
     [self realmWithTestPath]; // ensure a cached realm for the path
 
