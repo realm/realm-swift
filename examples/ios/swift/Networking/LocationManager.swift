@@ -25,9 +25,12 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
     let kFourSquareIntent = "browse"
     let limit = 50
     let client = APIClient(baseURL: NSURL(string: "https://api.foursquare.com")!)
+    let allRestaurantsID = "4d4b7105d754a06374d81259"
+    var category: Category?
 
     init(realm: RLMRealm) {
         self.realm = realm
+        category = Category.objectsInRealm(realm, "categoryID = %@", allRestaurantsID).firstObject() as? Category
         super.init()
         locationManager.delegate = self
     }
@@ -51,17 +54,22 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
     
     var venues: RLMResults {
         get {
-            let searchRadiusDegrees = (searchRadius / 111.325) / 1_000
+            let searchRadiusDegrees = (searchRadius / 111) / 1_000 * 1.2
             return Restaurant.objectsInRealm(realm,
                 "longitude < %f AND longitude > %f AND latitude < %f AND latitude > %f",
                 location.coordinate.longitude + searchRadiusDegrees,
                 location.coordinate.longitude - searchRadiusDegrees,
-                location.coordinate.latitude + searchRadiusDegrees,
-                location.coordinate.latitude - searchRadiusDegrees)
+                location.coordinate.latitude  + searchRadiusDegrees,
+                location.coordinate.latitude  - searchRadiusDegrees)
         }
     }
     
     func fetchVenues() {
+        // Only need to run
+        if Category.allObjectsInRealm(realm).count == 0 {
+            fetchCategories()
+        }
+
         let categoryID = "4d4b7105d754a06374d81259"
         let path = "/v2/venues/explore"
         let parameters = [
@@ -81,12 +89,16 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                         for item in items as [NSDictionary] {
                             if let venue = item["venue"] as? [String:AnyObject] {
                                 let location = venue["location"] as [String:AnyObject]
+                                let categories = venue["categories"] as? [[String:AnyObject]]
+                                let categoryID = categories?.first?["id"] as? String
+                                let category = Category.objectsInRealm(realm, "categoryID == %@", categoryID!).firstObject()! as Category
                                 let dict = [
                                     "venueID"    : venue["id"]     as? String ?? "",
                                     "name"       : venue["name"]   as? String ?? "",
                                     "latitude"   : location["lat"] as? Double ?? 0.0,
                                     "longitude"  : location["lng"] as? Double ?? 0.0,
-                                    "venueScore" : venue["rating"] as? Double ?? -1.0
+                                    "venueScore" : venue["rating"] as? Double ?? -1.0,
+                                    "category"   : category,
                                 ]
                                 Restaurant.createOrUpdateInRealm(realm, withObject: dict)
                             }
@@ -96,5 +108,43 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
             }
             realm.commitWriteTransaction()
         })
+    }
+
+    func fetchCategories() {
+        let path = "/v2/venues/categories"
+        client.request(path, parameters: [:]) { (json) -> () in
+            let realm = RLMRealm(path: self.realm.path)
+            realm.beginWriteTransaction()
+            Category.createOrUpdateInRealm(realm, withObject: ["name": "All Restaurants", "categoryID": self.allRestaurantsID])
+            if let response = json?["response"] as? [String:AnyObject] {
+                if let categories = response["categories"] as? [[String:AnyObject]] {
+                    for category in categories {
+                        if category["shortName"] as String == "Food" {
+                            if let foodCategories = category["categories"] as? [[String:AnyObject]] {
+                                for foodCategory in foodCategories {
+                                    let dict = [
+                                        "name"       : foodCategory["name"] as? String ?? "",
+                                        "categoryID" : foodCategory["id"]   as? String ?? ""
+                                    ]
+                                    let category = Category.createOrUpdateInRealm(realm, withObject: dict)
+                                    if category.iconImageData.length == 0 {
+                                        if let icon = foodCategory["icon"] as? [String:String] {
+                                            let prefix = icon["prefix"]
+                                            let suffix = icon["suffix"]
+                                            if prefix != nil && suffix != nil {
+                                                if let iconURL = NSURL(string: "\(prefix)64\(suffix)") {
+                                                    category.iconImageData = NSData(contentsOfURL: iconURL) ?? NSData()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            realm.commitWriteTransaction()
+        }
     }
 }

@@ -7,16 +7,28 @@
 //
 
 import UIKit
+import MapKit
 import Realm
 
-class ViewController: UITableViewController {
+class ViewController: UIViewController, MKMapViewDelegate {
     let realm: RLMRealm
     let venueManager: VenueManager
     var realmNotification: RLMNotificationToken?
+    let iconImageCache = NSCache()
+    let sixsquareBlue = UIColor(red: 28/255, green: 173/255, blue: 236/255, alpha: 1)
+    var mapView: MKMapView?
     
     var restaurants: RLMResults {
         willSet(restaurants) {
             title = "\(restaurants.count) venues nearby"
+        }
+
+        didSet {
+            mapView?.removeAnnotations(mapView!.annotations)
+            for restaurant in restaurants {
+                let annotation = RestaurantLocation(restaurant as Restaurant)
+                mapView?.addAnnotation(annotation)
+            }
         }
     }
 
@@ -35,36 +47,54 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         restaurants = venueManager.venues.sortedResultsUsingProperty("venueScore", ascending: false)
         super.viewDidLoad()
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "CellIdentifier")
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(venueManager, action: Selector("fetchVenues"), forControlEvents: .ValueChanged)
         realmNotification = realm.addNotificationBlock { [weak self] (name, realm) -> Void in
             NSOperationQueue.mainQueue().addOperationWithBlock {
                 if let vc = self {
                     vc.restaurants = vc.venueManager.venues.sortedResultsUsingProperty("venueScore", ascending: false)
-                    vc.refreshControl?.endRefreshing()
-                    vc.tableView.reloadData()
                 }
             }
         }
         venueManager.monitoring = true
+
+        mapView = MKMapView(frame: view.bounds)
+        mapView?.delegate = self
+        mapView?.rotateEnabled = false
+        mapView?.pitchEnabled = false
+        mapView?.mapType = .Standard
+        mapView?.centerCoordinate = venueManager.location.coordinate
+        view.addSubview(mapView!)
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Refine", style: .Plain, target: self, action: "refine")
+        navigationController?.navigationBar.barTintColor = sixsquareBlue
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Relocate", style: .Bordered, target: self, action: "relocate")
+        navigationItem.rightBarButtonItem?.tintColor = UIColor.whiteColor()
+
+        venueManager.fetchVenues()
     }
-    
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+
+    func refine() {
+
     }
-    
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return Int(restaurants.count)
-    }
-    
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("CellIdentifier", forIndexPath: indexPath) as UITableViewCell
-        if let restaurant = restaurants[UInt(indexPath.row)] as? Restaurant {
-            cell.textLabel?.text = "\(restaurant.name) (\(restaurant.venueScore))"
+
+    func relocate() {
+        if let mapView = mapView {
+            let location = mapView.centerCoordinate
+            venueManager.searchRadius = mapView.region.span.latitudeDelta * 111 * 1000
+            venueManager.location = CLLocation(latitude: location.latitude, longitude: location.longitude)
         }
-        
-        return cell
+    }
+
+    func mapView(mapView: MKMapView!, viewForAnnotation annotation: RestaurantLocation) -> MKAnnotationView! {
+        let annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("AnnotationIdentifier") ??
+                             MKPinAnnotationView(annotation: annotation, reuseIdentifier: "AnnotationIdentifier")
+        if let iconImage = annotation.image {
+            annotationView?.image = iconImage
+        }
+        annotationView?.canShowCallout = true
+
+        return annotationView
     }
 }
 

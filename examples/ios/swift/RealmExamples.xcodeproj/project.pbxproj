@@ -41,6 +41,8 @@
 		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C04171861A3A478800D7812C /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171801A3A478800D7812C /* Restaurant.swift */; };
 		C04171881A3A478800D7812C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171821A3A478800D7812C /* ViewController.swift */; };
+		C093D2371A3A8A9A00916140 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2361A3A8A9A00916140 /* Category.swift */; };
+		C093D2391A3AA95400916140 /* RestaurantLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2381A3AA95400916140 /* RestaurantLocation.swift */; };
 		E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
@@ -186,6 +188,8 @@
 		C041717F1A3A478700D7812C /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		C04171801A3A478800D7812C /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		C04171821A3A478800D7812C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C093D2361A3A8A9A00916140 /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		C093D2381A3AA95400916140 /* RestaurantLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantLocation.swift; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -294,6 +298,8 @@
 				C041717F1A3A478700D7812C /* LocationManager.swift */,
 				C04171801A3A478800D7812C /* Restaurant.swift */,
 				C04171821A3A478800D7812C /* ViewController.swift */,
+				C093D2361A3A8A9A00916140 /* Category.swift */,
+				C093D2381A3AA95400916140 /* RestaurantLocation.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -626,11 +632,13 @@
 			files = (
 				C03634731A3A594900443367 /* LaunchScreen.xib in Sources */,
 				C04171841A3A478800D7812C /* AppDelegate.swift in Sources */,
+				C093D2391A3AA95400916140 /* RestaurantLocation.swift in Sources */,
 				C04171861A3A478800D7812C /* Restaurant.swift in Sources */,
 				C04171851A3A478800D7812C /* LocationManager.swift in Sources */,
 				C04171731A3A462200D7812C /* RLMSupport.swift in Sources */,
 				C04171881A3A478800D7812C /* ViewController.swift in Sources */,
 				C04171831A3A478800D7812C /* APIClient.swift in Sources */,
+				C093D2371A3A8A9A00916140 /* Category.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

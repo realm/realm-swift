@@ -12,11 +12,11 @@ import Realm
 class Restaurant: RLMObject {
     dynamic var venueID: String = ""
     dynamic var name: String = ""
-    dynamic var category: String = ""
     dynamic var latitude: Double = 0.0
     dynamic var longitude: Double = 0.0
     dynamic var iconURLString: String = ""
     dynamic var venueScore: Double = 0.0
+    dynamic var category: Category? = Category()
     
     var iconURL: NSURL? {
         get { return NSURL(string: iconURLString) }
