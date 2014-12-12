@@ -12,7 +12,13 @@ import Realm
 @objc
 class VenueManager: NSObject, CLLocationManagerDelegate {
     let realm: RLMRealm
-    var location = CLLocation(latitude: 37.7798657, longitude: -122.3919903)
+    var location: CLLocation = CLLocation(latitude: 37.7798657, longitude: -122.3919903) {
+        didSet(oldLocation) {
+            if oldLocation != location {
+                fetchVenues()
+            }
+        }
+    }
     let locationManager = CLLocationManager()
     var searchRadius: Double = 1_000 // in meters
     let kFourSquareBaseURL = "https://api.foursquare.com"
@@ -24,7 +30,6 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
         self.realm = realm
         super.init()
         locationManager.delegate = self
-        monitoring = true
     }
     
     var monitoring: Bool {

@@ -15,7 +15,7 @@ class ViewController: UITableViewController {
     var realmNotification: RLMNotificationToken?
     
     var restaurants: RLMResults {
-        didSet(restaurants) {
+        willSet(restaurants) {
             title = "\(restaurants.count) venues nearby"
         }
     }
