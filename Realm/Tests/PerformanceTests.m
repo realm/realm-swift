@@ -19,6 +19,8 @@
 }
 @end
 
+#if !DEBUG
+
 @interface PerformanceTests : RLMTestCase
 @end
 
@@ -283,3 +285,5 @@
 }
 
 @end
+
+#endif
