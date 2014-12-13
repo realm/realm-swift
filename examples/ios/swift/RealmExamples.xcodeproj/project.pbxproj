@@ -41,6 +41,9 @@
 		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C04171861A3A478800D7812C /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171801A3A478800D7812C /* Restaurant.swift */; };
 		C04171881A3A478800D7812C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171821A3A478800D7812C /* ViewController.swift */; };
+		C05093D31A3B886000B67E73 /* LocationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05093D21A3B886000B67E73 /* LocationUtilities.swift */; };
+		C05093D51A3B8A7300B67E73 /* VenueScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */; };
+		C05093D71A3B8E4600B67E73 /* LocationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */; };
 		C093D2371A3A8A9A00916140 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2361A3A8A9A00916140 /* Category.swift */; };
 		C093D2391A3AA95400916140 /* RestaurantLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2381A3AA95400916140 /* RestaurantLocation.swift */; };
 		E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
@@ -188,6 +191,9 @@
 		C041717F1A3A478700D7812C /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		C04171801A3A478800D7812C /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		C04171821A3A478800D7812C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C05093D21A3B886000B67E73 /* LocationUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationUtilities.swift; sourceTree = "<group>"; };
+		C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VenueScoreView.swift; sourceTree = "<group>"; };
+		C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationAnnotationView.swift; sourceTree = "<group>"; };
 		C093D2361A3A8A9A00916140 /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		C093D2381A3AA95400916140 /* RestaurantLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantLocation.swift; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -300,6 +306,9 @@
 				C04171821A3A478800D7812C /* ViewController.swift */,
 				C093D2361A3A8A9A00916140 /* Category.swift */,
 				C093D2381A3AA95400916140 /* RestaurantLocation.swift */,
+				C05093D21A3B886000B67E73 /* LocationUtilities.swift */,
+				C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */,
+				C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -639,6 +648,9 @@
 				C04171881A3A478800D7812C /* ViewController.swift in Sources */,
 				C04171831A3A478800D7812C /* APIClient.swift in Sources */,
 				C093D2371A3A8A9A00916140 /* Category.swift in Sources */,
+				C05093D51A3B8A7300B67E73 /* VenueScoreView.swift in Sources */,
+				C05093D71A3B8E4600B67E73 /* LocationAnnotationView.swift in Sources */,
+				C05093D31A3B886000B67E73 /* LocationUtilities.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

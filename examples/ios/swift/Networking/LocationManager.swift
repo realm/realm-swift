@@ -9,6 +9,18 @@
 import CoreLocation
 import Realm
 
+extension Dictionary {
+    func select(block: ((_: Key, _: Value) -> Bool)) -> [Key:Value] {
+        var copy = [Key:Value]()
+        for (key, value) in self {
+            if block(key, value) {
+                copy[key] = value
+            }
+        }
+        return copy
+    }
+}
+
 @objc
 class VenueManager: NSObject, CLLocationManagerDelegate {
     let realm: RLMRealm
@@ -91,16 +103,17 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                                 let location = venue["location"] as [String:AnyObject]
                                 let categories = venue["categories"] as? [[String:AnyObject]]
                                 let categoryID = categories?.first?["id"] as? String
-                                let category = Category.objectsInRealm(realm, "categoryID == %@", categoryID!).firstObject()! as Category
+                                let category = Category.objectsInRealm(realm, "categoryID == %@", categoryID!).firstObject() as Category?
                                 let dict = [
-                                    "venueID"    : venue["id"]     as? String ?? "",
-                                    "name"       : venue["name"]   as? String ?? "",
-                                    "latitude"   : location["lat"] as? Double ?? 0.0,
-                                    "longitude"  : location["lng"] as? Double ?? 0.0,
-                                    "venueScore" : venue["rating"] as? Double ?? -1.0,
+                                    "venueID"    : venue["id"]     as? String,
+                                    "name"       : venue["name"]   as? String,
+                                    "latitude"   : location["lat"] as? Double,
+                                    "longitude"  : location["lng"] as? Double,
+                                    "venueScore" : venue["rating"] as? Double,
                                     "category"   : category,
-                                ]
-                                Restaurant.createOrUpdateInRealm(realm, withObject: dict)
+                                ] as [String:AnyObject?]
+                                let compactDict = dict.select({ $1 != nil }) as [String:AnyObject]
+                                Restaurant.createOrUpdateInRealm(realm, withObject: compactDict)
                             }
                         }
                     }
@@ -123,10 +136,11 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                             if let foodCategories = category["categories"] as? [[String:AnyObject]] {
                                 for foodCategory in foodCategories {
                                     let dict = [
-                                        "name"       : foodCategory["name"] as? String ?? "",
-                                        "categoryID" : foodCategory["id"]   as? String ?? ""
+                                        "name": foodCategory["name"] as? String,
+                                        "id"  : foodCategory["id"] as? String
                                     ]
-                                    let category = Category.createOrUpdateInRealm(realm, withObject: dict)
+                                    let compactDict = dict.select({ $1 != nil }) as [String:String]
+                                    let category = Category.createOrUpdateInRealm(realm, withObject: compactDict)
                                     if category.iconImageData.length == 0 {
                                         if let icon = foodCategory["icon"] as? [String:String] {
                                             let prefix = icon["prefix"]

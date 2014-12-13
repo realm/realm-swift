@@ -16,6 +16,7 @@ class RestaurantLocation: NSObject, MKAnnotation {
     let title: String
     let subtitle: String
     let image: UIImage?
+    let venueScore: Double
 
     init(_ restaurant: Restaurant) {
         venueID = restaurant.venueID
@@ -23,5 +24,6 @@ class RestaurantLocation: NSObject, MKAnnotation {
         coordinate = restaurant.location.coordinate
         subtitle = "\(restaurant.category!.name) (\(restaurant.venueScore))"
         image = restaurant.category?.iconImage
+        venueScore = restaurant.venueScore
     }
 }

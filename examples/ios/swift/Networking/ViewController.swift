@@ -19,11 +19,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
     var mapView: MKMapView?
     
     var restaurants: RLMResults {
-        willSet(restaurants) {
-            title = "\(restaurants.count) venues nearby"
-        }
-
         didSet {
+            title = "\(restaurants.count) venues nearby"
             mapView?.removeAnnotations(mapView!.annotations)
             for restaurant in restaurants {
                 let annotation = RestaurantLocation(restaurant as Restaurant)
@@ -87,12 +84,13 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
 
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: RestaurantLocation) -> MKAnnotationView! {
-        let annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("AnnotationIdentifier") ??
-                             MKPinAnnotationView(annotation: annotation, reuseIdentifier: "AnnotationIdentifier")
+        let annotationView: LocationAnnotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("AnnotationIdentifier") as LocationAnnotationView? ??
+                                                     LocationAnnotationView(annotation: annotation, reuseIdentifier: "AnnotationIdentifier")
         if let iconImage = annotation.image {
-            annotationView?.image = iconImage
+            annotationView.iconImage = iconImage
         }
-        annotationView?.canShowCallout = true
+        annotationView.canShowCallout = true
+        annotationView.venueScore = annotation.venueScore
 
         return annotationView
     }
