@@ -66,11 +66,13 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
                                      userInfo:nil];
     }
 }
-static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *expected) {
+static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __unsafe_unretained Class expectedClass) {
     NSString *objectClassName = obj.objectSchema.className;
-    if (![objectClassName isEqualToString:expected]) {
+    Class objClass = NSClassFromString(objectClassName);
+
+    if (![obj.class isSubclassOfClass:objClass]) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Attempting to insert wrong object type"
-                                     userInfo:@{@"expected class" : expected, @"actual class" : objectClassName}];
+                                     userInfo:@{@"expected class" : NSStringFromClass(expectedClass), @"actual class" : objectClassName}];
     }
 }
 
@@ -132,7 +134,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
 - (void)addObject:(RLMObject *)object {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
-    RLMValidateObjectClass(object, self.objectClassName);
+    RLMValidateObjectClass(object, self.class);
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
@@ -142,7 +144,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
-    RLMValidateObjectClass(object, self.objectClassName);
+    RLMValidateObjectClass(object, self.class);
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
@@ -177,7 +179,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
-    RLMValidateObjectClass(object, self.objectClassName);
+    RLMValidateObjectClass(object, self.class);
     if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Trying to replace object at invalid index" userInfo:nil];
