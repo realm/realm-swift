@@ -30,6 +30,11 @@ class SwiftStringObjectSubclass : SwiftStringObject {
     var stringCol2 = ""
 }
 
+class SwiftSelfRefrencingSubclass: SwiftStringObject {
+    dynamic var objects = RLMArray(objectClassName: SwiftSelfRefrencingSubclass.className())
+}
+
+
 class SwiftDefaultObject: RLMObject {
     dynamic var intCol = 1
     dynamic var boolCol = true
@@ -121,8 +126,15 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         // ensure creation in proper table
-        XCTAssertEqual(UInt(1), SwiftStringObjectSubclass.allObjects().count);
-        XCTAssertEqual(UInt(1), SwiftStringObject.allObjects().count);
+        XCTAssertEqual(UInt(1), SwiftStringObjectSubclass.allObjects().count)
+        XCTAssertEqual(UInt(1), SwiftStringObject.allObjects().count)
+
+        realm.transactionWithBlock { () -> Void in
+            // create self referencing subclass
+            var sub = SwiftSelfRefrencingSubclass.createInDefaultRealmWithObject(["string", []])
+            var sub2 = SwiftSelfRefrencingSubclass()
+            sub.objects.addObject(sub2)
+        }
     }
 
     func testOptionalSwiftProperties() {

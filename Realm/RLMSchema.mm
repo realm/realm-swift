@@ -101,7 +101,8 @@ static NSMutableDictionary *s_localNameToClass;
 
         NSString *className = NSStringFromClass(cls);
         if ([RLMSwiftSupport isSwiftClassName:className]) {
-            s_localNameToClass[[RLMSwiftSupport demangleClassName:className]] = cls;
+            className = [RLMSwiftSupport demangleClassName:className];
+            s_localNameToClass[className] = cls;
         }
         // NSStringFromClass demangles the names for top-level Swift classes
         // but not for nested classes. _T indicates it's a Swift symbol, t
@@ -115,16 +116,20 @@ static NSMutableDictionary *s_localNameToClass;
         else {
             s_localNameToClass[className] = cls;
         }
+
+        // override classname for all valid classes
+        RLMReplaceClassNameMethod(cls, className);
     }
 
     // process all RLMObject subclasses
     for (Class cls in s_localNameToClass.allValues) {
+        // override className and sharedSchema classs methods for performance
+
         RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
         [schemaArray addObject:schema];
 
-        // override className and sharedSchema classs methods for performance
+        // override sharedSchema classs methods for performance
         RLMReplaceSharedSchemaMethod(cls, schema);
-        RLMReplaceClassNameMethod(cls, schema.className);
 
         // set standalone class on shared shema for standalone object creation
         schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(schema.objectClass, schema);
