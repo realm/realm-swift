@@ -123,8 +123,6 @@ static NSMutableDictionary *s_localNameToClass;
 
     // process all RLMObject subclasses
     for (Class cls in s_localNameToClass.allValues) {
-        // override className and sharedSchema classs methods for performance
-
         RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
         [schemaArray addObject:schema];
 

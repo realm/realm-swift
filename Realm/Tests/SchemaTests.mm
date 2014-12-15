@@ -143,7 +143,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
         // Test creating objects of each class
         [self.class deleteFiles];
-        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
         [realm createObject:@"SchemaTestClassBase" withObject:@{@"baseCol": @[@0]}];
         [realm createObject:@"SchemaTestClassFirstChild" withObject:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
