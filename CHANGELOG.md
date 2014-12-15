@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Merge native Swift default property values with defaultPropertyValues().
 * Don't leave the database schema partially updated when opening a realm fails
   due to a migration being needed.
+* Fixed issue where objects with custom getter names couldn't be used to
+  initialize other objects.
 
 
 0.88.0 Release notes (2014-12-02)
