@@ -21,7 +21,7 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSwiftSupport.h"
@@ -161,7 +161,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            return [[objSchema.objectClass alloc] initWithObject:obj];
+            return [[objSchema.objectClass alloc] initWithObject:obj schema:schema];
         }
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // for arrays, create objects for each literal object and return new array

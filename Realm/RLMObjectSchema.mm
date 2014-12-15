@@ -66,10 +66,6 @@
 }
 
 + (instancetype)schemaForObjectClass:(Class)objectClass {
-    return [self schemaForObjectClass:objectClass createAccessors:NO];
-}
-
-+ (instancetype)schemaForObjectClass:(Class)objectClass createAccessors:(BOOL)create {
     RLMObjectSchema *schema = [RLMObjectSchema new];
 
     // determine classname from objectclass as className method has not yet been updated
@@ -112,13 +108,6 @@
                                            reason:@"Only 'string' and 'int' properties can be designated the primary key"
                                          userInfo:nil];
         }
-    }
-
-    if (create) {
-        schema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectClass, schema);
-
-        RLMReplaceSharedSchemaMethod(objectClass, schema);
-        RLMReplaceClassNameMethod(objectClass, className);
     }
 
     schema.defaultValues = RLMDefaultValuesForObjectSchema(schema);
