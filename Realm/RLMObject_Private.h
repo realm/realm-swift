@@ -35,6 +35,7 @@
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
                        schema:(__unsafe_unretained RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
+- (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 // namespace properties to prevent collision with user properties
 @property (nonatomic, readwrite) RLMRealm *realm;

@@ -43,9 +43,7 @@
 @property (nonatomic, readonly) tightdb::Table *table;
 
 // returns a cached or new schema for a given object class
-// creates standalone accessor classes for the object schema if create is YES
 +(instancetype)schemaForObjectClass:(Class)objectClass;
-+(instancetype)schemaForObjectClass:(Class)objectClass createAccessors:(BOOL)create;
 
 // generate a schema from a table
 +(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;

@@ -111,7 +111,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
     func testSubclass() {
         // test className methods
         XCTAssertEqual("SwiftStringObject", SwiftStringObject.className())
-        XCTAssertEqual("SwiftStringSubclassObject", SwiftStringObjectSubclass.className())
+        XCTAssertEqual("SwiftStringObjectSubclass", SwiftStringObjectSubclass.className())
 
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()

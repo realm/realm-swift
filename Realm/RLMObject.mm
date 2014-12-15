@@ -30,10 +30,13 @@
 @implementation RLMObject
 
 // standalone init
-- (instancetype)init
-{
+- (instancetype)init {
+    return [self initWithObjectSchema:[self.class sharedSchema]];
+}
+
+- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema {
     if (RLMSchema.sharedSchema) {
-        self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
+        self = [self initWithRealm:nil schema:schema defaultValues:YES];
 
         // set standalone accessor class
         object_setClass(self, self.objectSchema.standaloneClass);
@@ -48,10 +51,14 @@
 }
 
 - (instancetype)initWithObject:(id)value {
+    return [self initWithObject:value schema:RLMSchema.sharedSchema];
+}
+
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema {
     self = [self init];
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
-        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, RLMSchema.sharedSchema);
+        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, schema);
         NSArray *properties = _objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             [self setValue:array[i] forKeyPath:[properties[i] name]];
@@ -59,7 +66,7 @@
     }
     else {
         // assume our object is an NSDictionary or a an object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, schema);
         for (NSString *name in dict) {
             id val = dict[name];
             // strip out NSNull before passing values to standalone setters
