@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMBPaneViewController.m
-//  RealmBrowser
+// Copyright 2014 Realm Inc.
 //
-//  Created by Gustaf Kugelberg on 21/11/14.
-//  Copyright (c) 2014 Realm inc. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMBPaneViewController.h"
 
@@ -16,7 +26,7 @@
 @property (weak) IBOutlet NSSearchField *searchField;
 @property (weak) IBOutlet NSTableView *tableView;
 
-@property (nonatomic) RLMBViewModel *formatter;
+@property (nonatomic) RLMBViewModel *viewModel;
 
 @property (nonatomic) RLMObjectSchema *objectSchema;
 
@@ -29,7 +39,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.formatter = [[RLMBViewModel alloc] initWithOwner:self];
+        self.viewModel = [[RLMBViewModel alloc] initWithOwner:self];
     }
     
     return self;
@@ -66,8 +76,8 @@
 {
     NSInteger row = [self.tableView rowForView:sender];
     NSInteger column = [self.tableView columnForView:sender];
-    
     NSTableColumn *tableColumn = self.tableView.tableColumns[column];
+    
     NSNumber *value = @((BOOL)(sender.state == NSOnState));
 
     [self.realmDelegate changeProperty:tableColumn.identifier ofObject:self.objects[row] toValue:value];
@@ -75,15 +85,23 @@
 
 #pragma mark - Text Field Delegate
 
--(BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor
+-(void)textFieldWasSelected:(NSTextField *)textField
 {
-//    NSLog(@"text should begin editing: %@ -  %@", control, fieldEditor);
-    return YES;
+    NSInteger row = [self.tableView rowForView:textField];
+    NSInteger column = [self.tableView columnForView:textField];
+    NSTableColumn *tableColumn = self.tableView.tableColumns[column];
+    
+    RLMProperty *property = self.properties[tableColumn.identifier];
+
+    
+    
+    NSLog(@"textFieldWasSelected %@", textField);
 }
 
-//-(void)controlDidBecomeFirstResponder {
-//    NSLog(@"controlTextDidBeginEditing  %@", obj);
-//}
+-(BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor
+{
+    return YES;
+}
 
 #pragma mark - Public Methods - Table View Update
 
@@ -137,13 +155,13 @@
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if ([tableColumn.identifier isEqualToString:kRLMBGutterColumnIdentifier]) {
-        return [self.formatter cellViewForGutter:tableView row:row];
+        return [self.viewModel cellViewForGutter:tableView row:row];
     }
     
     id value = self.objects[row][tableColumn.identifier];
     RLMProperty *property = self.properties[tableColumn.identifier];
     
-    return [self.formatter tableView:tableView cellViewForValue:value type:property.type];
+    return [self.viewModel tableView:tableView cellViewForValue:value type:property.type];
 }
 
 #pragma mark - User Actions

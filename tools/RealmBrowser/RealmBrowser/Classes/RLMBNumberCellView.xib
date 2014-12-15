@@ -8,7 +8,7 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView identifier="RLMBNumberCellView" id="foV-wB-BZr" customClass="RLMBNumberCellView">
+        <tableCellView identifier="RLMBNumberCellView" id="foV-wB-BZr">
             <rect key="frame" x="0.0" y="0.0" width="200" height="17"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
@@ -30,7 +30,7 @@
             <connections>
                 <outlet property="textField" destination="lSS-d6-S2M" id="4bV-Qj-lpA"/>
             </connections>
-            <point key="canvasLocation" x="302" y="267.5"/>
+            <point key="canvasLocation" x="-390" y="88.5"/>
         </tableCellView>
     </objects>
 </document>

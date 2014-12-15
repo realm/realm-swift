@@ -16,22 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMBSidebarCellView.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation RLMBSidebarCellView
+@class RLMBTextField;
+@protocol RLMBTextFieldDelegate <NSTextFieldDelegate>
+- (void)textFieldWasSelected:(NSTextField *)textField;
+@end
 
-- (instancetype)initWithCoder:(NSCoder *)coder
-{
-    self = [super initWithCoder:coder];
-    if (self) {
-    }
-    return self;
-}
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
-}
+@interface RLMBTextField : NSTextField
 
 @end

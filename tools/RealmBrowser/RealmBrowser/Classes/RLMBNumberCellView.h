@@ -10,6 +10,4 @@
 
 @interface RLMBNumberCellView : NSTableCellView
 
-@property (nonatomic) NSNumber *number;
-
 @end

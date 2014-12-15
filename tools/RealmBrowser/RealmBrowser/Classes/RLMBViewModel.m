@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMBFormatter.m
-//  RealmBrowser
+// Copyright 2014 Realm Inc.
 //
-//  Created by Gustaf Kugelberg on 28/11/14.
-//  Copyright (c) 2014 Realm inc. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMBViewModel.h"
 
@@ -130,7 +140,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeString: {
             NSTableCellView *basicCellView = [tableView makeViewWithIdentifier:kRLMBBasicCellId owner:self.owner];
             basicCellView.textField.stringValue = [self printablePropertyValue:value ofType:type];
-
+            
             //            basicCellView.textField.editable = !self.realmIsLocked && type != RLMPropertyTypeData;
             
             cellView = basicCellView;
@@ -142,7 +152,89 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     return cellView;
 }
 
--(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
+- (NSString *)printablePropertyValue:(id)propertyValue type:(RLMPropertyType)propertyType
+{
+    switch (propertyType) {
+        case RLMPropertyTypeInt:
+            self.numberFormatter.minimumFractionDigits = 0;
+            
+            return [self.numberFormatter stringFromNumber:(NSNumber *)propertyValue];
+            
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            self.numberFormatter.minimumFractionDigits = 3;
+            self.numberFormatter.maximumFractionDigits = 3;
+            
+            return [self.numberFormatter stringFromNumber:(NSNumber *)propertyValue];
+            
+        case RLMPropertyTypeString: {
+            NSString *stringValue = propertyValue;
+            
+            if (stringValue.length > kMaxStringCharsInObjectLink) {
+                stringValue = [stringValue substringToIndex:kMaxStringCharsInObjectLink - 3];
+                stringValue = [stringValue stringByAppendingString:@"..."];
+            }
+            
+            return stringValue;
+        }
+            
+        case RLMPropertyTypeBool:
+            return [(NSNumber *)propertyValue boolValue] ? @"TRUE" : @"FALSE";
+            
+        case RLMPropertyTypeArray: {
+            RLMArray *referredArray = (RLMArray *)propertyValue;
+            return [NSString stringWithFormat:@"<%@>[%lu]", referredArray.objectClassName, referredArray.count];
+        }
+            
+        case RLMPropertyTypeDate:
+            return [self.dateFormatter stringFromDate:(NSDate *)propertyValue];
+            
+        case RLMPropertyTypeData:
+            return @"<Data>";
+            
+        case RLMPropertyTypeAny:
+            return @"<Any>";
+            
+        case RLMPropertyTypeObject: {
+            RLMObject *referredObject = (RLMObject *)propertyValue;
+            
+            if (format == RLMBDescriptionFormatEllipsis) {
+                return [NSString stringWithFormat:@"%@[...]", referredObject.objectSchema.className];
+            }
+            
+            NSString *returnString;
+            if (format == RLMBDescriptionFormatObject) {
+                returnString = @"[";
+            }
+            else {
+                returnString = [NSString stringWithFormat:@"%@[", referredObject.objectSchema.className];
+            }
+            
+            for (RLMProperty *property in referredObject.objectSchema.properties) {
+                id propertyValue = referredObject[property.name];
+                NSString *propertyDescription = [self printablePropertyValue:propertyValue
+                                                                      ofType:property.type
+                                                                      format:RLMBDescriptionFormatEllipsis];
+                
+                if (returnString.length > kMaxObjectCharsForTable - 4) {
+                    returnString = [returnString stringByAppendingFormat:@"..."];
+                    break;
+                }
+                
+                returnString = [returnString stringByAppendingFormat:@"%@, ", propertyDescription];
+            }
+            
+            if ([returnString hasSuffix:@", "]) {
+                returnString = [returnString substringToIndex:returnString.length - 2];
+            }
+            
+            return [returnString stringByAppendingString:@"]"];
+        }
+    }
+}
+
+
+- (NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType
 {
     return [self printablePropertyValue:propertyValue ofType:propertyType format:RLMBDescriptionFormatFull];
 }
