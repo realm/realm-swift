@@ -23,7 +23,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMSwiftSupport.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
@@ -198,7 +198,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
-        id obj = (isDict || [value respondsToSelector:NSSelectorFromString(prop.name)]) ? [value valueForKey:prop.name] : nil;
+        id obj = (isDict || [value respondsToSelector:prop.getterSel]) ? [value valueForKey:prop.getterName] : nil;
 
         // get default for nil object
         if (!obj && !allowMissing) {
