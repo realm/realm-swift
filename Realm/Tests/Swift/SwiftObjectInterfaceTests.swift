@@ -26,6 +26,10 @@ class OuterClass {
     }
 }
 
+class SwiftStringObjectSubclass : SwiftStringObject {
+    var stringCol2 = ""
+}
+
 class SwiftDefaultObject: RLMObject {
     dynamic var intCol = 1
     dynamic var boolCol = true
@@ -102,6 +106,23 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as SwiftDefaultObject
         XCTAssertEqual(object.intCol, 2, "defaultPropertyValues should override native property default value")
         XCTAssertEqual(object.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
+    }
+
+    func testSubclass() {
+        // test className methods
+        XCTAssertEqual("SwiftStringObject", SwiftStringObject.className())
+        XCTAssertEqual("SwiftStringSubclassObject", SwiftStringObjectSubclass.className())
+
+        let realm = RLMRealm.defaultRealm()
+        realm.beginWriteTransaction()
+        SwiftStringObject.createInDefaultRealmWithObject(["string"])
+
+        let obj = SwiftStringObjectSubclass.createInDefaultRealmWithObject(["string", "string2"])
+        realm.commitWriteTransaction()
+
+        // ensure creation in proper table
+        XCTAssertEqual(UInt(1), SwiftStringObjectSubclass.allObjects().count);
+        XCTAssertEqual(UInt(1), SwiftStringObject.allObjects().count);
     }
 
     func testOptionalSwiftProperties() {

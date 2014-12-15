@@ -448,6 +448,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 
 - (void)testObjectSubclass {
+    // test className methods
+    XCTAssertEqualObjects(@"StringObject", [StringObject className]);
+    XCTAssertEqualObjects(@"StringSubclassObject", [StringSubclassObject className]);
+
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [StringObject createInDefaultRealmWithObject:@[@"string"]];
