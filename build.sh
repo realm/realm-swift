@@ -94,13 +94,14 @@ xcrealm() {
 
 build_fat() {
     target="$1"
-    build_prefix="$2"
-    out_dir="$3"
+    config="$2"
+    build_prefix="$3"
+    out_dir="$4"
 
-    xcrealm "-scheme '$target' -configuration Release -sdk iphoneos"
-    xcrealm "-scheme '$target' -configuration Release -sdk iphonesimulator"
+    xcrealm "-scheme '$target' -configuration $config -sdk iphoneos"
+    xcrealm "-scheme '$target' -configuration $config -sdk iphonesimulator"
 
-    srcdir="build/DerivedData/Realm/Build/Products/Release-dynamic"
+    srcdir="build/DerivedData/Realm/Build/Products/$config-dynamic"
     mkdir -p build/$out_dir
     rm -rf build/$out_dir/Realm.framework
     cp -R $build_prefix-iphoneos/Realm.framework build/$out_dir
@@ -239,12 +240,12 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        build_fat iOS build/DerivedData/Realm/Build/Products/Release ios
+        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios
         exit 0
         ;;
 
     "ios-dynamic")
-        build_fat 'iOS 8' build/DerivedData/Realm/Build/Products/Release-dynamic ios-dynamic
+        build_fat 'iOS 8' Release build/DerivedData/Realm/Build/Products/Release-dynamic ios-dynamic
         exit 0
         ;;
 
@@ -254,7 +255,7 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        xcrealm "-scheme iOS -configuration Debug"
+        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios
         exit 0
         ;;
 
