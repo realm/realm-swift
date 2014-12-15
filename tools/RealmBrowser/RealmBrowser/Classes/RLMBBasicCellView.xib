@@ -20,6 +20,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
+                        <action selector="textFieldDidEndEditing:" target="-2" id="uDT-yx-EbP"/>
                         <outlet property="delegate" destination="-2" id="7m1-iA-F5n"/>
                     </connections>
                 </textField>

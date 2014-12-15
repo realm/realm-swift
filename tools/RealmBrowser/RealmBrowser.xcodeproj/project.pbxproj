@@ -42,7 +42,6 @@
 		22BD0C591A3B0A1900F18DC9 /* RLMBBoolCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22BD0C581A3B0A1900F18DC9 /* RLMBBoolCellView.xib */; };
 		22BD0C5C1A3B0A9900F18DC9 /* RLMBBoolCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BD0C5B1A3B0A9900F18DC9 /* RLMBBoolCellView.m */; };
 		22BD0C601A3B16C200F18DC9 /* RLMBNumberCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BD0C5F1A3B16C200F18DC9 /* RLMBNumberCellView.m */; };
-		22BD0C621A3B16DC00F18DC9 /* RLMBNumberCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22BD0C611A3B16DB00F18DC9 /* RLMBNumberCellView.xib */; };
 		22BD0C641A3B19C400F18DC9 /* RLMBBasicCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22BD0C631A3B19C400F18DC9 /* RLMBBasicCellView.xib */; };
 		22BD0C671A3B19D700F18DC9 /* RLMBBasicCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BD0C661A3B19D700F18DC9 /* RLMBBasicCellView.m */; };
 		22BD0C6B1A3B328E00F18DC9 /* RLMBGutterCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22BD0C6A1A3B328E00F18DC9 /* RLMBGutterCellView.xib */; };
@@ -169,7 +168,6 @@
 		22BD0C5B1A3B0A9900F18DC9 /* RLMBBoolCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBBoolCellView.m; path = Classes/RLMBBoolCellView.m; sourceTree = "<group>"; };
 		22BD0C5E1A3B16C200F18DC9 /* RLMBNumberCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBNumberCellView.h; path = Classes/RLMBNumberCellView.h; sourceTree = "<group>"; };
 		22BD0C5F1A3B16C200F18DC9 /* RLMBNumberCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBNumberCellView.m; path = Classes/RLMBNumberCellView.m; sourceTree = "<group>"; };
-		22BD0C611A3B16DB00F18DC9 /* RLMBNumberCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = RLMBNumberCellView.xib; path = Classes/RLMBNumberCellView.xib; sourceTree = "<group>"; };
 		22BD0C631A3B19C400F18DC9 /* RLMBBasicCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = RLMBBasicCellView.xib; path = Classes/RLMBBasicCellView.xib; sourceTree = "<group>"; };
 		22BD0C651A3B19D700F18DC9 /* RLMBBasicCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMBBasicCellView.h; path = Classes/RLMBBasicCellView.h; sourceTree = "<group>"; };
 		22BD0C661A3B19D700F18DC9 /* RLMBBasicCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMBBasicCellView.m; path = Classes/RLMBBasicCellView.m; sourceTree = "<group>"; };
@@ -291,7 +289,6 @@
 				22BD0C631A3B19C400F18DC9 /* RLMBBasicCellView.xib */,
 				22BD0C581A3B0A1900F18DC9 /* RLMBBoolCellView.xib */,
 				22CDE3121A387935009AE34E /* RLMBLinkCellView.xib */,
-				22BD0C611A3B16DB00F18DC9 /* RLMBNumberCellView.xib */,
 			);
 			name = TableCellViews;
 			sourceTree = "<group>";
@@ -678,7 +675,6 @@
 				84E0F9691921F3B900D6CA14 /* MainMenu.xib in Resources */,
 				84E0F96B1921F3B900D6CA14 /* Images.xcassets in Resources */,
 				22BD0C6B1A3B328E00F18DC9 /* RLMBGutterCellView.xib in Resources */,
-				22BD0C621A3B16DC00F18DC9 /* RLMBNumberCellView.xib in Resources */,
 				84BCA6041951BD07008FC850 /* realm.icns in Resources */,
 				22BD0C591A3B0A1900F18DC9 /* RLMBBoolCellView.xib in Resources */,
 				84E0F9601921F3B900D6CA14 /* Credits.rtf in Resources */,

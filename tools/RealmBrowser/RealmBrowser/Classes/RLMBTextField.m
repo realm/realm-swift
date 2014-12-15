@@ -25,10 +25,16 @@
 
 @implementation RLMBTextField
 
+-(void)cancelOperation:(id)sender
+{
+    [self abortEditing];
+    [self.delegate textFieldDidCancelEditing:self];
+}
+
 -(BOOL)becomeFirstResponder
 {
     [self.delegate textFieldWasSelected:self];
-    return YES;
+    return [super becomeFirstResponder];
 }
 
 @end

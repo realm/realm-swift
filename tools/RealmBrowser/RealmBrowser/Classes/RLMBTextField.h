@@ -21,6 +21,7 @@
 @class RLMBTextField;
 @protocol RLMBTextFieldDelegate <NSTextFieldDelegate>
 - (void)textFieldWasSelected:(NSTextField *)textField;
+- (void)textFieldDidCancelEditing:(NSTextField *)textField;
 @end
 
 

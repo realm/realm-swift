@@ -18,17 +18,24 @@
 
 #import "RLMBPaneViewController.h"
 
-@interface RLMBPaneViewController () <NSTableViewDataSource, NSTableViewDelegate>
+#import "RLMBBoolCellView.h"
+
+NSString *const kRLMBGutterColumnIdentifier = @" #";
+NSString *const kRLMBGutterCellId = @"RLMBGutterCellView";
+NSString *const kRLMBBasicCellId = @"RLMBBasicCellView";
+NSString *const kRLMBLinkCellId = @"RLMBLinkCellView";
+NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
+
+@interface RLMBPaneViewController () <RLMBTextFieldDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic) NSDictionary *properties;
+@property (nonatomic) RLMObjectSchema *objectSchema;
 
 @property (weak) IBOutlet NSTextField *classNameLabel;
 @property (weak) IBOutlet NSSearchField *searchField;
 @property (weak) IBOutlet NSTableView *tableView;
 
 @property (nonatomic) RLMBViewModel *viewModel;
-
-@property (nonatomic) RLMObjectSchema *objectSchema;
 
 @end
 
@@ -39,7 +46,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.viewModel = [[RLMBViewModel alloc] initWithOwner:self];
+        self.viewModel = [[RLMBViewModel alloc] init];
     }
     
     return self;
@@ -47,7 +54,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSArray *cellNibNames = @[kRLMBGutterCellId, kRLMBBasicCellId, kRLMBLinkCellId, kRLMBBoolCellId, kRLMBNumberCellId];
+    NSArray *cellNibNames = @[kRLMBGutterCellId, kRLMBBasicCellId, kRLMBLinkCellId, kRLMBBoolCellId];
     [self registerCellNibsNamed:cellNibNames inTableView:self.tableView];
 }
 
@@ -83,24 +90,47 @@
     [self.realmDelegate changeProperty:tableColumn.identifier ofObject:self.objects[row] toValue:value];
 }
 
-#pragma mark - Text Field Delegate
+#pragma mark - RLMB Text Field Delegate
 
 -(void)textFieldWasSelected:(NSTextField *)textField
 {
+    NSLog(@"textFieldWasSelected: %@", textField);
+
     NSInteger row = [self.tableView rowForView:textField];
     NSInteger column = [self.tableView columnForView:textField];
     NSTableColumn *tableColumn = self.tableView.tableColumns[column];
     
     RLMProperty *property = self.properties[tableColumn.identifier];
-
+    id value = self.objects[row][tableColumn.identifier];
     
-    
-    NSLog(@"textFieldWasSelected %@", textField);
+    NSString *editableString = [self.viewModel editablePropertyValue:value type:property.type];
+    if (editableString) {
+        textField.stringValue = editableString;
+    }
 }
 
--(BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor
+-(void)textFieldDidCancelEditing:(NSTextField *)textField
 {
-    return YES;
+    NSLog(@"textFieldDidCancelEditing: %@", textField);
+    [self.tableView reloadData];
+}
+
+-(IBAction)textFieldDidEndEditing:(NSTextField *)textField
+{
+    NSLog(@"textFieldDidEndEditing: %@", textField);
+    NSInteger row = [self.tableView rowForView:textField];
+    NSInteger column = [self.tableView columnForView:textField];
+    
+    NSTableColumn *tableColumn = self.tableView.tableColumns[column];
+    RLMProperty *property = self.properties[tableColumn.identifier];
+    
+    id value = [self.viewModel valueForString:textField.stringValue type:property.type];
+
+    if (value) {
+        [self.realmDelegate changeProperty:property.name ofObject:self.objects[row] toValue:value];
+    }
+    
+    [self.tableView reloadData];
 }
 
 #pragma mark - Public Methods - Table View Update
@@ -120,13 +150,6 @@
     NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:kRLMBGutterColumnIdentifier];
     [gutterColumn.headerCell setStringValue:@"#"];
     gutterColumn.width = 30;
-    
-//    NSTableHeaderCell *headerCell = gutterColumn.headerCell;
-//    headerCell.wraps = YES;
-//    headerCell.firstLine = @"";
-//    headerCell.secondLine = @"#";
-//    tableColumn.headerCell = headerCell;
-
 //    gutterColumn.headerToolTip = @"Order of object within array";
     
     [self.tableView addTableColumn:gutterColumn];
@@ -155,19 +178,71 @@
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if ([tableColumn.identifier isEqualToString:kRLMBGutterColumnIdentifier]) {
-        return [self.viewModel cellViewForGutter:tableView row:row];
+        NSTableCellView *gutterCellView = [self.tableView makeViewWithIdentifier:kRLMBGutterCellId owner:self];
+        gutterCellView.textField.stringValue = @(row).stringValue;
+        
+        return gutterCellView;
     }
     
     id value = self.objects[row][tableColumn.identifier];
     RLMProperty *property = self.properties[tableColumn.identifier];
     
-    return [self.viewModel tableView:tableView cellViewForValue:value type:property.type];
+    switch (property.type) {
+        case RLMPropertyTypeArray: {
+            NSTableCellView *badgeCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
+            badgeCellView.textField.stringValue = [self.viewModel printableArray:value];
+            
+            //            NSString *string = [self printablePropertyValue:value ofType:type];
+            //            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+            //            badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
+            
+            //            badgeCellView.badge.hidden = NO;
+            //            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", [(RLMArray *)propertyValue count]];
+            //            [badgeCellView.badge.cell setHighlightsBy:0];
+            //            [badgeCellView sizeToFit];
+            
+            return badgeCellView;
+        }
+        case RLMPropertyTypeObject: {
+            NSTableCellView *linkCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
+            //            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
+            //            linkCellView.delegate = self;
+            
+            linkCellView.textField.stringValue = [self.viewModel printableObject:value];
+            //            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+            //            linkCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
+            
+            return linkCellView;
+        }
+            
+        case RLMPropertyTypeBool: {
+            RLMBBoolCellView *boolCellView = [self.tableView makeViewWithIdentifier:kRLMBBoolCellId owner:self];
+            boolCellView.checkBox.state = [(NSNumber *)value boolValue] ? NSOnState : NSOffState;
+            
+            return boolCellView;
+        }
+        case RLMPropertyTypeData:
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeString: {
+            NSTableCellView *basicCellView = [self.tableView makeViewWithIdentifier:kRLMBBasicCellId owner:self];
+            basicCellView.textField.stringValue = [self.viewModel printablePropertyValue:value type:property.type];
+            if (property.type == RLMPropertyTypeData || property.type == RLMPropertyTypeArray) {
+                basicCellView.textField.editable = NO;
+            }
+            
+            return basicCellView;
+        }
+    }
 }
 
 #pragma mark - User Actions
 
 - (IBAction)toggleWidthAction:(NSButton *)sender {
-//    [self.canvasDelegate toggleWidthOfPane:self];
+    //    [self.canvasDelegate toggleWidthOfPane:self];
 }
 
 - (IBAction)userClicked:(NSTableView *)sender

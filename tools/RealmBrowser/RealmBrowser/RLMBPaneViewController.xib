@@ -123,6 +123,7 @@
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <action selector="userClicked:" target="-2" id="aXc-jV-U8i"/>
                                     <outlet property="dataSource" destination="-2" id="LQQ-w8-WFI"/>
                                     <outlet property="delegate" destination="-2" id="a2c-K4-hfC"/>
                                 </connections>

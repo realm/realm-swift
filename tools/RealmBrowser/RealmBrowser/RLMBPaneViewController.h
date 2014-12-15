@@ -37,7 +37,7 @@
 @end
 
 
-@interface RLMBPaneViewController : NSViewController <RLMBTextFieldDelegate>
+@interface RLMBPaneViewController : NSViewController
 
 @property (weak, nonatomic) id<RLMBCanvasDelegate> canvasDelegate;
 @property (weak, nonatomic) id<RLMBRealmDelegate> realmDelegate;
