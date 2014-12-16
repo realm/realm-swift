@@ -29,8 +29,12 @@ RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
 
-void RLMStartListeningForChanges(RLMRealm *realm);
-void RLMStopListeningForChanges(RLMRealm *realm);
-// notify all of the Realms other than `notifyingRealm` at the same path as
-// `notifyingRealm` that a commit has occurred
-void RLMNotifyOtherRealms(RLMRealm *notifyingRealm);
+@interface RLMWeakNotifier : NSObject
+// listens to changes to the realm's file and notifies it when they occur
+// does not retain the Realm
+- (instancetype)initWithRealm:(RLMRealm *)realm;
+// stop listening for changes
+- (void)stop;
+// notify other Realm instances for the same path that a change has occurred
+- (void)notifyOtherRealms;
+@end

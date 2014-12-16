@@ -1150,4 +1150,12 @@ extern "C" {
     XCTAssertThrows([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64] forRealmsAtPath:path]);
 }
 
+- (void)testNotificationPipeBufferOverfull {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    // pipes have a 8 KB buffer on OS X, so verify we don't block after 8192 commits
+    for (int i = 0; i < 9000; ++i) {
+        [realm transactionWithBlock:^{}];
+    }
+}
+
 @end

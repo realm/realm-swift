@@ -25,6 +25,8 @@
 // spawn a child process running the current test and wait for it complete
 // returns the return code of the process
 - (int)runChildAndWait;
+
+- (NSTask *)childTask;
 @end
 
 #define RLMRunChildAndWait() \
