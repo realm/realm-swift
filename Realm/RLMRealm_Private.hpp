@@ -38,6 +38,7 @@ extern "C" {
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
+- (void)handleExternalCommit;
 @end
 
 // throw an exception if the realm is being used from the wrong thread
