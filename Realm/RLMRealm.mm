@@ -24,6 +24,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealmUtil.h"
 #import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -33,6 +34,10 @@
 
 #include <tightdb/version.hpp>
 #include <tightdb/commit_log.hpp>
+
+using namespace std;
+using namespace tightdb;
+using namespace tightdb::util;
 
 // Notification Token
 
@@ -45,20 +50,11 @@
 - (void)dealloc
 {
     if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold \
-              on to the RLMNotificationToken returned from addNotificationBlock and call \
-              removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
+               "on to the RLMNotificationToken returned from addNotificationBlock and call "
+               "removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
-@end
-
-// A weak holder for an RLMRealm to allow calling performSelector:onThread: without
-// a strong reference to the realm
-@interface RLMWeakNotifier : NSObject
-@property (nonatomic, weak) RLMRealm *realm;
-
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)notify;
 @end
 
 using namespace std;
@@ -68,7 +64,7 @@ using namespace tightdb::util;
 //
 // Global encryption key cache and validation
 //
-static NSMutableDictionary *s_keysPerPath;
+static NSMutableDictionary *s_keysPerPath = [NSMutableDictionary new];
 static NSData *keyForPath(NSString *path) {
     @synchronized (s_keysPerPath) {
         return s_keysPerPath[path];
@@ -88,7 +84,7 @@ static void setKeyForPath(NSData *key, NSString *path) {
 
 static void clearKeyCache() {
     @synchronized(s_keysPerPath) {
-        s_keysPerPath = [NSMutableDictionary dictionary];
+        [s_keysPerPath removeAllObjects];
     }
 }
 
@@ -100,56 +96,10 @@ static NSData *validatedKey(NSData *key) {
 }
 
 //
-// Global RLMRealm instance cache
-//
-static NSMutableDictionary *s_realmsPerPath;
-
-// FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
-//  rather than by the path (since the path is not a reliable identifier). This requires additional support
-//  from the core library though, because the inode,device number pair needs to be taken from the open file
-//  (to avoid race conditions).
-static RLMRealm *cachedRealm(NSString *path) {
-    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
-    @synchronized(s_realmsPerPath) {
-        return [s_realmsPerPath[path] objectForKey:@(threadID)];
-    }
-}
-
-static void cacheRealm(RLMRealm *realm, NSString *path) {
-    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
-    @synchronized(s_realmsPerPath) {
-        if (!s_realmsPerPath[path]) {
-            s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
-        }
-        [s_realmsPerPath[path] setObject:realm forKey:@(threadID)];
-    }
-}
-
-static NSArray *realmsAtPath(NSString *path) {
-    @synchronized(s_realmsPerPath) {
-        return [s_realmsPerPath[path] objectEnumerator].allObjects;
-    }
-}
-
-static bool realmsOpenAtPath(NSString *path) {
-    return realmsAtPath(path).count > 0;
-}
-
-static void clearRealmCache() {
-    @synchronized(s_realmsPerPath) {
-        for (NSMapTable *map in s_realmsPerPath.allValues) {
-            [map removeAllObjects];
-        }
-        s_realmsPerPath = [NSMutableDictionary dictionary];
-    }
-}
-
-
-//
 // Schema version and migration blocks
 //
-static NSMutableDictionary *s_migrationBlocks;
-static NSMutableDictionary *s_schemaVersions;
+static NSMutableDictionary *s_migrationBlocks = [NSMutableDictionary new];
+static NSMutableDictionary *s_schemaVersions = [NSMutableDictionary new];
 
 static NSUInteger schemaVersionForPath(NSString *path) {
     @synchronized(s_migrationBlocks) {
@@ -169,22 +119,17 @@ static RLMMigrationBlock migrationBlockForPath(NSString *path) {
 
 static void clearMigrationCache() {
     @synchronized(s_migrationBlocks) {
-        s_migrationBlocks = [NSMutableDictionary new];
-        s_schemaVersions = [NSMutableDictionary new];
+        [s_migrationBlocks removeAllObjects];
+        [s_schemaVersions removeAllObjects];
     }
 }
 
-//
-// Global realm state
-//
 static NSString *s_defaultRealmPath = nil;
-
-NSString * const c_defaultRealmFileName = @"default.realm";
+static NSString * const c_defaultRealmFileName = @"default.realm";
 
 @implementation RLMRealm {
     // Used for read-write realms
-    NSThread *_thread;
-    NSMapTable *_notificationHandlers;
+    NSHashTable *_notificationHandlers;
 
     std::unique_ptr<Replication> _replication;
     std::unique_ptr<SharedGroup> _sharedGroup;
@@ -209,20 +154,15 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     }
     initialized = true;
 
-    // set up global realm cache
     RLMCheckForUpdates();
-
-    // reset global state
-    [RLMRealm resetRealmState];
 }
 
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)outError {
     self = [super init];
     if (self) {
         _path = path;
-        _thread = [NSThread currentThread];
         _threadID = pthread_mach_thread_np(pthread_self());
-        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
+        _notificationHandlers = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _inMemory = inMemory;
         _dynamic = dynamic;
@@ -395,7 +335,7 @@ static id RLMAutorelease(id value) {
     }
 
     // try to reuse existing realm first
-    RLMRealm *realm = cachedRealm(path);
+    RLMRealm *realm = RLMGetCurrentThreadCachedRealmForPath(path);
     if (realm) {
         if (realm->_readOnly != readonly) {
             @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
@@ -416,7 +356,8 @@ static id RLMAutorelease(id value) {
     }
 
     // we need to protect the realm cache and accessors cache
-    @synchronized(s_realmsPerPath) {
+    static id initLock = [NSObject new];
+    @synchronized(initLock) {
         // create tables, set schema, and create accessors when needed
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
@@ -429,10 +370,10 @@ static id RLMAutorelease(id value) {
         }
         else {
             // check cache for existing cached realms with the same path
-            NSArray *realms = realmsAtPath(path);
-            if (realms.count) {
+            RLMRealm *existingRealm = RLMGetAnyCachedRealmForPath(path);
+            if (existingRealm) {
                 // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(realm, [[realms[0] schema] shallowCopy], false);
+                RLMRealmSetSchema(realm, [existingRealm.schema shallowCopy], false);
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
@@ -450,10 +391,14 @@ static id RLMAutorelease(id value) {
             // initializing the schema started a read transaction, so end it
             [realm invalidate];
         }
+
+        if (!dynamic) {
+            RLMCacheRealm(realm);
+        }
     }
 
-    if (!dynamic) {
-        cacheRealm(realm, path);
+    if (!readonly) {
+        RLMStartListeningForChanges(realm);
     }
 
     return RLMAutorelease(realm);
@@ -477,7 +422,7 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
-    if (realmsOpenAtPath(path)) {
+    if (RLMGetAnyCachedRealmForPath(path)) {
         @throw RLMException(@"Cannot set encryption key for Realms that are already open.");
     }
 
@@ -486,8 +431,8 @@ static id RLMAutorelease(id value) {
 
 + (void)resetRealmState {
     clearMigrationCache();
-    clearRealmCache();
     clearKeyCache();
+    RLMClearRealmCache();
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
@@ -506,14 +451,14 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
     token.block = block;
-    [_notificationHandlers setObject:token forKey:token];
+    [_notificationHandlers addObject:token];
     return token;
 }
 
 - (void)removeNotification:(RLMNotificationToken *)token {
     RLMCheckThread(self);
     if (token) {
-        [_notificationHandlers removeObjectForKey:token];
+        [_notificationHandlers removeObject:token];
         token.realm = nil;
         token.block = nil;
     }
@@ -575,14 +520,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             _inWriteTransaction = NO;
 
             // notify other realm instances of changes
-            NSArray *realms = realmsAtPath(_path);
-            for (RLMRealm *realm in realms) {
-                if (![realm isEqual:self]) {
-                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                    [notifier performSelector:@selector(notify)
-                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                }
-            }
+            RLMNotifyOtherRealms(self);
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
@@ -648,6 +586,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
               "pending changes have been rolled back. Make sure to retain a reference to the "
               "RLMRealm for the duration of the write transaction.");
     }
+    RLMStopListeningForChanges(self);
 }
 
 - (void)handleExternalCommit {
@@ -789,7 +728,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
-    if (realmsOpenAtPath(realmPath)) {
+    if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
@@ -810,7 +749,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
     key = validatedKey(key) ?: keyForPath(realmPath);
-    RLMRealm *realm = cachedRealm(realmPath);
+    RLMRealm *realm = RLMGetCurrentThreadCachedRealmForPath(realmPath);
     if (!realm) {
         NSError *error;
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
@@ -836,7 +775,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
-    if (realmsOpenAtPath(realmPath)) {
+    if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
@@ -897,20 +836,4 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return [self writeCopyToPath:path key:key error:error];
 }
 
-@end
-
-@implementation RLMWeakNotifier
-- (instancetype)initWithRealm:(RLMRealm *)realm
-{
-    self = [super init];
-    if (self) {
-        _realm = realm;
-    }
-    return self;
-}
-
-- (void)notify
-{
-    [_realm handleExternalCommit];
-}
 @end
