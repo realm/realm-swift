@@ -20,6 +20,20 @@
 
 #import "RLMRealm_Private.hpp"
 
+#import <tightdb/group_shared.hpp>
+#import <tightdb/commit_log.hpp>
+#import <tightdb/lang_bind_helper.hpp>
+
+// A weak holder for an RLMRealm to allow calling performSelector:onThread:
+// without a strong reference to the realm
+@interface RLMWeakNotifier : NSObject
+@property (nonatomic, weak) RLMRealm *realm;
+@property (nonatomic, strong) void (^stop)();
+
+- (instancetype)initWithRealm:(RLMRealm *)realm;
+- (void)notifyOnTargetThread;
+@end
+
 // Global realm state
 static NSMutableDictionary *s_realmsPerPath = [NSMutableDictionary new];
 static NSMutableDictionary *s_notifiersPerPath = [NSMutableDictionary new];
@@ -49,57 +63,121 @@ RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path) {
 
 void RLMClearRealmCache() {
     @synchronized(s_realmsPerPath) {
-        for (NSMapTable *map in s_realmsPerPath.allValues) {
-            [map removeAllObjects];
-        }
         [s_realmsPerPath removeAllObjects];
     }
+    NSMutableArray *stopBlocks;
     @synchronized (s_notifiersPerPath) {
+        if (s_notifiersPerPath.count == 0) {
+            return;
+        }
+
+        stopBlocks = [NSMutableArray arrayWithCapacity:s_notifiersPerPath.count];
+        for (NSMutableSet *set in s_notifiersPerPath.objectEnumerator) {
+            if (id stop = [(RLMWeakNotifier *)set.anyObject stop])
+                [stopBlocks addObject:stop];
+            for (RLMWeakNotifier *notifier in set) {
+                notifier.stop = nil;
+            }
+        }
+
         [s_notifiersPerPath removeAllObjects];
+    }
+
+    // have to call stop() with s_notifiersPerPath unlocked as it waits for
+    // something that wants to lock s_notifiersPerPath
+    for (void (^stop)() in stopBlocks) {
+        stop();
     }
 }
 
-// A weak holder for an RLMRealm to allow calling performSelector:onThread:
-// without a strong reference to the realm
-@interface RLMWeakNotifier : NSObject
-@property (nonatomic, weak) RLMRealm *realm;
-
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)notifyOnTargetThread;
-@end
-
 void RLMStartListeningForChanges(RLMRealm *realm) {
     @synchronized (s_notifiersPerPath) {
-        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
+        NSMutableSet *notifiers = s_notifiersPerPath[realm.path];
         if (!notifiers) {
-            notifiers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsStrongMemory];
+            notifiers = [NSMutableSet new];
             s_notifiersPerPath[realm.path] = notifiers;
         }
-        [notifiers setObject:[[RLMWeakNotifier alloc] initWithRealm:realm] forKey:realm];
+
+        RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+        realm.notifier = notifier;
+        // If there's already a realm listening for changes to this path, no need
+        // to spawn another listener thread
+        if (RLMWeakNotifier *existing = notifiers.anyObject) {
+            notifier.stop = existing.stop;
+            [notifiers addObject:notifier];
+            return;
+        }
+        [notifiers addObject:notifier];
+
+        dispatch_queue_t queue = dispatch_queue_create(realm.path.UTF8String, 0);
+        __block bool cancel = false;
+        __block SharedGroup *group = nil;
+        notifier.stop = ^{
+            cancel = true;
+            @synchronized (queue) {
+                if (group) {
+                    group->wait_for_change_release();
+                }
+            }
+
+            // wait for the thread to wake up and tear down the SharedGroup to
+            // ensure that it doesn't continue to care about the files on disk after
+            // the last RLMRealm instance for them is deallocated
+            dispatch_sync(queue, ^{});
+        };
+
+        NSString *path = realm.path;
+        SharedGroup::DurabilityLevel durability = realm->_inMemory ? SharedGroup::durability_MemOnly
+                                                                   : SharedGroup::durability_Full;
+
+        dispatch_async(queue, ^{
+            std::unique_ptr<Replication> replication(tightdb::makeWriteLogCollector(path.UTF8String));
+            SharedGroup sg(*replication, durability);
+            @synchronized(queue) {
+                group = &sg;
+            }
+            sg.begin_read();
+
+            while (!cancel && sg.wait_for_change() && !cancel) {
+                // we don't have any accessors, so just start a new read transaction
+                // rather than using advance_read() as that does far more work
+                sg.end_read();
+                sg.begin_read();
+
+                @synchronized (s_notifiersPerPath) {
+                    for (RLMWeakNotifier *notifier in notifiers) {
+                        [notifier notifyOnTargetThread];
+                    }
+                }
+            }
+
+            @synchronized (queue) {
+                group = nil;
+            }
+        });
     }
 }
 
 void RLMStopListeningForChanges(RLMRealm *realm) {
-    @synchronized (s_notifiersPerPath) {
-        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
-        if (!notifiers) {
-            return;
-        }
+    if (!realm.notifier) {
+        return;
+    }
 
-        [notifiers removeObjectForKey:realm];
-        if (!notifiers.objectEnumerator.nextObject) {
+    dispatch_block_t stop = nil;
+
+    @synchronized (s_notifiersPerPath) {
+        NSMutableSet *notifiers = s_notifiersPerPath[realm.path];
+        [notifiers removeObject:realm.notifier];
+
+        if (notifiers && notifiers.count == 0) {
+            stop = realm.notifier.stop;
             [s_notifiersPerPath removeObjectForKey:realm.path];
         }
     }
-}
 
-void RLMNotifyOtherRealms(RLMRealm *notifyingRealm) {
-    @synchronized (s_notifiersPerPath) {
-        for (RLMWeakNotifier *notifier in [s_notifiersPerPath[notifyingRealm.path] objectEnumerator]) {
-            if (notifier.realm != notifyingRealm) {
-                [notifier notifyOnTargetThread];
-            }
-        }
+    // Needs to be called with s_notifiersPerPath unlocked
+    if (stop) {
+        stop();
     }
 }
 
@@ -130,4 +208,5 @@ void RLMNotifyOtherRealms(RLMRealm *notifyingRealm) {
                      onThread:_thread withObject:nil waitUntilDone:NO];
     }
 }
+
 @end
