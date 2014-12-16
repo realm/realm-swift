@@ -75,10 +75,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 + (void)setUp
 {
     [super setUp];
-    
-    // Delete Realm files
-    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
-    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+    [self deleteFiles];
 }
 
 + (void)tearDown

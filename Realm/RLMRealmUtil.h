@@ -16,25 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.h"
-#import "RLMUtil.hpp"
+#import <Foundation/Foundation.h>
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/group.hpp>
-#import <pthread.h>
+@class RLMRealm;
 
-namespace tightdb {
-    class Group;
-}
+// Add a Realm to the weak cache
+void RLMCacheRealm(RLMRealm *realm);
+// Get a Realm for the given path which can be used on the current thread
+RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path);
+// Get a Realm for the given path
+RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
+// Clear the weak cache of Realms
+void RLMClearRealmCache();
 
-@interface RLMRealm ()
-@property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
-- (void)handleExternalCommit;
-@end
-
-// throw an exception if the realm is being used from the wrong thread
-static inline void RLMCheckThread(__unsafe_unretained RLMRealm *realm) {
-    if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
-        @throw RLMException(@"Realm accessed from incorrect thread");
-    }
-}
+void RLMStartListeningForChanges(RLMRealm *realm);
+void RLMStopListeningForChanges(RLMRealm *realm);
+// notify all of the Realms other than `notifyingRealm` at the same path as
+// `notifyingRealm` that a commit has occurred
+void RLMNotifyOtherRealms(RLMRealm *notifyingRealm);
