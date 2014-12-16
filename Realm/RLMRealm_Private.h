@@ -18,16 +18,20 @@
 
 #import <Realm/RLMRealm.h>
 
+@class RLMWeakNotifier;
+
 // RLMRealm private members
 @interface RLMRealm () {
     @public
     // expose ivar to to avoid objc messages in accessors
     BOOL _inWriteTransaction;
+    BOOL _inMemory;
     mach_port_t _threadID;
 }
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
+@property (nonatomic, strong) RLMWeakNotifier *notifier;
 
 + (void)resetRealmState;
 
