@@ -62,7 +62,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
     }
-    
+
     [[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:nil];
     if ([[NSFileManager defaultManager] fileExistsAtPath:RLMLockPath(path)]) {
         @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
@@ -91,10 +91,7 @@ static BOOL encryptTests() {
 - (void)setUp
 {
     [super setUp];
-    
-    // Delete Realm files
-    RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
-    RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+    [self deleteFiles];
 
     if (encryptTests()) {
         [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
@@ -111,7 +108,7 @@ static BOOL encryptTests() {
 - (void)deleteFiles {
     // Clear cache
     [RLMRealm resetRealmState];
-    
+
     // Delete Realm files
     RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());

@@ -131,6 +131,12 @@
 		3F6B897119EF3C06004E8EA8 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F6B897219EF3C06004E8EA8 /* RLMUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F811955FC9300FDED82 /* RLMUtil.hpp */; };
 		3F6B89AF19EF40BA004E8EA8 /* libtightdb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F6B89AE19EF40BA004E8EA8 /* libtightdb-ios.a */; };
+		3F7668F81A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F7668F61A6D96C50058F4F1 /* RLMRealmUtil.h */; };
+		3F7668F91A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F7668F61A6D96C50058F4F1 /* RLMRealmUtil.h */; };
+		3F7668FA1A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F7668F61A6D96C50058F4F1 /* RLMRealmUtil.h */; };
+		3F7668FB1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7668F71A6D96C50058F4F1 /* RLMRealmUtil.mm */; };
+		3F7668FC1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7668F71A6D96C50058F4F1 /* RLMRealmUtil.mm */; };
+		3F7668FD1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7668F71A6D96C50058F4F1 /* RLMRealmUtil.mm */; };
 		3F7792371A60A646004E4CA6 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7792361A60A646004E4CA6 /* ResultsTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		3F7792381A60A646004E4CA6 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7792361A60A646004E4CA6 /* ResultsTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		3F7792391A60A646004E4CA6 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F7792361A60A646004E4CA6 /* ResultsTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -408,6 +414,8 @@
 		3F68999A1A9FB04800DFDE6A /* EncryptionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EncryptionTests.m; sourceTree = "<group>"; };
 		3F6B897819EF3C06004E8EA8 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F6B89AE19EF40BA004E8EA8 /* libtightdb-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-ios.a"; path = "../core/libtightdb-ios.a"; sourceTree = "<group>"; };
+		3F7668F61A6D96C50058F4F1 /* RLMRealmUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmUtil.h; sourceTree = "<group>"; };
+		3F7668F71A6D96C50058F4F1 /* RLMRealmUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmUtil.mm; sourceTree = "<group>"; };
 		3F7792361A60A646004E4CA6 /* ResultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultsTests.m; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
@@ -693,6 +701,8 @@
 				E8951F01196C96DE00D6461C /* RLMRealm_Dynamic.h */,
 				29FA588A1A7AE56D00A222E5 /* RLMRealm_Private.h */,
 				E81A1F7A1955FC9300FDED82 /* RLMRealm_Private.hpp */,
+				3F7668F61A6D96C50058F4F1 /* RLMRealmUtil.h */,
+				3F7668F71A6D96C50058F4F1 /* RLMRealmUtil.mm */,
 				02B8EF5819E601D80045A93D /* RLMResults.h */,
 				E81A1F6A1955FC9300FDED82 /* RLMResults.mm */,
 				29FA58771A7AC0EF00A222E5 /* RLMResults_Private.h */,
@@ -771,6 +781,7 @@
 				3F6B896D19EF3C06004E8EA8 /* RLMRealm_Dynamic.h in Headers */,
 				29FA588D1A7AE56D00A222E5 /* RLMRealm_Private.h in Headers */,
 				3F6B896E19EF3C06004E8EA8 /* RLMRealm_Private.hpp in Headers */,
+				3F7668FA1A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */,
 				3F6B895F19EF3C06004E8EA8 /* RLMResults.h in Headers */,
 				29FA587A1A7AC0EF00A222E5 /* RLMResults_Private.h in Headers */,
 				3F6B896F19EF3C06004E8EA8 /* RLMSchema.h in Headers */,
@@ -809,6 +820,7 @@
 				E8951F03196C96DE00D6461C /* RLMRealm_Dynamic.h in Headers */,
 				29FA588C1A7AE56D00A222E5 /* RLMRealm_Private.h in Headers */,
 				E856D2091956154C00FB2FCF /* RLMRealm_Private.hpp in Headers */,
+				3F7668F91A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */,
 				02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */,
 				29FA58791A7AC0EF00A222E5 /* RLMResults_Private.h in Headers */,
 				E856D20D1956154C00FB2FCF /* RLMSchema.h in Headers */,
@@ -847,6 +859,7 @@
 				E8951F02196C96DE00D6461C /* RLMRealm_Dynamic.h in Headers */,
 				29FA588B1A7AE56D00A222E5 /* RLMRealm_Private.h in Headers */,
 				E81A1FA71955FC9300FDED82 /* RLMRealm_Private.hpp in Headers */,
+				3F7668F81A6D96C50058F4F1 /* RLMRealmUtil.h in Headers */,
 				02B8EF5919E601D80045A93D /* RLMResults.h in Headers */,
 				29FA58781A7AC0EF00A222E5 /* RLMResults_Private.h in Headers */,
 				E81A1FAC1955FC9300FDED82 /* RLMSchema.h in Headers */,
@@ -1211,6 +1224,7 @@
 				3F6B895019EF3C06004E8EA8 /* RLMProperty.mm in Sources */,
 				3F6B895119EF3C06004E8EA8 /* RLMQueryUtil.mm in Sources */,
 				3F6B895219EF3C06004E8EA8 /* RLMRealm.mm in Sources */,
+				3F7668FD1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */,
 				3F6B894A19EF3C06004E8EA8 /* RLMResults.mm in Sources */,
 				3F6B895319EF3C06004E8EA8 /* RLMSchema.mm in Sources */,
 				3F6B895419EF3C06004E8EA8 /* RLMSwiftSupport.m in Sources */,
@@ -1266,6 +1280,7 @@
 				E856D2061956154C00FB2FCF /* RLMProperty.mm in Sources */,
 				E856D2081956154C00FB2FCF /* RLMQueryUtil.mm in Sources */,
 				E856D20B1956154C00FB2FCF /* RLMRealm.mm in Sources */,
+				3F7668FC1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */,
 				E856D1F91956154C00FB2FCF /* RLMResults.mm in Sources */,
 				E856D20E1956154C00FB2FCF /* RLMSchema.mm in Sources */,
 				3FDE338C19C37E4C003B7DBA /* RLMSwiftSupport.m in Sources */,
@@ -1332,6 +1347,7 @@
 				E81A1FA21955FC9300FDED82 /* RLMProperty.mm in Sources */,
 				E81A1FA51955FC9300FDED82 /* RLMQueryUtil.mm in Sources */,
 				E81A1FA91955FC9300FDED82 /* RLMRealm.mm in Sources */,
+				3F7668FB1A6D96C50058F4F1 /* RLMRealmUtil.mm in Sources */,
 				E81A1F901955FC9300FDED82 /* RLMResults.mm in Sources */,
 				E81A1FAD1955FC9300FDED82 /* RLMSchema.mm in Sources */,
 				3F452EC619C2279800AFC154 /* RLMSwiftSupport.m in Sources */,
