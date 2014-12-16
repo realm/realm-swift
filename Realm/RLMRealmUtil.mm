@@ -20,9 +20,13 @@
 
 #import "RLMRealm_Private.hpp"
 
+#import <sys/event.h>
+#import <sys/stat.h>
+#import <sys/time.h>
+#import <unistd.h>
+
 // Global realm state
 static NSMutableDictionary *s_realmsPerPath = [NSMutableDictionary new];
-static NSMutableDictionary *s_notifiersPerPath = [NSMutableDictionary new];
 
 void RLMCacheRealm(RLMRealm *realm) {
     @synchronized(s_realmsPerPath) {
@@ -49,85 +53,116 @@ RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path) {
 
 void RLMClearRealmCache() {
     @synchronized(s_realmsPerPath) {
-        for (NSMapTable *map in s_realmsPerPath.allValues) {
-            [map removeAllObjects];
-        }
         [s_realmsPerPath removeAllObjects];
-    }
-    @synchronized (s_notifiersPerPath) {
-        [s_notifiersPerPath removeAllObjects];
-    }
-}
-
-// A weak holder for an RLMRealm to allow calling performSelector:onThread:
-// without a strong reference to the realm
-@interface RLMWeakNotifier : NSObject
-@property (nonatomic, weak) RLMRealm *realm;
-
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)notifyOnTargetThread;
-@end
-
-void RLMStartListeningForChanges(RLMRealm *realm) {
-    @synchronized (s_notifiersPerPath) {
-        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
-        if (!notifiers) {
-            notifiers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsStrongMemory];
-            s_notifiersPerPath[realm.path] = notifiers;
-        }
-        [notifiers setObject:[[RLMWeakNotifier alloc] initWithRealm:realm] forKey:realm];
-    }
-}
-
-void RLMStopListeningForChanges(RLMRealm *realm) {
-    @synchronized (s_notifiersPerPath) {
-        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
-        if (!notifiers) {
-            return;
-        }
-
-        [notifiers removeObjectForKey:realm];
-        if (!notifiers.objectEnumerator.nextObject) {
-            [s_notifiersPerPath removeObjectForKey:realm.path];
-        }
-    }
-}
-
-void RLMNotifyOtherRealms(RLMRealm *notifyingRealm) {
-    @synchronized (s_notifiersPerPath) {
-        for (RLMWeakNotifier *notifier in [s_notifiersPerPath[notifyingRealm.path] objectEnumerator]) {
-            if (notifier.realm != notifyingRealm) {
-                [notifier notifyOnTargetThread];
-            }
-        }
     }
 }
 
 @implementation RLMWeakNotifier {
-    NSThread *_thread;
-    // flag used to avoid queuing up redundant notifications
-    std::atomic_flag _hasPendingNotification;
+    __weak RLMRealm *_realm;
+    int _notifyFd;
+    int _shutdownFd;
+}
+
+static void checkError(int ret) {
+    if (ret < 0 && errno != EEXIST) {
+        @throw RLMException(@(strerror(errno)));
+    }
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm {
     self = [super init];
     if (self) {
         _realm = realm;
-        _thread = [NSThread currentThread];
-        _hasPendingNotification.clear();
+
+        const char *path = [realm.path stringByAppendingString:@".note"].UTF8String;
+        checkError(mkfifo(path, 0600));
+
+        checkError(_notifyFd = open(path, O_RDWR));
+        // return -1 if pipe is full rather than blocking
+        fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
+
+        int pipeFd[2];
+        checkError(pipe(pipeFd));
+        _shutdownFd = pipeFd[1];
+
+        CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+
+        // Add a source to the current runloop that we'll signal every time
+        // there's a commit
+        CFRunLoopSourceContext ctx{};
+        ctx.info = (__bridge void *)self;
+        ctx.perform = [](void *info) {
+            RLMWeakNotifier *notifier = (__bridge RLMWeakNotifier *)info;
+            if (RLMRealm *realm = notifier->_realm) {
+                [realm handleExternalCommit];
+            }
+        };
+        CFRunLoopSourceRef signal = CFRunLoopSourceCreate(0, 0, &ctx);
+        CFRunLoopAddSource(runLoop, signal, kCFRunLoopDefaultMode);
+        CFRelease(signal);
+
+        int kq = kqueue();
+        checkError(kq);
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), [=] {
+            // Set up the kqueue to wait for data to become available to read
+            // on either the fifo shared with other processes or the pipe used
+            // to signal shutdowns
+            struct kevent ke[2];
+            EV_SET(&ke[0], _notifyFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
+            EV_SET(&ke[1], pipeFd[0], EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
+            kevent(kq, ke, 2, nullptr, 0, nullptr);
+
+            while (true) {
+                struct kevent ev;
+                // Wait until there's more data available on either of the fds.
+                // EV_CLEAR makes it only return each event once, so we don't
+                // need to actually read from the fifo (which is good, as it
+                // means that a single write can wake up everyone waiting on the fifo)
+                int ret = kevent(kq, nullptr, 0, &ev, 1, nullptr);
+                if (ret <= 0) {
+                    continue;
+                }
+
+                if (ev.ident == (uint32_t)pipeFd[0]) {
+                    // Someone called -stop, so tear everything down and exit
+                    CFRunLoopSourceInvalidate(signal);
+                    close(_notifyFd);
+                    close(pipeFd[0]);
+                    close(pipeFd[1]);
+                    close(kq);
+                    return;
+                }
+
+                CFRunLoopSourceSignal(signal);
+                CFRunLoopWakeUp(runLoop);
+            }
+        });
     }
     return self;
 }
 
-- (void)notify {
-    _hasPendingNotification.clear();
-    [_realm handleExternalCommit];
+static void notifyFd(int fd) {
+    while (true) {
+        char c = 0;
+        ssize_t ret = write(fd, &c, 1);
+        if (ret == 1) {
+            break;
+        }
+        assert(ret == -1 && errno == EAGAIN);
+
+        // pipe is full so read some data from it to make space
+        char buff[1024];
+        read(fd, buff, sizeof buff);
+    }
 }
 
-- (void)notifyOnTargetThread {
-    if (!_hasPendingNotification.test_and_set()) {
-        [self performSelector:@selector(notify)
-                     onThread:_thread withObject:nil waitUntilDone:NO];
-    }
+- (void)stop {
+    // wake up the kqueue
+    notifyFd(_shutdownFd);
+}
+
+- (void)notifyOtherRealms {
+    notifyFd(_notifyFd);
 }
 @end

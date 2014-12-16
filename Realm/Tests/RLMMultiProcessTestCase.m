@@ -73,18 +73,24 @@
     }
 }
 
-- (int)runChildAndWait {
+- (NSTask *)childTask {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
-
-    NSPipe *outputPipe = [NSPipe pipe];
-    NSFileHandle *handle = outputPipe.fileHandleForReading;
 
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = self.xctestPath;
     task.arguments = @[@"-XCTest", testName, self.testsPath];
     task.environment = env;
+    task.standardError = nil;
+    return task;
+}
+
+- (int)runChildAndWait {
+    NSPipe *outputPipe = [NSPipe pipe];
+    NSFileHandle *handle = outputPipe.fileHandleForReading;
+
+    NSTask *task = [self childTask];
     task.standardError = outputPipe;
     [task launch];
 
