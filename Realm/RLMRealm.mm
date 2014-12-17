@@ -154,7 +154,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     NSThread *_thread;
     NSMapTable *_notificationHandlers;
 
-    std::unique_ptr<LangBindHelper::TransactLogRegistry> _writeLogs;
     std::unique_ptr<Replication> _replication;
     std::unique_ptr<SharedGroup> _sharedGroup;
 
@@ -202,7 +201,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 _group = _readGroup.get();
             }
             else {
-                _writeLogs.reset(tightdb::getWriteLogs(path.UTF8String));
                 _replication.reset(tightdb::makeWriteLogCollector(path.UTF8String));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
@@ -217,12 +215,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         }
         catch (File::AccessError &ex) {
             *error = make_realm_error(RLMErrorFileAccessError, ex);
-        }
-        catch (SharedGroup::PresumablyStaleLockFile &ex) {
-            *error = make_realm_error(RLMErrorStaleLockFile, ex);
-        }
-        catch (SharedGroup::LockFileButNoData &ex) {
-            *error = make_realm_error(RLMErrorLockFileButNoData, ex);
         }
         catch (exception &ex) {
             *error = make_realm_error(RLMErrorFail, ex);
@@ -477,7 +469,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // begin the read transaction if needed
             [self getOrCreateGroup];
 
-            LangBindHelper::promote_to_write(*_sharedGroup, *_writeLogs);
+            LangBindHelper::promote_to_write(*_sharedGroup);
 
             if (announce) {
                 [self sendNotifications:RLMRealmDidChangeNotification];
@@ -581,7 +573,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         if (_sharedGroup->has_changed()) { // Throws
             if (_autorefresh) {
                 if (_group) {
-                    LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+                    LangBindHelper::advance_read(*_sharedGroup);
                 }
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
@@ -608,7 +600,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
             if (_group) {
-                LangBindHelper::advance_read(*_sharedGroup, *_writeLogs);
+                LangBindHelper::advance_read(*_sharedGroup);
             }
             else {
                 // Create the read transaction
