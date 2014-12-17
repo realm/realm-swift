@@ -162,6 +162,14 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 @end
 
+@interface StringSubclassDataObject : NSObject
+@property NSString *stringCol;
+@property (getter=customGetter) NSString *stringCol2;
+@end
+
+@implementation StringSubclassDataObject
+@end
+
 
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
@@ -484,12 +492,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithObject:@[NSNull.null, @[]]];
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
-    [realm commitWriteTransaction];
-
-    // create subclass with instance of base class
-    [realm beginWriteTransaction];
-    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:StringObject.allObjects.firstObject]);
-    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:StringObject.allObjects.firstObject]);
     [realm commitWriteTransaction];
 }
 
@@ -856,6 +858,25 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     [realm1 commitWriteTransaction];
     [realm2 commitWriteTransaction];
+}
+
+- (void)testCreateInRealmWithOtherObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    StringObject *object = [StringObject createInDefaultRealmWithObject:@[@"string"]];
+
+    // create subclass with instance of base class with/without default objects
+    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:object]);
+    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:object]);
+
+    // create using non-realm object with custom getter
+    StringSubclassDataObject *obj = [StringSubclassDataObject new];
+    obj.stringCol = @"a";
+    obj.stringCol2 = @"b";
+    [StringSubclassObjectWithDefaults createInDefaultRealmWithObject:obj];
+
+    XCTAssertEqual(2U, StringSubclassObjectWithDefaults.allObjects.count);
+    [realm commitWriteTransaction];
 }
 
 - (void)testCreateInRealmWithMissingValue
