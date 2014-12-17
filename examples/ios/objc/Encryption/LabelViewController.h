@@ -16,19 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "AppDelegate.h"
+#import <UIKit/UIKit.h>
 
-#import "LabelViewController.h"
-
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.rootViewController = [[LabelViewController alloc] init];
-    [self.window makeKeyAndVisible];
-
-    return YES;
-}
+@interface LabelViewController : UIViewController
 
 @end

@@ -36,6 +36,7 @@
     XCTAssertEqual(YES, success);
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithPath:fileURL.path
+                                          key:nil
                                      readOnly:NO
                                      inMemory:NO
                                       dynamic:YES

@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Fix a memory leak when circularly linked objects are added to a Realm.
+* Add support for encrypting Realm files on disk.
 
 ### Bugfixes
 
@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   due to a migration being needed.
 * Fixed issue where objects with custom getter names couldn't be used to
   initialize other objects.
+* Fix a major performance regression on queries on string properties.
+* Fix a memory leak when circularly linked objects are added to a Realm.
 
 
 0.88.0 Release notes (2014-12-02)
