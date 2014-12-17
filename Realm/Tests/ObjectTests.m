@@ -152,7 +152,16 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation StringSubclassObject
 @end
 
-@interface StringSubclassObjectWithDefaults : StringObject
+@interface StringObjectNoThrow : StringObject
+@end
+
+@implementation StringObjectNoThrow
+- (id)valueForUndefinedKey:(__unused NSString *)key {
+    return nil;
+}
+@end
+
+@interface StringSubclassObjectWithDefaults : StringObjectNoThrow
 @property NSString *stringCol2;
 @end
 
@@ -863,7 +872,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testCreateInRealmWithOtherObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    StringObject *object = [StringObject createInDefaultRealmWithObject:@[@"string"]];
+    StringObjectNoThrow *object = [StringObjectNoThrow createInDefaultRealmWithObject:@[@"string"]];
 
     // create subclass with instance of base class with/without default objects
     XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:object]);
@@ -978,7 +987,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testUnretainedRealmObjectUnknownKey
 {
     IntObject *obj = [[IntObject alloc] init];
-    XCTAssertNil([obj objectForKeyedSubscript:@""]);
+    XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
+                                 @"NSUnknownKeyException");
     XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
                                  @"NSUnknownKeyException");
 }
