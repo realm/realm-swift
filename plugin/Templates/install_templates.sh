@@ -1,6 +1,16 @@
 #!/bin/sh
 PATH=/bin:/usr/bin:/usr/libexec
 
+# User File Templates
+
+FILE_TEMPLATES_DIR="$HOME/Library/Developer/Xcode/Templates/File Templates/Realm"
+sudo -u $USER mkdir -p "$FILE_TEMPLATES_DIR"
+
+for dir in "file_templates/*/"
+do
+  sudo -u $USER cp -R ${dir%*/} "$FILE_TEMPLATES_DIR"
+done
+
 # Class Templates
 
 XCODE_DIR=$(xcode-select -p)
