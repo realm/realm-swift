@@ -343,4 +343,8 @@
     }
 }
 
+- (id)valueForUndefinedKey:(__unused NSString *)key {
+    return nil;
+}
+
 @end

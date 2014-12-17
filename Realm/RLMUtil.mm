@@ -196,9 +196,8 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    BOOL isDict = [value isKindOfClass:NSDictionary.class];
     for (RLMProperty *prop in properties) {
-        id obj = (isDict || [value respondsToSelector:prop.getterSel]) ? [value valueForKey:prop.getterName] : nil;
+        id obj = [value valueForKey:prop.name];
 
         // get default for nil object
         if (!obj && !allowMissing) {

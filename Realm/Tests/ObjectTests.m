@@ -152,6 +152,17 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation StringSubclassObject
 @end
 
+@interface StringSubclassObjectWithDefaults : StringObject
+@property NSString *stringCol2;
+@end
+
+@implementation StringSubclassObjectWithDefaults
++(NSDictionary *)defaultPropertyValues {
+    return @{@"stringCol2": @"default"};
+}
+@end
+
+
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
 @property RLMArray<StringObject> *stringObjectArrayCol;
@@ -473,6 +484,12 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     StringLinkObject *linkObject = [StringLinkObject createInDefaultRealmWithObject:@[NSNull.null, @[]]];
     XCTAssertThrows(linkObject.stringObjectCol = obj);
     XCTAssertThrows([linkObject.stringObjectArrayCol addObject:obj]);
+    [realm commitWriteTransaction];
+
+    // create subclass with instance of base class
+    [realm beginWriteTransaction];
+    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:StringObject.allObjects.firstObject]);
+    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:StringObject.allObjects.firstObject]);
     [realm commitWriteTransaction];
 }
 
@@ -940,8 +957,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testUnretainedRealmObjectUnknownKey
 {
     IntObject *obj = [[IntObject alloc] init];
-    XCTAssertThrowsSpecificNamed([obj objectForKeyedSubscript:@""], NSException,
-                                 @"NSUnknownKeyException");
+    XCTAssertNil([obj objectForKeyedSubscript:@""]);
     XCTAssertThrowsSpecificNamed([obj setObject:@0 forKeyedSubscript:@""], NSException,
                                  @"NSUnknownKeyException");
 }
