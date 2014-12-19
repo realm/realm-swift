@@ -37,7 +37,7 @@ command:
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
-  ios-dynamic [xcmode]:    builds iOS dynamic framework for iOS 8
+  ios-dynamic [xcmode]:    builds two iOS 8 dynamic frameworks: one for devices and one for the simulator
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -245,7 +245,11 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        build_fat 'iOS 8' Release build/DerivedData/Realm/Build/Products/Release-dynamic ios-dynamic
+        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
+        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
+        mkdir build/ios
+        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic.framework
+        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator.framework
         exit 0
         ;;
 
