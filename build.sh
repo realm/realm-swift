@@ -500,9 +500,11 @@ case "$COMMAND" in
         cd tightdb_objc
         sh build.sh test-ios "$XCMODE"
         sh build.sh examples "$XCMODE"
+        sh build.sh ios-dynamic "$XCMODE"
 
         cd build/ios
         zip --symlinks -r realm-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-dynamic-frameworks-ios.zip Realm-dynamic.framework Realm-dynamic-simulator.framework
         ;;
 
     "package-osx")
