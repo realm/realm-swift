@@ -503,8 +503,7 @@ case "$COMMAND" in
         sh build.sh ios-dynamic "$XCMODE"
 
         cd build/ios
-        zip --symlinks -r realm-framework-ios.zip Realm.framework
-        zip --symlinks -r realm-dynamic-frameworks-ios.zip Realm-dynamic.framework Realm-dynamic-simulator.framework
+        zip --symlinks -r realm-framework-ios.zip *.framework
         ;;
 
     "package-osx")
