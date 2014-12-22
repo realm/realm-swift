@@ -631,6 +631,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMCheckThread(self);
     CheckReadWrite(self, @"Cannot invalidate a read-only realm");
 
+    if (_inWriteTransaction) {
+        NSLog(@"WARNING: An RLMRealm instance was invalidated during a write "
+              "transaction and all pending changes have been rolled back.");
+        [self cancelWriteTransaction];
+    }
+    if (!_group) {
+        // Nothing to do if the read transaction hasn't been begun
+        return;
+    }
+
     _sharedGroup->end_read();
     _group = nullptr;
     for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
