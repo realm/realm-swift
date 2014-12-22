@@ -42,9 +42,20 @@
 
 #pragma mark - Private Methods - Accessors
 
-#pragma mark - Public Methods - Getters
+#pragma mark - Public Methods - Edit Action Overrides
 
--(BOOL)isRootPane
+- (void)minusRows:(NSIndexSet *)rowIndices
+{
+    NSMutableArray *objects = [NSMutableArray array];
+    [rowIndices enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger index, BOOL *stop) {
+        [objects addObject:self.objects[index]];
+    }];
+    [self.realmDelegate deleteObjects:objects];
+}
+
+#pragma mark - Public Methods - Getter Overrides
+
+- (BOOL)isRootPane
 {
     return YES;
 }

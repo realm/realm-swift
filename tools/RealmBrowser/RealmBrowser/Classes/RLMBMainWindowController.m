@@ -95,10 +95,29 @@ CGFloat const kRLMBPaneThinWidth = 300;
 
 #pragma mark - Realm Delegate
 
-- (void)changeProperty:(NSString *)propertyName ofObject:(RLMObject *)object toValue:(id)value
+- (void)setProperty:(NSString *)propertyName ofObject:(RLMObject *)object toValue:(id)value
 {
     [self.realm beginWriteTransaction];
     object[propertyName] = value;
+    [self.realm commitWriteTransaction];
+}
+
+- (void)deleteObjects:(NSArray *)objects
+{
+    NSLog(@"deleteObjects: %@", objects);
+
+    [self.realm beginWriteTransaction];
+    [self.realm deleteObjects:objects];
+    [self.realm commitWriteTransaction];
+}
+
+- (void)removeObjectsAtIndices:(NSIndexSet *)rowIndices fromArray:(RLMArray *)array
+{
+    NSLog(@"removeObjectsAtIndices: %@", rowIndices);
+    [self.realm beginWriteTransaction];
+    [rowIndices enumerateIndexesWithOptions:NSEnumerationReverse usingBlock:^(NSUInteger index, BOOL *stop) {
+        [array removeObjectAtIndex:index];
+    }];
     [self.realm commitWriteTransaction];
 }
 

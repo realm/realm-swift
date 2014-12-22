@@ -34,12 +34,18 @@
 
 #pragma mark - Public Methods - Setup
 
-
 #pragma mark - Table View Delegate
 
-#pragma mark - Public Methods - Getters
+#pragma mark - Public Methods - Edit Action Overrides
 
--(BOOL)isArrayPane
+- (void)minusRows:(NSIndexSet *)rowIndices
+{
+    [self.realmDelegate removeObjectsAtIndices:rowIndices fromArray:self.objects];
+}
+
+#pragma mark - Public Methods - Getter Overrides
+
+- (BOOL)isArrayPane
 {
     return YES;
 }

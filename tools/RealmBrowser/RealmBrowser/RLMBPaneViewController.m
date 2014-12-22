@@ -89,7 +89,7 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     
     NSNumber *value = @((BOOL)(sender.state == NSOnState));
 
-    [self.realmDelegate changeProperty:tableColumn.identifier ofObject:self.objects[row] toValue:value];
+    [self.realmDelegate setProperty:tableColumn.identifier ofObject:self.objects[row] toValue:value];
 }
 
 #pragma mark - RLMB Text Field Delegate
@@ -130,7 +130,7 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     id value = [self.viewModel valueForString:textField.stringValue type:property.type];
 
     if (value) {
-        [self.realmDelegate changeProperty:property.name ofObject:self.objects[row] toValue:value];
+        [self.realmDelegate setProperty:property.name ofObject:self.objects[row] toValue:value];
     }
     
     [self.tableView reloadData];
@@ -217,7 +217,6 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
             
             return linkCellView;
         }
-            
         case RLMPropertyTypeBool: {
             RLMBBoolCellView *boolCellView = [self.tableView makeViewWithIdentifier:kRLMBBoolCellId owner:self];
             boolCellView.checkBox.state = [(NSNumber *)value boolValue] ? NSOnState : NSOffState;
@@ -245,6 +244,9 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 #pragma mark - User Actions
 
 - (IBAction)toggleWidthAction:(NSButton *)sender {
+    [self minusRows:self.tableView.selectedRowIndexes];
+    [self.tableView reloadData];
+
     //    [self.canvasDelegate toggleWidthOfPane:self];
 }
 
@@ -293,24 +295,29 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     }
 }
 
+- (void)minusRows:(NSIndexSet *)rowIndexes
+{
+    // Implemented in subclass according to type of pane
+}
+
 #pragma mark - Public Methods - Getters
 
--(BOOL)isWide
+- (BOOL)isWide
 {
     return self.widthConstraint.multiplier > 0.75;
 }
 
--(BOOL)isRootPane
+- (BOOL)isRootPane
 {
     return NO;
 }
 
--(BOOL)isArrayPane
+- (BOOL)isArrayPane
 {
     return NO;
 }
 
--(BOOL)isObjectPane
+- (BOOL)isObjectPane
 {
     return NO;
 }

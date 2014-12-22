@@ -31,7 +31,9 @@
 
 @protocol RLMBRealmDelegate <NSObject>
 
-- (void)changeProperty:(NSString *)propertyName ofObject:(RLMObject *)object toValue:(id)value;
+- (void)setProperty:(NSString *)propertyName ofObject:(RLMObject *)object toValue:(id)value;
+- (void)deleteObjects:(NSArray *)objects;
+- (void)removeObjectsAtIndices:(NSIndexSet *)rowIndices fromArray:(RLMArray *)array;
 
 @end
 
@@ -50,5 +52,6 @@
 @property (nonatomic) id<RLMCollection> objects;
 
 - (void)updateWithObjects:(id<RLMCollection>)objects objectSchema:(RLMObjectSchema *)objectSchema;
+- (void)minusRows:(NSIndexSet *)rowIndexes;
 
 @end
