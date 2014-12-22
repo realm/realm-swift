@@ -20,6 +20,7 @@
 #import <Realm/RLMConstants.h>
 
 @class RLMRealm;
+@class RLMSchema;
 @class RLMObjectSchema;
 
 @interface RLMObjectBase : NSObject
@@ -29,6 +30,8 @@
 
 - (instancetype)init;
 - (instancetype)initWithObject:(id)object;
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
+- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
 
 - (BOOL)isEqualToObject:(RLMObjectBase *)object;
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;

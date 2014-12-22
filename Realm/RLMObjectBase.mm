@@ -130,7 +130,7 @@
     return className;
 }
 
-// overriddent at runtime per-class for performance
+// overridden at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
     return RLMSchema.sharedSchema[self.className];
 }

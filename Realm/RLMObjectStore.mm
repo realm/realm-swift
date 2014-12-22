@@ -231,9 +231,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     RLMCheckThread(realm);
 }
 
-static inline void RLMConvertToAccessor(RLMObjectBase *object) {
-    object_setClass(object, object.objectSchema.accessorClass);
-
+static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
     for (RLMProperty *prop in object.objectSchema.properties) {
         if (prop.swiftListIvar) {
@@ -341,12 +339,19 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
-            ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
+            if (prop.swiftListIvar) {
+                object_setIvar(object, prop.swiftListIvar, nil);
+            }
+            else {
+                ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
+            }
         }
     }
 
-    // switch class to use table backed accessor
+    // set to proper accessor class
     object_setClass(object, schema.accessorClass);
+
+    RLMInitializeSwiftListAccessor(object);
 }
 
 
@@ -399,9 +404,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
 
-    // switch class to use table backed accessor
-    object_setClass(object, objectSchema.accessorClass);
-
+    RLMInitializeSwiftListAccessor(object);
     return object;
 }
 
@@ -498,6 +501,7 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
                                   	   NSUInteger index) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
     accessor->_row = (*objectSchema.table)[index];
+    RLMInitializeSwiftListAccessor(accessor);
     return accessor;
 }
 

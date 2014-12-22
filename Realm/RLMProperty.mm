@@ -304,8 +304,10 @@
     prop->_attributes = _attributes;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
+    prop->_getterSel = _getterSel;
+    prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
-    [prop updateAccessors];
+    prop->_swiftListIvar = _swiftListIvar;
     
     return prop;
 }
