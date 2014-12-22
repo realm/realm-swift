@@ -44,6 +44,14 @@ public class Object : RLMObjectBase, Equatable {
         super.init(realm: realm, schema: schema, defaultValues: defaultValues)
     }
 
+    public override init(object: AnyObject, schema: RLMSchema) {
+        super.init(object: object, schema: schema)
+    }
+
+    public override init(objectSchema: RLMObjectSchema) {
+        super.init(objectSchema: objectSchema)
+    }
+
     // And overriding that hides these
     public override init(object: AnyObject) {
         super.init(object: object)
