@@ -52,7 +52,7 @@ private func deleteRealmFiles() {
     deleteRealmFilesAtPath(testRealmPath())
 }
 
-class SwiftTestCase: XCTestCase {
+class TestCase: XCTestCase {
     func realmWithTestPath() -> Realm {
         return Realm(path: testRealmPath())
     }
