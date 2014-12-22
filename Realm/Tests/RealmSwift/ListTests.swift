@@ -318,7 +318,6 @@ class ListNewlyAddedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         array.name = "name"
-
         let realm = self.realmWithTestPath()
         realm.write { realm.add(array) }
 
