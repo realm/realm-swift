@@ -29,7 +29,6 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 @interface RLMBPaneViewController () <RLMBTextFieldDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic) NSDictionary *properties;
-@property (nonatomic) RLMObjectSchema *objectSchema;
 
 @property (weak) IBOutlet NSTextField *classNameLabel;
 @property (weak) IBOutlet NSSearchField *searchField;
@@ -62,8 +61,6 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 
 - (void)updateWithObjects:(id<RLMCollection>)objects objectSchema:(RLMObjectSchema *)objectSchema
 {
-    self.objectSchema = objectSchema;
-    
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
     for (RLMProperty *property in objectSchema.properties) {
         properties[property.name] = property;
@@ -112,6 +109,7 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 -(void)textFieldDidCancelEditing:(NSTextField *)textField
 {
     NSLog(@"textFieldDidCancelEditing: %@", textField);
+    
     [self.tableView reloadData];
 }
 
@@ -148,10 +146,16 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     [tableView beginUpdates];
 
     NSTableColumn *gutterColumn = [[NSTableColumn alloc] initWithIdentifier:kRLMBGutterColumnIdentifier];
-    [gutterColumn.headerCell setStringValue:@"#"];
-    gutterColumn.width = 30;
-//    gutterColumn.headerToolTip = @"Order of object within array";
-    
+    if (self.isArrayPane) {
+        gutterColumn.headerToolTip = @"Order of object within array";
+        [gutterColumn.headerCell setStringValue:@"#"];
+        gutterColumn.width = 20;
+    }
+    else {
+        [gutterColumn.headerCell setStringValue:@""];
+        gutterColumn.width = 0;
+    }
+
     [self.tableView addTableColumn:gutterColumn];
     
     for (RLMProperty *property in properties) {
@@ -179,7 +183,7 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 {
     if ([tableColumn.identifier isEqualToString:kRLMBGutterColumnIdentifier]) {
         NSTableCellView *gutterCellView = [self.tableView makeViewWithIdentifier:kRLMBGutterCellId owner:self];
-        gutterCellView.textField.stringValue = @(row).stringValue;
+        gutterCellView.textField.stringValue = self.isArrayPane ? @(row).stringValue : @"";
         
         return gutterCellView;
     }
@@ -257,17 +261,17 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     }
     
     NSInteger column = self.tableView.clickedColumn;
-    if (column > self.properties.count) {
+    if (column == 0 || column > self.properties.count) {
         return;
     }
     
     NSTableColumn *tableColumn = self.tableView.tableColumns[column];
     RLMProperty *property = self.properties[tableColumn.identifier];
+    
     id propertyValue = self.objects[row][property.name];
     
     if (property.type == RLMPropertyTypeObject) {
-//        RLMObject *linkedObject = (RLMObject *)propertyValue;
-//        RLMObjectSchema *linkedObjectSchema = linkedObject.objectSchema;
+        [self.canvasDelegate addPaneWithObject:propertyValue afterPane:self];
     }
     else if (property.type == RLMPropertyTypeArray) {
         [self.canvasDelegate addPaneWithArray:propertyValue afterPane:self];
@@ -289,6 +293,21 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 -(BOOL)isWide
 {
     return self.widthConstraint.multiplier > 0.75;
+}
+
+-(BOOL)isRootPane
+{
+    return NO;
+}
+
+-(BOOL)isArrayPane
+{
+    return NO;
+}
+
+-(BOOL)isObjectPane
+{
+    return NO;
 }
 
 @end

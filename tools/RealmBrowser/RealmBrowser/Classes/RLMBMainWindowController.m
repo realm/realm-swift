@@ -23,6 +23,8 @@
 
 #import "RLMBPaneViewController.h"
 #import "RLMBRootPaneViewController.h"
+#import "RLMBArrayPaneViewController.h"
+#import "RLMBObjectPaneViewController.h"
 
 #import "RLMBSidebarCellView.h"
 
@@ -157,10 +159,23 @@ CGFloat const kRLMBPaneThinWidth = 300;
 {
     [self removePanesAfterPane:pane];
     
-    RLMBPaneViewController *newPane = [[RLMBPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil];
+    RLMBArrayPaneViewController *newPane = [[RLMBArrayPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil];
     [self addPane:newPane];
     
     RLMObjectSchema *linkedObjectSchema = [array.realm.schema schemaForClassName:array.objectClassName];
+    [newPane updateWithObjects:array objectSchema:linkedObjectSchema];
+}
+
+- (void)addPaneWithObject:(RLMObject *)object afterPane:(RLMBPaneViewController *)pane
+{
+    [self removePanesAfterPane:pane];
+
+    RLMBObjectPaneViewController *newPane = [[RLMBObjectPaneViewController alloc] initWithNibName:@"RLMBPaneViewController" bundle:nil];
+    [self addPane:newPane];
+    
+    RLMObjectSchema *linkedObjectSchema = object.objectSchema;
+    RLMArray *array = [[RLMArray alloc] initWithObjectClassName:linkedObjectSchema.className];
+    [array addObject:object];
     [newPane updateWithObjects:array objectSchema:linkedObjectSchema];
 }
 

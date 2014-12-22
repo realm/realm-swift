@@ -21,7 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do view setup here.
+    NSLog(@"RLMBRootPaneViewController did load");
 }
 
 #pragma mark - Public Methods - Update
@@ -31,5 +31,12 @@
 
 
 #pragma mark - Private Methods - Accessors
+
+#pragma mark - Public Methods - Getters
+
+-(BOOL)isRootPane
+{
+    return YES;
+}
 
 @end

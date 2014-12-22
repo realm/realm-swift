@@ -34,7 +34,7 @@
             <connections>
                 <outlet property="textField" destination="dan-mQ-ja6" id="KXu-3X-Fhp"/>
             </connections>
-            <point key="canvasLocation" x="213" y="172.5"/>
+            <point key="canvasLocation" x="-268" y="-625.5"/>
         </tableCellView>
     </objects>
 </document>

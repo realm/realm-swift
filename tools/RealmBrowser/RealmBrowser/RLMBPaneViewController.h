@@ -26,6 +26,7 @@
 @protocol RLMBCanvasDelegate <NSObject>
 
 - (void)addPaneWithArray:(RLMArray *)array afterPane:(RLMBPaneViewController *)pane;
+- (void)addPaneWithObject:(RLMObject *)object afterPane:(RLMBPaneViewController *)pane;
 
 @end
 
@@ -44,6 +45,9 @@
 
 @property (nonatomic) NSLayoutConstraint *widthConstraint;
 @property (nonatomic, readonly) BOOL isWide;
+@property (nonatomic, readonly) BOOL isRootPane;
+@property (nonatomic, readonly) BOOL isArrayPane;
+@property (nonatomic, readonly) BOOL isObjectPane;
 
 @property (nonatomic) id<RLMCollection> objects;
 

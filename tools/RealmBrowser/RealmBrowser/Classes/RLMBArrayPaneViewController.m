@@ -19,7 +19,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do view setup here.
+    NSLog(@"RLMBArrayPaneViewController did load");
 }
 
 #pragma mark - Public Methods - Setup
@@ -27,5 +27,11 @@
 
 #pragma mark - Table View Delegate
 
+#pragma mark - Public Methods - Getters
+
+-(BOOL)isArrayPane
+{
+    return YES;
+}
 
 @end
