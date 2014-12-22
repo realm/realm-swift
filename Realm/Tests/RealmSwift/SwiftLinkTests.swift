@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftLinkTests: SwiftTestCase {
+class SwiftLinkTests: TestCase {
 
     func testBasicLink() {
         let realm = realmWithTestPath()

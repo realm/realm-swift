@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftArrayTests: SwiftTestCase {
+class SwiftArrayTests: TestCase {
 
     func testFastEnumeration() {
         let realm = realmWithTestPath()

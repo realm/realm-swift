@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftDefaultObject: RLMObject {
+class SwiftDefaultObject: Object {
     dynamic var intCol = 1
     dynamic var boolCol = true
 
@@ -28,7 +28,7 @@ class SwiftDefaultObject: RLMObject {
     }
 }
 
-class SwiftObjectInterfaceTests: SwiftTestCase {
+class SwiftObjectInterfaceTests: TestCase {
 
     func testSwiftObject() {
         let realm = realmWithTestPath()
@@ -80,13 +80,13 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
 
     func testMergedDefaultValuesSwiftObject() {
         let realm = self.realmWithTestPath()
-        realm.beginWriteTransaction()
+        realm.beginWrite()
         SwiftDefaultObject.createInRealm(realm, withObject: NSDictionary())
-        realm.commitWriteTransaction()
+        realm.commitWrite()
 
-        let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as SwiftDefaultObject
-        XCTAssertEqual(object.intCol, 2, "defaultPropertyValues should override native property default value")
-        XCTAssertEqual(object.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
+        let object = realm.objects(SwiftDefaultObject).first()
+        XCTAssertEqual(object!.intCol, 2, "defaultPropertyValues should override native property default value")
+        XCTAssertEqual(object!.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
     }
 
     func testOptionalSwiftProperties() {
