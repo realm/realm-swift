@@ -30,6 +30,6 @@
 - (NSString *)editablePropertyValue:(id)propertyValue type:(RLMPropertyType)type;
 - (id)valueForString:(NSString *)string type:(RLMPropertyType)type;
 
-+ (NSString *)typeNameForProperty:(RLMProperty *)property;
++ (NSAttributedString *)headerStringForProperty:(RLMProperty *)property;
 
 @end

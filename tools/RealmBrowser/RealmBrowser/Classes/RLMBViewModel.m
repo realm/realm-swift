@@ -177,6 +177,20 @@ const NSUInteger kMaxObjectCharsForTable = 200;
     }
 }
 
++ (NSAttributedString *)headerStringForProperty:(RLMProperty *)property
+{
+    NSString *typeName = [self typeNameForProperty:property];
+    
+    NSString *stringValue = [NSString stringWithFormat:@"%@: %@", property.name, typeName];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:stringValue];
+    NSRange firstStringRange = NSMakeRange(0, property.name.length + 1);
+    NSRange secondStringRange = NSMakeRange(stringValue.length - typeName.length, typeName.length);
+    [attributedString addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:12.0] range:firstStringRange];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[NSColor grayColor] range:secondStringRange];
+    
+    return attributedString;
+}
+
 + (NSString *)typeNameForProperty:(RLMProperty *)property
 {
     switch (property.type) {
@@ -189,7 +203,7 @@ const NSUInteger kMaxObjectCharsForTable = 200;
         case RLMPropertyTypeDate:
             return @"Date";
         case RLMPropertyTypeBool:
-            return @"Boolean";
+            return @"Bool";
         case RLMPropertyTypeString:
             return @"String";
         case RLMPropertyTypeData:

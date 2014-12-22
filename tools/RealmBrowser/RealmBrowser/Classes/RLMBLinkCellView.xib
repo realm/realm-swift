@@ -13,7 +13,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="REt-23-F57">
-                    <rect key="frame" x="-2" y="0.0" width="158" height="17"/>
+                    <rect key="frame" x="3" y="0.0" width="148" height="17"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="RU8-F7-0bX">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="selectedMenuItemColor" catalog="System" colorSpace="catalog"/>
@@ -23,8 +23,8 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="REt-23-F57" secondAttribute="bottom" id="74g-tz-oPm"/>
-                <constraint firstItem="REt-23-F57" firstAttribute="leading" secondItem="wPI-ei-0Qx" secondAttribute="leading" id="Pm8-bt-57b"/>
-                <constraint firstAttribute="trailing" secondItem="REt-23-F57" secondAttribute="trailing" id="g9e-v6-2ei"/>
+                <constraint firstItem="REt-23-F57" firstAttribute="leading" secondItem="wPI-ei-0Qx" secondAttribute="leading" constant="5" id="Pm8-bt-57b"/>
+                <constraint firstAttribute="trailing" secondItem="REt-23-F57" secondAttribute="trailing" constant="5" id="g9e-v6-2ei"/>
                 <constraint firstItem="REt-23-F57" firstAttribute="top" secondItem="wPI-ei-0Qx" secondAttribute="top" id="sfk-fN-sIq"/>
             </constraints>
             <connections>

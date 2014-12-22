@@ -32,10 +32,8 @@
     
     if (self.isOpen) {
         [NSGraphicsContext saveGraphicsState];
-
         [self.borderColor set];
-        NSFrameRect([self bounds]);
-    
+        NSFrameRectWithWidth(self.bounds, 2.0);
         [NSGraphicsContext restoreGraphicsState];
     }
 }
@@ -44,7 +42,7 @@
 {
     [super setBackgroundStyle:backgroundStyle];
     self.textField.textColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor linkColor] : [NSColor whiteColor]);
-    self.borderColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor linkColor] : [NSColor whiteColor]);
+    self.borderColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor pinkColor] : [NSColor whiteColor]);
 }
 
 @end

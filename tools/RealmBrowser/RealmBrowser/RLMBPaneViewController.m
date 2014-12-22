@@ -166,9 +166,7 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     for (RLMProperty *property in properties) {
         NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:property.name];
         tableColumn.identifier = property.name;
-        NSString *typeName = [RLMBViewModel typeNameForProperty:property];
-        [tableColumn.headerCell setStringValue:[NSString stringWithFormat:@"%@: %@", property.name, typeName]];
-
+        [tableColumn.headerCell setAttributedStringValue:[RLMBViewModel headerStringForProperty:property]];
         [tableView addTableColumn:tableColumn];
     }
     
@@ -216,7 +214,6 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
             
             linkCellView.isOpen = (tableColumn == self.openColumn && row == self.openRow);
             linkCellView.textField.stringValue = [self.viewModel printableObject:value];
-            linkCellView.isOpen = NO;
             
             return linkCellView;
         }
