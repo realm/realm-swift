@@ -21,7 +21,7 @@ import RealmSwift
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
-class SwiftUnicodeTests: SwiftTestCase {
+class SwiftUnicodeTests: TestCase {
     func testUTF8StringContents() {
         let realm = realmWithTestPath()
 

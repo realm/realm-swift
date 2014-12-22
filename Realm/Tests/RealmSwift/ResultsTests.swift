@@ -23,7 +23,7 @@ class SwiftAggregateObjectList: Object {
     let list = List<SwiftAggregateObject>()
 }
 
-class ResultsTests: SwiftTestCase {
+class ResultsTests: TestCase {
     var str1: SwiftStringObject!
     var str2: SwiftStringObject!
     var results: Results<SwiftStringObject>!
