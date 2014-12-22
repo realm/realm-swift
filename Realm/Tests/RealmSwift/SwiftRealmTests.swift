@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftRealmTests: SwiftTestCase {
+class SwiftRealmTests: TestCase {
 
     func testRealmExists() {
         var realm = realmWithTestPath()

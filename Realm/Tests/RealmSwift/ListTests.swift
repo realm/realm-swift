@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ListTests: SwiftTestCase {
+class ListTests: TestCase {
     var str1: SwiftStringObject!
     var str2: SwiftStringObject!
     var arrayObject: SwiftArrayPropertyObject!
@@ -318,7 +318,6 @@ class ListNewlyAddedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         array.name = "name"
-
         let realm = self.realmWithTestPath()
         realm.write { realm.add(array) }
 

@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftPropertyTypeTest: SwiftTestCase {
+class SwiftPropertyTypeTest: TestCase {
     
     func testLongType() {
         let longNumber = 17179869184
