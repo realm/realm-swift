@@ -36,6 +36,14 @@
 // that).
 @implementation RLMObject
 
+- (instancetype)init {
+    return [super init];
+}
+
+- (instancetype)initWithObject:(id)object {
+    return [super initWithObject:object];
+}
+
 + (instancetype)createInDefaultRealmWithObject:(id)object {
     return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
 }
