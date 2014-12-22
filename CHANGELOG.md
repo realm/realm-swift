@@ -7,11 +7,16 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve the error message when a Realm can't be opened due to lacking write
+  permissions.
 
 ### Bugfixes
 
-* None.
+* Fix an assertion failure when inserting rows after calling `deleteAllObjects`
+  on a Realm.
+* Separate dynamic frameworks are now built for the simulator and devices to
+  work around App Store submission errors due to the simulator version not
+  being automatically stripped from dynamic libraries.
 
 0.89.0 Release notes (2014-12-18)
 =============================================================
