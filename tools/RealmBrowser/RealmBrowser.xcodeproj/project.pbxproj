@@ -288,11 +288,13 @@
 		22BD0C5D1A3B16A400F18DC9 /* TableCellViews */ = {
 			isa = PBXGroup;
 			children = (
+				22BD0C631A3B19C400F18DC9 /* RLMBBasicCellView.xib */,
+				22BD0C6A1A3B328E00F18DC9 /* RLMBGutterCellView.xib */,
 				22BD0C5A1A3B0A9900F18DC9 /* RLMBBoolCellView.h */,
 				22BD0C5B1A3B0A9900F18DC9 /* RLMBBoolCellView.m */,
-				22BD0C6A1A3B328E00F18DC9 /* RLMBGutterCellView.xib */,
-				22BD0C631A3B19C400F18DC9 /* RLMBBasicCellView.xib */,
 				22BD0C581A3B0A1900F18DC9 /* RLMBBoolCellView.xib */,
+				22CDE30F1A387721009AE34E /* RLMBLinkCellView.h */,
+				22CDE3101A387721009AE34E /* RLMBLinkCellView.m */,
 				22CDE3121A387935009AE34E /* RLMBLinkCellView.xib */,
 			);
 			name = TableCellViews;
@@ -303,9 +305,7 @@
 			children = (
 				22BD0C651A3B19D700F18DC9 /* RLMBBasicCellView.h */,
 				22BD0C661A3B19D700F18DC9 /* RLMBBasicCellView.m */,
-				22CDE30F1A387721009AE34E /* RLMBLinkCellView.h */,
 				22BD25901A48263A00DF6259 /* RLMBObjectPaneViewController.xib */,
-				22CDE3101A387721009AE34E /* RLMBLinkCellView.m */,
 				22BD0C5E1A3B16C200F18DC9 /* RLMBNumberCellView.h */,
 				22BD0C5F1A3B16C200F18DC9 /* RLMBNumberCellView.m */,
 				22CDE30A1A3865FA009AE34E /* RLMBTableView.h */,

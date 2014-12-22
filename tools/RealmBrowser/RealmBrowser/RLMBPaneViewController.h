@@ -18,8 +18,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Realm/Realm.h>
-#import "RLMBViewModel.h" // FIXME: inheritance/exposing
-
 #import "RLMBTextField.h"
 
 @class RLMBPaneViewController;

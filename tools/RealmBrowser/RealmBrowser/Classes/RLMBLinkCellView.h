@@ -10,4 +10,6 @@
 
 @interface RLMBLinkCellView : NSTableCellView
 
+@property (nonatomic) BOOL isOpen;
+
 @end

@@ -18,7 +18,9 @@
 
 #import "RLMBPaneViewController.h"
 
+#import "RLMBViewModel.h"
 #import "RLMBBoolCellView.h"
+#import "RLMBLinkCellView.h"
 
 NSString *const kRLMBGutterColumnIdentifier = @" #";
 NSString *const kRLMBGutterCellId = @"RLMBGutterCellView";
@@ -35,6 +37,9 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
 @property (weak) IBOutlet NSTableView *tableView;
 
 @property (nonatomic) RLMBViewModel *viewModel;
+
+@property (nonatomic) NSTableColumn *openColumn;
+@property (nonatomic) NSUInteger openRow;
 
 @end
 
@@ -193,13 +198,10 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     
     switch (property.type) {
         case RLMPropertyTypeArray: {
-            NSTableCellView *badgeCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
+            RLMBLinkCellView *badgeCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
             badgeCellView.textField.stringValue = [self.viewModel printableArray:value];
-            
-            //            NSString *string = [self printablePropertyValue:value ofType:type];
-            //            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
-            //            badgeCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
-            
+            badgeCellView.isOpen = (tableColumn == self.openColumn && row == self.openRow);
+
             //            badgeCellView.badge.hidden = NO;
             //            badgeCellView.badge.title = [NSString stringWithFormat:@"%lu", [(RLMArray *)propertyValue count]];
             //            [badgeCellView.badge.cell setHighlightsBy:0];
@@ -208,13 +210,13 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
             return badgeCellView;
         }
         case RLMPropertyTypeObject: {
-            NSTableCellView *linkCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
+            RLMBLinkCellView *linkCellView = [self.tableView makeViewWithIdentifier:kRLMBLinkCellId owner:self];
             //            linkCellView.dragType = [self dragTypeForClassName:classProperty.property.objectClassName];
             //            linkCellView.delegate = self;
             
+            linkCellView.isOpen = (tableColumn == self.openColumn && row == self.openRow);
             linkCellView.textField.stringValue = [self.viewModel printableObject:value];
-            //            NSDictionary *attr = @{NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
-            //            linkCellView.textField.attributedStringValue = [[NSAttributedString alloc] initWithString:string attributes:attr];
+            linkCellView.isOpen = NO;
             
             return linkCellView;
         }
@@ -275,6 +277,12 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     }
     else if (property.type == RLMPropertyTypeArray) {
         [self.canvasDelegate addPaneWithArray:propertyValue afterPane:self];
+    }
+    
+    if (property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeArray) {
+        self.openColumn = tableColumn;
+        self.openRow = row;
+        [self.tableView reloadData];
     }
 }
 
