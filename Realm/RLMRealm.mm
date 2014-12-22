@@ -434,7 +434,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                                                reason:@"Cannot open an uninitialized realm in read-only mode"
                                              userInfo:nil];
             }
-            RLMRealmSetSchema(realm, [RLMSchema sharedSchema]);
+            RLMRealmSetSchema(realm, [RLMSchema sharedSchema], true);
             RLMRealmCreateAccessors(realm.schema);
 
             cacheRealm(realm, path);
@@ -698,7 +698,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)addObject:(RLMObject *)object {
-    RLMAddObjectToRealm(object, self);
+    RLMAddObjectToRealm(object, self, RLMCreationOptionsNone);
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)array {
@@ -718,7 +718,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
 
-    RLMAddObjectToRealm(object, self, RLMSetFlagUpdateOrCreate);
+    RLMAddObjectToRealm(object, self, RLMCreationOptionsUpdateOrCreate);
 }
 
 - (void)addOrUpdateObjectsFromArray:(id)array {
@@ -838,7 +838,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object, RLMCreationOptionsNone);
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {

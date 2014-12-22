@@ -37,11 +37,11 @@
 @implementation RLMObject
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMSetFlagAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsAllowCopy);
 }
 
 + (instancetype)createInRealm:(RLMRealm *)realm withObject:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMSetFlagAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsAllowCopy);
 }
 
 + (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
@@ -52,11 +52,11 @@
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
 
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMSetFlagUpdateOrCreate | RLMSetFlagAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMSetFlagUpdateOrCreate | RLMSetFlagAllowCopy);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
 }
 
 - (id)objectForKeyedSubscript:(NSString *)key {

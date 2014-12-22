@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAccessor.h"
+#import <Foundation/Foundation.h>
 
-@class RLMRealm, RLMSchema, RLMObjectBase, RLMResults;
+@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,22 +30,41 @@ extern "C" {
 
 // sets a realm's schema to a copy of targetSchema
 // caches table accessors on each objectSchema
-void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns = true);
+void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns);
 
 // sets a realm's schema to a copy of targetSchema and creates/updates tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
-void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting = false);
+void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting);
 
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
+
+
+//
+// Options for object creation
+//
+typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
+    // Normal object creation
+    RLMCreationOptionsNone = 0,
+    // Verify that no existing row has the same value for this property
+    RLMCreationOptionsEnforceUnique = 1 << 0,
+    // If the property is a link or array property, upsert the linked objects
+    // if they have a primary key, and insert them otherwise.
+    RLMCreationOptionsUpdateOrCreate = 1 << 1,
+    // If a link or array property links to an object persisted in a different
+    // realm from the object, copy it into the object's realm rather than throwing
+    // an error
+    RLMCreationOptionsAllowCopy = 1 << 2,
+};
+
 
 //
 // Adding, Removing, Getting Objects
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMSetFlag options = 0);
+void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options);
 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObjectBase *object);
@@ -60,7 +79,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key);
 
 // create object from array or dictionary
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMSetFlag options = 0);
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options);
 
 
 //

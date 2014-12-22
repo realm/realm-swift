@@ -248,12 +248,12 @@ static inline void RLMConvertToAccessor(RLMObjectBase *object) {
 } // extern "C" {
 
 template<typename F>
-static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMSetFlag options, bool &created) {
+static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMCreationOptions options, bool &created) {
     // try to get existing row if updating
     size_t rowIndex = tightdb::not_found;
     tightdb::Table &table = *schema.table;
     RLMProperty *primaryProperty = schema.primaryKeyProperty;
-    if ((options & RLMSetFlagUpdateOrCreate) && primaryProperty) {
+    if ((options & RLMCreationOptionsUpdateOrCreate) && primaryProperty) {
         // get primary value
         id primaryValue = primaryValueGetter(primaryProperty);
         
@@ -279,7 +279,7 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
 
 extern "C" {
 
-void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMSetFlag options) {
+void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options) {
     RLMVerifyInWriteTransaction(realm);
 
     // verify that object is standalone
@@ -332,7 +332,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMSetFlag opti
         // set in table with out validation
         // skip primary key when updating since it doesn't change
         if (created || !prop.isPrimary) {
-            RLMDynamicSet(object, prop, value, options | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+            RLMDynamicSet(object, prop, value, options | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0));
         }
 
         // set the ivars for object and array properties to nil as otherwise the
@@ -350,7 +350,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMSetFlag opti
 }
 
 
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMSetFlag options) {
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
     // verify writable
     RLMVerifyInWriteTransaction(realm);
 
@@ -375,7 +375,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             // skip primary key when updating since it doesn't change
             if (created || !prop.isPrimary) {
                 RLMDynamicSet(object, prop, array[i],
-                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0));
             }
         }
     }
@@ -394,7 +394,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
             id propValue = dict[prop.name];
             if (propValue && (created || !prop.isPrimary)) {
                 RLMDynamicSet(object, prop, propValue,
-                              options | RLMSetFlagUpdateOrCreate | (prop.isPrimary ? RLMSetFlagEnforceUnique : 0));
+                              options | RLMCreationOptionsUpdateOrCreate | (prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0));
             }
         }
     }
