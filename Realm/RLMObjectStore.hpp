@@ -17,7 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMAccessor.h"
-#import "RLMResults.h"
+
+@class RLMRealm, RLMSchema, RLMObjectBase, RLMResults;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //
 // Table modifications
@@ -40,10 +45,10 @@ void RLMRealmCreateAccessors(RLMSchema *schema);
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm, RLMSetFlag options = 0);
+void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMSetFlag options = 0);
 
 // delete an object from its realm
-void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm);
+void RLMDeleteObjectFromRealm(RLMObjectBase *object);
 
 // deletes all objects from a realm
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
@@ -55,7 +60,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key);
 
 // create object from array or dictionary
-RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMSetFlag options = 0);
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMSetFlag options = 0);
 
 
 //
@@ -63,9 +68,10 @@ RLMObject *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
 //
 
 // Create accessors
-RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
-                                   __unsafe_unretained NSString *objectClassName,
-                                   NSUInteger index);
-RLMObject *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
-                                   __unsafe_unretained RLMObjectSchema *objectSchema,
-                                   NSUInteger index);
+RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
+                                	   __unsafe_unretained RLMObjectSchema *objectSchema,
+                                	   NSUInteger index);
+
+#ifdef __cplusplus
+}
+#endif

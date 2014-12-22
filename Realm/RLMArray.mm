@@ -17,10 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.hpp"
+
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMSwiftSupport.h"
 
 @implementation RLMArray {
     // array for standalone
@@ -33,6 +35,18 @@
         _objectClassName = objectClassName;
         if (standalone) {
             _backingArray = [[NSMutableArray alloc] init];
+        }
+    }
+    return self;
+}
+
+- (instancetype)initWithObjectClass:(Class)objectClass {
+    self = [super init];
+    if (self) {
+        _objectClassName = NSStringFromClass(objectClass);
+        _backingArray = [[NSMutableArray alloc] init];
+        if ([RLMSwiftSupport isSwiftClassName:_objectClassName]) {
+            _objectClassName = [RLMSwiftSupport demangleClassName:_objectClassName];
         }
     }
     return self;
@@ -146,7 +160,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (void)deleteObjectsFromRealm {
     for (RLMObject *obj in _backingArray) {
-        RLMDeleteObjectFromRealm(obj, _realm);
+        RLMDeleteObjectFromRealm(obj);
     }
 }
 

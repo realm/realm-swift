@@ -17,17 +17,27 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
+@class RLMRealm;
+@class RLMObjectSchema;
 
-#ifdef REALM_SWIFT
-#import <Realm/RLMListBase.h>
-#import <Realm/RLMObjectStore.hpp>
-#endif
+@interface RLMObjectBase : NSObject
+@property (nonatomic, readonly) RLMRealm *realm;
+@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
+- (instancetype)init;
+- (instancetype)initWithObject:(id)object;
+
+- (BOOL)isEqualToObject:(RLMObjectBase *)object;
+- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
+
++ (NSString *)className;
+
++ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
++ (NSDictionary *)defaultPropertyValues;
++ (NSString *)primaryKey;
++ (NSArray *)ignoredProperties;
+
+@end

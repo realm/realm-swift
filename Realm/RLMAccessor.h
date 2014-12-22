@@ -17,13 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMRealm.h"
+
+@class RLMObjectSchema, RLMProperty, RLMObjectBase;
 
 //
 // Accessors Class Creation/Caching
 //
-@class RLMObjectSchema;
-@class RLMProperty;
 
 // get accessor classes for an object class - generates classes if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix);
@@ -32,8 +31,8 @@ Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchem
 //
 // Dynamic getters/setters
 //
-void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val);
-id RLMDynamicGet(RLMObject *obj, NSString *propName);
+void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
+id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
 
 // Options for RLMDynamicSet
 typedef NS_OPTIONS(NSUInteger, RLMSetFlag) {
@@ -49,7 +48,7 @@ typedef NS_OPTIONS(NSUInteger, RLMSetFlag) {
 };
 
 // by property/column
-void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val, RLMSetFlag options);
+void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMSetFlag options);
 
 //
 // Class modification

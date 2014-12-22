@@ -125,8 +125,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateObjectAccessor(_realm, _objectSchema,
-                                   _backingLinkView->get(index).get_index());
+    return RLMCreateObjectAccessor(_realm, _objectSchema, _backingLinkView->get(index).get_index());
 }
 
 - (void)addObject:(RLMObject *)object {

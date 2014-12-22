@@ -16,18 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMListBase.h"
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
-
-#ifdef REALM_SWIFT
-#import <Realm/RLMListBase.h>
-#import <Realm/RLMObjectStore.hpp>
-#endif
+@implementation RLMListBase
+- (instancetype)initWithArray:(RLMArray *)array {
+    self = [super init];
+    if (self) {
+        __rlmArray = array;
+    }
+    return self;
+}
+@end

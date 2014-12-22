@@ -634,7 +634,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     _sharedGroup->end_read();
     _group = nullptr;
     for (RLMObjectSchema *objectSchema in _schema.objectSchema) {
-        objectSchema->_table.reset();
+        objectSchema.table = nullptr;
     }
 }
 
@@ -728,15 +728,15 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    RLMDeleteObjectFromRealm(object, self);
+    RLMDeleteObjectFromRealm(object);
 }
 
 - (void)deleteObjects:(id)array {
     if (NSArray *nsArray = RLMDynamicCast<NSArray>(array)) {
         // for arrays and standalone delete each individually
         for (id obj in nsArray) {
-            if ([obj isKindOfClass:RLMObject.class]) {
-                RLMDeleteObjectFromRealm(obj, self);
+            if ([obj isKindOfClass:RLMObjectBase.class]) {
+                RLMDeleteObjectFromRealm(obj);
             }
         }
     }
@@ -838,7 +838,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {
-    return RLMCreateObjectInRealmWithValue(self, className, object);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object);
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {

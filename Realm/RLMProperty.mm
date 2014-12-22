@@ -136,7 +136,7 @@
                                                           encoding:NSUTF8StringEncoding];
 
                 Class cls = [RLMSchema classForString:_objectClassName];
-                if (!RLMIsSubclass(cls, RLMObject.class)) {
+                if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
                                                  userInfo:nil];
@@ -158,7 +158,7 @@
 
                 // verify type
                 Class cls = [RLMSchema classForString:className];
-                if (!RLMIsSubclass(cls, RLMObject.class)) {
+                if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
                     @throw [NSException exceptionWithName:@"RLMException"
                                                    reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]
                                                  userInfo:nil];
@@ -276,6 +276,25 @@
     return self;
 }
 
+- (instancetype)initSwiftListPropertyWithName:(NSString *)name
+                                         ivar:(Ivar)ivar
+                              objectClassName:(NSString *)objectClassName {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+
+    _name = name;
+    _type = RLMPropertyTypeArray;
+    _objectClassName = objectClassName;
+    _objcType = 't';
+    _swiftListIvar = ivar;
+
+    // no obj-c property for generic lists, and thus no getter/setter names
+
+    return self;
+}
+
 - (id)copyWithZone:(NSZone *)zone {
     RLMProperty *prop = [[RLMProperty allocWithZone:zone] init];
     prop->_name = _name;
@@ -290,6 +309,7 @@
     
     return prop;
 }
+
 
 -(BOOL)isEqualToProperty:(RLMProperty *)prop {
     return [_name isEqualToString:prop.name] && _type == prop.type && prop.isPrimary == _isPrimary &&
