@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an assertion failure when invalidating a Realm which is in a write
+  transaction, has already been invalidated, or has never been used.
 
 0.89.1 Release notes (2014-12-22)
 =============================================================

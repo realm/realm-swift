@@ -970,6 +970,24 @@
     XCTAssertThrows([realm invalidate]);
 }
 
+- (void)testInvalidateBeforeReadDoesNotAssert
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm invalidate];
+}
+
+- (void)testInvalidateDuringWriteRollsBack
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    @autoreleasepool {
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }
+    [realm invalidate];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
 - (void)testRefreshCreatesAReadTransaction
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
