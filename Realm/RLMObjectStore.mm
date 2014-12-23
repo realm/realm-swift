@@ -339,10 +339,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
-            if (prop.swiftListIvar) {
-                object_setIvar(object, prop.swiftListIvar, nil);
-            }
-            else {
+            if (!prop.swiftListIvar) {
                 ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
             }
         }
