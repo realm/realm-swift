@@ -26,6 +26,15 @@
 		02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F08457E1A49E79A003868BE /* RLMTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F08457C1A49E79A003868BE /* RLMTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F08457F1A49E79A003868BE /* RLMTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F08457D1A49E79A003868BE /* RLMTransformer.m */; };
+		2F0845801A49EC72003868BE /* RLMTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F08457C1A49E79A003868BE /* RLMTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F0845811A49EC73003868BE /* RLMTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F08457C1A49E79A003868BE /* RLMTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F0845821A49EC9D003868BE /* RLMTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F08457D1A49E79A003868BE /* RLMTransformer.m */; };
+		2F0845831A49EC9E003868BE /* RLMTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F08457D1A49E79A003868BE /* RLMTransformer.m */; };
+		2F38D28A1A4FA8E000C0D6DD /* RLMObjectTranslationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F38D2891A4FA80000C0D6DD /* RLMObjectTranslationProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F38D28B1A4FA8E000C0D6DD /* RLMObjectTranslationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F38D2891A4FA80000C0D6DD /* RLMObjectTranslationProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2F38D28C1A4FA8E100C0D6DD /* RLMObjectTranslationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F38D2891A4FA80000C0D6DD /* RLMObjectTranslationProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F20DA2219BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F20DA2319BE1EA6007DE308 /* RLMUpdateChecker.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */; };
 		3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */; };
@@ -355,6 +364,9 @@
 		02B8EF5819E601D80045A93D /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
 		02B8EF5B19E7048D0045A93D /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
+		2F08457C1A49E79A003868BE /* RLMTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTransformer.h; sourceTree = "<group>"; };
+		2F08457D1A49E79A003868BE /* RLMTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTransformer.m; sourceTree = "<group>"; };
+		2F38D2891A4FA80000C0D6DD /* RLMObjectTranslationProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMObjectTranslationProtocol.h; sourceTree = "<group>"; };
 		3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PerformanceTests.m; sourceTree = "<group>"; };
 		3F1A5E721992EB7400F45F4C /* TestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateChecker.hpp; sourceTree = "<group>"; };
@@ -622,6 +634,7 @@
 				0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */,
 				E81A1F6E1955FC9300FDED82 /* RLMObject.h */,
 				E81A1F6F1955FC9300FDED82 /* RLMObject.mm */,
+				2F38D2891A4FA80000C0D6DD /* RLMObjectTranslationProtocol.h */,
 				E81A1F6D1955FC9300FDED82 /* RLMObject_Private.h */,
 				E81A1F711955FC9300FDED82 /* RLMObjectSchema.h */,
 				E81A1F721955FC9300FDED82 /* RLMObjectSchema.mm */,
@@ -645,6 +658,8 @@
 				E8F8D907196CB89100475368 /* RLMSwiftHelpers.h */,
 				3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */,
 				3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */,
+				2F08457C1A49E79A003868BE /* RLMTransformer.h */,
+				2F08457D1A49E79A003868BE /* RLMTransformer.m */,
 				3F20DA2019BE1EA6007DE308 /* RLMUpdateChecker.hpp */,
 				3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */,
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
@@ -693,6 +708,7 @@
 				3F6B895A19EF3C06004E8EA8 /* RLMAccessor.h in Headers */,
 				3F6B895B19EF3C06004E8EA8 /* RLMArray.h in Headers */,
 				3F6B895D19EF3C06004E8EA8 /* RLMArray_Private.hpp in Headers */,
+				2F0845811A49EC73003868BE /* RLMTransformer.h in Headers */,
 				3F6B895C19EF3C06004E8EA8 /* RLMCollection.h in Headers */,
 				3F6B895E19EF3C06004E8EA8 /* RLMConstants.h in Headers */,
 				3F6B896019EF3C06004E8EA8 /* RLMMigration.h in Headers */,
@@ -701,6 +717,7 @@
 				3F6B896319EF3C06004E8EA8 /* RLMObject_Private.h in Headers */,
 				3F6B896419EF3C06004E8EA8 /* RLMObjectSchema.h in Headers */,
 				3F6B896519EF3C06004E8EA8 /* RLMObjectSchema_Private.hpp in Headers */,
+				2F38D28C1A4FA8E100C0D6DD /* RLMObjectTranslationProtocol.h in Headers */,
 				3F6B896719EF3C06004E8EA8 /* RLMObjectStore.hpp in Headers */,
 				3F6B896819EF3C06004E8EA8 /* RLMPlatform.h in Headers */,
 				3F6B896919EF3C06004E8EA8 /* RLMProperty.h in Headers */,
@@ -727,6 +744,7 @@
 				E856D1F21956154C00FB2FCF /* RLMAccessor.h in Headers */,
 				E856D1F51956154C00FB2FCF /* RLMArray.h in Headers */,
 				E856D1F41956154C00FB2FCF /* RLMArray_Private.hpp in Headers */,
+				2F0845801A49EC72003868BE /* RLMTransformer.h in Headers */,
 				02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */,
 				E856D1FA1956154C00FB2FCF /* RLMConstants.h in Headers */,
 				0207AB82195DF9FB007EFB12 /* RLMMigration.h in Headers */,
@@ -735,6 +753,7 @@
 				E856D1FC1956154C00FB2FCF /* RLMObject_Private.h in Headers */,
 				E856D2001956154C00FB2FCF /* RLMObjectSchema.h in Headers */,
 				E856D1FF1956154C00FB2FCF /* RLMObjectSchema_Private.hpp in Headers */,
+				2F38D28B1A4FA8E000C0D6DD /* RLMObjectTranslationProtocol.h in Headers */,
 				E856D2021956154C00FB2FCF /* RLMObjectStore.hpp in Headers */,
 				024E6094198B2D51002FA042 /* RLMPlatform.h in Headers */,
 				E856D2051956154C00FB2FCF /* RLMProperty.h in Headers */,
@@ -761,6 +780,7 @@
 				E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */,
 				E81A1F891955FC9300FDED82 /* RLMArray.h in Headers */,
 				E81A1F881955FC9300FDED82 /* RLMArray_Private.hpp in Headers */,
+				2F08457E1A49E79A003868BE /* RLMTransformer.h in Headers */,
 				02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */,
 				E81A1F921955FC9300FDED82 /* RLMConstants.h in Headers */,
 				0207AB81195DF9FB007EFB12 /* RLMMigration.h in Headers */,
@@ -769,6 +789,7 @@
 				E81A1F951955FC9300FDED82 /* RLMObject_Private.h in Headers */,
 				E81A1F9A1955FC9300FDED82 /* RLMObjectSchema.h in Headers */,
 				E81A1F991955FC9300FDED82 /* RLMObjectSchema_Private.hpp in Headers */,
+				2F38D28A1A4FA8E000C0D6DD /* RLMObjectTranslationProtocol.h in Headers */,
 				E81A1F9D1955FC9300FDED82 /* RLMObjectStore.hpp in Headers */,
 				024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */,
 				E81A1FA11955FC9300FDED82 /* RLMProperty.h in Headers */,
@@ -1159,6 +1180,7 @@
 				3F6B894E19EF3C06004E8EA8 /* RLMObjectSchema.mm in Sources */,
 				3F6B894F19EF3C06004E8EA8 /* RLMObjectStore.mm in Sources */,
 				3F6B895019EF3C06004E8EA8 /* RLMProperty.mm in Sources */,
+				2F0845831A49EC9E003868BE /* RLMTransformer.m in Sources */,
 				3F6B895119EF3C06004E8EA8 /* RLMQueryUtil.mm in Sources */,
 				3F6B895219EF3C06004E8EA8 /* RLMRealm.mm in Sources */,
 				3F6B894A19EF3C06004E8EA8 /* RLMResults.mm in Sources */,
@@ -1216,6 +1238,7 @@
 				3FDE338C19C37E4C003B7DBA /* RLMSwiftSupport.m in Sources */,
 				3F20DA2519BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E856D2121956154C00FB2FCF /* RLMUtil.mm in Sources */,
+				2F0845821A49EC9D003868BE /* RLMTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1276,6 +1299,7 @@
 				3F452EC619C2279800AFC154 /* RLMSwiftSupport.m in Sources */,
 				3F20DA2419BE1EA6007DE308 /* RLMUpdateChecker.mm in Sources */,
 				E81A1FB11955FC9300FDED82 /* RLMUtil.mm in Sources */,
+				2F08457F1A49E79A003868BE /* RLMTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
