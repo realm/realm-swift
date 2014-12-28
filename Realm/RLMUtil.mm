@@ -182,18 +182,35 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
-    NSDictionary *keyMapping = [objectSchema.objectClass objectPropertyKeyPathMapping];
+    id<RLMObjectTranslationProtocol> translation = [objectSchema.objectClass defaultTranslation];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
     BOOL isDict = [value isKindOfClass:NSDictionary.class];
+    
     for (RLMProperty *prop in properties) {
-        id obj = (isDict || [value respondsToSelector:NSSelectorFromString(prop.name)]) ? [value valueForKey:prop.name] : nil;
         
-        // get value under the mapped property
-        NSString *mappedProp = keyMapping[prop.name];
-        if (!obj) {
-            obj = (isDict || [value respondsToSelector:NSSelectorFromString(mappedProp)]) ? [value valueForKeyPath:mappedProp] : nil;
+        // get the mapped source for this property
+        NSString *sourcePropertyName = prop.name;
+        if (translation) {
+            sourcePropertyName = [translation sourceKeyPathMappingForProperty:sourcePropertyName];
         }
-
+        
+        // get the mapped value from the source data
+        id obj = (isDict || [value respondsToSelector:NSSelectorFromString(sourcePropertyName)]) ? [value valueForKeyPath:sourcePropertyName] : nil;
+        
+        // apply any translation / transformation necessary
+        if (translation) {
+            RLMObjectTransformInput inputType = [translation transformInputForProperty:prop.name];
+            
+            // transform expects all attributes
+            if (inputType == RLMObjectTransformInputAttributes) {
+                obj = [translation transformObject:value forProperty:prop.name];
+            
+            // transform expects the single, mapped value
+            } else {
+                obj = [translation transformObject:obj forProperty:prop.name];
+            }
+        }
+        
         // get default for nil object
         if (!obj && !allowMissing) {
             obj = defaults[prop.name];
