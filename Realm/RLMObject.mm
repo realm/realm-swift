@@ -139,6 +139,11 @@
     return nil;
 }
 
+// default translation object
++ (id<RLMObjectTranslationProtocol>)defaultTranslation; {
+    return nil;
+}
+
 // default primaryKey implementation
 + (NSString *)primaryKey {
     return nil;
