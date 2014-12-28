@@ -250,9 +250,17 @@ RLM_ARRAY_TYPE(CircleObject);
 @property (readonly) int readOnlyPropertyMadeReadWriteInClassExtension;
 @end
 
-#pragma mark KeyPathObject
+#pragma mark UserTranslationObject
 
-@interface UserKeyPathObject : RLMObject
-@property(nonatomic, strong) NSString *userId;
-@property(nonatomic, strong) NSString *firstName;
+@interface UserTranslationObject : RLMObject
+@property(nonatomic, strong) NSString   *userId;
+@property(nonatomic, strong) NSString   *first;
+@property(nonatomic, strong) NSString   *last;
+@property(nonatomic, strong) NSString   *greeting;
+@property(nonatomic, strong) NSDate     *joined;
+@property(nonatomic, assign) BOOL       active;
 @end
+
+@interface UserAPITranslation : NSObject <RLMObjectTranslationProtocol>
+@end
+
