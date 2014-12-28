@@ -134,11 +134,6 @@
     return nil;
 }
 
-// default object property key path mapping implementation
-+ (NSDictionary *)objectPropertyKeyPathMapping {
-    return nil;
-}
-
 // default translation object
 + (id<RLMObjectTranslationProtocol>)defaultTranslation; {
     return nil;

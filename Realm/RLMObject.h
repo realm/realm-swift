@@ -253,17 +253,6 @@
 + (NSArray *)ignoredProperties;
 
 /**
- @brief Implement to specify how properties map to key paths in the initWithObject: attributes parameter.
- This dictionary is consulted if no attribute is found for a given property name. The dictionary can
- contain key path format mapping for cases where you need to collapse an object - e.g. property of
- firstName mapped to user.firstName.
- 
- @see [RLMObject initWithObject:]
- @return    NSDictionary specifying property key path mapping.
- */
-+ (NSDictionary *)objectPropertyKeyPathMapping;
-
-/**
  * @brief Implement to specify a default translation object that should be used when
  * creating new objects using the initWithObject: API. Translations define the mapping
  * and transformation logic applied to properties for the RLMObject being created.
