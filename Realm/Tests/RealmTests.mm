@@ -59,7 +59,17 @@
 
 - (void)testDefaultRealmPath
 {
-    XCTAssertEqualObjects([[RLMRealm defaultRealm] path], [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+    NSString *defaultPath = [[RLMRealm defaultRealm] path];
+    @autoreleasepool {
+        XCTAssertEqualObjects(defaultPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+    }
+
+    NSString *newPath = [defaultPath stringByAppendingPathExtension:@"new"];
+    [RLMRealm setDefaultRealmPath:newPath];
+    XCTAssertEqualObjects(newPath, [RLMRealm defaultRealmPath], @"Default Realm path should be correct.");
+
+    // we have to clean-up since dispatch_once isn't run for each test case
+    [RLMRealm setDefaultRealmPath:defaultPath];
 }
 
 - (void)testRealmPath
@@ -580,7 +590,7 @@
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[@"a"]];
@@ -605,7 +615,7 @@
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[]];
@@ -614,6 +624,27 @@
 
     XCTAssertThrows([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil],
                     @"should reject table missing column");
+}
+
+- (void)testMultipleRealms
+{
+    // Create one StringObject in two different realms
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    RLMRealm *testRealm = self.realmWithTestPath;
+    [defaultRealm beginWriteTransaction];
+    [testRealm beginWriteTransaction];
+    [StringObject createInRealm:defaultRealm withObject:@[@"a"]];
+    [StringObject createInRealm:testRealm withObject:@[@"b"]];
+    [testRealm commitWriteTransaction];
+    [defaultRealm commitWriteTransaction];
+
+    // Confirm that objects were added to the correct realms
+    RLMResults *defaultObjects = [StringObject allObjectsInRealm:defaultRealm];
+    RLMResults *testObjects = [StringObject allObjectsInRealm:testRealm];
+    XCTAssertEqual(defaultObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqual(testObjects.count, (NSUInteger)1, @"Expecting 1 object");
+    XCTAssertEqualObjects([defaultObjects.firstObject stringCol], @"a", @"Expecting column to be 'a'");
+    XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
 - (void)testAddOrUpdate {
@@ -636,7 +667,7 @@
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
     XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 3, @"Value should be 3");
 
-    // upsert on non-primary key object shoudld throw
+    // upsert on non-primary key object should throw
     XCTAssertThrows([realm addOrUpdateObject:[[StringObject alloc] initWithObject:@[@"string"]]]);
 
     [realm commitWriteTransaction];
@@ -651,13 +682,13 @@
 
     XCTAssertEqual(1U, OwnerObject.allObjects.count);
     XCTAssertEqual(1U, DogObject.allObjects.count);
-    XCTAssertEqual(NO, obj.deletedFromRealm);
+    XCTAssertEqual(NO, obj.invalidated);
 
     XCTAssertThrows([realm deleteAllObjects]);
 
     [realm transactionWithBlock:^{
         [realm deleteAllObjects];
-        XCTAssertEqual(YES, obj.deletedFromRealm);
+        XCTAssertEqual(YES, obj.invalidated);
     }];
 
     XCTAssertEqual(0U, OwnerObject.allObjects.count);
@@ -672,7 +703,7 @@
     IntObject *createdObject = [IntObject createInRealm:realm withObject:@[@0]];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(createdObject.isDeletedFromRealm);
+    XCTAssertTrue(createdObject.isInvalidated);
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -688,7 +719,7 @@
     [realm deleteObject:objectToDelete];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(objectToDelete.isDeletedFromRealm);
+    XCTAssertTrue(objectToDelete.isInvalidated);
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
 }
 
@@ -808,6 +839,17 @@
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
 }
 
+- (void)testRollbackTransactionWithoutExplicitCommitOrCancel
+{
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:[self realmWithTestPath]].count);
+}
+
 - (void)testAddObjectsFromArray
 {
     RLMRealm *realm = [self realmWithTestPath];
@@ -823,4 +865,174 @@
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
 }
 
+- (void)testWriteCopyOfRealm
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNil(writeError);
+    RLMRealm *copy = [self realmWithTestPath];
+    XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+}
+
+- (void)testCannotOverwriteWithWriteCopy
+{
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    NSError *writeError;
+    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    XCTAssertNotNil(writeError);
+}
+
+- (void)testWritingCopyUsesWriteTransactionInProgress
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@0]];
+
+        NSError *writeError;
+        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+        XCTAssertNil(writeError);
+        RLMRealm *copy = [self realmWithTestPath];
+        XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
+    }];
+}
+
+- (void)testCanRestartReadTransactionAfterInvalidate
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    [realm invalidate];
+    IntObject *obj = [IntObject allObjectsInRealm:realm].firstObject;
+    XCTAssertEqual(obj.intCol, 1);
+}
+
+- (void)testInvalidateDetachesAccessors
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block IntObject *obj;
+    [realm transactionWithBlock:^{
+        obj = [IntObject createInRealm:realm withObject:@[@0]];
+    }];
+
+    [realm invalidate];
+    XCTAssertTrue(obj.isInvalidated);
+    XCTAssertThrows([obj intCol]);
+}
+
+- (void)testInvalidateInvalidatesResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }];
+
+    RLMResults *results = [IntObject objectsInRealm:realm where:@"intCol = 1"];
+    XCTAssertEqual([results.firstObject intCol], 1);
+
+    [realm invalidate];
+    XCTAssertThrows([results count]);
+    XCTAssertThrows([results firstObject]);
+}
+
+- (void)testInvalidateInvalidatesArrays
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block ArrayPropertyObject *arrayObject;
+    [realm transactionWithBlock:^{
+        arrayObject = [ArrayPropertyObject createInRealm:realm withObject:@[@"", @[], @[@[@1]]]];
+    }];
+
+    RLMArray *array = arrayObject.intArray;
+    XCTAssertEqual(1U, array.count);
+
+    [realm invalidate];
+    XCTAssertThrows([array count]);
+}
+
+- (void)testInvalidteOnReadOnlyRealmIsError
+{
+    @autoreleasepool {
+        // Create the file
+        [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+    }
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+    XCTAssertThrows([realm invalidate]);
+}
+
+- (void)testInvalidateBeforeReadDoesNotAssert
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm invalidate];
+}
+
+- (void)testInvalidateDuringWriteRollsBack
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    @autoreleasepool {
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }
+    [realm invalidate];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
+- (void)testRefreshCreatesAReadTransaction
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_group_t group = dispatch_group_create();
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertTrue([realm refresh]);
+
+    dispatch_group_async(group, queue, ^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithObject:@[@1]];
+        }];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    // refresh above should have created a read transaction, so realm should
+    // still only see one object
+    XCTAssertEqual(1U, [IntObject allObjects].count);
+
+    // Just a sanity check
+    XCTAssertTrue([realm refresh]);
+    XCTAssertEqual(2U, [IntObject allObjects].count);
+}
+
+- (void)testBadEncryptionKeys
+{
+    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:nil readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:[NSData data] readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:nil]);
+    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:[NSData data]]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
+}
+
+- (void)testValidEncryptionKeys
+{
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64]
+                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
+
+}
 @end

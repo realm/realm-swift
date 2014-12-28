@@ -19,6 +19,10 @@
 #import "RLMTableView.h"
 #import "RLMTableColumn.h"
 #import "RLMArrayNode.h"
+#import "RLMTableHeaderCell.h"
+#import "RLMDescriptions.h"
+
+const NSInteger NOT_A_COLUMN = -1;
 
 @interface RLMTableView()<NSMenuDelegate>
 
@@ -26,16 +30,20 @@
 
 @implementation RLMTableView {
     NSTrackingArea *trackingArea;
-    BOOL mouseOverView;
     RLMTableLocation currentMouseLocation;
     RLMTableLocation previousMouseLocation;
+
     NSMenuItem *clickLockItem;
-    NSMenuItem *addRowItem;
+
+    NSMenuItem *deleteObjectItem;
+
+    NSMenuItem *removeFromArrayItem;
     NSMenuItem *deleteRowItem;
     NSMenuItem *insertIntoArrayItem;
-    NSMenuItem *removeFromArrayItem;
+    
     NSMenuItem *removeLinkToObjectItem;
     NSMenuItem *removeLinkToArrayItem;
+    
     NSMenuItem *openArrayInNewWindowItem;
 }
 
@@ -44,17 +52,16 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-
+    
     int options = NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect | NSTrackingMouseEnteredAndExited
     | NSTrackingMouseMoved | NSTrackingCursorUpdate;
     trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:options owner:self userInfo:nil];
     [self addTrackingArea:trackingArea];
     
-    mouseOverView = NO;
     currentMouseLocation = RLMTableLocationUndefined;
     previousMouseLocation = RLMTableLocationUndefined;
     
-    [self createContextMenu];
+    [self createContextMenuItems];
 }
 
 - (void)dealloc
@@ -76,63 +83,119 @@
 
 #pragma mark - Private Methods - NSObject Overrides
 
--(void)createContextMenu
+-(void)createContextMenuItems
 {
     NSMenu *rightClickMenu = [[NSMenu alloc] initWithTitle:@"Contextual Menu"];
     self.menu = rightClickMenu;
     self.menu.delegate = self;
-
-    unichar backspaceKey = NSBackspaceCharacter;
-    NSString *backspaceString = [NSString stringWithCharacters:&backspaceKey length:1];
-
+    
+    // This single menu item alerts the user that the realm is locked for editing
     clickLockItem = [[NSMenuItem alloc] initWithTitle:@"Click lock icon to edit"
                                                action:nil
                                         keyEquivalent:@""];
     clickLockItem.tag = 99;
-
-    addRowItem = [[NSMenuItem alloc] initWithTitle:@"Add row"
-                                            action:@selector(selectedAddRow:)
-                                     keyEquivalent:@"+"];
-    addRowItem.tag = 5;
     
-    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Delete row"
-                                               action:@selector(selectedDeleteRow:)
-                                        keyEquivalent:backspaceString];
-    deleteRowItem.tag = 6;
+    // Operations on objects in class tables
+    deleteObjectItem = [[NSMenuItem alloc] initWithTitle:@"Delete objects"
+                                                  action:@selector(deleteObjectsAction:)
+                                           keyEquivalent:@""];
+    deleteObjectItem.tag = 200;
+
+    // Operations on objects in arrays
+    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array"
+                                                     action:@selector(removeRowsFromArrayAction:)
+                                              keyEquivalent:@""];
+    removeFromArrayItem.tag = 210;
     
-    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Insert row into array"
-                                                     action:@selector(selectedInsertRow:)
-                                              keyEquivalent:@"+"];
-    insertIntoArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
-    insertIntoArrayItem.tag = 9;
-
-    removeFromArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove row from array"
-                                                     action:@selector(selectedRemoveRow:)
-                                              keyEquivalent:backspaceString];
-    removeFromArrayItem.keyEquivalentModifierMask = NSCommandKeyMask | NSShiftKeyMask;
-    removeFromArrayItem.tag = 10;
-
+    deleteRowItem = [[NSMenuItem alloc] initWithTitle:@"Remove objects from array and delete"
+                                               action:@selector(deleteRowsFromArrayAction:)
+                                        keyEquivalent:@""];
+    deleteRowItem.tag = 211;
+    
+    insertIntoArrayItem = [[NSMenuItem alloc] initWithTitle:@"Add new objects to array"
+                                                     action:@selector(addRowsToArrayAction:)
+                                              keyEquivalent:@""];
+    insertIntoArrayItem.tag = 212;
+    
+    // Operations on links in cells
     removeLinkToObjectItem= [[NSMenuItem alloc] initWithTitle:@"Remove link to object"
-                                                       action:@selector(selectedRemoveObjectLink:)
-                                              keyEquivalent:@""];
-    removeLinkToObjectItem.tag = 11;
-
-    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Remove link to array"
-                                                     action:@selector(selectedRemoveArrayLink:)
-                                              keyEquivalent:@""];
-    removeLinkToArrayItem.tag = 12;
+                                                       action:@selector(removeObjectLinksAction:)
+                                                keyEquivalent:@""];
+    removeLinkToObjectItem.tag = 220;
     
+    removeLinkToArrayItem = [[NSMenuItem alloc] initWithTitle:@"Make array empty"
+                                                       action:@selector(removeArrayLinksAction:)
+                                                keyEquivalent:@""];
+    removeLinkToArrayItem.tag = 221;
+    
+    // Open array in new window
     openArrayInNewWindowItem = [[NSMenuItem alloc] initWithTitle:@"Open array in new window"
-                                                          action:@selector(openArrayInNewWindow:)
+                                                          action:@selector(openArrayInNewWindowAction:)
                                                    keyEquivalent:@""];
-    openArrayInNewWindowItem.tag = 20;
+    openArrayInNewWindowItem.tag = 230;
+}
+
+#pragma mark - NSMenu Delegate
+
+// Called on the context menu before displaying
+-(void)menuNeedsUpdate:(NSMenu *)menu
+{
+    [self.menu removeAllItems];
+    
+    BOOL actualColumn = self.clickedColumn != NOT_A_COLUMN;
+    
+    // Menu items that are independent on the realm lock
+    if (actualColumn && [self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:openArrayInNewWindowItem];
+    }
+    
+    // If it is locked, show the unlock hint menu item and return
+    if (self.realmDelegate.realmIsLocked) {
+        [self.menu addItem:clickLockItem];
+        return;
+    }
+    
+    // Below, only menu items that do require editing
+    
+    if (self.realmDelegate.displaysArray) {
+        [self.menu addItem:insertIntoArrayItem];
+    }
+    
+    if (self.selectedRowIndexes.count == 0) {
+        return;
+    }
+    
+    // Below, only menu items that make sense with a row selected
+    
+    if (self.realmDelegate.displaysArray) {
+        [self.menu addItem:removeFromArrayItem];
+        [self.menu addItem:deleteRowItem];
+    }
+    else {
+        [self.menu addItem:deleteObjectItem];
+    }
+    
+    if (!actualColumn) {
+        return;
+    }
+    
+    // Below, only menu items that make sense when clicking in a column
+    
+    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToObjectItem];
+    }
+    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
+        [self.menu addItem:removeLinkToArrayItem];
+    }
 }
 
 #pragma mark - NSResponder Overrides
 
 - (void)cursorUpdate:(NSEvent *)event
 {
-    // Note: This method is left empty intentionally. It avoids cursor events to be passed on up
+    [self mouseMoved: event];
+    
+    // Note: This method is left mostly empty on purpose. It avoids cursor events to be passed on up
     //       the responder chain where it potentially could reach a displayed tool-tip view, which
     //       will undo any modification to the cursor image dome by the application. This "fix" is
     //       in order to circumvent a bug in OS X version prior to 10.10 Yosemite not honouring
@@ -140,47 +203,34 @@
     //       IMPORTANT: Must NOT be deleted!!!
 }
 
-- (void)mouseEntered:(NSEvent*)event
-{
-    mouseOverView = YES;
-    
-    if ([self.delegate respondsToSelector:@selector(mouseDidEnterView:)]) {
-        [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterView:self];
-    }
-}
-
 - (void)mouseMoved:(NSEvent *)event
 {
-    id myDelegate = [self delegate];
-    
-    if (!myDelegate) {
+    if (!self.delegate) {
         return; // No delegate, no need to track the mouse.
     }
+        
+    currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
 
-    if (mouseOverView) {
-        currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
-		
-        if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
-            return;
-        }
-        else {
-            if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
-            }
-
-            CGRect cellRect = [self rectOfLocation:previousMouseLocation];
-            [self setNeedsDisplayInRect:cellRect];
-
-            previousMouseLocation = currentMouseLocation;
-
-            if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
-                [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
-            }
-        }
-
-        CGRect cellRect = [self rectOfLocation:currentMouseLocation];
-        [self setNeedsDisplayInRect:cellRect];
+    if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
+        return;
     }
+    else {
+        if ([self.delegate respondsToSelector:@selector(mouseDidExitCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidExitCellAtLocation:previousMouseLocation];
+        }
+        
+        CGRect cellRect = [self rectOfLocation:previousMouseLocation];
+        [self setNeedsDisplayInRect:cellRect];
+        
+        previousMouseLocation = currentMouseLocation;
+        
+        if ([self.delegate respondsToSelector:@selector(mouseDidEnterCellAtLocation:)]) {
+            [(id<RLMTableViewDelegate>)self.delegate mouseDidEnterCellAtLocation:currentMouseLocation];
+        }
+    }
+    
+    CGRect cellRect = [self rectOfLocation:currentMouseLocation];
+    [self setNeedsDisplayInRect:cellRect];
 }
 
 -(void)rightMouseDown:(NSEvent *)theEvent
@@ -194,9 +244,7 @@
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
-{
-    mouseOverView = NO;
-    
+{    
     CGRect cellRect = [self rectOfLocation:currentMouseLocation];
     [self setNeedsDisplayInRect:cellRect];
     
@@ -208,157 +256,121 @@
     }
 }
 
--(void)keyDown:(NSEvent *)theEvent
-{
-    if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & !NSShiftKeyMask) {
-        if (theEvent.keyCode == 27) {
-            [self selectedAddRow:theEvent];
-        }
-        else if (theEvent.keyCode == 51) {
-            [self selectedDeleteRow:theEvent];
-        }
-    }
-    else if (theEvent.modifierFlags & NSCommandKeyMask & !NSAlternateKeyMask & NSShiftKeyMask) {
-        if (theEvent.keyCode == 27) {
-            [self selectedInsertRow:theEvent];
-        }
-        else if (theEvent.keyCode == 51) {
-            [self selectedRemoveRow:theEvent];
-        }
-    }
-    
-    [self interpretKeyEvents:@[theEvent]];
-}
-
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    BOOL multipleRows = self.selectedRowIndexes.count > 1;
-    BOOL canEditRows = !self.realmDelegate.realmIsLocked;
-    BOOL canDeleteRows = self.selectedRowIndexes.count > 0 && canEditRows;
+    BOOL nonemptySelection = self.selectedRowIndexes.count > 0;
+    BOOL multipleSelection = self.selectedRowIndexes.count > 1;
+    BOOL unlocked = !self.realmDelegate.realmIsLocked;
     BOOL displaysArray = self.realmDelegate.displaysArray;
 
+    NSString *numberModifier = multipleSelection ? @"s" : @"";
+    
     switch (menuItem.tag) {
-        case 1: // Tools -> Add row
-        case 5: // Context -> Add row
-            menuItem.title = multipleRows ? @"Add objects" : @"Add object";
-            return canEditRows && !displaysArray;
-            
-        case 2: // Tools -> Delete row
-        case 6: // Context -> Delete row
-            menuItem.title = multipleRows ? @"Delete objects" : @"Delete object";
-            return canDeleteRows;
-
-        case 9: // Context -> Insert row into array
-            menuItem.title = multipleRows ? @"Insert objects into array" : @"Insert object into array";
-            return canEditRows && displaysArray;
-
-        case 10: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove objects from array" : @"Remove object from array";
-            return canDeleteRows && displaysArray;
-
-        case 11: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to objects" : @"Remove link to object";
-            return YES;
-
-        case 12: // Context -> Remove row from array
-            menuItem.title = multipleRows ? @"Remove links to arrays" : @"Remove link to array";
-            return YES;
-
         case 99: // Context -> Click lock icon to edit
             return NO;
+
+        case 100: // Edit -> Delete object
+        case 200: // Context -> Delete object
+            menuItem.title = [NSString stringWithFormat:@"Delete object%@", numberModifier];
+            return nonemptySelection && unlocked && !displaysArray;
+
+        case 101: // Edit -> Add object
+//        case 201: // Context -> Add object
+            menuItem.title = [NSString stringWithFormat:@"Add new object%@", numberModifier];
+            return unlocked && !displaysArray;
+            
+        case 110: // Edit -> Remove object from array
+        case 210: // Context -> Remove object from array
+            menuItem.title = [NSString stringWithFormat:@"Remove object%@ from array", numberModifier];
+            return unlocked && nonemptySelection && displaysArray;
+
+        case 111: // Edit -> Remove object from array and delete
+        case 211: // Context -> Remove object from array and delete
+            menuItem.title = [NSString stringWithFormat:@"Remove object%@ from array and delete", numberModifier];
+            return unlocked && nonemptySelection && displaysArray;
+
+        case 112: // Edit -> Insert object into array
+        case 212: // Context -> Insert object into array
+            menuItem.title = [NSString stringWithFormat:@"Add new object%@ to array", numberModifier];
+            return unlocked && displaysArray;
+            
+        case 220: // Context -> Remove links to object
+            menuItem.title = [NSString stringWithFormat:@"Remove link%@ to object%@", numberModifier, numberModifier];
+            return unlocked && nonemptySelection;
+
+        case 221: // Context -> Remove links to array
+            menuItem.title = [NSString stringWithFormat:@"Make array%@ empty", numberModifier];
+            return unlocked && nonemptySelection;
+
+        case 230: // Context -> Open array in new window
+            menuItem.title = @"Open array in new window";
+            return YES;
 
         default:
             return YES;
     }
 }
 
-#pragma mark - NSMenu Delegate
-
--(void)menuNeedsUpdate:(NSMenu *)menu
-{
-    [self.menu removeAllItems];
-    
-    // Menu items that do not require editing
-    if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:openArrayInNewWindowItem];
-    }
-
-    if (self.realmDelegate.realmIsLocked) {
-        [self.menu addItem:clickLockItem];
-        return;
-    }
-    
-    // Menu items that do require editing
-    
-    // Menu items that make sense without a row selected
-    if (self.selectedRowIndexes.count == 0) {
-        return;
-    }
-    
-    // Menu items that make sense only with a row selected
-    [self.menu addItem:deleteRowItem];
-
-    if (self.realmDelegate.displaysArray) {
-        [self.menu addItem:removeFromArrayItem];
-    }
-
-    if (self.clickedColumn == -1) {
-        return;
-    }
-    
-    if ([self.realmDelegate containsObjectInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:removeLinkToObjectItem];
-    }
-    else if ([self.realmDelegate containsArrayInRows:self.selectedRowIndexes column:self.clickedColumn]) {
-        [self.menu addItem:removeLinkToArrayItem];
-    }
-}
-
 #pragma mark - First Responder User Actions
 
-- (IBAction)selectedAddRow:(id)sender
+// Delete selected objects
+- (IBAction)deleteObjectsAction:(id)sender
 {
-    if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate addRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate deleteObjects:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedDeleteRow:(id)sender
+// Add objects of the current type, according to number of selected rows
+- (IBAction)addObjectsAction:(id)sender
 {
-    if (!self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate deleteRows:self.selectedRowIndexes];
+    if (!self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate addNewObjects:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedRemoveRow:(id)sender
+// Remove selected objects from array, keeping the objects
+- (IBAction)removeRowsFromArrayAction:(id)sender
 {
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeRows:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedInsertRow:(id)sender
+// Remove selected objects from array and delete the objects
+- (IBAction)deleteRowsFromArrayAction:(id)sender
 {
     if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
-        [self.realmDelegate insertRows:self.selectedRowIndexes];
+        [self.realmDelegate deleteRows:self.selectedRowIndexes];
     }
 }
 
-- (IBAction)selectedRemoveObjectLink:(id)sender
+// Create and insert objects at the selected rows
+- (IBAction)addRowsToArrayAction:(id)sender
+{
+    if (self.realmDelegate.displaysArray && !self.realmDelegate.realmIsLocked) {
+        [self.realmDelegate addNewRows:self.selectedRowIndexes];
+    }
+}
+
+// Set object links in the clicked column to [NSNull null] at the selected rows
+- (IBAction)removeObjectLinksAction:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeObjectLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
 }
 
-- (IBAction)selectedRemoveArrayLink:(id)sender
+// Make array links in the clicked column, at selected rows, empty
+- (IBAction)removeArrayLinksAction:(id)sender
 {
     if (!self.realmDelegate.realmIsLocked) {
         [self.realmDelegate removeArrayLinksAtRows:self.selectedRowIndexes column:self.clickedColumn];
     }
 }
 
-- (IBAction)openArrayInNewWindow:(id)sender
+// Opens the array in the current cell in a new window
+- (IBAction)openArrayInNewWindowAction:(id)sender
 {
     [self.realmDelegate openArrayInNewWindowAtRow:self.clickedRow column:self.clickedColumn];
 }
@@ -377,7 +389,20 @@
 
 #pragma mark - Public Methods
 
-- (void)setupColumnsWithType:(RLMTypeNode *)typeNode withSelectionAtRow:(NSUInteger)selectionIndex
+- (void)scrollToRow:(NSInteger)rowIndex
+{
+    NSRect rowRect = [self rectOfRow:rowIndex];
+    NSPoint scrollOrigin = rowRect.origin;
+    NSClipView *clipView = (NSClipView *)[self superview];
+    scrollOrigin.y += MAX(0, round((NSHeight(rowRect) - NSHeight(clipView.frame))*0.5f));
+    NSScrollView *scrollView = (NSScrollView *)[clipView superview];
+    if ([scrollView respondsToSelector:@selector(flashScrollers)]){
+        [scrollView flashScrollers];
+    }
+    [[clipView animator] setBoundsOrigin:scrollOrigin];
+}
+
+- (void)setupColumnsWithType:(RLMTypeNode *)typeNode
 {
     while (self.numberOfColumns > 0) {
         [self removeTableColumn:[self.tableColumns lastObject]];
@@ -385,14 +410,25 @@
     
     [self reloadData];
 
+    NSRect frame = self.headerView.frame;
+    frame.size.height = 36;
+    self.headerView.frame = frame;
+    
     [self beginUpdates];
     // If array, add extra first column with numbers
     if ([typeNode isMemberOfClass:[RLMArrayNode class]]) {
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:@"#"];
         tableColumn.propertyType = RLMPropertyTypeInt;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:@"#"];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = @"";
+        headerCell.secondLine = @"#";
+
+        tableColumn.headerCell = headerCell;
         tableColumn.headerToolTip = @"Order of object within array";
+        
+        [self addTableColumn:tableColumn];
     }
     
     // ... and add new columns matching the structure of the new realm table.
@@ -403,9 +439,15 @@
         RLMTableColumn *tableColumn = [[RLMTableColumn alloc] initWithIdentifier:propertyColumn.name];
         
         tableColumn.propertyType = propertyColumn.type;
-        [self addTableColumn:tableColumn];
-        [tableColumn.headerCell setStringValue:propertyColumn.name];
+        
+        RLMTableHeaderCell *headerCell = [[RLMTableHeaderCell alloc] init];
+        headerCell.wraps = YES;
+        headerCell.firstLine = propertyColumn.name;
+        headerCell.secondLine = [RLMDescriptions typeNameOfProperty:propertyColumn.property];
+        tableColumn.headerCell = headerCell;
+        
         tableColumn.headerToolTip = [self.realmDataSource headerToolTipForColumn:propertyColumn];
+        [self addTableColumn:tableColumn];
     }
     
     [self endUpdates];

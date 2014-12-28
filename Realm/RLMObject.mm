@@ -30,10 +30,13 @@
 @implementation RLMObject
 
 // standalone init
-- (instancetype)init
-{
+- (instancetype)init {
+    return [self initWithObjectSchema:[self.class sharedSchema]];
+}
+
+- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema {
     if (RLMSchema.sharedSchema) {
-        self = [self initWithRealm:nil schema:[self.class sharedSchema] defaultValues:YES];
+        self = [self initWithRealm:nil schema:schema defaultValues:YES];
 
         // set standalone accessor class
         object_setClass(self, self.objectSchema.standaloneClass);
@@ -48,10 +51,14 @@
 }
 
 - (instancetype)initWithObject:(id)value {
+    return [self initWithObject:value schema:RLMSchema.sharedSchema];
+}
+
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema {
     self = [self init];
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
         // validate and populate
-        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, RLMSchema.sharedSchema);
+        array = RLMValidatedArrayForObjectSchema(array, _objectSchema, schema);
         NSArray *properties = _objectSchema.properties;
         for (NSUInteger i = 0; i < array.count; i++) {
             [self setValue:array[i] forKeyPath:[properties[i] name]];
@@ -59,7 +66,7 @@
     }
     else {
         // assume our object is an NSDictionary or a an object with kvc properties
-        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, RLMSchema.sharedSchema);
+        NSDictionary *dict = RLMValidatedDictionaryForObjectSchema(value, _objectSchema, schema);
         for (NSString *name in dict) {
             id val = dict[name];
             // strip out NSNull before passing values to standalone setters
@@ -73,8 +80,8 @@
     return self;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults {
     self = [super init];
     if (self) {
@@ -215,15 +222,15 @@
     return className;
 }
 
-// overriddent at runtime per-class for performance
+// overridden at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
     return RLMSchema.sharedSchema[self.className];
 }
 
 - (NSString *)description
 {
-    if (self.isDeletedFromRealm) {
-        return @"[deleted object]";
+    if (self.invalidated) {
+        return @"[invalid object]";
     }
 
     return [self descriptionWithMaxDepth:5];
@@ -254,9 +261,13 @@
     return [NSString stringWithString:mString];
 }
 
-- (BOOL)isDeletedFromRealm {
+- (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
     return self.class == self.objectSchema.accessorClass && !_row.is_attached();
+}
+
+- (BOOL)isDeletedFromRealm {
+    return self.invalidated;
 }
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
@@ -269,7 +280,7 @@
 
     if (!_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted and is no longer valid."
+                                       reason:@"Object is no longer valid."
                                      userInfo:nil];
     }
 
@@ -285,12 +296,16 @@
                                      userInfo:nil];
     }
 
-    Table &table = *schema->_table.get();
+    Table *table = schema.table;
+    if (!table) {
+        return @[];
+    }
+
     size_t col = prop.column;
-    NSUInteger count = _row.get_backlink_count(table, col);
+    NSUInteger count = _row.get_backlink_count(*table, col);
     NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(_realm, className, _row.get_backlink(table, col, i))];
+        [links addObject:RLMCreateObjectAccessor(_realm, className, _row.get_backlink(*table, col, i))];
     }
     return [links copy];
 }

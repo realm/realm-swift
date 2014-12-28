@@ -23,6 +23,7 @@
 #import "RLMTextField.h"
 
 @class RLMRealmBrowserWindowController;
+@class RLMArrayNode;
 
 @interface RLMInstanceTableViewController : RLMViewController <RLMTextFieldDelegate, RLMTableViewDelegate, RLMTableViewDataSource>
 
@@ -30,5 +31,10 @@
 
 @property (nonatomic) BOOL realmIsLocked;
 @property (nonatomic) BOOL displaysArray;
+
+- (void)removeRowsInTableViewAt:(NSIndexSet *)rowIndexes;
+- (void)deleteRowsInTableViewAt:(NSIndexSet *)rowIndexes;
+- (void)insertNewRowsInTableViewAt:(NSIndexSet *)rowIndexes;
+- (void)moveRowsInTableViewFrom:(NSIndexSet *)sourceIndexes to:(NSUInteger)destination;
 
 @end

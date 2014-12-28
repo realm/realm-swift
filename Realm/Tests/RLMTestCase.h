@@ -34,7 +34,6 @@ NSString *RLMRealmPathForFile(NSString *);
 
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-- (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema;
 
 + (void)deleteFiles;
 

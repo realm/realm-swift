@@ -21,9 +21,10 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
+#import "RLMSwiftSupport.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
@@ -160,7 +161,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
         if (prop.type == RLMPropertyTypeObject) {
             // for object create and try to initialize with obj
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
-            return [[objSchema.objectClass alloc] initWithObject:obj];
+            return [[objSchema.objectClass alloc] initWithObject:obj schema:schema];
         }
         else if (prop.type == RLMPropertyTypeArray && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // for arrays, create objects for each literal object and return new array
@@ -179,24 +180,33 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
     return obj;
 }
 
+NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
+        RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+        for (RLMProperty *prop in objectSchema.properties) {
+            if (!defaults[prop.name] && defaultObject[prop.name]) {
+                defaults[prop.name] = defaultObject[prop.name];
+            }
+        }
+    }
+    return defaults;
+}
+
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
-    NSDictionary *defaults = [objectSchema.objectClass defaultPropertyValues];
-    id<RLMObjectTranslationProtocol> translation = [objectSchema.objectClass defaultTranslation];
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    BOOL isDict = [value isKindOfClass:NSDictionary.class];
-    
+    id<RLMObjectTranslationProtocol> translation = [objectSchema.objectClass defaultTranslation];
+
     for (RLMProperty *prop in properties) {
-        
-        // get the mapped source for this property
+		// get the mapped source for this property
         NSString *sourcePropertyName = prop.name;
         if (translation) {
             sourcePropertyName = [translation sourceKeyPathMappingForProperty:sourcePropertyName];
         }
-        
-        // get the mapped value from the source data
-        id obj = (isDict || [value respondsToSelector:NSSelectorFromString(sourcePropertyName)]) ? [value valueForKeyPath:sourcePropertyName] : nil;
-        
+
+        id obj = [value valueForKeyPath:sourcePropertyName];
+
         // apply any translation / transformation necessary
         if (translation) {
             RLMObjectTransformInput inputType = [translation transformInputForProperty:prop.name];
@@ -210,10 +220,10 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
                 obj = [translation transformObject:obj forProperty:prop.name];
             }
         }
-        
+
         // get default for nil object
         if (!obj && !allowMissing) {
-            obj = defaults[prop.name];
+            obj = objectSchema.defaultValues[prop.name];
         }
 
         // validate if object is not nil, or for nil if we don't allow missing values

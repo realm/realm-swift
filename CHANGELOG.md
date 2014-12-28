@@ -1,3 +1,94 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an assertion failure when invalidating a Realm which is in a write
+  transaction, has already been invalidated, or has never been used.
+
+0.89.1 Release notes (2014-12-22)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Improve the error message when a Realm can't be opened due to lacking write
+  permissions.
+
+### Bugfixes
+
+* Fix an assertion failure when inserting rows after calling `deleteAllObjects`
+  on a Realm.
+* Separate dynamic frameworks are now built for the simulator and devices to
+  work around App Store submission errors due to the simulator version not
+  being automatically stripped from dynamic libraries.
+
+0.89.0 Release notes (2014-12-18)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Add support for encrypting Realm files on disk.
+* Support using KVC-compliant objects without getters or with custom getter
+  names to initialize RLMObjects with `createObjectInRealm` and friends.
+
+### Bugfixes
+
+* Merge native Swift default property values with defaultPropertyValues().
+* Don't leave the database schema partially updated when opening a realm fails
+  due to a migration being needed.
+* Fixed issue where objects with custom getter names couldn't be used to
+  initialize other objects.
+* Fix a major performance regression on queries on string properties.
+* Fix a memory leak when circularly linked objects are added to a Realm.
+
+0.88.0 Release notes (2014-12-02)
+=============================================================
+
+### API breaking changes
+
+* Deallocating an RLMRealm instance in a write transaction lacking an explicit
+  commit/cancel will now be automatically cancelled instead of committed.
+* `-[RLMObject isDeletedFromRealm]` has been renamed to `-[RLMObject isInvalidated]`.
+
+### Enhancements
+
+* Add `-[RLMRealm writeCopyToPath:]` to write a compacted copy of the Realm
+  another file.
+* Add support for case insensitive, BEGINSWITH, ENDSWITH and CONTAINS string
+  queries on array properties.
+* Make fast enumeration of `RLMArray` and `RLMResults` ~30% faster and
+  `objectAtIndex:` ~55% faster.
+* Added a lldb visualizer script for displaying the contents of persisted
+  RLMObjects when debugging.
+* Added method `-setDefaultRealmPath:` to change the default Realm path.
+* Add `-[RLMRealm invalidate]` to release data locked by the current thread.
+
+### Bugfixes
+
+* Fix for crash when running many simultaneous write transactions on background threads.
+* Fix for crashes caused by opening Realms at multiple paths simultaneously which have had
+  properties re-ordered during migration.
+* Don't run the query twice when `firstObject` or `lastObject` are called on an
+  `RLMResults` which has not had its results accessed already.
+* Fix for bug where schema version is 0 for new Realm created at the latest version.
+* Fix for error message where no migration block is specified when required.
+
 0.87.4 Release notes (2014-11-07)
 =============================================================
 
@@ -12,7 +103,6 @@
 ### Bugfixes
 
 * Fix browser location in release zip.
-
 
 0.87.3 Release notes (2014-11-06)
 =============================================================
@@ -33,7 +123,6 @@
 * Throw an exception when passing an array containing a
   non-RLMObject to -[RLMRealm addObjects:].
 * Fix for crash when deleting an object from multiple threads.
-
 
 0.87.0 Release notes (2014-10-21)
 =============================================================

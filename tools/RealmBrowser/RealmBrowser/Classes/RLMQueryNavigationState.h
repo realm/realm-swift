@@ -22,9 +22,9 @@
 
 @interface RLMQueryNavigationState : RLMNavigationState
 
-@property (nonatomic, readonly) RLMArray *results;
+@property (nonatomic, readonly) RLMResults *results;
 @property (nonatomic, readonly) NSString *searchText;
 
-- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMArray *)results;
+- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMResults *)results;
 
 @end

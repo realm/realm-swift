@@ -19,13 +19,11 @@
 #import "RLMClassNode.h"
 
 #import "RLMObjectNode.h"
+#import "RLMArrayNode.h"
+#import "RLMResultsNode.h"
+
 #import "RLMSidebarTableCellView.h"
-
-// private redeclaration
-@interface RLMRealm ()
-- (RLMResults *)allObjects:(NSString *)className;
-@end
-
+#import "Realm_Private.h"
 
 @interface RLMClassNode ()
 
@@ -91,18 +89,7 @@
 
 - (NSUInteger)indexOfInstance:(RLMObject *)instance
 {    
-// Note: The indexOfObject method of RLMArray is not yet implemented so we have to perform the
-//       lookup as a simple linear search;
-    
-    NSUInteger index = 0;
-    for (RLMObject *classInstance in self.allObjects) {
-        if (classInstance == instance) {
-            return index;
-        }
-        index++;
-    }
-    
-    return NSNotFound;
+    return [self.allObjects indexOfObject:instance];
 }
 
 - (NSView *)cellViewForTableView:(NSTableView *)tableView
@@ -146,20 +133,20 @@
     return objectNode;
 }
 
-- (RLMArrayNode *)displayChildArrayFromQuery:(NSString *)searchText result:(RLMArray *)result
+- (RLMResultsNode *)displayChildResultsFromQuery:(NSString *)searchText result:(RLMResults *)result
 {
     displaysQuery = YES;
-
-    RLMArrayNode *arrayNode = [[RLMArrayNode alloc] initWithQuery:searchText result:result andParent:self];
-
+    
+    RLMResultsNode *resultsNode = [[RLMResultsNode alloc] initWithQuery:searchText result:result andParent:self];
+    
     if (displayedArrays.count == 0) {
-        [displayedArrays addObject:arrayNode];
+        [displayedArrays addObject:resultsNode];
     }
     else {
-        [displayedArrays replaceObjectAtIndex:0 withObject:arrayNode];
+        [displayedArrays replaceObjectAtIndex:0 withObject:resultsNode];
     }
 
-    return arrayNode;
+    return resultsNode;
 }
 
 - (void)removeAllChildNodes

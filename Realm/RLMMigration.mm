@@ -47,14 +47,14 @@
 
 @implementation RLMMigration
 
-+ (instancetype)migrationForRealm:(RLMRealm *)realm error:(NSError **)error {
++ (instancetype)migrationForRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error {
     RLMMigration *migration = [RLMMigration new];
     
     // create rw realm to migrate with current on disk table
     migration->_realm = realm;
     
     // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path readOnly:NO inMemory:NO error:error];
+    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO error:error];
     if (migration->_oldRealm) {
         RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
     }
@@ -103,7 +103,7 @@
             // FIXME: replace with count of distinct once we support indexing
 
             // FIXME: support other types
-            tightdb::TableRef &table = objectSchema->_table;
+            tightdb::Table *table = objectSchema.table;
             NSUInteger count = table->size();
             if (primaryProperty.type == RLMPropertyTypeString) {
                 if (!table->has_search_index(primaryProperty.column)) {

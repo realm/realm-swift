@@ -97,32 +97,25 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     do @autoreleasepool {
         // Clean up any existing overridden things
         for (Class cls : testClasses) {
-            NSString *className = NSStringFromClass(cls);
-            if (Class subclass = NSClassFromString([@"RLMAccessor_" stringByAppendingString:className])) {
-                objc_disposeClassPair(subclass);
-            }
-            if (Class subclass = NSClassFromString([@"RLMStandalone_" stringByAppendingString:className])) {
-                objc_disposeClassPair(subclass);
-            }
-
             // Ensure that the className method isn't used during schema init
             // as it may not be overriden yet
+            NSString *className = NSStringFromClass(cls);
             Class metaClass = objc_getMetaClass(className.UTF8String);
             IMP imp = imp_implementationWithBlock(^{ return nil; });
             class_replaceMethod(metaClass, @selector(className), imp, "@:");
-            class_replaceMethod(metaClass, @selector(sharedSchema), imp, "@:");
         }
 
         NSMutableArray *objectSchemas = [NSMutableArray arrayWithCapacity:4U];
         for (Class cls : testClasses) {
-            [objectSchemas addObject:[RLMObjectSchema schemaForObjectClass:cls createAccessors:YES]];
+            [objectSchemas addObject:[RLMObjectSchema schemaForObjectClass:cls]];
         }
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = objectSchemas;
 
         for (RLMObjectSchema *objectSchema in objectSchemas) {
-            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
+            objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, @"RLMAccessor_");
+            objectSchema.standaloneClass = RLMStandaloneAccessorClassForObjectClass(objectSchema.objectClass, objectSchema);
         }
 
         // Verify that each class has the correct properties and className
@@ -150,11 +143,11 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 
         // Test creating objects of each class
         [self.class deleteFiles];
-        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
         [realm beginWriteTransaction];
-        [SchemaTestClassBase createInRealm:realm withObject:@{@"baseCol": @[@0]}];
-        [SchemaTestClassFirstChild createInRealm:realm withObject:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
-        [SchemaTestClassSecondChild createInRealm:realm withObject:@{@"baseCol": @[@0], @"secondChildCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassBase" withObject:@{@"baseCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassFirstChild" withObject:@{@"baseCol": @[@0], @"firstChildCol": @[@0]}];
+        [realm createObject:@"SchemaTestClassSecondChild" withObject:@{@"baseCol": @[@0], @"secondChildCol": @[@0]}];
         [realm commitWriteTransaction];
     } while (std::next_permutation(testClasses, std::end(testClasses), pred));
 }
@@ -191,7 +184,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     [self realmWithTestPathAndSchema:schema];
 
     // get dynamic realm and extract schema
-    RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *realm = [self realmWithTestPathAndSchema:nil];
     schema = realm.schema;
 
     // Test 1: Does the objectSchema return the right number of object schemas?

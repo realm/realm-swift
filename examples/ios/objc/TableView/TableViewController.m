@@ -46,14 +46,15 @@ static NSString * const kTableName = @"table";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.array = [[DemoObject allObjects] sortedResultsUsingProperty:@"date" ascending:YES];
     [self setupUI];
 
     // Set realm notification block
     __weak typeof(self) weakSelf = self;
     self.notification = [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        [weakSelf reloadData];
+        [weakSelf.tableView reloadData];
     }];
-    [self reloadData];
+    [self.tableView reloadData];
 }
 
 #pragma mark - UI
@@ -107,12 +108,6 @@ static NSString * const kTableName = @"table";
 }
 
 #pragma mark - Actions
-
-- (void)reloadData
-{
-    self.array = [[DemoObject allObjects] sortedResultsUsingProperty:@"date" ascending:YES];
-    [self.tableView reloadData];
-}
 
 - (void)backgroundAdd
 {

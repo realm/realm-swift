@@ -94,6 +94,48 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
+ Obtains an `RLMRealm` instance persisted to an encrypted file.
+
+ The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
+ but otherwise they behave like normal persisted Realms.
+
+ Encrypted Realms currently cannot be opened while lldb is attached to the
+ process due to that lldb does have an option to pass through mach exceptions to
+ the process being debugged. Attempting to open an encrypted Realm with lldb
+ attached will result in an EXC_BAD_ACCESS.
+
+ @param path        Path to the file you want the data saved in.
+ @param key         64-byte key to use to encrypt the data.
+ @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
+
+ @return An encrypted `RLMRealm` instance.
+ */
++ (instancetype)encryptedRealmWithPath:(NSString *)path
+                                   key:(NSData *)key
+                              readOnly:(BOOL)readonly
+                                 error:(NSError **)error;
+
+/**
+ Set the encryption key to use when opening Realms at a certain path.
+
+ This can be used as an alternative to explicitly passing the key to
+ `encryptedRealmWithPath:key:readOnly:error:` each time a Realm instance is
+ needed. The encryption key will be used any time a Realm is opened with
+ `realmWithPath:` or `defaultRealm`.
+
+ If you do not want Realm to hold on to your encryption keys any longer than
+ needed, then use `encryptedRealmWithPath:key:readOnly:error:` rather than this
+ method.
+
+ @param key     64-byte encryption key to use, or `nil` to unset.
+ @param path    Realm path to set the encryption key for.
+ */
++ (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path;
+
+/**
  Obtains an `RLMRealm` instance for an un-persisted in-memory Realm. The identifier
  used to create this instance can be used to access the same in-memory Realm from
  multiple threads.
@@ -143,6 +185,16 @@
  @see defaultRealm
  */
 + (NSString *)defaultRealmPath;
+
+/**
+ Set the default Realm path to a given path.
+
+ @param defaultRealmPath    The path to use for the default Realm.
+
+ @see defaultRealm
+ */
++ (void)setDefaultRealmPath:(NSString *)defaultRealmPath;
+
 
 #pragma mark - Notifications
 
@@ -226,9 +278,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  This rolls back all objects in the Realm to the state they were in at the
  beginning of the write transaction, and then ends the transaction.
 
- This does not reattach deleted accessors. Any `RLMObject`s which were added to
- the Realm will become deleted objects rather than switching back to standalone
- objects. Given the following code:
+ This restores the data for deleted objects, but does not re-validated deleted
+ accessor objects. Any `RLMObject`s which were added to the Realm will be
+ invalidated rather than switching back to standalone objects.
+ Given the following code:
 
      ObjectType *oldObject = [[ObjectType objectsWhere:@"..."] firstObject];
      ObjectType *newObject = [[ObjectType alloc] init];
@@ -238,7 +291,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
      [realm deleteObject:oldObject];
      [realm cancelWriteTransaction];
 
- Both `oldObject` and `newObject` will return `YES` for `isDeletedFromRealm`,
+ Both `oldObject` and `newObject` will return `YES` for `isInvalidated`,
  but re-running the query which provided `oldObject` will once again return
  the valid object.
 
@@ -285,6 +338,42 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  */
 @property (nonatomic) BOOL autorefresh;
 
+/**
+ Write a compacted copy of the RLMRealm to the given path.
+
+ The destination file cannot already exist.
+
+ Note that if this is called from within a write transaction it writes the
+ *current* data, and not data when the last write transaction was committed.
+
+ @param path Path to save the Realm to.
+ @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return YES if the realm was copied successfully. Returns NO if an error occurred.
+*/
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
+
+/**
+ Invalidate all RLMObjects and RLMResults read from this Realm.
+
+ An RLMRealm holds a read lock on the version of the data accessed by it, so
+ that changes made to the Realm on different threads do not modify or delete the
+ data seen by this RLMRealm. Calling this method releases the read lock,
+ allowing the space used on disk to be reused by later write transactions rather
+ than growing the file. This method should be called before performing long
+ blocking operations on a background thread on which you previously read data
+ from the Realm which you no longer need.
+
+ All `RLMObject`, `RLMResults` and `RLMArray` instances obtained from this
+ `RLMRealm` on the current thread are invalidated, and can not longer be used.
+ The `RLMRealm` itself remains valid, and a new read transaction is implicitly
+ begun the next time data is read from the Realm.
+
+ Calling this method multiple times in a row without reading any data from the
+ Realm, or before ever reading any data from the Realm is a no-op. This method
+ cannot be called on a read-only Realm.
+ */
+- (void)invalidate;
+
 #pragma mark - Accessing Objects
 
 /**---------------------------------------------------------------------------------------
@@ -302,8 +391,8 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  `-[RLMObject createInRealm:withObject]` to insert a copy of a persisted object
  into a different Realm.
 
- The object to be added cannot have been previously deleted from a Realm (i.e.
- `isDeletedFromRealm`) must be false.
+ The object to be added must be valid and cannot have been previously deleted
+ from a Realm (i.e. `isInvalidated`) must be false.
 
  @param object  Object to be added to this Realm.
  */
@@ -427,6 +516,17 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  @see               setSchemaVersion:withMigrationBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath;
+
+/**
+ Performs the registered migration block on an encrypted Realm at the given path.
+
+ As `migrateRealmAtPath:`, but for encrypted realms.
+
+ @param realmPath   The path of the Realm to migrate.
+ @param key         64-byte encryption key.
+ @return            The error that occurred while applying the migration, if any.
+ */
++ (NSError *)migrateEncryptedRealmAtPath:(NSString *)realmPath key:(NSData *)key;
 
 #pragma mark -
 

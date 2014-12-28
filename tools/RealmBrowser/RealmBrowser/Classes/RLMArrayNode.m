@@ -44,19 +44,9 @@
     return self;
 }
 
-- (instancetype)initWithQuery:(NSString *)searchText result:(RLMArray *)result andParent:(RLMTypeNode *)classNode
-{
-    if (self = [super initWithSchema:classNode.schema inRealm:classNode.realm]) {
-        displayedArray = result;
-        name = searchText;
-    }
-
-    return self;
-}
-
 -(BOOL)insertInstance:(RLMObject *)object atIndex:(NSUInteger)index
 {
-    if (index >= [displayedArray count]) {
+    if (index >= [displayedArray count] || !object) {
         return NO;
     }
     
@@ -71,6 +61,49 @@
     }
     
     [displayedArray removeObjectAtIndex:index];
+    return YES;
+}
+
+-(BOOL)moveInstanceFromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
+{
+    if (fromIndex >= [displayedArray count] || toIndex > [displayedArray count]) {
+        return NO;
+    }
+    
+    RLMObject *objectToMove = [displayedArray objectAtIndex:fromIndex];
+    
+    [displayedArray removeObjectAtIndex:fromIndex];
+    
+    if (toIndex > fromIndex) {
+        toIndex--;
+    }
+    
+    [displayedArray insertObject:objectToMove atIndex:toIndex];
+    
+    return YES;
+}
+
+-(BOOL)isEqualTo:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+    
+    if (self == object) {
+        return YES;
+    }
+    
+    RLMArrayNode *otherArrayNode = object;
+    if (self.instanceCount != otherArrayNode.instanceCount) {
+        return NO;
+    }
+    
+    for (int i = 0; i < self.instanceCount; i++) {
+        if (![displayedArray[i] isEqualToObject:[otherArrayNode instanceAtIndex:i]]) {
+            return NO;
+        }
+    }
+    
     return YES;
 }
 
