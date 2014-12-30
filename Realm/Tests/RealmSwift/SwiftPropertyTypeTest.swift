@@ -36,16 +36,16 @@ class SwiftPropertyTypeTest: TestCase {
         realm.commitWrite()
         
         let objects = realm.objects(SwiftIntObject)
-        XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
-        XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual(objects[2].intCol, negativeLongNumber, "-2 ^ 34 expected")
+        XCTAssert(objects.count == 3, "3 rows expected")
+        XCTAssert(objects[0].intCol == longNumber, "2 ^ 34 expected")
+        XCTAssert(objects[1].intCol == intNumber, "2 ^ 31 - 1 expected")
+        XCTAssert(objects[2].intCol == negativeLongNumber, "-2 ^ 34 expected")
         
         realm.beginWrite()
         objects[0].intCol = updatedLongNumber
         realm.commitWrite()
         
-        XCTAssertEqual(objects[0].intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssert(objects[0].intCol == updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
     func testIntSizes() {
@@ -59,18 +59,18 @@ class SwiftPropertyTypeTest: TestCase {
             let obj = SwiftAllIntSizesObject()
 
             obj.int16 = v16
-            XCTAssertEqual(obj.int16, v16)
+            XCTAssert(obj.int16 == v16)
             obj.int32 = v32
-            XCTAssertEqual(obj.int32, v32)
+            XCTAssert(obj.int32 == v32)
             obj.int64 = v64
-            XCTAssertEqual(obj.int64, v64)
+            XCTAssert(obj.int64 == v64)
 
             realm.add(obj)
         }
 
         let obj = realm.objects(SwiftAllIntSizesObject).first()!
-        XCTAssertEqual(obj.int16, v16)
-        XCTAssertEqual(obj.int32, v32)
-        XCTAssertEqual(obj.int64, v64)
+        XCTAssert(obj.int16 == v16)
+        XCTAssert(obj.int32 == v32)
+        XCTAssert(obj.int64 == v64)
     }
 }
