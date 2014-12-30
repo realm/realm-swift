@@ -36,6 +36,9 @@
 - (BOOL)isEqualToObject:(RLMObjectBase *)object;
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
+- (id)objectForKeyedSubscript:(NSString *)key;
+- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
+
 + (NSString *)className;
 
 + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;

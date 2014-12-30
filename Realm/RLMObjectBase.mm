@@ -171,6 +171,23 @@
     return [links copy];
 }
 
+- (id)objectForKeyedSubscript:(NSString *)key {
+    if (_realm) {
+        return RLMDynamicGet(self, key);
+    }
+    else {
+        return [self valueForKey:key];
+    }
+}
+
+- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
+    if (_realm) {
+        RLMDynamicValidatedSet(self, key, obj);
+    }
+    else {
+        [self setValue:obj forKey:key];
+    }
+}
 
 - (NSString *)description
 {
