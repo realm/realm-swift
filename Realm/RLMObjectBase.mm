@@ -78,8 +78,8 @@
     return self;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults {
     self = [super init];
     if (self) {
@@ -87,7 +87,6 @@
         _objectSchema = schema;
         if (useDefaults) {
             // set default values
-            // FIXME: Cache defaultPropertyValues in this instance
             NSDictionary *dict = [self.class defaultPropertyValues];
             for (NSString *key in dict) {
                 [self setValue:dict[key] forKey:key];
@@ -145,7 +144,7 @@
 
     if (!_row.is_attached()) {
         @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted and is no longer valid."
+                                       reason:@"Object has been deleted or invalidated and is no longer valid."
                                      userInfo:nil];
     }
 
@@ -162,6 +161,10 @@
     }
 
     Table *table = schema.table;
+    if (!table) {
+        return @[];
+    }
+    
     size_t col = prop.column;
     NSUInteger count = _row.get_backlink_count(*table, col);
     NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
@@ -192,7 +195,7 @@
 - (NSString *)description
 {
     if (self.isInvalidated) {
-        return @"[deleted object]";
+        return @"[invalid object]";
     }
 
     return [self descriptionWithMaxDepth:5];
@@ -208,7 +211,7 @@
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
     for (RLMProperty *property in objectSchema.properties) {
-        id object = [self valueForKey:property.name];
+        id object = self[property.name];
         NSString *sub;
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
             sub = [object descriptionWithMaxDepth:depth - 1];
