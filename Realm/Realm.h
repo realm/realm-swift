@@ -25,9 +25,3 @@
 #import <Realm/RLMRealm.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>
-
-//#ifdef REALM_SWIFT
-#import <Realm/RLMListBase.h>
-#import <Realm/RLMObjectStore.hpp>
-//#endif

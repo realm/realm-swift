@@ -16,9 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+extern "C" {
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
 #import "RLMAccessor.h"
+}
 
 #import <tightdb/link_view.hpp>
 #import <tightdb/group.hpp>
