@@ -18,9 +18,6 @@
 
 #import <Realm/Realm.h>
 
-#import "RLMListBase.h"
-#import "RLMSwiftHelpers.h"
-#import "RLMObjectStore.hpp"
-
+#import "RLMSwiftBridgingHeader.h"
 #import "RLMTestObjects.h"
 #import "RLMRealm_Dynamic.h"
