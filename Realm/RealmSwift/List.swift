@@ -39,7 +39,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Initializers
 
     public override init() {
-        super.init(array: RLMArray(objectClass: T.self))
+        super.init(array: RLMArray(objectClassName: T.className()))
     }
 
     init(_ rlmArray: RLMArray) {
