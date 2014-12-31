@@ -40,19 +40,6 @@
     return self;
 }
 
-- (instancetype)initWithObjectClass:(Class)objectClass {
-    self = [super init];
-    if (self) {
-        _objectClassName = NSStringFromClass(objectClass);
-        _backingArray = [[NSMutableArray alloc] init];
-        if ([RLMSwiftSupport isSwiftClassName:_objectClassName]) {
-            _objectClassName = [RLMSwiftSupport demangleClassName:_objectClassName];
-        }
-    }
-    return self;
-}
-
-// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     return [self initWithObjectClassName:objectClassName standalone:YES];
 }
