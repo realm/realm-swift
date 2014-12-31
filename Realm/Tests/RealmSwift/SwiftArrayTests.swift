@@ -43,13 +43,13 @@ class SwiftArrayTests: TestCase {
         realm.commitWrite()
 
         let results = realm.objects(SwiftAggregateObject).filter("intCol < 100")
-        XCTAssertEqual(results.count, UInt(10), "10 objects added")
+        XCTAssert(results.count == 10, "10 objects added")
 
         var totalSum = 0
         for obj in results {
             totalSum += obj.intCol
         }
-        XCTAssertEqual(totalSum, 100, "total sum should be 100")
+        XCTAssert(totalSum == 100, "total sum should be 100")
     }
 
     func testArrayDescription() {
@@ -109,13 +109,13 @@ class SwiftArrayTests: TestCase {
         realm.commitWrite()
 
         let peopleInCompany = company.employees
-        XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
+        XCTAssert(peopleInCompany.count == 3, "No links should have been deleted")
 
         realm.beginWrite()
         peopleInCompany.remove(1) // Should delete link to employee
         realm.commitWrite()
 
-        XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
+        XCTAssert(peopleInCompany.count == 2, "link deleted when accessing via links")
 
         var test = peopleInCompany[0]
         XCTAssertEqual(test.age, po1.age, "Should be equal")
@@ -131,13 +131,13 @@ class SwiftArrayTests: TestCase {
 
         realm.beginWrite()
         peopleInCompany.removeLast()
-        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 remaining link")
+        XCTAssert(peopleInCompany.count == 1, "1 remaining link")
         peopleInCompany.replace(0, object: po2)
-        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 link replaced")
+        XCTAssert(peopleInCompany.count == 1, "1 link replaced")
         peopleInCompany.insert(po1, atIndex: 0)
-        XCTAssertEqual(peopleInCompany.count, UInt(2), "2 links")
+        XCTAssert(peopleInCompany.count == 2, "2 links")
         peopleInCompany.removeAll()
-        XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
+        XCTAssert(peopleInCompany.count == 0, "0 remaining links")
         realm.commitWrite()
     }
 }

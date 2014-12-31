@@ -72,13 +72,13 @@ class ListTests: TestCase {
     }
 
     func testCount() {
-        XCTAssertEqual(UInt(0), array.count)
+        XCTAssert(0 == array.count)
 
         array.append(str1)
-        XCTAssertEqual(UInt(1), array.count)
+        XCTAssert(1 == array.count)
 
         array.append(str2)
-        XCTAssertEqual(UInt(2), array.count)
+        XCTAssert(2 == array.count)
     }
 
     func testIndexOfObject() {
@@ -86,12 +86,12 @@ class ListTests: TestCase {
         XCTAssertNil(array.indexOf(str2))
 
         array.append(str1)
-        XCTAssertEqual(UInt(0), array.indexOf(str1)!)
+        XCTAssert(0 == array.indexOf(str1)!)
         XCTAssertNil(array.indexOf(str2))
 
         array.append(str2)
-        XCTAssertEqual(UInt(0), array.indexOf(str1)!)
-        XCTAssertEqual(UInt(1), array.indexOf(str2)!)
+        XCTAssert(0 == array.indexOf(str1)!)
+        XCTAssert(1 == array.indexOf(str2)!)
     }
 
     func testIndexOfPredicate() {
@@ -102,12 +102,12 @@ class ListTests: TestCase {
         XCTAssertNil(array.indexOf(pred2))
 
         array.append(str1)
-        XCTAssertEqual(UInt(0), array.indexOf(pred1)!)
+        XCTAssert(0 == array.indexOf(pred1)!)
         XCTAssertNil(array.indexOf(pred2))
 
         array.append(str2)
-        XCTAssertEqual(UInt(0), array.indexOf(pred1)!)
-        XCTAssertEqual(UInt(1), array.indexOf(pred2)!)
+        XCTAssert(0 == array.indexOf(pred1)!)
+        XCTAssert(1 == array.indexOf(pred2)!)
     }
 
     func testIndexOfFormat() {
@@ -115,12 +115,12 @@ class ListTests: TestCase {
         XCTAssertNil(array.indexOf("stringCol = %@", "2"))
 
         array.append(str1)
-        XCTAssertEqual(UInt(0), array.indexOf("stringCol = %@", "1")!)
+        XCTAssert(0 == array.indexOf("stringCol = %@", "1")!)
         XCTAssertNil(array.indexOf("stringCol = %@", "2"))
 
         array.append(str2)
-        XCTAssertEqual(UInt(0), array.indexOf("stringCol = %@", "1")!)
-        XCTAssertEqual(UInt(1), array.indexOf("stringCol = %@", "2")!)
+        XCTAssert(0 == array.indexOf("stringCol = %@", "1")!)
+        XCTAssert(1 == array.indexOf("stringCol = %@", "2")!)
     }
 
     func testSubscript() {
@@ -158,44 +158,44 @@ class ListTests: TestCase {
     }
 
     func testFilterFormat() {
-        XCTAssertEqual(UInt(0), array.filter("stringCol = '1'").count)
-        XCTAssertEqual(UInt(0), array.filter("stringCol = '2'").count)
+        XCTAssert(0 == array.filter("stringCol = '1'").count)
+        XCTAssert(0 == array.filter("stringCol = '2'").count)
 
         array.append(str1)
-        XCTAssertEqual(UInt(1), array.filter("stringCol = '1'").count)
-        XCTAssertEqual(UInt(0), array.filter("stringCol = '2'").count)
+        XCTAssert(1 == array.filter("stringCol = '1'").count)
+        XCTAssert(0 == array.filter("stringCol = '2'").count)
 
         array.append(str2)
-        XCTAssertEqual(UInt(1), array.filter("stringCol = '1'").count)
-        XCTAssertEqual(UInt(1), array.filter("stringCol = '2'").count)
+        XCTAssert(1 == array.filter("stringCol = '1'").count)
+        XCTAssert(1 == array.filter("stringCol = '2'").count)
     }
 
     func testFilterPredicate() {
         let pred1 = NSPredicate(format: "stringCol = '1'")!
         let pred2 = NSPredicate(format: "stringCol = '2'")!
 
-        XCTAssertEqual(UInt(0), array.filter(pred1).count)
-        XCTAssertEqual(UInt(0), array.filter(pred2).count)
+        XCTAssert(0 == array.filter(pred1).count)
+        XCTAssert(0 == array.filter(pred2).count)
 
         array.append(str1)
-        XCTAssertEqual(UInt(1), array.filter(pred1).count)
-        XCTAssertEqual(UInt(0), array.filter(pred2).count)
+        XCTAssert(1 == array.filter(pred1).count)
+        XCTAssert(0 == array.filter(pred2).count)
 
         array.append(str2)
-        XCTAssertEqual(UInt(1), array.filter(pred1).count)
-        XCTAssertEqual(UInt(1), array.filter(pred2).count)
+        XCTAssert(1 == array.filter(pred1).count)
+        XCTAssert(1 == array.filter(pred2).count)
     }
 
     func testSort() {
         array.append([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
-        XCTAssertEqual("1", sorted[0].stringCol)
-        XCTAssertEqual("2", sorted[1].stringCol)
+        XCTAssert("1" == sorted[0].stringCol)
+        XCTAssert("2" == sorted[1].stringCol)
 
         sorted = array.sorted("stringCol", ascending: false)
-        XCTAssertEqual("2", sorted[0].stringCol)
-        XCTAssertEqual("1", sorted[1].stringCol)
+        XCTAssert("2" == sorted[0].stringCol)
+        XCTAssert("1" == sorted[1].stringCol)
     }
 
     func testFastEnumeration() {
@@ -205,12 +205,12 @@ class ListTests: TestCase {
             str += obj.stringCol
         }
 
-        XCTAssertEqual(str, "121")
+        XCTAssert(str == "121")
     }
 
     func testAppendArray() {
         array.append([str1, str2, str1])
-        XCTAssertEqual(UInt(3), array.count)
+        XCTAssert(3 == array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
         XCTAssertEqual(str1, array[2])
@@ -218,20 +218,20 @@ class ListTests: TestCase {
 
     func testAppendRLMResults() {
         array.append(realmWithTestPath().objects(SwiftStringObject))
-        XCTAssertEqual(UInt(2), array.count)
+        XCTAssert(2 == array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
     }
 
     func testInsert() {
-        XCTAssertEqual(UInt(0), array.count)
+        XCTAssert(0 == array.count)
 
         array.insert(str1, atIndex: 0)
-        XCTAssertEqual(UInt(1), array.count)
+        XCTAssert(1 == array.count)
         XCTAssertEqual(str1, array[0])
 
         array.insert(str2, atIndex: 0)
-        XCTAssertEqual(UInt(2), array.count)
+        XCTAssert(2 == array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
     }
@@ -248,11 +248,11 @@ class ListTests: TestCase {
         array.append([str1, str2])
 
         array.remove(str1)
-        XCTAssertEqual(UInt(1), array.count)
+        XCTAssert(1 == array.count)
         XCTAssertEqual(str2, array[0])
 
         array.remove(str1) // should be a no-op
-        XCTAssertEqual(UInt(1), array.count)
+        XCTAssert(1 == array.count)
         XCTAssertEqual(str2, array[0])
     }
 
@@ -260,30 +260,30 @@ class ListTests: TestCase {
         array.append([str1, str2])
 
         array.removeLast()
-        XCTAssertEqual(UInt(1), array.count)
+        XCTAssert(1 == array.count)
         XCTAssertEqual(str1, array[0])
 
         array.removeLast()
-        XCTAssertEqual(UInt(0), array.count)
+        XCTAssert(0 == array.count)
     }
 
     func testRemoveAll() {
         array.append([str1, str2])
 
         array.removeAll()
-        XCTAssertEqual(UInt(0), array.count)
+        XCTAssert(0 == array.count)
     }
 
     func testReplace() {
         array.append([str1, str1])
 
         array.replace(0, object: str2)
-        XCTAssertEqual(UInt(2), array.count)
+        XCTAssert(2 == array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
         array.replace(1, object: str2)
-        XCTAssertEqual(UInt(2), array.count)
+        XCTAssert(2 == array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str2, array[1])
     }
@@ -293,7 +293,7 @@ class ListTests: TestCase {
             array.append([str1, str2])
 
             let otherArray = realm.objects(SwiftArrayPropertyObject).first()!.array
-            XCTAssertEqual(UInt(2), otherArray.count)
+            XCTAssert(2 == otherArray.count)
         }
     }
 }
