@@ -451,6 +451,10 @@
 
     // ALL
     XCTAssertThrows([realm objects:className where:@"ALL intCol > 5"], @"ALL int > constant");
+
+    // Linked Column Comparison
+    XCTAssertThrows([realm objects:AllTypesObject.className where:@"objectCol.stringCol == stringCol"],
+                    @"can't compare linked columns to other columns");
 }
 
 - (void)testPredicateMisuse

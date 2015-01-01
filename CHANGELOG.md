@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve the exception message when comparing a linked property to another
+  property (unsupported).
 
 ### Bugfixes
 
