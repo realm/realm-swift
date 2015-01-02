@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 0.89.2 Release notes (2015-01-02)
 =============================================================
 
