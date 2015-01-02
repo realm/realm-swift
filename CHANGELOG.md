@@ -13,6 +13,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix an assertion failure when invalidating a Realm which is in a write
   transaction, has already been invalidated, or has never been used.
+* Fix an assertion failure when sorting an empty RLMArray property.
+* Fix a bug resulting in the browser never becoming visible on 10.9.
+* Write UTF-8 when generating class files from a realm file in the Browser.
 
 0.89.1 Release notes (2014-12-22)
 =============================================================
