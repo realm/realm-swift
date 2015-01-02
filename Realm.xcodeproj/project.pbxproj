@@ -355,19 +355,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		023B19C61A4234390067FB81 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		0207AB7C195DF9FB007EFB12 /* RLMMigration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration_Private.h; sourceTree = "<group>"; };
 		0207AB7D195DF9FB007EFB12 /* RLMMigration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration.h; sourceTree = "<group>"; };
@@ -379,17 +366,6 @@
 		023B19561A3BA90D0067FB81 /* RLMListBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMListBase.m; sourceTree = "<group>"; };
 		023B19571A3BA90D0067FB81 /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
 		023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectBase.mm; sourceTree = "<group>"; };
-		023B19C91A42353B0067FB81 /* ListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListTests.swift; sourceTree = "<group>"; };
-		023B19CA1A42353B0067FB81 /* ResultsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultsTests.swift; sourceTree = "<group>"; };
-		023B19CB1A42353B0067FB81 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftArrayTests.swift; sourceTree = "<group>"; };
-		023B19CD1A42353B0067FB81 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftLinkTests.swift; sourceTree = "<group>"; };
-		023B19CE1A42353B0067FB81 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
-		023B19CF1A42353B0067FB81 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
-		023B19D01A42353B0067FB81 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
-		023B19D21A42353B0067FB81 /* SwiftTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestCase.swift; sourceTree = "<group>"; };
-		023B19D31A42353B0067FB81 /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
-		023B19D41A42353B0067FB81 /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUnicodeTests.swift; sourceTree = "<group>"; };
-		023B19F71A423BD20067FB81 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		024E6093198B2D51002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		024E6096198B2D59002FA042 /* RLMPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPlatform.h; sourceTree = "<group>"; };
 		02B8EF5819E601D80045A93D /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
@@ -532,23 +508,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		023B19C81A42353B0067FB81 /* RealmSwift */ = {
-			isa = PBXGroup;
-			children = (
-				023B19C91A42353B0067FB81 /* ListTests.swift */,
-				023B19CA1A42353B0067FB81 /* ResultsTests.swift */,
-				023B19CB1A42353B0067FB81 /* SwiftArrayTests.swift */,
-				023B19CD1A42353B0067FB81 /* SwiftLinkTests.swift */,
-				023B19CE1A42353B0067FB81 /* SwiftObjectInterfaceTests.swift */,
-				023B19CF1A42353B0067FB81 /* SwiftPropertyTypeTest.swift */,
-				023B19D01A42353B0067FB81 /* SwiftRealmTests.swift */,
-				023B19D21A42353B0067FB81 /* SwiftTestCase.swift */,
-				023B19D31A42353B0067FB81 /* SwiftTestObjects.swift */,
-				023B19D41A42353B0067FB81 /* SwiftUnicodeTests.swift */,
-			);
-			path = RealmSwift;
-			sourceTree = "<group>";
-		};
 		024E6092198B2D51002FA042 /* ios */ = {
 			isa = PBXGroup;
 			children = (
@@ -634,7 +593,6 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
-				023B19F71A423BD20067FB81 /* libc++.dylib */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
 				E8D89B991955FC6D00CF2B9A /* Products */,
 				E8D89B9A1955FC6D00CF2B9A /* Realm */,
@@ -729,7 +687,6 @@
 			children = (
 				E81A20061955FE1600FDED82 /* Objective-C */,
 				E8D89BA81955FC6D00CF2B9A /* Supporting Files */,
-				023B19C81A42353B0067FB81 /* RealmSwift */,
 				E81A1FC81955FE0100FDED82 /* Swift */,
 				3F1A5E731992EB7400F45F4C /* TestHost */,
 			);
@@ -865,7 +822,6 @@
 			buildPhases = (
 				3F1A5E6E1992EB7400F45F4C /* Sources */,
 				3F1A5E6F1992EB7400F45F4C /* Frameworks */,
-				023B19C61A4234390067FB81 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1586,6 +1542,7 @@
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1622,6 +1579,7 @@
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};

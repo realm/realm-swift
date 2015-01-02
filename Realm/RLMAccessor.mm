@@ -548,7 +548,7 @@ static Class RLMCreateAccessorClass(Class objectClass,
         @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
     }
     if (!RLMIsKindOfclass(objectClass, RLMObjectBase.class)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObjectBase" userInfo:nil];
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject or Object" userInfo:nil];
     }
     
     // create and register proxy class which derives from object class
