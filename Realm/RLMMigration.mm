@@ -149,10 +149,13 @@
         // update new version
         RLMRealmSetSchemaVersion(_realm, newVersion);
     }
-    @finally {
-        // end transaction
-        [_realm commitWriteTransaction];
+    @catch (...) {
+        [_realm cancelWriteTransaction];
+        @throw;
     }
+
+    // end transaction
+    [_realm commitWriteTransaction];
 }
 
 -(RLMObject *)createObject:(NSString *)className withObject:(id)object {
