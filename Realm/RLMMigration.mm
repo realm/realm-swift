@@ -47,22 +47,22 @@
 
 @implementation RLMMigration
 
-+ (instancetype)migrationForRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error {
-    RLMMigration *migration = [RLMMigration new];
-    
-    // create rw realm to migrate with current on disk table
-    migration->_realm = realm;
-    
-    // create read only realm used during migration with current on disk schema
-    migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO error:error];
-    if (migration->_oldRealm) {
-        RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm], true);
+- (instancetype)initWithRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error {
+    self = [super init];
+    if (self) {
+        // create rw realm to migrate with current on disk table
+        _realm = realm;
+
+        // create read only realm used during migration with current on disk schema
+        _oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO error:error];
+        if (_oldRealm) {
+            RLMRealmSetSchema(_oldRealm, [RLMSchema dynamicSchemaFromRealm:_oldRealm], true);
+        }
+        if (error && *error) {
+            return nil;
+        }
     }
-    if (error && *error) {
-        return nil;
-    }
-    
-    return migration;
+    return self;
 }
 
 - (RLMSchema *)oldSchema {
