@@ -89,7 +89,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 // Create accessors
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
                                        __unsafe_unretained RLMObjectSchema *objectSchema,
-                                	   NSUInteger index);
+                                       NSUInteger index);
 
 #ifdef __cplusplus
 }
