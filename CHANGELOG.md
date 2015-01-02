@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Roll back changes made when an exception is thrown during a migration.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
