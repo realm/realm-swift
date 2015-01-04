@@ -196,8 +196,30 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
+    id<RLMObjectTranslationProtocol> translation = [objectSchema.objectClass defaultTranslation];
+
     for (RLMProperty *prop in properties) {
-        id obj = [value valueForKey:prop.name];
+		// get the mapped source for this property
+        NSString *sourcePropertyName = prop.name;
+        if (translation) {
+            sourcePropertyName = [translation sourceKeyPathMappingForProperty:sourcePropertyName];
+        }
+
+        id obj = [value valueForKeyPath:sourcePropertyName];
+
+        // apply any translation / transformation necessary
+        if (translation) {
+            RLMObjectTransformInput inputType = [translation transformInputForProperty:prop.name];
+            
+            // transform expects all attributes
+            if (inputType == RLMObjectTransformInputAttributes) {
+                obj = [translation transformObject:value forProperty:prop.name];
+            
+            // transform expects the single, mapped value
+            } else {
+                obj = [translation transformObject:obj forProperty:prop.name];
+            }
+        }
 
         // get default for nil object
         if (!obj && !allowMissing) {

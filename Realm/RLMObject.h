@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
+#import "RLMObjectTranslationProtocol.h"
 
 @class RLMRealm;
 @class RLMResults;
@@ -253,6 +254,16 @@
  */
 + (NSArray *)ignoredProperties;
 
+/**
+ * @brief Implement to specify a default translation object that should be used when
+ * creating new objects using the initWithObject: API. Translations define the mapping
+ * and transformation logic applied to properties for the RLMObject being created.
+ 
+ * @return An object that conforms to RLMObjectTranslationProtocol
+ * @see [RLMObject initWithObject:]
+ * @see RLMObjectTranslationProtocol
+ */
++ (id<RLMObjectTranslationProtocol>)defaultTranslation;
 
 /**---------------------------------------------------------------------------------------
  *  @name Getting & Querying Objects from the Default Realm

@@ -369,6 +369,25 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertThrows([[EmployeeObject alloc] initWithObject:nil], @"Not an array or dictionary");
 }
 
+- (void)testObjectInitTranslation {
+    
+    NSDictionary *attrs = @{@"userId": @"1234", // this is the actual property name
+                            @"id": @"9876",     // but, this is the field we want mapped
+                            @"user": @{@"prefix": @"Mr.",
+                                       @"first": @"John",
+                                       @"last": @"Doe"},
+                            @"started": @"2014-11-08T08:46:18-05:00",
+                            @"today": @"2014-12-20T08:46:18-05:00", // used solely to test expiration
+                            @"expirationDate": @"2014-12-30T08:46:18-05:00"};
+    
+    UserTranslationObject *user;
+    XCTAssertNoThrow(user = [[UserTranslationObject alloc] initWithObject:attrs]);
+    XCTAssert([user.greeting isEqualToString:@"Mr. Doe"]);
+    XCTAssert([user.first isEqualToString:@"John"]);
+    XCTAssert([user.last isEqualToString:@"Doe"]);
+    XCTAssert([user.userId isEqualToString:@"9876"]);
+    XCTAssertTrue(user.active);
+}
 
 - (void)testObjectSubscripting
 {

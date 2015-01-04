@@ -143,3 +143,94 @@
     return nil;
 }
 @end
+
+@implementation UserTranslationObject
++ (id<RLMObjectTranslationProtocol>)defaultTranslation {
+    return [UserAPITranslation new];
+}
+@end
+
+@interface UserAPITranslation()
+@property(nonatomic, strong) NSDictionary *mapping;
+@property(nonatomic, strong) NSDictionary *transforms;
+@end
+
+@implementation UserAPITranslation
+- (instancetype)init {
+    self = [super init];
+    
+    // Specify our property to attribute mapping
+    _mapping =  @{@"userId": @"id",
+                  @"first": @"user.first",
+                  @"last": @"user.last",
+                  @"joined": @"started"};
+    
+    // Specify our transforms
+    RLMTransformer *greetingTransformer = [RLMTransformer transformerWithBlock:^id(id attributes) {
+        if ([attributes isKindOfClass:NSDictionary.class]) {
+            NSString *prefix = [attributes valueForKeyPath:@"user.prefix"];
+            NSString *last = [attributes valueForKeyPath:@"user.last"];
+            return [NSString stringWithFormat:@"%@ %@", prefix, last];
+        }
+        return nil;
+    }];
+    
+    NSDateFormatter *dateFormatter = [NSDateFormatter new];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
+    RLMTransformer *joinedTransformer = [RLMTransformer transformerWithDateFormatter:dateFormatter];
+    
+    // Active transform - block set as local variable before creating transformer
+    RLMTransformBlock activeBlock = ^id(id attributes) {
+        if ([attributes isKindOfClass:NSDictionary.class]) {
+            
+            // Get the date from our payload
+            NSString *expirationDateString = attributes[@"expirationDate"];
+            NSString *todayDateString = attributes[@"today"];
+            
+            // Get the date objects
+            NSDateFormatter *formatter = [NSDateFormatter new];
+            [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
+            NSDate *expiryDate = [formatter dateFromString:expirationDateString];
+            NSDate *today = [formatter dateFromString:todayDateString];
+            
+            // Expiration comparison
+            return @([expiryDate compare:today] == NSOrderedDescending);
+        }
+        return [NSNumber numberWithBool:NO];
+    };
+    RLMTransformer *activeTransformer = [RLMTransformer transformerWithBlock:activeBlock];
+    
+    _transforms = @{@"greeting": greetingTransformer,
+                    @"joined": joinedTransformer,
+                    @"active": activeTransformer};
+    
+    return self;
+}
+
+- (NSString *)sourceKeyPathMappingForProperty:(NSString *)property {
+    if ([self.mapping.allKeys containsObject:property]) {
+        return self.mapping[property];
+    }
+    
+    // by default, return the property name passed in
+    return property;
+}
+
+- (RLMObjectTransformInput)transformInputForProperty:(NSString *)property {
+    if ([property.lowercaseString isEqualToString:@"greeting"] || [property.lowercaseString isEqualToString:@"active"]) {
+        return RLMObjectTransformInputAttributes;
+    }
+    
+    return RLMObjectTransformInputDefault;
+}
+
+- (id)transformObject:(id)object forProperty:(NSString *)property {
+    RLMTransformer *transform = self.transforms[property];
+    if (transform) {
+        return [transform transformObject:object];
+    }
+    
+    // by default, return the original input
+    return object;
+}
+@end

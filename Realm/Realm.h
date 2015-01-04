@@ -21,6 +21,8 @@
 #import <Realm/RLMArray.h>
 #import <Realm/RLMMigration.h>
 #import <Realm/RLMObject.h>
+#import <Realm/RLMObjectTranslationProtocol.h>
+#import <Realm/RLMTransformer.h>
 #import <Realm/RLMPlatform.h>
 #import <Realm/RLMRealm.h>
 #import <Realm/RLMResults.h>
