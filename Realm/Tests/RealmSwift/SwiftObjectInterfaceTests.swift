@@ -58,7 +58,7 @@ class SwiftObjectInterfaceTests: TestCase {
         XCTAssertEqual(firstObj.binaryCol, "abcd".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, "should be abcd data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
-        XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
+        XCTAssertEqual(obj.arrayCol.count, Int(1), "array count should be 1")
         XCTAssertEqual(obj.arrayCol.first()!.boolCol, true, "should be true")
     }
 
@@ -75,7 +75,7 @@ class SwiftObjectInterfaceTests: TestCase {
         XCTAssertEqual(firstObj.binaryCol, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, "should be a data")
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
-        XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
+        XCTAssertEqual(firstObj.arrayCol.count, Int(0), "array count should be zero")
     }
 
     func testMergedDefaultValuesSwiftObject() {
