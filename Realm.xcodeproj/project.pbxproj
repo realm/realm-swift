@@ -1683,10 +1683,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,
@@ -1710,10 +1707,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"REALM_SWIFT=1",
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					core/include,
@@ -1894,10 +1888,7 @@
 					"$(inherited)",
 					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"REALM_SWIFT=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
@@ -1923,10 +1914,7 @@
 					"$(inherited)",
 					"$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/Library/Frameworks",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"REALM_SWIFT=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",

@@ -47,7 +47,10 @@
 @property (nonatomic, readwrite, assign) NSString *className;
 @end
 
-@implementation RLMObjectSchema
+@implementation RLMObjectSchema {
+    // table accessor optimization
+    tightdb::TableRef _table;
+}
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
     self = [super init];

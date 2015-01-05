@@ -21,11 +21,7 @@
 #import <tightdb/table.hpp>
 
 // RLMObjectSchema private
-@interface RLMObjectSchema () {
-    @private
-    // table accessor optimization
-    tightdb::TableRef _table;
-}
+@interface RLMObjectSchema ()
 
 // writable redecleration
 @property (nonatomic, readwrite, copy) NSArray *properties;
