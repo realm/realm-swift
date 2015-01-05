@@ -181,13 +181,17 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
 }
 
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    if (!objectSchema.isSwiftClass) {
+        return [objectSchema.objectClass defaultPropertyValues];
+    }
+
+    // for swift merge
+    // FIXME: for new apis only return swift initialized values
     NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
-        RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
-        for (RLMProperty *prop in objectSchema.properties) {
-            if (!defaults[prop.name] && defaultObject[prop.name]) {
-                defaults[prop.name] = defaultObject[prop.name];
-            }
+    RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+    for (RLMProperty *prop in objectSchema.properties) {
+        if (!defaults[prop.name] && defaultObject[prop.name]) {
+            defaults[prop.name] = defaultObject[prop.name];
         }
     }
     return defaults;

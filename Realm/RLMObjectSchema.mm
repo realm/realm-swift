@@ -96,13 +96,14 @@
     schema.className = className;
     schema.objectClass = objectClass;
     schema.accessorClass = RLMObject.class;
-
+    schema.isSwiftClass = isSwift;
+    
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
     NSArray *props = @[];
     while (superClass != RLMObjectBase.class) {
-        props = [[RLMObjectSchema propertiesForClass:cls] arrayByAddingObjectsFromArray:props];
+        props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
         cls = superClass;
         superClass = class_getSuperclass(superClass);
     }
@@ -138,15 +139,11 @@
     return schema;
 }
 
-+ (NSArray *)propertiesForClass:(Class)objectClass {
++ (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     NSArray *ignoredProperties = [objectClass ignoredProperties];
 
     // For Swift classes we need an instance of the object when parsing properties
-    id swiftObjectInstance = nil;
-    BOOL isSwiftClass = [RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)];
-    if (isSwiftClass) {
-        swiftObjectInstance = [[objectClass alloc] init];
-    }
+    id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
 
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -253,6 +250,7 @@
     schema->_objectClass = _objectClass;
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
+    schema->_isSwiftClass = _isSwiftClass;
     schema.primaryKeyProperty = _primaryKeyProperty;
     // _table not copied as it's tightdb::Group-specific
     return schema;

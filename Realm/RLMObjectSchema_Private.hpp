@@ -25,6 +25,7 @@
 
 // writable redecleration
 @property (nonatomic, readwrite, copy) NSArray *properties;
+@property (nonatomic, readwrite, assign) bool isSwiftClass;
 
 // class used for this object schema
 @property (nonatomic, readwrite, assign) Class objectClass;
