@@ -144,6 +144,11 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         state->extra[1] = self.count;
     }
     else {
+        if (state->extra[1] != self.count) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Collection was mutated while being enumerated."
+                                         userInfo:nil];
+        }
         items = (__bridge id)(void *)state->extra[0];
         [items resize:len];
     }
