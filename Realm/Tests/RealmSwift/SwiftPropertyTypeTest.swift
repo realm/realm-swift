@@ -36,7 +36,7 @@ class SwiftPropertyTypeTest: TestCase {
         realm.commitWrite()
         
         let objects = realm.objects(SwiftIntObject)
-        XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
+        XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")
         XCTAssertEqual(objects[2].intCol, negativeLongNumber, "-2 ^ 34 expected")

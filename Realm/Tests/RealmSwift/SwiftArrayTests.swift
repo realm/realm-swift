@@ -43,7 +43,7 @@ class SwiftArrayTests: TestCase {
         realm.commitWrite()
 
         let results = realm.objects(SwiftAggregateObject).filter("intCol < 100")
-        XCTAssertEqual(results.count, UInt(10), "10 objects added")
+        XCTAssertEqual(results.count, Int(10), "10 objects added")
 
         var totalSum = 0
         for obj in results {
@@ -109,13 +109,13 @@ class SwiftArrayTests: TestCase {
         realm.commitWrite()
 
         let peopleInCompany = company.employees
-        XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
+        XCTAssertEqual(peopleInCompany.count, Int(3), "No links should have been deleted")
 
         realm.beginWrite()
         peopleInCompany.remove(1) // Should delete link to employee
         realm.commitWrite()
 
-        XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
+        XCTAssertEqual(peopleInCompany.count, Int(2), "link deleted when accessing via links")
 
         var test = peopleInCompany[0]
         XCTAssertEqual(test.age, po1.age, "Should be equal")
@@ -131,13 +131,13 @@ class SwiftArrayTests: TestCase {
 
         realm.beginWrite()
         peopleInCompany.removeLast()
-        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 remaining link")
+        XCTAssertEqual(peopleInCompany.count, Int(1), "1 remaining link")
         peopleInCompany.replace(0, object: po2)
-        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 link replaced")
+        XCTAssertEqual(peopleInCompany.count, Int(1), "1 link replaced")
         peopleInCompany.insert(po1, atIndex: 0)
-        XCTAssertEqual(peopleInCompany.count, UInt(2), "2 links")
+        XCTAssertEqual(peopleInCompany.count, Int(2), "2 links")
         peopleInCompany.removeAll()
-        XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
+        XCTAssertEqual(peopleInCompany.count, Int(0), "0 remaining links")
         realm.commitWrite()
     }
 }
