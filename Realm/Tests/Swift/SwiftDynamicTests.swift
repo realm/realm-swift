@@ -45,7 +45,7 @@ class SwiftDynamicTests: SwiftTestCase {
 
         // verify object type
         let array = SwiftDynamicObject.allObjectsInRealm(dyrealm)
-        XCTAssertEqual(array.count, UInt(2))
+        XCTAssertEqual(array.count, Int(2))
         XCTAssertEqual(array.objectClassName!, SwiftDynamicObject.className()!)
     }
 
@@ -89,7 +89,7 @@ class SwiftDynamicTests: SwiftTestCase {
 //        // verify properties
 //        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
 //        let array = dyrealm.allObjects(SwiftAllTypesObject.className())
-//        XCTAssertEqual(array.count, UInt(2))
+//        XCTAssertEqual(array.count, Int(2))
 //
 //        let schema = dyrealm.schema[SwiftAllTypesObject.className()]
 //        for idx in 0..<10 {
@@ -130,7 +130,7 @@ class SwiftDynamicTests: SwiftTestCase {
 
         // verify object type
         let array = DynamicObject.allObjectsInRealm(dyrealm)
-        XCTAssertEqual(array.count, UInt(2))
+        XCTAssertEqual(array.count, Int(2))
         XCTAssertEqual(array.objectClassName!, DynamicObject.className()!)
     }
 
@@ -197,7 +197,7 @@ class SwiftDynamicTests: SwiftTestCase {
         // verify properties
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects(AllTypesObject.className())
-        XCTAssertEqual(array.count, UInt(2))
+        XCTAssertEqual(array.count, Int(2))
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
