@@ -16,8 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+#import <Foundation/Foundation.h>
 
-#import "RLMSwiftBridgingHeader.h"
-#import "RLMTestObjects.h"
-#import "RLMRealm_Dynamic.h"
+@class RLMArray;
+
+// A base class for Swift generic Lists to make it possible to interact with
+// them from obj-c
+@interface RLMListBase : NSObject
+@property (nonatomic, strong) RLMArray *_rlmArray;
+
+- (instancetype)initWithArray:(RLMArray *)array;
+@end

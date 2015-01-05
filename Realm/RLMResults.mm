@@ -196,8 +196,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateObjectAccessor(_realm, _objectSchema,
-                                   _backingView.get_source_ndx(index));
+    return RLMCreateObjectAccessor(_realm, _objectSchema, _backingView.get_source_ndx(index));
 }
 
 - (id)firstObject {

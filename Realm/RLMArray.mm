@@ -17,10 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.hpp"
+
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMSwiftSupport.h"
 
 @implementation RLMArray {
     // array for standalone
@@ -38,7 +40,6 @@
     return self;
 }
 
-// FIXME - remove when we delete legacy swift support
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName {
     return [self initWithObjectClassName:objectClassName standalone:YES];
 }
@@ -146,7 +147,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (void)deleteObjectsFromRealm {
     for (RLMObject *obj in _backingArray) {
-        RLMDeleteObjectFromRealm(obj, _realm);
+        RLMDeleteObjectFromRealm(obj);
     }
 }
 

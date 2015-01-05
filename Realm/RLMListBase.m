@@ -16,8 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+#import "RLMListBase.h"
 
-#import "RLMSwiftBridgingHeader.h"
-#import "RLMTestObjects.h"
-#import "RLMRealm_Dynamic.h"
+@implementation RLMListBase
+- (instancetype)initWithArray:(RLMArray *)array {
+    self = [super init];
+    if (self) {
+        __rlmArray = array;
+    }
+    return self;
+}
+@end

@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMObjectBase.h>
 
 @class RLMRealm;
 @class RLMResults;
@@ -70,7 +71,7 @@
  */
 
 
-@interface RLMObject : NSObject
+@interface RLMObject : RLMObjectBase
 
 /**---------------------------------------------------------------------------------------
  *  @name Creating & Initializing Objects

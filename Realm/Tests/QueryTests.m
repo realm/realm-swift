@@ -1394,11 +1394,11 @@
     va_list args;
     va_start(args, predicateFormat);
     va_end(args);
-    XCTAssertEqual(normalCount, [[class objectsWhere:predicateFormat args:args] count]);
+    XCTAssertEqual(normalCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
     predicateFormat = [NSString stringWithFormat:@"NOT(%@)", predicateFormat];
     va_start(args, predicateFormat);
     va_end(args);
-    XCTAssertEqual(notCount, [[class objectsWhere:predicateFormat args:args] count]);
+    XCTAssertEqual(notCount, [[class objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]] count]);
 }
 
 - (void)testINPredicate

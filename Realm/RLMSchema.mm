@@ -95,7 +95,7 @@ static NSMutableDictionary *s_localNameToClass;
     s_localNameToClass = [NSMutableDictionary dictionary];
     for (unsigned int i = 0; i < numClasses; i++) {
         Class cls = classes[i];
-        if (!RLMIsSubclass(cls, RLMObject.class)) {
+        if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
             continue;
         }
 
@@ -158,7 +158,7 @@ static NSMutableDictionary *s_localNameToClass;
         NSString *className = RLMClassForTableName(@(realm.group->get_table_name(i).data()));
         if (className) {
             RLMObjectSchema *object = [RLMObjectSchema schemaFromTableForClassName:className realm:realm];
-            object->_table = realm.group->get_table(i);
+            object.table = realm.group->get_table(i).get();
             [schemaArray addObject:object];
         }
     }

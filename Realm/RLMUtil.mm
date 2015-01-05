@@ -130,7 +130,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            BOOL isValidObject = [RLMDynamicCast<RLMObject>(obj).objectSchema.className isEqualToString:property.objectClassName];
+            BOOL isValidObject = [RLMDynamicCast<RLMObjectBase>(obj).objectSchema.className isEqualToString:property.objectClassName];
             return isValidObject || obj == nil || obj == NSNull.null;
         }
         case RLMPropertyTypeArray: {
@@ -140,7 +140,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance
                 for (id el in array) {
-                    if (![RLMDynamicCast<RLMObject>(el).objectSchema.className isEqualToString:property.objectClassName]) {
+                    if (![RLMDynamicCast<RLMObjectBase>(el).objectSchema.className isEqualToString:property.objectClassName]) {
                         return NO;
                     }
                 }
@@ -181,13 +181,17 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
 }
 
 NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
+    if (!objectSchema.isSwiftClass) {
+        return [objectSchema.objectClass defaultPropertyValues];
+    }
+
+    // for swift merge
+    // FIXME: for new apis only return swift initialized values
     NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
-    if ([RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectSchema.objectClass)]) {
-        RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
-        for (RLMProperty *prop in objectSchema.properties) {
-            if (!defaults[prop.name] && defaultObject[prop.name]) {
-                defaults[prop.name] = defaultObject[prop.name];
-            }
+    RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
+    for (RLMProperty *prop in objectSchema.properties) {
+        if (!defaults[prop.name] && defaultObject[prop.name]) {
+            defaults[prop.name] = defaultObject[prop.name];
         }
     }
     return defaults;
@@ -196,12 +200,16 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing) {
     NSArray *properties = objectSchema.properties;
     NSMutableDictionary *outDict = [NSMutableDictionary dictionaryWithCapacity:properties.count];
+    NSDictionary *defaultValues = nil;
     for (RLMProperty *prop in properties) {
         id obj = [value valueForKey:prop.name];
 
         // get default for nil object
         if (!obj && !allowMissing) {
-            obj = objectSchema.defaultValues[prop.name];
+            if (!defaultValues) {
+                defaultValues = RLMDefaultValuesForObjectSchema(objectSchema);
+            }
+            obj = defaultValues[prop.name];
         }
 
         // validate if object is not nil, or for nil if we don't allow missing values

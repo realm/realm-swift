@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMArray.h"
+#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
@@ -25,13 +27,30 @@
 
 #import <tightdb/table.hpp>
 
+@interface RLMObject (Swift)
++ (NSArray *)getGenericListPropertyNames:(id)obj;
+@end
+
+@implementation RLMObject (Swift)
+// We need to implement this method in Swift, but we don't want the obj-c and
+// Swift in the same target to avoid polluting the RealmSwift namespace with
+// obj-c stuff. As such, this method is overridden in RealmSwift.Object to
+// supply the real implementation at runtime without a compile-time dependency.
++ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
+}
+@end
+
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary *propertiesByName;
 @property (nonatomic, readwrite, assign) NSString *className;
 @end
 
-@implementation RLMObjectSchema
+@implementation RLMObjectSchema {
+    // table accessor optimization
+    tightdb::TableRef _table;
+}
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
     self = [super init];
@@ -70,21 +89,28 @@
 
     // determine classname from objectclass as className method has not yet been updated
     NSString *className = NSStringFromClass(objectClass);
-    if ([RLMSwiftSupport isSwiftClassName:className]) {
+    bool isSwift = [RLMSwiftSupport isSwiftClassName:className];
+    if (isSwift) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
     schema.className = className;
     schema.objectClass = objectClass;
     schema.accessorClass = RLMObject.class;
-
+    schema.isSwiftClass = isSwift;
+    
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
+    Class superClass = class_getSuperclass(cls);
     NSArray *props = @[];
-    while (cls != RLMObject.class) {
-        props = [[RLMObjectSchema propertiesForClass:cls] arrayByAddingObjectsFromArray:props];
-        cls = class_getSuperclass(cls);
+    while (superClass != RLMObjectBase.class) {
+        props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
+        cls = superClass;
+        superClass = class_getSuperclass(superClass);
     }
     schema.properties = props;
+
+    // verify that we didn't add any properties twice due to inheritance
+    assert(props.count == [NSSet setWithArray:[props valueForKey:@"name"]].count);
 
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
@@ -110,20 +136,14 @@
         }
     }
 
-    schema.defaultValues = RLMDefaultValuesForObjectSchema(schema);
-
     return schema;
 }
 
-+ (NSArray *)propertiesForClass:(Class)objectClass {
++ (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
     NSArray *ignoredProperties = [objectClass ignoredProperties];
 
     // For Swift classes we need an instance of the object when parsing properties
-    id swiftObjectInstance = nil;
-    BOOL isSwiftClass = [RLMSwiftSupport isSwiftClassName:NSStringFromClass(objectClass)];
-    if (isSwiftClass) {
-        swiftObjectInstance = [[objectClass alloc] init];
-    }
+    id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
 
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -151,6 +171,20 @@
          }
     }
     free(props);
+
+    if (isSwiftClass) {
+        // List<> properties don't show up as objective-C properties due to
+        // being generic, so use Swift reflection to get a list of them, and
+        // then access their ivars directly
+        for (NSString *propName in [objectClass getGenericListPropertyNames:swiftObjectInstance]) {
+            Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
+            id value = object_getIvar(swiftObjectInstance, ivar);
+            NSString *className = [value _rlmArray].objectClassName;
+            [propArray addObject:[[RLMProperty alloc] initSwiftListPropertyWithName:propName
+                                                                               ivar:ivar
+                                                                    objectClassName:className]];
+        }
+    }
 
     return propArray;
 }
@@ -203,7 +237,6 @@
     schema.objectClass = RLMObject.class;
     schema.accessorClass = RLMObject.class;
     schema.standaloneClass = RLMObject.class;
-    schema.defaultValues = RLMDefaultValuesForObjectSchema(schema);
 
     return schema;
 }
@@ -217,8 +250,8 @@
     schema->_objectClass = _objectClass;
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
+    schema->_isSwiftClass = _isSwiftClass;
     schema.primaryKeyProperty = _primaryKeyProperty;
-    schema->_defaultValues = _defaultValues;
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
@@ -243,6 +276,10 @@
         _table = RLMTableForObjectClass(_realm, _className);
     }
     return _table.get();
+}
+
+- (void)setTable:(tightdb::Table *)table {
+    _table.reset(table);
 }
 
 @end

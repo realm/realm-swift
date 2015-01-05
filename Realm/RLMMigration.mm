@@ -56,7 +56,7 @@
     // create read only realm used during migration with current on disk schema
     migration->_oldRealm = [[RLMMigrationRealm alloc] initWithPath:realm.path key:key readOnly:NO inMemory:NO error:error];
     if (migration->_oldRealm) {
-        RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm]);
+        RLMRealmSetSchema(migration->_oldRealm, [RLMSchema dynamicSchemaFromRealm:migration->_oldRealm], true);
     }
     if (error && *error) {
         return nil;
