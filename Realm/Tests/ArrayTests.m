@@ -92,7 +92,7 @@
     }
     XCTAssertNil(objects[0], @"Object should have been released");
 
-    @try {
+    void (^mutateDuringEnumeration)() = ^{
         bool first = true;
         for (__unused AggregateObject *ao in result) {
             // Only insert the first time so we don't infinite loop if the check
@@ -104,12 +104,10 @@
                 first = false;
             }
         }
+    };
 
-        XCTFail(@"Adding an object during fast enumeration did not throw");
-    }
-    @catch (NSException *) {
-        // nothing to do here
-    }
+    XCTAssertThrows(mutateDuringEnumeration(),
+                    @"Adding an object during fast enumeration did not throw");
 }
 
 - (void)testObjectAggregate
