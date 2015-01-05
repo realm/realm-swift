@@ -94,18 +94,18 @@ class ResultsTests: TestCase {
     }
 
     func testCount() {
-        XCTAssertEqual(UInt(2), results.count)
-        XCTAssertEqual(UInt(1), results.filter("stringCol = '1'").count)
-        XCTAssertEqual(UInt(1), results.filter("stringCol = '2'").count)
-        XCTAssertEqual(UInt(0), results.filter("stringCol = '0'").count)
+        XCTAssertEqual(Int(2), results.count)
+        XCTAssertEqual(Int(1), results.filter("stringCol = '1'").count)
+        XCTAssertEqual(Int(1), results.filter("stringCol = '2'").count)
+        XCTAssertEqual(Int(0), results.filter("stringCol = '0'").count)
     }
 
     func testIndexOfObject() {
-        XCTAssertEqual(UInt(0), results.indexOf(str1)!)
-        XCTAssertEqual(UInt(1), results.indexOf(str2)!)
+        XCTAssertEqual(Int(0), results.indexOf(str1)!)
+        XCTAssertEqual(Int(1), results.indexOf(str2)!)
 
         let str1Only = results.filter("stringCol = '1'")
-        XCTAssertEqual(UInt(0), str1Only.indexOf(str1)!)
+        XCTAssertEqual(Int(0), str1Only.indexOf(str1)!)
         XCTAssertNil(str1Only.indexOf(str2))
     }
 
@@ -114,14 +114,14 @@ class ResultsTests: TestCase {
         let pred2 = NSPredicate(format: "stringCol = '2'")!
         let pred3 = NSPredicate(format: "stringCol = '3'")!
 
-        XCTAssertEqual(UInt(0), results.indexOf(pred1)!)
-        XCTAssertEqual(UInt(1), results.indexOf(pred2)!)
+        XCTAssertEqual(Int(0), results.indexOf(pred1)!)
+        XCTAssertEqual(Int(1), results.indexOf(pred2)!)
         XCTAssertNil(results.indexOf(pred3))
     }
 
     func testIndexOfFormat() {
-        XCTAssertEqual(UInt(0), results.indexOf("stringCol = %@", "1")!)
-        XCTAssertEqual(UInt(1), results.indexOf("stringCol = %@", "2")!)
+        XCTAssertEqual(Int(0), results.indexOf("stringCol = %@", "1")!)
+        XCTAssertEqual(Int(1), results.indexOf("stringCol = %@", "2")!)
         XCTAssertNil(results.indexOf("stringCol = %@", "3"))
     }
 
@@ -143,9 +143,9 @@ class ResultsTests: TestCase {
     }
 
     func testFilterFormat() {
-        XCTAssertEqual(UInt(1), results.filter("stringCol = %@", "1").count)
-        XCTAssertEqual(UInt(1), results.filter("stringCol = %@", "2").count)
-        XCTAssertEqual(UInt(0), results.filter("stringCol = %@", "3").count)
+        XCTAssertEqual(Int(1), results.filter("stringCol = %@", "1").count)
+        XCTAssertEqual(Int(1), results.filter("stringCol = %@", "2").count)
+        XCTAssertEqual(Int(0), results.filter("stringCol = %@", "3").count)
     }
 
     func testFilterPredicate() {
@@ -153,9 +153,9 @@ class ResultsTests: TestCase {
         let pred2 = NSPredicate(format: "stringCol = '2'")!
         let pred3 = NSPredicate(format: "stringCol = '3'")!
 
-        XCTAssertEqual(UInt(1), results.filter(pred1).count)
-        XCTAssertEqual(UInt(1), results.filter(pred2).count)
-        XCTAssertEqual(UInt(0), results.filter(pred3).count)
+        XCTAssertEqual(Int(1), results.filter(pred1).count)
+        XCTAssertEqual(Int(1), results.filter(pred2).count)
+        XCTAssertEqual(Int(0), results.filter(pred3).count)
     }
 
     func testSort() {

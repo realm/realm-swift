@@ -36,7 +36,7 @@ class SwiftUnicodeTests: TestCase {
         XCTAssertEqual(obj1, obj2)
         XCTAssertEqual(obj2.stringCol, utf8TestString)
 
-        XCTAssertEqual(UInt(0), realm.objects(SwiftStringObject).filter("stringCol != %@", utf8TestString).count)
+        XCTAssertEqual(Int(0), realm.objects(SwiftStringObject).filter("stringCol != %@", utf8TestString).count)
     }
 
     func testUTF8PropertyWithUTF8StringContents() {

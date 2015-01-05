@@ -44,7 +44,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     public var realm: Realm { return Realm(rlmRealm: rlmResults.realm) }
     public var description: String { return rlmResults.description }
-    public var count: UInt { return rlmResults.count }
+    public var count: Int { return Int(rlmResults.count) }
 
     // MARK: Initializers
 
@@ -54,23 +54,23 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Index Retrieval
 
-    public func indexOf(object: T) -> UInt? {
+    public func indexOf(object: T) -> Int? {
         return notFoundToNil(rlmResults.indexOfObject(unsafeBitCast(object, RLMObject.self)))
     }
 
-    public func indexOf(predicate: NSPredicate) -> UInt? {
+    public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
     }
 
-    public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> UInt? {
+    public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWhere(predicateFormat, args: getVaList(args)))
     }
 
     // MARK: Object Retrieval
 
-    public subscript(index: UInt) -> T {
+    public subscript(index: Int) -> T {
         get {
-            return rlmResults[index] as T
+            return rlmResults[UInt(index)] as T
         }
     }
 
@@ -131,10 +131,10 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Private stuff
 
-    private func notFoundToNil(index: UInt) -> UInt? {
+    private func notFoundToNil(index: UInt) -> Int? {
         if index == UInt(NSNotFound) {
             return nil
         }
-        return index
+        return Int(index)
     }
 }
