@@ -14,6 +14,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Roll back changes made when an exception is thrown during a migration.
 * Throw an exception if the number of items in a RLMResults or RLMArray changes
   while it's being fast-enumerated.
+* Also encrypt the temporary files used when encryption is enabled for a Realm.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
