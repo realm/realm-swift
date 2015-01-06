@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Roll back changes made when an exception is thrown during a migration.
+* Throw an exception if the number of items in a RLMResults or RLMArray changes
+  while it's being fast-enumerated.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
