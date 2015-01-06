@@ -92,6 +92,13 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
         state->extra[1] = _backingLinkView->size();
     }
     else {
+        // FIXME: mutationsPtr should be pointing to a value updated by core
+        // whenever the linkview is changed rather than doing this check
+        if (state->extra[1] != self.count) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Collection was mutated while being enumerated."
+                                         userInfo:nil];
+        }
         items = (__bridge id)(void *)state->extra[0];
         [items resize:len];
     }
