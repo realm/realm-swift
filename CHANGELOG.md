@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add ``-[RLMRealm writeEncryptedCopyToPath:key:error:]``.
 
 ### Bugfixes
 
