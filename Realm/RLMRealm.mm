@@ -851,11 +851,11 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object, RLMCreationOptionsNone);
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+- (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
     BOOL success = YES;
 
     try {
-        self.group->write(path.UTF8String);
+        self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
     }
     catch (File::PermissionDenied &ex) {
         success = NO;
@@ -883,6 +883,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 
     return success;
+}
+
+- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
+    return [self writeCopyToPath:path key:nil error:error];
+}
+
+- (BOOL)writeEncryptedCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
+    if (!key) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
+    }
+
+    return [self writeCopyToPath:path key:key error:error];
 }
 
 @end
