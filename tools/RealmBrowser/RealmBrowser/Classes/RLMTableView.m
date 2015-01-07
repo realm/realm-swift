@@ -62,6 +62,7 @@ const NSInteger NOT_A_COLUMN = -1;
     previousMouseLocation = RLMTableLocationUndefined;
     
     [self createContextMenuItems];
+    self.allowsColumnReordering = NO;
 }
 
 - (void)dealloc
