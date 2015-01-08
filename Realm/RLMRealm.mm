@@ -337,10 +337,10 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                       readOnly:NO inMemory:YES dynamic:NO schema:nil error:nil];
 }
 
-+ (instancetype)encryptedRealmWithPath:(NSString *)path
-                                   key:(NSData *)key
-                              readOnly:(BOOL)readonly
-                                 error:(NSError **)error
++ (instancetype)realmWithPath:(NSString *)path
+                encryptionKey:(NSData *)key
+                     readOnly:(BOOL)readonly
+                        error:(NSError **)error
 {
     if (!key) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
@@ -807,7 +807,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return [self migrateRealmAtPath:realmPath key:key];
 }
 
-+ (NSError *)migrateEncryptedRealmAtPath:(NSString *)realmPath key:(NSData *)key {
++ (NSError *)migratedRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
     if (!key) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
     }
@@ -896,7 +896,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return [self writeCopyToPath:path key:nil error:error];
 }
 
-- (BOOL)writeEncryptedCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
+- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
     if (!key) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
     }

@@ -113,10 +113,10 @@
 
  @return An encrypted `RLMRealm` instance.
  */
-+ (instancetype)encryptedRealmWithPath:(NSString *)path
-                                   key:(NSData *)key
-                              readOnly:(BOOL)readonly
-                                 error:(NSError **)error;
++ (instancetype)realmWithPath:(NSString *)path
+                encryptionKey:(NSData *)key
+                     readOnly:(BOOL)readonly
+                        error:(NSError **)error;
 
 /**
  Set the encryption key to use when opening Realms at a certain path.
@@ -365,7 +365,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
  @return YES if the realm was copied successfully. Returns NO if an error occurred.
 */
-- (BOOL)writeEncryptedCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error;
+- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error;
 
 /**
  Invalidate all RLMObjects and RLMResults read from this Realm.
@@ -541,7 +541,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  @param key         64-byte encryption key.
  @return            The error that occurred while applying the migration, if any.
  */
-+ (NSError *)migrateEncryptedRealmAtPath:(NSString *)realmPath key:(NSData *)key;
++ (NSError *)migratedRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key;
 
 #pragma mark -
 

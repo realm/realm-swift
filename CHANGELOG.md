@@ -3,11 +3,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
+  `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
 
 ### Enhancements
 
-* Add ``-[RLMRealm writeEncryptedCopyToPath:key:error:]``.
+* Add `-[RLMRealm writeCopyToPath:encryptionKey:error:]`.
 
 ### Bugfixes
 
