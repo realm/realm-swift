@@ -16,10 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+#import "RLMRealm_Dynamic.h"
 
-// These types don't change when wrapping in Swift
-// so we just typealias them to remove the 'RLM' prefix
-public typealias PropertyType = RLMPropertyType
-public typealias NotificationToken = RLMNotificationToken
-public typealias ObjectMigrationBlock = RLMObjectMigrationBlock
+// RLMRealm private members
+@interface RLMRealm () {
+    @public
+    // expose ivar to to avoid objc messages in accessors
+    BOOL _inWriteTransaction;
+    mach_port_t _threadID;
+}
+@property (nonatomic, readonly) BOOL inWriteTransaction;
+@property (nonatomic, readonly) BOOL dynamic;
+@property (nonatomic, readwrite) RLMSchema *schema;
+
++ (void)resetRealmState;
+
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
+@end
+

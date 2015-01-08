@@ -63,7 +63,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     }
 
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(rlmResults.indexOfObjectWhere(predicateFormat, args: getVaList(args)))
+        return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     // MARK: Object Retrieval
@@ -85,7 +85,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Subarray Retrieval
 
     public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
-        return Results<T>(rlmResults.objectsWhere(predicateFormat, args: getVaList(args)))
+        return Results<T>(rlmResults.objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     public func filter(predicate: NSPredicate) -> Results<T> {

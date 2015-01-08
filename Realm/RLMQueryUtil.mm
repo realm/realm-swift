@@ -19,7 +19,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMArray.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMUtil.hpp"
 

@@ -217,13 +217,13 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let peopleInCompany = company.employees
-        XCTAssertEqual(peopleInCompany.count, Int(3), "No links should have been deleted")
+        XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
         peopleInCompany.removeObjectAtIndex(1) // Should delete link to employee
         realm.commitWriteTransaction()
 
-        XCTAssertEqual(peopleInCompany.count, Int(2), "link deleted when accessing via links")
+        XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
         var test = peopleInCompany[0] as SwiftEmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
@@ -239,13 +239,13 @@ class SwiftArrayTests: SwiftTestCase {
 
         realm.beginWriteTransaction()
         peopleInCompany.removeLastObject()
-        XCTAssertEqual(peopleInCompany.count, Int(1), "1 remaining link")
+        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 remaining link")
         peopleInCompany.replaceObjectAtIndex(0, withObject: po2)
-        XCTAssertEqual(peopleInCompany.count, Int(1), "1 link replaced")
+        XCTAssertEqual(peopleInCompany.count, UInt(1), "1 link replaced")
         peopleInCompany.insertObject(po1, atIndex: 0)
-        XCTAssertEqual(peopleInCompany.count, Int(2), "2 links")
+        XCTAssertEqual(peopleInCompany.count, UInt(2), "2 links")
         peopleInCompany.removeAllObjects()
-        XCTAssertEqual(peopleInCompany.count, Int(0), "0 remaining links")
+        XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
         realm.commitWriteTransaction()
     }
 
@@ -438,13 +438,13 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let peopleInCompany = company.employees
-        XCTAssertEqual(peopleInCompany.count, Int(3), "No links should have been deleted")
+        XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
         peopleInCompany.removeObjectAtIndex(1) // Should delete link to employee
         realm.commitWriteTransaction()
 
-        XCTAssertEqual(peopleInCompany.count, Int(2), "link deleted when accessing via links")
+        XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
         var test = peopleInCompany[0] as EmployeeObject
         XCTAssertEqual(test.age, po1.age, "Should be equal")
@@ -459,7 +459,7 @@ class SwiftArrayTests: SwiftTestCase {
         // XCTAssertEqual(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         let allPeople = EmployeeObject.allObjectsInRealm(realm)
-        XCTAssertEqual(allPeople.count, Int(3), "Only links should have been deleted, not the employees")
+        XCTAssertEqual(allPeople.count, UInt(3), "Only links should have been deleted, not the employees")
     }
 
     func testIndexOfObject_objc() {
@@ -472,9 +472,9 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
-        XCTAssertEqual(Int(2), results.count)
-        XCTAssertEqual(Int(0), results.indexOfObject(po1));
-        XCTAssertEqual(Int(1), results.indexOfObject(po3));
+        XCTAssertEqual(UInt(2), results.count)
+        XCTAssertEqual(UInt(0), results.indexOfObject(po1));
+        XCTAssertEqual(UInt(1), results.indexOfObject(po3));
         XCTAssertEqual(NSNotFound, Int(results.indexOfObject(po2)));
     }
 
@@ -488,9 +488,9 @@ class SwiftArrayTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let results = EmployeeObject.objectsInRealm(realm, "hired = YES")
-        XCTAssertEqual(Int(2), results.count)
-        XCTAssertEqual(Int(0), results.indexOfObjectWhere("age = %d", 40))
-        XCTAssertEqual(Int(1), results.indexOfObjectWhere("age = %d", 25))
+        XCTAssertEqual(UInt(2), results.count)
+        XCTAssertEqual(UInt(0), results.indexOfObjectWhere("age = %d", 40))
+        XCTAssertEqual(UInt(1), results.indexOfObjectWhere("age = %d", 25))
         XCTAssertEqual(NSNotFound, Int(results.indexOfObjectWhere("age = %d", 30)))
     }
 

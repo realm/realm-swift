@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+import Realm.Private
 
 public class Object : RLMObjectBase, Equatable {
     // Get the names of all properties in the object which are of type List<>
