@@ -37,7 +37,6 @@ command:
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
-  ios-dynamic [xcmode]:    builds two iOS 8 dynamic frameworks: one for devices and one for the simulator
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -241,20 +240,17 @@ case "$COMMAND" in
 
     "ios")
         build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios
-        exit 0
-        ;;
-
-    "ios-dynamic")
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphoneos"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator"
         mkdir -p build/ios
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic.framework
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator.framework
+        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/RealmSwift.framework build/ios/RealmSwift.framework
+        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator/RealmSwift.framework build/ios/RealmSwift-simulator.framework
         exit 0
         ;;
 
     "osx")
         xcrealm "-scheme OSX -configuration Release"
+        xcrealm "-scheme 'RealmSwift OSX' -configuration Release"
         exit 0
         ;;
 
@@ -300,7 +296,7 @@ case "$COMMAND" in
     "test-ios")
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 4S' test"
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -316,7 +312,7 @@ case "$COMMAND" in
     "test-ios-debug")
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 4S' test"
-        xcrealm "-scheme 'iOS 8' -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'RealmSwift' -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -502,7 +498,7 @@ case "$COMMAND" in
         cd tightdb_objc
         sh build.sh test-ios "$XCMODE"
         sh build.sh examples "$XCMODE"
-        sh build.sh ios-dynamic "$XCMODE"
+        sh build.sh ios "$XCMODE"
 
         cd build/ios
         zip --symlinks -r realm-framework-ios.zip *.framework
