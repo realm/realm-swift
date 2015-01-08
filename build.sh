@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.87.5
+    REALM_CORE_VERSION=0.87.4
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -37,7 +37,6 @@ command:
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
   ios [xcmode]:            builds iOS framework with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
-  ios-dynamic [xcmode]:    builds two iOS 8 dynamic frameworks: one for devices and one for the simulator
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -97,18 +96,18 @@ build_fat() {
     config="$2"
     build_prefix="$3"
     out_dir="$4"
+    name="$5.framework"
 
     xcrealm "-scheme '$target' -configuration $config -sdk iphoneos"
     xcrealm "-scheme '$target' -configuration $config -sdk iphonesimulator"
 
-    srcdir="build/DerivedData/Realm/Build/Products/$config-dynamic"
     mkdir -p build/$out_dir
-    rm -rf build/$out_dir/Realm.framework
-    cp -R $build_prefix-iphoneos/Realm.framework build/$out_dir
-    if [ -d build/$out_dir/Realm.framework/Modules/Realm.swiftmodule ]; then
-        cp $build_prefix-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/$out_dir/Realm.framework/Modules/Realm.swiftmodule/
+    rm -rf build/$out_dir/$name
+    cp -R $build_prefix-iphoneos/$name build/$out_dir
+    if [ -d build/$out_dir/$name/Modules/$5.swiftmodule ]; then
+        cp $build_prefix-iphonesimulator/$name/Modules/$5.swiftmodule/* build/$out_dir/$name/Modules/$5.swiftmodule/
     fi
-    xcrun lipo -create "$build_prefix-iphonesimulator/Realm.framework/Realm" "$build_prefix-iphoneos/Realm.framework/Realm" -output "build/$out_dir/Realm.framework/Realm"
+    xcrun lipo -create "$build_prefix-iphonesimulator/$name/$5" "$build_prefix-iphoneos/$name/$5" -output "build/$out_dir/$name/$5"
 }
 
 ######################################
@@ -191,7 +190,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -exec rm -r "{}" +\;
+        find . -type d -name build -ls -delete
         exit 0
         ;;
 
@@ -240,26 +239,19 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios
-        exit 0
-        ;;
-
-    "ios-dynamic")
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios/Realm-dynamic build/ios/Realm-dynamic-simulator
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic/Realm.framework
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator/Realm.framework
+        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios Realm
+        build_fat 'RealmSwift iOS' Release build/DerivedData/Realm/Build/Products/Release ios RealmSwift
         exit 0
         ;;
 
     "osx")
         xcrealm "-scheme OSX -configuration Release"
+        xcrealm "-scheme 'RealmSwift OSX' -configuration Release"
         exit 0
         ;;
 
     "ios-debug")
-        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios
+        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios Realm
         exit 0
         ;;
 
@@ -300,7 +292,7 @@ case "$COMMAND" in
     "test-ios")
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 4S' test"
-        xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -316,7 +308,7 @@ case "$COMMAND" in
     "test-ios-debug")
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 4S' test"
-        xcrealm "-scheme 'iOS 8' -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'RealmSwift' -configuration Debug -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
@@ -445,12 +437,19 @@ case "$COMMAND" in
         mv $(readlink tmp) core
         rm tmp
 
-        # CocoaPods doesn't support multiple header_mappings_dir, so combine
-        # both sets of headers into a single directory
-        mv core/include include
-        mkdir include/Realm
-        cp Realm/*.h include/Realm
-        touch include/Realm/RLMPlatform.h
+        rm -r include-ios
+        mkdir include-ios
+        cp -R core/include/* include-ios
+        mkdir include-ios/Realm
+        cp Realm/*.{h,hpp} include-ios/Realm
+        cp Realm/ios/*.h include-ios/Realm
+
+        rm -r include-osx
+        mkdir include-osx
+        cp -R core/include/* include-osx
+        mkdir include-osx/Realm
+        cp Realm/*.{h,hpp} include-osx/Realm
+        cp Realm/osx/*.h include-osx/Realm
         ;;
 
     ######################################
@@ -495,10 +494,10 @@ case "$COMMAND" in
         cd tightdb_objc
         sh build.sh test-ios "$XCMODE"
         sh build.sh examples "$XCMODE"
-        sh build.sh ios-dynamic "$XCMODE"
+        sh build.sh ios "$XCMODE"
 
         cd build/ios
-        zip --symlinks -r realm-framework-ios.zip Realm*
+        zip --symlinks -r realm-framework-ios.zip *.framework
         ;;
 
     "package-osx")
