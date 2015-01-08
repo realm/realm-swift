@@ -23,24 +23,20 @@ Pod::Spec.new do |s|
 
   s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.private_header_files    = 'include-ios/**/*.hpp', 'include-osx/**/*.hpp', '**/*_Private.h'
-  s.source_files            = 'Realm/*.{m,mm}', 'core/**/*.{h,hpp}'
+  s.private_header_files    = '**/*.hpp', '**/*_Private.h', '**/*_Dynamic.h', 'include/tightdb/**/*.h'
+  s.source_files            = 'Realm/*.{h,m,mm,hpp}', 'include/**/*.hpp'
+  s.header_mappings_dir     = 'include'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '6.0'
   s.ios.vendored_library    = 'core/libtightdb-ios.a'
-  s.ios.header_mappings_dir = 'include-ios'
-  s.ios.source_files        = 'include-ios/**/*.hpp'
 
   s.osx.deployment_target   = '10.8'
   s.osx.vendored_library    = 'core/libtightdb.a'
-  s.osx.header_mappings_dir = 'include-osx'
-  s.osx.source_files        = 'include-osx/**/*.hpp'
 
   s.subspec 'Headers' do |s|
-    s.ios.source_files        = 'include-ios/**/*.h'
-    s.osx.source_files        = 'include-osx/**/*.h'
+    s.source_files          = 'include/**/*.h'
   end
 end
