@@ -16,10 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+#import "RLMObject_Private.h"
 
-// These types don't change when wrapping in Swift
-// so we just typealias them to remove the 'RLM' prefix
-public typealias PropertyType = RLMPropertyType
-public typealias NotificationToken = RLMNotificationToken
-public typealias ObjectMigrationBlock = RLMObjectMigrationBlock
+#import <tightdb/row.hpp>
+
+// RLMObject accessor and read/write realm
+@interface RLMObjectBase () {
+    @public
+    tightdb::Row _row;
+}
+
+@end
+

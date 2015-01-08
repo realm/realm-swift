@@ -23,9 +23,9 @@
 @end
 
 @implementation IndexedStringObject
-+ (RLMPropertyAttributes)attributesForProperty:(__unused NSString *)propertyName
++ (NSArray *)indexedProperties
 {
-    return RLMPropertyAttributeIndexed;
+    return @[@"stringCol"];
 }
 @end
 

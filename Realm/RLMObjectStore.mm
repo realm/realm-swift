@@ -16,15 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
+#import "RLMRealm_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <objc/message.h>
@@ -100,7 +100,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
         }
         default: {
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
-            if (prop.attributes & RLMPropertyAttributeIndexed) {
+            if (prop.indexed) {
                 // FIXME - support other types
                 if (prop.type != RLMPropertyTypeString && prop.type != RLMPropertyTypeInt) {
                     NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' and integer properties");

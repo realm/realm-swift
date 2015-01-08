@@ -78,7 +78,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.binaryCol!, data!)
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
-        XCTAssertEqual(obj.arrayCol.count, Int(1), "array count should be 1")
+        XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
         XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
     }
 
@@ -99,7 +99,7 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         XCTAssertEqual(firstObj.binaryCol!, data!)
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
-        XCTAssertEqual(firstObj.arrayCol.count, Int(0), "array count should be zero")
+        XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
     }
 
     func testMergedDefaultValuesSwiftObject() {
@@ -126,8 +126,8 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         // ensure creation in proper table
-        XCTAssertEqual(Int(1), SwiftStringObjectSubclass.allObjects().count)
-        XCTAssertEqual(Int(1), SwiftStringObject.allObjects().count)
+        XCTAssertEqual(UInt(1), SwiftStringObjectSubclass.allObjects().count)
+        XCTAssertEqual(UInt(1), SwiftStringObject.allObjects().count)
 
         realm.transactionWithBlock { () -> Void in
             // create self referencing subclass
@@ -189,14 +189,14 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.beginWriteTransaction()
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 1])
         let objects = SwiftPrimaryStringObject.allObjects();
-        XCTAssertEqual(objects.count, Int(1), "Should have 1 object");
+        XCTAssertEqual(objects.count, UInt(1), "Should have 1 object");
         XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 1, "Value should be 1");
 
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["stringCol": "string2", "intCol": 2])
-        XCTAssertEqual(objects.count, Int(2), "Should have 2 objects")
+        XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
 
         SwiftPrimaryStringObject.createOrUpdateInDefaultRealmWithObject(["string", 3])
-        XCTAssertEqual(objects.count, Int(2), "Should have 2 objects")
+        XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
         XCTAssertEqual((objects[0] as SwiftPrimaryStringObject).intCol, 3, "Value should be 3");
 
         realm.commitWriteTransaction()

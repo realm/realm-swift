@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMRealm_Private.hpp"
 #import "RLMArray.h"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -115,7 +116,7 @@
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
-                prop.attributes |= RLMPropertyAttributeIndexed;
+                prop.indexed = YES;
                 schema.primaryKeyProperty = prop;
                 break;
             }
@@ -145,22 +146,22 @@
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
+    NSSet *indexed = [[NSSet alloc] initWithArray:[objectClass indexedProperties]];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = @(property_getName(props[i]));
         if ([ignoredProperties containsObject:propertyName]) {
             continue;
         }
 
-        RLMPropertyAttributes atts = [objectClass attributesForProperty:propertyName];
         RLMProperty *prop = nil;
         if (isSwiftClass) {
             prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
-                                                       attributes:atts
+                                                          indexed:[indexed containsObject:propertyName]
                                                          property:props[i]
                                                          instance:swiftObjectInstance];
         }
         else {
-            prop = [[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]];
+            prop = [[RLMProperty alloc] initWithName:propertyName indexed:[indexed containsObject:propertyName] property:props[i]];
         }
 
         if (prop) {
@@ -204,7 +205,7 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                               objectClassName:nil
-                                                   attributes:(RLMPropertyAttributes)0];
+                                                      indexed:NO];
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays

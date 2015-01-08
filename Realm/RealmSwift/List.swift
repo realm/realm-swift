@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+import Realm.Private
 
 public class ListBase: RLMListBase, Printable {
     // Printable requires a description property defined in Swift (and not obj-c),
@@ -57,7 +58,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObjectWhere(predicateFormat, args: getVaList(args)))
+        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     // MARK: Object Retrieval
@@ -82,7 +83,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Subarray Retrieval
 
     public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
-        return Results<T>(_rlmArray.objectsWhere(predicateFormat, args: getVaList(args)))
+        return Results<T>(_rlmArray.objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     public func filter(predicate: NSPredicate) -> Results<T> {

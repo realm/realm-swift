@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMSchema.h"
-#import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
+
+@import Realm.Private;
 
 @interface DynamicTests : RLMTestCase
 @end
@@ -60,7 +59,7 @@
     RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
                                                      type:RLMPropertyTypeInt
                                           objectClassName:nil
-                                               attributes:0];
+                                                  indexed:NO];
     RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
                                                                    objectClass:RLMObject.class properties:@[prop]];
     schema.objectSchema = @[objectSchema];
