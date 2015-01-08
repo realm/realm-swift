@@ -22,7 +22,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
 #import "RLMConstants.h"
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMUpdateChecker.hpp"

@@ -40,7 +40,6 @@
 
 + (NSString *)className;
 
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
 + (NSDictionary *)defaultPropertyValues;
 + (NSString *)primaryKey;
 + (NSArray *)ignoredProperties;

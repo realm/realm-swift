@@ -115,5 +115,5 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
+                     indexed:(BOOL)indexed;
 @end
