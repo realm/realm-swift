@@ -295,3 +295,8 @@
 
 @end
 
+
+@interface RLMArray (Private)
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+@end
+

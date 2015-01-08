@@ -24,9 +24,9 @@
 #import "RLMObjectStore.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
-#import <objc/runtime.h>
+#import "RLMUtil.hpp"
 
-#import <tightdb/util/unique_ptr.hpp>
+#import <objc/runtime.h>
 
 //
 // RLMResults implementation
@@ -36,6 +36,7 @@
     tightdb::TableView _backingView;
     BOOL _viewCreated;
     RowIndexes::Sorter _sortOrder;
+    RLMObjectSchema *_objectSchema;
 
 @protected
     RLMRealm *_realm;
@@ -63,6 +64,7 @@
     ar->_backingQuery = move(query);
     ar->_sortOrder = sorter;
     ar->_realm = realm;
+    ar->_objectSchema = realm.schema[objectClassName];
     return ar;
 }
 
@@ -76,13 +78,14 @@
     ar->_backingView = move(view);
     ar->_backingQuery = move(query);
     ar->_realm = realm;
+    ar->_objectSchema = realm.schema[objectClassName];
     return ar;
 }
 
 //
 // validation helper
 //
-static inline void RLMResultsValidateAttached(RLMResults *ar) {
+static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *ar) {
     if (!ar->_viewCreated) {
         // create backing view if needed
         ar->_backingView = ar->_backingQuery->find_all();
@@ -99,12 +102,12 @@ static inline void RLMResultsValidateAttached(RLMResults *ar) {
         ar->_backingView.sync_if_needed();
     }
 }
-static inline void RLMResultsValidate(RLMResults *ar) {
+static inline void RLMResultsValidate(__unsafe_unretained RLMResults *ar) {
     RLMResultsValidateAttached(ar);
     RLMCheckThread(ar->_realm);
 }
 
-static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
+static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMResults *ar) {
     // first verify attached
     RLMResultsValidate(ar);
 
@@ -141,18 +144,24 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
         state->extra[1] = self.count;
     }
     else {
+        // FIXME: mutationsPtr should be pointing to a value updated by core
+        // whenever the results are changed rather than doing this check
+        if (state->extra[1] != self.count) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Collection was mutated while being enumerated."
+                                         userInfo:nil];
+        }
         items = (__bridge id)(void *)state->extra[0];
         [items resize:len];
     }
 
     NSUInteger batchCount = 0, index = state->state, count = state->extra[1];
 
-    RLMObjectSchema *objectSchema = _realm.schema[_objectClassName];
-    Class accessorClass = objectSchema.accessorClass;
+    Class accessorClass = _objectSchema.accessorClass;
     while (index < count && batchCount < len) {
         // get acessor fot the object class
-        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:objectSchema defaultValues:NO];
-        accessor->_row = (*objectSchema->_table)[_backingView.get_source_ndx(index++)];
+        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema defaultValues:NO];
+        accessor->_row = (*_objectSchema.table)[_backingView.get_source_ndx(index++)];
         items->array[batchCount] = accessor;
         buffer[batchCount] = accessor;
         batchCount++;
@@ -194,10 +203,12 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateObjectAccessor(_realm, _objectClassName, _backingView.get_source_ndx(index));
+    return RLMCreateObjectAccessor(_realm, _objectSchema, _backingView.get_source_ndx(index));
 }
 
 - (id)firstObject {
+    RLMResultsValidate(self);
+
     if (self.count) {
         return [self objectAtIndex:0];
     }
@@ -205,6 +216,8 @@ static inline void RLMResultsValidateInWriteTransaction(RLMResults *ar) {
 }
 
 - (id)lastObject {
+    RLMResultsValidate(self);
+
     NSUInteger count = self.count;
     if (count) {
         return [self objectAtIndex:count-1];

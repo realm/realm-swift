@@ -24,6 +24,7 @@
 
 // full constructor
 + (instancetype)realmWithPath:(NSString *)path
+                          key:(NSData *)key
                      readOnly:(BOOL)readonly
                      inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic

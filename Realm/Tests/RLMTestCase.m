@@ -20,6 +20,7 @@
 
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
+                          key:(NSData *)key
                      readOnly:(BOOL)readonly
                      inMemory:(BOOL)inMemory
                       dynamic:(BOOL)dynamic
@@ -110,11 +111,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO inMemory:NO dynamic:NO schema:schema error:nil];
-}
-
-- (RLMRealm *)dynamicRealmWithTestPathAndSchema:(RLMSchema *)schema {
-    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
+    return [RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:schema error:nil];
 }
 
 @end

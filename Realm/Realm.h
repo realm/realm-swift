@@ -25,4 +25,3 @@
 #import <Realm/RLMRealm.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>

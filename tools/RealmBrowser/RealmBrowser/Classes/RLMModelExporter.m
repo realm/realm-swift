@@ -73,7 +73,7 @@ NSString * const kLanguageObjC = @"Objective-C";
         NSString *fileContents = model[1];
         
         NSError *error;
-        BOOL success = [fileContents writeToURL:fileURL atomically:YES encoding:NSUnicodeStringEncoding error:&error];
+        BOOL success = [fileContents writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:&error];
         
         if (!success) {
             NSLog(@"Error writing file at %@\n%@", url, [error localizedFailureReason]);

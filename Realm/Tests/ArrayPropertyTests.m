@@ -243,6 +243,24 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
+
+    void (^mutateDuringEnumeration)() = ^{
+        bool first = true;
+        for (__unused EmployeeObject *e in company.employees) {
+            // Only insert the first time so we don't infinite loop if the check
+            // doesn't work
+            if (first) {
+                [realm beginWriteTransaction];
+                EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+                [company.employees addObject:eo];
+                [realm commitWriteTransaction];
+                first = false;
+            }
+        }
+    };
+
+    XCTAssertThrows(mutateDuringEnumeration(),
+                    @"Adding an object during fast enumeration did not throw");
 }
 
 - (void)testCrossThreadAccess

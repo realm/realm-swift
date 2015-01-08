@@ -18,12 +18,12 @@
 
 extern "C" {
 #import "RLMTestCase.h"
+#import "RLMSchema_Private.h"
 }
 #import "RLMMigration.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -61,10 +61,20 @@ extern "C" {
 - (RLMRealm *)realmWithSingleObject:(RLMObjectSchema *)objectSchema {
     // modify object schema to use RLMObject class (or else bad accessors will get created)
     objectSchema.objectClass = RLMObject.class;
+    objectSchema.accessorClass = RLMObject.class;
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self dynamicRealmWithTestPathAndSchema:schema];
+    return [self realmWithTestPathAndSchema:schema];
+}
+
+- (void)testSchemaVersion {
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                      __unused NSUInteger oldSchemaVersion) {
+    }];
+
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
 }
 
 - (void)testAddingProperty {
@@ -102,6 +112,9 @@ extern "C" {
     MigrationObject *mig1 = [MigrationObject allObjectsInRealm:realm][1];
     XCTAssertEqual(mig1.intCol, 2, @"Int column should have value 2");
     XCTAssertEqualObjects(mig1.stringCol, @"2", @"String column should be populated");
+
+    [RLMRealm setSchemaVersion:0 withMigrationBlock:nil];
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
 }
 
 
@@ -316,6 +329,29 @@ extern "C" {
     XCTAssertEqual(1U, [[MigrationPrimaryKeyObject allObjectsInRealm:[RLMRealm realmWithPath:RLMTestRealmPath()]] count]);
 }
 
+- (void)testIncompleteMigrationIsRolledBack {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    // fail to apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+
+    // should still be able to open with pre-migration schema
+    XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
+}
+
 - (void)testAddObjectDuringMigration {
     // initialize realm
     @autoreleasepool {
@@ -331,7 +367,7 @@ extern "C" {
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
-    @autoreleasepool { [self dynamicRealmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
+    @autoreleasepool { [self realmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
 
     [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
@@ -386,8 +422,13 @@ extern "C" {
 }
 
 - (void)testRearrangeProperties {
-    // create realm with the properties reversed
     @autoreleasepool {
+        // create object in default realm
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [CircleObject createInDefaultRealmWithObject:@[@"data", NSNull.null]];
+        }];
+
+        // create realm with the properties reversed
         RLMSchema *schema = [[RLMSchema sharedSchema] copy];
         RLMObjectSchema *objectSchema = schema[@"CircleObject"];
         objectSchema.properties = @[objectSchema.properties[1], objectSchema.properties[0]];
@@ -408,6 +449,29 @@ extern "C" {
     XCTAssertNoThrow(obj.data = @"new data");
     XCTAssertNoThrow(obj.next = obj);
     [realm commitWriteTransaction];
+
+    // open the default Realm and make sure accessors with alternate ordering work
+    CircleObject *defaultObj = [[CircleObject allObjects] firstObject];
+    XCTAssertEqualObjects(defaultObj.data, @"data");
+
+    // test object from other realm still works
+    XCTAssertEqualObjects(obj.data, @"new data");
+
+    // verify schema for both objects
+    NSArray *properties = defaultObj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
+    properties = obj.objectSchema.properties;
+    for (NSUInteger i = 0; i < properties.count; i++) {
+        XCTAssertEqual([properties[i] column], i);
+    }
+}
+
+- (void)testMigrationDoesNotEffectOtherPaths {
+    RLMRealm *defaultRealm = RLMRealm.defaultRealm;
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    XCTAssertEqual(defaultRealm, RLMRealm.defaultRealm);
 }
 
 @end

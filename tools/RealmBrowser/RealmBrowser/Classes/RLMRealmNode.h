@@ -17,23 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
 #import "RLMClassNode.h"
-
 #import "RLMRealmOutlineNode.h"
-
-@interface RLMRealm ()
-
-+ (instancetype)realmWithPath:(NSString *)path
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-
-- (RLMResults *)allObjects:(NSString *)className;
-
-@end
 
 @interface RLMRealmNode : NSObject <RLMRealmOutlineNode>
 

@@ -152,6 +152,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation StringSubclassObject
 @end
 
+@interface StringObjectNoThrow : StringObject
+@end
+
+@implementation StringObjectNoThrow
+- (id)valueForUndefinedKey:(__unused NSString *)key {
+    return nil;
+}
+@end
+
+@interface StringSubclassObjectWithDefaults : StringObjectNoThrow
+@property NSString *stringCol2;
+@end
+
+@implementation StringSubclassObjectWithDefaults
++(NSDictionary *)defaultPropertyValues {
+    return @{@"stringCol2": @"default"};
+}
+@end
+
+@interface StringSubclassDataObject : NSObject
+@property NSString *stringCol;
+@property (getter=customGetter) NSString *stringCol2;
+@end
+
+@implementation StringSubclassDataObject
+@end
+
+
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
 @property RLMArray<StringObject> *stringObjectArrayCol;
@@ -448,6 +476,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 
 - (void)testObjectSubclass {
+    // test className methods
+    XCTAssertEqualObjects(@"StringObject", [StringObject className]);
+    XCTAssertEqualObjects(@"StringSubclassObject", [StringSubclassObject className]);
+
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [StringObject createInDefaultRealmWithObject:@[@"string"]];
@@ -837,6 +869,25 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm2 commitWriteTransaction];
 }
 
+- (void)testCreateInRealmWithOtherObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    StringObjectNoThrow *object = [StringObjectNoThrow createInDefaultRealmWithObject:@[@"string"]];
+
+    // create subclass with instance of base class with/without default objects
+    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:object]);
+    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:object]);
+
+    // create using non-realm object with custom getter
+    StringSubclassDataObject *obj = [StringSubclassDataObject new];
+    obj.stringCol = @"a";
+    obj.stringCol2 = @"b";
+    [StringSubclassObjectWithDefaults createInDefaultRealmWithObject:obj];
+
+    XCTAssertEqual(2U, StringSubclassObjectWithDefaults.allObjects.count);
+    [realm commitWriteTransaction];
+}
+
 - (void)testCreateInRealmWithMissingValue
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1004,15 +1055,15 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 - (void)testIsDeleted {
     StringObject *obj1 = [[StringObject alloc] initWithObject:@[@"a"]];
-    XCTAssertEqual(obj1.deletedFromRealm, NO);
+    XCTAssertEqual(obj1.invalidated, NO);
 
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
     [realm addObject:obj1];
     StringObject *obj2 = [StringObject createInRealm:realm withObject:@[@"b"]];
 
-    XCTAssertEqual([obj1 isDeletedFromRealm], NO);
-    XCTAssertEqual(obj2.deletedFromRealm, NO);
+    XCTAssertEqual([obj1 isInvalidated], NO);
+    XCTAssertEqual(obj2.invalidated, NO);
 
     [realm commitWriteTransaction];
 
@@ -1021,14 +1072,14 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm deleteObject:obj1];
     [realm deleteObject:obj2];
 
-    XCTAssertEqual(obj1.deletedFromRealm, YES);
-    XCTAssertEqual(obj2.deletedFromRealm, YES);
+    XCTAssertEqual(obj1.invalidated, YES);
+    XCTAssertEqual(obj2.invalidated, YES);
 
     XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
     
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj1.deletedFromRealm, YES);
+    XCTAssertEqual(obj1.invalidated, YES);
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 

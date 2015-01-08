@@ -22,6 +22,7 @@
 
 #import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
+#import "Realm_Private.h"
 
 @implementation RLMRealmNode
 
@@ -43,6 +44,7 @@
 - (BOOL)connect:(NSError **)error
 {
     _realm = [RLMRealm realmWithPath:_url
+                                 key:nil
                             readOnly:NO
                             inMemory:NO
                              dynamic:YES
@@ -117,8 +119,7 @@
     
     for (NSUInteger index = 0; index < classCount; index++) {
         RLMObjectSchema *objectSchema = allObjectSchemas[index];        
-        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema
-                                                               inRealm:_realm];
+        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
         
         [result addObject:tableNode];
     }

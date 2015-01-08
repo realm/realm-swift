@@ -17,46 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "AppDelegate.h"
-#import <Realm/Realm.h>
 
-// Model definition
-@interface StringObject : RLMObject
-@property NSString *stringProp;
-@end
-
-@implementation StringObject
-@end
+#import "LabelViewController.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.rootViewController = [[UIViewController alloc] init];
+    self.window.rootViewController = [[LabelViewController alloc] init];
     [self.window makeKeyAndVisible];
-
-    // Realms are used to group data together
-    RLMRealm *realm = [RLMRealm defaultRealm]; // Create realm pointing to default file
-
-    // Encrypt realm file
-    NSError *error = nil;
-    NSDictionary *fileAttributes = @{NSFileProtectionKey: NSFileProtectionComplete};
-    BOOL success = [[NSFileManager defaultManager] setAttributes:fileAttributes
-                                                    ofItemAtPath:realm.path error:&error];
-    if (!success) {
-        NSLog(@"encryption attribute was not successfully set on realm file");
-        NSLog(@"error: %@", error.localizedDescription);
-    }
-
-    // Save an object
-    [realm beginWriteTransaction];
-    StringObject *obj = [[StringObject alloc] init];
-    obj.stringProp = @"abcd";
-    [realm addObject:obj];
-    [realm commitWriteTransaction];
-
-    // Read all string objects from the encrypted realm
-    NSLog(@"all string objects: %@", [StringObject allObjects]);
 
     return YES;
 }

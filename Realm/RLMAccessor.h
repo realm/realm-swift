@@ -17,39 +17,26 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMRealm.h"
+#import "RLMObjectStore.hpp"
+
+@class RLMObjectSchema, RLMProperty, RLMObjectBase;
 
 //
 // Accessors Class Creation/Caching
 //
-@class RLMObjectSchema;
-@class RLMProperty;
 
 // get accessor classes for an object class - generates classes if not cached
-Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
+Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema, NSString *prefix);
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema);
 
 //
 // Dynamic getters/setters
 //
-void RLMDynamicValidatedSet(RLMObject *obj, NSString *propName, id val);
-id RLMDynamicGet(RLMObject *obj, NSString *propName);
-
-// Options for RLMDynamicSet
-typedef NS_OPTIONS(NSUInteger, RLMSetFlag) {
-    // Verify that no existing row has the same value for this property
-    RLMSetFlagEnforceUnique = 1 << 0,
-    // If the property is a link or array property, upsert the linked objects
-    // if they have a primary key, and insert them otherwise.
-    RLMSetFlagUpdateOrCreate = 1 << 1,
-    // If a link or array property links to an object persisted in a different
-    // realm from the object, copy it into the object's realm rather than throwing
-    // an error
-    RLMSetFlagAllowCopy = 1 << 2,
-};
+void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val);
+id RLMDynamicGet(RLMObjectBase *obj, NSString *propName);
 
 // by property/column
-void RLMDynamicSet(RLMObject *obj, RLMProperty *prop, id val, RLMSetFlag options);
+void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
 
 //
 // Class modification
@@ -60,3 +47,4 @@ void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
 
 // Replace sharedSchema method for the given class
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema);
+

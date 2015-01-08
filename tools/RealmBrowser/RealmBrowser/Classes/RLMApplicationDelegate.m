@@ -57,8 +57,8 @@ NSString *const kDocumentsFolder = @"/Documents";
 {
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    if (!self.didLoadFile) {
+
+    if (!self.didLoadFile && ![[NSProcessInfo processInfo] environment][@"TESTING"]) {
         NSInteger openFileIndex = [self.fileMenu indexOfItem:self.openMenuItem];
         [self.fileMenu performActionForItemAtIndex:openFileIndex];
         
@@ -299,11 +299,11 @@ NSString *const kDocumentsFolder = @"/Documents";
     NSURL *url = [directories firstObject];
     
     // Prompt the user for location af new realm file.
-    [self showSavePanelStringFromDirectory:url completionHandler:^(BOOL userSelectesFile, NSURL *selectedFile) {
+    [self showSavePanelStringFromDirectory:url completionHandler:^(BOOL userSelectedFile, NSURL *selectedFile) {
         // If the user has selected a file url for storing the demo database, we first check if the
         // file already exists (and is actually a file) we delete the old file before creating the
         // new demo file.
-        if (userSelectesFile) {
+        if (userSelectedFile) {
             NSString *path = selectedFile.path;
             BOOL isDirectory = NO;
             
@@ -322,9 +322,9 @@ NSString *const kDocumentsFolder = @"/Documents";
                 
                 alert.alertStyle = NSInformationalAlertStyle;
                 alert.showsHelp = NO;
-                alert.informativeText = @"A new demo database has been generated. Do you want to open the new database?";
+                alert.informativeText = @"A demo database has been generated. Would you like to open it?";
                 alert.messageText = @"Open demo database?";
-                [alert addButtonWithTitle:@"Ok"];
+                [alert addButtonWithTitle:@"Open"];
                 [alert addButtonWithTitle:@"Cancel"];
                 
                 NSUInteger response = [alert runModal];

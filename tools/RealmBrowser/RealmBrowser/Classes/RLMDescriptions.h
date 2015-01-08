@@ -25,4 +25,6 @@
 -(NSString *)printablePropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType;
 -(NSString *)tooltipForPropertyValue:(id)propertyValue ofType:(RLMPropertyType)propertyType;
 
++(NSString *)typeNameOfProperty:(RLMProperty *)property;
+
 @end

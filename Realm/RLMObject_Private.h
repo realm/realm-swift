@@ -22,15 +22,20 @@
 #import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
-@interface RLMObject () {
+@interface RLMObjectBase () {
   @public
     tightdb::Row _row;
     RLMRealm *_realm;
+    // objectSchema is a cached pointer to an object stored in the RLMSchema
+    // owned by _realm, so it's guaranteed to stay alive as long as this object
+    // without retaining it (and retaining it makes iteration slower)
+    __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm
-                       schema:(RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *)schema
                 defaultValues:(BOOL)useDefaults;
+- (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 // namespace properties to prevent collision with user properties
 @property (nonatomic, readwrite) RLMRealm *realm;
