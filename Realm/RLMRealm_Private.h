@@ -16,24 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import "RLMRealm_Dynamic.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-#ifdef __cplusplus
+// RLMRealm private members
+@interface RLMRealm () {
+    @public
+    // expose ivar to to avoid objc messages in accessors
+    BOOL _inWriteTransaction;
+    mach_port_t _threadID;
 }
-#endif
+@property (nonatomic, readonly) BOOL inWriteTransaction;
+@property (nonatomic, readonly) BOOL dynamic;
+@property (nonatomic, readwrite) RLMSchema *schema;
 
-@interface RLMTestCase : XCTestCase
++ (void)resetRealmState;
 
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-+ (void)deleteFiles;
-
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
 @end

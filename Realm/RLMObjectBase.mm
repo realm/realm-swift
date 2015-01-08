@@ -16,11 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject_Private.h"
-
+#import "RLMRealm_Private.hpp"
+#import "RLMObject_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
 #import "RLMProperty_Private.h"
+
+#import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 

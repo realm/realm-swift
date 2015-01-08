@@ -196,12 +196,6 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation DataObject
 @end
 
-#pragma mark - Private
-
-@interface RLMRealm ()
-@property (nonatomic) RLMSchema *schema;
-@end
-
 #pragma mark - Tests
 
 @interface ObjectTests : RLMTestCase

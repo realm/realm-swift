@@ -18,12 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+@class RLMRealm, RLMSchema, RLMObjectSchema, RLMObjectBase, RLMResults;
 
 //
 // Table modifications
@@ -99,6 +98,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
                                        __unsafe_unretained RLMObjectSchema *objectSchema,
                                        NSUInteger index);
+
 
 #ifdef __cplusplus
 }

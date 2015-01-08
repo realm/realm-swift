@@ -20,7 +20,7 @@
 
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"

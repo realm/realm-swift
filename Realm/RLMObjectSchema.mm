@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMRealm_Private.hpp"
 #import "RLMArray.h"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -97,7 +98,7 @@
     schema.objectClass = objectClass;
     schema.accessorClass = RLMObject.class;
     schema.isSwiftClass = isSwift;
-    
+
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
@@ -195,7 +196,7 @@
     if (!table) {
         return nil;
     }
-    
+
     // create array of RLMProperties
     size_t count = table->get_column_count();
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
