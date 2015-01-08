@@ -23,6 +23,7 @@
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
+#import "RLMRealm_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
