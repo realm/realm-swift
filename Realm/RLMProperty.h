@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+#import "RLMConstants.h"
 
 /**
  This class models properties persisted to Realm in an RLMObjectSchema.
