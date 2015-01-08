@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 
 @class RLMObjectSchema, RLMProperty, RLMObjectBase;
 
