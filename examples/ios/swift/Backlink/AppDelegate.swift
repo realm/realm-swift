@@ -17,9 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
-class Dog: RLMObject {
+
+class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
     var owners: [Person] {
@@ -29,9 +30,9 @@ class Dog: RLMObject {
     }
 }
 
-class Person: RLMObject {
+class Person: Object {
     dynamic var name = ""
-    dynamic var dogs = RLMArray(objectClassName: Dog.className())
+    let dogs = List<Dog>()
 }
 
 @UIApplicationMain
@@ -45,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(RLMRealm.defaultRealmPath(), error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultRealmPath(), error: nil)
 
         let realm = RLMRealm.defaultRealm()
         realm.transactionWithBlock {

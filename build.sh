@@ -239,6 +239,7 @@ case "$COMMAND" in
         ;;
 
     "ios")
+        rm -rf build/ios
         build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios
         xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphoneos"
         xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator"
