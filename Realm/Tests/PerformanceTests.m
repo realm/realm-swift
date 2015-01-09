@@ -166,12 +166,24 @@
     }];
 }
 
-- (void)testEnumerateAndMutate {
-    RLMRealm *realm = [self createStringObjects:1];
+- (void)testEnumerateAndMutateAll {
+    RLMRealm *realm = [self createStringObjects:10];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            so.stringCol = @"c";
+        }
+        [realm commitWriteTransaction];
+    }];
+}
+
+- (void)testEnumerateAndMutateQuery {
+    RLMRealm *realm = [self createStringObjects:1];
+
+    [self measureBlock:^{
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol != 'b'"]) {
             so.stringCol = @"c";
         }
         [realm commitWriteTransaction];
@@ -189,7 +201,7 @@
     }];
 }
 
-- (void)testQueryDeletion {
+- (void)testDeleteAll {
     RLMRealm *realm = self.realmWithTestPath;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
@@ -202,6 +214,24 @@
         [self startMeasuring];
         [realm beginWriteTransaction];
         [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
+        [realm commitWriteTransaction];
+        [self stopMeasuring];
+    }];
+}
+
+- (void)testQueryDeletion {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        [realm beginWriteTransaction];
+        for (int i = 0; i < 5000; ++i) {
+            [StringObject createInRealm:realm withObject:@[@"a"]];
+        }
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a'"]];
         [realm commitWriteTransaction];
         [self stopMeasuring];
     }];
