@@ -422,7 +422,6 @@
 		02B8EF5819E601D80045A93D /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
 		02B8EF5B19E7048D0045A93D /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		02B9CCA71A48DB2E00330649 /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
-		02E334A81A5F2B58009F8810 /* RealmPrivate OSX copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "RealmPrivate OSX copy-Info.plist"; path = "/Users/ari/Src/Realm/realm-cocoa/RealmPrivate OSX copy-Info.plist"; sourceTree = "<absolute>"; };
 		02E334BC1A5F39FD009F8810 /* RealmSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RealmSwift.h; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
@@ -704,7 +703,6 @@
 				E8D89B9A1955FC6D00CF2B9A /* Realm */,
 				E8D89BA71955FC6D00CF2B9A /* Tests */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
-				02E334A81A5F2B58009F8810 /* RealmPrivate OSX copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
