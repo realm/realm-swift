@@ -467,9 +467,7 @@ static id RLMAutorelease(id value) {
 
     key = key ?: keyForPath(path);
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
-    if (realm) {
-        [realm initializeSchema:customSchema key:key];
-    }
+    [realm initializeSchema:customSchema key:key];
 
     if (!dynamic) {
         cacheRealm(realm, path);
@@ -523,11 +521,6 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
-    if (key && [key length] != 64) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Encryption key must be exactly 64 bytes"
-                                     userInfo:nil];
-    }
     setKeyForPath(validatedKey(key), path);
 }
 
