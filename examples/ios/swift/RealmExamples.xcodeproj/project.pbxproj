@@ -21,17 +21,13 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		0295B90819D103180036D6C3 /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
-		0295B90919D103180036D6C3 /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
-		0295B90A19D103180036D6C3 /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
 		0295B91619D103A70036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
-		C09C490B1A6057C600638C9F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490A1A6057C600638C9F /* RealmSwift.framework */; };
-		C09C490C1A6057CA00638C9F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C09C490A1A6057C600638C9F /* RealmSwift.framework */; };
-		E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
+		C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
 		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
@@ -94,11 +90,33 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C09C490D1A6059BA00638C9F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C09C491C1A6068E500638C9F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		0295B90619D103180036D6C3 /* RLMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMSupport.swift; sourceTree = "<group>"; };
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		C09C490A1A6057C600638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator/RealmSwift.framework"; sourceTree = "<group>"; };
+		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../build/ios/RealmSwift.framework; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -163,7 +181,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C09C490C1A6057CA00638C9F /* RealmSwift.framework in Frameworks */,
 				0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -172,7 +189,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C09C490B1A6057C600638C9F /* RealmSwift.framework in Frameworks */,
 				E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -183,9 +199,8 @@
 		0295B90519D103180036D6C3 /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
-				C09C490A1A6057C600638C9F /* RealmSwift.framework */,
+				C09C490F1A605A4800638C9F /* RealmSwift.framework */,
 				0295B91519D103A70036D6C3 /* libc++.dylib */,
-				0295B90619D103180036D6C3 /* RLMSupport.swift */,
 			);
 			name = RealmSwift;
 			path = ../../../Realm/Swift;
@@ -343,6 +358,7 @@
 				E8CB083519BA6AC60018434A /* Sources */,
 				E8CB083619BA6AC60018434A /* Frameworks */,
 				E8CB083719BA6AC60018434A /* Resources */,
+				C09C491C1A6068E500638C9F /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -360,6 +376,7 @@
 			buildPhases = (
 				E8CB085A19BA6ACA0018434A /* Sources */,
 				E8CB085B19BA6ACA0018434A /* Frameworks */,
+				C09C490D1A6059BA00638C9F /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -492,7 +509,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */,
-				E886FB561A12A6FC00CB2D0B /* RLMSupport.swift in Sources */,
 				E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -511,7 +527,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB088A19BA6AF70018434A /* AppDelegate.swift in Sources */,
-				0295B90819D103180036D6C3 /* RLMSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,7 +535,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB089919BA6B080018434A /* AppDelegate.swift in Sources */,
-				0295B90919D103180036D6C3 /* RLMSupport.swift in Sources */,
 				E8CB089C19BA6B080018434A /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -530,7 +544,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB089219BA6B000018434A /* AppDelegate.swift in Sources */,
-				0295B90A19D103180036D6C3 /* RLMSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -612,7 +625,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios/**";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -657,7 +670,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../../build/ios/**";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
