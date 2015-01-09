@@ -52,10 +52,10 @@
     // Use an autorelease pool to close the Realm at the end of the block, so
     // that we can try to reopen it with different keys
     @autoreleasepool {
-        RLMRealm *realm = [RLMRealm encryptedRealmWithPath:[RLMRealm defaultRealmPath]
-                                                       key:[self getKey]
-                                                  readOnly:NO
-                                                     error:nil];
+        RLMRealm *realm = [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
+                                    encryptionKey:[self getKey]
+                                         readOnly:NO
+                                            error:nil];
 
         // Add an object
         [realm beginWriteTransaction];
@@ -71,10 +71,10 @@
         SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
 
         NSError *error;
-        [RLMRealm encryptedRealmWithPath:[RLMRealm defaultRealmPath]
-                                                       key:[[NSData alloc] initWithBytes:buffer length:sizeof(buffer)]
-                                                  readOnly:NO
-                                                     error:&error];
+        [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
+                  encryptionKey:[[NSData alloc] initWithBytes:buffer length:sizeof(buffer)]
+                       readOnly:NO
+                          error:&error];
         [self log:@"Open with wrong key: %@", error];
     }
 
@@ -87,10 +87,10 @@
 
     // Reopening with the correct key works and can read the data
     @autoreleasepool {
-        RLMRealm *realm = [RLMRealm encryptedRealmWithPath:[RLMRealm defaultRealmPath]
-                                                       key:[self getKey]
-                                                  readOnly:NO
-                                                     error:nil];
+        RLMRealm *realm = [RLMRealm realmWithPath:[RLMRealm defaultRealmPath]
+                                    encryptionKey:[self getKey]
+                                         readOnly:NO
+                                            error:nil];
 
         [self log:@"Saved object: %@", [[[StringObject allObjectsInRealm:realm] firstObject] stringProp]];
     }

@@ -1021,10 +1021,10 @@
 
 - (void)testBadEncryptionKeys
 {
-    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:nil readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm encryptedRealmWithPath:RLMRealm.defaultRealmPath key:[NSData data] readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:nil]);
-    XCTAssertThrows([RLMRealm migrateEncryptedRealmAtPath:RLMRealm.defaultRealmPath key:[NSData data]]);
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data] readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data]]);
     XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
 }
 
