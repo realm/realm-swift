@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject.h"
-#import "RLMObjectSchema.h"
+#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectSchema.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {

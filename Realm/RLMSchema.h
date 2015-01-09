@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectSchema.h"
+#import <Realm/RLMObjectSchema.h>
 
 /**
  This class represents the collection of model object schemas persisted to Realm.
