@@ -518,6 +518,31 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 + (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
 
 /**
+ Get the schema version for a Realm at a given path.
+
+ @param realmPath   Path to a Realm file
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
+
+ @return            The version of the Realm at `realmPath`
+ */
++ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
+
+/**
+ Get the schema version for an encrypted Realm at a given path.
+
+ @param realmPath   Path to a Realm file
+ @param key         64-byte encryption key.
+ @param error       If an error occurs, upon return contains an `NSError` object
+                    that describes the problem. If you are not interested in
+                    possible errors, pass in `NULL`.
+
+ @return            The version of the Realm at `realmPath`
+ */
++ (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
+
+/**
  Performs the registered migration block on a Realm at the given path.
 
  This method is called automatically when opening a Realm for the first time and does
