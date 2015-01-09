@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
 import RealmSwift
 
 private func testRealmPath() -> String {

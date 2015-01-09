@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMProperty.h"
+#import <Realm/RLMProperty.h>
 
 /**
  This class represents Realm model object schemas persisted to Realm in an RLMSchema.
