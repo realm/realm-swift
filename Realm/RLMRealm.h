@@ -541,7 +541,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  @param key         64-byte encryption key.
  @return            The error that occurred while applying the migration, if any.
  */
-+ (NSError *)migratedRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key;
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key;
 
 #pragma mark -
 

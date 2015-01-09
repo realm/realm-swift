@@ -1023,8 +1023,8 @@
 {
     XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
     XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data] readOnly:NO error:nil]);
-    XCTAssertThrows([RLMRealm migratedRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
-    XCTAssertThrows([RLMRealm migratedRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data]]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data]]);
     XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
 }
 

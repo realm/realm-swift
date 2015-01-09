@@ -807,7 +807,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return [self migrateRealmAtPath:realmPath key:key];
 }
 
-+ (NSError *)migratedRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
++ (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
     if (!key) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
     }
