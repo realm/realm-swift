@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
-#import "RLMResults.h"
-#import "RLMObjectSchema.h"
+#import <Realm/RLMRealm.h>
+#import <Realm/RLMResults.h>
+#import <Realm/RLMObjectSchema.h>
 
 @interface RLMRealm (Dynamic)
 
