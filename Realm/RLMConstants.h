@@ -174,3 +174,7 @@ typedef NS_ENUM(NSInteger, RLMError) {
         active shared scheme, but fail due to the missing database file. */
     RLMErrorLockFileButNoData     = 7
 };
+
+// Schema version used for unitialized Realms
+extern const NSUInteger RLMNotVersioned;
+

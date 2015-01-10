@@ -525,7 +525,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return            The version of the Realm at `realmPath`
+ @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
 
@@ -538,7 +538,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return            The version of the Realm at `realmPath`
+ @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
 
