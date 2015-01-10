@@ -46,18 +46,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultRealmPath(), error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(defaultRealmPath(), error: nil)
 
-        let realm = RLMRealm.defaultRealm()
-        realm.transactionWithBlock {
+        let realm = defaultRealm()
+        realm.write {
             Person.createInRealm(realm, withObject: ["John", [["Fido", 1]]])
             Person.createInRealm(realm, withObject: ["Mary", [["Rex", 2]]])
         }
 
         // Log all dogs and their owners using the "owners" inverse relationship
-        let allDogs = Dog.allObjects()
+        let allDogs = objects(Dog)
         for dog in allDogs {
-            let dog = dog as Dog
             let ownerNames = dog.owners.map { $0.name }
             println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")
         }
