@@ -26,6 +26,9 @@
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
+		C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
@@ -91,6 +94,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C01304E31A60A4A000EB3E1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C01304E51A60A6CE00EB3E1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C01304E71A60A6EC00EB3E1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C09C490D1A6059BA00638C9F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -305,6 +338,7 @@
 				E886FB541A12A6FC00CB2D0B /* Sources */,
 				E886FB581A12A6FC00CB2D0B /* Frameworks */,
 				E886FB5B1A12A6FC00CB2D0B /* Resources */,
+				C01304E51A60A6CE00EB3E1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -340,6 +374,7 @@
 				E8CB081019BA6ABD0018434A /* Sources */,
 				E8CB081119BA6ABD0018434A /* Frameworks */,
 				E8CB081219BA6ABD0018434A /* Resources */,
+				C01304E71A60A6EC00EB3E1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -394,6 +429,7 @@
 			buildPhases = (
 				E8D3F24F1A11765200620884 /* Sources */,
 				E8D3F2501A11765200620884 /* Frameworks */,
+				C01304E31A60A4A000EB3E1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -881,7 +917,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Backlink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -898,7 +934,7 @@
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
 				);
 				INFOPLIST_FILE = Backlink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
