@@ -101,7 +101,6 @@ build_fat() {
     xcrealm "-scheme '$target' -configuration $config -sdk iphoneos"
     xcrealm "-scheme '$target' -configuration $config -sdk iphonesimulator"
 
-    srcdir="build/DerivedData/Realm/Build/Products/$config-dynamic"
     mkdir -p build/$out_dir
     rm -rf build/$out_dir/$name
     cp -R $build_prefix-iphoneos/$name build/$out_dir
