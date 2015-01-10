@@ -77,6 +77,22 @@ extern "C" {
     XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
 }
 
+- (void)testGetSchemaVersion {
+    XCTAssertThrows([RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                      __unused NSUInteger oldSchemaVersion) {
+    }];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    realm = nil;
+}
+
 - (void)testAddingProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];

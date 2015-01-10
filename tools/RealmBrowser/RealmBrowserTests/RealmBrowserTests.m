@@ -32,8 +32,10 @@
 {
     NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[NSUUID UUID] UUIDString]];
     NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
-    BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObject1 className]] objectCount:10];
-    XCTAssertEqual(YES, success);
+    @autoreleasepool {
+        BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObject1 className]] objectCount:10];
+        XCTAssertEqual(YES, success);
+    }
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithPath:fileURL.path
                                           key:nil
