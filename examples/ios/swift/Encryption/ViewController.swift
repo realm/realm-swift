@@ -17,12 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmSwift
 import Security
 import UIKit
 
 // Model definition
-class EncryptionObject: RLMObject {
+class EncryptionObject: Object {
     dynamic var stringProp = ""
 }
 
@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            let realm = RLMRealm.encryptedRealmWithPath(RLMRealm.defaultRealmPath(),
+            let realm = encryptedRealmWithPath(RLMRealm.defaultRealmPath(),
                 key: self.getKey(), readOnly: false, error: nil)
 
             // Add an object
