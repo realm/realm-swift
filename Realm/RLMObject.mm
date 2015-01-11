@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
 #import "RLMObject_Private.h"
 
 #import "RLMObjectSchema_Private.hpp"
