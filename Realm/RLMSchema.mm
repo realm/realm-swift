@@ -16,14 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMSchema_Private.h"
+
+#import "RLMAccessor.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
+#import <tightdb/group.hpp>
 
 NSString * const c_objectTableNamePrefix = @"class_";
 const char * const c_metadataTableName = "metadata";

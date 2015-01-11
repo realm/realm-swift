@@ -18,6 +18,8 @@
 
 #import <Realm/RLMSchema.h>
 
+@class RLMRealm;
+
 //
 // Realm table namespace costants/methods
 //
