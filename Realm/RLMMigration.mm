@@ -17,14 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMigration_Private.h"
-#import "RLMRealm_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
-#import "RLMObjectStore.h"
-#import "RLMArray.h"
 
+#import "RLMAccessor.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMResults.h"
+#import "RLMSchema_Private.h"
+
+#import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
 
 // The source realm for a migration has to use a SharedGroup to be able to share

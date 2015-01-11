@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+
 #import <Realm/RLMObjectBase.h>
 
 @class RLMRealm;

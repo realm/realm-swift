@@ -19,10 +19,11 @@
 #import "RLMArray_Private.hpp"
 
 #import "RLMObject.h"
-#import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
+#import "RLMObjectSchema.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMSwiftSupport.h"
+
+#import <tightdb/link_view.hpp>
 
 @implementation RLMArray {
     // array for standalone
