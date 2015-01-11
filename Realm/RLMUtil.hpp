@@ -17,15 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConstants.h"
-#import "RLMSchema.h"
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-#import <tightdb/row.hpp>
+#import <tightdb/binary_data.hpp>
 #import <tightdb/string_data.hpp>
-#import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMObjectSchema;
 @class RLMProperty;
+@class RLMSchema;
 
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);

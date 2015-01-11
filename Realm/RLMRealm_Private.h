@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm_Dynamic.h>
+#import <Realm/RLMRealm.h>
 
 // RLMRealm private members
 @interface RLMRealm () {

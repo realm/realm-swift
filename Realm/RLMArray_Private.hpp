@@ -19,9 +19,18 @@
 #import "RLMArray.h"
 #import "RLMResults.h"
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/table_view.hpp>
-#import <tightdb/query.hpp>
+#import <memory>
+
+namespace tightdb {
+    class LinkView;
+    class Query;
+    class TableView;
+
+    namespace util {
+        template<typename T> class bind_ptr;
+    }
+    typedef util::bind_ptr<LinkView> LinkViewRef;
+}
 
 @class RLMObjectSchema;
 
