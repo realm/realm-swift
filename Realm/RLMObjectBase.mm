@@ -16,18 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
 #import "RLMObject_Private.hpp"
-#import "RLMSchema_Private.h"
+
+#import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 
 #import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 @implementation RLMObjectBase
-
 
 // standalone init
 - (instancetype)init {
