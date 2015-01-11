@@ -17,8 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
 #import <Realm/RLMObjectSchema.h>
+#import <Realm/RLMProperty.h>
+
+@class RLMResults;
 
 @interface RLMRealm (Dynamic)
 
