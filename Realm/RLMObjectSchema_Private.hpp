@@ -18,6 +18,8 @@
 
 #import "RLMObjectSchema_Private.h"
 
+@class RLMRealm;
+
 namespace tightdb {
     class Table;
     template<typename T> class BasicTableRef;
