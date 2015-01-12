@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Throw an exception if the number of items in a RLMResults or RLMArray changes
   while it's being fast-enumerated.
 * Also encrypt the temporary files used when encryption is enabled for a Realm.
+* Fixed crash in JSONImport example on OS X with non-en_US locale.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
