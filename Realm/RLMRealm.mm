@@ -171,10 +171,6 @@ bool isDebuggerAttached() {
     return (info.kp_proc.p_flag & P_TRACED) != 0;
 }
 
-static NSString *s_defaultRealmPath = nil;
-static RLMMigrationBlock s_migrationBlock;
-static NSUInteger s_currentSchemaVersion = 0;
-
 NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
 } // anonymous namespace
