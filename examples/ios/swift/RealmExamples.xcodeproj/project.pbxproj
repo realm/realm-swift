@@ -29,6 +29,7 @@
 		C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304EA1A60B77B00EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
@@ -121,6 +122,16 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C01304E91A60B77600EB3E1E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C01304EA1A60B77B00EB3E1E /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +367,7 @@
 			buildPhases = (
 				E8CB07EB19BA6AB60018434A /* Sources */,
 				E8CB07EC19BA6AB60018434A /* Frameworks */,
+				C01304E91A60B77600EB3E1E /* CopyFiles */,
 			);
 			buildRules = (
 			);
