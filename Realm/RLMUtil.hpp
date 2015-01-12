@@ -17,15 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMConstants.h"
-#import "RLMSchema.h"
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-#import <tightdb/row.hpp>
+#import <tightdb/binary_data.hpp>
 #import <tightdb/string_data.hpp>
-#import <tightdb/util/safe_int_ops.hpp>
 
+@class RLMObjectSchema;
 @class RLMProperty;
+@class RLMSchema;
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);

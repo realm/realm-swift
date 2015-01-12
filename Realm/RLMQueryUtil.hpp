@@ -17,12 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <tightdb/table.hpp>
-#import <tightdb/table_view.hpp>
-#import <tightdb/query.hpp>
+#import <vector>
 
-#import "RLMObjectSchema.h"
-#import "RLMSchema.h"
+namespace tightdb {
+    class Query;
+    class Table;
+    class TableView;
+}
+
+@class RLMObjectSchema;
+@class RLMSchema;
 
 extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;

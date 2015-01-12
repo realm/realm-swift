@@ -16,14 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
 #import "RLMRealm_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMAccessor.h"
-}
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/group.hpp>
+#import <pthread.h>
+
+namespace tightdb {
+    class Group;
+}
 
 @interface RLMRealm ()
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
@@ -37,17 +36,3 @@ static inline void RLMCheckThread(__unsafe_unretained RLMRealm *realm) {
                                      userInfo:nil];
     }
 }
-
-// get the table used to store object of objectClass
-static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                                       NSString *className,
-                                                       bool &created) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_or_add_table(tableName.UTF8String, &created);
-}
-static inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
-                                                       NSString *className) {
-    NSString *tableName = RLMTableNameForClass(className);
-    return realm.group->get_table(tableName.UTF8String);
-}
-

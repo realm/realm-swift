@@ -18,6 +18,7 @@
 
 #import "RLMObject_Private.h"
 
+#import <tightdb/link_view.hpp> // required by row.hpp
 #import <tightdb/row.hpp>
 
 // RLMObject accessor and read/write realm
@@ -27,4 +28,3 @@
 }
 
 @end
-
