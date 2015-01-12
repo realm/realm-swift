@@ -35,6 +35,14 @@ public func defaultRealm() -> Realm {
     return Realm(rlmRealm: RLMRealm.defaultRealm())
 }
 
+public func encryptedRealm(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer) -> Realm? {
+    let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error)
+    if rlmRealm != nil  {
+        return Realm(rlmRealm: rlmRealm)
+    }
+    return nil
+}
+
 public class Realm {
     // MARK: Properties
 
