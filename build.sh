@@ -96,18 +96,18 @@ build_fat() {
     config="$2"
     build_prefix="$3"
     out_dir="$4"
+    name="$5.framework"
 
     xcrealm "-scheme '$target' -configuration $config -sdk iphoneos"
     xcrealm "-scheme '$target' -configuration $config -sdk iphonesimulator"
 
-    srcdir="build/DerivedData/Realm/Build/Products/$config-dynamic"
     mkdir -p build/$out_dir
-    rm -rf build/$out_dir/Realm.framework
-    cp -R $build_prefix-iphoneos/Realm.framework build/$out_dir
-    if [ -d build/$out_dir/Realm.framework/Modules/Realm.swiftmodule ]; then
-        cp $build_prefix-iphonesimulator/Realm.framework/Modules/Realm.swiftmodule/* build/$out_dir/Realm.framework/Modules/Realm.swiftmodule/
+    rm -rf build/$out_dir/$name
+    cp -R $build_prefix-iphoneos/$name build/$out_dir
+    if [ -d build/$out_dir/$name/Modules/$5.swiftmodule ]; then
+        cp $build_prefix-iphonesimulator/$name/Modules/$5.swiftmodule/* build/$out_dir/$name/Modules/$5.swiftmodule/
     fi
-    xcrun lipo -create "$build_prefix-iphonesimulator/Realm.framework/Realm" "$build_prefix-iphoneos/Realm.framework/Realm" -output "build/$out_dir/Realm.framework/Realm"
+    xcrun lipo -create "$build_prefix-iphonesimulator/$name/$5" "$build_prefix-iphoneos/$name/$5" -output "build/$out_dir/$name/$5"
 }
 
 ######################################
@@ -239,12 +239,8 @@ case "$COMMAND" in
         ;;
 
     "ios")
-        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios
-        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphoneos"
-        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios
-        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/RealmSwift.framework build/ios/RealmSwift.framework
-        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator/RealmSwift.framework build/ios/RealmSwift-simulator.framework
+        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios Realm
+        build_fat 'RealmSwift iOS' Release build/DerivedData/Realm/Build/Products/Release ios RealmSwift
         exit 0
         ;;
 
@@ -255,7 +251,7 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios
+        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios Realm
         exit 0
         ;;
 
