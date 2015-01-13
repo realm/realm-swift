@@ -122,7 +122,7 @@ class TableViewController: UITableViewController {
     func add() {
         defaultRealm().write {
             let object = [randomTitle(), NSDate(), randomSectionTitle()]
-            DemoObject.createInDefaultRealmWithObject(object)
+            DemoObject.createInRealm(defaultRealm(), withObject: object)
         }
     }
 }
