@@ -28,8 +28,9 @@
 //            of the typename (the rest of the name after class)
 //  metadata - table used for realm metadata storage
 extern NSString * const c_objectTableNamePrefix;
-extern const char *c_metadataTableName;
-extern const char *c_versionColumnName;
+extern const char * const c_metadataTableName;
+extern const char * const c_primaryKeyTableName;
+extern const char * const c_versionColumnName;
 extern const size_t c_versionColumnIndex;
 
 inline NSString *RLMClassForTableName(NSString *tableName) {

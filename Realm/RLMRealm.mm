@@ -160,8 +160,6 @@ NSData *validatedKey(NSData *key) {
     return key;
 }
 
-
-
 //
 // Global RLMRealm instance cache
 //
@@ -211,15 +209,54 @@ static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
 
-void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
+NSError *ensureRealmSchemaUpToDate(RLMRealm *realm, NSData *key,
+                                   RLMSchema *targetSchema, NSUInteger schemaVersion,
+                                   RLMMigrationBlock migrationBlock) {
     [realm beginWriteTransaction];
 
     @try {
         RLMRealmCreateMetadataTables(realm);
-        if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-            RLMRealmSetSchemaVersion(realm, s_currentSchemaVersion);
+        NSUInteger existingSchemaVersion = RLMRealmSchemaVersion(realm);
+
+        // Opening via dynamic interface, so update to the specified schema but
+        // don't touch the schema version, and never run a migration
+        if (schemaVersion == RLMNotVersioned) {
+            RLMRealmCreateTables(realm, targetSchema, true);
         }
-        RLMRealmCreateTables(realm, targetSchema, false);
+        // File that's never been initialized to a shared schema, so update to
+        // the current schema and set the version
+        else if (existingSchemaVersion == RLMNotVersioned) {
+            RLMRealmCreateTables(realm, targetSchema, true);
+            RLMRealmSetSchemaVersion(realm, schemaVersion);
+        }
+        // Schema versions match, so allow creating new tables but nothing else
+        else if (schemaVersion == existingSchemaVersion) {
+            RLMRealmCreateTables(realm, targetSchema, false);
+        }
+        // Schema versions are only allowed to go up, not down
+        else if (existingSchemaVersion > schemaVersion) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
+                                         userInfo:@{@"path" : realm.path}];
+        }
+        // Schema version is set, and the file's is lower than the schemas, so
+        // run a migration
+        else {
+            if (!migrationBlock) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"No migration block specified for a Realm with an existing schema version. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
+                                             userInfo:@{@"path" : realm.path}];
+            }
+
+            NSError *error;
+            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:realm key:key error:&error];
+            if (error) {
+                return error;
+            }
+            @autoreleasepool {
+                [migration migrateWithBlock:migrationBlock version:schemaVersion];
+            }
+        }
     }
     @catch (NSException *) {
         [realm cancelWriteTransaction];
@@ -227,6 +264,7 @@ void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     }
 
     [realm commitWriteTransaction];
+    return nil;
 }
 
 } // anonymous namespace
@@ -481,7 +519,9 @@ static id RLMAutorelease(id value) {
     @synchronized(s_realmsPerPath) {
         // create tables, set schema, and create accessors when needed
         if (_dynamic) {
-            createTablesInTransaction(self, customSchema ?: [RLMSchema dynamicSchemaFromRealm:self]);
+            ensureRealmSchemaUpToDate(self, key,
+                                      customSchema ?: [RLMSchema dynamicSchemaFromRealm:self],
+                                      RLMNotVersioned, nil);
         }
         else if (_readOnly) {
             if (RLMRealmSchemaVersion(self) == RLMNotVersioned) {
@@ -501,14 +541,7 @@ static id RLMAutorelease(id value) {
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
-                NSUInteger schemaVersion = RLMRealmSchemaVersion(self);
-                if (s_currentSchemaVersion == schemaVersion || schemaVersion == RLMNotVersioned) {
-                    createTablesInTransaction(self, [RLMSchema sharedSchema]);
-                }
-                else {
-                    [RLMRealm migrateRealm:self key:key];
-                }
-
+                ensureRealmSchemaUpToDate(self, key, [RLMSchema sharedSchema], s_currentSchemaVersion, s_migrationBlock);
                 RLMRealmCreateAccessors(_schema);
             }
         }
@@ -861,39 +894,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
     if (!error) {
-        [realm initializeSchema:nil key:key];
-        error = [self migrateRealm:realm key:key];
+        error = ensureRealmSchemaUpToDate(realm, key, [RLMSchema sharedSchema],
+                                          s_currentSchemaVersion, s_migrationBlock);
     }
     return error;
-}
-
-+ (NSError *)migrateRealm:(RLMRealm *)realm key:(NSData *)key {
-    // only perform migration if current version is > on-disk version
-    NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
-    if (schemaVersion < s_currentSchemaVersion) {
-        NSError *error;
-        RLMMigration *migration = [[RLMMigration alloc] initWithRealm:realm key:key error:&error];
-        if (error) {
-            return error;
-        }
-        @autoreleasepool {
-            [migration migrateWithBlock:s_migrationBlock version:s_currentSchemaVersion];
-        }
-    }
-    else if (schemaVersion > s_currentSchemaVersion && schemaVersion != RLMNotVersioned) {
-        if (!s_migrationBlock) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"No migration block specified for a Realm with a schema version greater than 0. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
-                                         userInfo:@{@"path" : realm.path}];
-        }
-        else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
-                                         userInfo:@{@"path" : realm.path}];
-        }
-    }
-
-    return nil;
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {

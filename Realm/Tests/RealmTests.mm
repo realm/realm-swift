@@ -21,6 +21,10 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 
+extern "C" {
+#import "RLMSchema_Private.h"
+}
+
 #import <libkern/OSAtomic.h>
 
 @interface RLMRealm ()
@@ -594,6 +598,7 @@
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[@"a"]];
+        RLMRealmSetSchemaVersion(realm, 0);
         [realm commitWriteTransaction];
     }
 
