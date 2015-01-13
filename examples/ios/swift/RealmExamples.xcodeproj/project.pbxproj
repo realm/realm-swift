@@ -739,11 +739,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -759,11 +754,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = GroupedTableView;
@@ -775,11 +765,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -795,11 +780,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Encryption/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -811,11 +791,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -831,11 +806,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Migration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -847,11 +817,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -867,11 +832,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = TableView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -883,11 +843,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -903,11 +858,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Simple/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -918,12 +868,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../build/ios",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -939,12 +883,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../build/ios",
-					"/Users/segiddins/Development/Realm/realm-cocoa/build/ios",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug",
-					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Realm-gbtsedkfhsfzridyalwdbzywqjbv/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Backlink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
