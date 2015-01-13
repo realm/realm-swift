@@ -45,8 +45,8 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            if let realm = encryptedRealm(defaultRealmPath(),
-                self.getKey(), false, nil) {
+            if let realm = Realm(path: defaultRealmPath(),
+                encryptionKey: self.getKey(), readOnly: false, error: nil) {
 
                 // Add an object
                 realm.write {
@@ -60,9 +60,9 @@ class ViewController: UIViewController {
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             var error: NSError? = nil
-            encryptedRealm(defaultRealmPath(),
-                "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!,
-                false, &error)
+            Realm(path: defaultRealmPath(),
+                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!,
+                readOnly: false, error: &error)
             self.log("Open with wrong key: \(error)")
         }
 
@@ -76,9 +76,9 @@ class ViewController: UIViewController {
         // Reopening with the correct key works and can read the data
         autoreleasepool {
             var error: NSError? = nil
-            if let realm = encryptedRealm(defaultRealmPath(),
-                self.getKey(),
-                false, &error) {
+            if let realm = Realm(path: defaultRealmPath(),
+                encryptionKey: self.getKey(),
+                readOnly: false, error: &error) {
                 self.log("Saved object: \((objects(EncryptionObject).first()!).stringProp)")
             }
         }
