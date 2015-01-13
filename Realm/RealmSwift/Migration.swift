@@ -26,7 +26,7 @@ public func setSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock
     })
 }
 
-public func migrationRealm(path: String) -> NSError? {
+public func migrateRealm(path: String) -> NSError? {
     return RLMRealm.migrateRealmAtPath(path)
 }
 
