@@ -131,15 +131,15 @@ class ResultsTests: TestCase {
     }
 
     func testFirst() {
-        XCTAssertEqual(str1, results.first()!)
-        XCTAssertEqual(str2, results.filter("stringCol = '2'").first()!)
-        XCTAssertNil(results.filter("stringCol = '3'").first())
+        XCTAssertEqual(str1, results.first!)
+        XCTAssertEqual(str2, results.filter("stringCol = '2'").first!)
+        XCTAssertNil(results.filter("stringCol = '3'").first)
     }
 
     func testLast() {
-        XCTAssertEqual(str2, results.last()!)
-        XCTAssertEqual(str2, results.filter("stringCol = '2'").last()!)
-        XCTAssertNil(results.filter("stringCol = '3'").last())
+        XCTAssertEqual(str2, results.last!)
+        XCTAssertEqual(str2, results.filter("stringCol = '2'").last!)
+        XCTAssertNil(results.filter("stringCol = '3'").last)
     }
 
     func testFilterFormat() {
