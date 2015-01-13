@@ -18,7 +18,11 @@
 
 import Realm
 
-public class Schema {
+public func ==(lhs: Schema, rhs: Schema) -> Bool {
+    return lhs.rlmSchema.isEqualToSchema(rhs.rlmSchema)
+}
+
+public class Schema: Equatable {
     // MARK: Properties
 
     var rlmSchema: RLMSchema
