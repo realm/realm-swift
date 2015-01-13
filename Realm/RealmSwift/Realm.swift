@@ -68,9 +68,8 @@ public class Realm {
     public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
         if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
-        }
-        else {
-            self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(NSUUID().UUIDString))
+        } else {
+            self.init(rlmRealm: RLMRealm())
             return nil
         }
     }
@@ -78,9 +77,8 @@ public class Realm {
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer) {
         if let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
-        }
-        else {
-            self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(NSUUID().UUIDString))
+        } else {
+            self.init(rlmRealm: RLMRealm())
             return nil
         }
     }
