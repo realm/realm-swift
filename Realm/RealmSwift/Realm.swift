@@ -35,14 +35,6 @@ public func defaultRealm() -> Realm {
     return Realm(rlmRealm: RLMRealm.defaultRealm())
 }
 
-public func encryptedRealm(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer) -> Realm? {
-    let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error)
-    if rlmRealm != nil  {
-        return Realm(rlmRealm: rlmRealm)
-    }
-    return nil
-}
-
 public class Realm {
     // MARK: Properties
 
@@ -66,15 +58,31 @@ public class Realm {
     }
 
     public convenience init(path: String) {
-        self.init(path: path, readOnly: false, error: nil)
+        self.init(rlmRealm: RLMRealm(path: path, readOnly: false, error: nil))
     }
 
     public convenience init(inMemoryIdentifier: String) {
         self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
-    public convenience init(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
-        self.init(rlmRealm: RLMRealm(path: path, readOnly: readonly, error: error))
+    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
+        if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
+            self.init(rlmRealm: rlmRealm)
+        }
+        else {
+            self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(NSUUID().UUIDString))
+            return nil
+        }
+    }
+
+    public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer) {
+        if let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+            self.init(rlmRealm: rlmRealm)
+        }
+        else {
+            self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(NSUUID().UUIDString))
+            return nil
+        }
     }
 
     // MARK: Transactions
