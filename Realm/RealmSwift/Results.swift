@@ -74,13 +74,9 @@ public final class Results<T: Object>: Printable, SequenceType {
         }
     }
 
-    public func first() -> T? {
-        return rlmResults.firstObject() as T?
-    }
+    public var first: T? { return rlmResults.firstObject() as T? }
 
-    public func last() -> T? {
-        return rlmResults.lastObject() as T?
-    }
+    public var last: T? { return rlmResults.lastObject() as T? }
 
     // MARK: Subarray Retrieval
 

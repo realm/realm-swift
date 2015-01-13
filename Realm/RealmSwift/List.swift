@@ -72,13 +72,9 @@ public final class List<T: Object>: ListBase, SequenceType {
         }
     }
 
-    public func first() -> T? {
-        return _rlmArray.firstObject() as T?
-    }
+    public var first: T? { return _rlmArray.firstObject() as T? }
 
-    public func last() -> T? {
-        return _rlmArray.lastObject() as T?
-    }
+    public var last: T? { return _rlmArray.lastObject() as T? }
 
     // MARK: Subarray Retrieval
 
