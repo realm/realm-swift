@@ -24,6 +24,7 @@ extern "C" {
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -65,7 +66,15 @@ extern "C" {
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self realmWithTestPathAndSchema:schema];
+    RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
+
+    // Set the initial version to 0 since we're pretending this was created with
+    // a shared schema
+    [realm beginWriteTransaction];
+    RLMRealmSetSchemaVersion(realm, 0);
+    [realm commitWriteTransaction];
+
+    return realm;
 }
 
 - (void)testSchemaVersion {
@@ -305,6 +314,31 @@ extern "C" {
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
+- (void)testStringPrimaryKeyNoPKTableMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"1"]];
+    [realm createObject:MigrationStringPrimaryKeyObject.className withObject:@[@"2"]];
+
+    // remove the PK table to match old versions that create it only when needed
+    realm.group->remove_table(c_primaryKeyTableName);
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration enumerateObjects:@"MigrationStringPrimaryKeyObject" block:^(__unused RLMObject *oldObject, RLMObject *newObject) {
+            newObject[@"stringCol"] = [[NSUUID UUID] UUIDString];
+        }];
+    }];
+    [self realmWithTestPath];
 }
 
 - (void)testDuplicatePrimaryKeyMigration {

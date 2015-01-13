@@ -17,6 +17,8 @@ x.x.x Release notes (yyyy-MM-dd)
   while it's being fast-enumerated.
 * Also encrypt the temporary files used when encryption is enabled for a Realm.
 * Fixed crash in JSONImport example on OS X with non-en_US locale.
+* Fix a crash when adding primary keys to older realm files with no primary
+  keys on any objects.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================

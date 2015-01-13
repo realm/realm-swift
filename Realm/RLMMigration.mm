@@ -127,35 +127,23 @@
 }
 
 - (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion {
-    // start write transaction
-    [_realm beginWriteTransaction];
+    // add new tables/columns for the current shared schema
+    RLMRealmCreateTables(_realm, [RLMSchema sharedSchema], true);
 
-    @try {
-        // add new tables/columns for the current shared schema
-        RLMRealmCreateTables(_realm, [RLMSchema sharedSchema], true);
-
-        // disable all primary keys for migration
-        for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-            objectSchema.primaryKeyProperty.isPrimary = NO;
-        }
-
-        // apply block and set new schema version
-        NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
-        block(self, oldVersion);
-
-        // verify uniqueness for any new unique columns before committing
-        [self verifyPrimaryKeyUniqueness];
-
-        // update new version
-        RLMRealmSetSchemaVersion(_realm, newVersion);
-    }
-    @catch (...) {
-        [_realm cancelWriteTransaction];
-        @throw;
+    // disable all primary keys for migration
+    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+        objectSchema.primaryKeyProperty.isPrimary = NO;
     }
 
-    // end transaction
-    [_realm commitWriteTransaction];
+    // apply block and set new schema version
+    NSUInteger oldVersion = RLMRealmSchemaVersion(_realm);
+    block(self, oldVersion);
+
+    // verify uniqueness for any new unique columns before committing
+    [self verifyPrimaryKeyUniqueness];
+
+    // update new version
+    RLMRealmSetSchemaVersion(_realm, newVersion);
 }
 
 -(RLMObject *)createObject:(NSString *)className withObject:(id)object {
