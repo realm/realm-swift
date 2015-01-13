@@ -68,7 +68,7 @@ class SwiftPropertyTypeTest: TestCase {
             realm.add(obj)
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject).first()!
+        let obj = realm.objects(SwiftAllIntSizesObject).first!
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
