@@ -24,6 +24,12 @@ public class ObjectSchema {
     var rlmObjectSchema: RLMObjectSchema
     public var className: String { return rlmObjectSchema.className }
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+    public var primaryKeyProperty: Property? {
+        if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
+            return Property(rlmProperty: rlmProperty)
+        }
+        return nil
+    }
 
     // MARK: Initializers
 
