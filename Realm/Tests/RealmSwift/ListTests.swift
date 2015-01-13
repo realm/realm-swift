@@ -136,25 +136,25 @@ class ListTests: TestCase {
     }
 
     func testFirst() {
-        XCTAssertNil(array.first())
+        XCTAssertNil(array.first)
 
         array.append(str1)
-        XCTAssertNotNil(array.first())
-        XCTAssertEqual(str1, array.first()!)
+        XCTAssertNotNil(array.first)
+        XCTAssertEqual(str1, array.first!)
 
         array.append(str2)
-        XCTAssertEqual(str1, array.first()!)
+        XCTAssertEqual(str1, array.first!)
     }
 
     func testLast() {
-        XCTAssertNil(array.last())
+        XCTAssertNil(array.last)
 
         array.append(str1)
-        XCTAssertNotNil(array.last())
-        XCTAssertEqual(str1, array.last()!)
+        XCTAssertNotNil(array.last)
+        XCTAssertEqual(str1, array.last!)
 
         array.append(str2)
-        XCTAssertEqual(str2, array.last()!)
+        XCTAssertEqual(str2, array.last!)
     }
 
     func testFilterFormat() {
@@ -292,7 +292,7 @@ class ListTests: TestCase {
         if let realm = array.realm {
             array.append([str1, str2])
 
-            let otherArray = realm.objects(SwiftArrayPropertyObject).first()!.array
+            let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -344,7 +344,7 @@ class ListRetrievedTests: ListTests {
         realm.beginWrite()
         SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject).first()!
+        let array = realm.objects(SwiftArrayPropertyObject).first!
 
         XCTAssertNotNil(array.realm)
         return array
