@@ -62,10 +62,6 @@ public class Object : RLMObjectBase, Equatable {
         super.init()
     }
 
-    public class func createInDefaultRealmWithObject(object: AnyObject) -> Self {
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(defaultRealm().rlmRealm, className(), object, .allZeros), self)
-    }
-
     public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
     }
