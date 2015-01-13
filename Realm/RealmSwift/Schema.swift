@@ -32,7 +32,10 @@ public class Schema {
 
     // MARK: ObjectSchema Retrieval
 
-    public subscript(className: String) -> ObjectSchema {
-        return ObjectSchema(rlmObjectSchema: rlmSchema.schemaForClassName(className))
+    public subscript(className: String) -> ObjectSchema? {
+        if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
+            return ObjectSchema(rlmObjectSchema: rlmObjectSchema)
+        }
+        return nil
     }
 }

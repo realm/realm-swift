@@ -33,7 +33,10 @@ public class ObjectSchema {
 
     // MARK: Property Retrieval
 
-    public subscript(propertyName: String) -> Property {
-        return Property(rlmProperty: rlmObjectSchema[className])
+    public subscript(propertyName: String) -> Property? {
+        if let rlmProperty = rlmObjectSchema[className] {
+            return Property(rlmProperty: rlmProperty)
+        }
+        return nil
     }
 }
