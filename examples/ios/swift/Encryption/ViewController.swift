@@ -78,7 +78,8 @@ class ViewController: UIViewController {
             var error: NSError? = nil
             if let realm = Realm(path: defaultRealmPath(),
                 encryptionKey: self.getKey(),
-                readOnly: false, error: &error) {
+                readOnly: false,
+                error: &error) {
                 self.log("Saved object: \((objects(EncryptionObject).first()!).stringProp)")
             }
         }
