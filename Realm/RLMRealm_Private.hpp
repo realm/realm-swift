@@ -32,6 +32,8 @@ extern "C" {
     BOOL _inWriteTransaction;
     mach_port_t _threadID;
 }
+@property (nonatomic, copy) RLMMigrationBlock migrationBlock;
+@property (nonatomic) NSUInteger currentSchemaVersion;
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;

@@ -44,11 +44,9 @@
     @catch (NSException *exception) {
         NSLog(@"Trying to open an outdated realm a migration block threw an exception.");
     }
-
-    // define a migration block
-    // you can define this inline, but we will reuse this to migrate realm files from multiple versions
-    // to the most current version of our data model
-    [RLMRealm setSchemaVersion:3 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    
+    NSUInteger schemaVersion = 3;
+    RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         if (oldSchemaVersion < 1) {
             [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 if (oldSchemaVersion < 1) {
@@ -75,7 +73,12 @@
             }];
         }
         NSLog(@"Migration complete.");
-    }];
+    };
+    
+    // define a migration block
+    // you can define this inline, but we will reuse this to migrate realm files from multiple versions
+    // to the most current version of our data model
+    [RLMRealm setSchemaVersion:schemaVersion withMigrationBlock:migrationBlock];
 
     // now that we have called `setSchemaVersion:withMigrationBlock` opening an outdated Realm will automatically
     // perform the migration and opening the Realm will succeed
@@ -95,13 +98,19 @@
     [[NSFileManager defaultManager] copyItemAtPath:v1Path toPath:realmv1Path error:nil];
     [[NSFileManager defaultManager] removeItemAtPath:realmv2Path error:nil];
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
-
+    
+    // setup migration block for realms with custom paths
+    // can be useful when using realms separately (e.g. from different libraries)
+    [RLMRealm setSchemaVersion:schemaVersion withMigrationBlock:migrationBlock realmPath:realmv1Path];
+    [RLMRealm setSchemaVersion:schemaVersion withMigrationBlock:migrationBlock realmPath:realmv2Path];
+    
     // manully migration v1Path, v2Path is migrated implicitly on access
     [RLMRealm migrateRealmAtPath:realmv1Path];
 
     // print out all migrated objects in the migrated realms
     RLMRealm *realmv1 = [RLMRealm realmWithPath:realmv1Path];
     NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[Person allObjectsInRealm:realmv1] description]);
+    
     RLMRealm *realmv2 = [RLMRealm realmWithPath:realmv2Path];
     NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[Person allObjectsInRealm:realmv2] description]);
 

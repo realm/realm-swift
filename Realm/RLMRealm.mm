@@ -208,8 +208,6 @@ void clearRealmCache() {
 // Global realm state
 //
 static NSString *s_defaultRealmPath = nil;
-static RLMMigrationBlock s_migrationBlock;
-static NSUInteger s_currentSchemaVersion = 0;
 
 void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     [realm beginWriteTransaction];
@@ -217,7 +215,7 @@ void createTablesInTransaction(RLMRealm *realm, RLMSchema *targetSchema) {
     @try {
         RLMRealmCreateMetadataTables(realm);
         if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-            RLMRealmSetSchemaVersion(realm, s_currentSchemaVersion);
+            RLMRealmSetSchemaVersion(realm, realm.currentSchemaVersion);
         }
         RLMRealmCreateTables(realm, targetSchema, false);
     }
@@ -467,6 +465,10 @@ static id RLMAutorelease(id value) {
 
     key = key ?: keyForPath(path);
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
+    NSDictionary *migrationDictionary = [self migrationDictionary][path];
+//    NSParameterAssert(migrationDictionary);
+    realm.migrationBlock = migrationDictionary[kMigrationBlockKey];
+    realm.currentSchemaVersion = [migrationDictionary[kMigrationVersionKey] unsignedIntegerValue];
     [realm initializeSchema:customSchema key:key];
 
     if (!dynamic) {
@@ -502,7 +504,7 @@ static id RLMAutorelease(id value) {
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(self);
-                if (s_currentSchemaVersion == schemaVersion || schemaVersion == RLMNotVersioned) {
+                if (self.currentSchemaVersion == schemaVersion || schemaVersion == RLMNotVersioned) {
                     createTablesInTransaction(self, [RLMSchema sharedSchema]);
                 }
                 else {
@@ -525,8 +527,7 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)resetRealmState {
-    s_currentSchemaVersion = 0;
-    s_migrationBlock = NULL;
+    [[self migrationDictionary] removeAllObjects];
     clearRealmCache();
     clearKeyCache();
 }
@@ -821,9 +822,35 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return RLMGetObjects(self, objectClassName, predicate);
 }
 
+static NSString *const kMigrationVersionKey = @"kMigrationVersionKey";
+static NSString *const kMigrationBlockKey = @"kMigrationBlockKey";
+
++ (NSMutableDictionary *)migrationDictionary
+{
+    static id sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [NSMutableDictionary dictionary];
+        // Do any other initialization stuff here
+    });
+    return sharedInstance;
+}
+
 + (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block {
-    s_currentSchemaVersion = version;
-    s_migrationBlock = block;
+    [self setSchemaVersion:version withMigrationBlock:block realmPath:nil];
+}
+
++ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block realmPath:(NSString *)path {
+    NSString *p = path.length? path : [self defaultRealmPath];
+    
+    if (!block) {
+        [self.migrationDictionary removeObjectForKey:p];
+        return;
+    }
+    
+    NSDictionary *migration = @{ kMigrationBlockKey : [block copy],
+                                 kMigrationVersionKey : @(version)};
+    [self.migrationDictionary setObject:migration forKey:p];
 }
 
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error {
@@ -860,6 +887,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
+    realm.migrationBlock = self.migrationDictionary[realmPath][kMigrationBlockKey];
+    realm.currentSchemaVersion = [self.migrationDictionary[realmPath][kMigrationVersionKey] unsignedIntegerValue];
     if (!error) {
         [realm initializeSchema:nil key:key];
         error = [self migrateRealm:realm key:key];
@@ -870,18 +899,18 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 + (NSError *)migrateRealm:(RLMRealm *)realm key:(NSData *)key {
     // only perform migration if current version is > on-disk version
     NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
-    if (schemaVersion < s_currentSchemaVersion) {
+    if (schemaVersion < realm.currentSchemaVersion) {
         NSError *error;
         RLMMigration *migration = [[RLMMigration alloc] initWithRealm:realm key:key error:&error];
         if (error) {
             return error;
         }
         @autoreleasepool {
-            [migration migrateWithBlock:s_migrationBlock version:s_currentSchemaVersion];
+            [migration migrateWithBlock:realm.migrationBlock version:realm.currentSchemaVersion];
         }
     }
-    else if (schemaVersion > s_currentSchemaVersion && schemaVersion != RLMNotVersioned) {
-        if (!s_migrationBlock) {
+    else if (schemaVersion > realm.currentSchemaVersion && schemaVersion != RLMNotVersioned) {
+        if (!realm.migrationBlock) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"No migration block specified for a Realm with a schema version greater than 0. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
                                          userInfo:@{@"path" : realm.path}];

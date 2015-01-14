@@ -511,8 +511,22 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
+ @param realmPath   The path of the Realm to migrate.
  @return            The error that occurred while applying the migration, if any.
 
+ @see               RLMMigration
+ */
++ (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block realmPath:(NSString *)path;;
+
+/**
+ Specify a schema version and an associated migration block for default realm
+ 
+ As `setSchemaVersion:withMigrationBlock:realmPath`, but for default realm path.
+ 
+ @param version     The current schema version.
+ @param block       The block which migrates the Realm to the current version.
+ @return            The error that occurred while applying the migration, if any.
+ 
  @see               RLMMigration
  */
 + (void)setSchemaVersion:(NSUInteger)version withMigrationBlock:(RLMMigrationBlock)block;
