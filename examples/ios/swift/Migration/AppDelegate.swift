@@ -110,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
 
         // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
-        migrationRealm(realmv1Path)
+        migrateRealm(realmv1Path)
 
         // print out all migrated objects in the migrated realms
         let realmv1 = Realm(path: realmv1Path)
