@@ -49,7 +49,7 @@ class SwiftObjectInterfaceTests: TestCase {
         obj.arrayCol.append(obj.objectCol)
         realm.commitWrite()
 
-        let firstObj = realm.objects(SwiftObject).first()!
+        let firstObj = realm.objects(SwiftObject).first!
         XCTAssertEqual(firstObj.boolCol, true, "should be true")
         XCTAssertEqual(firstObj.intCol, 1234, "should be 1234")
         XCTAssertEqual(firstObj.floatCol, Float(1.1), "should be 1.1")
@@ -59,14 +59,14 @@ class SwiftObjectInterfaceTests: TestCase {
         XCTAssertEqual(firstObj.dateCol, NSDate(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
         XCTAssertEqual(obj.arrayCol.count, Int(1), "array count should be 1")
-        XCTAssertEqual(obj.arrayCol.first()!.boolCol, true, "should be true")
+        XCTAssertEqual(obj.arrayCol.first!.boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftObject() {
         let realm = realmWithTestPath()
         realm.write { realm.add(SwiftObject()) }
 
-        let firstObj = realm.objects(SwiftObject).first()!
+        let firstObj = realm.objects(SwiftObject).first!
         XCTAssertEqual(firstObj.boolCol, false, "should be false")
         XCTAssertEqual(firstObj.intCol, 123, "should be 123")
         XCTAssertEqual(firstObj.floatCol, Float(1.23), "should be 1.23")
@@ -84,7 +84,7 @@ class SwiftObjectInterfaceTests: TestCase {
         SwiftDefaultObject.createInRealm(realm, withObject: NSDictionary())
         realm.commitWrite()
 
-        let object = realm.objects(SwiftDefaultObject).first()
+        let object = realm.objects(SwiftDefaultObject).first
         XCTAssertEqual(object!.intCol, 2, "defaultPropertyValues should override native property default value")
         XCTAssertEqual(object!.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
     }
@@ -93,7 +93,7 @@ class SwiftObjectInterfaceTests: TestCase {
         let realm = realmWithTestPath()
         realm.write { realm.add(SwiftOptionalObject()) }
 
-        let firstObj = realm.objects(SwiftOptionalObject).first()!
+        let firstObj = realm.objects(SwiftOptionalObject).first!
         XCTAssertNil(firstObj.optObjectCol)
 
         realm.write {

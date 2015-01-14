@@ -81,7 +81,7 @@ class SwiftLinkTests: TestCase {
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
         // refresh owner and check
-        let owner2 = realm.objects(SwiftOwnerObject).first()!
+        let owner2 = realm.objects(SwiftOwnerObject).first!
         XCTAssertNotNil(owner, "Should have 1 owner")
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
         XCTAssertEqual(realm.objects(SwiftDogObject).count, Int(0), "Expecting 0 dogs")

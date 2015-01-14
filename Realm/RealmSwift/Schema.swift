@@ -18,7 +18,11 @@
 
 import Realm
 
-public class Schema {
+public func ==(lhs: Schema, rhs: Schema) -> Bool {
+    return lhs.rlmSchema.isEqualToSchema(rhs.rlmSchema)
+}
+
+public class Schema: Equatable {
     // MARK: Properties
 
     var rlmSchema: RLMSchema
@@ -32,7 +36,10 @@ public class Schema {
 
     // MARK: ObjectSchema Retrieval
 
-    public subscript(className: String) -> ObjectSchema {
-        return ObjectSchema(rlmObjectSchema: rlmSchema.schemaForClassName(className))
+    public subscript(className: String) -> ObjectSchema? {
+        if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
+            return ObjectSchema(rlmObjectSchema: rlmObjectSchema)
+        }
+        return nil
     }
 }

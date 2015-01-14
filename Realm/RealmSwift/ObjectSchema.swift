@@ -18,12 +18,22 @@
 
 import Realm
 
-public class ObjectSchema {
+public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
+    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
+}
+
+public class ObjectSchema: Equatable {
     // MARK: Properties
 
     var rlmObjectSchema: RLMObjectSchema
     public var className: String { return rlmObjectSchema.className }
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+    public var primaryKeyProperty: Property? {
+        if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
+            return Property(rlmProperty: rlmProperty)
+        }
+        return nil
+    }
 
     // MARK: Initializers
 
@@ -33,7 +43,10 @@ public class ObjectSchema {
 
     // MARK: Property Retrieval
 
-    public subscript(propertyName: String) -> Property {
-        return Property(rlmProperty: rlmObjectSchema[className])
+    public subscript(propertyName: String) -> Property? {
+        if let rlmProperty = rlmObjectSchema[className] {
+            return Property(rlmProperty: rlmProperty)
+        }
+        return nil
     }
 }

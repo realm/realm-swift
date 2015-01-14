@@ -83,6 +83,16 @@ public class Realm {
         }
     }
 
+    // MARK: Writing a Copy
+
+    public func writeCopyToPath(path: String, error: NSErrorPointer) {
+        rlmRealm.writeCopyToPath(path, error: error)
+    }
+
+    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer) {
+        rlmRealm.writeEncryptedCopyToPath(path, key: encryptionKey, error: error)
+    }
+
     // MARK: Transactions
 
     public func write(block: (() -> Void)) {
@@ -101,6 +111,12 @@ public class Realm {
 
     public func refresh() {
         rlmRealm.refresh()
+    }
+
+    // MARK: Invalidation
+
+    public func invalidate() {
+        rlmRealm.invalidate()
     }
 
     // MARK: Mutating
@@ -138,6 +154,10 @@ public class Realm {
     }
 
     public func delete(objects: List<Object>) {
+        rlmRealm.deleteObjects(objects)
+    }
+
+    public func delete(objects: Results<Object>) {
         rlmRealm.deleteObjects(objects)
     }
 
