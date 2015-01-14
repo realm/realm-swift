@@ -65,7 +65,7 @@ public class Realm {
         self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
-    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer) {
+    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
         } else {
@@ -74,7 +74,7 @@ public class Realm {
         }
     }
 
-    public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer) {
+    public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
         } else {
@@ -85,11 +85,11 @@ public class Realm {
 
     // MARK: Writing a Copy
 
-    public func writeCopyToPath(path: String, error: NSErrorPointer) {
+    public func writeCopyToPath(path: String, error: NSErrorPointer = nil) {
         rlmRealm.writeCopyToPath(path, error: error)
     }
 
-    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer) {
+    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) {
         rlmRealm.writeEncryptedCopyToPath(path, key: encryptionKey, error: error)
     }
 
