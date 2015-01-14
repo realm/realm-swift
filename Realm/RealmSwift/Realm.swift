@@ -89,6 +89,10 @@ public class Realm {
         rlmRealm.writeCopyToPath(path, error: error)
     }
 
+    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer) {
+        rlmRealm.writeEncryptedCopyToPath(path, key: encryptionKey, error: error)
+    }
+
     // MARK: Transactions
 
     public func write(block: (() -> Void)) {
