@@ -80,7 +80,7 @@ class ViewController: UIViewController {
                 encryptionKey: self.getKey(),
                 readOnly: false,
                 error: &error) {
-                self.log("Saved object: \((objects(EncryptionObject).first()!).stringProp)")
+                self.log("Saved object: \((objects(EncryptionObject).first!).stringProp)")
             }
         }
     }
