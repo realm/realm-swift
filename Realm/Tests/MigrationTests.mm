@@ -315,15 +315,28 @@ extern "C" {
     objectSchema.primaryKeyProperty.attributes = 0;
 
     // create realm with old schema and populate
-    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
-    [realm beginWriteTransaction];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
-    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
-    [realm commitWriteTransaction];
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+        [realm commitWriteTransaction];
+
+        XCTAssertFalse(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
+    }
 
     // apply migration
     [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) { }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+
+    // check that column is now indexed
+    RLMRealm *realm = [self realmWithTestPath];
+    XCTAssertTrue(realm.schema[MigrationPrimaryKeyObject.className].table->has_search_index(0));
+
+    // verify that old data still exists
+    RLMResults *objects = [MigrationPrimaryKeyObject allObjectsInRealm:realm];
+    XCTAssertEqual(1, [objects[0] intCol]);
+    XCTAssertEqual(2, [objects[1] intCol]);
 }
 
 - (void)testDuplicatePrimaryKeyMigration {
