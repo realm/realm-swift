@@ -18,12 +18,12 @@
 
 extern "C" {
 #import "RLMTestCase.h"
+#import "RLMSchema_Private.h"
 }
 #import "RLMMigration.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -65,7 +65,7 @@ extern "C" {
 
     RLMSchema *schema = [[RLMSchema alloc] init];
     schema.objectSchema = @[objectSchema];
-    return [self dynamicRealmWithTestPathAndSchema:schema];
+    return [self realmWithTestPathAndSchema:schema];
 }
 
 - (void)testSchemaVersion {
@@ -75,6 +75,22 @@ extern "C" {
 
     RLMRealm *defaultRealm = [RLMRealm defaultRealm];
     XCTAssertEqual(1U, RLMRealmSchemaVersion(defaultRealm));
+}
+
+- (void)testGetSchemaVersion {
+    XCTAssertThrows([RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    @autoreleasepool {
+        [RLMRealm defaultRealm];
+    }
+
+    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
+                                                      __unused NSUInteger oldSchemaVersion) {
+    }];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
+    realm = nil;
 }
 
 - (void)testAddingProperty {
@@ -329,6 +345,29 @@ extern "C" {
     XCTAssertEqual(1U, [[MigrationPrimaryKeyObject allObjectsInRealm:[RLMRealm realmWithPath:RLMTestRealmPath()]] count]);
 }
 
+- (void)testIncompleteMigrationIsRolledBack {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // create realm with old schema and populate
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+        [realm beginWriteTransaction];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    // fail to apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()], @"Migration should throw due to duplicate primary keys)");
+
+    // should still be able to open with pre-migration schema
+    XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
+}
+
 - (void)testAddObjectDuringMigration {
     // initialize realm
     @autoreleasepool {
@@ -344,7 +383,7 @@ extern "C" {
 }
 
 - (void)testVersionNumberCanStaySameWithNoSchemaChanges {
-    @autoreleasepool { [self dynamicRealmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
+    @autoreleasepool { [self realmWithTestPathAndSchema:[RLMSchema sharedSchema]]; }
 
     [RLMRealm setSchemaVersion:0 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {}];
     XCTAssertNoThrow([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
@@ -443,6 +482,12 @@ extern "C" {
     for (NSUInteger i = 0; i < properties.count; i++) {
         XCTAssertEqual([properties[i] column], i);
     }
+}
+
+- (void)testMigrationDoesNotEffectOtherPaths {
+    RLMRealm *defaultRealm = RLMRealm.defaultRealm;
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+    XCTAssertEqual(defaultRealm, RLMRealm.defaultRealm);
 }
 
 @end

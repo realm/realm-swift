@@ -21,11 +21,11 @@ import Realm
 extension RLMObject {
     // Swift query convenience functions
     public class func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
-        return objectsWhere(predicateFormat, args: getVaList(args))
+        return objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     public class func objectsInRealm(realm: RLMRealm, _ predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
-        return objectsInRealm(realm, `where`: predicateFormat, args: getVaList(args))
+        return objectsInRealm(realm, withPredicate:NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 }
 
@@ -45,11 +45,11 @@ extension RLMArray: SequenceType {
 
     // Swift query convenience functions
     public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArgType...) -> UInt {
-        return indexOfObjectWhere(predicateFormat, args: getVaList(args))
+        return indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
-        return objectsWhere(predicateFormat, args: getVaList(args))
+        return objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 }
 
@@ -69,10 +69,10 @@ extension RLMResults: SequenceType {
 
     // Swift query convenience functions
     public func indexOfObjectWhere(predicateFormat: String, _ args: CVarArgType...) -> UInt {
-        return indexOfObjectWhere(predicateFormat, args: getVaList(args))
+        return indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
-        return objectsWhere(predicateFormat, args: getVaList(args))
+        return objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 }

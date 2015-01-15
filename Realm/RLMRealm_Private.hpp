@@ -16,9 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+extern "C" {
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
 #import "RLMAccessor.h"
+}
 
 #import <tightdb/link_view.hpp>
 #import <tightdb/group.hpp>
@@ -35,7 +37,7 @@
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
-- (instancetype)initWithPath:(NSString *)path readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error;
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
 @end
 
 // throw an exception if the realm is being used from the wrong thread

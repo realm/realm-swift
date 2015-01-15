@@ -19,7 +19,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="715" height="459"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="715" height="459"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -28,7 +28,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="715" height="459"/>
                         <subviews>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="27" horizontalPageScroll="10" verticalLineScroll="27" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="IUZ-GO-IM0">
-                                <rect key="frame" x="0.0" y="0.0" width="714" height="459"/>
+                                <rect key="frame" x="0.0" y="0.0" width="248" height="459"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" misplaced="YES" id="6cC-AR-sCL">
                                     <rect key="frame" x="1" y="0.0" width="238" height="134"/>
@@ -40,7 +40,7 @@
                                             <color key="backgroundColor" red="0.1013442737430168" green="0.1013442737430168" blue="0.1013442737430168" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn editable="NO" width="711" minWidth="100" maxWidth="1000" id="jUH-hE-VOt" userLabel="Class Column">
+                                                <tableColumn editable="NO" width="245" minWidth="100" maxWidth="1000" id="jUH-hE-VOt" userLabel="Class Column">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="CLASSES">
                                                         <font key="font" metaFont="cellTitle"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -54,19 +54,19 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="SidebarClassCell" id="EcG-iP-hKg" customClass="RLMBSidebarCellView">
-                                                            <rect key="frame" x="1" y="1" width="711" height="17"/>
+                                                            <rect key="frame" x="1" y="1" width="245" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mdc-yO-6NF">
-                                                                    <rect key="frame" x="18" y="-1" width="184" height="19"/>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="mdc-yO-6NF">
+                                                                    <rect key="frame" x="18" y="-1" width="185" height="19"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="Table View Cell" id="2IY-9P-8bR">
                                                                         <font key="font" metaFont="system" size="16"/>
                                                                         <color key="textColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZUF-ZJ-fhq" userLabel="Badge">
-                                                                    <rect key="frame" x="210" y="0.0" width="24" height="17"/>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZUF-ZJ-fhq" userLabel="Badge">
+                                                                    <rect key="frame" x="211" y="0.0" width="24" height="17"/>
                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" sendsActionOnEndEditing="YES" alignment="center" title="12" drawsBackground="YES" usesSingleLineMode="YES" id="fRn-qp-c4c" userLabel="Badge">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -114,6 +114,7 @@
                                 </tableHeaderView>
                             </scrollView>
                             <scrollView fixedFrame="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" id="gxa-ZW-9nb" userLabel="Scroll View">
+                                <rect key="frame" x="249" y="0.0" width="466" height="459"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <clipView key="contentView" id="qVE-Jh-eaF">
                                     <rect key="frame" x="1" y="1" width="166" height="79"/>
@@ -151,8 +152,9 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="U8V-tZ-Pdl"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="Qrw-EF-WId"/>
-                    <toolbarItem implicitItemIdentifier="3D3EE287-D44F-4FB7-A470-F13316123934" label="Toolbar Item" paletteLabel="Toolbar Item" tag="-1" image="I" id="vmi-oO-Y6u"/>
-                    <toolbarItem implicitItemIdentifier="415CA19E-494D-4E2F-BC88-99D6BA3A73E3" label="" paletteLabel="Navigation" id="uav-VS-jY2">
+                    <toolbarItem implicitItemIdentifier="3D3EE287-D44F-4FB7-A470-F13316123934" label="Minus" paletteLabel="Minus" tag="-1" image="NSRemoveTemplate" id="vmi-oO-Y6u"/>
+                    <toolbarItem implicitItemIdentifier="FBFB3742-933D-4C19-8EA8-504733F29A01" label="Plus" paletteLabel="Plus" tag="-1" image="NSAddTemplate" id="pci-ij-W4e"/>
+                    <toolbarItem implicitItemIdentifier="415CA19E-494D-4E2F-BC88-99D6BA3A73E3" explicitItemIdentifier="NvigationGroup" label="" paletteLabel="Navigation" id="uav-VS-jY2">
                         <nil key="toolTip"/>
                         <size key="minSize" width="67" height="28"/>
                         <size key="maxSize" width="104" height="28"/>
@@ -171,21 +173,46 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="E9E02C76-4AA9-4FCD-B80E-A2446A1B5545" label="" paletteLabel="Navigation" id="o3e-Pd-xyl">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="67" height="28"/>
+                        <size key="maxSize" width="225" height="28"/>
+                        <segmentedControl key="view" verticalHuggingPriority="750" id="PYu-Ng-1AZ">
+                            <rect key="frame" x="0.0" y="14" width="225" height="28"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="j4i-hL-EXX">
+                                <font key="font" metaFont="system"/>
+                                <segments>
+                                    <segment label="Add" toolTip="Add new object" image="NSAddTemplate" tag="2"/>
+                                    <segment label="Delete" toolTip="Delete object" image="NSRemoveTemplate" tag="3"/>
+                                    <segment label="Remove" toolTip="Remove object from array" image="NSRemoveTemplate" tag="4"/>
+                                </segments>
+                            </segmentedCell>
+                            <connections>
+                                <action selector="navigateAction:" target="-2" id="ghK-Iw-c8O"/>
+                            </connections>
+                        </segmentedControl>
+                        <connections>
+                            <action selector="editAction:" target="-1" id="s6l-LE-SzK"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="uav-VS-jY2"/>
                     <toolbarItem reference="Qrw-EF-WId"/>
+                    <toolbarItem reference="o3e-Pd-xyl"/>
                 </defaultToolbarItems>
             </toolbar>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="-774.5" y="-56.5"/>
+            <point key="canvasLocation" x="-835.5" y="-91.5"/>
         </window>
     </objects>
     <resources>
-        <image name="I" width="128" height="128"/>
+        <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="12"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="12"/>
     </resources>
 </document>

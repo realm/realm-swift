@@ -20,7 +20,7 @@
 
 @implementation RLMQueryNavigationState
 
-- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMArray *)results;
+- (instancetype)initWithQuery:(NSString*)searchText type:(RLMTypeNode *)type results:(RLMResults *)results;
 {
     if (self = [super initWithSelectedType:type
                                      index:0]) {

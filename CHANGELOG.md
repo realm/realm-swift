@@ -1,3 +1,85 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
+  `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
+
+### Enhancements
+
+* Add `-[RLMRealm writeCopyToPath:encryptionKey:error:]`.
+
+### Bugfixes
+
+* Roll back changes made when an exception is thrown during a migration.
+* Throw an exception if the number of items in a RLMResults or RLMArray changes
+  while it's being fast-enumerated.
+* Also encrypt the temporary files used when encryption is enabled for a Realm.
+* Fixed crash in JSONImport example on OS X with non-en_US locale.
+
+0.89.2 Release notes (2015-01-02)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an assertion failure when invalidating a Realm which is in a write
+  transaction, has already been invalidated, or has never been used.
+* Fix an assertion failure when sorting an empty RLMArray property.
+* Fix a bug resulting in the browser never becoming visible on 10.9.
+* Write UTF-8 when generating class files from a realm file in the Browser.
+
+0.89.1 Release notes (2014-12-22)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Improve the error message when a Realm can't be opened due to lacking write
+  permissions.
+
+### Bugfixes
+
+* Fix an assertion failure when inserting rows after calling `deleteAllObjects`
+  on a Realm.
+* Separate dynamic frameworks are now built for the simulator and devices to
+  work around App Store submission errors due to the simulator version not
+  being automatically stripped from dynamic libraries.
+
+0.89.0 Release notes (2014-12-18)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Add support for encrypting Realm files on disk.
+* Support using KVC-compliant objects without getters or with custom getter
+  names to initialize RLMObjects with `createObjectInRealm` and friends.
+
+### Bugfixes
+
+* Merge native Swift default property values with defaultPropertyValues().
+* Don't leave the database schema partially updated when opening a realm fails
+  due to a migration being needed.
+* Fixed issue where objects with custom getter names couldn't be used to
+  initialize other objects.
+* Fix a major performance regression on queries on string properties.
+* Fix a memory leak when circularly linked objects are added to a Realm.
+
 0.88.0 Release notes (2014-12-02)
 =============================================================
 

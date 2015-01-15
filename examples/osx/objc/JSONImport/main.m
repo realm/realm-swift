@@ -36,6 +36,7 @@ int main(int argc, const char * argv[])
         }
 
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         dateFormatter.dateFormat = @"MMMM dd, YYYY";
 
         RLMRealm *realm = [RLMRealm defaultRealm];

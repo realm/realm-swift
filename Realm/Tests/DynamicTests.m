@@ -38,7 +38,7 @@
         [realm commitWriteTransaction];
     }
     
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     XCTAssertNotNil(dyrealm, @"realm should not be nil");
     
     // verify schema
@@ -47,7 +47,7 @@
     XCTAssertEqual(dynSchema.properties.count, (NSUInteger)2, @"DynamicObject should have 2 properties");
     XCTAssertEqualObjects([dynSchema.properties[0] name], @"stringCol", @"Invalid property name");
     XCTAssertEqual([(RLMProperty *)dynSchema.properties[1] type], RLMPropertyTypeInt, @"Invalid type");
-    
+
     // verify object type
     RLMResults *results = [dyrealm allObjects:@"DynamicObject"];
     XCTAssertEqual(results.count, (NSUInteger)2, @"Array should have 2 elements");
@@ -64,7 +64,7 @@
     RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
                                                                    objectClass:RLMObject.class properties:@[prop]];
     schema.objectSchema = @[objectSchema];
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:schema];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:schema];
     XCTAssertNotNil(dyrealm, @"dynamic realm shouldn't be nil");
 }
 
@@ -79,7 +79,7 @@
     }
     
     // verify properties
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     RLMResults *results = [dyrealm allObjects:@"DynamicObject"];
     
     RLMObject *o1 = results[0], *o2 = results[1];
@@ -105,7 +105,7 @@
     }
     
     // verify properties
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     RLMResults *results = [dyrealm allObjects:AllTypesObject.className];
     XCTAssertEqual(results.count, (NSUInteger)2, @"Should have 2 objects");
     
@@ -132,7 +132,7 @@
         [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
     }
 
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     [dyrealm beginWriteTransaction];
     RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
     [dyrealm createObject:AllTypesObject.className withObject:@[@NO, @2, @2.2f, @2.22, @"string2",
@@ -149,7 +149,7 @@
         [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
     }
 
-    RLMRealm *dyrealm = [self dynamicRealmWithTestPathAndSchema:nil];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
     [dyrealm beginWriteTransaction];
     RLMObject *stringObject = [dyrealm createObject:StringObject.className withObject:@[@"string"]];
     RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withObject:@[@"string1"]];

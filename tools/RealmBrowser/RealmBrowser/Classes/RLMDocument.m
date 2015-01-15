@@ -26,14 +26,6 @@
 
 @implementation RLMDocument
 
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-    }
-    return self;
-}
-
 - (instancetype)initWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     if (self = [super init]) {
@@ -56,17 +48,17 @@
         NSString *realmName = [fileNameComponents firstObject];
         
         RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:realmName url:absoluteURL.path];
-        self.presentedRealm  = realmNode;
-        
-        NSArray *wcs = self.windowControllers;
+        RLMDocument *ws = self;
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             NSError *error;
             if ([realmNode connect:&error]) {
+                ws.presentedRealm  = realmNode;
+
                 NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
                 [documentController noteNewRecentDocumentURL:absoluteURL];
-                
-                for (RLMRealmBrowserWindowController *windowController in wcs) {
+            
+                for (RLMRealmBrowserWindowController *windowController in ws.windowControllers) {
                     [windowController realmDidLoad];
                 }
             }

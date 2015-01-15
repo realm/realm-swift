@@ -92,6 +92,13 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
         state->extra[1] = _backingLinkView->size();
     }
     else {
+        // FIXME: mutationsPtr should be pointing to a value updated by core
+        // whenever the linkview is changed rather than doing this check
+        if (state->extra[1] != self.count) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Collection was mutated while being enumerated."
+                                         userInfo:nil];
+        }
         items = (__bridge id)(void *)state->extra[0];
         [items resize:len];
     }
@@ -125,8 +132,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     if (index >= _backingLinkView->size()) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateObjectAccessor(_realm, _objectSchema,
-                                   _backingLinkView->get(index).get_index());
+    return RLMCreateObjectAccessor(_realm, _objectSchema, _backingLinkView->get(index).get_index());
 }
 
 - (void)addObject:(RLMObject *)object {

@@ -300,6 +300,19 @@ NSString *const kRLMBBoolCellId = @"RLMBBoolCellView";
     // Implemented in subclass according to type of pane
 }
 
+- (BOOL)validateToolbarItem:(NSToolbarItem *)theItem
+{
+    NSLog(@"validateToolbarItem: %ld", theItem.tag);
+
+    return theItem.tag % 2;
+}
+
+- (IBAction)editAction:(id)sender
+{
+    NSLog(@"sender: %@", sender);
+
+}
+
 #pragma mark - Public Methods - Getters
 
 - (BOOL)isWide

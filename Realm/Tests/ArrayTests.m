@@ -29,7 +29,7 @@
 - (void)testFastEnumeration
 {
     RLMRealm *realm = self.realmWithTestPath;
-    
+
     [realm beginWriteTransaction];
 
     // enumerate empty array
@@ -39,7 +39,7 @@
 
     NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
-    
+
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @0.0f, @2.5, @NO, dateMaxInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
@@ -58,11 +58,11 @@
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
     [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
-    
+
     [realm commitWriteTransaction];
-       
+
     RLMResults *result = [AggregateObject objectsInRealm:realm where:@"intCol < %i", 100];
-    
+
     XCTAssertEqual(result.count, (NSUInteger)18, @"18 objects added");
 
     __weak id objects[18];
@@ -77,7 +77,7 @@
         }
         objects[count++] = ao;
     }
-    
+
     XCTAssertEqual(count, 18, @"should have enumerated 18 objects");
 
     for (int i = 0; i < count; i++) {
@@ -91,6 +91,23 @@
         }
     }
     XCTAssertNil(objects[0], @"Object should have been released");
+
+    void (^mutateDuringEnumeration)() = ^{
+        bool first = true;
+        for (__unused AggregateObject *ao in result) {
+            // Only insert the first time so we don't infinite loop if the check
+            // doesn't work
+            if (first) {
+                [realm beginWriteTransaction];
+                [AggregateObject createInRealm:realm withObject:@[@10, @1.2f, @0.0, @YES, dateMinInput]];
+                [realm commitWriteTransaction];
+                first = false;
+            }
+        }
+    };
+
+    XCTAssertThrows(mutateDuringEnumeration(),
+                    @"Adding an object during fast enumeration did not throw");
 }
 
 - (void)testObjectAggregate

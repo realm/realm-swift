@@ -57,6 +57,22 @@
     XCTAssertEqual((int)objectFromRealm.age, (int)99, @"age property should be 99");
 }
 
+- (void)testCustomAccessorsWithCreateOrUpdate
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CustomAccessorsObject *caStandalone = [[CustomAccessorsObject alloc] init];
+    caStandalone.name = @"name";
+    caStandalone.age = 99;
+    [CustomAccessorsObject createOrUpdateInRealm:realm withObject:caStandalone];
+    [realm commitWriteTransaction];
+
+    CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];
+    XCTAssertEqualObjects(objectFromRealm.name, @"name", @"name property should be name.");
+    XCTAssertEqual(objectFromRealm.age, 99, @"age property should be 99");
+}
+
 - (void)testClassExtension
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

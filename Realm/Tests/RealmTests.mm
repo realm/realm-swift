@@ -590,7 +590,7 @@
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[@"a"]];
@@ -615,7 +615,7 @@
 
         RLMSchema *schema = [[RLMSchema alloc] init];
         schema.objectSchema = @[objectSchema];
-        RLMRealm *realm = [self dynamicRealmWithTestPathAndSchema:schema];
+        RLMRealm *realm = [self realmWithTestPathAndSchema:schema];
 
         [realm beginWriteTransaction];
         [realm createObject:StringObject.className withObject:@[]];
@@ -970,6 +970,24 @@
     XCTAssertThrows([realm invalidate]);
 }
 
+- (void)testInvalidateBeforeReadDoesNotAssert
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm invalidate];
+}
+
+- (void)testInvalidateDuringWriteRollsBack
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    @autoreleasepool {
+        [IntObject createInRealm:realm withObject:@[@1]];
+    }
+    [realm invalidate];
+
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+}
+
 - (void)testRefreshCreatesAReadTransaction
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -999,5 +1017,22 @@
     // Just a sanity check
     XCTAssertTrue([realm refresh]);
     XCTAssertEqual(2U, [IntObject allObjects].count);
+}
+
+- (void)testBadEncryptionKeys
+{
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data] readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data]]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
+}
+
+- (void)testValidEncryptionKeys
+{
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64]
+                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
+
 }
 @end

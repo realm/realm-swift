@@ -112,10 +112,10 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
         case RLMPropertyTypeArray: {
             RLMArray *referredArray = (RLMArray *)propertyValue;
             if (format == RLMDescriptionFormatEllipsis) {
-                return [NSString stringWithFormat:@"<%@>[%lu]", referredArray.objectClassName, referredArray.count];
+                return [NSString stringWithFormat:@"%@[%lu]", referredArray.objectClassName, referredArray.count];
             }
             
-            return [NSString stringWithFormat:@"<%@>", referredArray.objectClassName];
+            return [NSString stringWithFormat:@"%@", referredArray.objectClassName];
         }
             
         case RLMPropertyTypeDate:
@@ -131,16 +131,10 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
             RLMObject *referredObject = (RLMObject *)propertyValue;
             
             if (format == RLMDescriptionFormatEllipsis) {
-                return [NSString stringWithFormat:@"%@[...]", referredObject.objectSchema.className];
+                return [NSString stringWithFormat:@"%@(...)", referredObject.objectSchema.className];
             }
             
-            NSString *returnString;
-            if (format == RLMDescriptionFormatObject) {
-                returnString = @"[";
-            }
-            else {
-                returnString = [NSString stringWithFormat:@"%@[", referredObject.objectSchema.className];
-            }
+            NSString *returnString = @"(";
             
             for (RLMProperty *property in referredObject.objectSchema.properties) {
                 id propertyValue = referredObject[property.name];
@@ -160,12 +154,12 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
                 returnString = [returnString substringToIndex:returnString.length - 2];
             }
             
-            return [returnString stringByAppendingString:@"]"];
+            return [returnString stringByAppendingString:@")"];
         }
     }
 }
 
-+(NSString *)nameOfProperty:(RLMProperty *)property
++(NSString *)typeNameOfProperty:(RLMProperty *)property
 {
     switch (property.type) {
         case RLMPropertyTypeInt:
@@ -185,9 +179,9 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
         case RLMPropertyTypeAny:
             return @"Any";
         case RLMPropertyTypeArray:
-            return [NSString stringWithFormat:@"<%@>", property.objectClassName];
-        case RLMPropertyTypeObject:
             return [NSString stringWithFormat:@"[%@]", property.objectClassName];
+        case RLMPropertyTypeObject:
+            return [NSString stringWithFormat:@"<%@>", property.objectClassName];
     }
 }
 

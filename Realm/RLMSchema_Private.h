@@ -31,7 +31,6 @@ extern NSString * const c_objectTableNamePrefix;
 extern const char *c_metadataTableName;
 extern const char *c_versionColumnName;
 extern const size_t c_versionColumnIndex;
-extern const NSUInteger RLMNotVersioned;
 
 inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
@@ -48,6 +47,11 @@ inline NSString *RLMTableNameForClass(NSString *className) {
 //
 // Realm schema metadata
 //
+
+// create any metadata tables that don't already exist
+// must be in write transaction to set
+void RLMRealmCreateMetadataTables(RLMRealm *realm);
+
 NSUInteger RLMRealmSchemaVersion(RLMRealm *realm);
 
 // must be in write transaction to set

@@ -22,6 +22,7 @@
 
 #import "RLMSidebarTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
+#import "Realm_Private.h"
 
 @implementation RLMRealmNode
 
@@ -44,6 +45,7 @@
 - (BOOL)connect:(NSError **)error
 {
     _realm = [RLMRealm realmWithPath:_url
+                                 key:nil
                             readOnly:NO
                             inMemory:NO
                              dynamic:YES

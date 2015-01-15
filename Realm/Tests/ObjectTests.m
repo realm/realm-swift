@@ -152,6 +152,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 @implementation StringSubclassObject
 @end
 
+@interface StringObjectNoThrow : StringObject
+@end
+
+@implementation StringObjectNoThrow
+- (id)valueForUndefinedKey:(__unused NSString *)key {
+    return nil;
+}
+@end
+
+@interface StringSubclassObjectWithDefaults : StringObjectNoThrow
+@property NSString *stringCol2;
+@end
+
+@implementation StringSubclassObjectWithDefaults
++(NSDictionary *)defaultPropertyValues {
+    return @{@"stringCol2": @"default"};
+}
+@end
+
+@interface StringSubclassDataObject : NSObject
+@property NSString *stringCol;
+@property (getter=customGetter) NSString *stringCol2;
+@end
+
+@implementation StringSubclassDataObject
+@end
+
+
 @interface StringLinkObject : RLMObject
 @property StringObject *stringObjectCol;
 @property RLMArray<StringObject> *stringObjectArrayCol;
@@ -448,6 +476,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 }
 
 - (void)testObjectSubclass {
+    // test className methods
+    XCTAssertEqualObjects(@"StringObject", [StringObject className]);
+    XCTAssertEqualObjects(@"StringSubclassObject", [StringSubclassObject className]);
+
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [StringObject createInDefaultRealmWithObject:@[@"string"]];
@@ -835,6 +867,25 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     [realm1 commitWriteTransaction];
     [realm2 commitWriteTransaction];
+}
+
+- (void)testCreateInRealmWithOtherObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    StringObjectNoThrow *object = [StringObjectNoThrow createInDefaultRealmWithObject:@[@"string"]];
+
+    // create subclass with instance of base class with/without default objects
+    XCTAssertThrows([StringSubclassObject createInDefaultRealmWithObject:object]);
+    XCTAssertNoThrow([StringSubclassObjectWithDefaults createInDefaultRealmWithObject:object]);
+
+    // create using non-realm object with custom getter
+    StringSubclassDataObject *obj = [StringSubclassDataObject new];
+    obj.stringCol = @"a";
+    obj.stringCol2 = @"b";
+    [StringSubclassObjectWithDefaults createInDefaultRealmWithObject:obj];
+
+    XCTAssertEqual(2U, StringSubclassObjectWithDefaults.allObjects.count);
+    [realm commitWriteTransaction];
 }
 
 - (void)testCreateInRealmWithMissingValue
