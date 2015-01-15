@@ -221,8 +221,11 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                                                     delegate:nil
                                                delegateQueue:queue];
 
-        _transactLogRegistry.reset(makeWriteLogCollector(path.UTF8String));
-        _sharedGroup.reset(new SharedGroup(path.UTF8String));
+        bool server_synchronization_mode = true;
+        _transactLogRegistry.reset(makeWriteLogCollector(path.UTF8String,
+                                                         server_synchronization_mode));
+        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
+        _sharedGroup = make_unique<SharedGroup>(*_transactLogRegistry, durability);
 
         _uploadInProgress = false;
     }
@@ -331,7 +334,6 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                                                         applyLog); // Throws
                         transact.commit(); // Throws
                         BinaryData transactLog(data2, size);
-                        _transactLogRegistry->submit_transact_log(transactLog);
                         _transactLogRegistry->set_last_version_synced(receivedVersion);
                         currentVersion = receivedVersion;
                         numRetries = 0;
@@ -605,6 +607,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     BOOL _readOnly;
     BOOL _inMemory;
 
+    NSString *_serverBaseURL;
+
     RLMServerSync *_serverSync;
 }
 
@@ -626,7 +630,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     clearRealmCache();
 }
 
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error {
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSString *)serverBaseURL {
     if (key && [key length] != 64) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Encryption key must be exactly 64 bytes long"
@@ -648,6 +652,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         _readOnly = readonly;
         _inMemory = inMemory;
         _autorefresh = YES;
+        _serverBaseURL = serverBaseURL;
 
         try {
             if (readonly) {
@@ -655,7 +660,12 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 _group = _readGroup.get();
             }
             else {
-                _replication.reset(tightdb::makeWriteLogCollector(path.UTF8String, false,
+                // FIXME: The SharedGroup constructor, when called below, will
+                // throw a C++ exception if server_synchronization_mode is
+                // inconsistent with the accessed Realm file. This exception
+                // probably has to be transmuted to an NSError.
+                bool server_synchronization_mode = bool(serverBaseURL);
+                _replication.reset(tightdb::makeWriteLogCollector(path.UTF8String, server_synchronization_mode,
                                                                   static_cast<const char *>(key.bytes)));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
@@ -815,8 +825,13 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         }
     }
 
+    NSString *serverBaseURL;
+    @synchronized (s_serverBaseURLS) {
+        serverBaseURL = s_serverBaseURLS[path];
+    }
+
     NSError *error = nil;
-    realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory error:&error];
+    realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory error:&error serverBaseURL:serverBaseURL];
     realm->_dynamic = dynamic;
 
     if (error) {
@@ -862,19 +877,27 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             // check cache for existing cached realms with the same path
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
-                // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(realm, [realms[0] schema], false);
+                RLMRealm *sourceRealm = realms[0];
 
-                realm->_serverSync = ((RLMRealm *)realms[0])->_serverSync;
+                // if we have a cached realm on another thread, copy without a transaction
+                RLMRealmSetSchema(realm, [sourceRealm schema], false);
+
+                // Ensured by the SharedGRoup constructor.
+                TIGHTDB_ASSERT(bool(sourceRealm->_serverBaseURL) == bool(realm->_serverBaseURL));
+
+                if (bool(realm->_serverBaseURL)) {
+                    if (![realm->_serverBaseURL isEqualToString:sourceRealm->_serverBaseURL]) {
+                        @throw [NSException exceptionWithName:@"RLMException"
+                                                       reason:@"Server synchronization URL mismatch"
+                                                     userInfo:nil];
+                    }
+                    realm->_serverSync = sourceRealm->_serverSync;
+                }
             }
             else {
-                NSString *serverBaseURL;
-                @synchronized (s_serverBaseURLS) {
-                    serverBaseURL = s_serverBaseURLS[realm.path];
-                }
-                if (serverBaseURL) {
+                if (realm->_serverBaseURL) {
                     realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path
-                                                                     baseURL:serverBaseURL];
+                                                                     baseURL:realm->_serverBaseURL];
                 }
 
                 // Synchronize with server and block here until
