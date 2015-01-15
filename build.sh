@@ -247,7 +247,7 @@ case "$COMMAND" in
     "ios-dynamic")
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios
+        mkdir -p build/ios/Realm-dynamic build/ios/Realm-dynamic-simulator
         mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic/Realm.framework
         mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator/Realm.framework
         exit 0
