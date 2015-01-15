@@ -100,21 +100,22 @@
         RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
         RLMProperty *oldPrimaryProperty = [[_oldRealm.schema schemaForClassName:objectSchema.className] primaryKeyProperty];
         if (primaryProperty && primaryProperty != oldPrimaryProperty) {
-            // FIXME: replace with count of distinct once we support indexing
-
             // FIXME: support other types
             tightdb::Table *table = objectSchema.table;
+
+            if (!table->has_search_index(primaryProperty.column)) {
+                table->add_search_index(primaryProperty.column);
+            }
+
             NSUInteger count = table->size();
             if (primaryProperty.type == RLMPropertyTypeString) {
-                if (!table->has_search_index(primaryProperty.column)) {
-                    table->add_search_index(primaryProperty.column);
-                }
                 if (table->get_distinct_view(primaryProperty.column).size() != count) {
                     NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
                     @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
                 }
             }
             else {
+                // FIXME: replace with count of distinct once that's supported for more than string
                 for (NSUInteger i = 0; i < count; i++) {
                     if (table->count_int(primaryProperty.column, table->get_int(primaryProperty.column, i)) > 1) {
                         NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
