@@ -463,6 +463,12 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
 
 void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString *leftColumnName, NSString *rightColumnName, NSComparisonPredicateOptions predicateOptions)
 {
+    // Comparing two linked keypaths is unsupported.
+    RLMPrecondition([leftColumnName componentsSeparatedByString:@"."].count == 1 &&
+                    [rightColumnName componentsSeparatedByString:@"."].count == 1,
+                    @"Invalid predicate",
+                    @"Linked properties cannot be compared to other properties");
+
     // Validate object types
     NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
     RLMPropertyType leftType = [scheme[leftColumnName] type];
