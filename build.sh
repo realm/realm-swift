@@ -191,7 +191,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -exec rm -r "{}" \;
+        find . -type d -name build -exec rm -r "{}" +\;
         exit 0
         ;;
 
