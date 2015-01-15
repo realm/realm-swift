@@ -507,7 +507,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testDataSizeLimits {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    // Allocation must be < 16 MB, with an 8-byte header and the allcation size
+    // Allocation must be < 16 MB, with an 8-byte header and the allocation size
     // 8-byte aligned
     static const int maxSize = 0xFFFFFF - 15;
 
@@ -529,6 +529,34 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     // A blob over 16 MB should throw (and not crash)
     [realm beginWriteTransaction];
     XCTAssertThrows(obj.data1 = [NSData dataWithBytesNoCopy:malloc(maxSize + 1) length:maxSize + 1 freeWhenDone:YES]);
+    [realm commitWriteTransaction];
+}
+
+- (void)testStringSizeLimits {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    // Allocation must be < 16 MB, with an 8-byte header, trailing NUL,  and the
+    // allocation size 8-byte aligned
+    static const int maxSize = 0xFFFFFF - 16;
+
+    void *buffer = calloc(maxSize, 1);
+    strcpy((char *)buffer + maxSize - sizeof("hello") - 1, "hello");
+    NSString *str = [[NSString alloc] initWithBytesNoCopy:buffer length:maxSize encoding:NSUTF8StringEncoding freeWhenDone:YES];
+    StringObject *obj = [[StringObject alloc] init];
+    obj.stringCol = str;
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(str, obj.stringCol);
+
+    // A blob over 16 MB should throw (and not crash)
+    [realm beginWriteTransaction];
+    XCTAssertThrows(obj.stringCol = [[NSString alloc] initWithBytesNoCopy:calloc(maxSize + 1, 1)
+                                                                   length:maxSize + 1
+                                                                 encoding:NSUTF8StringEncoding
+                                                             freeWhenDone:YES]);
     [realm commitWriteTransaction];
 }
 
