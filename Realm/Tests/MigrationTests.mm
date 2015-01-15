@@ -307,6 +307,25 @@ extern "C" {
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
 
+- (void)testIntPrimaryKeyNoIndexMigration {
+    // make string an int
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+
+    // create without search index
+    objectSchema.primaryKeyProperty.attributes = 0;
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+    [realm commitWriteTransaction];
+
+    // apply migration
+    [RLMRealm setSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) { }];
+    [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
+}
+
 - (void)testDuplicatePrimaryKeyMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];

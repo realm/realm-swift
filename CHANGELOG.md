@@ -9,6 +9,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add `-[RLMRealm writeCopyToPath:encryptionKey:error:]`.
+* Int properties can now be indexed, and int primary keys are automatically
+  indexed (as string primary keys already were).
 
 ### Bugfixes
 

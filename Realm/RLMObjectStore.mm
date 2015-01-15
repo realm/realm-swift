@@ -102,8 +102,8 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
             if (prop.attributes & RLMPropertyAttributeIndexed) {
                 // FIXME - support other types
-                if (prop.type != RLMPropertyTypeString) {
-                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
+                if (prop.type != RLMPropertyTypeString && prop.type != RLMPropertyTypeInt) {
+                    NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' and integer properties");
                 }
                 else {
                     table.add_search_index(prop.column);
@@ -115,14 +115,9 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
 
 
 // Schema used to created generated accessors
-static NSMutableArray *s_accessorSchema;
+static NSMutableArray *s_accessorSchema = [NSMutableArray new];
 
 void RLMRealmCreateAccessors(RLMSchema *schema) {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_accessorSchema = [NSMutableArray new];
-    });
-
     // create accessors for non-dynamic realms
     RLMSchema *matchingSchema = nil;
     for (RLMSchema *accessorSchema in s_accessorSchema) {
