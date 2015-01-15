@@ -209,64 +209,6 @@ static NSString *s_defaultRealmPath = nil;
 static RLMMigrationBlock s_migrationBlock;
 static NSUInteger s_currentSchemaVersion = 0;
 
-NSError *ensureRealmSchemaUpToDate(RLMRealm *realm, NSData *key,
-                                   RLMSchema *targetSchema, NSUInteger schemaVersion,
-                                   RLMMigrationBlock migrationBlock) {
-    [realm beginWriteTransaction];
-
-    @try {
-        RLMRealmCreateMetadataTables(realm);
-        NSUInteger existingSchemaVersion = RLMRealmSchemaVersion(realm);
-
-        // Opening via dynamic interface, so update to the specified schema but
-        // don't touch the schema version, and never run a migration
-        if (schemaVersion == RLMNotVersioned) {
-            RLMRealmCreateTables(realm, targetSchema, true);
-        }
-        // File that's never been initialized to a shared schema, so update to
-        // the current schema and set the version
-        else if (existingSchemaVersion == RLMNotVersioned) {
-            RLMRealmCreateTables(realm, targetSchema, true);
-            RLMRealmSetSchemaVersion(realm, schemaVersion);
-        }
-        // Schema versions match, so allow creating new tables but nothing else
-        else if (schemaVersion == existingSchemaVersion) {
-            RLMRealmCreateTables(realm, targetSchema, false);
-        }
-        // Schema versions are only allowed to go up, not down
-        else if (existingSchemaVersion > schemaVersion) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm version is higher than the current version provided to `setSchemaVersion:withMigrationBlock:`"
-                                         userInfo:@{@"path" : realm.path}];
-        }
-        // Schema version is set, and the file's is lower than the schemas, so
-        // run a migration
-        else {
-            if (!migrationBlock) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"No migration block specified for a Realm with an existing schema version. You must supply a valid schema version and migration block before accessing any Realm by calling `setSchemaVersion:withMigrationBlock:`"
-                                             userInfo:@{@"path" : realm.path}];
-            }
-
-            NSError *error;
-            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:realm key:key error:&error];
-            if (error) {
-                return error;
-            }
-            @autoreleasepool {
-                [migration migrateWithBlock:migrationBlock version:schemaVersion];
-            }
-        }
-    }
-    @catch (NSException *) {
-        [realm cancelWriteTransaction];
-        @throw;
-    }
-
-    [realm commitWriteTransaction];
-    return nil;
-}
-
 } // anonymous namespace
 
 
@@ -505,7 +447,45 @@ static id RLMAutorelease(id value) {
 
     key = key ?: keyForPath(path);
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
-    [realm initializeSchema:customSchema key:key];
+    if (outError && *outError) {
+        return nil;
+    }
+
+    // we need to protect the realm cache and accessors cache
+    @synchronized(s_realmsPerPath) {
+        // create tables, set schema, and create accessors when needed
+        if (readonly) {
+            if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
+                @throw [NSException exceptionWithName:@"RLMException"
+                                               reason:@"Cannot open an uninitialized realm in read-only mode"
+                                             userInfo:nil];
+            }
+            RLMRealmSetSchema(realm, [RLMSchema sharedSchema], true);
+            RLMRealmCreateAccessors(realm.schema);
+        }
+        else {
+            // check cache for existing cached realms with the same path
+            NSArray *realms = realmsAtPath(path);
+            if (realms.count) {
+                // if we have a cached realm on another thread, copy without a transaction
+                RLMRealmSetSchema(realm, [realms[0] schema], false);
+            }
+            else {
+                // if we are the first realm at this path, set/align schema or perform migration if needed
+                RLMSchema *targetSchema = customSchema ?: dynamic ? [RLMSchema dynamicSchemaFromRealm:realm] : RLMSchema.sharedSchema;
+                NSError *error = RLMUpdateRealmToSchemaVersion(realm, s_currentSchemaVersion, targetSchema, [realm migrationBlock:key]);
+                if (error) {
+                    setOrThrowError(error, outError);
+                    return nil;
+                }
+
+                RLMRealmCreateAccessors(realm.schema);
+            }
+
+            // initializing the schema started a read transaction, so end it
+            [realm invalidate];
+        }
+    }
 
     if (!dynamic) {
         cacheRealm(realm, path);
@@ -514,43 +494,21 @@ static id RLMAutorelease(id value) {
     return RLMAutorelease(realm);
 }
 
-- (void)initializeSchema:(RLMSchema *)customSchema key:(NSData *)key {
-    // we need to protect the realm cache and accessors cache
-    @synchronized(s_realmsPerPath) {
-        // create tables, set schema, and create accessors when needed
-        if (_dynamic) {
-            ensureRealmSchemaUpToDate(self, key,
-                                      customSchema ?: [RLMSchema dynamicSchemaFromRealm:self],
-                                      RLMNotVersioned, nil);
-        }
-        else if (_readOnly) {
-            if (RLMRealmSchemaVersion(self) == RLMNotVersioned) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"Cannot open an uninitialized realm in read-only mode"
-                                             userInfo:nil];
+- (NSError *(^)())migrationBlock:(NSData *)encryptionKey {
+    RLMMigrationBlock userBlock = s_migrationBlock;
+    if (userBlock) {
+        return ^{
+            NSError *error;
+            RLMMigration *migration = [[RLMMigration alloc] initWithRealm:self key:encryptionKey error:&error];
+            if (error) {
+                return error;
             }
-            RLMRealmSetSchema(self, [RLMSchema sharedSchema], true);
-            RLMRealmCreateAccessors(_schema);
-        }
-        else {
-            // check cache for existing cached realms with the same path
-            NSArray *realms = realmsAtPath(_path);
-            if (realms.count) {
-                // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(self, [realms[0] schema], false);
-            }
-            else {
-                // if we are the first realm at this path, set/align schema or perform migration if needed
-                ensureRealmSchemaUpToDate(self, key, [RLMSchema sharedSchema], s_currentSchemaVersion, s_migrationBlock);
-                RLMRealmCreateAccessors(_schema);
-            }
-        }
 
-        if (!_readOnly) {
-            // initializing the schema started a read transaction, so end it
-            [self invalidate];
-        }
+            [migration execute:userBlock];
+            return error;
+        };
     }
+    return nil;
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
@@ -893,11 +851,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
-    if (!error) {
-        error = ensureRealmSchemaUpToDate(realm, key, [RLMSchema sharedSchema],
-                                          s_currentSchemaVersion, s_migrationBlock);
-    }
-    return error;
+    if (error)
+        return error;
+
+    return RLMUpdateRealmToSchemaVersion(realm, s_currentSchemaVersion, RLMSchema.sharedSchema, [realm migrationBlock:key]);
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {

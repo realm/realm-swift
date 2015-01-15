@@ -26,6 +26,6 @@
 
 - (instancetype)initWithRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error;
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion;
+- (void)execute:(RLMMigrationBlock)block;
 
 @end

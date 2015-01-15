@@ -148,6 +148,51 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
     }
 }
 
+NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+
+    [realm beginWriteTransaction];
+
+    @try {
+        NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
+
+        // validate versions
+        if (newVersion == RLMNotVersioned) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"No schema versions specified when initializing Realm"
+                                         userInfo:@{@"path" : realm.path}];
+        }
+        if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Realm version is higher than the previous version"
+                                         userInfo:@{@"path" : realm.path}];
+        }
+
+        // create tables
+        bool migrating = oldVersion != newVersion;
+        RLMRealmCreateTables(realm, targetSchema, migrating);
+
+        // apply migration block if provided
+        if (migrating && migrationBlock) {
+            NSError *error = migrationBlock();
+            if (error) {
+                [realm cancelWriteTransaction];
+                return error;
+            }
+        }
+
+        // set new version
+        RLMRealmSetSchemaVersion(realm, newVersion);
+    }
+    @catch (NSException *) {
+        [realm cancelWriteTransaction];
+        @throw;
+    }
+    
+    [realm commitWriteTransaction];
+    return nil;
+}
+
+
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = [targetSchema copy];
 
@@ -164,6 +209,9 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
 
 
 void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
+    // create metadata tables if neded
+    RLMRealmCreateMetadataTables(realm);
+
     realm.schema = [targetSchema copy];
 
     // first pass to create missing tables
