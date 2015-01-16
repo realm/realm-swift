@@ -296,8 +296,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self objectAtIndex:index];
 }
 
-template<typename Table>
-static id minOfProperty(Table const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
+template<typename TableType>
+static id minOfProperty(TableType const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
     if (table.size() == 0) {
         return nil;
     }
@@ -328,8 +328,8 @@ static id minOfProperty(Table const& table, RLMRealm *realm, NSString *objectCla
     return minOfProperty(_backingView, _realm, _objectClassName, property);
 }
 
-template<typename Table>
-static id maxOfProperty(Table const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
+template<typename TableType>
+static id maxOfProperty(TableType const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
     if (table.size() == 0) {
         return nil;
     }
@@ -360,8 +360,8 @@ static id maxOfProperty(Table const& table, RLMRealm *realm, NSString *objectCla
     return maxOfProperty(_backingView, _realm, _objectClassName, property);
 }
 
-template<typename Table>
-static NSNumber *sumOfProperty(Table const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
+template<typename TableType>
+static NSNumber *sumOfProperty(TableType const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
     if (table.size() == 0) {
         return @0;
     }
@@ -388,8 +388,8 @@ static NSNumber *sumOfProperty(Table const& table, RLMRealm *realm, NSString *ob
     return sumOfProperty(_backingView, _realm, _objectClassName, property);
 }
 
-template<typename Table>
-static NSNumber *averageOfProperty(Table const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
+template<typename TableType>
+static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSString *objectClassName, NSString *property) {
     if (table.size() == 0) {
         return nil;
     }
