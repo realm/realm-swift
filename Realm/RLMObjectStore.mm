@@ -240,12 +240,12 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
         if (objectSchema.primaryKeyProperty != nil) {
             // if there is a primary key set, check if it is the same as the old key
             if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
-                RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
+                RLMRealmSetPrimaryKeyForObjectClass(realm, NSStringFromClass(objectSchema.className), objectSchema.primaryKeyProperty.name);
             }
         }
         else if (tableSchema.primaryKeyProperty) {
             // there is no primary key, so if thre was one nil out
-            RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+            RLMRealmSetPrimaryKeyForObjectClass(realm, NSStringFromClass(objectSchema.objectClass), nil);
         }
     }
 
