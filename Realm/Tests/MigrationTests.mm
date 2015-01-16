@@ -94,7 +94,7 @@ extern "C" {
 
     XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:^(__unused RLMMigration *migration,
-                                                      __unused NSUInteger oldSchemaVersion) {
+                                                                  __unused NSUInteger oldSchemaVersion) {
     }];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -110,11 +110,23 @@ extern "C" {
     XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil]);
     [RLMRealm setDefaultRealmSchemaVersion:1 withMigrationBlock:nil];
 
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    @autoreleasepool {
+        RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+        RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
+
+        XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:defaultRealm.path encryptionKey:nil error:nil]);
+        XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
+    }
+
+    __block bool migrationComplete = false;
+    [RLMRealm setSchemaVersion:2 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:^(__unused RLMMigration *migration,
+                                                                                        __unused NSUInteger oldSchemaVersion) {
+        migrationComplete = true;
+    }];
     RLMRealm *anotherRealm = [RLMRealm realmWithPath:RLMTestRealmPath()];
 
-    XCTAssertEqual(1U, [RLMRealm schemaVersionAtPath:defaultRealm.path encryptionKey:nil error:nil]);
-    XCTAssertEqual(0U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
+    XCTAssertEqual(2U, [RLMRealm schemaVersionAtPath:anotherRealm.path encryptionKey:nil error:nil]);
+    XCTAssertTrue(migrationComplete);
 }
 
 - (void)testAddingProperty {
