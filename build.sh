@@ -401,7 +401,7 @@ case "$COMMAND" in
     # Browser
     ######################################
     "browser")
-        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build ${CODESIGN_PARAMS}"
+        xc "-project tools/RealmBrowser/RealmBrowser.xcodeproj -scheme RealmBrowser -configuration Release clean build"
         exit 0
         ;;
 
