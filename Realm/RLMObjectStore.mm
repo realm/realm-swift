@@ -156,14 +156,9 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
 
         // validate versions
-        if (newVersion == RLMNotVersioned) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"No schema versions specified when initializing Realm"
-                                         userInfo:@{@"path" : realm.path}];
-        }
         if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
             @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm version is higher than the previous version"
+                                           reason:@"Version of Realm file on disk is higher than current schema version"
                                          userInfo:@{@"path" : realm.path}];
         }
 

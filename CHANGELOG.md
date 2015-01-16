@@ -5,6 +5,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
   `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
+* `-[RLMRealm setSchemaVersion:withMigrationBlock]` is no longer global and must be called
+  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` 
+  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others; 
 
 ### Enhancements
 
