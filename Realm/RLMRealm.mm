@@ -182,7 +182,8 @@ void cacheRealm(RLMRealm *realm, NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         if (!s_realmsPerPath[path]) {
-            s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
+            s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality
+                                                          valueOptions:NSPointerFunctionsWeakMemory];
         }
         [s_realmsPerPath[path] setObject:realm forKey:@(threadID)];
     }
@@ -457,11 +458,12 @@ static id RLMAutorelease(id value) {
                                            reason:@"Realm at path already opened with different inMemory settings"
                                          userInfo:@{@"path":realm.path}];
         }
-        if (realm->_dynamic != dynamic) {
+        if (realm->_dynamic != dynamic || (customSchema && ![customSchema isEqualToSchema:realm->_schema])) {
             @throw [NSException exceptionWithName:@"RLMException"
                                            reason:@"Realm at path already opened with different dynamic settings"
                                          userInfo:@{@"path":realm.path}];
         }
+
         return RLMAutorelease(realm);
     }
 
@@ -469,9 +471,7 @@ static id RLMAutorelease(id value) {
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
     [realm initializeSchema:customSchema key:key];
 
-    if (!dynamic) {
-        cacheRealm(realm, path);
-    }
+    cacheRealm(realm, path);
 
     return RLMAutorelease(realm);
 }
@@ -493,13 +493,16 @@ static id RLMAutorelease(id value) {
             RLMRealmCreateAccessors(_schema);
         }
         else {
-            // check cache for existing cached realms with the same path
-            NSArray *realms = realmsAtPath(_path);
-            if (realms.count) {
-                // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(self, [realms[0] schema], false);
+            // check cache for existing cached non-dynamic realms with the same path
+            for (RLMRealm *cachedRealm in realmsAtPath(_path)) {
+                if (!cachedRealm->_dynamic) {
+                    // copy the existing schema without a transaction or validation
+                    RLMRealmSetSchema(self, cachedRealm->_schema, false);
+                    break;
+                }
             }
-            else {
+
+            if (!_schema) {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(self);
                 if (s_currentSchemaVersion == schemaVersion || schemaVersion == RLMNotVersioned) {
@@ -858,13 +861,22 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
-    NSError *error;
-    RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
-    if (!error) {
-        [realm initializeSchema:nil key:key];
-        error = [self migrateRealm:realm key:key];
+    @synchronized (s_realmsPerPath) {
+        // Checking the count is unreliable as weak pointers which have become
+        // nil are only removed the next time the map table is mutated
+        if ([s_realmsPerPath[realmPath] objectEnumerator].nextObject) {
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Cannot migrate a realm which is already open" userInfo:nil];
+        }
+
+        NSError *error;
+        RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
+        if (!error) {
+            [realm initializeSchema:nil key:key];
+            error = [self migrateRealm:realm key:key];
+        }
+
+        return error;
     }
-    return error;
 }
 
 + (NSError *)migrateRealm:(RLMRealm *)realm key:(NSData *)key {
