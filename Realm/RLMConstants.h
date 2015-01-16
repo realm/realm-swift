@@ -167,12 +167,10 @@ typedef NS_ENUM(NSInteger, RLMError) {
     RLMErrorFileExists            = 4,
     /** Returned by RLMRealm if no_create was specified and the file was not found when the realm is opened. */
     RLMErrorFileNotFound          = 5,
-    /** Returned by RLMRealm if a stale .lock file is present when the realm is opened. */
-    RLMErrorStaleLockFile         = 6,
-    /** Returned by RLMRealm if the database file is deleted while there are open realms,
-        and subsequent attempts to open realms will try to join an already
-        active shared scheme, but fail due to the missing database file. */
-    RLMErrorLockFileButNoData     = 7
+    /** Returned by RLMRealm if the database file is currently open in another
+        process which cannot share with the current process due to an
+        architecture mismatch. */
+    RLMErrorIncompatibleLockFile  = 8,
 };
 
 // Schema version used for unitialized Realms

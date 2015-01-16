@@ -30,6 +30,8 @@ x.x.x Release notes (yyyy-MM-dd)
   write transaction with changes were committed without the main thread
   RLMRealm getting a chance to refresh.
 * Fixed incomplete results when querying for non-null relationships.
+* Improve the error message when a Realm file is opened in multiple processes
+  at once.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
