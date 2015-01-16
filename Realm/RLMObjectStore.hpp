@@ -24,9 +24,15 @@
 extern "C" {
 #endif
 
+
 //
 // Table modifications
 //
+
+// updates a Realm to a given target schema/version
+// creates tables as necessary
+// optionally runs migration block if schema is out of date
+NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger version, RLMSchema *targetSchema, NSError *(^migrationBlock)());
 
 // sets a realm's schema to a copy of targetSchema
 // caches table accessors on each objectSchema

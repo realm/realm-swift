@@ -127,14 +127,8 @@
     }
 }
 
-- (void)migrateWithBlock:(RLMMigrationBlock)block version:(NSUInteger)newVersion {
-    // start write transaction
-    [_realm beginWriteTransaction];
-
-    @try {
-        // add new tables/columns for the current shared schema
-        RLMRealmCreateTables(_realm, [RLMSchema sharedSchema], true);
-
+- (void)execute:(RLMMigrationBlock)block {
+    @autoreleasepool {
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
             objectSchema.primaryKeyProperty.isPrimary = NO;
@@ -146,17 +140,7 @@
 
         // verify uniqueness for any new unique columns before committing
         [self verifyPrimaryKeyUniqueness];
-
-        // update new version
-        RLMRealmSetSchemaVersion(_realm, newVersion);
     }
-    @catch (...) {
-        [_realm cancelWriteTransaction];
-        @throw;
-    }
-
-    // end transaction
-    [_realm commitWriteTransaction];
 }
 
 -(RLMObject *)createObject:(NSString *)className withObject:(id)object {

@@ -5,6 +5,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Rename `-[RLMRealm encryptedRealmWithPath:key:readOnly:error:]` to
   `-[RLMRealm realmWithPath:encryptionKey:readOnly:error:]`.
+* `-[RLMRealm setSchemaVersion:withMigrationBlock]` is no longer global and must be called
+  for each individual Realm path used. You can now call `-[RLMRealm setDefaultRealmSchemaVersion:withMigrationBlock]` 
+  for the default Realm and `-[RLMRealm setSchemaVersion:forRealmAtPath:withMigrationBlock:]` for all others; 
 
 ### Enhancements
 
@@ -21,6 +24,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fixed crash in JSONImport example on OS X with non-en_US locale.
 * Fixed infinite loop when opening a Realm file in the Browser at the same time
   as it is open in a 32-bit simulator.
+* Fixed a crash when adding primary keys to older realm files with no primary
+  keys on any objects.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================

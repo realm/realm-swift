@@ -26,14 +26,14 @@
 #import <objc/runtime.h>
 
 NSString * const c_objectTableNamePrefix = @"class_";
-const char *c_metadataTableName = "metadata";
-const char *c_versionColumnName = "version";
+const char * const c_metadataTableName = "metadata";
+const char * const c_versionColumnName = "version";
 const size_t c_versionColumnIndex = 0;
 
-const char *c_primaryKeyTableName = "pk";
-const char *c_primaryKeyObjectClassColumnName = "pk_table";
+const char * const c_primaryKeyTableName = "pk";
+const char * const c_primaryKeyObjectClassColumnName = "pk_table";
 const size_t c_primaryKeyObjectClassColumnIndex =  0;
-const char *c_primaryKeyPropertyNameColumnName = "pk_property";
+const char * const c_primaryKeyPropertyNameColumnName = "pk_property";
 const size_t c_primaryKeyPropertyNameColumnIndex =  1;
 
 const NSUInteger RLMNotVersioned = (NSUInteger)-1;
