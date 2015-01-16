@@ -380,13 +380,13 @@
     XCTAssertEqual(test.age, po1.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
     XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
-    //XCTAssertEqualObjects(test, po1, @"Should be equal"); //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
+    XCTAssertTrue([test isEqualToObject:po1], @"Should be equal");
 
     test = peopleInCompany[1];
     XCTAssertEqual(test.age, po3.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po3.name, @"Should be equal");
     XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
-    //XCTAssertEqualObjects(test, po3, @"Should be equal"); // FIXME, should work Asana : https://app.asana.com/0/861870036984/13123030433568
+    XCTAssertTrue([test isEqualToObject:po3], @"Should be equal");
 
     XCTAssertThrowsSpecificNamed([peopleInCompany removeLastObject], NSException, @"RLMException", @"Not allowed in read transaction");
     XCTAssertThrowsSpecificNamed([peopleInCompany removeAllObjects], NSException, @"RLMException", @"Not allowed in read transaction");
