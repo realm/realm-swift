@@ -37,7 +37,8 @@ int main(int argc, const char * argv[])
 
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-        dateFormatter.dateFormat = @"MMMM dd, YYYY";
+        dateFormatter.dateFormat = @"MMMM dd, yyyy";
+        dateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
 
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm beginWriteTransaction];

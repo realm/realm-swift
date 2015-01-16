@@ -16,7 +16,7 @@ set -e
 # You can override the version of the core library
 # Otherwise, use the default value
 if [ -z "$REALM_CORE_VERSION" ]; then
-    REALM_CORE_VERSION=0.87.4
+    REALM_CORE_VERSION=0.87.5
 fi
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec:$PATH
@@ -191,7 +191,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -ls -delete
+        find . -type d -name build -exec rm -r "{}" +\;
         exit 0
         ;;
 
@@ -247,9 +247,9 @@ case "$COMMAND" in
     "ios-dynamic")
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphoneos"
         xcrealm "-scheme 'iOS 8' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic.framework
-        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator.framework
+        mkdir -p build/ios/Realm-dynamic build/ios/Realm-dynamic-simulator
+        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphoneos/Realm.framework build/ios/Realm-dynamic/Realm.framework
+        mv build/DerivedData/Realm/Build/Products/Release-dynamic-iphonesimulator/Realm.framework build/ios/Realm-dynamic-simulator/Realm.framework
         exit 0
         ;;
 
@@ -445,19 +445,12 @@ case "$COMMAND" in
         mv $(readlink tmp) core
         rm tmp
 
-        rm -r include-ios
-        mkdir include-ios
-        cp -R core/include/* include-ios
-        mkdir include-ios/Realm
-        cp Realm/*.{h,hpp} include-ios/Realm
-        cp Realm/ios/*.h include-ios/Realm
-
-        rm -r include-osx
-        mkdir include-osx
-        cp -R core/include/* include-osx
-        mkdir include-osx/Realm
-        cp Realm/*.{h,hpp} include-osx/Realm
-        cp Realm/osx/*.h include-osx/Realm
+        # CocoaPods doesn't support multiple header_mappings_dir, so combine
+        # both sets of headers into a single directory
+        mv core/include include
+        mkdir include/Realm
+        cp Realm/*.h include/Realm
+        touch include/Realm/RLMPlatform.h
         ;;
 
     ######################################
@@ -505,7 +498,7 @@ case "$COMMAND" in
         sh build.sh ios-dynamic "$XCMODE"
 
         cd build/ios
-        zip --symlinks -r realm-framework-ios.zip *.framework
+        zip --symlinks -r realm-framework-ios.zip Realm*
         ;;
 
     "package-osx")

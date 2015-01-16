@@ -106,7 +106,12 @@ static inline NSString *RLMGetString(__unsafe_unretained RLMObjectBase *obj, NSU
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUInteger colIndex, __unsafe_unretained NSString *val) {
     RLMVerifyInWriteTransaction(obj);
-    obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
+    try {
+        obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
+    }
+    catch (std::exception const& e) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+    }
 }
 static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *obj, NSUInteger colIndex, NSString *propName,
                                       __unsafe_unretained NSString *val) {
@@ -120,7 +125,12 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *obj, NSU
         NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    obj->_row.set_string(colIndex, str);
+    try {
+        obj->_row.set_string(colIndex, str);
+    }
+    catch (std::exception const& e) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+    }
 }
 
 // date getter/setter
@@ -144,16 +154,12 @@ static inline NSData *RLMGetData(__unsafe_unretained RLMObjectBase *obj, NSUInte
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUInteger colIndex, __unsafe_unretained NSData *data) {
     RLMVerifyInWriteTransaction(obj);
 
-    // Allocations are limited to 16 MB, including the 8 byte header. Additional
-    // -7 is due to that the allocation size is rounded up to a multiple of 8.
-    static const size_t maxSize = 0xFFFFFF - 15;
-    if (data.length > maxSize) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"NSData stored in Realm must be less than 16 MB"
-                                     userInfo:nil];
+    try {
+        obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
     }
-
-    obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
+    catch (std::exception const& e) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+    }
 }
 
 static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObjectBase *link,
