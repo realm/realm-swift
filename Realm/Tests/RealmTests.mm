@@ -604,7 +604,16 @@
 
     // verify that reading a missing table gives an empty array rather than
     // crashing
-    XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+    RLMResults *results = [IntObject allObjectsInRealm:realm];
+    XCTAssertEqual(0U, results.count);
+    XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
+    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertThrows([results objectAtIndex:0]);
+    XCTAssertEqual(NSNotFound, [results indexOfObject:nil]);
+    XCTAssertNoThrow([realm deleteObjects:results]);
+    for (__unused id obj in results) {
+        XCTFail(@"Got an item in empty results");
+    }
 }
 
 - (void)testReadOnlyRealmWithMissingColumns

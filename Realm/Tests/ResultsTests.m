@@ -93,6 +93,20 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
+    RLMResults *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
+    RLMResults *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
+    RLMResults *allArray = [AggregateObject allObjects];
+
+    XCTAssertEqual(0, [noArray sumOfProperty:@"intCol"].intValue);
+    XCTAssertEqual(0, [allArray sumOfProperty:@"intCol"].intValue);
+
+    XCTAssertNil([noArray averageOfProperty:@"intCol"]);
+    XCTAssertNil([allArray averageOfProperty:@"intCol"]);
+    XCTAssertNil([noArray minOfProperty:@"intCol"]);
+    XCTAssertNil([allArray minOfProperty:@"intCol"]);
+    XCTAssertNil([noArray maxOfProperty:@"intCol"]);
+    XCTAssertNil([allArray maxOfProperty:@"intCol"]);
+
     [realm beginWriteTransaction];
 
     // Truncate to seconds so it round-trips exactly
@@ -111,10 +125,6 @@
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
 
     [realm commitWriteTransaction];
-
-    RLMResults *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
-    RLMResults *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
-    RLMResults *allArray = [AggregateObject allObjects];
 
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
@@ -257,17 +267,24 @@
     EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    StringObject *so = [StringObject createInRealm:realm withObject:@[@""]];
+    StringObject *deletedObject = [StringObject createInRealm:realm withObject:@[@""]];
+    [realm deleteObject:deletedObject];
     [realm commitWriteTransaction];
 
     RLMResults *results = [EmployeeObject objectsWhere:@"hired = YES"];
     XCTAssertEqual(0U, [results indexOfObject:po1]);
     XCTAssertEqual(1U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
+    XCTAssertThrows([results indexOfObject:so]);
+    XCTAssertThrows([results indexOfObject:deletedObject]);
 
     results = [EmployeeObject allObjects];
     XCTAssertEqual(0U, [results indexOfObject:po1]);
     XCTAssertEqual(1U, [results indexOfObject:po2]);
     XCTAssertEqual(2U, [results indexOfObject:po3]);
+    XCTAssertThrows([results indexOfObject:so]);
+    XCTAssertThrows([results indexOfObject:deletedObject]);
 }
 
 - (void)testIndexOfObjectWhere
@@ -410,6 +427,32 @@ static vm_size_t get_resident_size() {
         OSSpinLockUnlock(&spinlock);
     });
     OSSpinLockLock(&spinlock);
+}
+
+- (void)testDeleteAllObjects
+{
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withObject:@[@"name1"]];
+    [StringObject createInRealm:realm withObject:@[@"name2"]];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [StringObject objectsInRealm:realm where:@"stringCol = 'name1'"];
+    XCTAssertThrows([realm deleteObjects:results]);
+    [realm beginWriteTransaction];
+    [realm deleteObjects:results];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(0U, results.count);
+    XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+
+    results = [StringObject allObjectsInRealm:realm];
+    XCTAssertThrows([realm deleteObjects:results]);
+    [realm beginWriteTransaction];
+    [realm deleteObjects:results];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(0U, results.count);
+    XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
 
 @end

@@ -229,19 +229,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMResultsValidate(self);
-    if (object->_realm && !object->_row.is_attached()) {
+    if (object.invalidated) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
     }
 
     // check that object types align
-    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
+    if (object->_row.get_table() != &_backingView.get_parent()) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Object type does not match RLMResults" userInfo:nil];
-    }
-
-    // if different tables then no match
-    if (object->_row.get_table() != &_backingView.get_parent()) {
-        return NSNotFound;
     }
 
     size_t object_ndx = object->_row.get_index();
@@ -492,13 +487,14 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMCheckThread(_realm);
-    if (object->_realm && !object->_row.is_attached()) {
+    if (object.invalidated) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
     }
 
-    // if different tables then no match
+    // check that object types align
     if (object->_row.get_table() != _table) {
-        return NSNotFound;
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Object type does not match RLMResults" userInfo:nil];
     }
 
     size_t ndx = object->_row.get_index();
