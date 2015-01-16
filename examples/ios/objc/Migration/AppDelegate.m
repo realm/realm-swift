@@ -48,7 +48,7 @@
     // define a migration block
     // you can define this inline, but we will reuse this to migrate realm files from multiple versions
     // to the most current version of our data model
-    [RLMRealm setSchemaVersion:3 withMigrationBlock:^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
+    RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, NSUInteger oldSchemaVersion) {
         if (oldSchemaVersion < 1) {
             [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 if (oldSchemaVersion < 1) {
@@ -75,7 +75,10 @@
             }];
         }
         NSLog(@"Migration complete.");
-    }];
+    };
+
+    // set the schema verion and migration block for the defualt realm
+    [RLMRealm setDefaultRealmSchemaVersion:3 withMigrationBlock:migrationBlock];
 
     // now that we have called `setSchemaVersion:withMigrationBlock` opening an outdated Realm will automatically
     // perform the migration and opening the Realm will succeed
@@ -95,6 +98,10 @@
     [[NSFileManager defaultManager] copyItemAtPath:v1Path toPath:realmv1Path error:nil];
     [[NSFileManager defaultManager] removeItemAtPath:realmv2Path error:nil];
     [[NSFileManager defaultManager] copyItemAtPath:v2Path toPath:realmv2Path error:nil];
+
+    // set schemave versions and migration blocks form Realms at each path
+    [RLMRealm setSchemaVersion:3 forRealmAtPath:realmv1Path withMigrationBlock:migrationBlock];
+    [RLMRealm setSchemaVersion:3 forRealmAtPath:realmv2Path withMigrationBlock:migrationBlock];
 
     // manully migration v1Path, v2Path is migrated implicitly on access
     [RLMRealm migrateRealmAtPath:realmv1Path];

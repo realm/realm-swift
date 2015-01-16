@@ -90,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             println("Migration complete.")
         }
-        RLMRealm.setSchemaVersion(3, withMigrationBlock: migrationBlock)
+        RLMRealm.setDefaultRealmSchemaVersion(3, withMigrationBlock: migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -108,6 +108,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)
         NSFileManager.defaultManager().removeItemAtPath(realmv2Path, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v2Path, toPath: realmv2Path, error: nil)
+
+        // set the schema version and migration blocks for our custom path realms
+        RLMRealm.setSchemaVersion(3, forRealmAtPath: realmv1Path, withMigrationBlock: migrationBlock)
+        RLMRealm.setSchemaVersion(3, forRealmAtPath: realmv2Path, withMigrationBlock: migrationBlock)
 
         // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
         RLMRealm.migrateRealmAtPath(realmv1Path)
