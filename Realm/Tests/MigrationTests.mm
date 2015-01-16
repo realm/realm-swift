@@ -24,6 +24,8 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
 
+#import <tightdb/table.hpp>
+
 @interface MigrationObject : RLMObject
 @property int intCol;
 @property NSString *stringCol;
@@ -311,7 +313,7 @@
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
 
     // create without search index
-    objectSchema.primaryKeyProperty.attributes = 0;
+    objectSchema.primaryKeyProperty.indexed = NO;
 
     // create realm with old schema and populate
     @autoreleasepool {
