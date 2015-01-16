@@ -38,11 +38,6 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger version, RLMS
 // caches table accessors on each objectSchema
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndAlignColumns);
 
-// sets a realm's schema to a copy of targetSchema and creates/updates tables
-// if update existing is true, updates existing tables, otherwise validates existing tables
-// NOTE: must be called from within write transaction
-void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting);
-
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
 
