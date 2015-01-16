@@ -566,7 +566,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  @return            The error that occurred while applying the migration if any.
 
  @see               RLMMigration
- @see               setSchemaVersion:withMigrationBlock:
+ @see               setSchemaVersion:forRealmAtPath:withMigrationBlock:
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath;
 
