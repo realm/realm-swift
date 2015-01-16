@@ -193,11 +193,13 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
     return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
 }
 
-void RLMRealmCreateMetadataTables(RLMRealm *realm) {
+bool RLMRealmCreateMetadataTables(RLMRealm *realm) {
+    bool changed = false;
     tightdb::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
     if (table->get_column_count() == 0) {
         table->add_column(tightdb::type_String, c_primaryKeyObjectClassColumnName);
         table->add_column(tightdb::type_String, c_primaryKeyPropertyNameColumnName);
+        changed = true;
     }
 
     table = realm.group->get_or_add_table(c_metadataTableName);
@@ -207,7 +209,10 @@ void RLMRealmCreateMetadataTables(RLMRealm *realm) {
         // set initial version
         table->add_empty_row();
         table->set_int(c_versionColumnIndex, 0, RLMNotVersioned);
+        changed = true;
     }
+
+    return changed;
 }
 
 void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass, NSString *primaryKey) {

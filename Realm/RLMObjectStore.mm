@@ -113,11 +113,10 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
     }
 }
 
-
-// Schema used to created generated accessors
-static NSMutableArray *s_accessorSchema = [NSMutableArray new];
-
 void RLMRealmCreateAccessors(RLMSchema *schema) {
+    // Schema used to created generated accessors
+    static NSMutableArray * const s_accessorSchema = [NSMutableArray new];
+
     // create accessors for non-dynamic realms
     RLMSchema *matchingSchema = nil;
     for (RLMSchema *accessorSchema in s_accessorSchema) {
@@ -136,52 +135,13 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
     else {
         // create accessors and cache in s_accessorSchema
         for (RLMObjectSchema *objectSchema in schema.objectSchema) {
-            NSString *prefix = [NSString stringWithFormat:@"RLMAccessor_v%lu_", (unsigned long)s_accessorSchema.count];
+            NSString *prefix = [NSString stringWithFormat:@"RLMAccessor_v%lu_",
+                                (unsigned long)s_accessorSchema.count];
             objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, prefix);
         }
         [s_accessorSchema addObject:[schema copy]];
     }
 }
-
-NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
-
-    [realm beginWriteTransaction];
-
-    @try {
-        NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
-
-        // validate versions
-        if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Version of Realm file on disk is higher than current schema version"
-                                         userInfo:@{@"path" : realm.path}];
-        }
-
-        // create tables
-        bool migrating = oldVersion != newVersion;
-        RLMRealmCreateTables(realm, targetSchema, migrating);
-
-        // apply migration block if provided
-        if (migrating && migrationBlock) {
-            NSError *error = migrationBlock();
-            if (error) {
-                [realm cancelWriteTransaction];
-                return error;
-            }
-        }
-
-        // set new version
-        RLMRealmSetSchemaVersion(realm, newVersion);
-    }
-    @catch (NSException *) {
-        [realm cancelWriteTransaction];
-        @throw;
-    }
-    
-    [realm commitWriteTransaction];
-    return nil;
-}
-
 
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     realm.schema = [targetSchema copy];
@@ -197,10 +157,12 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     }
 }
 
-
-void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
+// sets a realm's schema to a copy of targetSchema and creates/updates tables
+// if update existing is true, updates existing tables, otherwise validates existing tables
+// NOTE: must be called from within write transaction
+static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
     // create metadata tables if neded
-    RLMRealmCreateMetadataTables(realm);
+    bool changed = RLMRealmCreateMetadataTables(realm);
 
     realm.schema = [targetSchema copy];
 
@@ -213,6 +175,7 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
         // we will modify tables for any new objectSchema (table was created) or for all if updateExisting is true
         if (updateExisting || created) {
             [objectSchemaToUpdate addObject:objectSchema];
+            changed = true;
         }
     }
 
@@ -225,6 +188,7 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             // add any new properties (new name or different type)
             if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
+                changed = true;
             }
         }
 
@@ -233,6 +197,7 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             RLMProperty *prop = tableSchema.properties[i];
             if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
                 objectSchema.table->remove_column(prop.column);
+                changed = true;
             }
         }
 
@@ -241,11 +206,13 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
             // if there is a primary key set, check if it is the same as the old key
             if (tableSchema.primaryKeyProperty == nil || ![tableSchema.primaryKeyProperty isEqual:objectSchema.primaryKeyProperty]) {
                 RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, objectSchema.primaryKeyProperty.name);
+                changed = true;
             }
         }
         else if (tableSchema.primaryKeyProperty) {
             // there is no primary key, so if thre was one nil out
             RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+            changed = true;
         }
     }
 
@@ -256,8 +223,55 @@ void RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateE
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
         RLMVerifyAndAlignColumns(tableSchema, objectSchema);
     }
+
+    return changed;
 }
 
+NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+    [realm beginWriteTransaction];
+
+    @try {
+        NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
+
+        // validate versions
+        if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Version of Realm file on disk is higher than current schema version"
+                                         userInfo:@{@"path" : realm.path}];
+        }
+
+        // create tables
+        bool migrating = oldVersion != newVersion;
+        bool changed = RLMRealmCreateTables(realm, targetSchema, migrating);
+
+        if (migrating) {
+            // apply migration block if provided
+            if (migrationBlock) {
+                NSError *error = migrationBlock();
+                if (error) {
+                    [realm cancelWriteTransaction];
+                    return error;
+                }
+            }
+
+            RLMRealmSetSchemaVersion(realm, newVersion);
+            changed = true;
+        }
+
+        if (changed) {
+            [realm commitWriteTransaction];
+        }
+        else {
+            [realm cancelWriteTransaction];
+        }
+    }
+    @catch (NSException *) {
+        [realm cancelWriteTransaction];
+        @throw;
+    }
+
+    return nil;
+}
 
 static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
