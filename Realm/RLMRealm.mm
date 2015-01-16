@@ -473,23 +473,17 @@ static id RLMAutorelease(id value) {
         return nil;
     }
 
-    RLMSchema *targetSchema = RLMSchema.sharedSchema;
-    if (customSchema) {
-        targetSchema = customSchema;
-    }
-    else if (dynamic) {
-        targetSchema = [RLMSchema dynamicSchemaFromRealm:realm];
-    }
-
     // we need to protect the realm cache and accessors cache
     @synchronized(s_realmsPerPath) {
         // create tables, set schema, and create accessors when needed
-        if (readonly) {
+        if (readonly || (dynamic && !customSchema)) {
+            // for readonly realms and dynamic realms without a custom schema just set the schema
             if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
                 @throw [NSException exceptionWithName:@"RLMException"
                                                reason:@"Cannot open an uninitialized realm in read-only mode"
                                              userInfo:nil];
             }
+            RLMSchema *targetSchema = readonly ? RLMSchema.sharedSchema : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
             RLMRealmCreateAccessors(realm.schema);
         }
@@ -502,6 +496,7 @@ static id RLMAutorelease(id value) {
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
+                RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
                 NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), targetSchema, [realm migrationBlock:key]);
                 if (error) {
                     setOrThrowError(error, outError);

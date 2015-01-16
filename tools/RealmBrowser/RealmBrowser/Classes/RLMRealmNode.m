@@ -43,20 +43,13 @@
 
 - (BOOL)connect:(NSError **)error
 {
-    // set the schema version of the realm we are about to open to its current version
-    NSUInteger version = [RLMRealm schemaVersionAtPath:_url encryptionKey:nil error:error];
-
-    if (!*error) {
-        [RLMRealm setSchemaVersion:version forRealmAtPath:_url withMigrationBlock:nil];
-        _realm = [RLMRealm realmWithPath:_url
-                                     key:nil
-                                readOnly:NO
-                                inMemory:NO
-                                 dynamic:YES
-                                  schema:nil
-                                   error:error];
-    }
-
+    _realm = [RLMRealm realmWithPath:_url
+                                 key:nil
+                            readOnly:NO
+                            inMemory:NO
+                             dynamic:YES
+                              schema:nil
+                               error:error];
     if (*error) {
         NSLog(@"Realm was opened with error: %@", *error);
     }
