@@ -19,6 +19,8 @@ x.x.x Release notes (yyyy-MM-dd)
   while it's being fast-enumerated.
 * Also encrypt the temporary files used when encryption is enabled for a Realm.
 * Fixed crash in JSONImport example on OS X with non-en_US locale.
+* Fixed infinite loop when opening a Realm file in the Browser at the same time
+  as it is open in a 32-bit simulator.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
