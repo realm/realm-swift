@@ -75,7 +75,7 @@ public class Realm {
     }
 
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm.encryptedRealmWithPath(path, key: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
         } else {
             self.init(rlmRealm: RLMRealm())
@@ -90,7 +90,7 @@ public class Realm {
     }
 
     public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) {
-        rlmRealm.writeEncryptedCopyToPath(path, key: encryptionKey, error: error)
+        rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
     }
 
     // MARK: Transactions
