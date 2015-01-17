@@ -37,7 +37,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 @interface RLMMigration : NSObject
 
 /**
- Get the new RLMSchema for the migration. This is the schema which describes the RLMRealm before the
+ Get the old RLMSchema for the migration. This is the schema which describes the RLMRealm before the
  migration is applied.
  */
 @property (nonatomic, readonly) RLMSchema *oldSchema;
