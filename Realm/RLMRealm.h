@@ -487,7 +487,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
 /**
  Specify a schema version and an associated migration block which is applied when
- opening any Realm with and old schema version.
+ opening any Realm with an old schema version.
 
  Before you can open an existing `RLMRealm` which has a different on-disk schema
  from the schema defined in your object interfaces you must provide a migration 
@@ -511,7 +511,6 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
- @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -550,7 +549,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  exactly when and how migrations are performed.
 
  @param realmPath   The path of the Realm to migrate.
- @return            The error that occurred while applying the migration if any.
+ @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  @see               setSchemaVersion:withMigrationBlock:

@@ -20,6 +20,14 @@ import Realm
 
 // These types don't change when wrapping in Swift
 // so we just typealias them to remove the 'RLM' prefix
+
+// MARK: Aliases
+
+/// An enum of the different property types supported by Realm.
 public typealias PropertyType = RLMPropertyType
+
+/// A token that holds onto the Realm and the notification block.
 public typealias NotificationToken = RLMNotificationToken
+
+/// A block that is used to migrate objects from one version of a Realm to a newer version.
 public typealias ObjectMigrationBlock = RLMObjectMigrationBlock

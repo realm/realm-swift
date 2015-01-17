@@ -20,17 +20,34 @@ import Realm
 
 // MARK: Equatable
 
+/// Returns whether the two properties are equal.
 public func ==(lhs: Property, rhs: Property) -> Bool {
     return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
 }
 
+/**
+This class represents properties persisted to Realm in an ObjectSchema.
+
+When using Realm, Property objects allow performing migrations and
+introspecting the database's schema.
+
+These properties map to columns in the core database.
+*/
 public class Property: Equatable {
     // MARK: Properties
 
     var rlmProperty: RLMProperty
+
+    /// Returns the name of the property.
     public var name: String { return rlmProperty.name }
+
+    /// Returns the type of the property.
     public var type: PropertyType { return rlmProperty.type }
+
+    /// Returns whether the property is indexed.
     public var indexed: Bool { return rlmProperty.indexed }
+
+    /// Returns the name of the class the property stores.
     public var objectClassName: String { return rlmProperty.objectClassName }
 
     // MARK: Initializers
