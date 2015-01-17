@@ -19,10 +19,48 @@
 import Realm
 import Realm.Private
 
+/**
+
+In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
+You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
+
+```swift
+class Dog: Object {
+    dynamic var name: String = ""
+    dynamic var adopted: Bool = false
+    let siblings = List<Dog>
+}
+```
+
+### Supported property types
+
+- `String`
+- `Int`, `Float`, `NSInteger`, `CGFloat`, `int`, `long`, `float`, and `double`
+- `Bool`, `BOOL`, and `bool`
+- `NSDate`
+- `NSData`
+- `Object` subclasses, so you can have many-to-one relationships.
+- `List<T: Object>`, so you can have many-to-many relationships.
+
+### Querying
+
+You can gets `Results` of an Object subclass via tha `objects(_:)` free function or
+`Realm.
+
+### Relationships
+
+See our [Cocoa guide](http://realm.io/docs/cocoa/latest) for more details.
+*/
 public class Object : RLMObjectBase, Equatable {
-    // This is called by the obj-c accessor creation code, and if it's not
-    // overriden in Swift, the inline property initializers don't get called,
-    // and we require them for List<> properties
+    /**
+    This initializer is called by the Objective-C accessor creation code, and if it's
+    not overridden in Swift, the inline property initializers don't get called,
+    and we require them for `List<>` properties.
+
+    :param: realm         The realm to which this object belongs.
+    :param: schema        The schema for the object's class.
+    :param: defaultValues Whether the default values for the o
+    */
     public override init(realm: RLMRealm, schema: RLMObjectSchema, defaultValues: Bool) {
         super.init(realm: realm, schema: schema, defaultValues: defaultValues)
     }
@@ -44,11 +82,29 @@ public class Object : RLMObjectBase, Equatable {
         super.init()
     }
 
+    /**
+    Creates an Object in the given Realm with the given object.
+    
+    Creates an instance of this object and adds it to the given Realm populating
+    the object with the given object.
+
+    :param: realm  The Realm in which this object is persisted.
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+                   object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                   an Array with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
+
+                   When passing in an Array, all properties must be present, valid and in the same order as the properties defined in the model.
+
+    :returns: The created object.
+    */
     public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
     }
 }
 
+
+/// Returns whether both objects are equal.
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return lhs.isEqualToObject(rhs)
 }
