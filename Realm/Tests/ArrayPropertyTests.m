@@ -337,25 +337,9 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-
-    EmployeeObject *po1 = [[EmployeeObject alloc] init];
-    po1.age = 40;
-    po1.name = @"Joe";
-    po1.hired = YES;
-
-    EmployeeObject *po2 = [[EmployeeObject alloc] init];
-    po2.age = 30;
-    po2.name = @"John";
-    po2.hired = NO;
-
-    EmployeeObject *po3 = [[EmployeeObject alloc] init];
-    po3.age = 25;
-    po3.name = @"Jill";
-    po3.hired = YES;
-
-    [realm addObject:po1];
-    [realm addObject:po2];
-    [realm addObject:po3];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withObject:@[@"Joe", @40, @YES]];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withObject:@[@"John", @30, @NO]];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withObject:@[@"Jill", @25, @YES]];
 
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
