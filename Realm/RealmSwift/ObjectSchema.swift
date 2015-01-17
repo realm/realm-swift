@@ -18,16 +18,31 @@
 
 import Realm
 
+/// Returns whether the two object schemas are equal.
 public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
     return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
 }
 
+/**
+This class represents Realm model object schemas persisted to Realm in a Schema.
+
+When using Realm, ObjectSchema objects allow performing migrations and
+introspecting the database's schema.
+
+Object schemas map to tables in the core database.
+*/
 public class ObjectSchema: Equatable {
     // MARK: Properties
 
     var rlmObjectSchema: RLMObjectSchema
+
+    /// Returns the name of the class this object schema represents.
     public var className: String { return rlmObjectSchema.className }
+
+    /// Returns the properties in the object schema.
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+
+    /// Returns the property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
             return Property(rlmProperty: rlmProperty)
@@ -43,8 +58,9 @@ public class ObjectSchema: Equatable {
 
     // MARK: Property Retrieval
 
+    /// Returns the property with the given name, if there it exists.
     public subscript(propertyName: String) -> Property? {
-        if let rlmProperty = rlmObjectSchema[className] {
+	if let rlmProperty = rlmObjectSchema[propertyName] {
             return Property(rlmProperty: rlmProperty)
         }
         return nil
