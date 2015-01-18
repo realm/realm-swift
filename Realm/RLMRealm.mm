@@ -333,7 +333,6 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                         Replication::apply_transact_log(input, transact.get_group(),
                                                         applyLog); // Throws
                         transact.commit(); // Throws
-                        BinaryData transactLog(data2, size);
                         _transactLogRegistry->set_last_version_synced(receivedVersion);
                         currentVersion = receivedVersion;
                         numRetries = 0;
@@ -460,8 +459,6 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
                                 Replication::apply_transact_log(input, transact.get_group(),
                                                                 applyLog); // Throws
                                 transact.commit(); // Throws
-                                BinaryData transactLog(data2, size);
-                                _transactLogRegistry->submit_transact_log(transactLog);
                                 _transactLogRegistry->set_last_version_synced(receivedVersion);
                                 [RLMRealm notifyRealmsAtPath:_path exceptRealm:nil];
                                 [self nonblockingDownload:0];
