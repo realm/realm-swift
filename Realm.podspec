@@ -38,5 +38,6 @@ Pod::Spec.new do |s|
 
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.h'
+    s.private_header_files  = '**/*.hpp', '**/*_Private.h', '**/*_Dynamic.h', 'include/tightdb/**/*.h'
   end
 end
