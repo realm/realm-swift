@@ -26,9 +26,9 @@ class Restaurant: RLMObject {
         get {
             return CLLocation(latitude: latitude, longitude: longitude)
         }
-        set(location) {
-            latitude = location.coordinate.latitude
-            longitude = location.coordinate.longitude
+        set {
+            latitude = newValue.coordinate.latitude
+            longitude = newValue.coordinate.longitude
         }
     }
     

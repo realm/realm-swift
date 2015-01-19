@@ -28,7 +28,6 @@ struct APIClient {
             components.queryItems?.append(NSURLQueryItem(name: key, value: value))
         }
         let URL = components.URL!
-        println(URL)
         session.dataTaskWithURL(URL, completionHandler: { (data, response, error) -> Void in
             completion(NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: nil) as? [String:AnyObject])
         }).resume()

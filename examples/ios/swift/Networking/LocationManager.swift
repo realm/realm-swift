@@ -25,8 +25,8 @@ extension Dictionary {
 class VenueManager: NSObject, CLLocationManagerDelegate {
     let realm: RLMRealm
     var location: CLLocation = CLLocation(latitude: 37.7798657, longitude: -122.3919903) {
-        didSet(oldLocation) {
-            if oldLocation != location {
+        didSet {
+            if oldValue != location {
                 fetchVenues()
             }
         }

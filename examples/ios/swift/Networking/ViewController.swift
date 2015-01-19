@@ -29,6 +29,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
         }
     }
 
+    var selectedCategory: Category? = nil
+
     init(realm: RLMRealm) {
         self.realm = realm
         venueManager = VenueManager(realm: realm)
@@ -42,12 +44,24 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
     override func viewDidLoad() {
-        restaurants = venueManager.venues.sortedResultsUsingProperty("venueScore", ascending: false)
+        let restaurants = venueManager.venues
+        if let category = selectedCategory {
+            self.restaurants = restaurants.objectsWhere("category == %@", category)
+        }
+        else {
+            self.restaurants = restaurants
+        }
         super.viewDidLoad()
         realmNotification = realm.addNotificationBlock { [weak self] (name, realm) -> Void in
             NSOperationQueue.mainQueue().addOperationWithBlock {
                 if let vc = self {
-                    vc.restaurants = vc.venueManager.venues.sortedResultsUsingProperty("venueScore", ascending: false)
+                    let restaurants = vc.venueManager.venues
+                    if let category = vc.selectedCategory {
+                        vc.restaurants = restaurants.objectsWhere("category == %@", category)
+                    }
+                    else {
+                        vc.restaurants = restaurants
+                    }
                 }
             }
         }
@@ -72,7 +86,17 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
 
     func refine() {
-
+        self.navigationItem.leftBarButtonItem?.enabled = false
+        let pickerViewHeight = min(CGRectGetHeight(view.bounds) / 3.0, 206.0)
+        let pickerView = CategoryPickerView(frame: CGRect(x: 0, y: CGRectGetHeight(view.bounds) - pickerViewHeight, width: CGRectGetWidth(view.bounds), height: pickerViewHeight))
+        pickerView.categories = Category.allObjectsInRealm(realm)
+        pickerView.selectionBlock = { category in
+            self.navigationItem.leftBarButtonItem?.enabled = true
+            self.restaurants = self.restaurants.objectsWhere("category == %@", category)
+            self.selectedCategory = category
+            pickerView.removeFromSuperview()
+        }
+        view.addSubview(pickerView)
     }
 
     func relocate() {
@@ -93,6 +117,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
         annotationView.venueScore = annotation.venueScore
 
         return annotationView
+    }
+
+    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        relocate()
     }
 }
 
