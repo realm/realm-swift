@@ -18,9 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if let path = writeablePath {
             if !fileManager.fileExistsAtPath(path) {
-                let error = NSErrorPointer()
-                fileManager.copyItemAtPath(NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("sixsquare.realm"), toPath: path, error: error)
-                if let error = error.memory {
+                var error: NSError?
+                fileManager.copyItemAtPath(NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("sixsquare.realm"), toPath: path, error: &error)
+                if let error = error {
                     fatalError("Error copying Realm from bundle: \(error)")
                 }
             }

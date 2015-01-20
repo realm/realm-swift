@@ -21,10 +21,14 @@ class ViewController: UIViewController, MKMapViewDelegate {
     var restaurants: RLMResults {
         didSet {
             title = "\(restaurants.count) venues nearby"
-            mapView?.removeAnnotations(mapView!.annotations)
-            for restaurant in restaurants {
-                let annotation = RestaurantLocation(restaurant as Restaurant)
-                mapView?.addAnnotation(annotation)
+            if let mapView = mapView {
+                let oldIDs = NSSet(array: map(mapView.annotations, { ($0 as RestaurantLocation).venueID }))
+                for r in restaurants {
+                    let restaurant = r as Restaurant
+                    if !oldIDs.containsObject(restaurant.venueID) {
+                        mapView.addAnnotation(RestaurantLocation(restaurant))
+                    }
+                }
             }
         }
     }
@@ -72,11 +76,12 @@ class ViewController: UIViewController, MKMapViewDelegate {
         mapView?.rotateEnabled = false
         mapView?.pitchEnabled = false
         mapView?.mapType = .Standard
-        mapView?.centerCoordinate = venueManager.location.coordinate
+        mapView?.region = MKCoordinateRegionMakeWithDistance(venueManager.location.coordinate, 2_500, 2_500)
         view.addSubview(mapView!)
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Refine", style: .Plain, target: self, action: "refine")
         navigationController?.navigationBar.barTintColor = sixsquareBlue
+        navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Relocate", style: .Bordered, target: self, action: "relocate")
@@ -96,23 +101,23 @@ class ViewController: UIViewController, MKMapViewDelegate {
             self.selectedCategory = category
             pickerView.removeFromSuperview()
         }
+        if let selectedCategory = selectedCategory {
+            pickerView.pickerView.selectRow(Int(pickerView.categories.indexOfObject(selectedCategory)), inComponent: 0, animated: false)
+        }
         view.addSubview(pickerView)
     }
 
     func relocate() {
-        if let mapView = mapView {
-            let location = mapView.centerCoordinate
-            venueManager.searchRadius = mapView.region.span.latitudeDelta * 111 * 1000
-            venueManager.location = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        if let location = venueManager.locationManager.location {
+            mapView?.region = MKCoordinateRegionMakeWithDistance(location.coordinate, 2_500, 2_500)
         }
     }
 
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: RestaurantLocation) -> MKAnnotationView! {
         let annotationView: LocationAnnotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("AnnotationIdentifier") as LocationAnnotationView? ??
                                                      LocationAnnotationView(annotation: annotation, reuseIdentifier: "AnnotationIdentifier")
-        if let iconImage = annotation.image {
-            annotationView.iconImage = iconImage
-        }
+
+        annotationView.iconImage = annotation.image
         annotationView.canShowCallout = true
         annotationView.venueScore = annotation.venueScore
 
@@ -120,7 +125,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
 
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        relocate()
+        let location = mapView.centerCoordinate
+        venueManager.searchRadius = mapView.region.span.latitudeDelta * 111 * 1000
+        venueManager.location = CLLocation(latitude: location.latitude, longitude: location.longitude)
     }
 }
 

@@ -26,6 +26,7 @@
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
+		C027658E1A6F009400B1A25D /* sixsquare.realm in Resources */ = {isa = PBXBuildFile; fileRef = C027658C1A6F003300B1A25D /* sixsquare.realm */; };
 		C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C03634731A3A594900443367 /* LaunchScreen.xib in Sources */ = {isa = PBXBuildFile; fileRef = C03634721A3A58DF00443367 /* LaunchScreen.xib */; };
 		C04171731A3A462200D7812C /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0295B90619D103180036D6C3 /* RLMSupport.swift */; };
@@ -182,6 +183,7 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C027658C1A6F003300B1A25D /* sixsquare.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = sixsquare.realm; sourceTree = "<group>"; };
 		C03634721A3A58DF00443367 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		C03634751A3A5EFC00443367 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C041717A1A3A462200D7812C /* Networking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Networking.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -298,6 +300,7 @@
 		C041717C1A3A464E00D7812C /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				C027658C1A6F003300B1A25D /* sixsquare.realm */,
 				C03634721A3A58DF00443367 /* LaunchScreen.xib */,
 				C03634751A3A5EFC00443367 /* Info.plist */,
 				C041717D1A3A478700D7812C /* APIClient.swift */,
@@ -414,6 +417,7 @@
 			buildPhases = (
 				C04171711A3A462200D7812C /* Sources */,
 				C04171741A3A462200D7812C /* Frameworks */,
+				C027658D1A6F009000B1A25D /* Resources */,
 			);
 			buildRules = (
 			);
@@ -591,6 +595,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C027658D1A6F009000B1A25D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C027658E1A6F009400B1A25D /* sixsquare.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB5B1A12A6FC00CB2D0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;

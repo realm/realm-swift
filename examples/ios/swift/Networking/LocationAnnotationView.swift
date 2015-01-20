@@ -12,6 +12,11 @@ class LocationAnnotationView: MKAnnotationView {
     var iconImage: UIImage? {
         didSet {
             iconImageView.image = iconImage
+            if let image = iconImage {
+                let adjustmentDivisor: CGFloat = 2.1
+                let adjustedImageSize = CGSize(width: image.size.width / adjustmentDivisor, height: image.size.height / adjustmentDivisor)
+                iconImageView.frame = CGRect(x: CGRectGetWidth(bounds) / 2.0 - adjustedImageSize.width / 2.0, y: CGRectGetWidth(bounds) / 2.0 - adjustedImageSize.height / 2.0, width: adjustedImageSize.width, height: adjustedImageSize.height)
+            }
             setNeedsDisplay()
         }
     }
@@ -55,7 +60,6 @@ class LocationAnnotationView: MKAnnotationView {
     override func prepareForReuse() {
         iconImage = nil
         venueScore = -1
-        iconImageView.frame = CGRectZero
     }
 
     override func drawRect(rect: CGRect) {

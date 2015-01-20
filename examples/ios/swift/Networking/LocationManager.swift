@@ -9,6 +9,16 @@
 import CoreLocation
 import Realm
 
+func compact<Key, Value>(dictionary: Dictionary<Key, Value?>) -> Dictionary<Key, Value> {
+    var compacted = Dictionary<Key, Value>()
+    for (key, value) in dictionary {
+        if let value = value {
+            compacted[key] = value
+        }
+    }
+    return compacted
+}
+
 extension Dictionary {
     func select(block: ((_: Key, _: Value) -> Bool)) -> [Key:Value] {
         var copy = [Key:Value]()
@@ -42,7 +52,7 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
 
     init(realm: RLMRealm) {
         self.realm = realm
-        category = Category.objectsInRealm(realm, "categoryID = %@", allRestaurantsID).firstObject() as? Category
+        category = Category.objectsInRealm(realm, "categoryID == %@", allRestaurantsID).firstObject() as Category?
         super.init()
         locationManager.delegate = self
     }
@@ -82,7 +92,7 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
             fetchCategories()
         }
 
-        let categoryID = "4d4b7105d754a06374d81259"
+        let categoryID = allRestaurantsID
         let path = "/v2/venues/explore"
         let parameters = [
             "intent": kFourSquareIntent,
@@ -136,17 +146,17 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                             if let foodCategories = category["categories"] as? [[String:AnyObject]] {
                                 for foodCategory in foodCategories {
                                     let dict = [
-                                        "name": foodCategory["name"] as? String,
-                                        "id"  : foodCategory["id"] as? String
+                                        "name"       : foodCategory["name"] as? String,
+                                        "categoryID" : foodCategory["id"]   as? String,
                                     ]
-                                    let compactDict = dict.select({ $1 != nil }) as [String:String]
+                                    let compactDict = compact(dict)
                                     let category = Category.createOrUpdateInRealm(realm, withObject: compactDict)
                                     if category.iconImageData.length == 0 {
                                         if let icon = foodCategory["icon"] as? [String:String] {
                                             let prefix = icon["prefix"]
                                             let suffix = icon["suffix"]
                                             if prefix != nil && suffix != nil {
-                                                if let iconURL = NSURL(string: "\(prefix)64\(suffix)") {
+                                                if let iconURL = NSURL(string: "\(prefix!)64\(suffix!)") {
                                                     category.iconImageData = NSData(contentsOfURL: iconURL) ?? NSData()
                                                 }
                                             }
