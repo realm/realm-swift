@@ -21,9 +21,11 @@ Pod::Spec.new do |s|
   s.documentation_url       = "http://realm.io/docs/cocoa/#{s.version}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
+  private_header_files = '**/*.hpp', '**/*_Private.h', '**/*_Dynamic.h', 'include/tightdb/**/*.h'.freeze
+
   s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.private_header_files    = '**/*.hpp', '**/*_Private.h', '**/*_Dynamic.h', 'include/tightdb/**/*.h'
+  s.private_header_files    = private_header_files
   s.source_files            = 'Realm/*.{h,m,mm,hpp}', 'include/**/*.hpp'
   s.header_mappings_dir     = 'include'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
@@ -38,5 +40,6 @@ Pod::Spec.new do |s|
 
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.h'
+    s.private_header_files  = private_header_files
   end
 end

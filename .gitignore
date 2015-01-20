@@ -35,6 +35,9 @@ Realm.framework
 # sh build.sh build-cocoa
 bin
 
+# sh build.sh cocoapods-setup
+/include
+
 # sh build.sh docs
 /docs/output
 
