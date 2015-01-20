@@ -176,26 +176,35 @@ static RLMRealm *cachedRealm(NSString *path) {
 }
 
 static void cacheRealm(RLMRealm *realm, NSString *path) {
-    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         if (!s_realmsPerPath[path]) {
             s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
         }
-        [s_realmsPerPath[path] setObject:realm forKey:@(threadID)];
+        [s_realmsPerPath[path] setObject:realm forKey:@(realm->_threadID)];
     }
 }
 
 static void removeCachedRealm(RLMRealm *realm) {
-    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
-        [s_realmsPerPath[realm.path] removeObjectForKey:@(threadID)];
-        [realm cancelNotifications];
+        [s_realmsPerPath[realm.path] removeObjectForKey:@(realm->_threadID)];
     }
 }
 
 static NSArray *realmsAtPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].allObjects;
+    }
+}
+
+static void notifyCachedRealmsAtPath(NSString *path) {
+    @synchronized(s_realmsPerPath) {
+        @autoreleasepool {
+            NSArray *realms = realmsAtPath(path);
+            for (RLMRealm *realm in realms) {
+                RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+                [notifier performSelector:@selector(notify) onThread:realm->_thread withObject:nil waitUntilDone:NO];
+            }
+        }
     }
 }
 
@@ -251,7 +260,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
 @implementation RLMRealm {
     // Used for read-write realms
-    NSThread *_thread;
     NSMapTable *_notificationHandlers;
 
     std::unique_ptr<Replication> _replication;
@@ -510,6 +518,7 @@ static id RLMAutorelease(id value) {
                 // if we have a cached realm on another thread, copy without a transaction
                 RLMRealmSetSchema(realm, [realms[0] schema], false);
 
+                // copy notification queue and cancellation block from existin instance
                 realm->_notificationQueue = ((RLMRealm *)realms[0])->_notificationQueue;
                 realm->_cancelNotifications = ((RLMRealm *)realms[0])->_cancelNotifications;
             }
@@ -524,44 +533,10 @@ static id RLMAutorelease(id value) {
 
                 RLMRealmCreateAccessors(realm.schema);
 
-                // create interprocess notification thread
-                __block bool cancel = false;
-                __block SharedGroup *notificationGroup;
-                realm->_cancelNotifications = ^{
-                    cancel = true;
-                    @synchronized(s_realmsPerPath) {
-                        if (notificationGroup) {
-                            notificationGroup->wait_for_change_release();
-                        }
-                    }
-                };
-
-                realm->_notificationQueue = dispatch_queue_create(path.UTF8String, 0);
-                dispatch_async(realm->_notificationQueue, ^{
-                    std::unique_ptr<Replication> replication(tightdb::makeWriteLogCollector(path.UTF8String));
-                    SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
-                                                                         SharedGroup::durability_Full;
-                    SharedGroup group(*replication, durability);
-                    notificationGroup = &group;
-                    group.begin_read();
-
-                    while (!cancel && group.wait_for_change()) {
-                        group.end_read();
-                        group.begin_read();
-
-                        NSArray *realms = realmsAtPath(path);
-                        for (RLMRealm *realm in realms) {
-                            RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                            [notifier performSelector:@selector(notify)
-                                             onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                        }
-                    }
-
-                    group.end_read();
-                    @synchronized(s_realmsPerPath) {
-                        notificationGroup = nil;
-                    }
-                });
+                // start listening for notifications
+                if (!dynamic) {
+                    [realm startNotifications];
+                }
             }
 
             // initializing the schema started a read transaction, so end it
@@ -690,15 +665,8 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             _inWriteTransaction = NO;
 
             // notify other realm instances of changes
-            /*
-            NSArray *realms = realmsAtPath(_path);
-            for (RLMRealm *realm in realms) {
-                if (![realm isEqual:self]) {
-                    RLMWeakNotifier *notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
-                    [notifier performSelector:@selector(notify)
-                                     onThread:realm->_thread withObject:nil waitUntilDone:NO];
-                }
-            }*/
+            // FIXME - reenable this
+            // notifyCachedRealmsAtPath(_path);
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
@@ -766,11 +734,57 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 
     removeCachedRealm(self);
+    [self cancelNotifications];
+}
+
+- (void)startNotifications {
+    @synchronized(s_realmsPerPath) {
+        __block bool cancel = false;
+        __block SharedGroup *notificationGroup = nil;
+        _cancelNotifications = ^{
+            cancel = true;
+            @synchronized(s_realmsPerPath) {
+                if (notificationGroup) {
+                    notificationGroup->wait_for_change_release();
+                }
+            }
+        };
+
+        NSString *path = _path;
+        SharedGroup::DurabilityLevel durability = _inMemory ? SharedGroup::durability_MemOnly :
+                                                              SharedGroup::durability_Full;
+
+        _notificationQueue = dispatch_queue_create(path.UTF8String, 0);
+        dispatch_async(_notificationQueue, ^{
+            std::unique_ptr<Replication> replication(tightdb::makeWriteLogCollector(path.UTF8String));
+            SharedGroup group(*replication, durability);
+            @synchronized(s_realmsPerPath) {
+                notificationGroup = &group;
+            }
+            group.begin_read();
+
+            while (!cancel) {
+                group.wait_for_change();
+                if (group.has_changed() && !cancel) {
+                    group.end_read();
+                    group.begin_read();
+
+                    notifyCachedRealmsAtPath(path);
+                }
+            }
+
+            group.end_read();
+            @synchronized(s_realmsPerPath) {
+                notificationGroup = nil;
+            }
+        });
+    }
 }
 
 - (void)cancelNotifications {
     @synchronized(s_realmsPerPath) {
         NSArray *cachedRealms = realmsAtPath(_path);
+        // only call cancel block if there are no remaning cached realms
         if (_cancelNotifications && cachedRealms.count == 0) {
             _cancelNotifications();
         }
