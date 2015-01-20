@@ -1049,6 +1049,32 @@ extern "C" {
     XCTAssertNoThrow([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64]
                                 forRealmsAtPath:RLMRealm.defaultRealmPath]);
     XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
+}
 
+- (void)testInvalidLockFile
+{
+    // Create the realm file and lock file
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+
+    int fd = open([RLMRealm.defaultRealmPath stringByAppendingString:@".lock"].UTF8String, O_RDWR);
+    XCTAssertNotEqual(-1, fd);
+
+    // Change the value of the mutex size field in the shared info header
+    uint8_t value = 255;
+    pwrite(fd, &value, 1, 1);
+
+    // Ensure that SharedGroup can't get an exclusive lock on the lock file so
+    // that it can't just recreate it
+    int ret = flock(fd, LOCK_SH);
+    XCTAssertEqual(0, ret);
+
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMRealm.defaultRealmPath readOnly:NO error:&error];
+    XCTAssertNil(realm);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(RLMErrorIncompatibleLockFile, error.code);
+
+    flock(fd, LOCK_UN);
+    close(fd);
 }
 @end
