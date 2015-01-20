@@ -211,7 +211,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         }
         else if (tableSchema.primaryKeyProperty) {
             // there is no primary key, so if thre was one nil out
-            RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.objectClass, nil);
+            RLMRealmSetPrimaryKeyForObjectClass(realm, objectSchema.className, nil);
             changed = true;
         }
     }

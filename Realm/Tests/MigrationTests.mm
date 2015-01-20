@@ -302,6 +302,30 @@ extern "C" {
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
 
+- (void)testRemovePrimaryKeyMigration {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+
+    // create realm with old schema and populate
+    RLMRealm *realm = [self realmWithSingleObject:objectSchema];
+    [realm beginWriteTransaction];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@1]];
+    [realm createObject:MigrationPrimaryKeyObject.className withObject:@[@2]];
+    [realm commitWriteTransaction];
+
+    objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
+    objectSchema.primaryKeyProperty.isPrimary = NO;
+    objectSchema.primaryKeyProperty = nil;
+
+    // needs a no-op migration
+    XCTAssertThrows([self realmWithSingleObject:objectSchema]);
+
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) { }];
+
+    XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
+}
+
 - (void)testStringPrimaryKeyMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
