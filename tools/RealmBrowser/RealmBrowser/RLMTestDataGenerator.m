@@ -38,6 +38,7 @@ const NSUInteger kMaxItemsInTestArray = 12;
     RLMRealm *realm = [RLMRealm realmWithPath:url.path readOnly:NO error:&error];
     
     if (error) {
+        [[NSApplication sharedApplication] presentError:error];
         return NO;
     }
     

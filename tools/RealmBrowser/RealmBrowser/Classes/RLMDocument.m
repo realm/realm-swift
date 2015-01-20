@@ -62,6 +62,9 @@
                     [windowController realmDidLoad];
                 }
             }
+            else if (error) {
+                [[NSApplication sharedApplication] presentError:error];
+            }
         });
     }
     

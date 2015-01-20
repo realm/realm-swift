@@ -50,14 +50,15 @@
                              dynamic:YES
                               schema:nil
                                error:error];
-    if (*error) {
+
+    if (error && *error) {
         NSLog(@"Realm was opened with error: %@", *error);
     }
     else {
         _topLevelClasses = [self constructTopLevelClasses];    
     }
     
-    return error != nil;
+    return !(error && *error != nil);
 }
 
 
