@@ -26,6 +26,7 @@ x.x.x Release notes (yyyy-MM-dd)
   as it is open in a 32-bit simulator.
 * Fixed a crash when adding primary keys to older realm files with no primary
   keys on any objects.
+* Fixed a crash when removing a primary key in a migration.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
