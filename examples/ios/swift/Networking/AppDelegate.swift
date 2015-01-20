@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import Realm
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    let realm: RLMRealm = {
+    let realm: Realm = {
         let fileManager = NSFileManager.defaultManager()
         let writeablePath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first?.stringByAppendingPathComponent("sixsquare.realm")
 
@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     fatalError("Error copying Realm from bundle: \(error)")
                 }
             }
-            return RLMRealm(path: path)
+            return Realm(path: path)
         }
         else {
             fatalError("Unable to create realm")

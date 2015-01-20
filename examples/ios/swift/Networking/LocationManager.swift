@@ -7,7 +7,7 @@
 //
 
 import CoreLocation
-import Realm
+import RealmSwift
 
 func compact<Key, Value>(dictionary: Dictionary<Key, Value?>) -> Dictionary<Key, Value> {
     var compacted = Dictionary<Key, Value>()
@@ -33,7 +33,7 @@ extension Dictionary {
 
 @objc
 class VenueManager: NSObject, CLLocationManagerDelegate {
-    let realm: RLMRealm
+    let realm: Realm
     var location: CLLocation = CLLocation(latitude: 37.7798657, longitude: -122.3919903) {
         didSet {
             if oldValue != location {
@@ -50,9 +50,9 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
     let allRestaurantsID = "4d4b7105d754a06374d81259"
     var category: Category?
 
-    init(realm: RLMRealm) {
+    init(realm: Realm) {
         self.realm = realm
-        category = Category.objectsInRealm(realm, "categoryID == %@", allRestaurantsID).firstObject() as Category?
+        category = realm.objects(Category).filter("categoryID == %@", allRestaurantsID).first
         super.init()
         locationManager.delegate = self
     }
@@ -74,10 +74,10 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
         location = locations.first as? CLLocation ?? location
     }
     
-    var venues: RLMResults {
+    var venues: Results<Restaurant> {
         get {
-            let searchRadiusDegrees = (searchRadius / 111) / 1_000 * 1.2
-            return Restaurant.objectsInRealm(realm,
+            let searchRadiusDegrees = (searchRadius / 111) / 1_000 * 1.4
+            return realm.objects(Restaurant).filter(
                 "longitude < %f AND longitude > %f AND latitude < %f AND latitude > %f",
                 location.coordinate.longitude + searchRadiusDegrees,
                 location.coordinate.longitude - searchRadiusDegrees,
@@ -88,7 +88,7 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
     
     func fetchVenues() {
         // Only need to run
-        if Category.allObjectsInRealm(realm).count == 0 {
+        if realm.objects(Category).count == 0 {
             fetchCategories()
         }
 
@@ -102,8 +102,8 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
             "radius": searchRadius.description
         ] as [String:String]
         client.request(path, parameters: parameters, completion: { (json) -> () in
-            let realm = RLMRealm(path: self.realm.path)
-            realm.beginWriteTransaction()
+            let realm = Realm(path: self.realm.path)
+            realm.beginWrite()
             if let response = json?["response"] as? [String:AnyObject] {
                 if let groups = response["groups"] as? [AnyObject] {
                     let groupItems = groups.map({ ($0 as NSDictionary)["items"] })
@@ -113,7 +113,7 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                                 let location = venue["location"] as [String:AnyObject]
                                 let categories = venue["categories"] as? [[String:AnyObject]]
                                 let categoryID = categories?.first?["id"] as? String
-                                let category = Category.objectsInRealm(realm, "categoryID == %@", categoryID!).firstObject() as Category?
+                                let category = realm.objects(Category).filter("categoryID == %@", categoryID!).first
                                 let dict = [
                                     "venueID"    : venue["id"]     as? String,
                                     "name"       : venue["name"]   as? String,
@@ -129,15 +129,15 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                     }
                 }
             }
-            realm.commitWriteTransaction()
+            realm.commitWrite()
         })
     }
 
     func fetchCategories() {
         let path = "/v2/venues/categories"
         client.request(path, parameters: [:]) { (json) -> () in
-            let realm = RLMRealm(path: self.realm.path)
-            realm.beginWriteTransaction()
+            let realm = Realm(path: self.realm.path)
+            realm.beginWrite()
             Category.createOrUpdateInRealm(realm, withObject: ["name": "All Restaurants", "categoryID": self.allRestaurantsID])
             if let response = json?["response"] as? [String:AnyObject] {
                 if let categories = response["categories"] as? [[String:AnyObject]] {
@@ -168,7 +168,7 @@ class VenueManager: NSObject, CLLocationManagerDelegate {
                     }
                 }
             }
-            realm.commitWriteTransaction()
+            realm.commitWrite()
         }
     }
 }

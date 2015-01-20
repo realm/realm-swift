@@ -7,9 +7,9 @@
 //
 
 import CoreLocation.CLLocation
-import Realm
+import RealmSwift
 
-class Restaurant: RLMObject {
+class Restaurant: Object {
     dynamic var venueID: String = ""
     dynamic var name: String = ""
     dynamic var latitude: Double = 0.0

@@ -6,12 +6,13 @@
 //  Copyright (c) 2015 Realm. All rights reserved.
 //
 
+import RealmSwift
 import UIKit
 
 class CategoryPickerView: UIView, UIPickerViewDataSource, UIPickerViewDelegate {
     let pickerView = UIPickerView()
     let toolbar = UIToolbar()
-    var categories = Category.allObjects()
+    var categories = objects(Category)
     var selectionBlock: (Category -> Void) = { _ in }
 
     override init(frame: CGRect) {
@@ -43,7 +44,7 @@ class CategoryPickerView: UIView, UIPickerViewDataSource, UIPickerViewDelegate {
     func doneButtonPressed(button: UIButton) {
         let selectedRow = pickerView.selectedRowInComponent(0)
         if selectedRow != -1 {
-            selectionBlock(categories[UInt(selectedRow)] as Category)
+            selectionBlock(categories[selectedRow])
         }
     }
 
@@ -60,6 +61,6 @@ class CategoryPickerView: UIView, UIPickerViewDataSource, UIPickerViewDelegate {
     }
 
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
-        return categories[UInt(row)].name
+        return categories[row].name
     }
 }

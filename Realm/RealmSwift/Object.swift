@@ -99,7 +99,11 @@ public class Object : RLMObjectBase, Equatable {
     :returns: The created object.
     */
     public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .AllowCopy), self)
+    }
+
+    public class func createOrUpdateInRealm(realm: Realm, withObject object: AnyObject) -> Self {
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .UpdateOrCreate | .AllowCopy), self)
     }
 
     // MARK: Private Initializers

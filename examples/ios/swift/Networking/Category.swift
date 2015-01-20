@@ -6,10 +6,10 @@
 //  Copyright (c) 2014 Realm. All rights reserved.
 //
 
-import Realm
+import RealmSwift
 import UIKit.UIImage
 
-class Category: RLMObject {
+class Category: Object {
     dynamic var name: String = ""
     dynamic var categoryID: String = ""
 

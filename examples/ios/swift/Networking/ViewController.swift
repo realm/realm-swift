@@ -8,23 +8,22 @@
 
 import UIKit
 import MapKit
-import Realm
+import RealmSwift
 
 class ViewController: UIViewController, MKMapViewDelegate {
-    let realm: RLMRealm
+    let realm: Realm
     let venueManager: VenueManager
-    var realmNotification: RLMNotificationToken?
+    var realmNotification: NotificationToken?
     let iconImageCache = NSCache()
     let sixsquareBlue = UIColor(red: 28/255, green: 173/255, blue: 236/255, alpha: 1)
     var mapView: MKMapView?
     
-    var restaurants: RLMResults {
+    var restaurants: Results<Restaurant> {
         didSet {
             title = "\(restaurants.count) venues nearby"
             if let mapView = mapView {
                 let oldIDs = NSSet(array: map(mapView.annotations, { ($0 as RestaurantLocation).venueID }))
-                for r in restaurants {
-                    let restaurant = r as Restaurant
+                for restaurant in restaurants {
                     if !oldIDs.containsObject(restaurant.venueID) {
                         mapView.addAnnotation(RestaurantLocation(restaurant))
                     }
@@ -35,7 +34,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
     var selectedCategory: Category? = nil
 
-    init(realm: RLMRealm) {
+    init(realm: Realm) {
         self.realm = realm
         venueManager = VenueManager(realm: realm)
         restaurants = venueManager.venues
@@ -50,7 +49,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         let restaurants = venueManager.venues
         if let category = selectedCategory {
-            self.restaurants = restaurants.objectsWhere("category == %@", category)
+            self.restaurants = restaurants.filter("category == %@", category)
         }
         else {
             self.restaurants = restaurants
@@ -61,7 +60,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 if let vc = self {
                     let restaurants = vc.venueManager.venues
                     if let category = vc.selectedCategory {
-                        vc.restaurants = restaurants.objectsWhere("category == %@", category)
+                        vc.restaurants = restaurants.filter("category == %@", category)
                     }
                     else {
                         vc.restaurants = restaurants
@@ -94,15 +93,15 @@ class ViewController: UIViewController, MKMapViewDelegate {
         self.navigationItem.leftBarButtonItem?.enabled = false
         let pickerViewHeight = min(CGRectGetHeight(view.bounds) / 3.0, 206.0)
         let pickerView = CategoryPickerView(frame: CGRect(x: 0, y: CGRectGetHeight(view.bounds) - pickerViewHeight, width: CGRectGetWidth(view.bounds), height: pickerViewHeight))
-        pickerView.categories = Category.allObjectsInRealm(realm)
+        pickerView.categories = realm.objects(Category)
         pickerView.selectionBlock = { category in
             self.navigationItem.leftBarButtonItem?.enabled = true
-            self.restaurants = self.restaurants.objectsWhere("category == %@", category)
+            self.restaurants = self.restaurants.filter("category == %@", category)
             self.selectedCategory = category
             pickerView.removeFromSuperview()
         }
         if let selectedCategory = selectedCategory {
-            pickerView.pickerView.selectRow(Int(pickerView.categories.indexOfObject(selectedCategory)), inComponent: 0, animated: false)
+            pickerView.pickerView.selectRow(Int(pickerView.categories.indexOf(selectedCategory)!), inComponent: 0, animated: false)
         }
         view.addSubview(pickerView)
     }
