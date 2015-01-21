@@ -58,7 +58,7 @@ public class ObjectSchema: Equatable {
 
     // MARK: Property Retrieval
 
-    /// Returns the property with the given name, if there it exists.
+    /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
         if let rlmProperty = rlmObjectSchema[propertyName] {
             return Property(rlmProperty: rlmProperty)

@@ -19,11 +19,15 @@
 import Realm
 import Realm.Private
 
+/// Internal class. Do not use directly.
 public class ListBase: RLMListBase, Printable {
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
+    /// Returns a human-readable description of the objects contained in the list.
     @objc public override var description: String { return _rlmArray.description }
+    
+    /// Returns the number of objects in this list.
     public var count: Int { return Int(_rlmArray.count) }
 }
 
@@ -37,7 +41,8 @@ public class ListBase: RLMListBase, Printable {
 public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Properties
 
-    /// The Realm the objects in this list belong to, or `nil` if the list's owning object does not belong to a realm.
+    /// The Realm the objects in this list belong to, or `nil` if the list's owning
+    /// object does not belong to a realm (list is standalone).
     public var realm: Realm? {
         if _rlmArray.realm == nil {
             return nil
@@ -47,9 +52,7 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     // MARK: Initializers
 
-    /**
-     Creates a List that holds objects of type `T`.
-    */
+    /// Creates a List that holds objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
@@ -59,7 +62,7 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     :param: rlmArray The RLMArray that backs the list.
     */
-    init(_ rlmArray: RLMArray) {
+    internal init(_ rlmArray: RLMArray) {
         super.init(array: rlmArray)
     }
 
@@ -103,7 +106,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Object Retrieval
 
     /**
-    Returns the obejct at the given `index`.
+    Returns the object at the given `index`.
     
     :warning: You can only set an object during a write transaction.
 
@@ -158,7 +161,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :param: property  The property name to sort by.
     :param: ascending The direction to sort by.
 
-    :returns: Results containting the objects in the list sorted by the given property.
+    :returns: Results containing the objects in the list sorted by the given property.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
@@ -169,7 +172,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     /**
     Returns a `GeneratorOf<T>` that yields successive elements in the list.
 
-    :returns: Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    :returns: A `GeneratorOf<T>` that yields successive elements in the list.
     */
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
@@ -202,9 +205,9 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     :param: objects A sequence of objects.
     */
-    public func append<S where S: SequenceType>(objects: S) {
-        for obj in objects {
-            _rlmArray.addObject(unsafeBitCast(obj as T, RLMObject.self))
+    public func append<S: SequenceType where S.Generator.Element == T>(objects: S) {
+        for obj in SequenceOf<T>(objects) { // Workaround for http://stackoverflow.com/questions/26918594
+             _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
         }
     }
 
@@ -227,7 +230,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :warning: This method can only be called during a write transaction.
     :warning: Throws an exception when called with an index greater than the number of objects in the list.
 
-    :param: index  The index at which to remove the object.
+    :param: index The index at which to remove the object.
     */
     public func remove(index: Int) {
         _rlmArray.removeObjectAtIndex(UInt(index))
@@ -247,7 +250,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes the last object in the List.
+    Removes the last object in the List. Does not remove it from the Realm.
     
     :warning: This method can only be called during a write transaction.
     */
@@ -256,7 +259,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes all objects from the List.
+    Removes all objects from the List. Does not remove them from the Realm.
 
     :warning: This method can only be called during a write transaction.
     */
@@ -272,19 +275,25 @@ public final class List<T: Object>: ListBase, SequenceType {
     :warning: This method can only be called during a write transaction.
 
     :param: index  The list index of the object to be replaced.
-    :param: object An object
+    :param: object An object to replace at the specified index.
     */
     public func replace(index: Int, object: T) {
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
+}
 
-    // MARK: Private helpers
+// MARK: Private helpers
 
-    /// Converts `NSNotFound` to `nil`, otherwise returns `index` as an `Int`.
-    private func notFoundToNil(index: UInt) -> Int? {
-        if index == UInt(NSNotFound) {
-            return nil
-        }
-        return Int(index)
+/**
+Converts `NSNotFound` to `nil`, otherwise returns `index` as an `Int`.
+
+:param: index Value to convert.
+
+:returns: `nil` if `index` is `NSNotFound`, `index` as an `Int` otherwise.
+*/
+internal func notFoundToNil(index: UInt) -> Int? {
+    if index == UInt(NSNotFound) {
+        return nil
     }
+    return Int(index)
 }
