@@ -20,24 +20,6 @@ import Realm
 import Realm.Private
 
 public class Object : RLMObjectBase, Equatable {
-    // Get the names of all properties in the object which are of type List<>
-    public class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
-        let reflection = reflect(obj)
-
-        var properties = [String]()
-
-        // Skip the first property (super):
-        // super is an implicit property on Swift objects
-        for i in 1..<reflection.count {
-            let mirror = reflection[i].1
-            if mirror.valueType is RLMListBase.Type {
-                properties.append(reflection[i].0)
-            }
-        }
-
-        return properties
-    }
-
     // This is called by the obj-c accessor creation code, and if it's not
     // overriden in Swift, the inline property initializers don't get called,
     // and we require them for List<> properties
@@ -69,4 +51,25 @@ public class Object : RLMObjectBase, Equatable {
 
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return lhs.isEqualToObject(rhs)
+}
+
+public class ObjectUtil : NSObject {
+    // Get the names of all properties in the object which are of type List<>
+    @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
+        let reflection = reflect(obj)
+
+        var properties = [String]()
+
+        // Skip the first property (super):
+        // super is an implicit property on Swift objects
+        for i in 1..<reflection.count {
+            let mirror = reflection[i].1
+            if mirror.valueType is RLMListBase.Type {
+                properties.append(reflection[i].0)
+            }
+        }
+
+        return properties
+    }
+
 }
