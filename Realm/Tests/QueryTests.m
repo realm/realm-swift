@@ -60,7 +60,8 @@
 @property (nonatomic, assign) float     float2;
 @property (nonatomic, assign) double    double1;
 @property (nonatomic, assign) double    double2;
-@property (nonatomic, copy) NSString   *recordTag;
+@property (nonatomic, copy) NSString   *string1;
+@property (nonatomic, copy) NSString   *string2;
 @end
 
 @implementation QueryObject
@@ -535,68 +536,69 @@
 
     [realm beginWriteTransaction];
 
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"Instance 2"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"Instance 3"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"Instance 4"]];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 5"]];
-    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"Instance 6"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"a", @"a"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"a", @"A"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @NO,  @2, @2, @1.0f,  @3.55f, @99.9, @6.66, @"a", @"ab"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @3, @6, @4.21f, @1.0f,  @1.0,  @7.77, @"a", @"AB"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @4, @5, @23.0f, @23.0f, @7.4,  @8.88, @"a", @"b"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @15, @8, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"ba"]];
+    [QueryObject createInRealm:realm withObject:@[@NO,  @YES, @15, @15, @1.0f,  @66.0f, @1.01, @9.99, @"a", @"BA"]];
 
     [realm commitWriteTransaction];
-    
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 == bool1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 == bool2" expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"bool1 != bool2" expectedCount:4];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"bool1 == bool1"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"bool1 == bool2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"bool1 != bool2"].count);
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 == int1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 == int2"  expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 != int2"  expectedCount:5];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 > int2"   expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 < int2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 >= int2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"int1 <= int2"  expectedCount:6];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"int1 == int1"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"int1 == int2"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"int1 != int2"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"int1 > int2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"int1 < int2"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"int1 >= int2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"int1 <= int2"].count);
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 == float1"  expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 == float2"  expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 != float2"  expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 > float2"   expectedCount:2];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 < float2"   expectedCount:4];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 >= float2"  expectedCount:3];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"float1 <= float2"  expectedCount:5];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"float1 == float1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"float1 == float2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"float1 != float2"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"float1 > float2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"float1 < float2"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"float1 >= float2"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"float1 <= float2"].count);
 
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 == double1" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 == double2" expectedCount:0];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 != double2" expectedCount:7];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 > double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 < double2" expectedCount:6];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 >= double2" expectedCount:1];
-    [self executeTwoColumnKeypathRealmComparisonQueryWithClass:@"QueryObject" predicate:@"double1 <= double2" expectedCount:6];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"double1 == double1"].count);
+    XCTAssertEqual(0U, [QueryObject objectsWhere:@"double1 == double2"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"double1 != double2"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"double1 > double2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"double1 < double2"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"double1 >= double2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"double1 <= double2"].count);
 
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int1"  expectedCount:7];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 == int2"  expectedCount:2];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 != int2"  expectedCount:5];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 > int2"   expectedCount:1];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 < int2"   expectedCount:4];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 >= int2"  expectedCount:3];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"int1 <= int2"  expectedCount:6];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 == string1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"string1 == string2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"string1 != string2"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 CONTAINS string1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"string1 CONTAINS string2"].count);
+    XCTAssertEqual(3U, [QueryObject objectsWhere:@"string2 CONTAINS string1"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 BEGINSWITH string1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"string1 BEGINSWITH string2"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string2 BEGINSWITH string1"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 ENDSWITH string1"].count);
+    XCTAssertEqual(1U, [QueryObject objectsWhere:@"string1 ENDSWITH string2"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string2 ENDSWITH string1"].count);
 
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 == float1"  expectedCount:7];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 == float2"  expectedCount:1];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 != float2"  expectedCount:6];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 > float2"   expectedCount:2];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 < float2"   expectedCount:4];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 >= float2"  expectedCount:3];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"float1 <= float2"  expectedCount:5];
-
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 == double1" expectedCount:7];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 == double2" expectedCount:0];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 != double2" expectedCount:7];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 > double2" expectedCount:1];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 < double2" expectedCount:6];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 >= double2" expectedCount:1];
-    [self executeTwoColumnKeypathComparisonQueryWithPredicate:@"double1 <= double2" expectedCount:6];
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 ==[c] string1"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string1 ==[c] string2"].count);
+    XCTAssertEqual(5U, [QueryObject objectsWhere:@"string1 !=[c] string2"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 CONTAINS[c] string1"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string1 CONTAINS[c] string2"].count);
+    XCTAssertEqual(6U, [QueryObject objectsWhere:@"string2 CONTAINS[c] string1"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 BEGINSWITH[c] string1"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string1 BEGINSWITH[c] string2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"string2 BEGINSWITH[c] string1"].count);
+    XCTAssertEqual(7U, [QueryObject objectsWhere:@"string1 ENDSWITH[c] string1"].count);
+    XCTAssertEqual(2U, [QueryObject objectsWhere:@"string1 ENDSWITH[c] string2"].count);
+    XCTAssertEqual(4U, [QueryObject objectsWhere:@"string2 ENDSWITH[c] string1"].count);
 
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
                                                    predicate:@"int1 == float1"
@@ -611,15 +613,15 @@
                                               expectedReason:@"Property type mismatch between double and int"];
 
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
-                                                   predicate:@"int2 != recordTag"
+                                                   predicate:@"int2 != string1"
                                               expectedReason:@"Property type mismatch between int and string"];
 
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
-                                                   predicate:@"float1 > recordTag"
+                                                   predicate:@"float1 > string1"
                                               expectedReason:@"Property type mismatch between float and string"];
 
     [self executeInvalidTwoColumnKeypathRealmComparisonQuery:[QueryObject className]
-                                                   predicate:@"double1 < recordTag"
+                                                   predicate:@"double1 < string1"
                                               expectedReason:@"Property type mismatch between double and string"];
 }
 
@@ -903,18 +905,6 @@
                                  @"Key path in absent in an integer comparison.");
 }
 
-- (void)executeTwoColumnKeypathRealmComparisonQueryWithClass:(NSString *)className
-                                                   predicate:(NSString *)predicate
-                                               expectedCount:(NSUInteger)expectedCount
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    RLMResults *queryResult = [realm objects:className where:predicate];
-    NSUInteger actualCount = queryResult.count;
-    XCTAssertEqual(actualCount, expectedCount, @"Predicate: %@, Expecting %zd result(s), found %zd",
-                   predicate, expectedCount, actualCount);
-}
-
 - (void)executeTwoColumnKeypathComparisonQueryWithPredicate:(NSString *)predicate
                                               expectedCount:(NSUInteger)expectedCount
 {
@@ -974,7 +964,7 @@
 
     [realm beginWriteTransaction];
     {
-        [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+        [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
 
         RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
         RLMResults *resultsTableView = [QueryObject objectsWhere:@"bool1 = YES"];
@@ -993,7 +983,7 @@
         XCTAssertEqual(resultsTableView.count, 0U);
 
         // Add an object that does not match query
-        QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+        QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
         XCTAssertEqual(resultsQuery.count, 0U);
         XCTAssertEqual(resultsTableView.count, 0U);
 
@@ -1003,7 +993,7 @@
         XCTAssertEqual(resultsTableView.count, 1U);
 
         // Add another object that matches
-        [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+        [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
         XCTAssertEqual(resultsQuery.count, 2U);
         XCTAssertEqual(resultsTableView.count, 2U);
     }
@@ -1015,7 +1005,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
     [realm commitWriteTransaction];
 
     RLMResults *resultsQuery = [QueryObject objectsWhere:@"bool1 = YES"];
@@ -1039,7 +1029,7 @@
 
     // Add an object that does not match query
     [realm beginWriteTransaction];
-    QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"Instance 0"]];
+    QueryObject *q1 = [QueryObject createInRealm:realm withObject:@[@NO, @YES, @1, @2, @23.0f, @1.7f,  @0.0,  @5.55, @"", @""]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(resultsQuery.count, 0U);
@@ -1055,7 +1045,7 @@
 
     // Add another object that matches
     [realm beginWriteTransaction];
-    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"Instance 1"]];
+    [QueryObject createInRealm:realm withObject:@[@YES, @NO,  @1, @3, @-5.3f, @4.21f, @1.0,  @4.44, @"", @""]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(resultsQuery.count, 2U);
