@@ -116,8 +116,17 @@ static NSMutableDictionary *s_localNameToClass;
         RLMReplaceClassNameMethod(cls, className);
     }
 
+    // FIXME: Temporary hack to ensure that initial transactions are
+    // identical as long as the application code is identical.
+    NSArray *unorderedClasses = s_localNameToClass.allValues;
+    NSArray *classesOrderedByName = [unorderedClasses sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+            NSString *a2 = NSStringFromClass((Class)a);
+            NSString *b2 = NSStringFromClass((Class)b);
+            return [a2 compare:b2];
+        }];
+
     // process all RLMObject subclasses
-    for (Class cls in s_localNameToClass.allValues) {
+    for (Class cls in classesOrderedByName) {
         RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
         [schemaArray addObject:schema];
 
