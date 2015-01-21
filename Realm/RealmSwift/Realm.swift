@@ -24,7 +24,7 @@ import Realm.Private
 /**
 Returns all objects of the given type in the default realm.
 
-:param: type The type of the obejcts to be returned.
+:param: type The type of the objects to be returned.
 
 :returns: Results with all objects of the given type in the default realm.
 */
@@ -59,16 +59,16 @@ database.
 Realms can either be stored on disk (see `init(path:)`) or in
 memory (see `init(inMemoryIdentifier:)`).
 
-RLMRealm instances are cached internally, and constructing equivalent RLMRealm
+Realm instances are cached internally, and constructing equivalent Realm
 objects (with the same path or identifier) multiple times on a single thread
 within a single iteration of the run loop will normally return the same
-RLMRealm object. If you specifically want to ensure a RLMRealm object is
+Realm object. If you specifically want to ensure a Realm object is
 destroyed (for example, if you wish to open a realm, check some property, and
 then possibly delete the realm file and re-open it), place the code which uses
 the realm within an `@autoreleasepool {}` and ensure you have no other
 strong references to it.
 
-:warning: RLMRealm instances are not thread safe and can not be shared across
+:warning: Realm instances are not thread safe and can not be shared across
 	  threads or dispatch queues. You must call this method on each thread you want
 	  to interact with the realm on. For dispatch queues, this means that you must
 	  call it in each block which is dispatched, as a queue is not guaranteed to run
@@ -77,7 +77,7 @@ strong references to it.
 public final class Realm {
     // MARK: Properties
 
-    var rlmRealm: RLMRealm
+    internal var rlmRealm: RLMRealm
 
     /// Returns the path to the file where the realm is persisted.
     public var path: String { return rlmRealm.path }
@@ -111,10 +111,10 @@ public final class Realm {
     `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
     objects will not work.
 
-    Defaults to YES.
+    Defaults to true.
     */
     public var autorefresh: Bool {
-        get {
+	get {
             return rlmRealm.autorefresh
         }
         set {
@@ -124,7 +124,7 @@ public final class Realm {
 
     // MARK: Initializers
 
-    init(rlmRealm: RLMRealm) {
+    internal init(rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 
@@ -170,18 +170,18 @@ public final class Realm {
 	      correctness in code that should not need to write to the Realm.
 
     :param: path        Path to the file you want the data saved in.
-    :param: readonly    Bool indicating if this Realm is read-only (must use for read-only files).
+    :param: readOnly    Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error       If an error occurs, upon return contains an `NSError` object
 			that describes the problem. If you are not interested in
 			possible errors, pass in `nil`.
     */
-    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
-        } else {
-            self.init(rlmRealm: RLMRealm())
-            return nil
-        }
+    public convenience init?(path: String, readOnly: Bool, error: NSErrorPointer = nil) {
+	if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
+	    self.init(rlmRealm: rlmRealm)
+	} else {
+	    self.init(rlmRealm: RLMRealm()) // `rlmRealm` cannot be nil.
+	    return nil
+	}
     }
 
     /**
@@ -197,13 +197,13 @@ public final class Realm {
 
     :param: path        Path to the file you want the data saved in.
     :param: key         64-byte key to use to encrypt the data.
-    :param: readonly    Bool indicating if this Realm is read-only (must use for read-only files).
+    :param: readOnly    Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error       If an error occurs, upon return contains an `NSError` object
 			that describes the problem. If you are not interested in
-			possible errors, pass in `NULL`.
+			possible errors, omit the argument or pass in `nil`.
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+	if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm: rlmRealm)
         } else {
             self.init(rlmRealm: RLMRealm())
@@ -305,7 +305,7 @@ public final class Realm {
     Given the following code:
 
     ```swift
-    let oldObject = objects(ObjectType.self).first!
+    let oldObject = objects(ObjectType).first!
     let newObject = ObjectType()
 
     realm.beginWrite()
@@ -385,9 +385,9 @@ public final class Realm {
 
     :param: objects A sequence which contains objects to be added to this Realm.
     */
-    public func add<S where S: SequenceType>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-            RLMAddObjectToRealm(obj as Object, rlmRealm, .allZeros)
+	    RLMAddObjectToRealm(obj, rlmRealm, .allZeros)
         }
     }
 
@@ -416,9 +416,9 @@ public final class Realm {
 
     :param: objects  A sequence of `Object`s to be added to this Realm.
     */
-    public func addOrUpdate<S where S: SequenceType>(objects: S) {
+    public func addOrUpdate<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-            rlmRealm.addOrUpdateObject(obj as RLMObject)
+	    addOrUpdate(obj)
         }
     }
 
@@ -450,12 +450,23 @@ public final class Realm {
     }
 
     /**
-    Deletes the given object from this Realm.
+    Deletes the given objects from this Realm.
 
-    :param: object The object to be deleted.
+    :param: object The objects to be deleted.
     */
     public func delete(objects: Results<Object>) {
-        rlmRealm.deleteObjects(objects)
+	rlmRealm.deleteObjects(objects.rlmResults)
+    }
+
+    /**
+    Deletes the given objects from this Realm.
+
+    :param: object The objects to be deleted.
+    */
+    public func delete<S: SequenceType where S.Generator.Element == Object>(objects: S) {
+	for obj in objects {
+	    RLMDeleteObjectFromRealm(obj)
+	}
     }
 
     /**
@@ -470,13 +481,11 @@ public final class Realm {
     /**
     Add a notification handler for changes in this Realm.
 
-
-
-    :param: block   A block which is called to process RLMRealm notifications.
+    :param: block   A block which is called to process Realm notifications.
 		    It receives the following parameters:
 
 		    - `Notification`:    The incoming notification.
-		    - `Realm`:           The realm for which this notification occurred
+		    - `Realm`:           The realm for which this notification occurred.
 
     :returns: A notification token which can later be passed to `removeNotification(_:)`
 	      to remove this notification.
@@ -501,7 +510,7 @@ public final class Realm {
     /**
     Returns all objects of the given type in this Realm.
 
-    :param: type The type of the obejcts to be returned.
+    :param: type The type of the objects to be returned.
 
     :returns: Results with all objects of the given type in this realm.
     */
@@ -512,20 +521,18 @@ public final class Realm {
 
 // MARK: Notifications
 
-/**
-A notification due to changes to a realm.
-
-- DidChange:       The realm did change.
-- RefreshRequired: The realm requires a refresh.
-*/
+/// A notification due to changes to a realm.
 public enum Notification: String {
+    /// The realm did change.
     case DidChange = "RLMRealmDidChangeNotification"
+    /// The realm requires a refresh.
     case RefreshRequired = "RLMRealmRefreshRequiredNotification"
 }
 
+/// Closure to run when the data in a Realm was modified.
 public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
 
-func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
+internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
         return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
     }
