@@ -28,6 +28,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fixed a crash when multiple write transactions with no changes followed by a
   write transaction with changes were committed without the main thread
   RLMRealm getting a chance to refresh.
+* Fixed incomplete results when querying for non-null relationships.
 
 0.89.2 Release notes (2015-01-02)
 =============================================================
