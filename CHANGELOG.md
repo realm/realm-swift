@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add `-[RLMRealm writeCopyToPath:encryptionKey:error:]`.
+* Add support for comparing string columns to other string columns in queries.
 
 ### Bugfixes
 

@@ -461,7 +461,9 @@ Query column_expression(NSComparisonPredicateOptions operatorType,
     }
 }
 
-void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, NSString *leftColumnName, NSString *rightColumnName, NSComparisonPredicateOptions predicateOptions)
+void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query,
+                                         NSString *leftColumnName, NSString *rightColumnName,
+                                         NSComparisonPredicate *predicate)
 {
     // Validate object types
     NSUInteger leftIndex = RLMValidatedColumnIndex(scheme, leftColumnName);
@@ -482,24 +484,50 @@ void update_query_with_column_expression(RLMObjectSchema *scheme, Query &query, 
                     RLMTypeToString(rightType));
 
     // TODO: Should we handle special case where left row is the same as right row (tautology)
+    Table *table = query.get_table().get();
+    NSPredicateOperatorType type = predicate.predicateOperatorType;
     switch (leftType) {
         case type_Bool:
-            query.and_query(column_expression<Bool>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            query.and_query(column_expression<Bool>(type, leftIndex, rightIndex, table));
             break;
         case type_Int:
-            query.and_query(column_expression<Int>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            query.and_query(column_expression<Int>(type, leftIndex, rightIndex, table));
             break;
         case type_Float:
-            query.and_query(column_expression<Float>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            query.and_query(column_expression<Float>(type, leftIndex, rightIndex, table));
             break;
         case type_Double:
-            query.and_query(column_expression<Double>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            query.and_query(column_expression<Double>(type, leftIndex, rightIndex, table));
             break;
         case type_DateTime:
             // FIXME: int64_t should be DateTime but that doesn't work on 32 bit
             // FIXME: as time_t(32bit) != time_t(64bit)
-            query.and_query(column_expression<int64_t>(predicateOptions, leftIndex, rightIndex, &(*query.get_table())));
+            query.and_query(column_expression<int64_t>(type, leftIndex, rightIndex, table));
             break;
+        case type_String: {
+            bool caseSensitive = (predicate.options & NSCaseInsensitivePredicateOption) == 0;
+            switch (type) {
+                case NSBeginsWithPredicateOperatorType:
+                    query.and_query(table->column<String>(leftIndex).begins_with(table->column<String>(rightIndex), caseSensitive));
+                    break;
+                case NSEndsWithPredicateOperatorType:
+                    query.and_query(table->column<String>(leftIndex).ends_with(table->column<String>(rightIndex), caseSensitive));
+                    break;
+                case NSContainsPredicateOperatorType:
+                    query.and_query(table->column<String>(leftIndex).contains(table->column<String>(rightIndex), caseSensitive));
+                    break;
+                case NSEqualToPredicateOperatorType:
+                    query.and_query(table->column<String>(leftIndex).equal(table->column<String>(rightIndex), caseSensitive));
+                    break;
+                case NSNotEqualToPredicateOperatorType:
+                    query.and_query(table->column<String>(leftIndex).not_equal(table->column<String>(rightIndex), caseSensitive));
+                    break;
+                default:
+                    @throw RLMPredicateException(@"Invalid operator type",
+                                                 @"Operator type %lu not supported for string type", (unsigned long)type);
+            }
+            break;
+        }
         default:
             @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
                                          RLMUnsupportedTypesFoundInPropertyComparisonReason,
@@ -574,8 +602,8 @@ void update_query_with_predicate(NSPredicate *predicate, RLMSchema *schema,
 
         if (exp1Type == NSKeyPathExpressionType && exp2Type == NSKeyPathExpressionType) {
             // both expression are KeyPaths
-            update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath,
-                                                compp.predicateOperatorType);
+            update_query_with_column_expression(objectSchema, query, compp.leftExpression.keyPath,
+                                                compp.rightExpression.keyPath, compp);
         }
         else if (exp1Type == NSKeyPathExpressionType && exp2Type == NSConstantValueExpressionType) {
             // comparing keypath to value
