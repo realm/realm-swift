@@ -23,6 +23,8 @@
 #import <tightdb/table_view.hpp>
 #import <tightdb/query.hpp>
 
+@class RLMObjectSchema;
+
 // RLMArray private properties/ivars for all subclasses
 @interface RLMArray () {
   @protected
@@ -73,6 +75,11 @@
 @interface RLMEmptyResults : RLMResults
 + (instancetype)emptyResultsWithObjectClassName:(NSString *)objectClassName
                                           realm:(RLMRealm *)realm;
+@end
+
+// RLMResults backed by a tightdb::Table directly rather than using a TableView
+@interface RLMTableResults : RLMResults
++ (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end
 
 //

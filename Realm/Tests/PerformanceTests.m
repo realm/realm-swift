@@ -34,7 +34,34 @@
 @interface PerformanceTests : RLMTestCase
 @end
 
+static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
+
 @implementation PerformanceTests
+
++ (void)setUp {
+    [super setUp];
+
+    s_smallRealm = [self createStringObjects:1];
+    s_mediumRealm = [self createStringObjects:5];
+    s_largeRealm = [self createStringObjects:50];
+}
+
++ (void)tearDown {
+    [super tearDown];
+    s_smallRealm = s_mediumRealm = s_largeRealm = nil;
+}
+
++ (RLMRealm *)createStringObjects:(int)factor {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 1000 * factor; ++i) {
+        [StringObject createInRealm:realm withObject:@[@"a"]];
+        [StringObject createInRealm:realm withObject:@[@"b"]];
+    }
+    [realm commitWriteTransaction];
+
+    return realm;
+}
 
 - (void)testInsertMultiple {
     [self measureBlock:^{
@@ -74,20 +101,15 @@
     }];
 }
 
-- (RLMRealm *)createStringObjects:(int)factor {
-    RLMRealm *realm = self.realmWithTestPath;
-    [realm beginWriteTransaction];
-    for (int i = 0; i < 1000 * factor; ++i) {
-        [StringObject createInRealm:realm withObject:@[@"a"]];
-        [StringObject createInRealm:realm withObject:@[@"b"]];
-    }
-    [realm commitWriteTransaction];
-
-    return realm;
+- (RLMRealm *)getStringObjects:(int)factor {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
+    [NSFileManager.defaultManager removeItemAtPath:RLMTestRealmPath() error:nil];
+    [realm writeCopyToPath:RLMTestRealmPath() error:nil];
+    return [self realmWithTestPath];
 }
 
 - (void)testCountWhereQuery {
-    RLMRealm *realm = [self createStringObjects:50];
+    RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
         RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
         [array count];
@@ -95,7 +117,7 @@
 }
 
 - (void)testCountWhereTableView {
-    RLMRealm *realm = [self createStringObjects:50];
+    RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
         RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
         [array firstObject]; // Force materialization of backing table view
@@ -104,7 +126,7 @@
 }
 
 - (void)testEnumerateAndAccessQuery {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol = 'a'"]) {
@@ -114,7 +136,7 @@
 }
 
 - (void)testEnumerateAndAccessAll {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -124,7 +146,7 @@
 }
 
 - (void)testEnumerateAndAccessAllSlow {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         RLMResults *all = [StringObject allObjectsInRealm:realm];
@@ -136,7 +158,7 @@
 }
 
 - (void)testEnumerateAndAccessArrayProperty {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -151,7 +173,7 @@
 }
 
 - (void)testEnumerateAndAccessArrayPropertySlow {
-    RLMRealm *realm = [self createStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -166,12 +188,24 @@
     }];
 }
 
-- (void)testEnumerateAndMutate {
-    RLMRealm *realm = [self createStringObjects:1];
+- (void)testEnumerateAndMutateAll {
+    RLMRealm *realm = [self getStringObjects:10];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            so.stringCol = @"c";
+        }
+        [realm commitWriteTransaction];
+    }];
+}
+
+- (void)testEnumerateAndMutateQuery {
+    RLMRealm *realm = [self getStringObjects:1];
+
+    [self measureBlock:^{
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol != 'b'"]) {
             so.stringCol = @"c";
         }
         [realm commitWriteTransaction];
@@ -189,15 +223,9 @@
     }];
 }
 
-- (void)testQueryDeletion {
-    RLMRealm *realm = self.realmWithTestPath;
-
+- (void)testDeleteAll {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
-            [StringObject createInRealm:realm withObject:@[@"a"]];
-        }
-        [realm commitWriteTransaction];
+        RLMRealm *realm = [self getStringObjects:5];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -207,17 +235,23 @@
     }];
 }
 
-- (void)testManualDeletion {
-    RLMRealm *realm = self.realmWithTestPath;
-
+- (void)testQueryDeletion {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
-        [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
-            [StringObject createInRealm:realm withObject:@[@"a"]];
-        }
-        [realm commitWriteTransaction];
+        RLMRealm *realm = [self getStringObjects:5];
 
-        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:5000];
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol = 'a' OR stringCol = 'b'"]];
+        [realm commitWriteTransaction];
+        [self stopMeasuring];
+    }];
+}
+
+- (void)testManualDeletion {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:5];
+
+        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10000];
         for (StringObject *obj in [StringObject allObjectsInRealm:realm]) {
             [objects addObject:obj];
         }

@@ -488,14 +488,18 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
         // missing ones on init
         return [RLMEmptyResults emptyResultsWithObjectClassName:objectClassName realm:realm];
     }
-    tightdb::Query query = objectSchema.table->where();
-    RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
-    
-    // create and populate array
-    __autoreleasing RLMResults * results = [RLMResults resultsWithObjectClassName:objectClassName
-                                                                            query:std::make_unique<Query>(query)
-                                                                            realm:realm];
-    return results;
+
+    if (predicate) {
+        tightdb::Query query = objectSchema.table->where();
+        RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
+
+        // create and populate array
+        return [RLMResults resultsWithObjectClassName:objectClassName
+                                                query:std::make_unique<Query>(query)
+                                                realm:realm];
+    }
+
+    return [RLMTableResults tableResultsWithObjectSchema:objectSchema realm:realm];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
