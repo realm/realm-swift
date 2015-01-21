@@ -200,7 +200,7 @@ public final class Realm {
     :param: readOnly    Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error       If an error occurs, upon return contains an `NSError` object
 			that describes the problem. If you are not interested in
-			possible errors, omit the argument or pass in `nil`.
+			possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
 	if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
@@ -428,7 +428,7 @@ public final class Realm {
     :param: object The object to be deleted.
     */
     public func delete(object: Object) {
-        RLMDeleteObjectFromRealm(object)
+	RLMDeleteObjectFromRealm(object)
     }
 
     /**
@@ -437,7 +437,7 @@ public final class Realm {
     :param: object The objects to be deleted.
     */
     public func delete(objects: [Object]) {
-        rlmRealm.deleteObjects(objects)
+	rlmRealm.deleteObjects(objects)
     }
 
     /**
@@ -446,7 +446,7 @@ public final class Realm {
     :param: object The objects to be deleted.
     */
     public func delete(objects: List<Object>) {
-        rlmRealm.deleteObjects(objects)
+	rlmRealm.deleteObjects(objects)
     }
 
     /**
