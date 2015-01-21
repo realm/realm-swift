@@ -16,8 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMigration.h"
-#import "RLMRealm.h"
+#import <Realm/RLMMigration.h>
+#import <Realm/RLMRealm.h>
+#import <Realm/RLMObjectBase.h>
+
+typedef void (^RLMObjectBaseMigrationBlock)(RLMObjectBase *oldObject, RLMObjectBase *newObject);
 
 @interface RLMMigration ()
 
@@ -25,6 +28,8 @@
 @property (nonatomic, strong) RLMRealm *realm;
 
 - (instancetype)initWithRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error;
+
+- (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block;
 
 - (void)execute:(RLMMigrationBlock)block;
 

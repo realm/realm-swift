@@ -17,8 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+import Realm.Private
 
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
+public typealias MigrationObjectEnumerateBlock = (oldObject: RLMObjectBase!, newObject: RLMObjectBase!) -> Void
 
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
     RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: {
@@ -39,8 +41,8 @@ public class Migration {
     public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
-    public func enumerate(objectClassName: String, block: ObjectMigrationBlock) {
-        rlmMigration.enumerateObjects(objectClassName, block: block)
+    public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
+        rlmMigration.enumerateBaseObjects(objectClassName, dynamicAccessorClass: MigrationObject.self, block: block)
     }
 
     public func create(className: String, withObject object: AnyObject) -> RLMObject {
@@ -57,3 +59,22 @@ public class Migration {
         self.rlmMigration = rlmMigration
     }
 }
+
+@objc(MigrationObject)
+public class MigrationObject : Object {
+    subscript(key: String) -> AnyObject? {
+        if (self.objectSchema[key].type == RLMPropertyType.Array) {
+            return listProperties[key]
+        }
+        return super[key]
+    }
+
+    private func initalizeListProperty(name: String, rlmArray: RLMArray) {
+        var list = List<Object>()
+        list._rlmArray = rlmArray
+        listProperties[name] = list
+    }
+
+    private var listProperties = [String: List<Object>]()
+}
+

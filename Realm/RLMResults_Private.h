@@ -16,9 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+#import "RLMResults.h"
 
-// These types don't change when wrapping in Swift
-// so we just typealias them to remove the 'RLM' prefix
-public typealias PropertyType = RLMPropertyType
-public typealias NotificationToken = RLMNotificationToken
+@class RLMObjectSchema;
+
+@interface RLMResults () {
+  @public
+    RLMObjectSchema *_objectSchema;
+}
+@end

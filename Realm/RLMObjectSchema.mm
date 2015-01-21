@@ -118,7 +118,9 @@
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
-                prop.indexed = YES;
+                if (prop.type == RLMPropertyTypeString) {
+                    prop.indexed = YES;
+                }
                 schema.primaryKeyProperty = prop;
                 break;
             }
