@@ -76,11 +76,11 @@ static __attribute__((noreturn)) void throw_objc_exception(exception &ex) {
 }
 
 // create NSError from c++ exception
-static NSError *make_realm_error(RLMError code, exception &ex) {
-    NSMutableDictionary *details = [NSMutableDictionary dictionary];
-    [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
-    [details setValue:@(code) forKey:@"Error Code"];
-    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
+static NSError *make_realm_error(RLMError code, exception const& ex) {
+    return [NSError errorWithDomain:@"io.realm"
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: @(ex.what()),
+                                      @"Error Code": @(code)}];
 }
 
 static void setOrThrowError(NSError *error, NSError **outError) {
@@ -304,20 +304,32 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                                                         static_cast<const char *>(key.bytes));
             }
         }
-        catch (File::PermissionDenied &ex) {
+        catch (File::PermissionDenied const& ex) {
             NSString *mode = readonly ? @"read" : @"read-write";
             NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
             NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-            ex = File::PermissionDenied(newMessage.UTF8String);
-            error = make_realm_error(RLMErrorFilePermissionDenied, ex);
+            error = make_realm_error(RLMErrorFilePermissionDenied,
+                                     File::PermissionDenied(newMessage.UTF8String));
         }
-        catch (File::Exists &ex) {
+        catch (File::Exists const& ex) {
             error = make_realm_error(RLMErrorFileExists, ex);
         }
-        catch (File::AccessError &ex) {
+        catch (File::AccessError const& ex) {
             error = make_realm_error(RLMErrorFileAccessError, ex);
         }
-        catch (exception &ex) {
+        catch (IncompatibleLockFile const&) {
+            NSString *err = @"Realm file is currently open in another process "
+                             "which cannot share access with this process. All "
+                             "processes sharing a single file must be the same "
+                             "architecture. For sharing files between the Realm "
+                             "Browser and an iOS simulator, this means that you "
+                             "must use a 64-bit simulator.";
+            error = [NSError errorWithDomain:@"io.realm"
+                                        code:RLMErrorIncompatibleLockFile
+                                    userInfo:@{NSLocalizedDescriptionKey: err,
+                                               @"Error Code": @(RLMErrorIncompatibleLockFile)}];
+        }
+        catch (exception const& ex) {
             error = make_realm_error(RLMErrorFail, ex);
         }
 
