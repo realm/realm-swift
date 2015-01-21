@@ -19,12 +19,13 @@
 #import "RLMMigration_Private.h"
 
 #import "RLMAccessor.h"
+#import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
-#import "RLMResults.h"
+#import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
 #import <tightdb/link_view.hpp>
@@ -74,10 +75,17 @@
     return [RLMSchema sharedSchema];
 }
 
-- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
+- (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block {
     // get all objects
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
+
+    // FIXME - we are overwring the schema for the old realm. Since it is dynamic and used only for the migration this
+    // might be ok but it seems pretty wrong
+    for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
+        objectSchema.accessorClass = cls;
+    }
+
     if (objects && oldObjects) {
         for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], objects[i]);
@@ -93,6 +101,14 @@
             block(oldObjects[i], nil);
         }
     }
+}
+
+- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
+    [self enumerateBaseObjects:className
+          dynamicAccessorClass:RLMObject.class
+                         block:^(RLMObjectBase *oldObject, RLMObjectBase *newObject) {
+        block((RLMObject *)oldObject, (RLMObject *)newObject);
+    }];
 }
 
 - (void)verifyPrimaryKeyUniqueness {
