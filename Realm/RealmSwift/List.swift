@@ -32,11 +32,11 @@ public class ListBase: RLMListBase, Printable {
 }
 
 /**
- List<T> is the container type in Realm used to define to-many relationships.
+List<T> is the container type in Realm used to define to-many relationships.
 
- Lists hold a single `Object` subclass, `T`, which defines the "type" of the list.
+Lists hold a single `Object` subclass, `T`, which defines the "type" of the list.
 
- Lists can be filtered and sorted with the same predicates as `Results<T>`.
+Lists can be filtered and sorted with the same predicates as `Results<T>`.
 */
 public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Properties
