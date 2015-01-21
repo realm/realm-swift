@@ -30,7 +30,7 @@
 
 #import <tightdb/group.hpp>
 
-@protocol ObjectUtil <NSObject>
+@protocol RLMObjectUtil <NSObject>
 + (NSArray *)getGenericListPropertyNames:(id)obj;
 @end
 
