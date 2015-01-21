@@ -48,7 +48,7 @@ queries.
 Results cannot be created directly.
 */
 public final class Results<T: Object>: Printable, SequenceType {
-    let rlmResults: RLMResults
+    internal let rlmResults: RLMResults
 
     // MARK: Properties
 
@@ -63,7 +63,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Initializers
 
-    init(_ rlmResults: RLMResults) {
+    internal init(_ rlmResults: RLMResults) {
         self.rlmResults = rlmResults
     }
 
