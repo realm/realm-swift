@@ -18,11 +18,6 @@
 
 import Realm
 
-/// Returns whether the two object schemas are equal.
-public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
-    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
-}
-
 /**
 This class represents Realm model object schemas persisted to Realm in a Schema.
 
@@ -31,18 +26,20 @@ introspecting the database's schema.
 
 Object schemas map to tables in the core database.
 */
-public class ObjectSchema: Equatable {
+public final class ObjectSchema {
+
     // MARK: Properties
 
-    var rlmObjectSchema: RLMObjectSchema
+    /// Wrapped `RLMObjectSchema`.
+    internal var rlmObjectSchema: RLMObjectSchema
 
-    /// Returns the name of the class this object schema represents.
-    public var className: String { return rlmObjectSchema.className }
-
-    /// Returns the properties in the object schema.
+    /// Array of persisted `Property` objects for an object.
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
 
-    /// Returns the property that serves as the primary key, if there is a primary key.
+    /// The name of the class this schema describes.
+    public var className: String { return rlmObjectSchema.className }
+
+    /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
             return Property(rlmProperty: rlmProperty)
@@ -52,7 +49,7 @@ public class ObjectSchema: Equatable {
 
     // MARK: Initializers
 
-    init(rlmObjectSchema: RLMObjectSchema) {
+    internal init(rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
 
@@ -65,4 +62,13 @@ public class ObjectSchema: Equatable {
         }
         return nil
     }
+}
+
+// MARK: Equatable
+
+extension ObjectSchema: Equatable {}
+
+/// Returns whether the two object schemas are equal.
+public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
+    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
 }
