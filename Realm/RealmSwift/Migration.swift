@@ -62,9 +62,9 @@ exactly when and how migrations are performed.
 
 :see: setSchemaVersion(_:_:)
 
-:param: realmPath The path of the Realm to migrate.
+:param: path The path of the Realm to migrate.
 
-:returns: The error that occurred while applying the migration if any.
+:returns: The error that occurred while applying the migration, if any.
 */
 public func migrateRealm(path: String) -> NSError? {
     return RLMRealm.migrateRealmAtPath(path)
@@ -76,12 +76,10 @@ Migration encapsulates the information passed into a MigrationBlock when updatin
 public class Migration {
     // MARK: Properties
 
-    /// The old schema.
-    /// This is the schema that describes the Realm before the migration is applied.
+    /// The schema that describes the Realm before the migration is applied.
     public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
 
-    /// The new schema.
-    /// This is the schema that describes the Realm after applying the migration.
+    /// The schema that describes the Realm after applying the migration.
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
     // MARK: Altering objects
@@ -128,7 +126,7 @@ public class Migration {
 
     private var rlmMigration: RLMMigration
 
-    init(_ rlmMigration: RLMMigration) {
+    internal init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }

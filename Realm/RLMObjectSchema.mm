@@ -31,7 +31,7 @@
 #import <tightdb/group.hpp>
 
 @interface RLMObjectBase (Swift)
-+ (NSArray *)getGenericListPropertyNames:(id)obj;
++ (NSArray *)PRIVATE_getGenericListPropertyNames:(id)obj;
 @end
 
 @implementation RLMObjectBase (Swift)
@@ -39,7 +39,7 @@
 // Swift in the same target to avoid polluting the RealmSwift namespace with
 // obj-c stuff. As such, this method is overridden in RealmSwift.Object to
 // supply the real implementation at runtime without a compile-time dependency.
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
++ (NSArray *)PRIVATE_getGenericListPropertyNames:(__unused id)obj {
     return nil;
 }
 @end
@@ -176,7 +176,7 @@
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        for (NSString *propName in [objectClass getGenericListPropertyNames:swiftObjectInstance]) {
+        for (NSString *propName in [objectClass PRIVATE_getGenericListPropertyNames:swiftObjectInstance]) {
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
             NSString *className = [value _rlmArray].objectClassName;
