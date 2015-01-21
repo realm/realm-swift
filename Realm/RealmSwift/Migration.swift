@@ -54,7 +54,7 @@ public class Migration {
 
     private var rlmMigration: RLMMigration
 
-    init(_ rlmMigration: RLMMigration) {
+    internal init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }

@@ -20,7 +20,6 @@ import Realm
 
 // MARK: MinMaxType
 
-
 /// Types which can be used for min()/max().
 public protocol MinMaxType {}
 extension Double: MinMaxType {}
@@ -107,7 +106,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Object Retrieval
 
     /**
-    Returns the obejct at the given `index`.
+    Returns the object at the given `index`.
 
     :param: index The index.
 
@@ -157,7 +156,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     :param: property  The property name to sort by.
     :param: ascending The direction to sort by.
 
-    :returns: Results containting the objects in the list sorted by the given property.
+    :returns: Results containing the objects in the list sorted by the given property.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return Results<T>(rlmResults.sortedResultsUsingProperty(property, ascending: ascending))
@@ -170,7 +169,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :param: property The property to look for a minimum on.
 
-    @return The minimum value for the property amongst objects in the Results, or nil if the Results is empty.
+    :returns: The minimum value for the property amongst objects in the Results, or nil if the Results is empty.
     */
     public func min<U: MinMaxType>(property: String) -> U? {
 	return rlmResults.minOfProperty(property) as U?
@@ -181,7 +180,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :param: property The property to look for a maximum on.
 
-    @return The maximum value for the property amongst objects in the Results, or nil if the Results is empty.
+    :returns: The maximum value for the property amongst objects in the Results, or nil if the Results is empty.
     */
     public func max<U: MinMaxType>(property: String) -> U? {
 	return rlmResults.maxOfProperty(property) as U?
@@ -192,7 +191,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :param: property The property to sum on.
 
-    @return The sum of the given property over all objects in the Results.
+    :returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(property: String) -> U {
         return rlmResults.sumOfProperty(property) as AnyObject as U
@@ -203,7 +202,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :param: property The property to average.
 
-    @return The average of the given property over all objects in the Results.
+    :returns: The average of the given property over all objects in the Results.
     */
     public func average<U: AddableType>(property: String) -> U {
         return rlmResults.averageOfProperty(property) as AnyObject as U
@@ -214,7 +213,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     /**
     Returns a `GeneratorOf<T>` that yields successive elements in the list.
 
-    :returns: Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    :returns: A `GeneratorOf<T>` that yields successive elements in the list.
     */
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
@@ -225,14 +224,5 @@ public final class Results<T: Object>: Printable, SequenceType {
                 return self.rlmResults[i++] as? T
             }
         }
-    }
-
-    // MARK: Private stuff
-
-    private func notFoundToNil(index: UInt) -> Int? {
-        if index == UInt(NSNotFound) {
-            return nil
-        }
-        return Int(index)
     }
 }
