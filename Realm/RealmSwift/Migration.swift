@@ -20,8 +20,13 @@ import Realm
 
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
 
-public func setSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, withMigrationBlock: {
+public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
+    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: {
+        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
+    })
+}
+public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBlock: MigrationBlock) {
+    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: {
         migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
     })
 }

@@ -20,10 +20,7 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Dynamic.h"
-
-extern "C" {
 #import "RLMSchema_Private.h"
-}
 
 #import <libkern/OSAtomic.h>
 
