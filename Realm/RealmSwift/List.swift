@@ -42,7 +42,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Properties
 
     /// The Realm the objects in this list belong to, or `nil` if the list's owning
-    /// object does not belong to a realm (list is standalone).
+    /// object does not belong to a realm (the list is standalone).
     public var realm: Realm? {
         if _rlmArray.realm == nil {
             return nil
@@ -207,8 +207,8 @@ public final class List<T: Object>: ListBase, SequenceType {
     */
     public func append<S: SequenceType where S.Generator.Element == T>(objects: S) {
 	for obj in SequenceOf<T>(objects) { // Workaround for http://stackoverflow.com/questions/26918594
-	     _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
-        }
+	    _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
+	}
     }
 
     /**
@@ -250,7 +250,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes the last object in the List. Does not remove it from the Realm.
+    Removes the last object in the List. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
     */
@@ -259,7 +259,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes all objects from the List. Does not remove them from the Realm.
+    Removes all objects from the List. Does not remove the objects from the Realm.
 
     :warning: This method can only be called during a write transaction.
     */
