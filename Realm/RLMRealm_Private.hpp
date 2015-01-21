@@ -37,9 +37,12 @@ extern "C" {
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
 @property (nonatomic, readwrite) RLMSchema *schema;
 
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSString *)serverBaseURL;
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSURL *)serverBaseURL;
 
 + (void)notifyRealmsAtPath:(NSString *)path exceptRealm:(RLMRealm *)exceptRealm;
+
+- (tightdb::SharedGroup *)sharedGroup;
+- (tightdb::Replication *)transactLogRegistry;
 
 @end
 

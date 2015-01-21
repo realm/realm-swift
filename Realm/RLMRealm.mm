@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
+#include <tightdb/util/memory_stream.hpp>
 #include <tightdb/version.hpp>
 #include <tightdb/group_shared.hpp>
 #include <tightdb/commit_log.hpp>
@@ -173,418 +174,750 @@ bool isDebuggerAttached() {
 
 NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
+// Access to s_serverFiles (referenced object),
+// s_nextLocalFileIdent, s_serverConnections (referenced
+// object), and s_serverSyncBackgroundQueue (reference) must be
+// synchronized with respect to s_realmsPerPath.
+NSMapTable *s_serverFiles = [NSMapTable strongToWeakObjectsMapTable];
+unsigned long s_nextLocalFileIdent = 0;
+NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
+NSOperationQueue *s_serverSyncBackgroundQueue = nil;
+
+// Access to s_foreignTransactLogs (referenced object), and
+// s_foreignTransactApplicationInProgresss must be synchronized with
+// respect to s_foreignTransactLogs.
+NSMutableArray *s_foreignTransactLogs = [NSMutableArray array];
+BOOL s_foreignTransactApplicationInProgress = NO;
+
 } // anonymous namespace
 
 
-@interface RLMServerSync : NSObject
-@property (atomic) NSString *baseURL; // E.g. http://187.56.46.23:123
+// Instances of RLMServerConnection and RLMServerFile may be created by any
+// thread, but all instance methods must be called by the main thread, except
+// backgroundThreadApplyTransactLog on RLMServerFile.
+
+@interface RLMOutputMessage : NSObject
+@property NSString *head;
+@property NSData *body; // May be nil
 @end
 
-@implementation RLMServerSync {
-    NSString *_path;
+@interface RLMForeignTransactLog : NSObject
+@property Replication::version_type version;
+@end
 
-    NSURLSession *_urlSession;
+@interface RLMServerConnection : NSObject <NSStreamDelegate>
+@property (readonly) BOOL isConnected;
+@end
 
-    // At the present time we need to apply foreign transaction logs
-    // via a special SharedGroup instance on which replication is not
-    // enabled. This is necessary because some (not all) of the
-    // actions taken during transaction log application submits new
-    // entries to a new transaction log.
-    unique_ptr<Replication> _transactLogRegistry;
-    unique_ptr<SharedGroup> _sharedGroup;
+@interface RLMServerFile : NSObject
+@property (readonly) RLMServerConnection *connection;
+- (void)connected;
+- (void)handleTransactMessageWithVersion:(Replication::version_type)version andLog:(NSData *)log;
+- (void)handleAcceptMessageWithVersion:(Replication::version_type)version;
+- (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
+                                            andData:(NSData *)data;
+@end
 
-    bool _uploadInProgress;
+
+@implementation RLMOutputMessage {
+    void (^_completionHandler)();
 }
 
-- (instancetype)initWithPath:(NSString *)path baseURL:(NSString *)baseURL {
+- (instancetype)init {
+    self = [super init];
+    if (self)
+        _completionHandler = nil;
+    return self;
+}
+
+- (void (^)())completionHandler {
+    return _completionHandler;
+}
+
+- (void)setCompletionHandler:(void (^)())block {
+    _completionHandler = block;
+}
+
+@end
+
+
+@implementation RLMForeignTransactLog {
+    RLMServerFile *_file;
+    NSData *_data;
+}
+
+- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
+                        data:(NSData *)data {
     self = [super init];
     if (self) {
-        _baseURL = baseURL;
-
-        _path = path;
-
-        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-        queue.name = @"io.Realm.sync";
-
-        // Emphemeral config disables everything that would result in
-        // data being automatically saved to disk
-        NSURLSessionConfiguration *config =
-            [NSURLSessionConfiguration ephemeralSessionConfiguration];
-
-        // Disable caching
-        config.URLCache = nil;
-        config.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-
-        config.HTTPShouldUsePipelining = YES;
-
-        _urlSession = [NSURLSession sessionWithConfiguration:config
-                                                    delegate:nil
-                                               delegateQueue:queue];
-
-        bool server_synchronization_mode = true;
-        _transactLogRegistry.reset(makeWriteLogCollector(path.UTF8String,
-                                                         server_synchronization_mode));
-        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _sharedGroup = make_unique<SharedGroup>(*_transactLogRegistry, durability);
-
-        _uploadInProgress = false;
+        _file = file;
+        _version = version;
+        _data = data;
     }
     return self;
 }
 
-- (void)initialBlockingDownload {
-    Replication::version_type lastVersionUploaded, lastVersionAvailable;
-    lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
-    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
-    Replication::version_type currentVersion = LangBindHelper::get_current_version(*_sharedGroup);
-    TIGHTDB_ASSERT(currentVersion == lastVersionAvailable);
-
-    // Never ask for next transaction log that is newer than one
-    // beyong the last version uploaded. If we do that, we risk
-    // getting something back even when the upload in progress is in
-    // conflict with somebody elses transaction, and in that case the
-    // received transaction log would be corrupt from our point of
-    // view.
-    typedef unsigned long long ulonglong;
-    if (lastVersionUploaded < currentVersion) {
-        NSLog(@"initialBlockingDownload: Skipping due to pending uploads (%llu<%llu)",
-              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
-        return;
-    }
-
-    int maxRetries = 16;
-    int numRetries = 0;
-    __block NSMutableArray *upToDate = [NSMutableArray arrayWithObject:@NO];
-    for (;;) {
-        __block NSMutableArray *responseData = [NSMutableArray array];
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        NSString *url = [NSString stringWithFormat:@"%@/receive/%llu",
-                                  self.baseURL, ulonglong(currentVersion)];
-        NSMutableURLRequest *request =
-            [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-        request.HTTPMethod = @"POST";
-        [[_urlSession dataTaskWithRequest:request
-                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                    if (error) {
-                        NSLog(@"initialBlockingDownload: HTTP request failed: %@", error);
-                    }
-                    else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                        NSLog(@"initialBlockingDownload: HTTP request failed with status %ld",
-                              long(((NSHTTPURLResponse *)response).statusCode));
-                    }
-                    else if (!response.MIMEType) {
-                        // FIXME: Using the MIME type in this way is
-                        // not reliable as it may in general be
-                        // modified in complicated ways by various
-                        // involved HTTP agents.
-                        NSLog(@"initialBlockingDownload: HTTP request failed: "
-                              "No MIME type in response");
-                    }
-                    else if ([response.MIMEType isEqualToString:@"text/plain"]) {
-                        NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
-                                                                      length:10
-                                                                freeWhenDone:NO];
-                        if ([data isEqualToData:upToDateString]) {
-                            upToDate[0] = @YES;
-                        }
-                        else {
-                            NSLog(@"initialBlockingDownload: Unrecognized message from server %@",
-                                  data.description);
-                        }
-                    }
-                    else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
-                        // Assuming that `data` needs to be copied
-                        // here to make it available outside the
-                        // completion handler.
-                        responseData[0] = [data copy];
-                    }
-                    else {
-                        NSLog(@"initialBlockingDownload: Unexpected MIME type "
-                              "in HTTP response '%@'", response.MIMEType);
-                    }
-                    dispatch_semaphore_signal(semaphore);
-                }] resume];
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-
-        if (((NSNumber *)upToDate[0]).boolValue)
-            break;
-
-        if (responseData.firstObject) {
-            NSData *data = responseData.firstObject;
-            if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
-                NSLog(@"initialBlockingDownload: Bad transaction log from server "
-                      "(no leading null character)");
-            }
-            else {
-                Replication::version_type receivedVersion = currentVersion + 1;
-                const char *data2 = (const char *)data.bytes + 1;
-                size_t size = size_t(data.length) - 1;
-                NSLog(@"initialBlockingDownload: Received transaction log %llu -> %llu "
-                      "of size %llu", ulonglong(receivedVersion-1), ulonglong(receivedVersion),
-                      ulonglong(size));
-                // Apply transaction log via the special SharedGroup instance
-                {
-                    WriteTransaction transact(*_sharedGroup);
-                    Replication::SimpleInputStream input(data2, size);
-                    ostream *applyLog = 0;
-                    applyLog = &cerr;
-                    try {
-                        Replication::apply_transact_log(input, transact.get_group(),
-                                                        applyLog); // Throws
-                        transact.commit(); // Throws
-                        _transactLogRegistry->set_last_version_synced(receivedVersion);
-                        currentVersion = receivedVersion;
-                        numRetries = 0;
-                        continue;
-                    }
-                    catch (Replication::BadTransactLog&) {}
-                    NSLog(@"initialBlockingDownload: Transaction log application failed");
-                }
-            }
-        }
-        if (numRetries == maxRetries) {
-            NSLog(@"initialBlockingDownload: Too many failed HTTP requests, giving up");
-            break;
-/*
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Too many HTTP request failures"
-                                         userInfo:nil];
-*/
-        }
-        ++numRetries;
-    }
+// Must never be called by the main thread
+- (void)backgroundThreadApply {
+    [_file backgroundThreadApplyTransactLogWithVersion:_version andData:_data];
 }
 
-- (void)rescheduleNonblockingDownload {
-    // Schedule server download request roughly 100 times per second
-    [self rescheduleNonblockingDownload:10 numFastRetries:0];
-}
-
-- (void)rescheduleNonblockingDownload:(int)msecDelay numFastRetries:(int)numFastRetries {
-    int64_t nsecDelay = int64_t(msecDelay)*1000000L;
-    // FIXME: Does dispatch_get_main_queue() imply that the block is
-    // going to be executed by the main thread? Such a constraint is
-    // not required. Any thread would suffice.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, nsecDelay),
-                   dispatch_get_main_queue(), ^{
-                       [self nonblockingDownload:numFastRetries];
-                   });
-}
-
-- (void)nonblockingDownload:(int)numFastRetries {
-    int maxFastRetries = 16;
-
-    Replication::version_type currentVersion, lastVersionUploaded, lastVersionAvailable;
-    @synchronized (self) {
-        currentVersion = LangBindHelper::get_current_version(*_sharedGroup);
-        lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
-    }
-    TIGHTDB_ASSERT(lastVersionUploaded <= lastVersionAvailable);
-    TIGHTDB_ASSERT(currentVersion <= lastVersionAvailable);
-
-    // Never ask for next transaction log that is newer than one
-    // beyong the last version uploaded. If we do that, we risk
-    // getting something back even when the upload in progress is in
-    // conflict with somebody elses transaction, and in that case the
-    // received transaction log would be corrupt from our point of
-    // view.
-    typedef unsigned long long ulonglong;
-    if (lastVersionUploaded < currentVersion) {
-//        NSLog(@"nonblockingDownload: Skipping due to pending uploads (%llu<%llu)",
-//              ulonglong(lastVersionUploaded), ulonglong(currentVersion));
-        [self rescheduleNonblockingDownload];
-        return;
-    }
-
-    NSString *url = [NSString stringWithFormat:@"%@/receive/%llu",
-                              self.baseURL, ulonglong(currentVersion)];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    request.HTTPMethod = @"POST";
-    Replication::version_type originalVersion = currentVersion;
-    [[_urlSession dataTaskWithRequest:request
-                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                if (error) {
-                    NSLog(@"nonblockingDownload: HTTP request failed: %@", error);
-                }
-                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                    NSLog(@"nonblockingDownload: HTTP request failed with status %ld",
-                          long(((NSHTTPURLResponse *)response).statusCode));
-                }
-                else if (!response.MIMEType) {
-                    // FIXME: Using the MIME type in this way is
-                    // not reliable as it may in general be
-                    // modified in complicated ways by various
-                    // involved HTTP agents.
-                    NSLog(@"nonlockingDownload: HTTP request failed: No MIME type in response");
-                }
-                else if ([response.MIMEType isEqualToString:@"text/plain"]) {
-                    NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"up-to-date"
-                                                                  length:10
-                                                            freeWhenDone:NO];
-                    if ([data isEqualToData:upToDateString]) {
-                        [self rescheduleNonblockingDownload];
-                        return;
-                    }
-                    NSLog(@"nonblockingDownload: Unrecognized message from server %@",
-                          data.description);
-                }
-                else if ([response.MIMEType isEqualToString:@"application/octet-stream"]) {
-                    if (data.length < 1 || ((const char *)data.bytes)[0] != '\0') {
-                        NSLog(@"nonblockingDownload: Bad transaction log from server "
-                              "(no leading null character)");
-                    }
-                    else {
-                        const char *data2 = (const char *)data.bytes + 1;
-                        size_t size = size_t(data.length) - 1;
-                        Replication::version_type receivedVersion = originalVersion + 1;
-                        NSLog(@"nonblockingDownload: Received transaction log %llu -> %llu "
-                              "of size %llu", ulonglong(receivedVersion-1),
-                              ulonglong(receivedVersion), ulonglong(size));
-                        @synchronized (self) {
-                            WriteTransaction transact(*_sharedGroup);
-                            Replication::version_type newCurrentVersion =
-                                LangBindHelper::get_current_version(*_sharedGroup);
-                            if (newCurrentVersion != originalVersion) {
-                                NSLog(@"nonblockingDownload: Dropping received transaction log "
-                                      "due to advance of local version %llu",
-                                      ulonglong(newCurrentVersion));
-                                [self rescheduleNonblockingDownload];
-                                return;
-                            }
-                            Replication::SimpleInputStream input(data2, size);
-                            ostream *applyLog = 0;
-                            applyLog = &cerr;
-                            try {
-                                Replication::apply_transact_log(input, transact.get_group(),
-                                                                applyLog); // Throws
-                                transact.commit(); // Throws
-                                _transactLogRegistry->set_last_version_synced(receivedVersion);
-                                [RLMRealm notifyRealmsAtPath:_path exceptRealm:nil];
-                                [self nonblockingDownload:0];
-                                return;
-                            }
-                            catch (Replication::BadTransactLog&) {}
-                        }
-                        NSLog(@"nonlockingDownload: Transaction log application failed");
-                    }
-                }
-                else {
-                    NSLog(@"nonblockingDownload: Unexpected MIME type in HTTP response '%@'",
-                          response.MIMEType);
-                }
-                if (numFastRetries == maxFastRetries) {
-                    NSLog(@"nonblockingDownload: Too many failed HTTP requests, "
-                          "waiting 10 seconds");
-                    [self rescheduleNonblockingDownload:10000 numFastRetries:numFastRetries];
-                    return;
-                }
-                // Try again in one second
-                [self rescheduleNonblockingDownload:1000 numFastRetries:numFastRetries+1];
-            }] resume];
-}
-
-- (void)resumeNonblockingUpload {
-    Replication::version_type lastVersionUploaded, lastVersionAvailable;
-    NSData *data;
-    @synchronized (self) {
-        if (_uploadInProgress)
-            return;
-
-        lastVersionUploaded = _transactLogRegistry->get_last_version_synced(&lastVersionAvailable);
-        if (lastVersionUploaded == lastVersionAvailable)
-            return;
-
-        BinaryData transact_log;
-        _transactLogRegistry->get_commit_entries(lastVersionUploaded, lastVersionUploaded+1,
-                                                 &transact_log);
-        data = [NSData dataWithBytes:transact_log.data() length:transact_log.size()];
-
-        _uploadInProgress = true;
-    }
-
-    Replication::version_type version = lastVersionUploaded+1;
-    typedef unsigned long long ulonglong;
-    NSLog(@"Sending transaction log %llu -> %llu", ulonglong(version-1), ulonglong(version));
-
-    [self nonblockingUpload:data version:version numFastRetries:0];
-}
-
-- (void)rescheduleNonblockingUpload:(NSData *)data version:(Replication::version_type)version
-                          msecDelay:(int)msecDelay numFastRetries:(int)numFastRetries {
-    int64_t nsecDelay = int64_t(msecDelay)*1000000L;
-    // FIXME: Does dispatch_get_main_queue() imply that the block is
-    // going to be executed by the main thread? Such a constraint is
-    // not required. Any thread would suffice.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, nsecDelay),
-                   dispatch_get_main_queue(), ^{
-                       [self nonblockingUpload:data version:version numFastRetries:numFastRetries];
-                   });
-}
-
-- (void)nonblockingUpload:(NSData *)data version:(Replication::version_type)version
-               numFastRetries:(int)numFastRetries {
-    int maxFastRetries = 16;
-    typedef unsigned long long ulonglong;
-    NSString *url = [NSString stringWithFormat:@"%@/send/%llu", self.baseURL, ulonglong(version)];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    request.HTTPMethod = @"POST";
-    [[_urlSession uploadTaskWithRequest:request
-                               fromData:data
-                      completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                if (error) {
-                    NSLog(@"nonblockingUpload: HTTP request failed: %@", error);
-                }
-                else if (((NSHTTPURLResponse *)response).statusCode != 200) {
-                    NSLog(@"nonblockingUpload: HTTP request failed with status %ld",
-                          long(((NSHTTPURLResponse *)response).statusCode));
-                }
-                else if (!response.MIMEType) {
-                    // FIXME: Using the MIME type in this way is
-                    // not reliable as it may in general be
-                    // modified in complicated ways by various
-                    // involved HTTP agents.
-                    NSLog(@"nonblockingUpload: HTTP request failed: No MIME type in response");
-                }
-                else if ([response.MIMEType isEqualToString:@"text/plain"]) {
-                    NSData *upToDateString = [NSData dataWithBytesNoCopy:(void *)"ok"
-                                                                  length:2
-                                                            freeWhenDone:NO];
-                    if ([data isEqualToData:upToDateString]) {
-                        @synchronized (self) {
-                            _transactLogRegistry->set_last_version_synced(version);
-                            _uploadInProgress = false;
-                            NSLog(@"Server received transaction log %llu -> %llu",
-                                  ulonglong(version-1), ulonglong(version));
-                        }
-                        [self resumeNonblockingUpload];
-                        return;
-                    }
-                    NSData *conflictString = [NSData dataWithBytesNoCopy:(void *)"conflict"
-                                                                  length:8
-                                                            freeWhenDone:NO];
-                    if ([data isEqualToData:conflictString])
-                        @throw [NSException exceptionWithName:@"RLMException"
-                                                       reason:@"Conflicting transaction detected"
-                                                     userInfo:nil];
-                    NSLog(@"nonblockingUpload: Unrecognized response from server %@", data.description);
-                }
-                else {
-                    NSLog(@"nonblockingUpload: Unexpected MIME type in HTTP response '%@'",
-                          response.MIMEType);
-                }
-                if (numFastRetries == maxFastRetries) {
-                    NSLog(@"nonblockingUpload: Too many failed HTTP requests, waiting 10 seconds");
-                    [self rescheduleNonblockingUpload:data version:version msecDelay:10000
-                                       numFastRetries:numFastRetries];
-                    return;
-                }
-                // Try again in one second
-                [self rescheduleNonblockingUpload:data version:version msecDelay:1000
-                                   numFastRetries:numFastRetries+1];
-            }] resume];
-}
 @end
+
+
+@implementation RLMServerConnection {
+    BOOL _isConnected;
+
+    NSString *_address;
+    NSNumber *_port;
+
+    NSRunLoop *_runLoop;
+
+    NSInputStream  *_inputStream;
+    NSOutputStream *_outputStream;
+
+    BOOL _inputIsHead;
+    size_t _inputBufferSize;
+    unique_ptr<char[]> _inputBuffer;
+
+    size_t _headBufferSize;
+    unique_ptr<char[]> _headBuffer;
+    char *_headBufferCurr;
+
+    size_t _messageBodySize;
+    NSMutableData *_messageBodyBuffer;
+    char *_messageBodyCurr;
+    void (^_messageHandler)();
+
+    NSMutableArray *_outputQueue; // Of RLMOutputMessage instances
+    NSData *_currentOutputChunk;
+    NSData *_nextOutputChunk;
+    void (^_outputCompletionHandler)();
+    const char *_currentOutputBegin;
+    const char *_currentOutputEnd;
+
+    // Maps a file identifier to an RLMServerFile instance. A file
+    // identifier is a locally assigned integer that uniquely
+    // identifies the RLMServerFile instance. Two instances must have
+    // different identifiers even if their lifetimes do not overlap.
+    NSMapTable *_files;
+}
+
+
+- (instancetype)initWithAddress:(NSString *)address port:(NSNumber *)port {
+    self = [super init];
+    if (self) {
+        _isConnected = NO;
+
+        _address = address;
+        _port = port ? port : [NSNumber numberWithInt:7800];
+
+        _runLoop = nil;
+
+        _inputBufferSize = 1024;
+        _inputBuffer = make_unique<char[]>(_inputBufferSize);
+
+        _headBufferSize = 32;
+        _headBuffer = make_unique<char[]>(_headBufferSize);
+
+        _currentOutputChunk = nil;
+        _nextOutputChunk = nil;
+        _outputCompletionHandler = nil;
+
+        _files = [NSMapTable strongToWeakObjectsMapTable];
+    }
+    return self;
+}
+
+
+- (void)mainThreadInit {
+    // Called by main thread
+    if (_runLoop)
+        return;
+    _runLoop = [NSRunLoop currentRunLoop];
+
+    [self open];
+}
+
+
+- (void)open {
+    if (_isConnected)
+        return;
+
+    NSLog(@"Opening connection to %@:%@", _address, _port);
+
+    CFAllocatorRef defaultAllocator = 0;
+    CFStringRef address2 = (__bridge CFStringRef)_address;
+    UInt32 port2 = UInt32(_port.unsignedLongValue);
+    CFReadStreamRef  readStream  = 0;
+    CFWriteStreamRef writeStream = 0;
+    CFStreamCreatePairWithSocketToHost(defaultAllocator, address2, port2,
+                                       &readStream, &writeStream);
+    NSInputStream  *inputStream  = (__bridge_transfer NSInputStream  *)readStream;
+    NSOutputStream *outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+
+    [inputStream setDelegate:self];
+    [outputStream setDelegate:self];
+
+    [inputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
+    [inputStream open];
+    [outputStream open];
+
+    _inputStream  = inputStream;
+    _outputStream = outputStream;
+
+    _inputIsHead = YES;
+    _headBufferCurr = _headBuffer.get();
+
+    _outputQueue = [NSMutableArray array];
+
+    _isConnected = YES;
+
+    for(NSNumber *ident in _files) {
+        RLMServerFile *file = [_files objectForKey:ident];
+        [file connected];
+    }
+}
+
+
+- (void)close {
+    if (!_isConnected)
+        return;
+
+    _inputStream  = nil;
+    _outputStream = nil;
+
+    _outputQueue = nil;
+    _currentOutputChunk = nil;
+    _nextOutputChunk = nil;
+    _outputCompletionHandler = nil;
+
+    _isConnected = NO;
+
+    NSLog(@"Closed connection to %@:%@", _address, _port);
+
+    // FIXME: Retry opening the connection after a delay, maybe with
+    // progressively frowing delays.
+}
+
+
+- (void)addFile:(RLMServerFile *)file withIdent:(NSNumber *)ident {
+    [_files setObject:file forKey:ident];
+    if (_isConnected)
+        [file connected];
+}
+
+
+- (void)sendBindMessageWithIdent:(NSNumber *)ident version:(Replication::version_type)version
+                      remotePath:(NSString *)remotePath {
+    typedef unsigned long ulong;
+    typedef unsigned long long ulonglong;
+    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    msg.body = [remotePath dataUsingEncoding:NSUTF8StringEncoding];
+    msg.head = [NSString stringWithFormat:@"bind %@ %llu %lu\n",
+                         ident, ulonglong(version), ulong(msg.body.length)];
+    [self enqueueOutputMessage:msg];
+    NSLog(@"Sending: Bind local file #%@ at version %llu to remote file '%@'",
+          ident, ulonglong(version), remotePath);
+}
+
+
+- (void)sendUnbindMessageWithIdent:(NSNumber *)ident {
+    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    msg.head = [NSString stringWithFormat:@"unbind %@\n", ident];
+    [self enqueueOutputMessage:msg];
+    NSLog(@"Sending: Unbind local file #%@", ident);
+}
+
+
+- (void)enqueueOutputMessage:(RLMOutputMessage *)msg {
+    [_outputQueue addObject:msg];
+    if (_isConnected && !_currentOutputChunk) {
+        [self resumeOutput];
+        [_outputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
+    }
+}
+
+
+- (BOOL)resumeOutput {
+    if (_nextOutputChunk) {
+        _currentOutputChunk = _nextOutputChunk;
+        _nextOutputChunk = nil;
+    }
+    else {
+        if (_outputCompletionHandler) {
+            void (^completionHandler)();
+            completionHandler = _outputCompletionHandler;
+            _outputCompletionHandler = nil;
+            // This handler is allowed to enqueue new output messages
+            completionHandler();
+        }
+        RLMOutputMessage *msg = _outputQueue.firstObject;
+        if (!msg)
+            return NO;
+        _currentOutputChunk = [msg.head dataUsingEncoding:NSUTF8StringEncoding];
+        _nextOutputChunk = msg.body;
+        if (_nextOutputChunk.length == 0)
+            _nextOutputChunk = nil;
+        _outputCompletionHandler = msg.completionHandler;
+        [_outputQueue removeObjectAtIndex:0];
+    }
+    _currentOutputBegin = static_cast<const char*>(_currentOutputChunk.bytes);
+    _currentOutputEnd   = _currentOutputBegin + _currentOutputChunk.length;
+    return YES;
+}
+
+
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
+    switch (eventCode) {
+        case NSStreamEventHasBytesAvailable: {
+            if (stream != _inputStream)
+                return;
+            uint8_t *buffer = reinterpret_cast<uint8_t *>(_inputBuffer.get());
+            NSUInteger length = _inputBufferSize;
+            NSInteger n = [_inputStream read:buffer maxLength:length];
+            if (n < 0) {
+                NSLog(@"Error reading from socket: %@", _inputStream.streamError);
+                // FIXME: Report the error, close the connection, and try to reconnect later
+                return;
+            }
+            if (n == 0)
+                goto end_of_input;
+            char *headBufferBegin = _headBuffer.get();
+            char *headBufferEnd = headBufferBegin + _headBufferSize;
+            const char *inputBegin = _inputBuffer.get();
+            const char *inputEnd = inputBegin + n;
+            if (!_inputIsHead)
+                goto body;
+            for (;;) {
+                // Message head
+                {
+                    size_t sourceAvail = inputEnd - inputBegin;
+                    size_t destAvail = headBufferEnd - _headBufferCurr;
+                    size_t avail = min(sourceAvail, destAvail);
+                    const char *i = find(inputBegin, inputBegin + avail, '\n');
+                    _headBufferCurr = copy(inputBegin, i, _headBufferCurr);
+                    if (_headBufferCurr == headBufferEnd) {
+                        NSLog(@"Message head too big");
+                        // FIXME: Report the error, close the connection, and try to reconnect later
+                        return;
+                    }
+                    inputBegin = i;
+                    if (inputBegin == inputEnd)
+                        break;
+                    ++inputBegin; // Discard newline from input
+                    _inputIsHead = NO;
+
+                    MemoryInputStream parser;
+                    parser.set_buffer(headBufferBegin, _headBufferCurr);
+                    _headBufferCurr = headBufferBegin;
+                    parser.unsetf(std::ios_base::skipws);
+
+                    string message_type;
+                    parser >> message_type;
+
+                    _messageHandler = nil;
+                    __weak RLMServerConnection *weakSelf = self;
+                    if (message_type == "transact") {
+                        // A new foreign transaction log is available for download
+                        unsigned long fileIdent = 0;
+                        Replication::version_type version = 0;
+                        size_t logSize = 0;
+                        char sp1, sp2, sp3;
+                        parser >> sp1 >> fileIdent >> sp2 >> version >> sp3 >> logSize;
+                        if (!parser || !parser.eof() || sp1 != ' ' || sp2 != ' ' || sp3 != ' ') {
+                            NSLog(@"Bad 'transact' message from server");
+                            // FIXME: Report the error, close the connection, and try to reconnect later
+                            return;
+                        }
+                        _messageBodySize = logSize;
+                        _messageHandler = ^{
+                            NSNumber *fileIdent2 = [NSNumber numberWithUnsignedLong:fileIdent];
+                            [weakSelf handleTransactMessageWithFileIdent:fileIdent2
+                                                              andVersion:version];
+                        };
+                    }
+                    else if (message_type == "accept") {
+                        // Server accepts a previously uploaded transaction log
+                        unsigned long fileIdent = 0;
+                        Replication::version_type version = 0;
+                        char sp1, sp2;
+                        parser >> sp1 >> fileIdent >> sp2 >> version;
+                        if (!parser || !parser.eof() || sp1 != ' ' || sp2 != ' ') {
+                            NSLog(@"Bad 'accept' message from server");
+                            // FIXME: Report the error, close the connection, and try to reconnect later
+                            return;
+                        }
+                        NSNumber *fileIdent2 = [NSNumber numberWithUnsignedLong:fileIdent];
+                        [self handleAcceptMessageWithFileIdent:fileIdent2
+                                                    andVersion:version];
+                    }
+                    else {
+                        NSLog(@"Unknown message from server");
+                        // FIXME: Report the error, close the connection, and try to reconnect later
+                        return;
+                    }
+                }
+
+                // Message body
+                if (_messageHandler) {
+                    _messageBodyBuffer = [NSMutableData dataWithLength:_messageBodySize];
+                    _messageBodyCurr = static_cast<char*>(_messageBodyBuffer.mutableBytes);
+                  body:
+                    char *messageBodyBegin = static_cast<char*>(_messageBodyBuffer.mutableBytes);
+                    char *messageBodyEnd = messageBodyBegin + _messageBodySize;
+                    size_t sourceAvail = inputEnd - inputBegin;
+                    size_t destAvail = messageBodyEnd - _messageBodyCurr;
+                    size_t avail = min(sourceAvail, destAvail);
+                    const char *i = inputBegin + avail;
+                    _messageBodyCurr = copy(inputBegin, i, _messageBodyCurr);
+                    inputBegin = i;
+                    if (_messageBodyCurr != messageBodyEnd) {
+                        TIGHTDB_ASSERT(inputBegin == inputEnd);
+                        break;
+                    }
+                    void (^messageHandler)();
+                    messageHandler = _messageHandler;
+                    _messageHandler = nil;
+                    messageHandler();
+                    if (!_isConnected)
+                        return;
+                }
+                _inputIsHead = YES;
+            }
+            break;
+        }
+        case NSStreamEventHasSpaceAvailable: {
+            if (stream != _outputStream)
+                return;
+            TIGHTDB_ASSERT(_currentOutputChunk);
+            const uint8_t *buffer = reinterpret_cast<const uint8_t *>(_currentOutputBegin);
+            NSUInteger length = _currentOutputEnd - _currentOutputBegin;
+            NSInteger n = [_outputStream write:buffer maxLength:length];
+            if (n < 0) {
+                NSLog(@"Error writing to socket: %@", _outputStream.streamError);
+                // FIXME: Report the error, close the connection, and try to reconnect later
+                return;
+            }
+            _currentOutputBegin += n;
+            if (_currentOutputBegin == _currentOutputEnd) {
+                BOOL more = [self resumeOutput];
+                if (!more) {
+                    _currentOutputChunk = 0;
+                    [_outputStream removeFromRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
+                }
+            }
+            break;
+        }
+        case NSStreamEventEndEncountered: {
+            if (stream != _inputStream && stream != _outputStream)
+                return;
+          end_of_input:
+            NSLog(@"Server closed connection");
+            // FIXME: Report the error, and try to reconnect later
+            return;
+        }
+        case NSStreamEventErrorOccurred: {
+            if (stream != _inputStream && stream != _outputStream)
+                return;
+            NSLog(@"Socket error: %@", _outputStream.streamError);
+            // FIXME: Report the error, close the connection, and try to reconnect later
+            return;
+        }
+    }
+}
+
+
+- (void)handleTransactMessageWithFileIdent:(NSNumber *)fileIdent
+                                andVersion:(Replication::version_type)version {
+    typedef unsigned long long ulonglong;
+    NSLog(@"Received: Foreign transaction log %llu -> %llu for local file #%@",
+          ulonglong(version-1), ulonglong(version), fileIdent);
+
+    RLMServerFile *file = [_files objectForKey:fileIdent];
+    if (!file)
+        return;
+
+    NSData *log = _messageBodyBuffer;
+    _messageBodyBuffer = nil;
+
+    [file handleTransactMessageWithVersion:version andLog:log];
+}
+
+- (void)handleAcceptMessageWithFileIdent:(NSNumber *)fileIdent
+                              andVersion:(Replication::version_type)version {
+    typedef unsigned long long ulonglong;
+    NSLog(@"Received: Accept transaction log %llu -> %llu on local file #%@",
+          ulonglong(version-1), ulonglong(version), fileIdent);
+
+    RLMServerFile *file = [_files objectForKey:fileIdent];
+    if (!file)
+        return;
+
+    [file handleAcceptMessageWithVersion:version];
+}
+
+@end
+
+
+@implementation RLMServerFile {
+    NSNumber *_ident;
+    NSString *_localPath;
+    NSString *_remotePath;
+
+    unique_ptr<Replication> _backgroundTransactLogRegistry;
+    unique_ptr<SharedGroup> _backgroundSharedGroup;
+
+    RLMRealm *_realm;
+    SharedGroup* _sharedGroup; // The one residing inside `_realm`
+    Replication* _transactLogRegistry; // The one residing inside `_realm`
+    RLMNotificationToken *_notifyToken;
+
+    Replication::version_type _latestVersionAcceptedByServer;
+    Replication::version_type _latestVersionUploaded;
+    Replication::version_type _latestVersionAvailable;
+    BOOL _uploadInProgress;
+}
+
+
+- (instancetype)initWithConnection:(RLMServerConnection *)connection
+                        localIdent:(NSNumber *)ident
+                         localPath:(NSString *)localPath
+                        remotePath:(NSString *)remotePath {
+    self = [super init];
+    if (self) {
+        _connection = connection;
+        _ident = ident;
+        _localPath = localPath;
+        _remotePath = remotePath;
+
+        bool serverSynchronizationMode = true;
+        _backgroundTransactLogRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
+                                                                   serverSynchronizationMode));
+        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
+        _backgroundSharedGroup = make_unique<SharedGroup>(*_backgroundTransactLogRegistry, durability);
+
+        _realm = nil;
+        _notifyToken = nil;
+        _uploadInProgress = NO;
+    }
+    return self;
+}
+
+
+- (void)mainThreadInit {
+    // Called by main thread
+    _realm = [RLMRealm realmWithPath:_localPath];
+    _sharedGroup = [_realm sharedGroup];
+    _transactLogRegistry = [_realm transactLogRegistry];
+    __weak RLMServerFile *weakSelf = self;
+    _notifyToken = [_realm addNotificationBlock:^(NSString *, RLMRealm *) {
+            [weakSelf onNewLocalTransaction];
+        }];
+
+    _latestVersionUploaded = 0;
+    [self refreshVersionInfo];
+
+    [_connection mainThreadInit];
+    [_connection addFile:self withIdent:_ident];
+}
+
+
+- (void)onNewLocalTransaction {
+    [self refreshVersionInfo];
+    [self resumeUpload];
+}
+
+
+- (void)refreshVersionInfo {
+    _latestVersionAcceptedByServer = _transactLogRegistry->get_last_version_synced();
+    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
+
+    // Note: It may happen transiently that _latestVersionAcceptedByServer >
+    // _latestVersionAvailable due to the order in which these values are
+    // updated (at least in backgroundThreadApplyTransactLog of RLMSerferFile).
+    if (_latestVersionAcceptedByServer > _latestVersionAvailable)
+        _latestVersionAcceptedByServer = _latestVersionAvailable;
+
+    if (_latestVersionUploaded < _latestVersionAcceptedByServer)
+        _latestVersionUploaded = _latestVersionAcceptedByServer;
+
+    [self resumeForeignTransactLogApplication];
+}
+
+
+- (void)connected {
+    _latestVersionUploaded = _latestVersionAcceptedByServer;
+    [_connection sendBindMessageWithIdent:_ident version:_latestVersionAcceptedByServer
+                               remotePath:_remotePath];
+    [self resumeUpload];
+}
+
+
+- (void)resumeUpload {
+    if (_uploadInProgress || !_connection.isConnected)
+        return;
+    _uploadInProgress = YES;
+
+    // Fetch and copy the next transaction log, and produce an output message from it.
+    // Set the completionHandler to a block that calls resumeUpload.
+    TIGHTDB_ASSERT(_latestVersionUploaded <= _latestVersionAvailable);
+    if (_latestVersionUploaded == _latestVersionAvailable) {
+        _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
+        if (_latestVersionUploaded == _latestVersionAvailable) {
+            _uploadInProgress = NO;
+            return;
+        }
+    }
+    Replication::version_type uploadVersion = _latestVersionUploaded + 1;
+    BinaryData transactLog;
+    _transactLogRegistry->get_commit_entries(uploadVersion-1, uploadVersion, &transactLog);
+    typedef unsigned long ulong;
+    typedef unsigned long long ulonglong;
+    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    msg.body = [NSData dataWithBytes:transactLog.data() length:transactLog.size()]; // Full copy
+    msg.head = [NSString stringWithFormat:@"transact %@ %llu %lu\n",
+                         _ident, ulonglong(uploadVersion), ulong(msg.body.length)];
+    NSLog(@"Sending: Transaction log %llu -> %llu of size %lu on local file #%@",
+          ulonglong(uploadVersion-1), ulonglong(uploadVersion), ulong(msg.body.length), _ident);
+    __weak RLMServerFile *weakSelf = self;
+    [msg setCompletionHandler:^{
+            [weakSelf uplaodCompletedWithVersion:uploadVersion];
+        }];
+    [_connection enqueueOutputMessage:msg];
+}
+
+
+- (void)uplaodCompletedWithVersion:(Replication::version_type)version {
+    TIGHTDB_ASSERT(version == _latestVersionUploaded+1);
+    _uploadInProgress = NO;
+    _latestVersionUploaded = version;
+    [self resumeUpload];
+}
+
+
+- (void)handleTransactMessageWithVersion:(Replication::version_type)version andLog:(NSData *)log {
+
+    RLMForeignTransactLog *log2 =
+        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:log];
+
+    // FIXME: Consider whether we should attempt to apply small
+    // transactions immediately on the main thread (right here) if a
+    // try-lock on the write-transaction mutex succeeds. This might be
+    // an effective way of reducing latency due to context switches.
+
+    @synchronized (s_foreignTransactLogs) {
+        RLMForeignTransactLog *last = s_foreignTransactLogs.lastObject;
+        if (last && version != last.version + 1) {
+            typedef unsigned long long ulonglong;
+            NSLog(@"ERROR: Bad version %llu in transaction message for file #%@",
+                  ulonglong(version), _ident);
+            [_connection close];
+            return;
+        }
+        [s_foreignTransactLogs addObject:log2];
+    }
+
+    [self resumeForeignTransactLogApplication];
+}
+
+
+- (void)handleAcceptMessageWithVersion:(Replication::version_type)version {
+    Replication::version_type expectedVersion = _latestVersionAcceptedByServer + 1;
+    if (version != expectedVersion || version > _latestVersionUploaded) {
+        typedef unsigned long long ulonglong;
+        NSLog(@"ERROR: Bad version %llu in accept message for file #%@",
+              ulonglong(version), _ident);
+        [_connection close];
+        return;
+    }
+    _transactLogRegistry->set_last_version_synced(version);
+    _latestVersionAcceptedByServer = version;
+
+    [self resumeForeignTransactLogApplication];
+}
+
+
+- (void)resumeForeignTransactLogApplication {
+    @synchronized (s_foreignTransactLogs) {
+        if (s_foreignTransactApplicationInProgress)
+            return;
+        RLMForeignTransactLog *first = s_foreignTransactLogs.firstObject;
+        if (!first)
+            return;
+        Replication::version_type maxResumeVersion = _latestVersionAcceptedByServer + 1;
+        if (first.version > maxResumeVersion)
+            return;
+        s_foreignTransactApplicationInProgress = YES;
+    }
+    [s_serverSyncBackgroundQueue addOperationWithBlock:^{
+            for (;;) {
+                RLMForeignTransactLog *log;
+                @synchronized (s_foreignTransactLogs) {
+                    if (s_foreignTransactLogs.count == 0) {
+                        s_foreignTransactApplicationInProgress = NO;
+                        return;
+                    }
+                    log = s_foreignTransactLogs.firstObject;
+                    [s_foreignTransactLogs removeObjectAtIndex:0];
+                }
+                [log backgroundThreadApply];
+            }
+        }];
+}
+
+
+- (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
+                                            andData:(NSData *)data {
+    typedef unsigned long long ulonglong;
+    NSLog(@"Applying foreign transaction log (%llu -> %llu)", ulonglong(version-1),
+          ulonglong(version));
+
+    BOOL success;
+
+    const char *data2 = static_cast<const char *>(data.bytes);
+    size_t size = data.length;
+    BinaryData transactLog(data2, size);
+    ostream *applyLog = 0;
+    try {
+        Replication &repl = *_backgroundTransactLogRegistry;
+        success = repl.apply_foreign_transact_log(*_backgroundSharedGroup, version,
+                                                  transactLog, applyLog);
+    }
+    catch (Replication::BadTransactLog&) {
+        NSLog(@"Transaction log application failed");
+        return;
+    }
+
+    if (!success) {
+        // FIXME: This may be a non-critical situation if version <
+        // expectedVersion, but if version > expectedVersion, it is
+        // unrecoverable given the current implementation, because we
+        // will never receive the missing transaction log from the
+        // server.
+        NSLog(@"Canceling application of foreign transaction log (%llu -> %llu) "
+              "due to version mismatch", ulonglong(version-1), ulonglong(version));
+        return;
+    }
+
+    [RLMRealm notifyRealmsAtPath:_localPath exceptRealm:nil];
+}
+
+
+- (void)dealloc {
+    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+    RLMRealm *realm = _realm;
+    RLMNotificationToken *notifyToken = _notifyToken;
+    __weak RLMServerConnection *weakConnection = _connection;
+    NSNumber *ident = _ident;
+    [mainQueue addOperationWithBlock:^{
+            [realm removeNotification:notifyToken];
+            [weakConnection sendUnbindMessageWithIdent:ident];
+        }];
+}
+
+@end
+
 
 NSString * const c_defaultRealmFileName = @"default.realm";
 
@@ -604,9 +937,8 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     BOOL _readOnly;
     BOOL _inMemory;
 
-    NSString *_serverBaseURL;
-
-    RLMServerSync *_serverSync;
+    NSURL *_serverBaseURL;
+    RLMServerFile *_serverFile;
 }
 
 + (BOOL)isCoreDebug {
@@ -627,7 +959,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
     clearRealmCache();
 }
 
-- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSString *)serverBaseURL {
+- (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory error:(NSError **)error serverBaseURL:(NSURL *)serverBaseURL {
     if (key && [key length] != 64) {
         @throw [NSException exceptionWithName:@"RLMException"
                                        reason:@"Encryption key must be exactly 64 bytes long"
@@ -822,7 +1154,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
         }
     }
 
-    NSString *serverBaseURL;
+    NSURL *serverBaseURL;
     @synchronized (s_serverBaseURLS) {
         serverBaseURL = s_serverBaseURLS[path];
     }
@@ -879,46 +1211,77 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                 // if we have a cached realm on another thread, copy without a transaction
                 RLMRealmSetSchema(realm, [sourceRealm schema], false);
 
-                // Ensured by the SharedGRoup constructor.
+                // Ensured by the SharedGroup constructor.
                 TIGHTDB_ASSERT(bool(sourceRealm->_serverBaseURL) == bool(realm->_serverBaseURL));
 
-                if (bool(realm->_serverBaseURL)) {
-                    if (![realm->_serverBaseURL isEqualToString:sourceRealm->_serverBaseURL]) {
+                if (realm->_serverBaseURL) {
+                    if (![realm->_serverBaseURL isEqual:sourceRealm->_serverBaseURL]) {
                         @throw [NSException exceptionWithName:@"RLMException"
                                                        reason:@"Server synchronization URL mismatch"
                                                      userInfo:nil];
                     }
-                    realm->_serverSync = sourceRealm->_serverSync;
+                    realm->_serverFile = sourceRealm->_serverFile;
                 }
             }
             else {
-                if (realm->_serverBaseURL) {
-                    realm->_serverSync = [[RLMServerSync alloc] initWithPath:realm.path
-                                                                     baseURL:realm->_serverBaseURL];
+                RLMServerFile *file = 0;
+                // FIXME: A file cannot be correctly identified by its path, and
+                // in this case it is even unsafe to do so. The right identifier
+                // is the combination of the inode and device IDs, which can be
+                // obtained by fstat(). Note that race conditions can only be
+                // avoided by stat'ing the open file rather than the path.
+                file = [s_serverFiles objectForKey:realm.path];
+                if (!file) {
+                    if (serverBaseURL) {
+                        NSString *hostKey = serverBaseURL.host;
+                        if (serverBaseURL.port) {
+                            hostKey = [NSString stringWithFormat:@"%@:%@", serverBaseURL.host, serverBaseURL.port];
+                        }
+                        RLMServerConnection *conn = [s_serverConnections objectForKey:hostKey];
+                        if (!conn) {
+                            if (!s_serverSyncBackgroundQueue) {
+                                s_serverSyncBackgroundQueue = [[NSOperationQueue alloc] init];
+                                s_serverSyncBackgroundQueue.name = @"io.realm.sync";
+                            }
+                            conn = [[RLMServerConnection alloc] initWithAddress:serverBaseURL.host
+                                                                           port:serverBaseURL.port];
+                            [s_serverConnections setObject:conn forKey:hostKey];
+                        }
+                        NSNumber *localFileIdent = [NSNumber numberWithUnsignedLong:++s_nextLocalFileIdent];
+                        file = [[RLMServerFile alloc] initWithConnection:conn
+                                                              localIdent:localFileIdent
+                                                               localPath:realm.path
+                                                              remotePath:serverBaseURL.path];
+                        [s_serverFiles setObject:file forKey:realm.path];
+                        NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+                        __weak RLMServerFile *weakFile = file;
+                        [mainQueue addOperationWithBlock:^{
+                                [weakFile mainThreadInit];
+                            }];
+                    }
                 }
+                realm->_serverFile = file;
 
-                // Synchronize with server and block here until
-                // synchronization is complete.
+                // Synchronize with server and block here until synchronization
+                // is complete.
                 //
-                // This is done to ensure that only one client submits
-                // a transaction that creates the schema for
-                // compile-time specified Realm classes. If all
-                // clients did that, there would be an immediate need
-                // for conflict resolution, but in the first (proto)
-                // implementation of client-server synchronization,
-                // conflict resolution will not be available.
+                // This is done to ensure that only one client submits a
+                // transaction that creates the schema for compile-time
+                // specified Realm classes. If all clients did that, there would
+                // be an immediate need for conflict resolution, but in the
+                // first (proto) implementation of client-server
+                // synchronization, conflict resolution will not be available.
                 //
                 // This kind of blocking is obviously not good enough,
-                // especially when it occurs on the main thread, so
-                // some kind of nonblocking alternative has to be
-                // found.
+                // especially when it occurs on the main thread, so some kind of
+                // nonblocking alternative has to be found.
                 //
-                // When transaction merging becomes possible, this
-                // problem disappears completely, becasue then all the
-                // initial schema creating transactions can be merged.
-                [realm->_serverSync initialBlockingDownload];
+                // When transaction merging becomes possible, this problem
+                // disappears completely, becasue then all the initial schema
+                // creating transactions can be merged.
+//                [realm->_serverSync initialBlockingDownload];
 
-                [realm->_serverSync rescheduleNonblockingDownload];
+//                [realm->_serverSync rescheduleNonblockingDownload];
 
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
@@ -939,8 +1302,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             cacheRealm(realm, path);
         }
     }
-
-    [realm->_serverSync resumeNonblockingUpload];
 
     return realm;
 }
@@ -1061,8 +1422,6 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
-
-            [_serverSync resumeNonblockingUpload];
         }
         catch (std::exception& ex) {
             throw_objc_exception(ex);
@@ -1334,8 +1693,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL {
+    NSURL *url = [NSURL URLWithString:serverBaseURL];
+    // The URL must specify a scheme, a host, and a path, and the
+    // scheme must be 'realm'.
+    bool good = url && url.scheme && url.host && url.path &&
+        !url.user && !url.query && !url.fragment &&
+        [url.scheme.lowercaseString isEqualToString:@"realm"];
+    if (!good)
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Bad URL" userInfo:nil];
     @synchronized (s_serverBaseURLS) {
-        s_serverBaseURLS[path] = serverBaseURL;
+        s_serverBaseURLS[path] = url;
     }
 }
 
@@ -1383,6 +1750,14 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 
     return [self writeCopyToPath:path key:key error:error];
+}
+
+- (tightdb::SharedGroup *)sharedGroup {
+    return _sharedGroup.get();
+}
+
+- (tightdb::Replication *)transactLogRegistry {
+    return _replication.get();
 }
 
 @end
