@@ -90,7 +90,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             println("Migration complete.")
         }
-        setSchemaVersion(3, migrationBlock)
+
+        setDefaultRealmSchemaVersion(3, migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -103,6 +104,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let v2Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v2.realm")
         let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
         let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
+        setSchemaVersion(3, realmv1Path, migrationBlock)
+        setSchemaVersion(3, realmv2Path, migrationBlock)
 
         NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)

@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMResults_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMRealm_Private.hpp"
@@ -37,7 +38,6 @@
     tightdb::TableView _backingView;
     BOOL _viewCreated;
     RowIndexes::Sorter _sortOrder;
-    RLMObjectSchema *_objectSchema;
 
 @protected
     RLMRealm *_realm;
