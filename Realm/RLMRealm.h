@@ -583,7 +583,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  path. Must be called prior to requesting any accessor object
  (RLMRealm) for that Realm.
 
- @param serverBaseURL E.g. https://realm.foo.com/my_realm, where
+ @param serverBaseURL E.g. realm://realm.foo.com:7800/my_realm, where
  `my_realm` is the name of the Realm at \a path as known to the
  server.
 */

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
-               BuildableName = "TableView copy.app"
+               BuildableName = "Draw.app"
                BlueprintName = "Draw"
                ReferencedContainer = "container:RealmExamples.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
@@ -52,7 +52,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E87985A61A1450E800FB1EBF"
-            BuildableName = "TableView copy.app"
+            BuildableName = "Draw.app"
             BlueprintName = "Draw"
             ReferencedContainer = "container:RealmExamples.xcodeproj">
          </BuildableReference>

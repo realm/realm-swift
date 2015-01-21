@@ -25,7 +25,7 @@
 {
     [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                       serverBaseURL:@"http://Alexanders-MacBook-Pro.local:8080"];
+                       serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/chat"];
     return YES;
 }
 
