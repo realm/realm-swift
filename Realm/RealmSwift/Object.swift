@@ -61,7 +61,7 @@ public class Object : RLMObjectBase, Equatable {
 
     :returns: Returns the names of all properties in `obj` that are of type `List<>`.
     */
-    public class func PRIVATE_getGenericListPropertyNames(obj: AnyObject) -> NSArray {
+    public class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
         let reflection = reflect(obj)
 
         var properties = [String]()
