@@ -107,6 +107,7 @@ strong references to it.
 	  on a consistent thread.
 */
 public final class Realm {
+
     // MARK: Properties
 
     internal var rlmRealm: RLMRealm
@@ -156,6 +157,11 @@ public final class Realm {
 
     // MARK: Initializers
 
+    /**
+    Create a `Realm` by passing in the `RLMRealm` to be wrapped.
+
+    :param: rlmrealm `RLMRealm`.
+    */
     internal init(rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }

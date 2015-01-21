@@ -49,6 +49,11 @@ public final class ObjectSchema {
 
     // MARK: Initializers
 
+    /**
+    Create an `ObjectSchema` by passing in the `RLMObjectSchema` to be wrapped.
+
+    :param: rlmObjectSchema `RLMObjectSchema`.
+    */
     internal init(rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
