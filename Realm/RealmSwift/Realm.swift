@@ -43,7 +43,7 @@ The location of the default Realm as a string. Can be overridden.
 
 :returns: Location of the default Realm.
 */
-var defaultRealmPath: String {
+public var defaultRealmPath: String {
     set {
 	RLMRealm.setDefaultRealmPath(newValue)
     }
