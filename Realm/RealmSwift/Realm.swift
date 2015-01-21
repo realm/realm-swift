@@ -110,7 +110,7 @@ public final class Realm {
     `defaultRealm().autorefresh = false` in
     `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
     objects will not work.
-    
+
     Defaults to true.
     */
     public var autorefresh: Bool {
@@ -200,7 +200,7 @@ public final class Realm {
     :param: readOnly    Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error       If an error occurs, upon return contains an `NSError` object
                         that describes the problem. If you are not interested in
-                        possible errors, omit the argument or pass in `nil`.
+                        possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
@@ -223,7 +223,7 @@ public final class Realm {
 
     :param: path  Path to save the Realm to.
     :param: error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual
-                  error object containing the error information. You may specify nil for this parameter if you 
+                  error object containing the error information. You may specify nil for this parameter if you
                   do not want the error information.
     */
     public func writeCopyToPath(path: String, error: NSErrorPointer = nil) {
@@ -363,8 +363,8 @@ public final class Realm {
     Adds an object to be persisted it in this Realm.
 
     Once added, this object can be retrieved using the `objects(_:)` free function.
-    When added, all linked (child) objects referenced by this object will also be 
-    added to the Realm if they are not already in it. If the object or any linked 
+    When added, all linked (child) objects referenced by this object will also be
+    added to the Realm if they are not already in it. If the object or any linked
     objects already belong to a different Realm an exception will be thrown. Use
     `Object(realm:object:)` to insert a copy of a persisted object
     into a different Realm.
@@ -430,28 +430,28 @@ public final class Realm {
     public func delete(object: Object) {
         RLMDeleteObjectFromRealm(object)
     }
-    
+
     /**
     Deletes the given objects from this Realm.
-    
+
     :param: object The objects to be deleted.
     */
     public func delete(objects: [Object]) {
         rlmRealm.deleteObjects(objects)
     }
-    
+
     /**
     Deletes the given objects from this Realm.
-    
+
     :param: object The objects to be deleted.
     */
     public func delete(objects: List<Object>) {
         rlmRealm.deleteObjects(objects)
     }
-    
+
     /**
     Deletes the given objects from this Realm.
-    
+
     :param: object The objects to be deleted.
     */
     public func delete(objects: Results<Object>) {
