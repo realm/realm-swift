@@ -375,6 +375,7 @@ extern "C" {
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
 }
 
+#if 0 // FIXME: re-enable when int indexing is enabled
 - (void)testIntPrimaryKeyNoIndexMigration {
     // make string an int
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
@@ -406,6 +407,7 @@ extern "C" {
     XCTAssertEqual(1, [objects[0] intCol]);
     XCTAssertEqual(2, [objects[1] intCol]);
 }
+#endif
 
 - (void)testDuplicatePrimaryKeyMigration {
     // make string an int

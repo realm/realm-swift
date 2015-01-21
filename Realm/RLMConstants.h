@@ -22,9 +22,8 @@
 
 typedef NS_OPTIONS(NSUInteger, RLMPropertyAttributes) {
 /**
- Create an index for this property for improved search performance. Only string
- and int properties can be indexed. Returning this for properties of any other
- type is an error.
+ Create an index for this property for improved search performance. Only string properties
+ can be indexed. Returning this for properties of any other type will have no effect.
  */
     RLMPropertyAttributeIndexed = 1 << 2,
 
