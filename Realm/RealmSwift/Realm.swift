@@ -48,7 +48,7 @@ public var defaultRealmPath: String {
 	RLMRealm.setDefaultRealmPath(newValue)
     }
     get {
-	RLMRealm.defaultRealmPath()
+	return RLMRealm.defaultRealmPath()
     }
 }
 
