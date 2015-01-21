@@ -34,16 +34,6 @@
 + (NSArray *)getGenericListPropertyNames:(id)obj;
 @end
 
-@implementation RLMObjectBase (Swift)
-// We need to implement this method in Swift, but we don't want the obj-c and
-// Swift in the same target to avoid polluting the RealmSwift namespace with
-// obj-c stuff. As such, this method is overridden in RealmSwift.Object to
-// supply the real implementation at runtime without a compile-time dependency.
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-@end
-
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary *propertiesByName;
