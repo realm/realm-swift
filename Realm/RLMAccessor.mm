@@ -310,7 +310,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
                 return;
         }
     }
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj.objectSchema.properties[col_ndx] name]] userInfo:nil];
 }
 
 // dynamic getter with column closure
