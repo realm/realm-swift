@@ -43,22 +43,27 @@
 
 - (BOOL)connect:(NSError **)error
 {
+    NSError *localError;
     _realm = [RLMRealm realmWithPath:_url
                                  key:nil
                             readOnly:NO
                             inMemory:NO
                              dynamic:YES
                               schema:nil
-                               error:error];
+                               error:&localError];
 
-    if (error && *error) {
-        NSLog(@"Realm was opened with error: %@", *error);
+    if (localError) {
+        NSLog(@"Realm was opened with error: %@", localError);
     }
     else {
         _topLevelClasses = [self constructTopLevelClasses];    
     }
+
+    if (error) {
+        *error = localError;
+    }
     
-    return !(error && *error != nil);
+    return !localError;
 }
 
 
