@@ -56,18 +56,23 @@ public class Object : RLMObjectBase, Equatable {
 
     // MARK: Properties
 
-    /// The Realm this object belongs to, or `nil` if the object
+    // FIXME: Rename to `realm`
+    /// The `Realm` this object belongs to, or `nil` if the object
     /// does not belong to a realm (the object is standalone).
-    // FIXME: Implement
-    // public var realm: Realm? { return }
+    public var swiftRealm: Realm? {
+	if let rlmRealm = realm {
+	    return Realm(rlmRealm: rlmRealm)
+	}
+	return nil
+    }
 
-    /// The ObjectSchema which lists the persisted properties for this object.
-    // FIXME: Implement
-    // public var objectSchema: ObjectSchema { return }
+    // FIXME: Rename to `objectSchema`
+    /// The `ObjectSchema` which lists the persisted properties for this object.
+    public var swiftObjectSchema: ObjectSchema { return ObjectSchema(rlmObjectSchema: objectSchema) }
 
+    // FIXME: Rename to `invalidated`
     /// Indicates if an object can no longer be accessed.
-    // FIXME: Implement
-    // public var invalidated: Bool { return }
+    public var swiftInvalidated: Bool { return invalidated }
 
     // MARK: Initializers
 
@@ -169,7 +174,7 @@ public class Object : RLMObjectBase, Equatable {
 
     :returns: `Array` of property names to index.
     */
-    public class func indexedProperties() -> [String] { return [] } // FIXME: Use this
+    public class func indexedProperties() -> [String]? { return nil }
 
     /**
     Override to designate a property as the primary key for an `Object` subclass. Only properties of
@@ -179,30 +184,32 @@ public class Object : RLMObjectBase, Equatable {
 
     :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
     */
-    public override class func primaryKey() -> String? { return nil } // FIXME: Use this
+    public override class func primaryKey() -> String? { return nil }
 
+    // FIXME: Expose this
 //    /**
 //    Override to return an array of property names to ignore. These properties will not be persisted
 //    and are treated as transient.
 //
 //    :returns: `Array` of property names to ignore.
 //    */
-//    public class func ignoredProperties() -> [String] { return  [] } // FIXME: Use this
-//
-//    // MARK: Inverse Relationships
-//
-//    /**
-//    Get an `Array` of objects of type `className` which have this object as the given property value. This can
-//    be used to get the inverse relationship value for `Object` and `List` properties.
-//
-//    @param className   The type of object on which the relationship to query is defined.
-//    @param property    The name of the property which defines the relationship.
-//
-//    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
-//    */
-//    public func linkingObjectsOfClass(className: String, forProperty propertyName: String) -> [Object] {
-//        return unsafeBitCast(self, RLMObject.self).linkingObjectsOfClass(className, forProperty: propertyName) as [Object]
-//    }
+//    public class func ignoredProperties() -> [String]? { return  [] }
+
+    // MARK: Inverse Relationships
+
+    // FIXME: Don't prefix with `swift`
+    /**
+    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    be used to get the inverse relationship value for `Object` and `List` properties.
+
+    @param className   The type of object on which the relationship to query is defined.
+    @param property    The name of the property which defines the relationship.
+
+    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    */
+    public func swiftLinkingObjectsOfClass(className: String, forProperty propertyName: String) -> [Object] {
+	return unsafeBitCast(self, RLMObject.self).linkingObjectsOfClass(className, forProperty: propertyName) as [Object]
+    }
 
     // MARK: Property Retrieval
 
@@ -273,7 +280,6 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return lhs.isEqualToObject(rhs)
 }
 
-// FIXME: Move to separate file
 /// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
     // Get the names of all properties in the object which are of type List<>
