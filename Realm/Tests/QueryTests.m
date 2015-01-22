@@ -128,6 +128,11 @@
     XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
     betweenResults = [AllTypesObject objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
     XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+
+    betweenResults = [AllTypesObject.allObjects objectsWhere:@"intCol BETWEEN {2, 3}"];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
+    betweenResults = [AllTypesObject.allObjects objectsWhere:@"doubleCol BETWEEN {3.0, 7.0}"];
+    XCTAssertEqual(betweenResults.count, 2U, @"Should equal 2");
 }
 
 - (void)testQueryWithDates

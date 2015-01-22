@@ -527,7 +527,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (std::unique_ptr<Query>)cloneQuery {
-    return std::make_unique<tightdb::Query>(_table->where());
+    return std::make_unique<tightdb::Query>(_table->where(), tightdb::Query::TCopyExpressionTag{});
 }
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
