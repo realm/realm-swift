@@ -185,7 +185,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 
 @implementation RLMRealm {
     // Used for read-write realms
-    NSMapTable *_notificationHandlers;
+    NSHashTable *_notificationHandlers;
 
     std::unique_ptr<Replication> _replication;
     std::unique_ptr<SharedGroup> _sharedGroup;
@@ -218,7 +218,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     if (self) {
         _path = path;
         _threadID = pthread_mach_thread_np(pthread_self());
-        _notificationHandlers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsWeakMemory];
+        _notificationHandlers = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
         _readOnly = readonly;
         _inMemory = inMemory;
         _dynamic = dynamic;
@@ -520,14 +520,14 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
     token.realm = self;
     token.block = block;
-    [_notificationHandlers setObject:token forKey:token];
+    [_notificationHandlers addObject:token];
     return token;
 }
 
 - (void)removeNotification:(RLMNotificationToken *)token {
     RLMCheckThread(self);
     if (token) {
-        [_notificationHandlers removeObjectForKey:token];
+        [_notificationHandlers removeObject:token];
         token.realm = nil;
         token.block = nil;
     }
