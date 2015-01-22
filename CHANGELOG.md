@@ -4,6 +4,7 @@
 ### Bugfixes
 
 * Fix for RLMObject being treated as a model object class and showing up in the browser.
+* Fix compilation from the podspec.
 
 0.90.0 Release notes (2015-01-21)
 =============================================================
