@@ -65,7 +65,7 @@ directory on OS X.
 :returns: The default `Realm` instance for the current thread.
 */
 public func defaultRealm() -> Realm {
-    return Realm(rlmRealm: RLMRealm.defaultRealm())
+    return Realm(RLMRealm.defaultRealm())
 }
 
 /**
@@ -122,7 +122,7 @@ public final class Realm {
     public var readOnly: Bool { return rlmRealm.readOnly }
 
     /// The Schema used by this realm.
-    public var schema: Schema { return Schema(rlmSchema: rlmRealm.schema) }
+    public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /**
     Whether this Realm automatically updates when changes happen in other threads.
@@ -165,7 +165,7 @@ public final class Realm {
 
     :param: rlmrealm `RLMRealm`.
     */
-    internal init(rlmRealm: RLMRealm) {
+    internal init(_ rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 
@@ -175,7 +175,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String) {
-        self.init(rlmRealm: RLMRealm(path: path, readOnly: false, error: nil))
+	self.init(RLMRealm(path: path, readOnly: false, error: nil))
     }
 
     /**
@@ -194,7 +194,7 @@ public final class Realm {
     :param: identifier A string used to identify a particular in-memory Realm.
     */
     public convenience init(inMemoryIdentifier: String) {
-        self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
+	self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
     /**
@@ -217,12 +217,12 @@ public final class Realm {
 		     possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, error: NSErrorPointer = nil) {
-	if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
-	    self.init(rlmRealm: rlmRealm)
-	} else {
-	    self.init(rlmRealm: RLMRealm()) // `rlmRealm` cannot be nil.
-	    return nil
-	}
+        if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
+            self.init(rlmRealm)
+        } else {
+            self.init(RLMRealm()) // `rlmRealm` cannot be nil.
+            return nil
+        }
     }
 
     /**
@@ -244,10 +244,10 @@ public final class Realm {
 			  possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
-	if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
+        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+            self.init(rlmRealm)
         } else {
-            self.init(rlmRealm: RLMRealm())
+            self.init(RLMRealm())
             return nil
         }
     }
@@ -561,6 +561,6 @@ Converts a `NotificationBlock` to an `RLMNotificationBlock`.
 */
 internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
+	return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
     }
 }

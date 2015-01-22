@@ -52,7 +52,7 @@ public final class Property {
 
     :param: rlmProperty `RLMProperty`.
     */
-    internal init(rlmProperty: RLMProperty) {
+    internal init(_ rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }
 }
