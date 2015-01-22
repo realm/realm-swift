@@ -11,7 +11,7 @@
 
 @interface TickViewController : UIViewController
 
-@property (nonatomic, strong) UILabel *label;
+@property (nonatomic, strong) UIButton *button;
 @property (nonatomic, strong) Tick *tick;
 @property (nonatomic, strong) RLMNotificationToken *notificationToken;
 
@@ -33,6 +33,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [RLMRealm setDefaultRealmPath:[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.io.realm.examples.extension"] URLByAppendingPathComponent:@"extension.realm"].path];
     self.tick = [Tick allObjects].firstObject;
     if (!self.tick) {
         [[RLMRealm defaultRealm] transactionWithBlock:^{
@@ -41,21 +42,40 @@
     }
     self.notificationToken = [self.tick.realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
         if (self.tick.count % 2 == 0) {
-            [realm transactionWithBlock:^{
-                self.tick.count++;
-            }];
+            [self tock];
         }
         [self updateLabel];
     }];
-    self.label = [[UILabel alloc] initWithFrame:self.view.bounds];
-    self.label.textAlignment = NSTextAlignmentCenter;
-    self.view.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:self.label];
+    self.button = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.button.frame = self.view.bounds;
+    [self.button addTarget:self action:@selector(tock) forControlEvents:UIControlEventTouchUpInside];
+    self.button.titleLabel.textAlignment = NSTextAlignmentCenter;
+    [self.button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.view addSubview:self.button];
+    self.view.backgroundColor = [UIColor purpleColor];
+    [self updateLabel];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    self.button.frame = self.view.bounds;
+    [self updateLabel];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self tock];
     [self updateLabel];
 }
 
 - (void)updateLabel {
-    self.label.text = [NSString stringWithFormat:@"%ld", (long)self.tick.count];
+    [self.button setTitle:[NSString stringWithFormat:@"%ld", (long)self.tick.count] forState:UIControlStateNormal];
+}
+
+- (void)tock {
+    [[RLMRealm defaultRealm] transactionWithBlock:^{
+        self.tick.count++;
+    }];
 }
 
 @end
