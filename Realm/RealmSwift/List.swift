@@ -32,13 +32,17 @@ public class ListBase: RLMListBase, Printable {
 }
 
 /**
-List<T> is the container type in Realm used to define to-many relationships.
+`List<T>` is the container type in Realm used to define to-many relationships.
 
-Lists hold a single `Object` subclass, `T`, which defines the "type" of the list.
+Lists hold a single `Object` subclass (`T`) which defines the "type" of the list.
 
 Lists can be filtered and sorted with the same predicates as `Results<T>`.
+
+List properties on objects are lazily created when accessed, or can be
+obtained by querying a Realm.
 */
 public final class List<T: Object>: ListBase, SequenceType {
+
     // MARK: Properties
 
     /// The Realm the objects in this list belong to, or `nil` if the list's owning
@@ -52,13 +56,13 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     // MARK: Initializers
 
-    /// Creates a List that holds objects of type `T`.
+    /// Creates a `List` that holds objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
     /**
-    Creates a List that is backed by the given `RLMArray`.
+    Creates a `List` that is backed by the given `RLMArray`.
 
     :param: rlmArray The RLMArray that backs the list.
     */
@@ -95,18 +99,19 @@ public final class List<T: Object>: ListBase, SequenceType {
     Returns the index of the first object matching the given predicate,
     or `nil` if the object is not in the list.
 
-    :param: predicateFormat The predicate format to filter the objects.
+    :param: predicateFormat The predicate format string which can accept variable arguments.
 
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+	return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     // MARK: Object Retrieval
 
     /**
-    Returns the object at the given `index`.
+    Returns the object at the given `index` on get.
+    Replaces the object at the given `index` on set.
 
     :warning: You can only set an object during a write transaction.
 
@@ -129,25 +134,25 @@ public final class List<T: Object>: ListBase, SequenceType {
     /// Returns the last object in the list, or `nil` if empty.
     public var last: T? { return _rlmArray.lastObject() as T? }
 
-    // MARK: Subarray Retrieval
+    // MARK: Filtering
 
     /**
-    Filters the List to the objects that match the given predicate.
+    Returns `Results` containing list elements that match the given predicate.
 
     :param: predicateFormat The predicate format string which can accept variable arguments.
 
-    :returns: Results containing objects that match the given predicate.
+    :returns: `Results` containing list elements that match the given predicate.
     */
     public func filter(predicateFormat: String, _ args: CVarArgType...) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     /**
-    Filters the List to the objects that match the given predicate.
+    Returns `Results` containing list elements that match the given predicate.
 
-    :param: predicateFormat The predicate to filter the objects.
+    :param: predicate The predicate to filter the objects.
 
-    :returns: Results containing objects that match the given predicate.
+    :returns: `Results` containing list elements that match the given predicate.
     */
     public func filter(predicate: NSPredicate) -> Results<T> {
         return Results<T>(_rlmArray.objectsWithPredicate(predicate))
@@ -156,15 +161,27 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Sorting
 
     /**
-    Returns a sorted version of the list.
+    Returns `Results` containing list elements sorted by the given property name.
 
     :param: property  The property name to sort by.
     :param: ascending The direction to sort by.
 
-    :returns: Results containing the objects in the list sorted by the given property.
+    :returns: `Results` containing list elements sorted by the given property name.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
-        return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
+	return sorted([SortDescriptor(property: property, ascending: ascending)])
+    }
+
+    /**
+    Returns `Results` containing list elements sorted by the given sort descriptors.
+
+    :param: property  The property name to sort by.
+    :param: ascending The direction to sort by.
+
+    :returns: `Results` containing list elements sorted by the given property name.
+    */
+    public func sorted(sortDescriptors: [SortDescriptor]) -> Results<T> {
+	return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Sequence support
@@ -225,7 +242,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes the object at the given index.
+    Removes the object at the given index from the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
     :warning: Throws an exception when called with an index greater than the number of objects in the list.
@@ -237,7 +254,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes the given object from the list.
+    Removes the given object from the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
 
@@ -250,7 +267,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 
     /**
-    Removes the last object in the List. Does not remove the object from the Realm.
+    Removes the last object in the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
     */
