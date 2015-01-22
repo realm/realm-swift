@@ -25,7 +25,7 @@ void RLMCacheRealm(RLMRealm *realm);
 // Get a Realm for the given path which can be used on the current thread
 RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path);
 // Get a Realm for the given path
-RLMRealm *RLMGetCachedRealmForPath(NSString *path);
+RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
 

@@ -34,7 +34,7 @@ void RLMCacheRealm(RLMRealm *realm) {
     }
 }
 
-RLMRealm *RLMGetCachedRealmForPath(NSString *path) {
+RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].nextObject;
     }

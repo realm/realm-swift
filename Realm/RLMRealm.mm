@@ -442,7 +442,7 @@ static id RLMAutorelease(id value) {
         }
         else {
             // check cache for existing cached realms with the same path
-            RLMRealm *existingRealm = RLMGetCachedRealmForPath(path);
+            RLMRealm *existingRealm = RLMGetAnyCachedRealmForPath(path);
             if (existingRealm) {
                 // if we have a cached realm on another thread, copy without a transaction
                 RLMRealmSetSchema(realm, existingRealm.schema, false);
