@@ -70,25 +70,24 @@ void RLMClearRealmCache() {
 
 void RLMStartListeningForChanges(RLMRealm *realm) {
     @synchronized (s_notifiersPerPath) {
-        NSMutableArray *notifiers = s_notifiersPerPath[realm.path];
+        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
         if (!notifiers) {
-            notifiers = [NSMutableArray new];
+            notifiers = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsStrongMemory];
             s_notifiersPerPath[realm.path] = notifiers;
         }
-        [notifiers addObject:[[RLMWeakNotifier alloc] initWithRealm:realm]];
+        [notifiers setObject:[[RLMWeakNotifier alloc] initWithRealm:realm] forKey:realm];
     }
 }
 
 void RLMStopListeningForChanges(RLMRealm *realm) {
     @synchronized (s_notifiersPerPath) {
-        NSMutableArray *notifiers = s_notifiersPerPath[realm.path];
+        NSMapTable *notifiers = s_notifiersPerPath[realm.path];
         if (!notifiers) {
             return;
         }
 
-        // we're called from `dealloc`, so the weak pointer is already nil
-        [notifiers filterUsingPredicate:[NSPredicate predicateWithFormat:@"realm != nil"]];
-        if (notifiers.count == 0) {
+        [notifiers removeObjectForKey:realm];
+        if (!notifiers.objectEnumerator.nextObject) {
             [s_notifiersPerPath removeObjectForKey:realm.path];
         }
     }
@@ -96,7 +95,7 @@ void RLMStopListeningForChanges(RLMRealm *realm) {
 
 void RLMNotifyOtherRealms(RLMRealm *notifyingRealm) {
     @synchronized (s_notifiersPerPath) {
-        for (RLMWeakNotifier *notifier in s_notifiersPerPath[notifyingRealm.path]) {
+        for (RLMWeakNotifier *notifier in [s_notifiersPerPath[notifyingRealm.path] objectEnumerator]) {
             if (notifier.realm != notifyingRealm) {
                 [notifier notifyOnTargetThread];
             }
