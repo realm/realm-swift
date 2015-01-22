@@ -25,7 +25,7 @@
 #import "RLMObjectStore.hpp"
 #import "RLMObject_Private.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealmCache.h"
+#import "RLMRealmUtil.h"
 #import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
