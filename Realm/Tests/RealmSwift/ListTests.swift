@@ -217,7 +217,7 @@ class ListTests: TestCase {
     }
 
     func testAppendRLMResults() {
-        array.append(realmWithTestPath().objects(SwiftStringObject))
+	array.append(objects(SwiftStringObject.self, inRealm: realmWithTestPath()))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -292,7 +292,7 @@ class ListTests: TestCase {
         if let realm = array.realm {
             array.append([str1, str2])
 
-            let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
+	    let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -330,7 +330,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
+	let array = SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -342,9 +342,9 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
+	SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
         realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject).first!
+	let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
 
         XCTAssertNotNil(array.realm)
         return array
