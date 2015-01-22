@@ -175,16 +175,15 @@ public final class List<T: Object>: ListBase, SequenceType {
     /**
     Returns `Results` containing list elements sorted by the given sort descriptors.
 
-    :param: property  The property name to sort by.
-    :param: ascending The direction to sort by.
+    :param: sortDescriptors `SortDescriptor`s to sort by.
 
-    :returns: `Results` containing list elements sorted by the given property name.
+    :returns: `Results` containing list elements sorted by the given sort descriptors.
     */
     public func sorted(sortDescriptors: [SortDescriptor]) -> Results<T> {
 	return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
-    // MARK: Sequence support
+    // MARK: Sequence Support
 
     /**
     Returns a `GeneratorOf<T>` that yields successive elements in the list.
@@ -299,7 +298,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 }
 
-// MARK: Private helpers
+// MARK: Private Helpers
 
 /**
 Converts `NSNotFound` to `nil`, otherwise returns `index` as an `Int`.
