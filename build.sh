@@ -35,8 +35,11 @@ command:
   clean [xcmode]:          clean up/remove all generated files
   build [xcmode]:          builds iOS and OS X frameworks with release configuration
   build-debug [xcmode]:    builds iOS and OS X frameworks with debug configuration
-  ios [xcmode]:            builds iOS framework with release configuration
+  ios [xcmode]:            builds iOS frameworks with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
+  ios-static [xcmode]:     builds a fat iOS static framework with release configuration
+  ios-dynamic [xcmode]:    builds two iOS 8 dynamic frameworks: one for devices and one for the simulator
+  ios-swift [xcmode]:      builds two Swift frameworks: one for devices and one for the simulator
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -239,8 +242,32 @@ case "$COMMAND" in
         ;;
 
     "ios")
+        sh build.sh ios-static "$XCMODE"
+        #sh build.sh ios-dynamic "$XCMODE"
+        sh build.sh ios-swift "$XCMODE"
+        exit 0
+        ;;
+
+    "ios-static")
         build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios Realm
-        build_fat 'RealmSwift iOS' Release build/DerivedData/Realm/Build/Products/Release ios RealmSwift
+        exit 0
+        ;;
+
+    "ios-swift")
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphoneos"
+        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator"
+        mkdir -p build/ios/Realm-iphone build/ios/Realm-simulator
+        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/RealmSwift.framework build/ios/Realm-iphone/RealmSwift.framework
+        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator/RealmSwift.framework build/ios/Realm-simulator/RealmSwift.framework
+        exit 0
+        ;;
+
+    "ios-dynamic")
+        xcrealm "-scheme 'iOS-dynamic' -configuration Release -sdk iphoneos"
+        xcrealm "-scheme 'iOS-dynamic' -configuration Release -sdk iphonesimulator"
+        mkdir -p build/ios/Realm-iphone build/ios/Realm-simulator
+        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework build/ios/Realm-iphone/Realm.framework
+        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator-dynamic/Realm.framework build/ios/Realm-simulator/Realm.framework
         exit 0
         ;;
 
@@ -292,6 +319,7 @@ case "$COMMAND" in
     "test-ios")
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration Release -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealm "-scheme 'iOS-dynamic' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
