@@ -28,6 +28,9 @@
 		0295B90319D102880036D6C3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
+		C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
+		C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		C0DC41D41A7072680067156A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41D31A7072670067156A /* AppDelegate.m */; };
 		C0DC41F41A70729D0067156A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		C0DC41F51A70729D0067156A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -41,7 +44,6 @@
 		C0DC42101A7079D00067156A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0DC420F1A7079D00067156A /* MainInterface.storyboard */; };
 		C0DC42181A707B960067156A /* Tick.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41FB1A7072DE0067156A /* Tick.m */; };
 		C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		C0DC421A1A707BFB0067156A /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -271,7 +273,9 @@
 			files = (
 				C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */,
 				C0DC42081A7079D00067156A /* NotificationCenter.framework in Frameworks */,
-				C0DC421A1A707BFB0067156A /* Realm.framework in Frameworks */,
+				C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */,
+				C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */,
+				C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,8 +554,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				C0DC41F31A70728B0067156A /* PBXTargetDependency */,
 				C06134E11A718BB800D22D12 /* PBXTargetDependency */,
+				C0DC41F31A70728B0067156A /* PBXTargetDependency */,
 			);
 			name = extension;
 			productName = Extension;
