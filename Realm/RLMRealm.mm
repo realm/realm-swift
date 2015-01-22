@@ -384,6 +384,9 @@ BOOL s_foreignTransactApplicationInProgress = NO;
     if (!_isConnected)
         return;
 
+    [_inputStream close];
+    [_outputStream close];
+    
     _inputStream  = nil;
     _outputStream = nil;
 
