@@ -19,7 +19,7 @@
 extern "C" {
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
-#import "RLMAccessor.h"
+#import "RLMAccessor_Private.h"
 }
 
 #import <tightdb/link_view.hpp>
