@@ -95,7 +95,7 @@ static NSMutableDictionary *s_localNameToClass;
     s_localNameToClass = [NSMutableDictionary dictionary];
     for (unsigned int i = 0; i < numClasses; i++) {
         Class cls = classes[i];
-        if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
+        if (!RLMIsSubclass(class_getSuperclass(cls), RLMObjectBase.class)) {
             continue;
         }
 

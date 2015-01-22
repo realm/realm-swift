@@ -229,6 +229,9 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     
     // Test 7: Test querying object schemas using subscription for unexpected types
     XCTAssertThrows(schema[unexpectedType], @"Expecting asking schema for type %@ in realm using subscription to throw", unexpectedType);
+
+    // Test 8: RLMObject should not appear in the shared object schema
+    XCTAssertThrows(RLMSchema.sharedSchema[@"RLMObject"]);
 }
 
 @end
