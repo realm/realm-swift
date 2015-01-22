@@ -61,15 +61,6 @@ public final class List<T: Object>: ListBase, SequenceType {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
-    /**
-    Creates a `List` that is backed by the given `RLMArray`.
-
-    :param: rlmArray The RLMArray that backs the list.
-    */
-    internal init(_ rlmArray: RLMArray) {
-        super.init(array: rlmArray)
-    }
-
     // MARK: Index Retrieval
 
     /**
