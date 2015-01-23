@@ -94,23 +94,47 @@ xcrealm() {
     xc "-project $PROJECT $@"
 }
 
-build_fat() {
-    scheme="$1"
-    config="$2"
-    build_prefix="$3"
-    out_dir="$4"
-    name="$5.framework"
+build_combined() {
+    local scheme="$1"
+    local config="$2"
+    local module_name="$3"
+    local scope_suffix="$4"
 
+    # Derive build paths
+    local build_products_path="build/DerivedData/Realm/Build/Products"
+    local product_name="$module_name.framework"
+    local binary_path="$module_name"
+    local iphoneos_path="$build_products_path/$config-iphoneos$scope_suffix/$product_name"
+    local iphonesimulator_path="$build_products_path/$config-iphonesimulator$scope_suffix/$product_name"
+    local out_path="build/ios"
+
+    # Build for each platform
     xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
     xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator"
 
-    mkdir -p build/$out_dir
-    rm -rf build/$out_dir/$name
-    cp -R $build_prefix-iphoneos/$name build/$out_dir
-    if [ -d build/$out_dir/$name/Modules/$5.swiftmodule ]; then
-        cp $build_prefix-iphonesimulator/$name/Modules/$5.swiftmodule/* build/$out_dir/$name/Modules/$5.swiftmodule/
+    # Combine .swiftmodule
+    if [ -d $iphoneos_path/Modules/$module_name.swiftmodule ]; then
+      cp $iphoneos_path/Modules/$module_name.swiftmodule/* $iphonesimulator_path/Modules/$module_name.swiftmodule/
     fi
-    xcrun lipo -create "$build_prefix-iphonesimulator/$name/$5" "$build_prefix-iphoneos/$name/$5" -output "build/$out_dir/$name/$5"
+
+    # Retrieve build products
+    local combined_out_path="$out_path"
+    if file $iphoneos_path/$binary_path | grep -q "dynamically linked"; then
+      combined_out_path="$out_path/simulator"
+      clean_retrieve $iphoneos_path        $out_path/iphone    $product_name
+      clean_retrieve $iphonesimulator_path $out_path/simulator $product_name
+    else
+      clean_retrieve $iphoneos_path        $out_path           $product_name
+    fi
+
+    # Combine ar archives
+    xcrun lipo -create "$iphonesimulator_path/$binary_path" "$iphoneos_path/$binary_path" -output "$combined_out_path/$product_name/$module_name"
+}
+
+clean_retrieve() {
+  mkdir -p $2
+  rm -rf $2/$3
+  cp -R $1 $2
 }
 
 ######################################
@@ -249,25 +273,18 @@ case "$COMMAND" in
         ;;
 
     "ios-static")
-        build_fat iOS Release build/DerivedData/Realm/Build/Products/Release ios Realm
+        build_combined iOS Release Realm
         exit 0
         ;;
 
     "ios-swift")
-        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphoneos"
-        xcrealm "-scheme 'RealmSwift iOS' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios/Realm-iphone build/ios/Realm-simulator
-        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/RealmSwift.framework build/ios/Realm-iphone/RealmSwift.framework
-        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator/RealmSwift.framework build/ios/Realm-simulator/RealmSwift.framework
+        build_combined 'RealmSwift iOS' Release RealmSwift
+        build_combined 'RealmSwift iOS' Release RealmSwift
         exit 0
         ;;
 
     "ios-dynamic")
-        xcrealm "-scheme 'iOS-dynamic' -configuration Release -sdk iphoneos"
-        xcrealm "-scheme 'iOS-dynamic' -configuration Release -sdk iphonesimulator"
-        mkdir -p build/ios/Realm-iphone build/ios/Realm-simulator
-        mv build/DerivedData/Realm/Build/Products/Release-iphoneos/Realm.framework build/ios/Realm-iphone/Realm.framework
-        mv build/DerivedData/Realm/Build/Products/Release-iphonesimulator-dynamic/Realm.framework build/ios/Realm-simulator/Realm.framework
+        build_combined iOS-dynamic Release Realm -dynamic
         exit 0
         ;;
 
@@ -278,7 +295,7 @@ case "$COMMAND" in
         ;;
 
     "ios-debug")
-        build_fat iOS Debug build/DerivedData/Realm/Build/Products/Debug ios Realm
+        build_combined iOS Debug Realm
         exit 0
         ;;
 
