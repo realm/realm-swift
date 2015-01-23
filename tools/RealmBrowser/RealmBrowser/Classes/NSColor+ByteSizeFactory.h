@@ -22,6 +22,8 @@
 
 + (NSColor *)linkColor;
 
++ (NSColor *)pinkColor;
+
 + (NSColor *)colorWithByteRed:(NSUInteger)red green:(NSUInteger)green blue:(NSUInteger)blue alpha:(NSUInteger)alpha;
 
 + (NSColor *)colorWithByteWhite:(NSUInteger)white alpha:(NSUInteger)alpha;

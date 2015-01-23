@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="RLMRealmBrowserWindowController">
@@ -22,23 +22,21 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES" unifiedTitleAndToolbar="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="500" y="485" width="977" height="476"/>
+            <rect key="contentRect" x="100" y="100" width="977" height="476"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" id="gIp-Ho-8D9">
                 <rect key="frame" x="0.0" y="0.0" width="977" height="476"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <splitView focusRingType="none" placeholderIntrinsicWidth="977" placeholderIntrinsicHeight="300" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IXc-8a-g01" userLabel="Left-Right Split">
                         <rect key="frame" x="0.0" y="0.0" width="977" height="476"/>
                         <subviews>
                             <customView focusRingType="none" id="wGq-XQ-Lyz" userLabel="Outline">
-                                <rect key="frame" x="0.0" y="0.0" width="236" height="476"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <scrollView appearanceType="aqua" borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MSf-82-x0U" userLabel="OutlineScroll">
-                                        <rect key="frame" x="0.0" y="0.0" width="236" height="476"/>
-                                        <clipView key="contentView" focusRingType="none" drawsBackground="NO" id="udQ-xx-2L4">
+                                    <scrollView appearanceType="aqua" misplaced="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MSf-82-x0U" userLabel="OutlineScroll">
+                                        <clipView key="contentView" focusRingType="none" misplaced="YES" drawsBackground="NO" id="udQ-xx-2L4">
                                             <rect key="frame" x="0.0" y="0.0" width="236" height="564"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
@@ -48,7 +46,7 @@
                                                     <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn editable="NO" width="233" minWidth="16" maxWidth="1000" id="ye8-fR-LJ8">
+                                                        <tableColumn editable="NO" width="16" minWidth="16" maxWidth="1000" id="ye8-fR-LJ8">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -62,7 +60,7 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <textField identifier="HeaderLabel" verticalHuggingPriority="750" id="PZp-xm-tfc">
-                                                                    <rect key="frame" x="1" y="0.0" width="233" height="17"/>
+                                                                    <rect key="frame" x="1" y="0.0" width="16" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" usesSingleLineMode="YES" id="ntn-io-NM2">
                                                                         <font key="font" metaFont="smallSystem"/>
@@ -71,7 +69,7 @@
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <customView identifier="MainCell" id="O58-xq-8no" userLabel="MainCellView" customClass="RLMSidebarTableCellView">
-                                                                    <rect key="frame" x="1" y="17" width="233" height="22"/>
+                                                                    <rect key="frame" x="1" y="17" width="16" height="22"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                                     <subviews>
                                                                         <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lUk-zd-1z6">
@@ -111,7 +109,7 @@
                                             </subviews>
                                             <nil key="backgroundColor"/>
                                         </clipView>
-                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="exH-b9-o3D">
+                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="exH-b9-o3D">
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="2YT-v9-0yd">
@@ -123,20 +121,21 @@
                                     <constraint firstAttribute="bottom" secondItem="MSf-82-x0U" secondAttribute="bottom" id="1MR-hG-UmC"/>
                                     <constraint firstAttribute="trailing" secondItem="MSf-82-x0U" secondAttribute="trailing" id="SCi-ef-bJn"/>
                                     <constraint firstItem="MSf-82-x0U" firstAttribute="leading" secondItem="wGq-XQ-Lyz" secondAttribute="leading" id="heW-be-7kt"/>
+                                    <constraint firstAttribute="width" constant="200" id="lur-8H-2kQ"/>
                                     <constraint firstItem="MSf-82-x0U" firstAttribute="top" secondItem="wGq-XQ-Lyz" secondAttribute="top" id="po8-mG-pzB"/>
                                 </constraints>
                             </customView>
                             <customView id="XsG-4h-zWh" userLabel="MainTableView">
-                                <rect key="frame" x="237" y="0.0" width="740" height="476"/>
+                                <rect key="frame" x="1" y="0.0" width="976" height="476"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3b6-BA-X5L" userLabel="MainScroll">
-                                        <rect key="frame" x="0.0" y="0.0" width="740" height="476"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="976" height="476"/>
                                         <clipView key="contentView" focusRingType="none" misplaced="YES" id="kRO-aN-FFM">
                                             <rect key="frame" x="0.0" y="17" width="740" height="547"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" autosaveName="InstanceTable" rowHeight="18" headerView="cDp-e2-1cA" viewBased="YES" id="enp-HN-e6b" customClass="RLMTableView">
+                                                <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" typeSelect="NO" autosaveName="InstanceTable" rowHeight="18" headerView="cDp-e2-1cA" viewBased="YES" id="enp-HN-e6b" customClass="RLMTableView">
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -403,7 +402,7 @@
                                             </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </clipView>
-                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="4Ib-5w-NOS">
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="4Ib-5w-NOS">
                                             <rect key="frame" x="0.0" y="548" width="740" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
@@ -492,7 +491,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
-            <point key="canvasLocation" x="420.5" y="343"/>
+            <point key="canvasLocation" x="50.5" y="38"/>
         </window>
         <customObject id="hSp-0t-Gbg" customClass="RLMTypeOutlineViewController">
             <connections>

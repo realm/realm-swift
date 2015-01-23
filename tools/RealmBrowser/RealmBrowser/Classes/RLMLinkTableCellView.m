@@ -19,11 +19,72 @@
 #import "RLMLinkTableCellView.h"
 #import "NSColor+ByteSizeFactory.h"
 
-@implementation RLMLinkTableCellView
+@interface RLMLinkTableCellView ()
 
-- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle {
+@property (nonatomic) NSAttributedString *attributedStringValue;
+
+@end
+
+
+@implementation RLMLinkTableCellView 
+
+-(void)setDragType:(NSString *)dragType
+{
+    _dragType = dragType;
+    [self unregisterDraggedTypes];
+    
+    if (dragType) {
+        [self registerForDraggedTypes:@[dragType]];
+    }
+}
+
+- (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle
+{
     [super setBackgroundStyle:backgroundStyle];
     self.textField.textColor = (backgroundStyle == NSBackgroundStyleLight ? [NSColor linkColor] : [NSColor whiteColor]);
+}
+
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
+{
+    NSLog(@"--entered");
+
+    NSArray *supportedTypes = @[self.dragType];
+    NSPasteboard *draggingPasteboard = [sender draggingPasteboard];
+    NSString *availableType = [draggingPasteboard availableTypeFromArray:supportedTypes];
+
+    if ([availableType compare:self.dragType] != NSOrderedSame) {
+        NSLog(@"--WRONG TYPE");
+        return NSDragOperationNone;
+    }
+    
+    self.attributedStringValue = self.textField.attributedStringValue;
+    self.textField.stringValue = @"Update link";
+    
+    return NSDragOperationAll;
+}
+
+- (void)draggingExited:(id<NSDraggingInfo>)sender
+{
+    NSLog(@"--exited");
+    self.textField.attributedStringValue = self.attributedStringValue;
+}
+
+- (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender
+{
+    NSLog(@"--prepare");
+    return YES;
+}
+
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
+{
+    NSLog(@"--perform");
+    self.textField.attributedStringValue = self.attributedStringValue;
+    
+    BOOL success = [self.delegate performDragOperationToCell:sender];
+    
+    NSLog(@"drag operation %@", success ? @"succeeded" : @"failed");
+    
+    return success;
 }
 
 @end

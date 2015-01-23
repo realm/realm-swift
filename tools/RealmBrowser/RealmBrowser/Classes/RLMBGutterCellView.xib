@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <tableCellView identifier="RLMBGutterCellView" id="TsM-R9-trP" userLabel="Gutter Cell View">
+            <rect key="frame" x="0.0" y="0.0" width="154" height="13"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="roc-nY-PeQ">
+                    <rect key="frame" x="-2" y="0.0" width="158" height="13"/>
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Gutter" id="JJq-Y1-mcZ">
+                        <font key="font" metaFont="system" size="10"/>
+                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="roc-nY-PeQ" secondAttribute="trailing" id="7oX-bB-ZU6"/>
+                <constraint firstItem="roc-nY-PeQ" firstAttribute="leading" secondItem="TsM-R9-trP" secondAttribute="leading" id="TPw-9d-JTE"/>
+                <constraint firstItem="roc-nY-PeQ" firstAttribute="top" secondItem="TsM-R9-trP" secondAttribute="top" id="hzk-Sa-i7M"/>
+                <constraint firstAttribute="bottom" secondItem="roc-nY-PeQ" secondAttribute="bottom" id="y9z-aF-1CD"/>
+            </constraints>
+            <connections>
+                <outlet property="textField" destination="roc-nY-PeQ" id="ORi-rI-0ke"/>
+            </connections>
+            <point key="canvasLocation" x="213" y="172.5"/>
+        </tableCellView>
+    </objects>
+</document>

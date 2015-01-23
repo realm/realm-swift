@@ -18,14 +18,14 @@
 
 #import "TestClasses.h"
 
-@implementation RealmTestClass0
+@implementation RealmTestClassA
 
 @end
 
-@implementation RealmTestClass1
+@implementation RealmTestClassB
 
 @end
 
-@implementation RealmTestClass2
+@implementation RealmTestClassC
 
 @end

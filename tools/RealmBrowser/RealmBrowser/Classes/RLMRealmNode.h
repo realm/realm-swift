@@ -20,12 +20,24 @@
 #import "RLMClassNode.h"
 #import "RLMRealmOutlineNode.h"
 
+@class RLMArrayNode;
+@interface RLMObjectPasteboard : NSObject
+
+// Array containing the objects being pasted, if from array
+@property (nonatomic) RLMArrayNode *containingArray;
+@property (nonatomic) NSMutableArray *objects;
+
+-(void)emptyContents;
+
+@end
+
 @interface RLMRealmNode : NSObject <RLMRealmOutlineNode>
 
 @property (nonatomic, readonly) RLMRealm *realm;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *url;
 @property (nonatomic, readonly) NSArray *topLevelClasses;
+@property (nonatomic) RLMObjectPasteboard *objectPasteboard;
 
 - (instancetype)initWithName:(NSString *)name url:(NSString *)url;
 

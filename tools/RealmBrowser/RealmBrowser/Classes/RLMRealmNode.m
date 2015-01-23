@@ -36,7 +36,8 @@
 {
     if (self = [super init]) {
         _name = name;
-        _url = url;        
+        _url = url;
+        _objectPasteboard = [[RLMObjectPasteboard alloc] init];
     }
     return self;
 }
@@ -133,3 +134,30 @@
 }
 
 @end
+
+
+@interface RLMObjectPasteboard ()
+
+@end
+
+
+@implementation RLMObjectPasteboard
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.objects = [NSMutableArray array];
+    }
+    return self;
+}
+
+-(void)emptyContents
+{
+    self.containingArray = nil;
+    [self.objects removeAllObjects];
+}
+
+@end
+
+

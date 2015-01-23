@@ -204,6 +204,9 @@ NSString * const kRealmKeyOutlineWidthForRealm = @"OutlineWidthForRealm:%@";
     [self.modelDocument addWindowController:wc];
     [self.modelDocument showWindows];
     [wc addNavigationState:state fromViewController:wc.tableViewController];
+
+    [wc.outlineViewController realmDidLoad];
+    wc.window.alphaValue = 1.0;
 }
 
 - (IBAction)userClicksOnNavigationButtons:(NSSegmentedControl *)buttons

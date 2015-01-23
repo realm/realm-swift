@@ -19,32 +19,36 @@
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
 
-@interface RealmTestClass0 : RLMObject
+@class RealmTestClassB;
+RLM_ARRAY_TYPE(RealmTestClassB)
+
+@interface RealmTestClassA : RLMObject
 
 @property NSInteger integerValue;
+@property RLMArray<RealmTestClassB> *arrayReference;
 @property NSString *stringValue;
 @property NSData *dataValue;
 
 @end
 
-RLM_ARRAY_TYPE(RealmTestClass0)
+RLM_ARRAY_TYPE(RealmTestClassA)
 
-@interface RealmTestClass1 : RLMObject
+@interface RealmTestClassB : RLMObject
 
 @property NSInteger integerValue;
+@property RLMArray<RealmTestClassA> *arrayReference;
 @property BOOL boolValue;
 @property float floatValue;
 @property double doubleValue;
 @property NSString *stringValue;
 @property NSDate *dateValue;
-@property RLMArray<RealmTestClass0> *arrayReference;
 
 @end
 
-@interface RealmTestClass2 : RLMObject
+@interface RealmTestClassC : RLMObject
 
 @property NSInteger integerValue;
 @property BOOL boolValue;
-@property RealmTestClass1 *objectReference;
+@property RealmTestClassB *objectReference;
 
 @end

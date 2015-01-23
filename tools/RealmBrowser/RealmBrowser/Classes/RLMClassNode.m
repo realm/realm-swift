@@ -19,7 +19,9 @@
 #import "RLMClassNode.h"
 
 #import "RLMObjectNode.h"
-#import "RLMArrayNode.h"
+#import "RLMSidebarTableCellView.h"
+#import "RLMBHeaders_Private.h"
+
 #import "RLMResultsNode.h"
 
 #import "RLMSidebarTableCellView.h"

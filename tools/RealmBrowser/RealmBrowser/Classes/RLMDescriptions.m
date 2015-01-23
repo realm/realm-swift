@@ -129,9 +129,6 @@ typedef NS_ENUM(int32_t, RLMDescriptionFormat) {
             
         case RLMPropertyTypeObject: {
             RLMObject *referredObject = (RLMObject *)propertyValue;
-            if (referredObject == nil) {
-                return @"";
-            }
             
             if (format == RLMDescriptionFormatEllipsis) {
                 return [NSString stringWithFormat:@"%@(...)", referredObject.objectSchema.className];

@@ -194,11 +194,9 @@ const NSInteger NOT_A_COLUMN = -1;
 
 - (void)cursorUpdate:(NSEvent *)event
 {
-    [self mouseMoved: event];
-    
     // Note: This method is left mostly empty on purpose. It avoids cursor events to be passed on up
     //       the responder chain where it potentially could reach a displayed tool-tip view, which
-    //       will undo any modification to the cursor image dome by the application. This "fix" is
+    //       will undo any modification to the cursor image done by the application. This "fix" is
     //       in order to circumvent a bug in OS X version prior to 10.10 Yosemite not honouring
     //       the NSTrackingActiveAlways option even when the cursorRect has been disabled.
     //       IMPORTANT: Must NOT be deleted!!!
@@ -206,12 +204,8 @@ const NSInteger NOT_A_COLUMN = -1;
 
 - (void)mouseMoved:(NSEvent *)event
 {
-    if (!self.delegate) {
-        return; // No delegate, no need to track the mouse.
-    }
-        
     currentMouseLocation = [self currentLocationAtPoint:[event locationInWindow]];
-
+    
     if (RLMTableLocationEqual(previousMouseLocation, currentMouseLocation)) {
         return;
     }
@@ -245,7 +239,7 @@ const NSInteger NOT_A_COLUMN = -1;
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
-{    
+{
     CGRect cellRect = [self rectOfLocation:currentMouseLocation];
     [self setNeedsDisplayInRect:cellRect];
     

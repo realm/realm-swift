@@ -25,6 +25,11 @@
     return [NSColor colorWithByteRed:52 green:94 blue:242 alpha:255];
 }
 
++ (NSColor *)pinkColor
+{
+    return [NSColor colorWithByteRed:253 green:183 blue:186 alpha:255];
+}
+
 + (NSColor *)colorWithByteRed:(NSUInteger)red green:(NSUInteger)green blue:(NSUInteger)blue alpha:(NSUInteger)alpha
 {
     return [NSColor colorWithRed:(CGFloat)red/255.0f

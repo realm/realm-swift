@@ -23,4 +23,6 @@
 
 @property (strong) IBOutlet NSButton *badge;
 
+- (void)sizeToFit;
+
 @end

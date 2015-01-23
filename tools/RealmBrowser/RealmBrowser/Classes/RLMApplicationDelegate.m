@@ -23,6 +23,11 @@
 
 #import "TestClasses.h"
 
+// New
+
+#import "RLMBMainWindowController.h"
+
+
 const NSUInteger kTopTipDelay = 250;
 const NSUInteger kMaxFilesPerCategory = 7;
 const CGFloat kMenuImageSize = 16;
@@ -49,12 +54,36 @@ NSString *const kDocumentsFolder = @"/Documents";
 @property (nonatomic, strong) NSMetadataQuery *projQuery;
 @property (nonatomic, strong) NSArray *groupedFileItems;
 
+
+// NEW
+
+@property (nonatomic) NSMutableArray *windowControllers;
+
 @end
 
 @implementation RLMApplicationDelegate
 
+- (IBAction)openNewFile:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    openPanel.allowedFileTypes = @[kRealmFileExension];
+    [openPanel beginWithCompletionHandler:^(NSInteger result) {
+        RLMBMainWindowController *wc = [[RLMBMainWindowController alloc] initWithWindowNibName:@"RLMBMainWindowController"];
+        RLMRealm *realm = [RLMRealm realmWithPath:openPanel.URL.path];
+        [wc setupWithRealm:realm];
+        [openPanel orderOut:self];
+        
+        [self.windowControllers addObject:wc];
+        [wc window];
+    }];
+}
+
 -(void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints"];
+    self.windowControllers = [NSMutableArray array];
+    return;
+    
     [[NSUserDefaults standardUserDefaults] setObject:@(kTopTipDelay) forKey:@"NSInitialToolTipDelay"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
@@ -314,8 +343,8 @@ NSString *const kDocumentsFolder = @"/Documents";
                 }
             }
             
-            NSArray *classNames = @[[RealmTestClass0 className], [RealmTestClass1 className], [RealmTestClass2 className]];
-            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:1000];
+            NSArray *classNames = @[[RealmTestClassA className], [RealmTestClassB className], [RealmTestClassC className]];
+            BOOL success = [RLMTestDataGenerator createRealmAtUrl:selectedFile withClassesNamed:classNames objectCount:100];
             
             if (success) {
                 NSAlert *alert = [[NSAlert alloc] init];
