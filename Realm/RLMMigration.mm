@@ -76,11 +76,12 @@
 }
 
 - (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block {
-    // FIXME - we are overwring the schema for the old realm. Since it is dynamic and used only for the migration this
-    // might be ok but it seems pretty wrong
     for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
         objectSchema.accessorClass = cls;
     }
+
+    // copy old schema and reset after enumeration
+    RLMSchema *savedSchema = [_realm.schema copy];
     for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
         objectSchema.accessorClass = cls;
     }
@@ -104,6 +105,9 @@
             block(oldObjects[i], nil);
         }
     }
+
+    // reset schema with proper accessor classes
+    _realm.schema = savedSchema;
 }
 
 - (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {

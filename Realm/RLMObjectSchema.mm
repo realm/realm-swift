@@ -253,6 +253,7 @@
 
     // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
