@@ -57,7 +57,6 @@
 		023B19F11A4235D20067FB81 /* Realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B19E81A4235D20067FB81 /* Realm.swift */; };
 		023B19F21A4235D20067FB81 /* Results.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B19E91A4235D20067FB81 /* Results.swift */; };
 		023B19F31A4235D20067FB81 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 023B19EA1A4235D20067FB81 /* Schema.swift */; };
-		023B19F61A4235DE0067FB81 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		023B19F81A423BD20067FB81 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 023B19F71A423BD20067FB81 /* libc++.dylib */; };
 		024E6094198B2D51002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6093198B2D51002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		024E6097198B2D59002FA042 /* RLMPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 024E6096198B2D59002FA042 /* RLMPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -293,13 +292,6 @@
 			remoteGlobalIDString = 0201B2661A54C68C004CFB6F;
 			remoteInfo = "RealmSwift OSX";
 		};
-		023B19F41A4235D80067FB81 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
-			remoteInfo = iOS;
-		};
 		02B8225D1A532100007F28A5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -320,6 +312,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E8D89B971955FC6D00CF2B9A;
 			remoteInfo = OSX;
+		};
+		29E3C73D1A71CC8700B62C1D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 29E3C7041A71C1C700B62C1D;
+			remoteInfo = "iOS-dynamic";
 		};
 		3F1A5E951992FD4800F45F4C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -559,8 +558,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29E3C73C1A71CBD000B62C1D /* Realm.framework in Frameworks */,
 				023B19F81A423BD20067FB81 /* libc++.dylib in Frameworks */,
-				023B19F61A4235DE0067FB81 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1000,12 +999,12 @@
 				023B19A31A4234380067FB81 /* Sources */,
 				023B19A41A4234380067FB81 /* Frameworks */,
 				023B19A51A4234380067FB81 /* Headers */,
-				023B19A61A4234380067FB81 /* Resources */,
+				29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				023B19F51A4235D80067FB81 /* PBXTargetDependency */,
+				29E3C73E1A71CC8700B62C1D /* PBXTargetDependency */,
 			);
 			name = "RealmSwift iOS";
 			productName = RealmSwift;
@@ -1233,13 +1232,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		023B19A61A4234380067FB81 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E8D89B961955FC6D00CF2B9A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1267,6 +1259,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+		};
+		29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)-dynamic/Realm.framework",
+			);
+			name = "Embed Dynamic/Realm.framework";
+			outputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/$(FRAMEWORKS_FOLDER_PATH)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"";
+			showEnvVarsInLog = 0;
 		};
 		293F98F01A76E05700C0199D /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1637,6 +1646,11 @@
 			target = E8D89B971955FC6D00CF2B9A /* OSX */;
 			targetProxy = 02E334BF1A5F3C0A009F8810 /* PBXContainerItemProxy */;
 		};
+		29E3C73E1A71CC8700B62C1D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 29E3C7041A71C1C700B62C1D /* iOS-dynamic */;
+			targetProxy = 29E3C73D1A71CC8700B62C1D /* PBXContainerItemProxy */;
+		};
 		3F1A5E961992FD4800F45F4C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -1815,6 +1829,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)-dynamic";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
@@ -1840,6 +1855,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)-dynamic";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
