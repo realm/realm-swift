@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
                         'include/Realm/RLMObject.h',
                         'include/Realm/RLMObjectBase.h',
                         'include/Realm/RLMObjectSchema.h',
+                        'include/Realm/RLMPlatform.h',
                         'include/Realm/RLMProperty.h',
                         'include/Realm/RLMRealm.h',
                         'include/Realm/RLMResults.h',
