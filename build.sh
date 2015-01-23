@@ -280,6 +280,12 @@ case "$COMMAND" in
     "ios-swift")
         build_combined 'RealmSwift iOS' Release RealmSwift
         build_combined 'RealmSwift iOS' Release RealmSwift
+
+        # Combine swiftmodules of nested frameworks
+        nested_iphone_module="build/ios/iphone/RealmSwift.framework/Frameworks/Realm.framework/Modules/Realm.swiftmodule/*"
+        if [ -d $nested_simulator_module ]; then
+          cp $nested_iphone_module build/ios/simulator/RealmSwift.framework/Frameworks/Realm.framework/Modules/Realm.swiftmodule/
+        fi
         exit 0
         ;;
 
