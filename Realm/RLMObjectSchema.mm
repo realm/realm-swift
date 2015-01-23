@@ -253,6 +253,7 @@
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
+    schema->_realm = _realm;
     schema.primaryKeyProperty = _primaryKeyProperty;
     // _table not copied as it's tightdb::Group-specific
     return schema;
