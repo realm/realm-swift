@@ -95,14 +95,14 @@ xcrealm() {
 }
 
 build_fat() {
-    target="$1"
+    scheme="$1"
     config="$2"
     build_prefix="$3"
     out_dir="$4"
     name="$5.framework"
 
-    xcrealm "-scheme '$target' -configuration $config -sdk iphoneos"
-    xcrealm "-scheme '$target' -configuration $config -sdk iphonesimulator"
+    xcrealm "-scheme '$scheme' -configuration $config -sdk iphoneos"
+    xcrealm "-scheme '$scheme' -configuration $config -sdk iphonesimulator"
 
     mkdir -p build/$out_dir
     rm -rf build/$out_dir/$name
