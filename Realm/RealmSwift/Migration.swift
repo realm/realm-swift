@@ -20,7 +20,7 @@ import Realm
 import Realm.Private
 
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
-public typealias MigrationObjectEnumerateBlock = (oldObject: RLMObjectBase!, newObject: RLMObjectBase!) -> Void
+public typealias MigrationObjectEnumerateBlock = (oldObject: Object, newObject: Object) -> Void
 
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
     RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: {
@@ -42,11 +42,13 @@ public class Migration {
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
     public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
-        rlmMigration.enumerateBaseObjects(objectClassName, dynamicAccessorClass: MigrationObject.self, block: block)
+        rlmMigration.enumerateBaseObjects(objectClassName, dynamicAccessorClass: MigrationObject.self, block: {
+            block(oldObject: $0 as Object, newObject: $1 as Object);
+        })
     }
 
-    public func create(className: String, withObject object: AnyObject) -> RLMObject {
-        return rlmMigration.createObject(className, withObject: object)
+    public func create(className: String, withObject object: AnyObject) -> MigrationObject {
+        return unsafeBitCast(rlmMigration.createObject(className, withObject: object), MigrationObject.self)
     }
 
     public func delete(object: RLMObject) {
@@ -60,7 +62,6 @@ public class Migration {
     }
 }
 
-@objc(MigrationObject)
 public class MigrationObject : Object {
     subscript(key: String) -> AnyObject? {
         if (self.objectSchema[key].type == RLMPropertyType.Array) {
@@ -69,7 +70,7 @@ public class MigrationObject : Object {
         return super[key]
     }
 
-    private func initalizeListProperty(name: String, rlmArray: RLMArray) {
+    public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
         var list = List<Object>()
         list._rlmArray = rlmArray
         listProperties[name] = list

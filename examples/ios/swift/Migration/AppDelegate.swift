@@ -83,8 +83,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
                     if newObject["fullName"] as String == "JP McDonald" {
-                        let jpsDog = Pet(object: ["Jimbo", "dog"])
-                        newObject["pets"].addObject(jpsDog)
+                        let jpsDog = migration.create(Pet.className(), withObject: ["Jimbo", "dog"])
+                        let dogs = newObject["pets"] as List<Object>
+                        dogs.append(jpsDog)
                     }
                 }
             }
