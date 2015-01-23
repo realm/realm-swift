@@ -137,6 +137,11 @@ clean_retrieve() {
   cp -R $1 $2
 }
 
+disabled_task() {
+    echo "ERROR: The invoked build task '$COMMAND' is disabled."
+    exit 1
+}
+
 ######################################
 # Device Test Helper
 ######################################
@@ -268,7 +273,7 @@ case "$COMMAND" in
     "ios")
         sh build.sh ios-static "$XCMODE"
         #sh build.sh ios-dynamic "$XCMODE"
-        sh build.sh ios-swift "$XCMODE"
+        #sh build.sh ios-swift "$XCMODE"
         exit 0
         ;;
 
@@ -278,6 +283,7 @@ case "$COMMAND" in
         ;;
 
     "ios-swift")
+        disabled_task
         build_combined 'RealmSwift iOS' Release RealmSwift
         build_combined 'RealmSwift iOS' Release RealmSwift
 
@@ -290,6 +296,7 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
+        disabled_task
         build_combined iOS-dynamic Release Realm -dynamic
         exit 0
         ;;
