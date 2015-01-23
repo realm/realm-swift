@@ -76,15 +76,18 @@
 }
 
 - (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block {
-    // get all objects
-    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
-    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
-
     // FIXME - we are overwring the schema for the old realm. Since it is dynamic and used only for the migration this
     // might be ok but it seems pretty wrong
     for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
         objectSchema.accessorClass = cls;
     }
+    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
+        objectSchema.accessorClass = cls;
+    }
+
+    // get all objects
+    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
+    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
 
     if (objects && oldObjects) {
         for (long i = oldObjects.count - 1; i >= 0; i--) {
