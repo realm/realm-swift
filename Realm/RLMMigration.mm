@@ -74,20 +74,10 @@
 }
 
 - (RLMSchema *)newSchema {
-    return [RLMSchema sharedSchema];
+    return self.realm.schema;
 }
 
-- (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block {
-    for (RLMObjectSchema *objectSchema in _oldRealm.schema.objectSchema) {
-        objectSchema.accessorClass = cls;
-    }
-
-    // copy old schema and reset after enumeration
-    RLMSchema *savedSchema = [_realm.schema copy];
-    for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
-        objectSchema.accessorClass = cls;
-    }
-
+- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
     // get all objects
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
@@ -107,17 +97,6 @@
             block(oldObjects[i], nil);
         }
     }
-
-    // reset schema with proper accessor classes
-    _realm.schema = savedSchema;
-}
-
-- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
-    [self enumerateBaseObjects:className
-          dynamicAccessorClass:RLMObject.class
-                         block:^(RLMObjectBase *oldObject, RLMObjectBase *newObject) {
-        block((RLMObject *)oldObject, (RLMObject *)newObject);
-    }];
 }
 
 - (void)verifyPrimaryKeyUniqueness {

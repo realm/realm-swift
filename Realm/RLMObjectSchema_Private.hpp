@@ -16,9 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema.h"
-
-@class RLMRealm;
+#import "RLMObjectSchema_Private.h"
 
 namespace tightdb {
     class Table;
@@ -29,26 +27,7 @@ namespace tightdb {
 // RLMObjectSchema private
 @interface RLMObjectSchema ()
 
-// writable redecleration
-@property (nonatomic, readwrite, copy) NSArray *properties;
-@property (nonatomic, readwrite, assign) bool isSwiftClass;
-
-// class used for this object schema
-@property (nonatomic, readwrite, assign) Class objectClass;
-@property (nonatomic, readwrite, assign) Class accessorClass;
-@property (nonatomic, readwrite, assign) Class standaloneClass;
-
-@property (nonatomic, readwrite) RLMProperty *primaryKeyProperty;
-
-// The Realm retains its object schemas, so they need to not retain the Realm
-@property (nonatomic, unsafe_unretained) RLMRealm *realm;
 @property (nonatomic) tightdb::Table *table;
-
-// returns a cached or new schema for a given object class
-+(instancetype)schemaForObjectClass:(Class)objectClass;
-
-// generate a schema from a table
-+(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
 
 @end
 
