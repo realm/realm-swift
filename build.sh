@@ -38,8 +38,6 @@ command:
   ios [xcmode]:            builds iOS frameworks with release configuration
   ios-debug [xcmode]:      builds iOS framework with debug configuration
   ios-static [xcmode]:     builds a fat iOS static framework with release configuration
-  ios-dynamic [xcmode]:    builds two iOS 8 dynamic frameworks: one for devices and one for the simulator
-  ios-swift [xcmode]:      builds two Swift frameworks: one for devices and one for the simulator
   osx [xcmode]:            builds OS X framework with release configuration
   osx-debug [xcmode]:      builds OS X framework with debug configuration
   test-ios [xcmode]:       tests iOS framework with release configuration
@@ -137,10 +135,6 @@ clean_retrieve() {
   cp -R $1 $2
 }
 
-disabled_task() {
-    echo "ERROR: The invoked build task '$COMMAND' is disabled."
-    exit 1
-}
 
 ######################################
 # Device Test Helper
@@ -272,32 +266,11 @@ case "$COMMAND" in
 
     "ios")
         sh build.sh ios-static "$XCMODE"
-        #sh build.sh ios-dynamic "$XCMODE"
-        #sh build.sh ios-swift "$XCMODE"
         exit 0
         ;;
 
     "ios-static")
         build_combined iOS Release Realm
-        exit 0
-        ;;
-
-    "ios-swift")
-        disabled_task
-        build_combined 'RealmSwift iOS' Release RealmSwift
-        build_combined 'RealmSwift iOS' Release RealmSwift
-
-        # Combine swiftmodules of nested frameworks
-        nested_iphone_module="build/ios/iphone/RealmSwift.framework/Frameworks/Realm.framework/Modules/Realm.swiftmodule/*"
-        if [ -d $nested_simulator_module ]; then
-          cp $nested_iphone_module build/ios/simulator/RealmSwift.framework/Frameworks/Realm.framework/Modules/Realm.swiftmodule/
-        fi
-        exit 0
-        ;;
-
-    "ios-dynamic")
-        disabled_task
-        build_combined iOS-dynamic Release Realm -dynamic
         exit 0
         ;;
 
