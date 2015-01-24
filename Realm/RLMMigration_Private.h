@@ -29,8 +29,6 @@ typedef void (^RLMObjectBaseMigrationBlock)(RLMObjectBase *oldObject, RLMObjectB
 
 - (instancetype)initWithRealm:(RLMRealm *)realm key:(NSData *)key error:(NSError **)error;
 
-- (void)enumerateBaseObjects:(NSString *)className dynamicAccessorClass:(Class)cls block:(RLMObjectBaseMigrationBlock)block;
-
 - (void)execute:(RLMMigrationBlock)block;
 
 @end

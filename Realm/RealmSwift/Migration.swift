@@ -20,17 +20,14 @@ import Realm
 import Realm.Private
 
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
-public typealias MigrationObjectEnumerateBlock = (oldObject: Object, newObject: Object) -> Void
+public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject, newObject: MigrationObject) -> Void
 
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
-    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: {
-        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
-    })
+    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
+
 public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: {
-        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
-    })
+    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
 
 public func migrateRealm(path: String) -> NSError? {
@@ -42,8 +39,8 @@ public class Migration {
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
     public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
-        rlmMigration.enumerateBaseObjects(objectClassName, dynamicAccessorClass: MigrationObject.self, block: {
-            block(oldObject: $0 as Object, newObject: $1 as Object);
+        rlmMigration.enumerateObjects(objectClassName, block: {
+            block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self));
         })
     }
 
@@ -78,4 +75,25 @@ public class MigrationObject : Object {
 
     private var listProperties = [String: List<Object>]()
 }
+
+private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+    return { migration, oldVersion in
+        for objectSchema in migration.oldSchema.objectSchema {
+            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+        }
+
+        // copy old schema and reset after enumeration
+        let savedSchema = migration.newSchema.copy() as RLMSchema
+        for objectSchema in migration.newSchema.objectSchema {
+            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+        }
+
+        // run migration
+        migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
+
+        // reset old schema
+        migration.realm.schema = savedSchema
+    }
+}
+
 
