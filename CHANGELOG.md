@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix incorrect column type assertions when the first Realm file opened is a
+  read-only file that is missing tables.
+
 0.90.1 Release notes (2015-01-22)
 =============================================================
 
