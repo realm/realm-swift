@@ -1097,14 +1097,19 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // delete
     [realm beginWriteTransaction];
+    // Delete directly
     [realm deleteObject:obj1];
-    [realm deleteObject:obj2];
+    // Delete as result of query since then obj2's realm could point to a different instance
+    [realm deleteObject:[[StringObject allObjectsInRealm:realm] firstObject]];
 
     XCTAssertEqual(obj1.invalidated, YES);
     XCTAssertEqual(obj2.invalidated, YES);
 
     XCTAssertThrows([realm addObject:obj1], @"Adding deleted object should throw");
-    
+
+    NSArray *propObject = @[@"", @[obj2], @[]];
+    XCTAssertThrows([ArrayPropertyObject createInRealm:realm withObject:propObject], @"Adding deleted object as a link should throw");
+
     [realm commitWriteTransaction];
 
     XCTAssertEqual(obj1.invalidated, YES);

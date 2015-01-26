@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix incorrect column type assertions when the first Realm file opened is a
   read-only file that is missing tables.
+* Throw an exception when adding an invalidated or deleted object as a link.
 
 0.90.1 Release notes (2015-01-22)
 =============================================================
