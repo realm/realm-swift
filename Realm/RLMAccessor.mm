@@ -165,7 +165,12 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
 static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObjectBase *link,
                                         __unsafe_unretained RLMRealm *realm,
                                         RLMCreationOptions options) {
-    if (link.realm != realm) {
+    if (link.isInvalidated) {
+        @throw [NSException exceptionWithName:@"RLMException"
+                                       reason:@"Adding a deleted or invalidated object to a Realm is not permitted"
+                                     userInfo:nil];
+    }
+    else if (link.realm != realm) {
         // only try to update if link object has primary key
         if ((options & RLMCreationOptionsUpdateOrCreate) && link.objectSchema.primaryKeyProperty) {
             link = [link.class createOrUpdateInRealm:realm withObject:link];
