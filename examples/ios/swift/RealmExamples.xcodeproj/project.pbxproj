@@ -25,14 +25,13 @@
 		0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
-		02D479B41A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479B51A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479B61A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479B71A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479B81A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479B91A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; };
-		02D479BA1A6F49B000FA78E8 /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
+		C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C01304EA1A60B77B00EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
 		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
@@ -59,6 +58,13 @@
 			remoteInfo = Realm;
 		};
 		E8AD212019E49249000603D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
+		};
+		E8AD212219E4924C000603D7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E805758D19BA55E600376620 /* Project object */;
 			proxyType = 1;
@@ -95,6 +101,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C01304E41A60A4A500EB3E1E /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +111,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,7 +121,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				02D479BA1A6F49B000FA78E8 /* RealmSwift.framework in CopyFiles */,
+				C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +131,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C01304EA1A60B77B00EB3E1E /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +141,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,6 +151,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,8 +159,8 @@
 
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../DerivedData/Realm/Build/Products/Debug-iphonesimulator/RealmSwift.framework"; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../build/ios/RealmSwift.framework; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -183,7 +194,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */,
-				02D479B61A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,7 +202,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0295B91619D103A70036D6C3 /* libc++.dylib in Frameworks */,
-				02D479B51A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,7 +210,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0295B91719D103BE0036D6C3 /* libc++.dylib in Frameworks */,
-				02D479B71A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +218,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0295B91819D103C60036D6C3 /* libc++.dylib in Frameworks */,
-				02D479B91A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,7 +226,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0295B91919D103CB0036D6C3 /* libc++.dylib in Frameworks */,
-				02D479B81A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,7 +234,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8D3F27D1A1177D900620884 /* libc++.dylib in Frameworks */,
-				02D479B41A6F49AA00FA78E8 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,7 +243,7 @@
 		0295B90519D103180036D6C3 /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
-				02D479B31A6F49AA00FA78E8 /* RealmSwift.framework */,
+				C09C490F1A605A4800638C9F /* RealmSwift.framework */,
 				0295B91519D103A70036D6C3 /* libc++.dylib */,
 			);
 			name = RealmSwift;
@@ -386,6 +391,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E8AD212319E4924C000603D7 /* PBXTargetDependency */,
 			);
 			name = Migration;
 			productName = Migration;
@@ -610,6 +616,11 @@
 			target = 0295B90B19D1034F0036D6C3 /* Realm */;
 			targetProxy = E8AD212019E49249000603D7 /* PBXContainerItemProxy */;
 		};
+		E8AD212319E4924C000603D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = E8AD212219E4924C000603D7 /* PBXContainerItemProxy */;
+		};
 		E8AD212519E4924F000603D7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0295B90B19D1034F0036D6C3 /* Realm */;
@@ -728,11 +739,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -748,11 +754,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = GroupedTableView;
@@ -764,11 +765,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -784,11 +780,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Encryption/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -800,11 +791,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -820,11 +806,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Migration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -836,11 +817,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -856,11 +832,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = TableView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -872,11 +843,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -892,11 +858,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Simple/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -907,11 +868,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -927,11 +883,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/ari/src/realm/realm-cocoa/Realm/Swift",
-					"/Users/ari/src/realm/realm-cocoa/DerivedData/Realm/Build/Products/Debug-iphonesimulator",
-				);
 				INFOPLIST_FILE = Backlink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

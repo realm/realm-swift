@@ -68,9 +68,7 @@ public class MigrationObject : Object {
     }
 
     public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
-        var list = List<Object>()
-        list._rlmArray = rlmArray
-        listProperties[name] = list
+        listProperties[name] = List<Object>(rlmArray)
     }
 
     private var listProperties = [String: List<Object>]()
