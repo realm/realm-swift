@@ -41,6 +41,8 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verifyAndA
 // create or get cached accessors for the given schema
 void RLMRealmCreateAccessors(RLMSchema *schema);
 
+// Clear the cache of created accessor classes
+void RLMClearAccessorCache();
 
 //
 // Options for object creation
