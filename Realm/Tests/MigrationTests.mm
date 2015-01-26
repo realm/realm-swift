@@ -605,5 +605,44 @@ extern "C" {
     XCTAssertEqual(defaultRealm, RLMRealm.defaultRealm);
 }
 
+- (void)testAccessorCreationForReadOnlyRealms {
+    RLMClearAccessorCache();
+
+    // Create a realm file with only a single table
+    @autoreleasepool {
+        RLMRealm *realm = [self realmWithSingleObject:[RLMObjectSchema schemaForObjectClass:IntObject.class]];
+        [realm beginWriteTransaction];
+        [realm createObject:IntObject.className withObject:@[@1]];
+        [realm commitWriteTransaction];
+    }
+
+    Class intObjectAccessorClass;
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil];
+
+        intObjectAccessorClass = realm.schema[IntObject.className].accessorClass;
+
+        // StringObject table doesn't exist, so it should not have an accessor
+        // class despite being in the object schema
+        RLMObjectSchema *missingTableSchema = realm.schema[StringObject.className];
+        XCTAssertNotNil(missingTableSchema);
+        XCTAssertEqual(missingTableSchema.accessorClass, RLMObject.class);
+    }
+
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+
+        // read-write realm should have a different IntObject accessor class due
+        // to that we check for RLMSchema compatibility and not for each RLMObjectSchema
+        XCTAssertNotEqual(intObjectAccessorClass, realm.schema[IntObject.className].accessorClass);
+
+        // StringObject should now have an accessor class
+        RLMObjectSchema *missingTableSchema = realm.schema[StringObject.className];
+        XCTAssertNotNil(missingTableSchema);
+        XCTAssertNotNil(missingTableSchema.accessorClass);
+        XCTAssertNotEqual(missingTableSchema.accessorClass, RLMObject.class);
+    }
+}
+
 @end
 

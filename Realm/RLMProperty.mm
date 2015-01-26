@@ -314,8 +314,11 @@
 
 
 -(BOOL)isEqualToProperty:(RLMProperty *)prop {
-    return [_name isEqualToString:prop.name] && _type == prop.type && prop.isPrimary == _isPrimary &&
-           (_objectClassName == nil || [_objectClassName isEqualToString:prop.objectClassName]);
+    return _type == prop->_type
+        && _isPrimary == prop->_isPrimary
+        && _column == prop->_column
+        && [_name isEqualToString:prop->_name]
+        && (_objectClassName == prop->_objectClassName  || [_objectClassName isEqualToString:prop->_objectClassName]);
 }
 
 - (BOOL)isEqual:(id)object {
