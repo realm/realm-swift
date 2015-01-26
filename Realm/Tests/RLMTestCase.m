@@ -72,7 +72,7 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 @implementation RLMTestCase
 
-+ (void)setUp
+- (void)setUp
 {
     [super setUp];
     
@@ -81,13 +81,13 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
-+ (void)tearDown
+- (void)tearDown
 {
     [super tearDown];
     [self deleteFiles];
 }
 
-+ (void)deleteFiles {
+- (void)deleteFiles {
     // Clear cache
     [RLMRealm resetRealmState];
     
@@ -98,11 +98,11 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (void)invokeTest
 {
-    [RLMTestCase setUp];
+    [self setUp];
     @autoreleasepool {
         [super invokeTest];
     }
-    [RLMTestCase tearDown];
+    [self tearDown];
 }
 
 - (RLMRealm *)realmWithTestPath
