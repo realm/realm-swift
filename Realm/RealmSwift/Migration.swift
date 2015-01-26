@@ -17,18 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+import Realm.Private
 
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
+public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject, newObject: MigrationObject) -> Void
 
 public func setDefaultRealmSchemaVersion(schemaVersion: UInt, migrationBlock: MigrationBlock) {
-    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: {
-        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
-    })
+    RLMRealm.setDefaultRealmSchemaVersion(schemaVersion, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
+
 public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBlock: MigrationBlock) {
-    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: {
-        migrationBlock(migration: Migration($0), oldSchemaVersion: $1)
-    })
+    RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: realmPath, withMigrationBlock: accessorMigrationBlock(migrationBlock))
 }
 
 public func migrateRealm(path: String) -> NSError? {
@@ -39,12 +38,14 @@ public class Migration {
     public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
-    public func enumerate(objectClassName: String, block: ObjectMigrationBlock) {
-        rlmMigration.enumerateObjects(objectClassName, block: block)
+    public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
+        rlmMigration.enumerateObjects(objectClassName, block: {
+            block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self));
+        })
     }
 
-    public func create(className: String, withObject object: AnyObject) -> RLMObject {
-        return rlmMigration.createObject(className, withObject: object)
+    public func create(className: String, withObject object: AnyObject) -> MigrationObject {
+        return unsafeBitCast(rlmMigration.createObject(className, withObject: object), MigrationObject.self)
     }
 
     public func delete(object: RLMObject) {
@@ -57,3 +58,40 @@ public class Migration {
         self.rlmMigration = rlmMigration
     }
 }
+
+public class MigrationObject : Object {
+    subscript(key: String) -> AnyObject? {
+        if (self.objectSchema[key].type == RLMPropertyType.Array) {
+            return listProperties[key]
+        }
+        return super[key]
+    }
+
+    public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
+        listProperties[name] = List<Object>(rlmArray)
+    }
+
+    private var listProperties = [String: List<Object>]()
+}
+
+private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
+    return { migration, oldVersion in
+        for objectSchema in migration.oldSchema.objectSchema {
+            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+        }
+
+        // copy old schema and reset after enumeration
+        let savedSchema = migration.newSchema.copy() as RLMSchema
+        for objectSchema in migration.newSchema.objectSchema {
+            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+        }
+
+        // run migration
+        migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
+
+        // reset old schema
+        migration.realm.schema = savedSchema
+    }
+}
+
+

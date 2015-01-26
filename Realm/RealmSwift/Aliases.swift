@@ -22,4 +22,3 @@ import Realm
 // so we just typealias them to remove the 'RLM' prefix
 public typealias PropertyType = RLMPropertyType
 public typealias NotificationToken = RLMNotificationToken
-public typealias ObjectMigrationBlock = RLMObjectMigrationBlock
