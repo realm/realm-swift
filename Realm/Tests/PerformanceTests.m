@@ -47,8 +47,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 + (void)tearDown {
-    [super tearDown];
     s_smallRealm = s_mediumRealm = s_largeRealm = nil;
+    [super tearDown];
 }
 
 + (RLMRealm *)createStringObjects:(int)factor {
