@@ -102,9 +102,9 @@ public class Object : RLMObjectBase, Equatable {
     // MARK: Constructors
 
     /**
-    Create an `Object` in the given `Realm` with the given object.
+    Create an `Object` in the default `Realm` with the given object.
 
-    Creates an instance of this object and adds it to the given `Realm` populating
+    Creates an instance of this object and adds it to the default `Realm` populating
     the object with the given object.
 
     :param: object The object used to populate the object. This can be any key/value coding compliant
@@ -114,13 +114,55 @@ public class Object : RLMObjectBase, Equatable {
 
 		   When passing in an `Array`, all properties must be present,
 		   valid and in the same order as the properties defined in the model.
-    :param: realm  The Realm in which this object is persisted.
-		   The default Realm will be used if this argument is omitted.
 
     :returns: The created object.
     */
-    public class func createWithObject(object: AnyObject, inRealm realm: Realm = defaultRealm()) -> Self {
+    public class func createInDefaultRealmWithObject(object: AnyObject) -> Self {
+	return createInRealm(defaultRealm(), withObject: object)
+    }
+
+    /**
+    Create an `Object` in the given `Realm` with the given object.
+
+    Creates an instance of this object and adds it to the given `Realm` populating
+    the object with the given object.
+
+    :param: realm  The Realm in which this object is persisted.
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+		   or an `Array` with one object for each persisted property. An exception will be
+		   thrown if any required properties are not present and no default is set.
+
+		   When passing in an `Array`, all properties must be present,
+		   valid and in the same order as the properties defined in the model.
+
+    :returns: The created object.
+    */
+    public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
 	return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+    }
+
+    /**
+    Create or update an `Object` in the default `Realm` with the given object.
+
+    This method can only be called on object types with a primary key defined. If there is already
+    an object with the same primary key value in the default Realm its values are updated and the object
+    is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
+
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+		   or an `Array` with one object for each persisted property. An exception will be
+		   thrown if any required properties are not present and no default is set.
+
+		   When passing in an `Array`, all properties must be present,
+		   valid and in the same order as the properties defined in the model.
+
+    :returns: The created or updated object.
+
+    :see: Object.primaryKey()
+    */
+    public class func createOrUpdateInDefaultRealmWithObject(object: AnyObject) -> Self {
+	return createOrUpdateInRealm(defaultRealm(), withObject: object)
     }
 
     /**
@@ -130,6 +172,7 @@ public class Object : RLMObjectBase, Equatable {
     an object with the same primary key value in the specified Realm its values are updated and the object
     is returned. Otherwise this creates and populates a new instance of this object in the specified Realm.
 
+    :param: realm  The Realm in which this object is persisted.
     :param: object The object used to populate the object. This can be any key/value coding compliant
 		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
 		   or an `Array` with one object for each persisted property. An exception will be
@@ -137,14 +180,12 @@ public class Object : RLMObjectBase, Equatable {
 
 		   When passing in an `Array`, all properties must be present,
 		   valid and in the same order as the properties defined in the model.
-    :param: realm  The Realm in which this object is persisted.
-		   The default Realm will be used if this argument is omitted.
 
     :returns: The created or updated object.
 
     :see: Object.primaryKey()
     */
-    public class func createOrUpdateWithObject(object: AnyObject, inRealm realm: Realm = defaultRealm()) -> Self {
+    public class func createOrUpdateInRealm(realm: Realm, withObject object: AnyObject) -> Self {
 	return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
     }
 
