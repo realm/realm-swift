@@ -58,11 +58,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultParentPath = defaultRealmPath.stringByDeletingLastPathComponent
+        let defaultPath = defaultRealmPath()
+        let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
-        NSFileManager.defaultManager().removeItemAtPath(defaultRealmPath, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultRealmPath, error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
+        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
 
         // define a migration block
         // you can define this inline, but we will reuse this to migrate realm files from multiple versions

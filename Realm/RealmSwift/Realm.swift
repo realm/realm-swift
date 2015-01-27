@@ -46,13 +46,8 @@ The location of the default Realm as a string. Can be overridden.
 
 :returns: Location of the default Realm.
 */
-public var defaultRealmPath: String {
-    set {
-        RLMRealm.setDefaultRealmPath(newValue)
-    }
-    get {
-        return RLMRealm.defaultRealmPath()
-    }
+public func defaultRealmPath() -> String {
+    return RLMRealm.defaultRealmPath()
 }
 
 /**
@@ -66,25 +61,6 @@ directory on OS X.
 */
 public func defaultRealm() -> Realm {
     return Realm(RLMRealm.defaultRealm())
-}
-
-/**
-Set the encryption key to use when opening Realms at a certain path.
-
-This can be used as an alternative to explicitly passing the key to
-`Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
-needed. The encryption key will be used any time a Realm is opened with
-`Realm(path:)` or `defaultRealm()`.
-
-If you do not want Realm to hold on to your encryption keys any longer than
-needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
-method.
-
-:param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
-:param: path          Realm path to set the encryption key for.
-*/
-public func setEncryptionKey(encryptionKey: NSData?, forRealmsAtPath path: String) {
-    RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: path)
 }
 
 /**
@@ -248,7 +224,7 @@ public final class Realm {
         if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm)
         } else {
-            self.init(RLMRealm())
+            self.init(RLMRealm()) // `rlmRealm` cannot be nil.
             return nil
         }
     }
@@ -337,37 +313,6 @@ public final class Realm {
     */
     public func commitWrite() {
         rlmRealm.commitWriteTransaction()
-    }
-
-    /**
-    Revert all writes made in the current write transaction and end the transaction.
-
-    This rolls back all objects in the Realm to the state they were in at the
-    beginning of the write transaction, and then ends the transaction.
-
-    This restores the data for deleted objects, but does not re-validated deleted
-    accessor objects. Any `Object`s which were added to the Realm will be
-    invalidated rather than switching back to standalone objects.
-    Given the following code:
-
-    ```swift
-    let oldObject = objects(ObjectType).first!
-    let newObject = ObjectType()
-
-    realm.beginWrite()
-    realm.add(newObject)
-    realm.delete(oldObject)
-    realm.cancelWrite()
-    ```
-
-    Both `oldObject` and `newObject` will return `true` for `invalidated`,
-    but re-running the query which provided `oldObject` will once again return
-    the valid object.
-
-    Calling this when not in a write transaction will throw an exception.
-    */
-    public func cancelWrite() {
-        rlmRealm.cancelWriteTransaction()
     }
 
     // MARK: Refresh

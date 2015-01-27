@@ -156,8 +156,6 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
-		D430A52A1A707BB200450FBA /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D430A5291A707BB200450FBA /* SortDescriptor.swift */; };
-		D430A52B1A707BB200450FBA /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D430A5291A707BB200450FBA /* SortDescriptor.swift */; };
 		E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; };
 		E81A1F861955FC9300FDED82 /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F641955FC9300FDED82 /* RLMAccessor.mm */; };
 		E81A1F881955FC9300FDED82 /* RLMArray_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F651955FC9300FDED82 /* RLMArray_Private.hpp */; };
@@ -442,7 +440,6 @@
 		3F6B89AE19EF40BA004E8EA8 /* libtightdb-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-ios.a"; path = "../core/libtightdb-ios.a"; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
-		D430A5291A707BB200450FBA /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SortDescriptor.swift; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -616,7 +613,6 @@
 				023B19E81A4235D20067FB81 /* Realm.swift */,
 				023B19E91A4235D20067FB81 /* Results.swift */,
 				023B19EA1A4235D20067FB81 /* Schema.swift */,
-				D430A5291A707BB200450FBA /* SortDescriptor.swift */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -1266,7 +1262,6 @@
 				0201B26B1A54C68C004CFB6F /* Property.swift in Sources */,
 				0201B26C1A54C68C004CFB6F /* Aliases.swift in Sources */,
 				0201B26D1A54C68C004CFB6F /* Results.swift in Sources */,
-				D430A52B1A707BB200450FBA /* SortDescriptor.swift in Sources */,
 				0201B26E1A54C68C004CFB6F /* List.swift in Sources */,
 				0201B26F1A54C68C004CFB6F /* Realm.swift in Sources */,
 				0201B2701A54C68C004CFB6F /* Object.swift in Sources */,
@@ -1300,7 +1295,6 @@
 				023B19F01A4235D20067FB81 /* Property.swift in Sources */,
 				023B19EB1A4235D20067FB81 /* Aliases.swift in Sources */,
 				023B19F21A4235D20067FB81 /* Results.swift in Sources */,
-				D430A52A1A707BB200450FBA /* SortDescriptor.swift in Sources */,
 				023B19EC1A4235D20067FB81 /* List.swift in Sources */,
 				023B19F11A4235D20067FB81 /* Realm.swift in Sources */,
 				023B19EE1A4235D20067FB81 /* Object.swift in Sources */,

@@ -169,18 +169,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: `Results` containing list elements sorted by the given property name.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
-        return sorted([SortDescriptor(property: property, ascending: ascending)])
-    }
-
-    /**
-    Returns `Results` containing list elements sorted by the given sort descriptors.
-
-    :param: sortDescriptors `SortDescriptor`s to sort by.
-
-    :returns: `Results` containing list elements sorted by the given sort descriptors.
-    */
-    public func sorted(sortDescriptors: [SortDescriptor]) -> Results<T> {
-        return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
+        return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
     }
 
     // MARK: Sequence Support

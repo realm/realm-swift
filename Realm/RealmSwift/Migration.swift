@@ -102,43 +102,6 @@ public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBl
 }
 
 /**
-Get the schema version for a Realm at a given path.
-
-:param: realmPath Path to a Realm file.
-:param: error     If an error occurs, upon return contains an `NSError` object
-                  that describes the problem. If you are not interested in
-                  possible errors, omit the argument, or pass in `nil`.
-
-:returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
-*/
-public func schemaVersionAtPath(realmPath: String, error: NSErrorPointer = nil) -> UInt? {
-    let version = RLMRealm.schemaVersionAtPath(realmPath, error: error)
-    if version == RLMNotVersioned {
-        return nil
-    }
-    return version
-}
-
-/**
-Get the schema version for an encrypted Realm at a given path.
-
-:param: realmPath     Path to a Realm file.
-:param: encryptionKey 64-byte encryption key.
-:param: error         If an error occurs, upon return contains an `NSError` object
-                      that describes the problem. If you are not interested in
-                      possible errors, omit the argument, or pass in `nil`.
-
-:returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
-*/
-public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData, error: NSErrorPointer = nil) -> UInt? {
-    let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
-    if version == RLMNotVersioned {
-        return nil
-    }
-    return version
-}
-
-/**
 Performs the registered migration block on a Realm at the given path.
 
 This method is called automatically when opening a Realm for the first time and does
@@ -238,7 +201,7 @@ public final class MigrationObject: Object {
     private var listProperties = [String: List<Object>]()
 
     /// Returns or sets the value of the property with the given name.
-    public override subscript(key: String) -> AnyObject? {
+    public subscript(key: String) -> AnyObject? {
         get {
             if self.objectSchema[key].type == .Array {
                 return listProperties[key]
