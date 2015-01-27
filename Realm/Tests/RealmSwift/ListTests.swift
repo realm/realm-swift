@@ -292,7 +292,7 @@ class ListTests: TestCase {
         if let realm = array.realm {
             array.append([str1, str2])
 
-        let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
+            let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
