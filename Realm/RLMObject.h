@@ -156,7 +156,7 @@
  is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
  
  If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithObject:` will be
- called on them.
+ called on them if have a primary key (`createInDefaultRealmWithObject:` otherwise).
  
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
@@ -179,7 +179,7 @@
  is returned. Otherwise this creates and populates a new instance of this object in the provided Realm.
  
  If nested objects are included in the argument, `createOrUpdateInRealm:withObject:` will be
- called on them.
+ called on them if have a primary key (`createInRealm:withObject:` otherwise).
 
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
