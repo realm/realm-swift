@@ -230,9 +230,9 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Sequence Support
 
     /**
-    Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    Returns a `GeneratorOf<T>` that yields successive elements in the results.
 
-    :returns: A `GeneratorOf<T>` that yields successive elements in the list.
+    :returns: A `GeneratorOf<T>` that yields successive elements in the results.
     */
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
