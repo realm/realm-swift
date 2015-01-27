@@ -272,7 +272,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         NSMutableArray *tablesToDelete = [NSMutableArray array];
         for (size_t i = 0; i < realm.group->size(); i++) {
             NSString *tableName = RLMStringDataToNSString(realm.group->get_table_name(i));
-            if ([tableName hasPrefix:c_objectTableNamePrefix] && !realm.schema[RLMClassForTableName(tableName)]) {
+            if ([tableName hasPrefix:c_objectTableNamePrefix] && ![realm.schema schemaForClassName:RLMClassForTableName(tableName)]) {
                 [tablesToDelete addObject:tableName];
             }
         }
