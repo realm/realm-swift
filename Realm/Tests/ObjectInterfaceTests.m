@@ -20,6 +20,18 @@
 
 #pragma mark - Test Objects
 
+@interface PrimaryKeyWithLinkObject : RLMObject
+@property NSString *primaryKey;
+@property StringObject *string;
+@end
+
+@implementation PrimaryKeyWithLinkObject
++ (NSString *)primaryKey
+{
+    return @"primaryKey";
+}
+@end
+
 #pragma mark - Tests
 
 @interface ObjectInterfaceTests : RLMTestCase
@@ -65,12 +77,22 @@
     CustomAccessorsObject *caStandalone = [[CustomAccessorsObject alloc] init];
     caStandalone.name = @"name";
     caStandalone.age = 99;
-    [CustomAccessorsObject createOrUpdateInRealm:realm withObject:caStandalone];
+    [CustomAccessorsObject createInRealm:realm withObject:caStandalone];
     [realm commitWriteTransaction];
 
     CustomAccessorsObject *objectFromRealm = [CustomAccessorsObject allObjects][0];
     XCTAssertEqualObjects(objectFromRealm.name, @"name", @"name property should be name.");
     XCTAssertEqual(objectFromRealm.age, 99, @"age property should be 99");
+}
+
+- (void)testCreateOrUpdateSameRealm
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    PrimaryKeyWithLinkObject *object = [PrimaryKeyWithLinkObject createInRealm:realm withObject:@[@"", @[@""]]];
+    PrimaryKeyWithLinkObject *returnedObject = [PrimaryKeyWithLinkObject createOrUpdateInRealm:realm withObject:object];
+    XCTAssertEqual(object, returnedObject);
+    [realm commitWriteTransaction];
 }
 
 - (void)testClassExtension
