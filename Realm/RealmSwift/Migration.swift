@@ -253,10 +253,10 @@ public final class MigrationObject: Object {
         }
     }
 
-     /**
+    /**
     WARNING: This is an internal initializer for Realm that must be `public`, but is not intended to
              be used directly.
-    
+
     Sets a list property by passing in its name and `RLMArray` to be wrapped.
 
     :param: name     Name of the list property to set.

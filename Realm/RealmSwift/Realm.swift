@@ -104,7 +104,7 @@ the realm within an `autoreleasepool {}` and ensure you have no other
 strong references to it.
 
 :warning: Realm instances are not thread safe and can not be shared across
-          threads or dispatch queues. You must call this method on each thread you want
+          threads or dispatch queues. You must construct a new instance on each thread you want
           to interact with the realm on. For dispatch queues, this means that you must
           call it in each block which is dispatched, as a queue is not guaranteed to run
           on a consistent thread.
