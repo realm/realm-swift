@@ -160,7 +160,7 @@
 
     // verify migration
     realm = [self realmWithTestPath];
-    XCTAssertEqual(realm::not_found, realm.group->find_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
+    XCTAssertFalse(realm.group->has_table(RLMStringDataWithNSString(RLMTableNameForClass(@"DeletedClass"))), @"The deleted class should not have a table.");
 
     [RLMRealm setSchemaVersion:0 forRealmAtPath:RLMTestRealmPath() withMigrationBlock:nil];
     XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMTestRealmPath()]);
