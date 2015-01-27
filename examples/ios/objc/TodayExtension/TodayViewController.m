@@ -69,7 +69,7 @@
 }
 
 - (void)updateLabel {
-    [self.button setTitle:[NSString stringWithFormat:@"%ld", (long)self.tick.count] forState:UIControlStateNormal];
+    [self.button setTitle:@(self.tick.count).stringValue forState:UIControlStateNormal];
 }
 
 - (void)tock {

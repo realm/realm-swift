@@ -66,7 +66,7 @@
 }
 
 - (void)updateLabel {
-    [self.button setTitle:[NSString stringWithFormat:@"%ld", (long)self.tick.count]];
+    [self.button setTitle:@(self.tick.count).stringValue];
 }
 
 - (void)tock {
