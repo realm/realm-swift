@@ -30,9 +30,9 @@ class SwiftPropertyTypeTest: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        SwiftIntObject.createWithObject([longNumber], inRealm: realm)
-        SwiftIntObject.createWithObject([intNumber], inRealm: realm)
-        SwiftIntObject.createWithObject([negativeLongNumber], inRealm: realm)
+        SwiftIntObject.createInRealm(realm, withObject: [longNumber])
+        SwiftIntObject.createInRealm(realm, withObject: [intNumber])
+        SwiftIntObject.createInRealm(realm, withObject: [negativeLongNumber])
         realm.commitWrite()
 
         let results = objects(SwiftIntObject.self, inRealm: realm)

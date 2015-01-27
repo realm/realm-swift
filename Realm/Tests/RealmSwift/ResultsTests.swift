@@ -221,7 +221,7 @@ class ResultsFromTableViewTests: ResultsTests {
 
 class ResultsFromLinkViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-        let array = SwiftArrayPropertyObject.createWithObject(["", [str1, str2], []], inRealm: realmWithTestPath())
+        let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(), withObject: ["", [str1, str2], []])
         return array.array.filter("stringCol != ''") // i.e. all of them
     }
 

@@ -330,7 +330,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        let array = SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
+        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -342,7 +342,7 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
+        SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
         let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
 

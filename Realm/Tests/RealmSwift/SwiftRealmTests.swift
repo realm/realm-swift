@@ -40,9 +40,9 @@ class SwiftRealmTests: TestCase {
     func testRealmAddAndRemoveObjects() {
         var realm = realmWithTestPath()
         realm.beginWrite()
-        SwiftStringObject.createWithObject(["a"], inRealm: realm)
-        SwiftStringObject.createWithObject(["b"], inRealm: realm)
-        SwiftStringObject.createWithObject(["c"], inRealm: realm)
+        SwiftStringObject.createInRealm(realm, withObject: ["a"])
+        SwiftStringObject.createInRealm(realm, withObject: ["b"])
+        SwiftStringObject.createInRealm(realm, withObject: ["c"])
         XCTAssertEqual(objects(SwiftStringObject.self, inRealm: realm).count, Int(3), "Expecting 3 objects")
         realm.commitWrite()
 
@@ -75,7 +75,7 @@ class SwiftRealmTests: TestCase {
         dispatch_async(dispatch_queue_create("background", nil)) {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
-            SwiftStringObject.createWithObject(["string"], inRealm: realm)
+            SwiftStringObject.createInRealm(realm, withObject: ["string"])
             realm.commitWrite()
         }
         waitForExpectationsWithTimeout(2, handler: nil)

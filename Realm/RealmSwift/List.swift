@@ -61,6 +61,15 @@ public final class List<T: Object>: ListBase, SequenceType {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
+    /**
+    Create a `List` by passing in the `RLMArray` to be wrapped.
+
+    :param: rlmArray `RLMArray`.
+    */
+    internal init(_ rlmArray: RLMArray) {
+        super.init(array: rlmArray)
+    }
+
     // MARK: Index Retrieval
 
     /**
