@@ -23,6 +23,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
+#import "RLMObjectStore.h"
 
 #import <tightdb/table.hpp>
 
