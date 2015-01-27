@@ -193,7 +193,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {
-            if (i >= self._rlmArray.count) {
+            if i >= self._rlmArray.count {
                 return .None
             } else {
                 return self._rlmArray[i++] as? T
