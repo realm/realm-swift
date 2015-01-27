@@ -112,6 +112,9 @@
 
  Creates an instance of this object and adds it to the default Realm populating
  the object with the given object.
+ 
+ If nested objects are included in the argument, `createInDefaultRealmWithObject:` will be called
+ on them.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
@@ -129,6 +132,9 @@
  
  Creates an instance of this object and adds it to the given Realm populating
  the object with the given object.
+ 
+ If nested objects are included in the argument, `createInRealm:withObject:` will be called
+ on them.
  
  @param realm   The Realm in which this object is persisted.
  @param object  The object used to populate the object. This can be any key/value coding compliant
@@ -148,6 +154,11 @@
  This method can only be called on object types with a primary key defined. If there is already
  an object with the same primary key value in the default RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
+ 
+ If nested objects are included in the argument, `createOrUpdateInDefaultRealmWithObject:` will be
+ called on them.
+ 
+ This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
  @param object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
@@ -166,6 +177,11 @@
  This method can only be called on object types with a primary key defined. If there is already
  an object with the same primary key value in the provided RLMRealm its values are updated and the object
  is returned. Otherwise this creates and populates a new instance of this object in the provided Realm.
+ 
+ If nested objects are included in the argument, `createOrUpdateInRealm:withObject:` will be
+ called on them.
+
+ This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
  @param realm   The Realm in which this object is persisted.
  @param object  The object used to populate the object. This can be any key/value coding compliant

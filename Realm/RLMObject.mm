@@ -53,17 +53,16 @@
 }
 
 + (instancetype)createOrUpdateInDefaultRealmWithObject:(id)object {
+    return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withObject:object];
+}
+
++ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
     // verify primary key
     RLMObjectSchema *schema = [self sharedSchema];
     if (!schema.primaryKeyProperty) {
         NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
         @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
     }
-
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], object, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
-}
-
-+ (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withObject:(id)value {
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
 }
 
