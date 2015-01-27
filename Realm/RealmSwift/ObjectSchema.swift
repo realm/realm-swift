@@ -42,7 +42,7 @@ public final class ObjectSchema {
     /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
-	    return Property(rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }

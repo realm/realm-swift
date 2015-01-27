@@ -170,18 +170,18 @@ class ResultsTests: TestCase {
 
     func testMin() {
         let results = getAggregateableResults()
-	XCTAssertEqual(1, results.min("intCol") as Int!)
-	XCTAssertEqual(Float(1.1), results.min("floatCol") as Float!)
-	XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
-	XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
+        XCTAssertEqual(1, results.min("intCol") as Int!)
+        XCTAssertEqual(Float(1.1), results.min("floatCol") as Float!)
+        XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
     }
 
     func testMax() {
         let results = getAggregateableResults()
-	XCTAssertEqual(2, results.max("intCol") as Int!)
-	XCTAssertEqual(Float(2.2), results.max("floatCol") as Float!)
-	XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
-	XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
+        XCTAssertEqual(2, results.max("intCol") as Int!)
+        XCTAssertEqual(Float(2.2), results.max("floatCol") as Float!)
+        XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
     }
 
     func testSum() {
@@ -210,18 +210,18 @@ class ResultsTests: TestCase {
 
 class ResultsFromTableViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-	return objects(SwiftStringObject.self, inRealm: realmWithTestPath())
+        return objects(SwiftStringObject.self, inRealm: realmWithTestPath())
     }
 
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         makeAggregateableObjects()
-	return objects(SwiftAggregateObject.self, inRealm: realmWithTestPath())
+        return objects(SwiftAggregateObject.self, inRealm: realmWithTestPath())
     }
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-	let array = SwiftArrayPropertyObject.createWithObject(["", [str1, str2], []], inRealm: realmWithTestPath())
+        let array = SwiftArrayPropertyObject.createWithObject(["", [str1, str2], []], inRealm: realmWithTestPath())
         return array.array.filter("stringCol != ''") // i.e. all of them
     }
 

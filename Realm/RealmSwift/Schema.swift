@@ -53,7 +53,7 @@ public final class Schema {
     /// Returns the object schema with the given class name, if it exists.
     public subscript(className: String) -> ObjectSchema? {
         if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
-	    return ObjectSchema(rlmObjectSchema)
+            return ObjectSchema(rlmObjectSchema)
         }
         return nil
     }

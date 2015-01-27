@@ -27,7 +27,7 @@ or in the default realm if the `realm` argument is omitted.
 
 :param: type  The type of the objects to be returned.
 :param: realm The Realm instance to query.
-	      The default Realm will be used if this argument is omitted.
+              The default Realm will be used if this argument is omitted.
 
 :returns: Results with all objects of the given type in the specified Realm.
 */
@@ -48,10 +48,10 @@ The location of the default Realm as a string. Can be overridden.
 */
 public var defaultRealmPath: String {
     set {
-	RLMRealm.setDefaultRealmPath(newValue)
+        RLMRealm.setDefaultRealmPath(newValue)
     }
     get {
-	return RLMRealm.defaultRealmPath()
+        return RLMRealm.defaultRealmPath()
     }
 }
 
@@ -104,10 +104,10 @@ the realm within an `autoreleasepool {}` and ensure you have no other
 strong references to it.
 
 :warning: Realm instances are not thread safe and can not be shared across
-	  threads or dispatch queues. You must call this method on each thread you want
-	  to interact with the realm on. For dispatch queues, this means that you must
-	  call it in each block which is dispatched, as a queue is not guaranteed to run
-	  on a consistent thread.
+          threads or dispatch queues. You must call this method on each thread you want
+          to interact with the realm on. For dispatch queues, this means that you must
+          call it in each block which is dispatched, as a queue is not guaranteed to run
+          on a consistent thread.
 */
 public final class Realm {
 
@@ -150,7 +150,7 @@ public final class Realm {
     Defaults to true.
     */
     public var autorefresh: Bool {
-	get {
+        get {
             return rlmRealm.autorefresh
         }
         set {
@@ -175,7 +175,7 @@ public final class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String) {
-	self.init(RLMRealm(path: path, readOnly: false, error: nil))
+        self.init(RLMRealm(path: path, readOnly: false, error: nil))
     }
 
     /**
@@ -194,7 +194,7 @@ public final class Realm {
     :param: identifier A string used to identify a particular in-memory Realm.
     */
     public convenience init(inMemoryIdentifier: String) {
-	self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
+        self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
     /**
@@ -204,17 +204,17 @@ public final class Realm {
     Like `init(path:)`, but with the ability to open read-only realms and get
     errors as an `NSError` inout parameter rather than exceptions.
 
-    :warning: warning Read-only Realms do not support changes made to the file while the
-	      `Realm` exists. This means that you cannot open a Realm as both read-only
-	      and read-write at the same time. Read-only Realms should normally only be used
-	      on files which cannot be opened in read-write mode, and not just for enforcing
-	      correctness in code that should not need to write to the Realm.
+    :warning: Read-only Realms do not support changes made to the file while the
+              `Realm` exists. This means that you cannot open a Realm as both read-only
+              and read-write at the same time. Read-only Realms should normally only be used
+              on files which cannot be opened in read-write mode, and not just for enforcing
+              correctness in code that should not need to write to the Realm.
 
     :param: path     Path to the file you want the data saved in.
     :param: readOnly Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error    If an error occurs, upon return contains an `NSError` object
-		     that describes the problem. If you are not interested in
-		     possible errors, omit the argument, or pass in `nil`.
+                     that describes the problem. If you are not interested in
+                     possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
@@ -240,8 +240,8 @@ public final class Realm {
     :param: encryptionKey 64-byte key to use to encrypt the data.
     :param: readOnly      Bool indicating if this Realm is read-only (must use for read-only files).
     :param: error         If an error occurs, upon return contains an `NSError` object
-			  that describes the problem. If you are not interested in
-			  possible errors, omit the argument, or pass in `nil`.
+                          that describes the problem. If you are not interested in
+                          possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
@@ -264,13 +264,13 @@ public final class Realm {
 
     :param: path  Path to save the Realm to.
     :param: error If an error occurs, upon return contains an `NSError` object
-		  that describes the problem. If you are not interested in
-		  possible errors, omit the argument, or pass in `nil`.
+                  that describes the problem. If you are not interested in
+                  possible errors, omit the argument, or pass in `nil`.
 
     :returns: Whether the realm was copied successfully.
     */
     public func writeCopyToPath(path: String, error: NSErrorPointer = nil) -> Bool {
-	return rlmRealm.writeCopyToPath(path, error: error)
+        return rlmRealm.writeCopyToPath(path, error: error)
     }
 
     /**
@@ -284,13 +284,13 @@ public final class Realm {
     :param: path          Path to save the Realm to.
     :param: encryptionKey 64-byte encryption key to encrypt the new file with.
     :param: error         If an error occurs, upon return contains an `NSError` object
-			  that describes the problem. If you are not interested in
-			  possible errors, omit the argument, or pass in `nil`.
+                          that describes the problem. If you are not interested in
+                          possible errors, omit the argument, or pass in `nil`.
 
     :returns: Whether the realm was copied successfully.
     */
     public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) -> Bool {
-	return rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
+        return rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
     }
 
     // MARK: Transactions
@@ -366,7 +366,7 @@ public final class Realm {
     Calling this when not in a write transaction will throw an exception.
     */
     public func cancelWrite() {
-	rlmRealm.cancelWriteTransaction()
+        rlmRealm.cancelWriteTransaction()
     }
 
     // MARK: Refresh
@@ -376,10 +376,10 @@ public final class Realm {
     data for this `Realm`.
 
     :returns: Whether the realm had any updates.
-	      Note that this may return true even if no data has actually changed.
+              Note that this may return true even if no data has actually changed.
     */
     public func refresh() -> Bool {
-	return rlmRealm.refresh()
+        return rlmRealm.refresh()
     }
 
     // MARK: Invalidation
@@ -438,7 +438,7 @@ public final class Realm {
     */
     public func add<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-	    RLMAddObjectToRealm(obj, rlmRealm, .allZeros)
+            RLMAddObjectToRealm(obj, rlmRealm, .allZeros)
         }
     }
 
@@ -469,7 +469,7 @@ public final class Realm {
     */
     public func addOrUpdate<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-	    addOrUpdate(obj)
+            addOrUpdate(obj)
         }
     }
 
@@ -479,7 +479,7 @@ public final class Realm {
     :param: object The object to be deleted.
     */
     public func delete(object: Object) {
-	RLMDeleteObjectFromRealm(object)
+        RLMDeleteObjectFromRealm(object)
     }
 
     /**
@@ -488,7 +488,7 @@ public final class Realm {
     :param: object The objects to be deleted.
     */
     public func delete(objects: List<Object>) {
-	rlmRealm.deleteObjects(objects)
+        rlmRealm.deleteObjects(objects)
     }
 
     /**
@@ -497,9 +497,9 @@ public final class Realm {
     :param: object The objects to be deleted.
     */
     public func delete<S: SequenceType where S.Generator.Element == Object>(objects: S) {
-	for obj in objects {
-	    RLMDeleteObjectFromRealm(obj)
-	}
+        for obj in objects {
+            RLMDeleteObjectFromRealm(obj)
+        }
     }
 
     /**
@@ -515,13 +515,13 @@ public final class Realm {
     Add a notification handler for changes in this Realm.
 
     :param: block A block which is called to process Realm notifications.
-		  It receives the following parameters:
+                  It receives the following parameters:
 
-		  - `Notification`:    The incoming notification.
-		  - `Realm`:           The realm for which this notification occurred.
+                  - `Notification`:    The incoming notification.
+                  - `Realm`:           The realm for which this notification occurred.
 
     :returns: A notification token which can later be passed to `removeNotification(_:)`
-	      to remove this notification.
+              to remove this notification.
     */
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock(rlmNotificationBlockFromNotificationBlock(block))
@@ -531,8 +531,8 @@ public final class Realm {
     Remove a previously registered notification handler using the token returned
     from `addNotificationBlock(_:)`
 
-    :param: notificationToken   The token returned from `addNotificationBlock(_:)`
-	    corresponding to the notification block to remove.
+    :param: notificationToken The token returned from `addNotificationBlock(_:)`
+                              corresponding to the notification block to remove.
     */
     public func removeNotification(notificationToken: NotificationToken) {
         rlmRealm.removeNotification(notificationToken)
@@ -561,6 +561,6 @@ Converts a `NotificationBlock` to an `RLMNotificationBlock`.
 */
 internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-	return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
+        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
     }
 }

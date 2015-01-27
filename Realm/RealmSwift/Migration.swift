@@ -61,7 +61,7 @@ public class Migration {
 
 public class MigrationObject : Object {
     subscript(key: String) -> AnyObject? {
-        if (self.objectSchema[key].type == RLMPropertyType.Array) {
+        if (self.objectSchema[key].type == .Array) {
             return listProperties[key]
         }
         return super[key]
@@ -93,5 +93,3 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
         migration.realm.schema = savedSchema
     }
 }
-
-

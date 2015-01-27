@@ -36,7 +36,7 @@ public struct SortDescriptor {
 
     /// Converts the receiver to an `RLMSortDescriptor`
     internal var rlmSortDescriptorValue: RLMSortDescriptor {
-	return RLMSortDescriptor(property: property, ascending: ascending)
+        return RLMSortDescriptor(property: property, ascending: ascending)
     }
 
     // MARK: Initializers
@@ -48,14 +48,14 @@ public struct SortDescriptor {
     :param: ascending Whether this descriptor sorts in ascending or descending order.
     */
     public init(property: String, ascending: Bool = true) {
-	self.property = property
-	self.ascending = ascending
+        self.property = property
+        self.ascending = ascending
     }
 
     // MARK: Functions
 
     /// Returns a copy of the receiver with the sort order reversed.
     public func reversed() -> SortDescriptor {
-	return SortDescriptor(property: property, ascending: !ascending)
+        return SortDescriptor(property: property, ascending: !ascending)
     }
 }
