@@ -58,12 +58,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = defaultRealmPath()
-        let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
+        let defaultParentPath = defaultRealmPath.stringByDeletingLastPathComponent
 
         let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
-        NSFileManager.defaultManager().removeItemAtPath(defaultPath, error: nil)
-        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultPath, error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(defaultRealmPath, error: nil)
+        NSFileManager.defaultManager().copyItemAtPath(v0Path, toPath: defaultRealmPath, error: nil)
 
         // define a migration block
         // you can define this inline, but we will reuse this to migrate realm files from multiple versions
@@ -118,9 +117,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the migrated realms
         let realmv1 = Realm(path: realmv1Path)
-        println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
+        println("Migrated objects in the Realm migrated from v1: \(objects(Person.self, inRealm: realmv1))")
         let realmv2 = Realm(path: realmv2Path)
-        println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
+        println("Migrated objects in the Realm migrated from v2: \(objects(Person.self, inRealm: realmv2))")
 
         return true
     }
