@@ -51,7 +51,7 @@ public final class List<T: Object>: ListBase, SequenceType {
         if _rlmArray.realm == nil {
             return nil
         }
-	return Realm(_rlmArray.realm)
+        return Realm(_rlmArray.realm)
     }
 
     // MARK: Initializers
@@ -59,6 +59,11 @@ public final class List<T: Object>: ListBase, SequenceType {
     /// Creates a `List` that holds objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: T.className()))
+    }
+
+    /// Creates a `List` that holds objects of type `T` by passing in the `RLMArray` to be wrapped.
+    internal init(_ rlmArray: RLMArray) {
+        super.init(array: rlmArray)
     }
 
     // MARK: Index Retrieval
@@ -95,7 +100,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-	return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     // MARK: Object Retrieval
@@ -160,7 +165,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: `Results` containing list elements sorted by the given property name.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
-	return sorted([SortDescriptor(property: property, ascending: ascending)])
+    return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
@@ -171,7 +176,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: `Results` containing list elements sorted by the given sort descriptors.
     */
     public func sorted(sortDescriptors: [SortDescriptor]) -> Results<T> {
-	return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    return Results<T>(_rlmArray.sortedResultsUsingDescriptors(sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Sequence Support
@@ -213,9 +218,9 @@ public final class List<T: Object>: ListBase, SequenceType {
     :param: objects A sequence of objects.
     */
     public func append<S: SequenceType where S.Generator.Element == T>(objects: S) {
-	for obj in SequenceOf<T>(objects) { // Workaround for http://stackoverflow.com/questions/26918594
-	    _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
-	}
+        for obj in SequenceOf<T>(objects) { // Workaround for http://stackoverflow.com/questions/26918594
+            _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
+        }
     }
 
     /**
@@ -300,7 +305,7 @@ Converts `NSNotFound` to `nil`, otherwise returns `index` as an `Int`.
 */
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {
-	return nil
+        return nil
     }
     return Int(index)
 }

@@ -60,10 +60,10 @@ public class Object : RLMObjectBase, Equatable {
     /// The `Realm` this object belongs to, or `nil` if the object
     /// does not belong to a realm (the object is standalone).
     public var swiftRealm: Realm? {
-	if let rlmRealm = realm {
-	    return Realm(rlmRealm)
-	}
-	return nil
+        if let rlmRealm = realm {
+            return Realm(rlmRealm)
+        }
+        return nil
     }
 
     // FIXME: Rename to `objectSchema`
@@ -83,7 +83,7 @@ public class Object : RLMObjectBase, Equatable {
     :see: Realm().add(_:)
     */
     public override init() {
-	super.init()
+        super.init()
     }
 
     /**
@@ -91,12 +91,12 @@ public class Object : RLMObjectBase, Equatable {
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
     :param: object The object used to populate the object. This can be any key/value coding compliant
-		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		   or an `Array` with one object for each persisted property. An exception will be
-		   thrown if any required properties are not present and no default is set.
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
     */
     public override init(object: AnyObject) {
-	super.init(object: object)
+        super.init(object: object)
     }
 
     // MARK: Constructors
@@ -108,17 +108,17 @@ public class Object : RLMObjectBase, Equatable {
     the object with the given object.
 
     :param: object The object used to populate the object. This can be any key/value coding compliant
-		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		   or an `Array` with one object for each persisted property. An exception will be
-		   thrown if any required properties are not present and no default is set.
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
 
-		   When passing in an `Array`, all properties must be present,
-		   valid and in the same order as the properties defined in the model.
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
 
     :returns: The created object.
     */
     public class func createInDefaultRealmWithObject(object: AnyObject) -> Self {
-	return createInRealm(defaultRealm(), withObject: object)
+        return createInRealm(defaultRealm(), withObject: object)
     }
 
     /**
@@ -129,17 +129,17 @@ public class Object : RLMObjectBase, Equatable {
 
     :param: realm  The Realm in which this object is persisted.
     :param: object The object used to populate the object. This can be any key/value coding compliant
-		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		   or an `Array` with one object for each persisted property. An exception will be
-		   thrown if any required properties are not present and no default is set.
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
 
-		   When passing in an `Array`, all properties must be present,
-		   valid and in the same order as the properties defined in the model.
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
 
     :returns: The created object.
     */
     public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-	return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
     }
 
     /**
@@ -150,19 +150,19 @@ public class Object : RLMObjectBase, Equatable {
     is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
 
     :param: object The object used to populate the object. This can be any key/value coding compliant
-		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		   or an `Array` with one object for each persisted property. An exception will be
-		   thrown if any required properties are not present and no default is set.
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
 
-		   When passing in an `Array`, all properties must be present,
-		   valid and in the same order as the properties defined in the model.
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
 
     :returns: The created or updated object.
 
     :see: Object.primaryKey()
     */
     public class func createOrUpdateInDefaultRealmWithObject(object: AnyObject) -> Self {
-	return createOrUpdateInRealm(defaultRealm(), withObject: object)
+        return createOrUpdateInRealm(defaultRealm(), withObject: object)
     }
 
     /**
@@ -174,19 +174,19 @@ public class Object : RLMObjectBase, Equatable {
 
     :param: realm  The Realm in which this object is persisted.
     :param: object The object used to populate the object. This can be any key/value coding compliant
-		   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		   or an `Array` with one object for each persisted property. An exception will be
-		   thrown if any required properties are not present and no default is set.
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
 
-		   When passing in an `Array`, all properties must be present,
-		   valid and in the same order as the properties defined in the model.
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
 
     :returns: The created or updated object.
 
     :see: Object.primaryKey()
     */
     public class func createOrUpdateInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-	return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
     }
 
     // MARK: Object Retrieval
@@ -204,7 +204,7 @@ public class Object : RLMObjectBase, Equatable {
     :returns: An object of the subclass type or `nil` if an object with the given primary key does not exist.
     */
     public class func objectForPrimaryKey(key: AnyObject, inRealm realm: Realm = defaultRealm()) -> Self? {
-	return unsafeBitCast(RLMGetObject(realm.rlmRealm, className(), key), self)
+        return unsafeBitCast(RLMGetObject(realm.rlmRealm, className(), key), self)
     }
 
     // MARK: Customizing
@@ -243,25 +243,25 @@ public class Object : RLMObjectBase, Equatable {
     Get an `Array` of objects of type `className` which have this object as the given property value. This can
     be used to get the inverse relationship value for `Object` and `List` properties.
 
-    @param className   The type of object on which the relationship to query is defined.
-    @param property    The name of the property which defines the relationship.
+    :param: className The type of object on which the relationship to query is defined.
+    :param: property  The name of the property which defines the relationship.
 
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func swiftLinkingObjectsOfClass(className: String, forProperty propertyName: String) -> [Object] {
-	return unsafeBitCast(self, RLMObject.self).linkingObjectsOfClass(className, forProperty: propertyName) as [Object]
+        return unsafeBitCast(self, RLMObject.self).linkingObjectsOfClass(className, forProperty: propertyName) as [Object]
     }
 
     // MARK: Property Retrieval
 
     /// Returns or sets the value of the property with the given name.
     public subscript(key: String) -> AnyObject? {
-	get {
-	    return super[key]
-	}
-	set {
-	    super[key] = newValue
-	}
+        get {
+            return super[key]
+        }
+        set {
+            super[key] = newValue
+        }
     }
 
     // MARK: Private Initializers
@@ -270,7 +270,7 @@ public class Object : RLMObjectBase, Equatable {
 
     /**
     WARNING: This is an internal initializer for Realm that must be `public`, but is
-	     not intended to be used directly.
+         not intended to be used directly.
 
     This initializer is called by the Objective-C accessor creation code, and if it's
     not overridden in Swift, the inline property initializers don't get called,
@@ -281,12 +281,12 @@ public class Object : RLMObjectBase, Equatable {
     :param: defaultValues Whether the default values for this model should be used.
     */
     public override init(realm: RLMRealm, schema: RLMObjectSchema, defaultValues: Bool) {
-	super.init(realm: realm, schema: schema, defaultValues: defaultValues)
+        super.init(realm: realm, schema: schema, defaultValues: defaultValues)
     }
 
     /**
     WARNING: This is an internal initializer for Realm that must be `public`, but is
-	     not intended to be used directly.
+         not intended to be used directly.
 
     This initializer is called by the Objective-C accessor creation code, and if it's
     not overridden in Swift, the inline property initializers don't get called,
@@ -296,12 +296,12 @@ public class Object : RLMObjectBase, Equatable {
     :param: schema The realm's schema.
     */
     public override init(object: AnyObject, schema: RLMSchema) {
-	super.init(object: object, schema: schema)
+        super.init(object: object, schema: schema)
     }
 
     /**
     WARNING: This is an internal initializer for Realm that must be `public`, but is
-	     not intended to be used directly.
+         not intended to be used directly.
 
     This initializer is called by the Objective-C accessor creation code, and if it's
     not overridden in Swift, the inline property initializers don't get called,
@@ -310,7 +310,7 @@ public class Object : RLMObjectBase, Equatable {
     :param: objectSchema The schema for the object's class.
     */
     public override init(objectSchema: RLMObjectSchema) {
-	super.init(objectSchema: objectSchema)
+        super.init(objectSchema: objectSchema)
     }
 }
 
@@ -340,5 +340,4 @@ public class ObjectUtil : NSObject {
 
         return properties
     }
-
 }

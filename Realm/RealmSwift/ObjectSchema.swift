@@ -42,7 +42,7 @@ public final class ObjectSchema {
     /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
-	    return Property(rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }
@@ -63,7 +63,7 @@ public final class ObjectSchema {
     /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
         if let rlmProperty = rlmObjectSchema[propertyName] {
-        return Property(rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }

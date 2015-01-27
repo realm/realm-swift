@@ -189,7 +189,7 @@ class ListTests: TestCase {
     func testSort() {
         array.append([str1, str2])
 
-        var sorted = array.sorted("stringCol", ascending: true)
+        var sorted = array.sorted("stringCol")
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
@@ -206,6 +206,8 @@ class ListTests: TestCase {
         }
 
         XCTAssertEqual(str, "121")
+        str = reduce(map(array) { $0.stringCol }, "", +)
+        XCTAssertEqual(str, "121")
     }
 
     func testAppendArray() {
@@ -217,7 +219,7 @@ class ListTests: TestCase {
     }
 
     func testAppendRLMResults() {
-	array.append(objects(SwiftStringObject.self, inRealm: realmWithTestPath()))
+        array.append(objects(SwiftStringObject.self, inRealm: realmWithTestPath()))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -291,8 +293,7 @@ class ListTests: TestCase {
     func testChangesArePersisted() {
         if let realm = array.realm {
             array.append([str1, str2])
-
-	    let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
+            let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -330,7 +331,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-	let array = SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
+        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -342,9 +343,9 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-	SwiftArrayPropertyObject.createWithObject(["name", [], []], inRealm: realm)
+        SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
-	let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
+        let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
 
         XCTAssertNotNil(array.realm)
         return array

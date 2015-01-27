@@ -34,14 +34,14 @@ private func realmLockPath(path: String) -> String {
 private func deleteRealmFilesAtPath(path: String) {
     let fileManager = NSFileManager.defaultManager()
     if fileManager.fileExistsAtPath(path) {
-	let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-	assert(succeeded, "Unable to delete realm")
+        let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+        assert(succeeded, "Unable to delete realm")
     }
 
     let lockPath = realmLockPath(path)
     if fileManager.fileExistsAtPath(lockPath) {
-	let succeeded = NSFileManager.defaultManager().removeItemAtPath(lockPath, error: nil)
-	assert(succeeded, "Unable to delete realm")
+        let succeeded = NSFileManager.defaultManager().removeItemAtPath(lockPath, error: nil)
+        assert(succeeded, "Unable to delete realm")
     }
 }
 
@@ -53,18 +53,18 @@ private func deleteRealmFiles() {
 
 class TestCase: XCTestCase {
     func realmWithTestPath() -> Realm {
-	return Realm(path: testRealmPath())
+        return Realm(path: testRealmPath())
     }
 
     override func invokeTest() {
-	deleteRealmFiles()
+        deleteRealmFiles()
 
-	autoreleasepool {
-	    self.setUp()
-	    self.invocation.invoke()
-	    self.tearDown()
-	}
+        autoreleasepool {
+            self.setUp()
+            self.invocation.invoke()
+            self.tearDown()
+        }
 
-	deleteRealmFiles()
+        deleteRealmFiles()
     }
 }
