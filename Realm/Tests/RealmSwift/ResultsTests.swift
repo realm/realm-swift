@@ -159,7 +159,7 @@ class ResultsTests: TestCase {
     }
 
     func testSort() {
-        var sorted = results.sorted("stringCol", ascending: true)
+        var sorted = results.sorted("stringCol")
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
@@ -170,18 +170,18 @@ class ResultsTests: TestCase {
 
     func testMin() {
         let results = getAggregateableResults()
-        XCTAssertEqual(1, results.min("intCol") as Int)
-        XCTAssertEqual(Float(1.1), results.min("floatCol") as Float)
-        XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double)
-        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate)
+        XCTAssertEqual(1, results.min("intCol") as Int!)
+        XCTAssertEqual(Float(1.1), results.min("floatCol") as Float!)
+        XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
     }
 
     func testMax() {
         let results = getAggregateableResults()
-        XCTAssertEqual(2, results.max("intCol") as Int)
-        XCTAssertEqual(Float(2.2), results.max("floatCol") as Float)
-        XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double)
-        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate)
+        XCTAssertEqual(2, results.max("intCol") as Int!)
+        XCTAssertEqual(Float(2.2), results.max("floatCol") as Float!)
+        XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
     }
 
     func testSum() {
@@ -199,30 +199,31 @@ class ResultsTests: TestCase {
     }
 
     func testFastEnumeration() {
-        var str = ""
+        var str1 = ""
         for obj in results {
-            str += obj.stringCol
+            str1 += obj.stringCol
         }
+        XCTAssertEqual(str1, "12")
 
-        XCTAssertEqual(str, "12")
+        let str2 = reduce(map(results) { $0.stringCol }, "", +)
+        XCTAssertEqual(str2, "12")
     }
 }
 
 class ResultsFromTableViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject)
+        return objects(SwiftStringObject.self, inRealm: realmWithTestPath())
     }
 
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         makeAggregateableObjects()
-        return realmWithTestPath().objects(SwiftAggregateObject)
+        return objects(SwiftAggregateObject.self, inRealm: realmWithTestPath())
     }
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-    let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(),
-        withObject: ["", [str1, str2], []])
+        let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(), withObject: ["", [str1, str2], []])
         return array.array.filter("stringCol != ''") // i.e. all of them
     }
 

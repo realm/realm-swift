@@ -35,8 +35,8 @@ public func migrateRealm(path: String) -> NSError? {
 }
 
 public class Migration {
-    public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
-    public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
+    public var oldSchema: Schema { return Schema(rlmMigration.oldSchema) }
+    public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
 
     public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(objectClassName, block: {
@@ -54,23 +54,26 @@ public class Migration {
 
     private var rlmMigration: RLMMigration
 
-    init(_ rlmMigration: RLMMigration) {
+    internal init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }
 
 public class MigrationObject : Object {
-    subscript(key: String) -> AnyObject? {
-        if (self.objectSchema[key].type == RLMPropertyType.Array) {
-            return listProperties[key]
+    public override subscript(key: String) -> AnyObject? {
+        get {
+            if (objectSchema[key].type == .Array) {
+                return listProperties[key]
+            }
+            return super[key]
         }
-        return super[key]
+        set {
+            super[key] = newValue
+        }
     }
 
     public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
-        var list = List<Object>()
-        list._rlmArray = rlmArray
-        listProperties[name] = list
+        listProperties[name] = List<Object>(rlmArray)
     }
 
     private var listProperties = [String: List<Object>]()

@@ -189,7 +189,7 @@ class ListTests: TestCase {
     func testSort() {
         array.append([str1, str2])
 
-        var sorted = array.sorted("stringCol", ascending: true)
+        var sorted = array.sorted("stringCol")
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
@@ -206,6 +206,8 @@ class ListTests: TestCase {
         }
 
         XCTAssertEqual(str, "121")
+        str = reduce(map(array) { $0.stringCol }, "", +)
+        XCTAssertEqual(str, "121")
     }
 
     func testAppendArray() {
@@ -217,7 +219,7 @@ class ListTests: TestCase {
     }
 
     func testAppendRLMResults() {
-        array.append(realmWithTestPath().objects(SwiftStringObject))
+        array.append(objects(SwiftStringObject.self, inRealm: realmWithTestPath()))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -291,8 +293,7 @@ class ListTests: TestCase {
     func testChangesArePersisted() {
         if let realm = array.realm {
             array.append([str1, str2])
-
-            let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
+            let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -344,7 +345,7 @@ class ListRetrievedTests: ListTests {
         realm.beginWrite()
         SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject).first!
+        let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
 
         XCTAssertNotNil(array.realm)
         return array

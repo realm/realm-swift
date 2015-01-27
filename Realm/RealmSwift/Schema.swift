@@ -18,28 +18,52 @@
 
 import Realm
 
-public func ==(lhs: Schema, rhs: Schema) -> Bool {
-    return lhs.rlmSchema.isEqualToSchema(rhs.rlmSchema)
-}
+/**
+This class represents the collection of model object schemas persisted to Realm.
 
-public class Schema: Equatable {
+When using Realm, `Schema` objects allow performing migrations and
+introspecting the database's schema.
+
+Schemas map to collections of tables in the core database.
+*/
+public final class Schema {
+
     // MARK: Properties
 
-    var rlmSchema: RLMSchema
+    /// Wrapped `RLMSchema`.
+    internal var rlmSchema: RLMSchema
+
+    /// `ObjectSchema`s for all object types in this Realm. Meant
+    /// to be used during migrations for dynamic introspection.
     public var objectSchema: [ObjectSchema] { return rlmSchema.objectSchema as [ObjectSchema] }
 
     // MARK: Initializers
 
-    init(rlmSchema: RLMSchema) {
+    /**
+    Create a `Schema` by passing in the `RLMSchema` to be wrapped.
+
+    :param: rlmSchema `RLMSchema`.
+    */
+    internal init(_ rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }
 
     // MARK: ObjectSchema Retrieval
 
+    /// Returns the object schema with the given class name, if it exists.
     public subscript(className: String) -> ObjectSchema? {
         if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
-            return ObjectSchema(rlmObjectSchema: rlmObjectSchema)
+            return ObjectSchema(rlmObjectSchema)
         }
         return nil
     }
+}
+
+// MARK: Equatable
+
+extension Schema: Equatable {}
+
+/// Returns whether the two schemas are equal.
+public func ==(lhs: Schema, rhs: Schema) -> Bool {
+    return lhs.rlmSchema.isEqualToSchema(rhs.rlmSchema)
 }
