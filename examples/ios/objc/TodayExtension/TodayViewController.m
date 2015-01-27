@@ -32,7 +32,7 @@
         }];
     }
     self.notificationToken = [self.tick.realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
-        if (self.tick.count % 2 == 1) {
+        if (self.tick.count % 19 == 0) {
             [self tock];
         }
         [self updateLabel];
