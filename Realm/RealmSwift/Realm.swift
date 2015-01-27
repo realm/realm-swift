@@ -113,6 +113,7 @@ public final class Realm {
 
     // MARK: Properties
 
+    /// Wrapped `RLMRealm`.
     internal var rlmRealm: RLMRealm
 
     /// Path to the file where this Realm is persisted.

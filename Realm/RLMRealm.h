@@ -474,14 +474,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Migration block used to migrate a Realm.
 
- @param migration   `RLMMigration` object used to perform the migration. The
-                    migration object allows you to enumerate and alter any
-                    existing objects which require migration.
-
- @param oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
-
- @return    Schema version number for the `RLMRealm` after completing the
-            migration. Must be greater than `oldSchemaVersion`.
+ @param migration        `RLMMigration` object used to perform the migration. The
+                         migration object allows you to enumerate and alter any
+                         existing objects which require migration.
+ @param oldSchemaVersion The schema version of the `RLMRealm` being migrated.
  */
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
