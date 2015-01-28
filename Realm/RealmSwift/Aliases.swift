@@ -23,8 +23,30 @@ import Realm
 
 // MARK: Aliases
 
-/// An enum of the different property types supported by Realm.
+/**
+An enum of the different property types supported by Realm. Object type.
+
+See [Realm Models](http://realm.io/docs/cocoa/latest/#models).
+
+## Primitive types
+
+* Int    = 0
+* Bool   = 1
+* Float  = 9
+* Double = 10
+
+## Object types
+
+* String = 2
+* Data   = 4
+* Date   = 7
+
+## Array/Linked object types
+
+* Object = 12
+* Array  = 13
+*/
 public typealias PropertyType = RLMPropertyType
 
-/// A token that holds onto the Realm and the notification block.
+/// An opaque token used to unregister notification blocks from Realms.
 public typealias NotificationToken = RLMNotificationToken

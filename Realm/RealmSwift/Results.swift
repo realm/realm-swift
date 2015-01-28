@@ -45,8 +45,8 @@ extension Int: AddableType {}
 `Results` is an auto-updating container type in Realm returned from object
 queries.
 
-Results can be queried with the same predicates as `Object` and `List`
-and you can chain queries to further filter query results.
+Results can be queried with the same predicates as `List<T>` and you can chain queries to further
+filter query results.
 
 Results cannot be created directly.
 */
@@ -176,7 +176,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Aggregate Operations
 
     /**
-    Returns the minimum (lowest) value of the given property.
+    Returns the minimum value of the given property.
 
     :warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
 
@@ -189,7 +189,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     }
 
     /**
-    Returns the maximum (lowest) value of the given property.
+    Returns the maximum value of the given property.
 
     :warning: Only names of properties of a type conforming to the `MinMaxType` protocol can be used.
 
@@ -206,7 +206,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
-    :param: property The name of a property conforming to `AddableType` to look for a minimum on.
+    :param: property The name of a property conforming to `AddableType` to calculate sum on.
 
     :returns: The sum of the given property over all objects in the Results.
     */
@@ -219,7 +219,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
-    :param: property The name of a property conforming to `AddableType` to look for a minimum on.
+    :param: property The name of a property conforming to `AddableType` to calculate average on.
 
     :returns: The average of the given property over all objects in the Results.
     */
@@ -229,11 +229,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Sequence Support
 
-    /**
-    Returns a `GeneratorOf<T>` that yields successive elements in the results.
-
-    :returns: A `GeneratorOf<T>` that yields successive elements in the results.
-    */
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {

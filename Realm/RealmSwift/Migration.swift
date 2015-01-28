@@ -133,7 +133,6 @@ public class Migration {
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
-    /// Wrapped `RLMMigration`.
     private var rlmMigration: RLMMigration
 
     // MARK: Altering Objects During a Migration
@@ -143,8 +142,8 @@ public class Migration {
     each object. Object properties can be accessed using subscripting.
 
     :warning: All objects returned are of a type specific to the current migration and should not be
-              casted to className. Instead you should access them as `Object`s and use subscripting
-              to access properties.
+              casted to the normal object type. Instead you should access them as `Object`s and use
+              subscripting to access properties.
     
     :param: className The name of the `Object` class to enumerate.
     :param: block     The block providing both the old and new versions of an object in this Realm.
@@ -194,7 +193,6 @@ public class Migration {
 /// Object interface which allows untyped getters and setters for Objects during a migration.
 public class MigrationObject : Object {
 
-    /// Backing store for list properties.
     private var listProperties = [String: List<Object>]()
 
     /// Returns the value of the property with the given name.
@@ -221,13 +219,6 @@ public class MigrationObject : Object {
 
 // MARK: Private Helpers
 
-/**
-Converts a `MigrationBlock` to an `RLMMigrationBlock`.
-
-:param: migrationBlock `MigrationBlock` to convert.
-
-:returns: `RLMMigrationBlock`.
-*/
 private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
     return { migration, oldVersion in
         for objectSchema in migration.oldSchema.objectSchema {

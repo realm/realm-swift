@@ -384,7 +384,7 @@ public class Realm {
     inserted. Otherwise, the existing object is updated with any changed values.
 
     As with `add`, the object cannot already be persisted in a different
-    Realm. Use `Object(realm:object:)` to copy values to a different Realm.
+    Realm. Use `createOrUpdate` to copy values to a different Realm.
 
     :param: object Object to be added or updated.
     */
@@ -460,8 +460,8 @@ public class Realm {
     :param: block A block which is called to process Realm notifications.
                   It receives the following parameters:
 
-                  - `Notification`:    The incoming notification.
-                  - `Realm`:           The realm for which this notification occurred.
+                  - `Notification`: The incoming notification.
+                  - `Realm`:        The realm for which this notification occurred.
 
     :returns: A notification token which can later be passed to `removeNotification(_:)`
               to remove this notification.
@@ -499,9 +499,25 @@ public class Realm {
 
 /// A notification due to changes to a realm.
 public enum Notification: String {
-    /// The realm did change.
+    /**
+    Posted when the data in a realm has changed.
+
+    DidChange are posted after a realm has been refreshed to reflect a write transaction, i.e. when
+    an autorefresh occurs, `refresh()` is called, after an implicit refresh from
+    `beginWriteTransaction()`, and after a local write transaction is committed.
+    */
     case DidChange = "RLMRealmDidChangeNotification"
-    /// The realm requires a refresh.
+
+    /**
+    Posted when a write transaction has been committed to a realm on a different thread for the same
+    file. This is not posted if `autorefresh` is enabled or if the Realm is refreshed before the
+    notifcation has a chance to run.
+
+    Realms with autorefresh disabled should normally have a handler for this notification which
+    calls `refresh()` after doing some work.
+    While not refreshing is allowed, it may lead to large Realm files as Realm has to keep an extra
+    copy of the data for the un-refreshed Realm.
+    */
     case RefreshRequired = "RLMRealmRefreshRequiredNotification"
 }
 

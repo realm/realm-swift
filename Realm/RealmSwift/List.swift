@@ -38,8 +38,7 @@ Lists hold a single `Object` subclass (`T`) which defines the "type" of the list
 
 Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
-List properties on objects are lazily created when accessed, or can be
-obtained by querying a Realm.
+When added as a property on `Object` models, the property must be `let` and cannot be `dynamic`.
 */
 public final class List<T: Object>: ListBase, SequenceType {
 
@@ -99,7 +98,8 @@ public final class List<T: Object>: ListBase, SequenceType {
     Returns the index of the first object matching the given predicate,
     or `nil` if the object is not in the list.
 
-    :param: predicateFormat The predicate format string which can accept variable arguments.
+    :param: predicateFormat The predicate format string, optionally followed by a variable number
+                            of arguments.
 
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
@@ -161,12 +161,12 @@ public final class List<T: Object>: ListBase, SequenceType {
     // MARK: Sorting
 
     /**
-    Returns `Results` containing list elements sorted by the given property name.
+    Returns `Results` containing list elements sorted by the given property.
 
     :param: property  The property name to sort by.
     :param: ascending The direction to sort by.
 
-    :returns: `Results` containing list elements sorted by the given property name.
+    :returns: `Results` containing list elements sorted by the given property.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
@@ -174,11 +174,7 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     // MARK: Sequence Support
 
-    /**
-    Returns a `GeneratorOf<T>` that yields successive elements in the list.
-
-    :returns: A `GeneratorOf<T>` that yields successive elements in the list.
-    */
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {
@@ -220,7 +216,8 @@ public final class List<T: Object>: ListBase, SequenceType {
     Inserts the given object at the given index.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index greater than the number of objects in the list.
+    :warning: Throws an exception when called with an index smaller than zero or greater than the
+              number of objects in the list.
 
     :param: object An object.
     :param: index  The index at which to insert the object.
@@ -233,7 +230,8 @@ public final class List<T: Object>: ListBase, SequenceType {
     Removes the object at the given index from the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index greater than the number of objects in the list.
+    :warning: Throws an exception when called with an index smaller than zero or greater than the
+              number of objects in the list.
 
     :param: index The index at which to remove the object.
     */
@@ -275,9 +273,9 @@ public final class List<T: Object>: ListBase, SequenceType {
     /**
     Replaces an object at the given index with a new object.
 
-    Throws an exception when called with an index greater than the number of objects in this List.
-
     :warning: This method can only be called during a write transaction.
+    :warning: Throws an exception when called with an index smaller than zero or greater than the
+              number of objects in the list.
 
     :param: index  The list index of the object to be replaced.
     :param: object An object to replace at the specified index.
