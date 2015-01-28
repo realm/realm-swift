@@ -25,6 +25,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSwiftSupport.h"
+#import "RLMVersion.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
@@ -238,3 +239,18 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     }
     return outArray;
 };
+
+NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
+    [info addEntriesFromDictionary:@{
+                                     RLMRealmVersionKey : REALM_VERSION,
+                                     RLMRealmCoreVersionKey : @TIGHTDB_VERSION
+                                     }];
+
+    return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
+}
+
+NSException *RLMException(std::exception exception) {
+    return RLMException(@(exception.what()));
+}
+

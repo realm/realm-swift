@@ -27,6 +27,9 @@
 
 @class RLMProperty;
 
+NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
+NSException *RLMException(std::exception exception);
+
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 
