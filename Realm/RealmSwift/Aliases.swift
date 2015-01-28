@@ -30,21 +30,21 @@ See [Realm Models](http://realm.io/docs/cocoa/latest/#models).
 
 ## Primitive types
 
-* Int    = 0
-* Bool   = 1
-* Float  = 9
-* Double = 10
+* Int
+* Bool
+* Float
+* Double
 
 ## Object types
 
-* String = 2
-* Data   = 4
-* Date   = 7
+* String
+* Data
+* Date
 
 ## Array/Linked object types
 
-* Object = 12
-* Array  = 13
+* Object
+* Array
 */
 public typealias PropertyType = RLMPropertyType
 

@@ -38,7 +38,7 @@ Lists hold a single `Object` subclass (`T`) which defines the "type" of the list
 
 Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
-When added as a property on `Object` models, the property must be `let` and cannot be `dynamic`.
+When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
 public final class List<T: Object>: ListBase, SequenceType {
 
