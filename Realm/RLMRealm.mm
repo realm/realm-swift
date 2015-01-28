@@ -68,23 +68,6 @@ using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
 
-// create NSError from c++ exception
-static NSError *make_realm_error(RLMError code, exception const& ex) {
-    return [NSError errorWithDomain:@"io.realm"
-                               code:code
-                           userInfo:@{NSLocalizedDescriptionKey: @(ex.what()),
-                                      @"Error Code": @(code)}];
-}
-
-static void setOrThrowError(NSError *error, NSError **outError) {
-    if (outError) {
-        *outError = error;
-    }
-    else {
-        @throw RLMException(error.localizedDescription);
-    }
-}
-
 //
 // Global encryption key cache and validation
 //
@@ -295,14 +278,14 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             NSString *mode = readonly ? @"read" : @"read-write";
             NSString *additionalMessage = [NSString stringWithFormat:@"Unable to open a realm at path '%@'. Please use a path where your app has %@ permissions.", path, mode];
             NSString *newMessage = [NSString stringWithFormat:@"%s\n%@", ex.what(), additionalMessage];
-            error = make_realm_error(RLMErrorFilePermissionDenied,
+            error = RLMMakeError(RLMErrorFilePermissionDenied,
                                      File::PermissionDenied(newMessage.UTF8String));
         }
         catch (File::Exists const& ex) {
-            error = make_realm_error(RLMErrorFileExists, ex);
+            error = RLMMakeError(RLMErrorFileExists, ex);
         }
         catch (File::AccessError const& ex) {
-            error = make_realm_error(RLMErrorFileAccessError, ex);
+            error = RLMMakeError(RLMErrorFileAccessError, ex);
         }
         catch (IncompatibleLockFile const&) {
             NSString *err = @"Realm file is currently open in another process "
@@ -317,11 +300,11 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                                                @"Error Code": @(RLMErrorIncompatibleLockFile)}];
         }
         catch (exception const& ex) {
-            error = make_realm_error(RLMErrorFail, ex);
+            error = RLMMakeError(RLMErrorFail, ex);
         }
 
         if (error) {
-            setOrThrowError(error, outError);
+            RLMSetErrorOrThrow(error, outError);
             return nil;
         }
 
@@ -487,7 +470,7 @@ static id RLMAutorelease(id value) {
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
                 NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), targetSchema, [realm migrationBlock:key]);
                 if (error) {
-                    setOrThrowError(error, outError);
+                    RLMSetErrorOrThrow(error, outError);
                     return nil;
                 }
 
@@ -848,7 +831,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         NSError *error;
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];
         if (error) {
-            setOrThrowError(error, outError);
+            RLMSetErrorOrThrow(error, outError);
             return RLMNotVersioned;
         }
     }
@@ -893,25 +876,25 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     catch (File::PermissionDenied &ex) {
         success = NO;
         if (error) {
-            *error = make_realm_error(RLMErrorFilePermissionDenied, ex);
+            *error = RLMMakeError(RLMErrorFilePermissionDenied, ex);
         }
     }
     catch (File::Exists &ex) {
         success = NO;
         if (error) {
-            *error = make_realm_error(RLMErrorFileExists, ex);
+            *error = RLMMakeError(RLMErrorFileExists, ex);
         }
     }
     catch (File::AccessError &ex) {
         success = NO;
         if (error) {
-            *error = make_realm_error(RLMErrorFileAccessError, ex);
+            *error = RLMMakeError(RLMErrorFileAccessError, ex);
         }
     }
     catch (exception &ex) {
         success = NO;
         if (error) {
-            *error = make_realm_error(RLMErrorFail, ex);
+            *error = RLMMakeError(RLMErrorFail, ex);
         }
     }
 

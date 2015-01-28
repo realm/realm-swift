@@ -30,6 +30,10 @@
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
 NSException *RLMException(std::exception const& exception);
 
+NSError *RLMMakeError(RLMError code, std::exception const& exception);
+
+void RLMSetErrorOrThrow(NSError *error, NSError **outError);
+
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 

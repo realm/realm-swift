@@ -252,3 +252,18 @@ NSException *RLMException(std::exception const& exception) {
     return RLMException(@(exception.what()));
 }
 
+NSError *RLMMakeError(RLMError code, std::exception const& exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                                      @"Error Code": @(code)}];
+}
+
+void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
+    if (outError) {
+        *outError = error;
+    }
+    else {
+        @throw RLMException(error.localizedDescription, error.userInfo);
+    }
+}
