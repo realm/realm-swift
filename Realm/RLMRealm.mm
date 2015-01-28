@@ -495,7 +495,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     NSAssert(!_readOnly, @"Read-only realms do not have notifications");
 
     // call this realms notification blocks
-    for (RLMNotificationToken *token in [_notificationHandlers copy]) {
+    for (RLMNotificationToken *token in [_notificationHandlers allObjects]) {
         if (token.block) {
             token.block(notification, self);
         }
