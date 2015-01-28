@@ -109,6 +109,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3F6474991A79A07A008D5795 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
+			remoteInfo = Realm;
+		};
+		3F64749B1A79A07F008D5795 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8F70EC719BA51B1006F60D5;
+			remoteInfo = Realm;
+		};
 		C06134E01A718BB800D22D12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
@@ -639,6 +653,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3F64749C1A79A07F008D5795 /* PBXTargetDependency */,
 				C0658DC21A76CBD8002F7A84 /* PBXTargetDependency */,
 			);
 			name = "extension WatchKit Extension";
@@ -672,8 +687,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				C06134E11A718BB800D22D12 /* PBXTargetDependency */,
 				C0DC41F31A70728B0067156A /* PBXTargetDependency */,
+				C06134E11A718BB800D22D12 /* PBXTargetDependency */,
 				C0658DCB1A76CBD8002F7A84 /* PBXTargetDependency */,
 			);
 			name = extension;
@@ -692,6 +707,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3F64749A1A79A07A008D5795 /* PBXTargetDependency */,
 			);
 			name = TodayExtension;
 			productName = TodayExtension;
@@ -1067,6 +1083,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		3F64749A1A79A07A008D5795 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8F70EC719BA51B1006F60D5 /* Realm */;
+			targetProxy = 3F6474991A79A07A008D5795 /* PBXContainerItemProxy */;
+		};
+		3F64749C1A79A07F008D5795 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8F70EC719BA51B1006F60D5 /* Realm */;
+			targetProxy = 3F64749B1A79A07F008D5795 /* PBXContainerItemProxy */;
+		};
 		C06134E11A718BB800D22D12 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C0DC42051A7079D00067156A /* TodayExtension */;
