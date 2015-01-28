@@ -68,12 +68,6 @@ using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
 
-
-// create NSException from c++ exception
-static __attribute__((noreturn)) void throw_objc_exception(exception &ex) {
-    @throw RLMException(ex);
-}
-
 // create NSError from c++ exception
 static NSError *make_realm_error(RLMError code, exception const& ex) {
     return [NSError errorWithDomain:@"io.realm"
@@ -605,7 +599,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             // File access errors are treated as exceptions here since they should not occur after the shared
             // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
             // the excepted error related to file access.
-            throw_objc_exception(ex);
+            @throw RLMException(ex);
         }
     } else {
         @throw RLMException(@"The Realm is already in a write transaction");
@@ -637,7 +631,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             [self sendNotifications:RLMRealmDidChangeNotification];
         }
         catch (std::exception& ex) {
-            throw_objc_exception(ex);
+            @throw RLMException(ex);
         }
     } else {
        @throw RLMException(@"Can't commit a non-existing write transaction");
@@ -662,7 +656,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             _inWriteTransaction = NO;
         }
         catch (std::exception& ex) {
-            throw_objc_exception(ex);
+            @throw RLMException(ex);
         }
     } else {
         @throw RLMException(@"Can't cancel a non-existing write transaction");
@@ -716,7 +710,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         }
     }
     catch (exception &ex) {
-        throw_objc_exception(ex);
+        @throw RLMException(ex);
     }
 }
 
@@ -745,7 +739,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         return NO;
     }
     catch (exception &ex) {
-        throw_objc_exception(ex);
+        @throw RLMException(ex);
     }
 }
 
