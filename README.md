@@ -1,4 +1,4 @@
-![Realm](logo.png)
+![Realm](logo.svg)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS & OSX versions of Realm, for both Swift & Objective-C.
