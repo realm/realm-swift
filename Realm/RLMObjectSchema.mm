@@ -127,12 +127,10 @@
         if (!schema.primaryKeyProperty) {
             NSString *message = [NSString stringWithFormat:@"Primary key property '%@' does not exist on object '%@'",
                                  primaryKey, className];
-            @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+            @throw RLMException(message);
         }
         if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Only 'string' and 'int' properties can be designated the primary key"
-                                         userInfo:nil];
+            @throw RLMException(@"Only 'string' and 'int' properties can be designated the primary key");
         }
     }
 
@@ -229,7 +227,7 @@
         schema.primaryKeyProperty = schema[primaryKey];
         if (!schema.primaryKeyProperty) {
             NSString *reason = [NSString stringWithFormat:@"No property matching primary key '%@'", primaryKey];
-            @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+            @throw RLMException(reason);
         }
     }
 

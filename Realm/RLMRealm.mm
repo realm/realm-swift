@@ -71,8 +71,7 @@ using namespace tightdb::util;
 
 // create NSException from c++ exception
 static __attribute__((noreturn)) void throw_objc_exception(exception &ex) {
-    NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
-    @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
+    @throw RLMException(ex);
 }
 
 // create NSError from c++ exception
@@ -88,9 +87,7 @@ static void setOrThrowError(NSError *error, NSError **outError) {
         *outError = error;
     }
     else {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:[error localizedDescription]
-                                     userInfo:nil];
+        @throw RLMException(error.localizedDescription);
     }
 }
 
@@ -142,18 +139,14 @@ static bool isDebuggerAttached() {
 
 static void validateNotInDebugger() {
     if (isDebuggerAttached()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Cannot open an encrypted Realm with a debugger attached to the process"
-                                     userInfo:nil];
+        @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
     }
 }
 
 static NSData *validatedKey(NSData *key) {
     if (key) {
         if ([key length] != 64) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Encryption key must be exactly 64 bytes long"
-                                         userInfo:nil];
+            @throw RLMException(@"Encryption key must be exactly 64 bytes long");
         }
     }
     return key;
@@ -419,7 +412,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                         error:(NSError **)error
 {
     if (!key) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
+        @throw RLMException(@"Encryption key must not be nil");
     }
 
     return [self realmWithPath:path key:key readOnly:readonly inMemory:NO dynamic:NO schema:nil error:error];
@@ -442,39 +435,30 @@ static id RLMAutorelease(id value) {
                         error:(NSError **)outError
 {
     if (!path || path.length == 0) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Path is not valid"
-                                     userInfo:@{@"path":(path ?: @"nil")}];
+        @throw RLMException(@"Path is not valid", @{@"path":(path ?: @"nil")});
     }
 
     if (![NSRunLoop currentRunLoop]) {
-        @throw [NSException exceptionWithName:@"realm:runloop_exception"
-                                       reason:[NSString stringWithFormat:@"%@ \
+        @throw RLMException([NSString stringWithFormat:@"%@ \
                                                can only be called from a thread with a runloop.",
-                                               NSStringFromSelector(_cmd)] userInfo:nil];
+                             NSStringFromSelector(_cmd)]);
     }
 
     if (customSchema && !dynamic) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Custom schema only supported when using dynamic Realms" userInfo:nil];
+        @throw RLMException(@"Custom schema only supported when using dynamic Realms");
     }
 
     // try to reuse existing realm first
     RLMRealm *realm = cachedRealm(path);
     if (realm) {
         if (realm->_readOnly != readonly) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm at path already opened with different read permissions"
-                                         userInfo:@{@"path":realm.path}];
+            @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
         }
         if (realm->_inMemory != inMemory) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm at path already opened with different inMemory settings"
-                                         userInfo:@{@"path":realm.path}];
+            @throw RLMException(@"Realm at path already opened with different inMemory settings", @{@"path":realm.path});
         }
         if (realm->_dynamic != dynamic) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Realm at path already opened with different dynamic settings"
-                                         userInfo:@{@"path":realm.path}];
+            @throw RLMException(@"Realm at path already opened with different dynamic settings", @{@"path":realm.path});
         }
         return RLMAutorelease(realm);
     }
@@ -491,9 +475,7 @@ static id RLMAutorelease(id value) {
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
             if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"Cannot open an uninitialized realm in read-only mode"
-                                             userInfo:nil];
+                @throw RLMException(@"Cannot open an uninitialized realm in read-only mode");
             }
             RLMSchema *targetSchema = readonly ? RLMSchema.sharedSchema : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
@@ -559,9 +541,7 @@ static id RLMAutorelease(id value) {
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
     if (realm->_readOnly) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:msg
-                                     userInfo:nil];
+        @throw RLMException(msg);
     }
 }
 
@@ -569,7 +549,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     RLMCheckThread(self);
     CheckReadWrite(self, @"Read-only Realms do not change and do not have change notifications");
     if (!block) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"The notification block should not be nil" userInfo:nil];
+        @throw RLMException(@"The notification block should not be nil");
     }
 
     RLMNotificationToken *token = [[RLMNotificationToken alloc] init];
@@ -628,7 +608,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             throw_objc_exception(ex);
         }
     } else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"The Realm is already in a writetransaction" userInfo:nil];
+        @throw RLMException(@"The Realm is already in a write transaction");
     }
 }
 
@@ -660,7 +640,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             throw_objc_exception(ex);
         }
     } else {
-       @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't commit a non-existing write transaction" userInfo:nil];
+       @throw RLMException(@"Can't commit a non-existing write transaction");
     }
 }
 
@@ -685,7 +665,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
             throw_objc_exception(ex);
         }
     } else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Can't cancel a non-existing write transaction" userInfo:nil];
+        @throw RLMException(@"Can't cancel a non-existing write transaction");
     }
 }
 
@@ -777,7 +757,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     for (RLMObject *obj in array) {
         if (![obj isKindOfClass:[RLMObject class]]) {
             NSString *msg = [NSString stringWithFormat:@"Cannot insert objects of type %@ with addObjects:. Only RLMObjects are supported.", NSStringFromClass(obj.class)];
-            @throw [NSException exceptionWithName:@"RLMException" reason:msg userInfo:nil];
+            @throw RLMException(msg);
         }
         [self addObject:obj];
     }
@@ -787,7 +767,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     // verify primary key
     if (!object.objectSchema.primaryKeyProperty) {
         NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", object.objectSchema.className];
-        @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
 
     RLMAddObjectToRealm(object, self, RLMCreationOptionsUpdateOrCreate);
@@ -821,7 +801,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         [rlmResults deleteObjectsFromRealm];
     }
     else {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects" userInfo:nil];
+        @throw RLMException(@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects");
     }
 }
 
@@ -888,7 +868,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key {
     if (!key) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
+        @throw RLMException(@"Encryption key must not be nil");
     }
 
     return [self migrateRealmAtPath:realmPath key:key];
@@ -950,7 +930,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 - (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
     if (!key) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Encryption key must not be nil" userInfo:nil];
+        @throw RLMException(@"Encryption key must not be nil");
     }
 
     return [self writeCopyToPath:path key:key error:error];

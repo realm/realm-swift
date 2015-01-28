@@ -57,7 +57,7 @@ static NSMutableDictionary *s_localNameToClass;
     RLMObjectSchema *schema = _objectSchemaByName[className];
     if (!schema) {
         NSString *message = [NSString stringWithFormat:@"Object type '%@' not persisted in Realm", className];
-        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+        @throw RLMException(message);
     }
     return schema;
 }
@@ -109,9 +109,7 @@ static NSMutableDictionary *s_localNameToClass;
         // indicates it's a type, and CC indicates it's a class within a
         // class (further nesting will add more Cs)
         else if ([className hasPrefix:@"_TtCC"]) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"RLMObject subclasses cannot be nested within other classes"
-                                         userInfo:nil];
+            @throw RLMException(@"RLMObject subclasses cannot be nested within other classes");
         }
         else {
             s_localNameToClass[className] = cls;
