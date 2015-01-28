@@ -42,6 +42,7 @@
         }];
     }
     self.notificationToken = [self.tick.realm addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
+        // Occasionally, respond immediately to the notification by triggering a new notification.
         if (self.tick.count % 19 == 0) {
             [self tock];
         }
