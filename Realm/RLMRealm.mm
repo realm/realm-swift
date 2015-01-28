@@ -176,18 +176,18 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
 // Access to s_serverFiles (referenced object),
 // s_nextLocalFileIdent, s_serverConnections (referenced
-// object), and s_serverSyncBackgroundQueue (reference) must be
+// object), and s_backgroundOperationQueue (reference) must be
 // synchronized with respect to s_realmsPerPath.
 NSMapTable *s_serverFiles = [NSMapTable strongToWeakObjectsMapTable];
 unsigned long s_nextLocalFileIdent = 0;
 NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
-NSOperationQueue *s_serverSyncBackgroundQueue = nil;
+NSOperationQueue *s_backgroundOperationQueue = nil;
 
-// Access to s_foreignTransactLogs (referenced object), and
-// s_foreignTransactApplicationInProgresss must be synchronized with
-// respect to s_foreignTransactLogs.
-NSMutableArray *s_foreignTransactLogs = [NSMutableArray array];
-BOOL s_foreignTransactApplicationInProgress = NO;
+// Access to s_backgroundTaskQueue (referenced object), and
+// s_backgroundProcessingInProgresss must be synchronized with
+// respect to s_backgroundTaskQueue.
+NSMutableArray *s_backgroundTaskQueue = [NSMutableArray array];
+BOOL s_backgroundProcessingInProgress = NO;
 
 } // anonymous namespace
 
@@ -197,25 +197,29 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 // backgroundThreadApplyTransactLog on RLMServerFile.
 
 @interface RLMOutputMessage : NSObject
-@property NSString *head;
-@property NSData *body; // May be nil
-@end
-
-@interface RLMForeignTransactLog : NSObject
-@property Replication::version_type version;
+@property (nonatomic) NSString *head;
+@property (nonatomic) NSData *body; // May be nil
 @end
 
 @interface RLMServerConnection : NSObject <NSStreamDelegate>
-@property (readonly) BOOL isConnected;
+@property (readonly, nonatomic) BOOL isConnected;
 @end
 
 @interface RLMServerFile : NSObject
-@property (readonly) RLMServerConnection *connection;
+@property (readonly, nonatomic) RLMServerConnection *connection;
 - (void)connected;
-- (void)handleTransactMessageWithVersion:(Replication::version_type)version andLog:(NSData *)log;
+- (void)handleTransactMessageWithVersion:(Replication::version_type)version andData:(NSData *)data;
 - (void)handleAcceptMessageWithVersion:(Replication::version_type)version;
 - (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
                                             andData:(NSData *)data;
+@end
+
+@interface RLMForeignTransactLog : NSObject
+@property (weak, readonly, nonatomic) RLMServerFile *file;
+@property (readonly, nonatomic) Replication::version_type version;
+@property (readonly, nonatomic) NSData *data;
+- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
+                        data:(NSData *)data;
 @end
 
 
@@ -236,30 +240,6 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 
 - (void)setCompletionHandler:(void (^)())block {
     _completionHandler = block;
-}
-
-@end
-
-
-@implementation RLMForeignTransactLog {
-    RLMServerFile *_file;
-    NSData *_data;
-}
-
-- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
-                        data:(NSData *)data {
-    self = [super init];
-    if (self) {
-        _file = file;
-        _version = version;
-        _data = data;
-    }
-    return self;
-}
-
-// Must never be called by the main thread
-- (void)backgroundThreadApply {
-    [_file backgroundThreadApplyTransactLogWithVersion:_version andData:_data];
 }
 
 @end
@@ -386,7 +366,7 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 
     [_inputStream close];
     [_outputStream close];
-    
+
     _inputStream  = nil;
     _outputStream = nil;
 
@@ -400,7 +380,7 @@ BOOL s_foreignTransactApplicationInProgress = NO;
     NSLog(@"Closed connection to %@:%@", _address, _port);
 
     // FIXME: Retry opening the connection after a delay, maybe with
-    // progressively frowing delays.
+    // a progressively growing delay.
 }
 
 
@@ -522,7 +502,7 @@ BOOL s_foreignTransactApplicationInProgress = NO;
                     _messageHandler = nil;
                     __weak RLMServerConnection *weakSelf = self;
                     if (message_type == "transact") {
-                        // A new foreign transaction log is available for download
+                        // A new foreign changeset is available for download
                         unsigned long fileIdent = 0;
                         Replication::version_type version = 0;
                         size_t logSize = 0;
@@ -541,7 +521,7 @@ BOOL s_foreignTransactApplicationInProgress = NO;
                         };
                     }
                     else if (message_type == "accept") {
-                        // Server accepts a previously uploaded transaction log
+                        // Server accepts a previously uploaded changeset
                         unsigned long fileIdent = 0;
                         Replication::version_type version = 0;
                         char sp1, sp2;
@@ -634,24 +614,29 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 - (void)handleTransactMessageWithFileIdent:(NSNumber *)fileIdent
                                 andVersion:(Replication::version_type)version {
     typedef unsigned long long ulonglong;
-    NSLog(@"Received: Foreign transaction log %llu -> %llu for local file #%@",
+#ifdef TIGHTDB_DEBUG
+    NSLog(@"Received: Foreign changeset %llu -> %llu for local file #%@",
           ulonglong(version-1), ulonglong(version), fileIdent);
+#endif
 
     RLMServerFile *file = [_files objectForKey:fileIdent];
     if (!file)
         return;
 
-    NSData *log = _messageBodyBuffer;
+    NSData *data = _messageBodyBuffer;
     _messageBodyBuffer = nil;
 
-    [file handleTransactMessageWithVersion:version andLog:log];
+    [file handleTransactMessageWithVersion:version andData:data];
 }
+
 
 - (void)handleAcceptMessageWithFileIdent:(NSNumber *)fileIdent
                               andVersion:(Replication::version_type)version {
     typedef unsigned long long ulonglong;
-    NSLog(@"Received: Accept transaction log %llu -> %llu on local file #%@",
+#ifdef TIGHTDB_DEBUG
+    NSLog(@"Received: Accept changeset %llu -> %llu on local file #%@",
           ulonglong(version-1), ulonglong(version), fileIdent);
+#endif
 
     RLMServerFile *file = [_files objectForKey:fileIdent];
     if (!file)
@@ -668,17 +653,15 @@ BOOL s_foreignTransactApplicationInProgress = NO;
     NSString *_localPath;
     NSString *_remotePath;
 
-    unique_ptr<Replication> _backgroundTransactLogRegistry;
+    unique_ptr<SharedGroup> _sharedGroup;
+    unique_ptr<Replication> _transactLogRegistry;
+
     unique_ptr<SharedGroup> _backgroundSharedGroup;
+    unique_ptr<Replication> _backgroundTransactLogRegistry;
 
-    RLMRealm *_realm;
-    SharedGroup* _sharedGroup; // The one residing inside `_realm`
-    Replication* _transactLogRegistry; // The one residing inside `_realm`
-    RLMNotificationToken *_notifyToken;
-
-    Replication::version_type _latestVersionAcceptedByServer;
-    Replication::version_type _latestVersionUploaded;
     Replication::version_type _latestVersionAvailable;
+    Replication::version_type _latestVersionUploaded;
+    Replication::version_type _latestVersionIntegratedByServer;
     BOOL _uploadInProgress;
 }
 
@@ -695,13 +678,14 @@ BOOL s_foreignTransactApplicationInProgress = NO;
         _remotePath = remotePath;
 
         bool serverSynchronizationMode = true;
+        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
+        _transactLogRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
+                                                         serverSynchronizationMode));
+        _sharedGroup = make_unique<SharedGroup>(*_transactLogRegistry, durability);
         _backgroundTransactLogRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
                                                                    serverSynchronizationMode));
-        SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
         _backgroundSharedGroup = make_unique<SharedGroup>(*_backgroundTransactLogRegistry, durability);
 
-        _realm = nil;
-        _notifyToken = nil;
         _uploadInProgress = NO;
     }
     return self;
@@ -710,48 +694,26 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 
 - (void)mainThreadInit {
     // Called by main thread
-    _realm = [RLMRealm realmWithPath:_localPath];
-    _sharedGroup = [_realm sharedGroup];
-    _transactLogRegistry = [_realm transactLogRegistry];
-    __weak RLMServerFile *weakSelf = self;
-    _notifyToken = [_realm addNotificationBlock:^(NSString *, RLMRealm *) {
-            [weakSelf onNewLocalTransaction];
-        }];
-
-    _latestVersionUploaded = 0;
-    [self refreshVersionInfo];
+    _latestVersionIntegratedByServer = _transactLogRegistry->get_last_version_synced();
+    _latestVersionUploaded = _latestVersionIntegratedByServer;
+    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
+    if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible
+        _latestVersionUploaded = _latestVersionAvailable;
 
     [_connection mainThreadInit];
     [_connection addFile:self withIdent:_ident];
 }
 
 
-- (void)onNewLocalTransaction {
-    [self refreshVersionInfo];
+- (void)refreshLatestVersionAvailable {
+    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
     [self resumeUpload];
 }
 
 
-- (void)refreshVersionInfo {
-    _latestVersionAcceptedByServer = _transactLogRegistry->get_last_version_synced();
-    _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
-
-    // Note: It may happen transiently that _latestVersionAcceptedByServer >
-    // _latestVersionAvailable due to the order in which these values are
-    // updated (at least in backgroundThreadApplyTransactLog of RLMSerferFile).
-    if (_latestVersionAcceptedByServer > _latestVersionAvailable)
-        _latestVersionAcceptedByServer = _latestVersionAvailable;
-
-    if (_latestVersionUploaded < _latestVersionAcceptedByServer)
-        _latestVersionUploaded = _latestVersionAcceptedByServer;
-
-    [self resumeForeignTransactLogApplication];
-}
-
-
 - (void)connected {
-    _latestVersionUploaded = _latestVersionAcceptedByServer;
-    [_connection sendBindMessageWithIdent:_ident version:_latestVersionAcceptedByServer
+    _latestVersionUploaded = _latestVersionIntegratedByServer;
+    [_connection sendBindMessageWithIdent:_ident version:_latestVersionIntegratedByServer
                                remotePath:_remotePath];
     [self resumeUpload];
 }
@@ -762,27 +724,34 @@ BOOL s_foreignTransactApplicationInProgress = NO;
         return;
     _uploadInProgress = YES;
 
-    // Fetch and copy the next transaction log, and produce an output message from it.
-    // Set the completionHandler to a block that calls resumeUpload.
-    TIGHTDB_ASSERT(_latestVersionUploaded <= _latestVersionAvailable);
-    if (_latestVersionUploaded == _latestVersionAvailable) {
-        _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
+    // Fetch and copy the next changset, and produce an output message
+    // from it.  Set the completionHandler to a block that calls
+    // resumeUpload.
+    Replication::version_type uploadVersion;
+    Replication::CommitLogEntry changeset;
+    for (;;) {
+        TIGHTDB_ASSERT(_latestVersionUploaded <= _latestVersionAvailable);
         if (_latestVersionUploaded == _latestVersionAvailable) {
             _uploadInProgress = NO;
             return;
         }
+        uploadVersion = _latestVersionUploaded + 1;
+        _transactLogRegistry->get_commit_entries(uploadVersion-1, uploadVersion, &changeset);
+        // Skip changesets that were downloaded from the server
+        if (!changeset.is_foreign)
+            break;
+        _latestVersionUploaded = uploadVersion;
     }
-    Replication::version_type uploadVersion = _latestVersionUploaded + 1;
-    BinaryData transactLog;
-    _transactLogRegistry->get_commit_entries(uploadVersion-1, uploadVersion, &transactLog);
     typedef unsigned long ulong;
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
-    msg.body = [NSData dataWithBytes:transactLog.data() length:transactLog.size()]; // Full copy
+    msg.body = [NSData dataWithBytes:changeset.log_data.data() length:changeset.log_data.size()]; // Full copy
     msg.head = [NSString stringWithFormat:@"transact %@ %llu %lu\n",
                          _ident, ulonglong(uploadVersion), ulong(msg.body.length)];
-    NSLog(@"Sending: Transaction log %llu -> %llu of size %lu on local file #%@",
+#ifdef TIGHTDB_DEBUG
+    NSLog(@"Sending: Changeset %llu -> %llu of size %lu on local file #%@",
           ulonglong(uploadVersion-1), ulonglong(uploadVersion), ulong(msg.body.length), _ident);
+#endif
     __weak RLMServerFile *weakSelf = self;
     [msg setCompletionHandler:^{
             [weakSelf uplaodCompletedWithVersion:uploadVersion];
@@ -792,79 +761,87 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 
 
 - (void)uplaodCompletedWithVersion:(Replication::version_type)version {
-    TIGHTDB_ASSERT(version == _latestVersionUploaded+1);
+    TIGHTDB_ASSERT(version <= _latestVersionUploaded+1);
     _uploadInProgress = NO;
-    _latestVersionUploaded = version;
+    if (_latestVersionUploaded < version)
+        _latestVersionUploaded = version;
     [self resumeUpload];
 }
 
 
-- (void)handleTransactMessageWithVersion:(Replication::version_type)version andLog:(NSData *)log {
+- (void)handleTransactMessageWithVersion:(Replication::version_type)version
+                                 andData:(NSData *)data {
+    Replication::version_type expectedVersion = _latestVersionIntegratedByServer + 1;
+    if (version != expectedVersion) {
+        typedef unsigned long long ulonglong;
+        NSLog(@"ERROR: Bad version %llu in changeset message (expected %llu)",
+              ulonglong(version), ulonglong(expectedVersion));
+        [_connection close];
+        return;
+    }
+    _latestVersionIntegratedByServer = version;
 
-    RLMForeignTransactLog *log2 =
-        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:log];
+    RLMForeignTransactLog *log =
+        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:data];
 
     // FIXME: Consider whether we should attempt to apply small
-    // transactions immediately on the main thread (right here) if a
-    // try-lock on the write-transaction mutex succeeds. This might be
-    // an effective way of reducing latency due to context switches.
+    // transactions immediately on the main thread (right here) if
+    // auto-refresh is enabled, `s_backgroundTaskQueue` is empty, and
+    // a try-lock on the write-transaction mutex succeeds. This might
+    // be an effective way of reducing latency due to context
+    // switches.
 
-    @synchronized (s_foreignTransactLogs) {
-        RLMForeignTransactLog *last = s_foreignTransactLogs.lastObject;
-        if (last && version != last.version + 1) {
-            typedef unsigned long long ulonglong;
-            NSLog(@"ERROR: Bad version %llu in transaction message for file #%@",
-                  ulonglong(version), _ident);
-            [_connection close];
-            return;
-        }
-        [s_foreignTransactLogs addObject:log2];
-    }
-
-    [self resumeForeignTransactLogApplication];
+    [RLMServerFile addBackgroundTaskWithLog:log];
 }
 
 
 - (void)handleAcceptMessageWithVersion:(Replication::version_type)version {
-    Replication::version_type expectedVersion = _latestVersionAcceptedByServer + 1;
-    if (version != expectedVersion || version > _latestVersionUploaded) {
+    Replication::version_type expectedVersion = _latestVersionIntegratedByServer + 1;
+    if (version != expectedVersion) {
         typedef unsigned long long ulonglong;
-        NSLog(@"ERROR: Bad version %llu in accept message for file #%@",
-              ulonglong(version), _ident);
+        NSLog(@"ERROR: Bad version %llu in accept message (expected %llu)",
+              ulonglong(version), ulonglong(expectedVersion));
         [_connection close];
         return;
     }
-    _transactLogRegistry->set_last_version_synced(version);
-    _latestVersionAcceptedByServer = version;
+    _latestVersionIntegratedByServer = version;
 
-    [self resumeForeignTransactLogApplication];
+    RLMForeignTransactLog *log =
+        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:nil];
+
+    [RLMServerFile addBackgroundTaskWithLog:log];
 }
 
 
-- (void)resumeForeignTransactLogApplication {
-    @synchronized (s_foreignTransactLogs) {
-        if (s_foreignTransactApplicationInProgress)
++ (void)addBackgroundTaskWithLog:(RLMForeignTransactLog *)log {
+    @synchronized (s_backgroundTaskQueue) {
+        [s_backgroundTaskQueue addObject:log];
+        if (s_backgroundProcessingInProgress)
             return;
-        RLMForeignTransactLog *first = s_foreignTransactLogs.firstObject;
-        if (!first)
-            return;
-        Replication::version_type maxResumeVersion = _latestVersionAcceptedByServer + 1;
-        if (first.version > maxResumeVersion)
-            return;
-        s_foreignTransactApplicationInProgress = YES;
+        s_backgroundProcessingInProgress = YES;
     }
-    [s_serverSyncBackgroundQueue addOperationWithBlock:^{
+    [s_backgroundOperationQueue addOperationWithBlock:^{
+            NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
             for (;;) {
                 RLMForeignTransactLog *log;
-                @synchronized (s_foreignTransactLogs) {
-                    if (s_foreignTransactLogs.count == 0) {
-                        s_foreignTransactApplicationInProgress = NO;
+                @synchronized (s_backgroundTaskQueue) {
+                    if (s_backgroundTaskQueue.count == 0) {
+                        s_backgroundProcessingInProgress = NO;
                         return;
                     }
-                    log = s_foreignTransactLogs.firstObject;
-                    [s_foreignTransactLogs removeObjectAtIndex:0];
+                    log = s_backgroundTaskQueue.firstObject;
+                    [s_backgroundTaskQueue removeObjectAtIndex:0];
                 }
-                [log backgroundThreadApply];
+                {
+                    RLMServerFile *file = log.file; // from weak
+                    if (!file)
+                        continue;
+                    if (log.data)
+                        [file backgroundThreadApplyTransactLogWithVersion:log.version andData:log.data];
+                }
+                [mainQueue addOperationWithBlock:^{
+                        [log.file markVersionIntegratedByServer:log.version];
+                    }];
             }
         }];
 }
@@ -873,50 +850,96 @@ BOOL s_foreignTransactApplicationInProgress = NO;
 - (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
                                             andData:(NSData *)data {
     typedef unsigned long long ulonglong;
-    NSLog(@"Applying foreign transaction log (%llu -> %llu)", ulonglong(version-1),
-          ulonglong(version));
-
-    BOOL success;
-
+    Replication::version_type baseVersion = version - 1;
     const char *data2 = static_cast<const char *>(data.bytes);
     size_t size = data.length;
     BinaryData transactLog(data2, size);
     ostream *applyLog = 0;
+    BOOL conflict;
     try {
         Replication &repl = *_backgroundTransactLogRegistry;
-        success = repl.apply_foreign_transact_log(*_backgroundSharedGroup, version,
-                                                  transactLog, applyLog);
+        Replication::version_type serverVersion = 0; // Value is imaterial for now
+        Replication::version_type newVersion =
+            repl.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
+                                         transactLog, serverVersion, applyLog);
+        conflict = (newVersion == 0);
+        TIGHTDB_ASSERT(conflict || newVersion == version);
     }
     catch (Replication::BadTransactLog&) {
-        NSLog(@"Transaction log application failed");
+        NSString *message = [NSString stringWithFormat:@"Application of changeset (%llu -> %llu) "
+                                      "failed", ulonglong(baseVersion), ulonglong(baseVersion+1)];
+        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+    }
+
+    if (!conflict) {
+#ifdef TIGHTDB_DEBUG
+        NSLog(@"Foreign changeset (%llu -> %llu) applied",
+              ulonglong(baseVersion), ulonglong(baseVersion+1));
+#endif
+        [RLMRealm notifyRealmsAtPath:_localPath exceptRealm:nil];
         return;
     }
 
-    if (!success) {
-        // FIXME: This may be a non-critical situation if version <
-        // expectedVersion, but if version > expectedVersion, it is
-        // unrecoverable given the current implementation, because we
-        // will never receive the missing transaction log from the
-        // server.
-        NSLog(@"Canceling application of foreign transaction log (%llu -> %llu) "
-              "due to version mismatch", ulonglong(version-1), ulonglong(version));
+    BinaryData changeset(static_cast<const char*>(data.bytes), data.length);
+    Replication::CommitLogEntry conflictingChangeset;
+    _backgroundTransactLogRegistry->get_commit_entries(baseVersion, baseVersion+1,
+                                                       &conflictingChangeset);
+    if (conflictingChangeset.is_foreign) {
+        // Assuming resend of previously integrated changelog
+        TIGHTDB_ASSERT(conflictingChangeset.log_data == changeset);
+        NSLog(@"Skipping previously applied foreign changeset (%llu -> %llu)",
+              ulonglong(baseVersion), ulonglong(baseVersion+1));
         return;
     }
 
-    [RLMRealm notifyRealmsAtPath:_localPath exceptRealm:nil];
+    // WARNING: Strictly speaking, the following is not the correct
+    // resulution of the conflict between two identical initial
+    // transactions, but it is done as a temporary workaround to allow
+    // the current version of this binding to carry out an initial
+    // schema creating transaction without getting into an immediate
+    // unrecoverable conflict. It does not work in general as even the
+    // initial transaction is allowed to contain elements that are
+    // additive rather than idempotent.
+    BOOL isInitialTransact = (baseVersion == 1); // Schema creation
+    if (isInitialTransact && conflictingChangeset.log_data == changeset) {
+        NSLog(@"Conflict on identical initial transactions resolved (impropperly)");
+        return;
+    }
+
+    NSString *message = [NSString stringWithFormat:@"Conflicting foreign changeset (%llu -> %llu)",
+                                  ulonglong(baseVersion), ulonglong(baseVersion+1)];
+    @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+}
+
+
+- (void)markVersionIntegratedByServer:(Replication::version_type)version {
+    _transactLogRegistry->set_last_version_synced(version);
 }
 
 
 - (void)dealloc {
     NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-    RLMRealm *realm = _realm;
-    RLMNotificationToken *notifyToken = _notifyToken;
     __weak RLMServerConnection *weakConnection = _connection;
     NSNumber *ident = _ident;
     [mainQueue addOperationWithBlock:^{
-            [realm removeNotification:notifyToken];
             [weakConnection sendUnbindMessageWithIdent:ident];
         }];
+}
+
+@end
+
+
+@implementation RLMForeignTransactLog {}
+
+- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
+                        data:(NSData *)data {
+    self = [super init];
+    if (self) {
+        _file = file;
+        _version = version;
+        _data = data;
+    }
+    return self;
 }
 
 @end
@@ -1228,11 +1251,17 @@ NSString * const c_defaultRealmFileName = @"default.realm";
             }
             else {
                 RLMServerFile *file = 0;
-                // FIXME: A file cannot be correctly identified by its path, and
-                // in this case it is even unsafe to do so. The right identifier
-                // is the combination of the inode and device IDs, which can be
-                // obtained by fstat(). Note that race conditions can only be
-                // avoided by stat'ing the open file rather than the path.
+                // FIXME: A file cannot be reliably identified by its path. A
+                // safe approach is to start by opening the file, then get the
+                // inode and device numbers from the file descriptor, then use
+                // that pair as a key to lookup a preexisting RLMRealm
+                // instance. If one is found, the opened file can be closed. If
+                // one is not found, a new RLMRealm instance can be created from
+                // the handle of the open file. Alternatively, on a system with
+                // a proc filesystem, on can use the path to the file descriptor
+                // as a basis for constructing the new RLMInstance. Note that
+                // the inode number is only guaranteed to stay valid for as long
+                // as you hold on the the handle of the open file.
                 file = [s_serverFiles objectForKey:realm.path];
                 if (!file) {
                     if (serverBaseURL) {
@@ -1242,9 +1271,9 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                         }
                         RLMServerConnection *conn = [s_serverConnections objectForKey:hostKey];
                         if (!conn) {
-                            if (!s_serverSyncBackgroundQueue) {
-                                s_serverSyncBackgroundQueue = [[NSOperationQueue alloc] init];
-                                s_serverSyncBackgroundQueue.name = @"io.realm.sync";
+                            if (!s_backgroundOperationQueue) {
+                                s_backgroundOperationQueue = [[NSOperationQueue alloc] init];
+                                s_backgroundOperationQueue.name = @"io.realm.sync";
                             }
                             conn = [[RLMServerConnection alloc] initWithAddress:serverBaseURL.host
                                                                            port:serverBaseURL.port];
@@ -1264,27 +1293,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                     }
                 }
                 realm->_serverFile = file;
-
-                // Synchronize with server and block here until synchronization
-                // is complete.
-                //
-                // This is done to ensure that only one client submits a
-                // transaction that creates the schema for compile-time
-                // specified Realm classes. If all clients did that, there would
-                // be an immediate need for conflict resolution, but in the
-                // first (proto) implementation of client-server
-                // synchronization, conflict resolution will not be available.
-                //
-                // This kind of blocking is obviously not good enough,
-                // especially when it occurs on the main thread, so some kind of
-                // nonblocking alternative has to be found.
-                //
-                // When transaction merging becomes possible, this problem
-                // disappears completely, becasue then all the initial schema
-                // creating transactions can be merged.
-//                [realm->_serverSync initialBlockingDownload];
-
-//                [realm->_serverSync rescheduleNonblockingDownload];
 
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 NSUInteger schemaVersion = RLMRealmSchemaVersion(realm);
@@ -1425,6 +1433,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             // send local notification
             [self sendNotifications:RLMRealmDidChangeNotification];
+
+            NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+            __weak RLMServerFile *weakFile = _serverFile;
+            [mainQueue addOperationWithBlock:^{
+                    [weakFile refreshLatestVersionAvailable];
+                }];
         }
         catch (std::exception& ex) {
             throw_objc_exception(ex);
