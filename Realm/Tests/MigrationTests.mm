@@ -153,6 +153,7 @@ extern "C" {
             XCTAssertThrows(oldObject[@"stringCol"], @"stringCol should not exist on old object");
             NSNumber *intObj;
             XCTAssertNoThrow(intObj = oldObject[@"intCol"], @"Should be able to access intCol on oldObject");
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
             NSString *stringObj = [NSString stringWithFormat:@"%@", intObj];
             XCTAssertNoThrow(newObject[@"stringCol"] = stringObj, @"Should be able to set stringCol");
         }];
@@ -191,6 +192,9 @@ extern "C" {
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNoThrow(oldObject[@"deletedCol"], @"Deleted column should be accessible on old object.");
             XCTAssertThrows(newObject[@"deletedCol"], @"Deleted column should not be accessible on new object.");
+
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
+            XCTAssertEqualObjects(newObject[@"stringCol"], oldObject[@"stringCol"]);
         }];
     }];
     [RLMRealm migrateRealmAtPath:RLMTestRealmPath()];
@@ -258,6 +262,7 @@ extern "C" {
         XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
         [migration enumerateObjects:MigrationObject.className
                                        block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(newObject[@"intCol"], oldObject[@"intCol"]);
             NSNumber *intObj = oldObject[@"stringCol"];
             XCTAssert([intObj isKindOfClass:NSNumber.class], @"Old stringCol should be int");
             newObject[@"stringCol"] = intObj.stringValue;
@@ -321,7 +326,11 @@ extern "C" {
 
     [RLMRealm setSchemaVersion:1
                 forRealmAtPath:RLMTestRealmPath()
-            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) { }];
+            withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+        [migration enumerateObjects:@"MigrationPrimaryKeyObject" block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+        }];
+    }];
 
     XCTAssertNoThrow([self realmWithSingleObject:objectSchema]);
 }
@@ -576,6 +585,7 @@ extern "C" {
 
     // accessors should work
     CircleObject *obj = [[CircleObject allObjectsInRealm:realm] firstObject];
+    XCTAssertEqualObjects(@"data", obj.data);
     [realm beginWriteTransaction];
     XCTAssertNoThrow(obj.data = @"new data");
     XCTAssertNoThrow(obj.next = obj);
