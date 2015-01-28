@@ -248,7 +248,7 @@ NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
 }
 
-NSException *RLMException(std::exception exception) {
+NSException *RLMException(std::exception const& exception) {
     return RLMException(@(exception.what()));
 }
 
