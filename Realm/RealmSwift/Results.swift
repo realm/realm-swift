@@ -55,10 +55,10 @@ public final class Results<T: Object>: Printable, SequenceType {
     // MARK: Properties
 
     /// Wrapped `RLMResults`.
-    internal let rlmResults: RLMResults
+    let rlmResults: RLMResults
 
     /// Returns the Realm these results are associated with.
-    public var realm: Realm { return Realm(rlmResults.realm) }
+    public var realm: Realm { return Realm(rlmRealm: rlmResults.realm) }
 
     /// Returns a human-readable description of the objects contained in these results.
     public var description: String { return rlmResults.description }
@@ -73,7 +73,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :param: rlmResults The `RLMResults` that backs the results.
     */
-    internal init(_ rlmResults: RLMResults) {
+    init(_ rlmResults: RLMResults) {
         self.rlmResults = rlmResults
     }
 
@@ -184,8 +184,8 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func min<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.minOfProperty(property) as U?
+    public func min<U: MinMaxType>(property: String) -> U {
+        return rlmResults.minOfProperty(property) as U
     }
 
     /**
@@ -197,8 +197,8 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func max<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.maxOfProperty(property) as U?
+    public func max<U: MinMaxType>(property: String) -> U {
+        return rlmResults.maxOfProperty(property) as U
     }
 
     /**
@@ -237,7 +237,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {
-            if i >= self.rlmResults.count {
+            if (i >= self.rlmResults.count) {
                 return .None
             } else {
                 return self.rlmResults[i++] as? T

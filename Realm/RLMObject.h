@@ -321,12 +321,12 @@
 
 /**
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
- be used to get the inverse relationship value for `RLMObject` and `RLMArray` properties.
+ be used to get the inverse relatshionship value for `RLMObject` and `RLMArray` properties.
 
  @param className   The type of object on which the relationship to query is defined.
  @param property    The name of the property which defines the relationship.
 
- @return    An NSArray of objects of type `className` which have this object as their value for the `property` property.
+ @return    An NSArray of objects of type `className` which have this object as thier value for the `property` property.
  */
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 

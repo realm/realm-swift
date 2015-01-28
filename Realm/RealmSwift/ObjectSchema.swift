@@ -26,12 +26,12 @@ introspecting the database's schema.
 
 Object schemas map to tables in the core database.
 */
-public final class ObjectSchema {
+public class ObjectSchema: Equatable {
 
     // MARK: Properties
 
     /// Wrapped `RLMObjectSchema`.
-    internal var rlmObjectSchema: RLMObjectSchema
+    var rlmObjectSchema: RLMObjectSchema
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
@@ -42,7 +42,7 @@ public final class ObjectSchema {
     /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
-            return Property(rlmProperty)
+            return Property(rlmProperty: rlmProperty)
         }
         return nil
     }
@@ -54,7 +54,7 @@ public final class ObjectSchema {
 
     :param: rlmObjectSchema `RLMObjectSchema`.
     */
-    internal init(_ rlmObjectSchema: RLMObjectSchema) {
+    init(rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
 
@@ -63,15 +63,13 @@ public final class ObjectSchema {
     /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
         if let rlmProperty = rlmObjectSchema[propertyName] {
-            return Property(rlmProperty)
+            return Property(rlmProperty: rlmProperty)
         }
         return nil
     }
 }
 
 // MARK: Equatable
-
-extension ObjectSchema: Equatable {}
 
 /// Returns whether the two object schemas are equal.
 public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {

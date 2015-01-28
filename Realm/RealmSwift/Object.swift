@@ -160,7 +160,7 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
 }
 
 /// Internal class. Do not use directly.
-public class ObjectUtil: NSObject {
+public class ObjectUtil : NSObject {
     // Get the names of all properties in the object which are of type List<>
     @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
         let reflection = reflect(obj)
@@ -175,6 +175,8 @@ public class ObjectUtil: NSObject {
                 properties.append(reflection[i].0)
             }
         }
+
         return properties
     }
+
 }

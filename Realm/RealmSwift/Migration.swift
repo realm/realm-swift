@@ -108,15 +108,12 @@ This method is called automatically when opening a Realm for the first time and 
 not need to be called explicitly. You can choose to call this method to control
 exactly when and how migrations are performed.
 
-:param: path          The path of the Realm to migrate.
-:param: encryptionKey 64-byte encryption key if Realms at the given path are encrypted.
-                      If the Realms at the given path are not encrypted, omit the argument or pass
-                      in `nil`.
+:param: path The path of the Realm to migrate.
 
 :returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
           that occured otherwise.
 */
-public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
+public func migrateRealm(path: String) -> NSError? {
     return RLMRealm.migrateRealmAtPath(path)
 }
 
@@ -126,15 +123,15 @@ of a `Realm` instance.
 
 This object provides access to the previous and current `Schema`s for this migration.
 */
-public final class Migration { // TODO: Should this be a struct?
+public class Migration {
 
     // MARK: Properties
 
     /// The migration's old `Schema`, describing the `Realm` before applying a migration.
-    public var oldSchema: Schema { return Schema(rlmMigration.oldSchema) }
+    public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
 
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
-    public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
+    public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
     /// Wrapped `RLMMigration`.
     private var rlmMigration: RLMMigration
@@ -180,8 +177,8 @@ public final class Migration { // TODO: Should this be a struct?
 
     :param: object Object to be deleted from the Realm being migrated.
     */
-    public func delete(object: MigrationObject) {
-        rlmMigration.deleteObject(unsafeBitCast(object, RLMObject.self))
+    public func delete(object: RLMObject) {
+        rlmMigration.deleteObject(object)
     }
 
     /**
@@ -189,31 +186,23 @@ public final class Migration { // TODO: Should this be a struct?
 
     :param: rlmMigration `RLMMigration`.
     */
-    private init(_ rlmMigration: RLMMigration) {
+    init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }
 
 /// Object interface which allows untyped getters and setters for Objects during a migration.
-public final class MigrationObject: Object {
+public class MigrationObject : Object {
 
     /// Backing store for list properties.
     private var listProperties = [String: List<Object>]()
 
-    /// Returns or sets the value of the property with the given name.
-    public subscript(key: String) -> AnyObject? {
-        get {
-            if self.objectSchema[key].type == .Array {
-                return listProperties[key]
-            }
-            return super[key]
+    /// Returns the value of the property with the given name.
+    subscript(key: String) -> AnyObject? {
+        if (self.objectSchema[key].type == RLMPropertyType.Array) {
+            return listProperties[key]
         }
-        set {
-            if self.objectSchema[key].type != .Array {
-                super[key] = newValue
-            }
-            // FIXME: Implement List property setter
-        }
+        return super[key]
     }
 
     /**
@@ -258,3 +247,5 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
         migration.realm.schema = savedSchema
     }
 }
+
+

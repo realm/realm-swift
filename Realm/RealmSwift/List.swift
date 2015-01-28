@@ -51,7 +51,7 @@ public final class List<T: Object>: ListBase, SequenceType {
         if _rlmArray.realm == nil {
             return nil
         }
-        return Realm(_rlmArray.realm)
+        return Realm(rlmRealm: _rlmArray.realm)
     }
 
     // MARK: Initializers
@@ -66,7 +66,7 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     :param: rlmArray `RLMArray`.
     */
-    internal init(_ rlmArray: RLMArray) {
+    init(_ rlmArray: RLMArray) {
         super.init(array: rlmArray)
     }
 
@@ -104,7 +104,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
     }
 
     // MARK: Object Retrieval
@@ -182,7 +182,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     public func generate() -> GeneratorOf<T> {
         var i: UInt = 0
         return GeneratorOf<T>() {
-            if i >= self._rlmArray.count {
+            if (i >= self._rlmArray.count) {
                 return .None
             } else {
                 return self._rlmArray[i++] as? T
@@ -210,9 +210,9 @@ public final class List<T: Object>: ListBase, SequenceType {
 
     :param: objects A sequence of objects.
     */
-    public func append<S: SequenceType where S.Generator.Element == T>(objects: S) {
-        for obj in SequenceOf<T>(objects) { // Workaround for http://stackoverflow.com/questions/26918594
-            _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
+    public func append<S where S: SequenceType>(objects: S) {
+        for obj in objects {
+            _rlmArray.addObject(unsafeBitCast(obj as T, RLMObject.self))
         }
     }
 

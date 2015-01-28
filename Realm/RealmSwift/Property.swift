@@ -26,12 +26,12 @@ introspecting the database's schema.
 
 These properties map to columns in the core database.
 */
-public final class Property {
+public class Property: Equatable {
 
     // MARK: Properties
 
     /// Wrapped `RLMProperty`.
-    internal var rlmProperty: RLMProperty
+    var rlmProperty: RLMProperty
 
     /// Property name.
     public var name: String { return rlmProperty.name }
@@ -52,14 +52,12 @@ public final class Property {
 
     :param: rlmProperty `RLMProperty`.
     */
-    internal init(_ rlmProperty: RLMProperty) {
+    init(rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }
 }
 
 // MARK: Equatable
-
-extension Property: Equatable {}
 
 /// Returns whether the two properties are equal.
 public func ==(lhs: Property, rhs: Property) -> Bool {

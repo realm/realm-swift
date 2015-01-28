@@ -37,7 +37,7 @@
  strong references to it.
 
  @warning RLMRealm instances are not thread safe and can not be shared across
- threads or dispatch queues. You must construct a new instance on each thread you want
+ threads or dispatch queues. You must call this method on each thread you want
  to interact with the realm on. For dispatch queues, this means that you must
  call it in each block which is dispatched, as a queue is not guaranteed to run
  on a consistent thread.
@@ -474,10 +474,14 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Migration block used to migrate a Realm.
 
- @param migration        `RLMMigration` object used to perform the migration. The
-                         migration object allows you to enumerate and alter any
-                         existing objects which require migration.
- @param oldSchemaVersion The schema version of the `RLMRealm` being migrated.
+ @param migration   `RLMMigration` object used to perform the migration. The
+                    migration object allows you to enumerate and alter any
+                    existing objects which require migration.
+
+ @param oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
+
+ @return    Schema version number for the `RLMRealm` after completing the
+            migration. Must be greater than `oldSchemaVersion`.
  */
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
 
@@ -507,6 +511,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  @param version     The current schema version.
  @param block       The block which migrates the Realm to the current version.
+ @return            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -558,7 +563,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  exactly when and how migrations are performed.
 
  @param realmPath   The path of the Realm to migrate.
- @return            The error that occurred while applying the migration, if any.
+ @return            The error that occurred while applying the migration if any.
 
  @see               RLMMigration
  @see               setSchemaVersion:forRealmAtPath:withMigrationBlock:
