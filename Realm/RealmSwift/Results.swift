@@ -54,7 +54,6 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Properties
 
-    /// Wrapped `RLMResults`.
     let rlmResults: RLMResults
 
     /// Returns the Realm these results are associated with.
@@ -68,11 +67,6 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Initializers
 
-    /**
-    Creates a `Results` that is backed by the given `RLMResults`.
-
-    :param: rlmResults The `RLMResults` that backs the results.
-    */
     init(_ rlmResults: RLMResults) {
         self.rlmResults = rlmResults
     }

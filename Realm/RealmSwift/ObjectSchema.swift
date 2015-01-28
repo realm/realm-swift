@@ -30,7 +30,6 @@ public class ObjectSchema: Equatable {
 
     // MARK: Properties
 
-    /// Wrapped `RLMObjectSchema`.
     var rlmObjectSchema: RLMObjectSchema
 
     /// Array of persisted `Property` objects for an object.
@@ -49,11 +48,6 @@ public class ObjectSchema: Equatable {
 
     // MARK: Initializers
 
-    /**
-    Create an `ObjectSchema` by passing in the `RLMObjectSchema` to be wrapped.
-
-    :param: rlmObjectSchema `RLMObjectSchema`.
-    */
     init(rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }

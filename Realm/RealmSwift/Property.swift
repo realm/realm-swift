@@ -30,7 +30,6 @@ public class Property: Equatable {
 
     // MARK: Properties
 
-    /// Wrapped `RLMProperty`.
     var rlmProperty: RLMProperty
 
     /// Property name.
@@ -47,11 +46,6 @@ public class Property: Equatable {
 
     // MARK: Initializers
 
-    /**
-    Create a `Property` from an `RLMProperty`.
-
-    :param: rlmProperty `RLMProperty`.
-    */
     init(rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }

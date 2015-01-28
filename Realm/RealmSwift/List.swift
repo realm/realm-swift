@@ -60,11 +60,6 @@ public final class List<T: Object>: ListBase, SequenceType {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
-    /**
-    Create a `List` by passing in the `RLMArray` to be wrapped.
-
-    :param: rlmArray `RLMArray`.
-    */
     init(_ rlmArray: RLMArray) {
         super.init(array: rlmArray)
     }
@@ -285,15 +280,8 @@ public final class List<T: Object>: ListBase, SequenceType {
     }
 }
 
-// MARK: Private Helpers
+// MARK: Internal Helpers
 
-/**
-Converts `NSNotFound` to `nil`, otherwise returns `index` as an `Int`.
-
-:param: index Value to convert.
-
-:returns: `nil` if `index` is `NSNotFound`, `index` as an `Int` otherwise.
-*/
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {
         return nil

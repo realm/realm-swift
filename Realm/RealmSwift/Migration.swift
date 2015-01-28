@@ -180,11 +180,6 @@ public class Migration {
         rlmMigration.deleteObject(object)
     }
 
-    /**
-    Create a `Migration` by passing in the `RLMMigration` to be wrapped.
-
-    :param: rlmMigration `RLMMigration`.
-    */
     init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
@@ -238,5 +233,3 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
         migration.realm.schema = savedSchema
     }
 }
-
-

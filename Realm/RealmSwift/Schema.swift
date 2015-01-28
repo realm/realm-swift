@@ -30,7 +30,6 @@ public class Schema: Equatable {
 
     // MARK: Properties
 
-    /// Wrapped `RLMSchema`.
     var rlmSchema: RLMSchema
 
     /// `ObjectSchema`s for all object types in this Realm. Meant
@@ -39,11 +38,6 @@ public class Schema: Equatable {
 
     // MARK: Initializers
 
-    /**
-    Create a `Schema` by passing in the `RLMSchema` to be wrapped.
-
-    :param: rlmSchema `RLMSchema`.
-    */
     init(rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }
