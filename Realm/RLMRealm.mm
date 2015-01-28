@@ -294,7 +294,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                              "architecture. For sharing files between the Realm "
                              "Browser and an iOS simulator, this means that you "
                              "must use a 64-bit simulator.";
-            error = [NSError errorWithDomain:@"io.realm"
+            error = [NSError errorWithDomain:RLMErrorDomain
                                         code:RLMErrorIncompatibleLockFile
                                     userInfo:@{NSLocalizedDescriptionKey: err,
                                                @"Error Code": @(RLMErrorIncompatibleLockFile)}];
