@@ -26,14 +26,9 @@
 
 @end
 
-#define RLMAssertEqualExceptions(actual, expected) do { \
-    if ([actual.name isEqualToString:expected.name] && [actual.reason isEqualToString:expected.reason] && [actual.userInfo isEqual:expected.userInfo]) { \
-        XCTAssertEqualObjects(actual, expected); \
-    } \
-    else { \
-        XCTFail(@"(%@) is not equal to (%@)", actual.debugDescription, expected.debugDescription); \
-    } \
-} while (0)
+static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
+    return [actual.name isEqualToString:expected.name] && [actual.reason isEqualToString:expected.reason] && [actual.userInfo isEqual:expected.userInfo];
+}
 
 @implementation RLMUtilTests
 
@@ -45,15 +40,15 @@
                                        RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                                        };
 
-    RLMAssertEqualExceptions(RLMException(reason), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]);
-    RLMAssertEqualExceptions(RLMException(reason, nil), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]);
+    XCTAssertTrue(RLMEqualExceptions(RLMException(reason), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
+    XCTAssertTrue(RLMEqualExceptions(RLMException(reason, nil), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
 
     expectedUserInfo = @{
                          @"key" : @"value",
                          RLMRealmVersionKey : REALM_VERSION,
                          RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                          };
-    RLMAssertEqualExceptions(RLMException(reason, userInfo), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]);
+    XCTAssertTrue(RLMEqualExceptions(RLMException(reason, userInfo), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
 }
 
 - (void)testRLMExceptionWithCPlusPlusException {
@@ -63,7 +58,7 @@
                                        RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                                        };
 
-    RLMAssertEqualExceptions(RLMException(exception), [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]);
+    XCTAssertTrue(RLMEqualExceptions(RLMException(exception), [NSException exceptionWithName:RLMExceptionName reason:@"Reason" userInfo:expectedUserInfo]));
 }
 
 - (void)testRLMMakeError {
