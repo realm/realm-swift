@@ -25,6 +25,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSwiftSupport.h"
+#import "RLMVersion.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {
@@ -152,7 +153,7 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             return NO;
         }
     }
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
+    @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
 id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
@@ -175,7 +176,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
 
         // if not a literal throw
         NSString *message = [NSString stringWithFormat:@"Invalid value '%@' for property '%@'", obj ?: @"nil", prop.name];
-        @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil];
+        @throw RLMException(message);
     }
     return obj;
 }
@@ -226,9 +227,7 @@ NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *o
 NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objectSchema, RLMSchema *schema) {
     NSArray *props = objectSchema.properties;
     if (array.count != props.count) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Invalid array input. Number of array elements does not match number of properties."
-                                     userInfo:nil];
+        @throw RLMException(@"Invalid array input. Number of array elements does not match number of properties.");
     }
 
     // validate all values
@@ -238,3 +237,33 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     }
     return outArray;
 };
+
+NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
+    [info addEntriesFromDictionary:@{
+                                     RLMRealmVersionKey : REALM_VERSION,
+                                     RLMRealmCoreVersionKey : @TIGHTDB_VERSION
+                                     }];
+
+    return [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:info];
+}
+
+NSException *RLMException(std::exception const& exception) {
+    return RLMException(@(exception.what()));
+}
+
+NSError *RLMMakeError(RLMError code, std::exception const& exception) {
+    return [NSError errorWithDomain:RLMErrorDomain
+                               code:code
+                           userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
+                                      @"Error Code": @(code)}];
+}
+
+void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
+    if (outError) {
+        *outError = error;
+    }
+    else {
+        @throw RLMException(error.localizedDescription, error.userInfo);
+    }
+}

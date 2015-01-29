@@ -21,3 +21,11 @@
 
 NSString * const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
 NSString * const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";
+
+NSString * const RLMErrorDomain = @"io.realm";
+
+NSString * const RLMExceptionName = @"RLMException";
+
+NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
+
+NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";

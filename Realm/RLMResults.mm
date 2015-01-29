@@ -89,7 +89,7 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *ar
     if (ar->_viewCreated) {
         // verify view is attached and up to date
         if (!ar->_backingView.is_attached()) {
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMResults is no longer valid" userInfo:nil];
+            @throw RLMException(@"RLMResults is no longer valid");
         }
         ar->_backingView.sync_if_needed();
     }
@@ -113,9 +113,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(ar);
 
     if (!ar->_realm->_inWriteTransaction) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can't mutate a persisted array outside of a write transaction."
-                                     userInfo:nil];
+        @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }
 
@@ -148,9 +146,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         // FIXME: mutationsPtr should be pointing to a value updated by core
         // whenever the results are changed rather than doing this check
         if (state->extra[1] != self.count) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Collection was mutated while being enumerated."
-                                         userInfo:nil];
+            @throw RLMException(@"Collection was mutated while being enumerated.");
         }
         items = (__bridge id)(void *)state->extra[0];
         [items resize:len];
@@ -202,7 +198,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(self);
 
     if (index >= self.count) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
+        @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
     }
     return RLMCreateObjectAccessor(_realm, _objectSchema, [self indexInSource:index]);
 }
@@ -230,13 +226,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     // check attached for table and object
     RLMResultsValidate(self);
     if (object.invalidated) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
+        @throw RLMException(@"RLMObject is no longer valid");
     }
 
     // check that object types align
     if (object->_row.get_table() != &_backingView.get_parent()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMResults" userInfo:nil];
+        @throw RLMException(@"Object type does not match RLMResults");
     }
 
     size_t object_ndx = object->_row.get_index();
@@ -488,13 +483,12 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMCheckThread(_realm);
     if (object.invalidated) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"RLMObject is no longer valid" userInfo:nil];
+        @throw RLMException(@"RLMObject is no longer valid");
     }
 
     // check that object types align
     if (object->_row.get_table() != _table) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object type does not match RLMResults" userInfo:nil];
+        @throw RLMException(@"Object type does not match RLMResults");
     }
 
     size_t ndx = object->_row.get_index();
@@ -562,7 +556,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
+    @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {

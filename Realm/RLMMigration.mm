@@ -24,6 +24,7 @@
 #import "RLMObject_Private.h"
 #import "RLMObjectStore.hpp"
 #import "RLMArray.h"
+#import "RLMUtil.hpp"
 
 #import <tightdb/table_view.hpp>
 
@@ -39,9 +40,7 @@
 }
 
 - (void)beginWriteTransaction {
-    @throw [NSException exceptionWithName:@"RLMException"
-                                   reason:@"Cannot modify the source Realm in a migration"
-                                 userInfo:nil];
+    @throw RLMException(@"Cannot modify the source Realm in a migration");
 }
 @end
 
@@ -111,14 +110,14 @@
                 }
                 if (table->get_distinct_view(primaryProperty.column).size() != count) {
                     NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-                    @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                    @throw RLMException(reason);
                 }
             }
             else {
                 for (NSUInteger i = 0; i < count; i++) {
                     if (table->count_int(primaryProperty.column, table->get_int(primaryProperty.column, i)) > 1) {
                         NSString *reason = [NSString stringWithFormat:@"Primary key property '%@' has duplicate values after migration.", primaryProperty.name];
-                        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+                        @throw RLMException(reason);
                     }
                 }
             }

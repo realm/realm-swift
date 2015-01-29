@@ -136,28 +136,22 @@
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     if (!_realm) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Linking object only available for objects in a Realm."
-                                     userInfo:nil];
+        @throw RLMException(@"Linking object only available for objects in a Realm.");
     }
     RLMCheckThread(_realm);
 
     if (!_row.is_attached()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted or invalidated and is no longer valid."
-                                     userInfo:nil];
+        @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
     }
 
     RLMObjectSchema *schema = _realm.schema[className];
     RLMProperty *prop = schema[property];
     if (!prop) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Invalid property '%@'", property] userInfo:nil];
+        @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
     }
 
     if (![prop.objectClassName isEqualToString:_objectSchema.className]) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:[NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]
-                                     userInfo:nil];
+        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]);
     }
 
     Table *table = schema.table;

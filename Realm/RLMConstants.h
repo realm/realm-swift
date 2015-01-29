@@ -176,3 +176,10 @@ typedef NS_ENUM(NSInteger, RLMError) {
 // Schema version used for unitialized Realms
 extern const NSUInteger RLMNotVersioned;
 
+extern NSString * const RLMErrorDomain;
+
+extern NSString * const RLMExceptionName;
+
+extern NSString * const RLMRealmVersionKey;
+
+extern NSString * const RLMRealmCoreVersionKey;

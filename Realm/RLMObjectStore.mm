@@ -76,10 +76,8 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
 
     // throw if errors
     if (exceptionMessages.count) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:[NSString stringWithFormat:@"Migration is required for object type '%@' due to the following errors:\n- %@",
-                                               objectSchema.className, [exceptionMessages componentsJoinedByString:@"\n- "]]
-                                     userInfo:nil];
+        @throw RLMException([NSString stringWithFormat:@"Migration is required for object type '%@' due to the following errors:\n- %@",
+                             objectSchema.className, [exceptionMessages componentsJoinedByString:@"\n- "]]);
     }
 
     // set new properties array with correct column alignment
@@ -242,9 +240,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
 
         // validate versions
         if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Version of Realm file on disk is higher than current schema version"
-                                         userInfo:@{@"path" : realm.path}];
+            @throw RLMException(@"Version of Realm file on disk is higher than current schema version", @{@"path" : realm.path});
         }
 
         // create tables
@@ -283,9 +279,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
 static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first."
-                                     userInfo:nil];
+        @throw RLMException(@"Can only add, remove, or create objects in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
     RLMCheckThread(realm);
 }
@@ -341,9 +335,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 
     // verify that object is standalone
     if (object.invalidated) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Adding a deleted or invalidated object to a Realm is not permitted"
-                                     userInfo:nil];
+        @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
     if (object.realm) {
         if (object.realm == realm) {
@@ -351,9 +343,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
             return;
         }
         // for differing realms users must explicitly create the object in the second realm
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object is already persisted in a Realm"
-                                     userInfo:nil];
+        @throw RLMException(@"Object is already persisted in a Realm");
     }
 
     // set the realm and schema
@@ -380,10 +370,8 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 
         // FIXME: Add condition to check for Mixed once it can support a nil value.
         if (!value && prop.type != RLMPropertyTypeObject) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"No value or default value specified for property '%@' in '%@'",
-                                                   prop.name, schema.className]
-                                         userInfo:nil];
+            @throw RLMException([NSString stringWithFormat:@"No value or default value specified for property '%@' in '%@'",
+                                 prop.name, schema.className]);
         }
 
         // set in table with out validation
@@ -524,7 +512,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     RLMProperty *primaryProperty = objectSchema.primaryKeyProperty;
     if (!primaryProperty) {
         NSString *msg = [NSString stringWithFormat:@"%@ does not have a primary key", objectClassName];
-        @throw [NSException exceptionWithName:@"RLMException" reason:msg userInfo:nil];
+        @throw RLMException(msg);
     }
 
     if (!objectSchema.table) {
@@ -539,9 +527,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
             row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
         }
         else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"Invalid value '%@' for primary key", key]
-                                         userInfo:nil];
+            @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for primary key", key]);
         }
     }
     else {
@@ -549,9 +535,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
             row = objectSchema.table->find_first_int(primaryProperty.column, number.longLongValue);
         }
         else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:[NSString stringWithFormat:@"Invalid value '%@' for primary key", key]
-                                         userInfo:nil];
+            @throw RLMException([NSString stringWithFormat:@"Invalid value '%@' for primary key", key]);
         }
     }
 

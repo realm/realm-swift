@@ -137,20 +137,14 @@
 
                 Class cls = [RLMSchema classForString:_objectClassName];
                 if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]
-                                                 userInfo:nil];
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMArray object type. RLMArrays can only contain instances of RLMObject subclasses. See http://realm.io/docs/cocoa/#to-many for more information.", self.objectClassName]);
                 }
             }
             else if (strcmp(code, "@\"NSNumber\"") == 0) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:[NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]
-                                             userInfo:nil];
+                @throw RLMException([NSString stringWithFormat:@"'NSNumber' is not supported as an RLMObject property. Supported number types include int, long, float, double, and other primitive number types. See http://realm.io/docs/cocoa/api/Constants/RLMPropertyType.html for all supported types."]);
             }
             else if (strcmp(code, "@\"RLMArray\"") == 0) {
-                @throw [NSException exceptionWithName:@"RLMException"
-                                               reason:@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>"
-                                             userInfo:nil];
+                @throw RLMException(@"RLMArray properties require a protocol defining the contained type - example: RLMArray<Person>");
             }
             else {
                 // for objects strip the quotes and @
@@ -159,9 +153,7 @@
                 // verify type
                 Class cls = [RLMSchema classForString:className];
                 if (!RLMIsSubclass(cls, RLMObjectBase.class)) {
-                    @throw [NSException exceptionWithName:@"RLMException"
-                                                   reason:[NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]
-                                                 userInfo:nil];
+                    @throw RLMException([NSString stringWithFormat:@"'%@' is not supported as an RLMObject property. All properties must be primitives, NSString, NSDate, NSData, RLMArray, or subclasses of RLMObject. See http://realm.io/docs/cocoa/api/Classes/RLMObject.html for more information.", className]);
                 }
 
                 _type = RLMPropertyTypeObject;
@@ -232,7 +224,7 @@
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                             "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
 
     // convert type for any swift property types (which are parsed as Any)
@@ -267,7 +259,7 @@
     if (![self setTypeFromRawType]) {
         NSString *reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", self.name];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
 
     // update getter/setter names

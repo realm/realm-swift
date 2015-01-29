@@ -48,5 +48,5 @@ va_start(ARGS, PREDICATE_FORMAT);          \
 va_end(ARGS);                              \
 if (PREDICATE_FORMAT && ![PREDICATE_FORMAT isKindOfClass:[NSString class]]) {         \
     NSString *reason = @"predicate must be an NSString with optional format va_list"; \
-    [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];       \
+    [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:nil];       \
 }

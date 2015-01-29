@@ -28,9 +28,7 @@
 // verify attached
 static inline void RLMVerifyAttached(__unsafe_unretained RLMObjectBase *obj) {
     if (!obj->_row.is_attached()) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Object has been deleted or invalidated."
-                                     userInfo:nil];
+        @throw RLMException(@"Object has been deleted or invalidated.");
     }
     RLMCheckThread(obj->_realm);
 }
@@ -41,9 +39,7 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase
     RLMVerifyAttached(obj);
 
     if (!obj->_realm->_inWriteTransaction) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first."
-                                     userInfo:nil];
+        @throw RLMException(@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
 }
 
@@ -64,7 +60,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *obj, NSU
     }
     if (row != tightdb::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%lld'.", propName, val];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
     obj->_row.set_int(colIndex, val);
 }
@@ -110,7 +106,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
         obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
     }
     catch (std::exception const& e) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+        @throw RLMException(e);
     }
 }
 static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *obj, NSUInteger colIndex, NSString *propName,
@@ -123,13 +119,13 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *obj, NSU
     }
     if (row != tightdb::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
-        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+        @throw RLMException(reason);
     }
     try {
         obj->_row.set_string(colIndex, str);
     }
     catch (std::exception const& e) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+        @throw RLMException(e);
     }
 }
 
@@ -158,7 +154,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
         obj->_row.set_binary(colIndex, RLMBinaryDataForNSData(data));
     }
     catch (std::exception const& e) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@(e.what()) userInfo:nil];
+        @throw RLMException(e);
     }
 }
 
@@ -166,9 +162,7 @@ static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObjectBase *link,
                                         __unsafe_unretained RLMRealm *realm,
                                         RLMCreationOptions options) {
     if (link.isInvalidated) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Adding a deleted or invalidated object to a Realm is not permitted"
-                                     userInfo:nil];
+        @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
     else if (link.realm != realm) {
         // only try to update if link object has primary key
@@ -208,7 +202,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
         if (![[obj.objectSchema.properties[colIndex] objectClassName] isEqualToString:val.objectSchema.className]) {
             NSString *reason = [NSString stringWithFormat:@"Can't set object of type '%@' to property of type '%@'",
                                 val.objectSchema.className, [obj.objectSchema.properties[colIndex] objectClassName]];
-            @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
+            @throw RLMException(reason);
         }
 
         obj->_row.set_link(colIndex, RLMAddLinkedObject(val, obj.realm, options));
@@ -271,7 +265,7 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *obj, NSUIn
             // for links and other unsupported types throw
         case RLMPropertyTypeObject:
         default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
+            @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
         }
     }
 }
@@ -315,7 +309,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *obj, NSUIntege
                 return;
         }
     }
-    @throw [NSException exceptionWithName:@"RLMException" reason:[NSString stringWithFormat:@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj.objectSchema.properties[col_ndx] name]] userInfo:nil];
+    @throw RLMException([NSString stringWithFormat:@"Inserting invalid object of class %@ for an RLMPropertyTypeAny property (%@).", [val class], [obj.objectSchema.properties[col_ndx] name]]);
 }
 
 // dynamic getter with column closure
@@ -376,7 +370,7 @@ static IMP RLMAccessorGetter(RLMProperty *prop, char accessorCode, NSString *obj
                 return RLMGetAnyProperty(obj, colIndex);
             });
         default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+            @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -384,9 +378,7 @@ template<typename ArgType, typename StorageType=ArgType>
 static IMP RLMMakeSetter(NSUInteger colIndex, bool isPrimary) {
     if (isPrimary) {
         return imp_implementationWithBlock(^(__unused RLMObjectBase *obj, __unused ArgType val) {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Primary key can't be changed after an object is inserted."
-                                         userInfo:nil];
+            @throw RLMException(@"Primary key can't be changed after an object is inserted.");
         });
     }
     return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *obj, ArgType val) {
@@ -413,9 +405,7 @@ static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
         case 't': return RLMMakeSetter<RLMArray *>(colIndex, prop.isPrimary);
         case '@': return RLMMakeSetter<id>(colIndex, prop.isPrimary);
         default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
+            @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -488,7 +478,7 @@ static const char *getterTypeStringForObjcCode(char code) {
         case 'B': return GETTER_TYPES("B");
         case 'c': return GETTER_TYPES("c");
         case '@': return GETTER_TYPES("@");
-        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+        default: @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -506,7 +496,7 @@ static const char *setterTypeStringForObjcCode(char code) {
         case 'B': return SETTER_TYPES("B");
         case 'c': return SETTER_TYPES("c");
         case '@': return SETTER_TYPES("@");
-        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+        default: @throw RLMException(@"Invalid accessor code");
     }
 }
 
@@ -527,7 +517,7 @@ static char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
                 case RLMPropertyTypeDouble:
                 case RLMPropertyTypeFloat:
                 case RLMPropertyTypeInt:
-                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type for objc typecode" userInfo:nil];
+                    @throw RLMException(@"Invalid type for objc typecode");
             }
         default:
             return objcTypeCode;
@@ -556,10 +546,10 @@ static Class RLMCreateAccessorClass(Class objectClass,
                                     IMP (*setterGetter)(RLMProperty *, char)) {
     // throw if no schema, prefix, or object class
     if (!objectClass || !schema || !accessorClassPrefix) {
-        @throw [NSException exceptionWithName:@"RLMInternalException" reason:@"Missing arguments" userInfo:nil];
+        @throw RLMException(@"Missing arguments");
     }
     if (!RLMIsKindOfclass(objectClass, RLMObjectBase.class)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject or Object" userInfo:nil];
+        @throw RLMException(@"objectClass must derive from RLMObject or Object");
     }
     
     // create and register proxy class which derives from object class
@@ -607,16 +597,14 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj.objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : propName ?: @"nil",
-                                                @"Class name": obj.objectSchema.className}];
+        @throw RLMException(@"Invalid property name",
+                            @{@"Property name:" : propName ?: @"nil",
+                              @"Class name": obj.objectSchema.className});
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Invalid value for property"
-                                     userInfo:@{@"Property name:" : propName ?: @"nil",
-                                                @"Value": val ? [val description] : @"nil"}];
+        @throw RLMException(@"Invalid property name",
+                            @{@"Property name:" : propName ?: @"nil",
+                              @"Value": val ? [val description] : @"nil"});
     }
     RLMDynamicSet(obj, prop, val, prop.isPrimary ? RLMCreationOptionsEnforceUnique : 0);
 }
@@ -670,19 +658,16 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained R
             RLMSetValue(obj, col, val);
             break;
         default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
+            @throw RLMException(@"Invalid accessor code");
     }
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSString *propName) {
     RLMProperty *prop = obj.objectSchema[propName];
     if (!prop) {
-        @throw [NSException exceptionWithName:@"RLMException"
-                                       reason:@"Invalid property name"
-                                     userInfo:@{@"Property name:" : propName ?: @"nil",
-                                                @"Class name": obj.objectSchema.className}];
+        @throw RLMException(@"Invalid property name",
+                            @{@"Property name:" : propName ?: @"nil",
+                              @"Class name": obj.objectSchema.className});
     }
     NSUInteger col = prop.column;
     switch (accessorCodeForType(prop.objcType, prop.type)) {
@@ -701,8 +686,6 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSS
         case 't': return RLMGetArray(obj, col, prop.objectClassName);
         case '@': return RLMGetAnyProperty(obj, col);
         default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
+            @throw RLMException(@"Invalid accessor code");
     }
 }
