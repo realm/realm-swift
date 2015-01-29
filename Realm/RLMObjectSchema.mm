@@ -62,25 +62,20 @@
 
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
-    if (!_propertiesByName) {
-        NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
-        for (RLMProperty *prop in _properties) {
-            map[prop.name] = prop;
-        }
-        _propertiesByName = map;
-    }
     return _propertiesByName[key];
 }
 
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
-    _propertiesByName = nil;
     _properties = properties;
+    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
     for (RLMProperty *prop in _properties) {
+        map[prop.name] = prop;
         if (prop.isPrimary) {
             self.primaryKeyProperty = prop;
         }
     }
+    _propertiesByName = map;
 }
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
@@ -254,7 +249,27 @@
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
+
+    // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+    // _table not copied as it's tightdb::Group-specific
+    return schema;
+}
+
+- (instancetype)shallowCopy {
+    RLMObjectSchema *schema = [[RLMObjectSchema alloc] init];
+    schema->_objectClass = _objectClass;
+    schema->_className = _className;
+    schema->_objectClass = _objectClass;
+    schema->_accessorClass = _accessorClass;
+    schema->_standaloneClass = _standaloneClass;
+    schema->_isSwiftClass = _isSwiftClass;
+
+    // reuse propery array, map, and primary key instnaces
+    schema->_properties = _properties;
+    schema->_propertiesByName = _propertiesByName;
+    schema->_primaryKeyProperty = _primaryKeyProperty;
+
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }

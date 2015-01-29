@@ -495,7 +495,7 @@ static id RLMAutorelease(id value) {
                                                reason:@"Cannot open an uninitialized realm in read-only mode"
                                              userInfo:nil];
             }
-            RLMSchema *targetSchema = readonly ? RLMSchema.sharedSchema : [RLMSchema dynamicSchemaFromRealm:realm];
+            RLMSchema *targetSchema = readonly ? [RLMSchema.sharedSchema copy] : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
             RLMRealmCreateAccessors(realm.schema);
         }
@@ -504,7 +504,7 @@ static id RLMAutorelease(id value) {
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(realm, [realms[0] schema], false);
+                RLMRealmSetSchema(realm, [[realms[0] schema] shallowCopy], false);
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed

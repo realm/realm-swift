@@ -39,9 +39,12 @@
 @property (nonatomic) tightdb::Table *table;
 
 // returns a cached or new schema for a given object class
-+(instancetype)schemaForObjectClass:(Class)objectClass;
++ (instancetype)schemaForObjectClass:(Class)objectClass;
 
 // generate a schema from a table
-+(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
++ (instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm;
+
+// shallow copy reusing properties and property map
+- (instancetype)shallowCopy;
 
 @end

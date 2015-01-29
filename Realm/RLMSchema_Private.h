@@ -83,4 +83,7 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
 // class for string
 + (Class)classForString:(NSString *)className;
 
+// shallow copy for reusing schema properties accross the same Realm on multiple threads
+- (instancetype)shallowCopy;
+
 @end

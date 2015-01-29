@@ -149,7 +149,7 @@ void RLMClearAccessorCache() {
 }
 
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
-    realm.schema = [targetSchema copy];
+    realm.schema = targetSchema;
 
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         objectSchema.realm = realm;
