@@ -16,6 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 #import <Realm/RLMSchema.h>
 
 @class RLMRealm;
@@ -89,3 +93,7 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
 - (instancetype)shallowCopy;
 
 @end
+
+#ifdef __cplusplus
+}
+#endif
