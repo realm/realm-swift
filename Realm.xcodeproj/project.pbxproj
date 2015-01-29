@@ -1556,6 +1556,7 @@
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
 				METAL_ENABLE_DEBUG_INFO = YES;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
 				OTHER_LIBTOOLFLAGS = "-ltightdb-ios-dbg";
 				PRODUCT_NAME = Realm;
@@ -1593,6 +1594,7 @@
 				LLVM_LTO = YES;
 				MACH_O_TYPE = mh_dylib;
 				METAL_ENABLE_DEBUG_INFO = NO;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-ios";
 				OTHER_LIBTOOLFLAGS = "-ltightdb-ios";
 				PRODUCT_NAME = Realm;
@@ -1670,6 +1672,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = staticlib;
 				METAL_ENABLE_DEBUG_INFO = YES;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
 				OTHER_LIBTOOLFLAGS = "-ltightdb-ios-dbg";
 				PRODUCT_NAME = Realm;
@@ -1700,6 +1703,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = staticlib;
 				METAL_ENABLE_DEBUG_INFO = NO;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-ios";
 				OTHER_LIBTOOLFLAGS = "-ltightdb-ios";
 				PRODUCT_NAME = Realm;
@@ -1882,6 +1886,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = Realm;
 				SDKROOT = macosx;
@@ -1910,6 +1915,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = Realm;
 				SDKROOT = macosx;
