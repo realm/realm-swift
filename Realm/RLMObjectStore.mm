@@ -140,7 +140,7 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
                 objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, prefix);
             }
         }
-        [s_accessorSchema addObject:[schema copy]];
+        [s_accessorSchema addObject:schema];
     }
 }
 
@@ -173,7 +173,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
     // create metadata tables if neded
     bool changed = RLMRealmCreateMetadataTables(realm);
 
-    realm.schema = [targetSchema copy];
+    realm.schema = targetSchema;
 
     // first pass to create missing tables
     NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
