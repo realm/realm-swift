@@ -62,20 +62,25 @@
 
 // return properties by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key {
+    if (!_propertiesByName) {
+        NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
+        for (RLMProperty *prop in _properties) {
+            map[prop.name] = prop;
+        }
+        _propertiesByName = map;
+    }
     return _propertiesByName[key];
 }
 
 // create property map when setting property array
 -(void)setProperties:(NSArray *)properties {
-    NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:properties.count];
-    for (RLMProperty *prop in properties) {
-        map[prop.name] = prop;
+    _propertiesByName = nil;
+    _properties = properties;
+    for (RLMProperty *prop in _properties) {
         if (prop.isPrimary) {
             self.primaryKeyProperty = prop;
         }
     }
-    _propertiesByName = map;
-    _properties = properties;
 }
 
 - (void)setPrimaryKeyProperty:(RLMProperty *)primaryKeyProperty {
@@ -243,7 +248,6 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
-    schema->_propertiesByName = _propertiesByName;
     schema->_objectClass = _objectClass;
     schema->_className = _className;
     schema->_objectClass = _objectClass;
