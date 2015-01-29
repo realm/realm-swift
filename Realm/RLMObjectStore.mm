@@ -63,9 +63,8 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
         }
 
         // create new property with aligned column
-        RLMProperty *prop = [schemaProp copy];
-        prop.column = tableProp.column;
-        [properties addObject:prop];
+        schemaProp.column = tableProp.column;
+        [properties addObject:schemaProp];
     }
 
     // check for new missing properties
@@ -163,6 +162,10 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     }
 }
 
+static bool RLMPropertiesAreCompatible(RLMProperty *p1, RLMProperty *p2) {
+    return p1.type == p2.type && [p1.name isEqualToString:p2.name] && (p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName]);
+}
+
 // sets a realm's schema to a copy of targetSchema and creates/updates tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
@@ -192,7 +195,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         // add missing columns
         for (RLMProperty *prop in objectSchema.properties) {
             // add any new properties (new name or different type)
-            if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
+            if (!tableSchema[prop.name] || !RLMPropertiesAreCompatible(prop, tableSchema[prop.name])) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
                 changed = true;
             }
@@ -201,7 +204,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         // remove extra columns
         for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
             RLMProperty *prop = tableSchema.properties[i];
-            if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
+            if (!objectSchema[prop.name] || !RLMPropertiesAreCompatible(prop, objectSchema[prop.name])) {
                 objectSchema.table->remove_column(prop.column);
                 changed = true;
             }

@@ -642,6 +642,8 @@ extern "C" {
         XCTAssertNotNil(missingTableSchema.accessorClass);
         XCTAssertNotEqual(missingTableSchema.accessorClass, RLMObject.class);
     }
+
+    RLMClearAccessorCache();
 }
 
 @end

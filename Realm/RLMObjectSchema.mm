@@ -243,7 +243,6 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
-    schema->_properties = _properties;
     schema->_propertiesByName = _propertiesByName;
     schema->_objectClass = _objectClass;
     schema->_className = _className;
@@ -251,7 +250,7 @@
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
-    schema.primaryKeyProperty = _primaryKeyProperty;
+    schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
@@ -264,7 +263,12 @@
     // compare ordered list of properties
     NSArray *otherProperties = objectSchema.properties;
     for (NSUInteger i = 0; i < _properties.count; i++) {
-        if (![_properties[i] isEqualToProperty:otherProperties[i]]) {
+        RLMProperty *p1 = _properties[i], *p2 = otherProperties[i];
+        if (p1.type != p2.type ||
+            p1.column != p2.column ||
+            p1.isPrimary != p2.isPrimary ||
+            ![p1.name isEqualToString:p2.name] ||
+            !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
             return NO;
         }
     }

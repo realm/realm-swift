@@ -312,20 +312,4 @@
     return prop;
 }
 
-
--(BOOL)isEqualToProperty:(RLMProperty *)prop {
-    return _type == prop->_type
-        && _isPrimary == prop->_isPrimary
-        && _column == prop->_column
-        && [_name isEqualToString:prop->_name]
-        && (_objectClassName == prop->_objectClassName  || [_objectClassName isEqualToString:prop->_objectClassName]);
-}
-
-- (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:RLMProperty.class]) {
-        return NO;
-    }
-    return [self isEqualToProperty:object];
-}
-
 @end
