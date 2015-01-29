@@ -63,9 +63,8 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
         }
 
         // create new property with aligned column
-        RLMProperty *prop = [schemaProp copy];
-        prop.column = tableProp.column;
-        [properties addObject:prop];
+        schemaProp.column = tableProp.column;
+        [properties addObject:schemaProp];
     }
 
     // check for new missing properties
@@ -141,7 +140,7 @@ void RLMRealmCreateAccessors(RLMSchema *schema) {
                 objectSchema.accessorClass = RLMAccessorClassForObjectClass(objectSchema.objectClass, objectSchema, prefix);
             }
         }
-        [s_accessorSchema addObject:[schema copy]];
+        [s_accessorSchema addObject:schema];
     }
 }
 
@@ -150,7 +149,7 @@ void RLMClearAccessorCache() {
 }
 
 void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
-    realm.schema = [targetSchema copy];
+    realm.schema = targetSchema;
 
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         objectSchema.realm = realm;
@@ -163,6 +162,13 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     }
 }
 
+static bool RLMPropertyHasChanged(RLMProperty *p1, RLMProperty *p2) {
+    return p2 == nil
+        || p1.type != p2.type
+        || ![p1.name isEqualToString:p2.name]
+        || (p1.objectClassName != p2.objectClassName && ![p1.objectClassName isEqualToString:p2.objectClassName]);
+}
+
 // sets a realm's schema to a copy of targetSchema and creates/updates tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
@@ -170,11 +176,9 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
     // create metadata tables if neded
     bool changed = RLMRealmCreateMetadataTables(realm);
 
-    realm.schema = [targetSchema copy];
-
     // first pass to create missing tables
     NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         bool created = false;
         objectSchema.table = RLMTableForObjectClass(realm, objectSchema.className, created).get();
 
@@ -192,7 +196,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         // add missing columns
         for (RLMProperty *prop in objectSchema.properties) {
             // add any new properties (new name or different type)
-            if (!tableSchema[prop.name] || ![prop isEqualToProperty:tableSchema[prop.name]]) {
+            if (RLMPropertyHasChanged(prop, tableSchema[prop.name])) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
                 changed = true;
             }
@@ -201,7 +205,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
         // remove extra columns
         for (int i = (int)tableSchema.properties.count - 1; i >= 0; i--) {
             RLMProperty *prop = tableSchema.properties[i];
-            if (!objectSchema[prop.name] || ![prop isEqualToProperty:objectSchema[prop.name]]) {
+            if (RLMPropertyHasChanged(prop, objectSchema[prop.name])) {
                 objectSchema.table->remove_column(prop.column);
                 changed = true;
             }
@@ -224,11 +228,8 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
     // FIXME - remove deleted tables
 
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        objectSchema.realm = realm;
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
-        RLMVerifyAndAlignColumns(tableSchema, objectSchema);
-    }
+    // set and validate final schema
+    RLMRealmSetSchema(realm, targetSchema, true);
 
     return changed;
 }

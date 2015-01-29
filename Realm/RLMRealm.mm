@@ -495,7 +495,7 @@ static id RLMAutorelease(id value) {
                                                reason:@"Cannot open an uninitialized realm in read-only mode"
                                              userInfo:nil];
             }
-            RLMSchema *targetSchema = readonly ? RLMSchema.sharedSchema : [RLMSchema dynamicSchemaFromRealm:realm];
+            RLMSchema *targetSchema = readonly ? [RLMSchema.sharedSchema copy] : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
             RLMRealmCreateAccessors(realm.schema);
         }
@@ -504,12 +504,13 @@ static id RLMAutorelease(id value) {
             NSArray *realms = realmsAtPath(path);
             if (realms.count) {
                 // if we have a cached realm on another thread, copy without a transaction
-                RLMRealmSetSchema(realm, [realms[0] schema], false);
+                RLMRealmSetSchema(realm, [[realms[0] schema] shallowCopy], false);
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
                 RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
-                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), targetSchema, [realm migrationBlock:key]);
+                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path),
+                                                               [targetSchema copy], [realm migrationBlock:key]);
                 if (error) {
                     setOrThrowError(error, outError);
                     return nil;
@@ -900,7 +901,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (error)
         return error;
 
-    return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), RLMSchema.sharedSchema, [realm migrationBlock:key]);
+    return RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(realmPath), [RLMSchema.sharedSchema copy], [realm migrationBlock:key]);
 }
 
 - (RLMObject *)createObject:(NSString *)className withObject:(id)object {

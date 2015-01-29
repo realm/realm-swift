@@ -1,3 +1,10 @@
+0.90.4 Release notes (2015-01-29)
+=============================================================
+
+### Bugfixes
+
+* Fix bug that resulted in columns being dropped and recreated during migrations.
+
 0.90.3 Release notes (2015-01-27)
 =============================================================
 

@@ -248,6 +248,16 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
     return schema;
 }
 
+- (instancetype)shallowCopy {
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    NSMutableArray *objectSchema = [NSMutableArray arrayWithCapacity:_objectSchema.count];
+    for (RLMObjectSchema *schema in _objectSchema) {
+        [objectSchema addObject:[schema shallowCopy]];
+    }
+    schema.objectSchema = objectSchema;
+    return schema;
+}
+
 - (BOOL)isEqualToSchema:(RLMSchema *)schema {
     if (_objectSchema.count != schema.objectSchema.count) {
         return NO;
