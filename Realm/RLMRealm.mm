@@ -17,25 +17,22 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
-#import "RLMObject_Private.h"
+
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
-#import "RLMConstants.h"
-#import "RLMObjectStore.hpp"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
+#import "RLMObject_Private.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
-#include <exception>
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
 #include <tightdb/version.hpp>
-#include <tightdb/group_shared.hpp>
 #include <tightdb/commit_log.hpp>
-#include <tightdb/lang_bind_helper.hpp>
 
 // Notification Token
 

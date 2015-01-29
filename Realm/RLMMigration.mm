@@ -17,14 +17,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMigration_Private.h"
-#import "RLMRealm_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
-#import "RLMObjectStore.hpp"
-#import "RLMArray.h"
 
+#import "RLMAccessor.h"
+#import "RLMObject.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMResults_Private.h"
+#import "RLMSchema_Private.h"
+
+#import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>
 
 // The source realm for a migration has to use a SharedGroup to be able to share
@@ -70,13 +74,14 @@
 }
 
 - (RLMSchema *)newSchema {
-    return [RLMSchema sharedSchema];
+    return self.realm.schema;
 }
 
 - (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
     // get all objects
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
+
     if (objects && oldObjects) {
         for (long i = oldObjects.count - 1; i >= 0; i--) {
             block(oldObjects[i], objects[i]);

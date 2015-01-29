@@ -130,7 +130,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
     //        realm.addObject(array)
     //        realm.commitWriteTransaction()
     //
-    //        XCTAssertEqual(array.array.count, UInt(2), "Should have two elements in array")
+    //        XCTAssertEqual(array.array.count, Int(2), "Should have two elements in array")
     //        XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
     //        XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "a", "Second element should have property value 'a'")
     //    }

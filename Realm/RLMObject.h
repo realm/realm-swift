@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMConstants.h>
+
 #import <Realm/RLMObjectBase.h>
 
 @class RLMRealm;
@@ -48,17 +48,7 @@
  - `NSData`
  - RLMObject subclasses, so you can have many-to-one relationships.
  - `RLMArray<X>`, where X is an RLMObject subclass, so you can have many-to-many relationships.
- 
- ### Attributes for Properties
 
- You can set which of these properties should be indexed, stored inline, unique, required
- as well as delete rules for the links by implementing the attributesForProperty: method.
- 
- You can set properties to ignore (i.e. transient properties you do not want
- persisted to a Realm) by implementing ignoredProperties.
- 
- You can set default values for properties by implementing defaultPropertyValues.
- 
  ### Querying
  
  You can query an object directly via the class methods: allObjects, objectsWhere:, objectsOrderedBy:where: and objectForKeyedSubscript:
@@ -219,31 +209,11 @@
  */
 
 /**
- Implement to set custom attributes for each property.
-
- The default attributes for each property should be obtained by calling
- `[super attributesForProperty:propertyName]`, and then ORed together with
- the attributes you wish to add. For example, to index a single property:
-
-     @interface Model : RLMObject
-     @property NSString *indexedProperty;
-     @property NSString *unindexedProperty;
-     @end
-
-     @implementation Model
-     + (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-        RLMPropertyAttributes attributes = [super attributesForProperty:propertyName];
-        if ([propertyName isEqualToString:@"indexedProperty"]) {
-            attributes |= RLMPropertyAttributeIndexed;
-        }
-        return attributes;
-     }
-     @end
-
- @param propertyName    Name of property for which attributes have been requested.
- @return                Bitmask of property attributes for the given property.
+ Return an array of property names for properties which should be indexed. Only supported
+ for string properties.
+ @return    NSArray of property names.
  */
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName;
++ (NSArray *)indexedProperties;
 
 /**
  Implement to indicate the default values to be used for each property.

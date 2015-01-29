@@ -16,16 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 
+#import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+
+#import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 @implementation RLMObjectBase
-
 
 // standalone init
 - (instancetype)init {
@@ -96,14 +99,10 @@
     return self;
 }
 
-// default attributes for property implementation
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return (RLMPropertyAttributes)0;
-    // FIXME: return RLMPropertyAttributeDeleteNever;
+// default indexed properties implementation
++ (NSArray *)indexedProperties {
+    return @[];
 }
-#pragma clang diagnostic pop
 
 // default default values implementation
 + (NSDictionary *)defaultPropertyValues {

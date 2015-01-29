@@ -16,16 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 
+#import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMSwiftSupport.h"
 
 #import <objc/message.h>
 
@@ -100,7 +103,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
         }
         default: {
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
-            if (prop.attributes & RLMPropertyAttributeIndexed) {
+            if (prop.indexed) {
                 // FIXME - support other types
                 if (prop.type != RLMPropertyTypeString) {
                     NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
@@ -291,12 +294,20 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 
 static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
-    for (RLMProperty *prop in object.objectSchema.properties) {
-        if (prop.swiftListIvar) {
-            auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
-            list._rlmArray = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                   view:object->_row.get_linklist(prop.column)
-                                                                  realm:object->_realm];
+    if ([object isKindOfClass:NSClassFromString(@"RealmSwift.Object")]) {
+        for (RLMProperty *prop in object.objectSchema.properties) {
+            if (prop.swiftListIvar) {
+                RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                        view:object->_row.get_linklist(prop.column)
+                                                                       realm:object->_realm];
+                if (object.class == NSClassFromString(@"RealmSwift.MigrationObject")) {
+                    [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
+                }
+                else {
+                    auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
+                    list._rlmArray = array;
+                }
+            }
         }
     }
 }

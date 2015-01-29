@@ -16,15 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
 #import "RLMTestCase.h"
-#import "RLMSchema_Private.h"
-}
+
 #import "RLMMigration.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMObjectStore.h"
+
+#import <tightdb/table.hpp>
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -173,7 +174,7 @@ extern "C" {
 - (void)testRemoveProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool objectClassName:nil attributes:(RLMPropertyAttributes)0];
+    RLMProperty *thirdProperty = [[RLMProperty alloc] initWithName:@"deletedCol" type:RLMPropertyTypeBool objectClassName:nil indexed:NO];
     thirdProperty.column = 2;
     objectSchema.properties = [objectSchema.properties arrayByAddingObject:thirdProperty];
 
@@ -204,7 +205,7 @@ extern "C" {
 - (void)testRemoveAndAddProperty {
     // create schema to migrate from with single string column
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationObject.class];
-    RLMProperty *oldInt = [[RLMProperty alloc] initWithName:@"oldIntCol" type:RLMPropertyTypeInt objectClassName:nil attributes:(RLMPropertyAttributes)0];
+    RLMProperty *oldInt = [[RLMProperty alloc] initWithName:@"oldIntCol" type:RLMPropertyTypeInt objectClassName:nil indexed:NO];
     objectSchema.properties = @[oldInt, objectSchema.properties[1]];
 
     // create realm with old schema and populate
@@ -355,7 +356,7 @@ extern "C" {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationStringPrimaryKeyObject.class];
 
     // create without search index
-    objectSchema.primaryKeyProperty.attributes = 0;
+    objectSchema.primaryKeyProperty.indexed = NO;
 
     // create realm with old schema and populate
     RLMRealm *realm = [self realmWithSingleObject:objectSchema];
@@ -381,7 +382,7 @@ extern "C" {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
 
     // create without search index
-    objectSchema.primaryKeyProperty.attributes = 0;
+    objectSchema.primaryKeyProperty.indexed = NO;
 
     // create realm with old schema and populate
     @autoreleasepool {

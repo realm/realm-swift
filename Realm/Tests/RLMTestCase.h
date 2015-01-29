@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <XCTest/XCTest.h>
-#import <Realm/Realm.h>
 #import "RLMTestObjects.h"
 
 #ifdef __cplusplus

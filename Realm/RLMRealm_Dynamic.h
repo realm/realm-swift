@@ -16,9 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm.h"
-#import "RLMResults.h"
-#import "RLMObjectSchema.h"
+#import <Realm/RLMRealm.h>
+#import <Realm/RLMObjectSchema.h>
+#import <Realm/RLMProperty.h>
+
+@class RLMResults;
 
 @interface RLMRealm (Dynamic)
 
@@ -115,5 +117,5 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes;
+                     indexed:(BOOL)indexed;
 @end

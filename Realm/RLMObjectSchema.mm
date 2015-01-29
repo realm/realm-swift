@@ -16,29 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObjectSchema_Private.hpp"
+
 #import "RLMArray.h"
 #import "RLMListBase.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject.h"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/table.hpp>
+#import <tightdb/group.hpp>
 
-@interface RLMObject (Swift)
+@protocol RLMObjectUtil <NSObject>
 + (NSArray *)getGenericListPropertyNames:(id)obj;
-@end
-
-@implementation RLMObject (Swift)
-// We need to implement this method in Swift, but we don't want the obj-c and
-// Swift in the same target to avoid polluting the RealmSwift namespace with
-// obj-c stuff. As such, this method is overridden in RealmSwift.Object to
-// supply the real implementation at runtime without a compile-time dependency.
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
 @end
 
 // private properties
@@ -115,9 +108,8 @@
     if (NSString *primaryKey = [objectClass primaryKey]) {
         for (RLMProperty *prop in schema.properties) {
             if ([primaryKey isEqualToString:prop.name]) {
-                 // FIXME - enable for ints when we have core suppport
                 if (prop.type == RLMPropertyTypeString) {
-                    prop.attributes |= RLMPropertyAttributeIndexed;
+                    prop.indexed = YES;
                 }
                 schema.primaryKeyProperty = prop;
                 break;
@@ -148,27 +140,27 @@
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
+    NSSet *indexed = [[NSSet alloc] initWithArray:[objectClass indexedProperties]];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = @(property_getName(props[i]));
         if ([ignoredProperties containsObject:propertyName]) {
             continue;
         }
 
-        RLMPropertyAttributes atts = [objectClass attributesForProperty:propertyName];
         RLMProperty *prop = nil;
         if (isSwiftClass) {
             prop = [[RLMProperty alloc] initSwiftPropertyWithName:propertyName
-                                                       attributes:atts
+                                                          indexed:[indexed containsObject:propertyName]
                                                          property:props[i]
                                                          instance:swiftObjectInstance];
         }
         else {
-            prop = [[RLMProperty alloc] initWithName:propertyName attributes:atts property:props[i]];
+            prop = [[RLMProperty alloc] initWithName:propertyName indexed:[indexed containsObject:propertyName] property:props[i]];
         }
 
         if (prop) {
             [propArray addObject:prop];
-         }
+        }
     }
     free(props);
 
@@ -176,7 +168,8 @@
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        for (NSString *propName in [objectClass getGenericListPropertyNames:swiftObjectInstance]) {
+        Class objectUtil = NSClassFromString(@"RealmSwift.ObjectUtil");
+        for (NSString *propName in [objectUtil getGenericListPropertyNames:swiftObjectInstance]) {
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
             NSString *className = [value _rlmArray].objectClassName;
@@ -207,7 +200,7 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                               objectClassName:nil
-                                                   attributes:(RLMPropertyAttributes)0];
+                                                      indexed:NO];
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
@@ -251,6 +244,7 @@
     schema->_accessorClass = _accessorClass;
     schema->_standaloneClass = _standaloneClass;
     schema->_isSwiftClass = _isSwiftClass;
+    schema->_realm = _realm;
     schema.primaryKeyProperty = _primaryKeyProperty;
     // _table not copied as it's tightdb::Group-specific
     return schema;
@@ -283,3 +277,16 @@
 }
 
 @end
+
+tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                         NSString *className,
+                                         bool &created) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_or_add_table(tableName.UTF8String, &created);
+}
+
+tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                         NSString *className) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_table(tableName.UTF8String);
+}

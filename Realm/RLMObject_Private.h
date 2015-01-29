@@ -16,15 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
-#import "RLMObject.h"
-#import "RLMObjectSchema.h"
-#import <tightdb/row.hpp>
+#import <Realm/RLMObject.h>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
   @public
-    tightdb::Row _row;
     RLMRealm *_realm;
     // objectSchema is a cached pointer to an object stored in the RLMSchema
     // owned by _realm, so it's guaranteed to stay alive as long as this object

@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F6B894319EF3C06004E8EA8"
+               BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
                BuildableName = "Realm.framework"
-               BlueprintName = "iOS 8"
+               BlueprintName = "iOS-dynamic"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F512D8919F9A1F300746016"
-               BuildableName = "iOS 8 Tests.xctest"
-               BlueprintName = "iOS 8 Tests"
-               ReferencedContainer = "container:Realm.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -52,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F6B894319EF3C06004E8EA8"
+            BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
             BuildableName = "Realm.framework"
-            BlueprintName = "iOS 8"
+            BlueprintName = "iOS-dynamic"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -70,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F6B894319EF3C06004E8EA8"
+            BlueprintIdentifier = "29E3C7041A71C1C700B62C1D"
             BuildableName = "Realm.framework"
-            BlueprintName = "iOS 8"
+            BlueprintName = "iOS-dynamic"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

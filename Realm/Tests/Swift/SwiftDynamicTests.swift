@@ -89,7 +89,7 @@ class SwiftDynamicTests: SwiftTestCase {
 //        // verify properties
 //        let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
 //        let array = dyrealm.allObjects(SwiftAllTypesObject.className())
-//        XCTAssertEqual(array.count, UInt(2))
+//        XCTAssertEqual(array.count, Int(2))
 //
 //        let schema = dyrealm.schema[SwiftAllTypesObject.className()]
 //        for idx in 0..<10 {

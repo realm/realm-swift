@@ -18,6 +18,7 @@
 
 import XCTest
 import Realm
+import Realm.Private
 
 func testRealmPath() -> String {
     return realmPathForFile("test.realm")
