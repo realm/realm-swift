@@ -508,8 +508,9 @@ static id RLMAutorelease(id value) {
             }
             else {
                 // if we are the first realm at this path, set/align schema or perform migration if needed
-                RLMSchema *targetSchema = customSchema ?: [RLMSchema.sharedSchema copy];
-                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path), targetSchema, [realm migrationBlock:key]);
+                RLMSchema *targetSchema = customSchema ?: RLMSchema.sharedSchema;
+                NSError *error = RLMUpdateRealmToSchemaVersion(realm, schemaVersionForPath(path),
+                                                               [targetSchema copy], [realm migrationBlock:key]);
                 if (error) {
                     setOrThrowError(error, outError);
                     return nil;

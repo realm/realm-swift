@@ -176,11 +176,9 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
     // create metadata tables if neded
     bool changed = RLMRealmCreateMetadataTables(realm);
 
-    realm.schema = targetSchema;
-
     // first pass to create missing tables
     NSMutableArray *objectSchemaToUpdate = [NSMutableArray array];
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
+    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
         bool created = false;
         objectSchema.table = RLMTableForObjectClass(realm, objectSchema.className, created).get();
 
@@ -230,11 +228,8 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
     // FIXME - remove deleted tables
 
-    for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
-        objectSchema.realm = realm;
-        RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
-        RLMVerifyAndAlignColumns(tableSchema, objectSchema);
-    }
+    // set and validate final schema
+    RLMRealmSetSchema(realm, targetSchema, true);
 
     return changed;
 }
