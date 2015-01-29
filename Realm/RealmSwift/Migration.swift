@@ -154,6 +154,9 @@ exactly when and how migrations are performed.
           that occured otherwise.
 */
 public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
+    if let encryptionKey = encryptionKey {
+        return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
+    }
     return RLMRealm.migrateRealmAtPath(path)
 }
 
@@ -163,7 +166,7 @@ of a `Realm` instance.
 
 This object provides access to the previous and current `Schema`s for this migration.
 */
-public final class Migration {
+public struct Migration {
 
     // MARK: Properties
 
@@ -173,7 +176,7 @@ public final class Migration {
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
     public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
 
-    private var rlmMigration: RLMMigration
+    private let rlmMigration: RLMMigration
 
     // MARK: Altering Objects During a Migration
 
