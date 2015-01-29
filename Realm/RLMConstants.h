@@ -183,4 +183,3 @@ extern NSString * const RLMExceptionName;
 extern NSString * const RLMRealmVersionKey;
 
 extern NSString * const RLMRealmCoreVersionKey;
-
