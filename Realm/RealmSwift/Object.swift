@@ -54,6 +54,26 @@ See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
 public class Object : RLMObjectBase, Equatable {
 
+    // MARK: Properties
+
+    // FIXME: Rename to `realm`
+    /// The `Realm` this object belongs to, or `nil` if the object
+    /// does not belong to a realm (the object is standalone).
+    public var swiftRealm: Realm? {
+        if let rlmRealm = realm {
+            return Realm(rlmRealm: rlmRealm)
+        }
+        return nil
+    }
+
+    // FIXME: Rename to `objectSchema`
+    /// The `ObjectSchema` which lists the persisted properties for this object.
+    public var swiftObjectSchema: ObjectSchema { return ObjectSchema(rlmObjectSchema: objectSchema) }
+
+    // FIXME: Rename to `invalidated`
+    /// Indicates if an object can no longer be accessed.
+    public var swiftInvalidated: Bool { return invalidated }
+
     // MARK: Initializers
 
     /**
@@ -82,6 +102,26 @@ public class Object : RLMObjectBase, Equatable {
     // MARK: Constructors
 
     /**
+    Create an `Object` in the default `Realm` with the given object.
+
+    Creates an instance of this object and adds it to the default `Realm` populating
+    the object with the given object.
+
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
+
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
+
+    :returns: The created object.
+    */
+    public class func createInDefaultRealmWithObject(object: AnyObject) -> Self {
+        return createInRealm(defaultRealm(), withObject: object)
+    }
+
+    /**
     Create an `Object` in the given `Realm` with the given object.
 
     Creates an instance of this object and adds it to the given `Realm` populating
@@ -100,6 +140,128 @@ public class Object : RLMObjectBase, Equatable {
     */
     public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+    }
+
+    /**
+    Create or update an `Object` in the default `Realm` with the given object.
+
+    This method can only be called on object types with a primary key defined. If there is already
+    an object with the same primary key value in the default Realm its values are updated and the object
+    is returned. Otherwise this creates and populates a new instance of this object in the default Realm.
+
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
+
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
+
+    :returns: The created or updated object.
+
+    :see: Object.primaryKey()
+    */
+    public class func createOrUpdateInDefaultRealmWithObject(object: AnyObject) -> Self {
+        return createOrUpdateInRealm(defaultRealm(), withObject: object)
+    }
+
+    /**
+    Create or update an `Object` in the given `Realm` with the given object.
+
+    This method can only be called on object types with a primary key defined. If there is already
+    an object with the same primary key value in the specified Realm its values are updated and the object
+    is returned. Otherwise this creates and populates a new instance of this object in the specified Realm.
+
+    :param: realm  The Realm in which this object is persisted.
+    :param: object The object used to populate the object. This can be any key/value coding compliant
+                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                   or an `Array` with one object for each persisted property. An exception will be
+                   thrown if any required properties are not present and no default is set.
+
+                   When passing in an `Array`, all properties must be present,
+                   valid and in the same order as the properties defined in the model.
+
+    :returns: The created or updated object.
+
+    :see: Object.primaryKey()
+    */
+    public class func createOrUpdateInRealm(realm: Realm, withObject object: AnyObject) -> Self {
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+    }
+
+    // MARK: Object Retrieval
+
+    /**
+    Get the single object with the given primary key from the specified Realm,
+    or from the default Realm if the `realm` argument is omitted.
+
+    Returns `nil` if the object does not exist.
+
+    This method requires that `primaryKey()` be overridden on the receiving subclass.
+
+    :see: Object.primaryKey()
+
+    :returns: An object of the subclass type or `nil` if an object with the given primary key does not exist.
+    */
+    public class func objectForPrimaryKey(key: AnyObject, inRealm realm: Realm = defaultRealm()) -> Self? {
+        return unsafeBitCast(RLMGetObject(realm.rlmRealm, className(), key), self)
+    }
+
+    // MARK: Customizing
+
+    /**
+    Return an array of property names for properties which should be indexed. Only supported
+    for string and int properties.
+
+    :returns: `Array` of property names to index.
+    */
+    public class func indexedProperties() -> [String]? { return nil }
+
+    /**
+    Override to designate a property as the primary key for an `Object` subclass. Only properties of
+    type String and Int can be designated as the primary key. Primary key
+    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+    Indexes are created automatically for string primary key properties.
+
+    :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
+    */
+    public override class func primaryKey() -> String? { return nil }
+
+    // FIXME: Expose this
+//    /**
+//    Override to return an array of property names to ignore. These properties will not be persisted
+//    and are treated as transient.
+//
+//    :returns: `Array` of property names to ignore.
+//    */
+//    public class func ignoredProperties() -> [String]? { return  [] }
+
+    // MARK: Inverse Relationships
+
+    // FIXME: Don't prefix with `swift`
+    /**
+    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    be used to get the inverse relationship value for `Object` and `List` properties.
+
+    :param: className The type of object on which the relationship to query is defined.
+    :param: property  The name of the property which defines the relationship.
+
+    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    */
+    public func swiftLinkingObjectsOfClass(className: String, forProperty propertyName: String) -> [Object] {
+        return unsafeBitCast(self, RLMObject.self).linkingObjectsOfClass(className, forProperty: propertyName) as [Object]
+    }
+
+    // MARK: Property Retrieval
+
+    /// Returns or sets the value of the property with the given name.
+    public subscript(key: String) -> AnyObject? {
+        get {
+            return super[key]
+        }
+        set {
+            super[key] = newValue
+        }
     }
 
     // MARK: Private Initializers
@@ -175,8 +337,6 @@ public class ObjectUtil : NSObject {
                 properties.append(reflection[i].0)
             }
         }
-
         return properties
     }
-
 }

@@ -190,12 +190,20 @@ public class MigrationObject : Object {
 
     private var listProperties = [String: List<Object>]()
 
-    /// Returns the value of the property with the given name.
-    subscript(key: String) -> AnyObject? {
-        if (self.objectSchema[key].type == RLMPropertyType.Array) {
-            return listProperties[key]
+    /// Returns or sets the value of the property with the given name.
+    public override subscript(key: String) -> AnyObject? {
+        get {
+            if self.objectSchema[key].type == .Array {
+                return listProperties[key]
+            }
+            return super[key]
         }
-        return super[key]
+        set {
+            if self.objectSchema[key].type != .Array {
+                super[key] = newValue
+            }
+            // FIXME: Implement List property setter
+        }
     }
 
     /**
