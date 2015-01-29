@@ -95,7 +95,7 @@ public class Realm {
     public var readOnly: Bool { return rlmRealm.readOnly }
 
     /// The Schema used by this realm.
-    public var schema: Schema { return Schema(rlmSchema: rlmRealm.schema) }
+    public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /**
     Whether this Realm automatically updates when changes happen in other threads.

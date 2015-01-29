@@ -26,11 +26,11 @@ introspecting the database's schema.
 
 Schemas map to collections of tables in the core database.
 */
-public class Schema: Equatable {
+public final class Schema {
 
     // MARK: Properties
 
-    var rlmSchema: RLMSchema
+    internal var rlmSchema: RLMSchema
 
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
@@ -38,7 +38,7 @@ public class Schema: Equatable {
 
     // MARK: Initializers
 
-    init(rlmSchema: RLMSchema) {
+    internal init(_ rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }
 
@@ -47,13 +47,15 @@ public class Schema: Equatable {
     /// Returns the object schema with the given class name, if it exists.
     public subscript(className: String) -> ObjectSchema? {
         if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
-            return ObjectSchema(rlmObjectSchema: rlmObjectSchema)
+            return ObjectSchema(rlmObjectSchema)
         }
         return nil
     }
 }
 
 // MARK: Equatable
+
+extension Schema: Equatable {}
 
 /// Returns whether the two schemas are equal.
 public func ==(lhs: Schema, rhs: Schema) -> Bool {
