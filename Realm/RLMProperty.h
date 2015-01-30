@@ -43,7 +43,7 @@
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
- Whether this property is indexed.
+ Indicates if this property is indexed.
  
  @see RLMObject
  */
