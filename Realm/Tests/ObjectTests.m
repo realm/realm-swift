@@ -71,13 +71,9 @@
 @end
 
 @implementation IndexedObject
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName
++ (NSArray *)indexedProperties
 {
-    RLMPropertyAttributes superAttributes = [super attributesForProperty:propertyName];
-    if ([propertyName isEqualToString:@"name"]) {
-        superAttributes |= RLMPropertyAttributeIndexed;
-    }
-    return superAttributes;
+    return @[@"name"];
 }
 @end
 
@@ -993,10 +989,10 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 - (void)testIndex
 {
     RLMProperty *nameProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"name"];
-    XCTAssertTrue(nameProperty.attributes & RLMPropertyAttributeIndexed, @"indexed property should have an index");
+    XCTAssertTrue(nameProperty.indexed, @"indexed property should have an index");
     
     RLMProperty *ageProperty = [[RLMRealm defaultRealm] schema][IndexedObject.className][@"age"];
-    XCTAssertFalse(ageProperty.attributes & RLMPropertyAttributeIndexed, @"non-indexed property shouldn't have an index");
+    XCTAssertFalse(ageProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
 - (void)testRetainedRealmObjectUnknownKey

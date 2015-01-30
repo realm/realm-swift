@@ -23,13 +23,13 @@
 @interface RLMProperty ()
 
 - (instancetype)initWithName:(NSString *)name
-                  attributes:(RLMPropertyAttributes)attributes
+                     indexed:(BOOL)indexed
                     property:(objc_property_t)property;
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
-                               attributes:(RLMPropertyAttributes)attributes
+                                  indexed:(BOOL)indexed
                                  property:(objc_property_t)property
-                                 instance:(RLMObject *)objectInstance;
+                                 instance:(RLMObjectBase *)objectInstance;
 
 - (instancetype)initSwiftListPropertyWithName:(NSString *)name
                                          ivar:(Ivar)ivar
@@ -38,7 +38,7 @@
 // private setters
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, readwrite, assign) RLMPropertyType type;
-@property (nonatomic, readwrite) RLMPropertyAttributes attributes;
+@property (nonatomic, readwrite) BOOL indexed;
 @property (nonatomic, copy) NSString *objectClassName;
 
 // private properties

@@ -31,13 +31,13 @@
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type
              objectClassName:(NSString *)objectClassName
-                  attributes:(RLMPropertyAttributes)attributes {
+                  indexed:(BOOL)indexed {
     self = [super init];
     if (self) {
         _name = name;
         _type = type;
         _objectClassName = objectClassName;
-        _attributes = attributes;
+        _indexed = indexed;
         [self setObjcCodeFromType];
         [self updateAccessors];
     }
@@ -201,7 +201,7 @@
 }
 
 - (instancetype)initSwiftPropertyWithName:(NSString *)name
-                               attributes:(RLMPropertyAttributes)attributes
+                                  indexed:(BOOL)indexed
                                  property:(objc_property_t)property
                                  instance:(RLMObject *)obj {
     self = [super init];
@@ -210,7 +210,7 @@
     }
 
     _name = name;
-    _attributes = attributes;
+    _indexed = indexed;
 
     if ([self parseObjcProperty:property]) {
         return nil;
@@ -241,7 +241,7 @@
 }
 
 - (instancetype)initWithName:(NSString *)name
-                  attributes:(RLMPropertyAttributes)attributes
+                     indexed:(BOOL)indexed
                     property:(objc_property_t)property
 {
     self = [super init];
@@ -250,7 +250,7 @@
     }
 
     _name = name;
-    _attributes = attributes;
+    _indexed = indexed;
 
     if ([self parseObjcProperty:property]) {
         return nil;
@@ -293,7 +293,7 @@
     prop->_type = _type;
     prop->_objcType = _objcType;
     prop->_objectClassName = _objectClassName;
-    prop->_attributes = _attributes;
+    prop->_indexed = _indexed;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
     prop->_getterSel = _getterSel;

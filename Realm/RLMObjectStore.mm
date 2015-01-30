@@ -97,7 +97,7 @@ static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty 
         }
         default: {
             prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
-            if (prop.attributes & RLMPropertyAttributeIndexed) {
+            if (prop.indexed) {
                 // FIXME - support other types
                 if (prop.type != RLMPropertyTypeString) {
                     NSLog(@"RLMPropertyAttributeIndexed only supported for 'NSString' properties");
