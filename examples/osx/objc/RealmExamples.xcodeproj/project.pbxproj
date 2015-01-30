@@ -28,6 +28,7 @@
 		027838FD1A7AE8CC00553A86 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838F81A7AE8CC00553A86 /* DrawPath.m */; };
 		027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FA1A7AE8CC00553A86 /* DrawPoint.m */; };
 		027838FF1A7AE8CC00553A86 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FC1A7AE8CC00553A86 /* DrawView.m */; };
+		027839061A7C48D500553A86 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
 		E823C34D19BA4A7600D2FF5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34919BA4A7600D2FF5F /* main.m */; };
 		E823C34E19BA4A7600D2FF5F /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34B19BA4A7600D2FF5F /* Person.m */; };
@@ -61,6 +62,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				027839061A7C48D500553A86 /* Realm.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
