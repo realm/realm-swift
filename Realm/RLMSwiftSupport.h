@@ -18,9 +18,17 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMArray;
+
 @interface RLMSwiftSupport : NSObject
 
 + (BOOL)isSwiftClassName:(NSString *)className;
 + (NSString *)demangleClassName:(NSString *)className;
+
+@end
+
+@protocol RLMSwiftMigrationObject <NSObject>
+
+- (void)initalizeListPropertyWithName:(NSString *)name rlmArray:(RLMArray *)rlmArray;
 
 @end

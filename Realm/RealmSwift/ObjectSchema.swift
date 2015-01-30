@@ -18,35 +18,56 @@
 
 import Realm
 
-public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
-    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
-}
+/**
+This class represents Realm model object schemas persisted to Realm in a Schema.
 
-public class ObjectSchema: Equatable {
+When using Realm, ObjectSchema objects allow performing migrations and
+introspecting the database's schema.
+
+Object schemas map to tables in the core database.
+*/
+public final class ObjectSchema {
+
     // MARK: Properties
 
-    var rlmObjectSchema: RLMObjectSchema
-    public var className: String { return rlmObjectSchema.className }
+    internal var rlmObjectSchema: RLMObjectSchema
+
+    /// Array of persisted `Property` objects for an object.
     public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+
+    /// The name of the class this schema describes.
+    public var className: String { return rlmObjectSchema.className }
+
+    /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
-            return Property(rlmProperty: rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }
 
     // MARK: Initializers
 
-    init(rlmObjectSchema: RLMObjectSchema) {
+    internal init(_ rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
 
     // MARK: Property Retrieval
 
+    /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
-        if let rlmProperty = rlmObjectSchema[className] {
-            return Property(rlmProperty: rlmProperty)
+        if let rlmProperty = rlmObjectSchema[propertyName] {
+            return Property(rlmProperty)
         }
         return nil
     }
+}
+
+// MARK: Equatable
+
+extension ObjectSchema: Equatable {}
+
+/// Returns whether the two object schemas are equal.
+public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
+    return lhs.rlmObjectSchema.isEqualToObjectSchema(rhs.rlmObjectSchema)
 }
