@@ -1,3 +1,22 @@
+
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* `attributesForProperty:` has been removed from `RLMObject`. You now specify indexed
+  properties by implementing the `indexedProperties` method.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 0.90.4 Release notes (2015-01-29)
 =============================================================
 

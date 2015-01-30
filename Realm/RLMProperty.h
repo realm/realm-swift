@@ -43,11 +43,11 @@
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
- Property attributes.
+ Indicates if this property is indexed.
  
- @see RLMPropertyAttributes
+ @see RLMObject
  */
-@property (nonatomic, readonly) RLMPropertyAttributes attributes;
+@property (nonatomic, readonly) BOOL indexed;
 
 /**
  Object class name - specify object types for RLMObject and RLMArray properties.

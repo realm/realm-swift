@@ -130,8 +130,8 @@
     return [super className];
 }
 
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return [super attributesForProperty:propertyName];
++ (NSArray *)indexedProperties {
+    return @[];
 }
 
 + (NSDictionary *)defaultPropertyValues {

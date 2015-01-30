@@ -96,14 +96,10 @@
     return self;
 }
 
-// default attributes for property implementation
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-+ (RLMPropertyAttributes)attributesForProperty:(NSString *)propertyName {
-    return (RLMPropertyAttributes)0;
-    // FIXME: return RLMPropertyAttributeDeleteNever;
+// default indexed properties implementation
++ (NSArray *)indexedProperties {
+    return @[];
 }
-#pragma clang diagnostic pop
 
 // default default values implementation
 + (NSDictionary *)defaultPropertyValues {
