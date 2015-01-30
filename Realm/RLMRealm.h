@@ -122,7 +122,7 @@
  Set the encryption key to use when opening Realms at a certain path.
 
  This can be used as an alternative to explicitly passing the key to
- `encryptedRealmWithPath:key:readOnly:error:` each time a Realm instance is
+ `realmWithPath:key:readOnly:error:` each time a Realm instance is
  needed. The encryption key will be used any time a Realm is opened with
  `realmWithPath:` or `defaultRealm`.
 
