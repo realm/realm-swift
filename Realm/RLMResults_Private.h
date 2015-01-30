@@ -16,21 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
+#import "RLMResults.h"
 
-namespace tightdb {
-    class Table;
-    template<typename T> class BasicTableRef;
-    typedef BasicTableRef<Table> TableRef;
+@class RLMObjectSchema;
+
+@interface RLMResults () {
+  @public
+    RLMObjectSchema *_objectSchema;
 }
-
-// RLMObjectSchema private
-@interface RLMObjectSchema ()
-
-@property (nonatomic) tightdb::Table *table;
-
 @end
-
-// get the table used to store object of objectClass
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className, bool &created);
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className);
