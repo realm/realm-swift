@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import "RLMSchema.h"
-#import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
+
+@import Realm.Private;
 
 @interface DynamicTests : RLMTestCase
 @end

@@ -16,22 +16,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMObjectSchema_Private.hpp"
+
 #import "RLMArray.h"
 #import "RLMListBase.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject.h"
 #import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/table.hpp>
+#import <tightdb/group.hpp>
 
-@interface RLMObject (Swift)
+@interface RLMObjectBase (Swift)
 + (NSArray *)getGenericListPropertyNames:(id)obj;
 @end
 
-@implementation RLMObject (Swift)
+@implementation RLMObjectBase (Swift)
 // We need to implement this method in Swift, but we don't want the obj-c and
 // Swift in the same target to avoid polluting the RealmSwift namespace with
 // obj-c stuff. As such, this method is overridden in RealmSwift.Object to
@@ -97,7 +100,7 @@
     schema.objectClass = objectClass;
     schema.accessorClass = RLMObject.class;
     schema.isSwiftClass = isSwift;
-    
+
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
@@ -195,7 +198,7 @@
     if (!table) {
         return nil;
     }
-    
+
     // create array of RLMProperties
     size_t count = table->get_column_count();
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
@@ -250,6 +253,7 @@
 
     // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
+
     // _table not copied as it's tightdb::Group-specific
     return schema;
 }
@@ -304,3 +308,16 @@
 }
 
 @end
+
+tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                         NSString *className,
+                                         bool &created) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_or_add_table(tableName.UTF8String, &created);
+}
+
+tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+                                         NSString *className) {
+    NSString *tableName = RLMTableNameForClass(className);
+    return realm.group->get_table(tableName.UTF8String);
+}

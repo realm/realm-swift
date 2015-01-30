@@ -16,16 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMVersion.h"
+#import "RLMSchema_Private.h"
 
 static inline bool nsnumber_is_like_integer(NSNumber *obj)
 {

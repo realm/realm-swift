@@ -16,17 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObject_Private.h"
+#import "RLMResults_Private.h"
+#import "RLMObject_Private.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.hpp"
+#import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
+#import <tightdb/table_view.hpp>
 
 //
 // RLMResults implementation
@@ -36,7 +38,6 @@
     tightdb::TableView _backingView;
     BOOL _viewCreated;
     RowIndexes::Sorter _sortOrder;
-    RLMObjectSchema *_objectSchema;
 
 @protected
     RLMRealm *_realm;

@@ -16,24 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import <Realm/RLMResults.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-#ifdef __cplusplus
+@class RLMObjectSchema;
+
+@interface RLMResults () {
+  @public
+    RLMObjectSchema *_objectSchema;
 }
-#endif
-
-@interface RLMTestCase : XCTestCase
-
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-+ (void)deleteFiles;
-
 @end

@@ -19,11 +19,15 @@
 #import <XCTest/XCTest.h>
 
 #import "RLMTestCase.h"
+
+#import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
+#import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
-#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 
+#import <algorithm>
 #import <objc/runtime.h>
 
 @interface SchemaTestClassBase : RLMObject
