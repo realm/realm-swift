@@ -181,13 +181,6 @@ NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 NSMapTable *s_serverFiles = [NSMapTable strongToWeakObjectsMapTable];
 unsigned long s_nextLocalFileIdent = 0;
 NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
-NSOperationQueue *s_backgroundOperationQueue = nil;
-
-// Access to s_backgroundTaskQueue (referenced object), and
-// s_backgroundProcessingInProgresss must be synchronized with
-// respect to s_backgroundTaskQueue.
-NSMutableArray *s_backgroundTaskQueue = [NSMutableArray array];
-BOOL s_backgroundProcessingInProgress = NO;
 
 } // anonymous namespace
 
@@ -210,16 +203,6 @@ BOOL s_backgroundProcessingInProgress = NO;
 - (void)connected;
 - (void)handleTransactMessageWithVersion:(Replication::version_type)version andData:(NSData *)data;
 - (void)handleAcceptMessageWithVersion:(Replication::version_type)version;
-- (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
-                                            andData:(NSData *)data;
-@end
-
-@interface RLMForeignTransactLog : NSObject
-@property (weak, readonly, nonatomic) RLMServerFile *file;
-@property (readonly, nonatomic) Replication::version_type version;
-@property (readonly, nonatomic) NSData *data;
-- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
-                        data:(NSData *)data;
 @end
 
 
@@ -663,6 +646,8 @@ BOOL s_backgroundProcessingInProgress = NO;
     Replication::version_type _latestVersionUploaded;
     Replication::version_type _latestVersionIntegratedByServer;
     BOOL _uploadInProgress;
+
+    NSOperationQueue *_backgroundOperationQueue;
 }
 
 
@@ -687,6 +672,10 @@ BOOL s_backgroundProcessingInProgress = NO;
         _backgroundSharedGroup = make_unique<SharedGroup>(*_backgroundTransactLogRegistry, durability);
 
         _uploadInProgress = NO;
+
+        _backgroundOperationQueue = [[NSOperationQueue alloc] init];
+        _backgroundOperationQueue.name = @"io.realm.sync";
+        _backgroundOperationQueue.maxConcurrentOperationCount = 1;
     }
     return self;
 }
@@ -781,17 +770,14 @@ BOOL s_backgroundProcessingInProgress = NO;
     }
     _latestVersionIntegratedByServer = version;
 
-    RLMForeignTransactLog *log =
-        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:data];
-
     // FIXME: Consider whether we should attempt to apply small
     // transactions immediately on the main thread (right here) if
-    // auto-refresh is enabled, `s_backgroundTaskQueue` is empty, and
-    // a try-lock on the write-transaction mutex succeeds. This might
-    // be an effective way of reducing latency due to context
+    // auto-refresh is enabled, `s_backgroundOperationQueue` is empty,
+    // and a try-lock on the write-transaction mutex succeeds. This
+    // might be an effective way of reducing latency due to context
     // switches.
 
-    [RLMServerFile addBackgroundTaskWithLog:log];
+    [self addBackgroundTaskWithVersion:version andData:data];
 }
 
 
@@ -806,49 +792,32 @@ BOOL s_backgroundProcessingInProgress = NO;
     }
     _latestVersionIntegratedByServer = version;
 
-    RLMForeignTransactLog *log =
-        [[RLMForeignTransactLog alloc] initWithFile:self version:version data:nil];
-
-    [RLMServerFile addBackgroundTaskWithLog:log];
+    [self addBackgroundTaskWithVersion:version andData:nil];
 }
 
 
-+ (void)addBackgroundTaskWithLog:(RLMForeignTransactLog *)log {
-    @synchronized (s_backgroundTaskQueue) {
-        [s_backgroundTaskQueue addObject:log];
-        if (s_backgroundProcessingInProgress)
-            return;
-        s_backgroundProcessingInProgress = YES;
-    }
-    [s_backgroundOperationQueue addOperationWithBlock:^{
-            NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
-            for (;;) {
-                RLMForeignTransactLog *log;
-                @synchronized (s_backgroundTaskQueue) {
-                    if (s_backgroundTaskQueue.count == 0) {
-                        s_backgroundProcessingInProgress = NO;
-                        return;
-                    }
-                    log = s_backgroundTaskQueue.firstObject;
-                    [s_backgroundTaskQueue removeObjectAtIndex:0];
-                }
-                {
-                    RLMServerFile *file = log.file; // from weak
-                    if (!file)
-                        continue;
-                    if (log.data)
-                        [file backgroundThreadApplyTransactLogWithVersion:log.version andData:log.data];
-                }
-                [mainQueue addOperationWithBlock:^{
-                        [log.file markVersionIntegratedByServer:log.version];
-                    }];
-            }
+- (void)addBackgroundTaskWithVersion:(Replication::version_type)version andData:(NSData *)data {
+    __weak RLMServerFile *weakSelf = self;
+    [_backgroundOperationQueue addOperationWithBlock:^{
+            [weakSelf backgroundTaskWithVersion:version andData:data];
         }];
 }
 
 
-- (void)backgroundThreadApplyTransactLogWithVersion:(Replication::version_type)version
-                                            andData:(NSData *)data {
+- (void)backgroundTaskWithVersion:(Replication::version_type)version andData:(NSData *)data {
+    if (data)
+        [self backgroundApplyChangesetWithVersion:version andData:data];
+
+    __weak RLMServerFile *weakSelf = self;
+    NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+    [mainQueue addOperationWithBlock:^{
+            [weakSelf markVersionIntegratedByServer:version];
+        }];
+}
+
+
+- (void)backgroundApplyChangesetWithVersion:(Replication::version_type)version
+                                    andData:(NSData *)data {
     typedef unsigned long long ulonglong;
     Replication::version_type baseVersion = version - 1;
     const char *data2 = static_cast<const char *>(data.bytes);
@@ -924,22 +893,6 @@ BOOL s_backgroundProcessingInProgress = NO;
     [mainQueue addOperationWithBlock:^{
             [weakConnection sendUnbindMessageWithIdent:ident];
         }];
-}
-
-@end
-
-
-@implementation RLMForeignTransactLog {}
-
-- (instancetype)initWithFile:(RLMServerFile *)file version:(Replication::version_type)version
-                        data:(NSData *)data {
-    self = [super init];
-    if (self) {
-        _file = file;
-        _version = version;
-        _data = data;
-    }
-    return self;
 }
 
 @end
@@ -1271,10 +1224,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                         }
                         RLMServerConnection *conn = [s_serverConnections objectForKey:hostKey];
                         if (!conn) {
-                            if (!s_backgroundOperationQueue) {
-                                s_backgroundOperationQueue = [[NSOperationQueue alloc] init];
-                                s_backgroundOperationQueue.name = @"io.realm.sync";
-                            }
                             conn = [[RLMServerConnection alloc] initWithAddress:serverBaseURL.host
                                                                            port:serverBaseURL.port];
                             [s_serverConnections setObject:conn forKey:hostKey];
