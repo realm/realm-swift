@@ -83,14 +83,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
                     if newObject["fullName"] as String == "JP McDonald" {
-                        let jpsDog = Pet(object: ["Jimbo", "dog"])
-                        newObject["pets"].addObject(jpsDog)
+                        let jpsDog = migration.create(Pet.className(), withObject: ["Jimbo", "dog"])
+                        let dogs = newObject["pets"] as List<Object>
+                        dogs.append(jpsDog)
                     }
                 }
             }
             println("Migration complete.")
         }
-        setSchemaVersion(3, migrationBlock)
+
+        setDefaultRealmSchemaVersion(3, migrationBlock)
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
@@ -103,6 +105,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let v2Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v2.realm")
         let realmv1Path = defaultParentPath.stringByAppendingPathComponent("default-v1.realm")
         let realmv2Path = defaultParentPath.stringByAppendingPathComponent("default-v2.realm")
+        setSchemaVersion(3, realmv1Path, migrationBlock)
+        setSchemaVersion(3, realmv2Path, migrationBlock)
 
         NSFileManager.defaultManager().removeItemAtPath(realmv1Path, error: nil)
         NSFileManager.defaultManager().copyItemAtPath(v1Path, toPath: realmv1Path, error: nil)

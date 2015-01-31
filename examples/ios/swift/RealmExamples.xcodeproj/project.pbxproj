@@ -30,8 +30,22 @@
 		C01304E61A60A6D400EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C01304E81A60A6F000EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C01304EA1A60B77B00EB3E1E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C027658E1A6F009400B1A25D /* sixsquare.realm in Resources */ = {isa = PBXBuildFile; fileRef = C027658C1A6F003300B1A25D /* sixsquare.realm */; };
+		C02765961A6F04D100B1A25D /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C03634731A3A594900443367 /* LaunchScreen.xib in Sources */ = {isa = PBXBuildFile; fileRef = C03634721A3A58DF00443367 /* LaunchScreen.xib */; };
+		C04171751A3A462200D7812C /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
+		C04171831A3A478800D7812C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C041717D1A3A478700D7812C /* APIClient.swift */; };
+		C04171841A3A478800D7812C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C041717E1A3A478700D7812C /* AppDelegate.swift */; };
+		C04171851A3A478800D7812C /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C041717F1A3A478700D7812C /* LocationManager.swift */; };
+		C04171861A3A478800D7812C /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171801A3A478800D7812C /* Restaurant.swift */; };
+		C04171881A3A478800D7812C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04171821A3A478800D7812C /* ViewController.swift */; };
+		C05093D51A3B8A7300B67E73 /* VenueScoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */; };
+		C05093D71A3B8E4600B67E73 /* LocationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */; };
+		C093D2371A3A8A9A00916140 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2361A3A8A9A00916140 /* Category.swift */; };
+		C093D2391A3AA95400916140 /* RestaurantLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D2381A3AA95400916140 /* RestaurantLocation.swift */; };
 		C09C491B1A6061F900638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C09C491D1A6068EB00638C9F /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C0FB1B551A6DB39200EEF867 /* CategoryPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FB1B541A6DB39200EEF867 /* CategoryPickerView.swift */; };
 		E886FB591A12A6FC00CB2D0B /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B91519D103A70036D6C3 /* libc++.dylib */; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
 		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
@@ -50,6 +64,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C04171701A3A462200D7812C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E805758D19BA55E600376620 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0295B90B19D1034F0036D6C3;
+			remoteInfo = Realm;
+		};
 		E886FB531A12A6FC00CB2D0B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E805758D19BA55E600376620 /* Project object */;
@@ -135,6 +156,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C02765951A6F04CC00B1A25D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C02765961A6F04D100B1A25D /* RealmSwift.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C09C490D1A6059BA00638C9F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -160,7 +191,21 @@
 /* Begin PBXFileReference section */
 		0295B91519D103A70036D6C3 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C027658C1A6F003300B1A25D /* sixsquare.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = sixsquare.realm; sourceTree = "<group>"; };
+		C03634721A3A58DF00443367 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		C03634751A3A5EFC00443367 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C041717A1A3A462200D7812C /* Networking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Networking.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C041717D1A3A478700D7812C /* APIClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		C041717E1A3A478700D7812C /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C041717F1A3A478700D7812C /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		C04171801A3A478800D7812C /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
+		C04171821A3A478800D7812C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VenueScoreView.swift; sourceTree = "<group>"; };
+		C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationAnnotationView.swift; sourceTree = "<group>"; };
+		C093D2361A3A8A9A00916140 /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		C093D2381A3AA95400916140 /* RestaurantLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantLocation.swift; sourceTree = "<group>"; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../build/ios/RealmSwift.framework; sourceTree = "<group>"; };
+		C0FB1B541A6DB39200EEF867 /* CategoryPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryPickerView.swift; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -189,6 +234,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C04171741A3A462200D7812C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C04171751A3A462200D7812C /* libc++.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB581A12A6FC00CB2D0B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -250,6 +303,26 @@
 			path = ../../../Realm/Swift;
 			sourceTree = "<group>";
 		};
+		C041717C1A3A464E00D7812C /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				C027658C1A6F003300B1A25D /* sixsquare.realm */,
+				C03634721A3A58DF00443367 /* LaunchScreen.xib */,
+				C03634751A3A5EFC00443367 /* Info.plist */,
+				C041717D1A3A478700D7812C /* APIClient.swift */,
+				C041717E1A3A478700D7812C /* AppDelegate.swift */,
+				C041717F1A3A478700D7812C /* LocationManager.swift */,
+				C04171801A3A478800D7812C /* Restaurant.swift */,
+				C04171821A3A478800D7812C /* ViewController.swift */,
+				C093D2361A3A8A9A00916140 /* Category.swift */,
+				C093D2381A3AA95400916140 /* RestaurantLocation.swift */,
+				C05093D41A3B8A7300B67E73 /* VenueScoreView.swift */,
+				C05093D61A3B8E4600B67E73 /* LocationAnnotationView.swift */,
+				C0FB1B541A6DB39200EEF867 /* CategoryPickerView.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
@@ -258,6 +331,7 @@
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
 				E805759619BA55E600376620 /* Products */,
+				C041717C1A3A464E00D7812C /* Networking */,
 				0295B90519D103180036D6C3 /* RealmSwift */,
 				E8CB088F19BA6B000018434A /* Simple */,
 				E8CB089419BA6B080018434A /* TableView */,
@@ -271,8 +345,9 @@
 				E8CB07EF19BA6AB60018434A /* Encryption.app */,
 				E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */,
 				E8CB081419BA6ABD0018434A /* Migration.app */,
-				E8CB085E19BA6ACA0018434A /* Simple.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
+				E8CB085E19BA6ACA0018434A /* Simple.app */,
+				C041717A1A3A462200D7812C /* Networking.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -342,6 +417,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C041716E1A3A462200D7812C /* Networking */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C04171771A3A462200D7812C /* Build configuration list for PBXNativeTarget "Networking" */;
+			buildPhases = (
+				C04171711A3A462200D7812C /* Sources */,
+				C04171741A3A462200D7812C /* Frameworks */,
+				C027658D1A6F009000B1A25D /* Resources */,
+				C02765951A6F04CC00B1A25D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C041716F1A3A462200D7812C /* PBXTargetDependency */,
+			);
+			name = Networking;
+			productName = Simple;
+			productReference = C041717A1A3A462200D7812C /* Networking.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E886FB511A12A6FC00CB2D0B /* GroupedTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E886FB5D1A12A6FC00CB2D0B /* Build configuration list for PBXNativeTarget "GroupedTableView" */;
@@ -499,6 +593,7 @@
 				E8CB07EE19BA6AB60018434A /* Encryption */,
 				E886FB511A12A6FC00CB2D0B /* GroupedTableView */,
 				E8CB081319BA6ABD0018434A /* Migration */,
+				C041716E1A3A462200D7812C /* Networking */,
 				E8CB085D19BA6ACA0018434A /* Simple */,
 				E8CB083819BA6AC60018434A /* TableView */,
 				0295B90B19D1034F0036D6C3 /* Realm */,
@@ -507,6 +602,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C027658D1A6F009000B1A25D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C027658E1A6F009400B1A25D /* sixsquare.realm in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB5B1A12A6FC00CB2D0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -552,6 +655,24 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C04171711A3A462200D7812C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C03634731A3A594900443367 /* LaunchScreen.xib in Sources */,
+				C04171841A3A478800D7812C /* AppDelegate.swift in Sources */,
+				C093D2391A3AA95400916140 /* RestaurantLocation.swift in Sources */,
+				C04171861A3A478800D7812C /* Restaurant.swift in Sources */,
+				C04171851A3A478800D7812C /* LocationManager.swift in Sources */,
+				C04171881A3A478800D7812C /* ViewController.swift in Sources */,
+				C04171831A3A478800D7812C /* APIClient.swift in Sources */,
+				C093D2371A3A8A9A00916140 /* Category.swift in Sources */,
+				C05093D51A3B8A7300B67E73 /* VenueScoreView.swift in Sources */,
+				C0FB1B551A6DB39200EEF867 /* CategoryPickerView.swift in Sources */,
+				C05093D71A3B8E4600B67E73 /* LocationAnnotationView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E886FB541A12A6FC00CB2D0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -606,6 +727,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C041716F1A3A462200D7812C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0295B90B19D1034F0036D6C3 /* Realm */;
+			targetProxy = C04171701A3A462200D7812C /* PBXContainerItemProxy */;
+		};
 		E886FB521A12A6FC00CB2D0B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0295B90B19D1034F0036D6C3 /* Realm */;
@@ -650,6 +776,32 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		C04171781A3A462200D7812C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/Networking/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = Networking;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C04171791A3A462200D7812C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "$(SRCROOT)/Networking/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = Networking;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -898,6 +1050,15 @@
 			buildConfigurations = (
 				0295B90D19D1034F0036D6C3 /* Debug */,
 				0295B90E19D1034F0036D6C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C04171771A3A462200D7812C /* Build configuration list for PBXNativeTarget "Networking" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04171781A3A462200D7812C /* Debug */,
+				C04171791A3A462200D7812C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
