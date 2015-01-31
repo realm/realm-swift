@@ -172,10 +172,10 @@ static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObjectBase *link,
     if (link.realm != realm) {
         // only try to update if link object has primary key
         if ((options & RLMCreationOptionsUpdateOrCreate) && link.objectSchema.primaryKeyProperty) {
-            link = [link.class createOrUpdateInRealm:realm withObject:link];
+            link = RLMCreateObjectInRealmWithValue(realm, link.objectSchema.className, link, RLMCreationOptionsUpdateOrCreate | RLMCreationOptionsAllowCopy);
         }
         else if (options & RLMCreationOptionsAllowCopy) {
-            link = [link.class createInRealm:realm withObject:link];
+            link = RLMCreateObjectInRealmWithValue(realm, link.objectSchema.className, link, RLMCreationOptionsAllowCopy);
         }
         else {
             RLMAddObjectToRealm(link, realm, options);
