@@ -21,6 +21,14 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		027838DD1A7AE77A00553A86 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DC1A7AE77A00553A86 /* AppDelegate.m */; };
+		027838DF1A7AE77A00553A86 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838DE1A7AE77A00553A86 /* main.m */; };
+		027838E11A7AE77A00553A86 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 027838E01A7AE77A00553A86 /* Images.xcassets */; };
+		027838E41A7AE77A00553A86 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 027838E21A7AE77A00553A86 /* MainMenu.xib */; };
+		027838FD1A7AE8CC00553A86 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838F81A7AE8CC00553A86 /* DrawPath.m */; };
+		027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FA1A7AE8CC00553A86 /* DrawPoint.m */; };
+		027838FF1A7AE8CC00553A86 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 027838FC1A7AE8CC00553A86 /* DrawView.m */; };
+		027839061A7C48D500553A86 /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E85A517019BA76B7006C63CB /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F1E82019BA4A3800FAD64E /* Foundation.framework */; };
 		E823C34D19BA4A7600D2FF5F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34919BA4A7600D2FF5F /* main.m */; };
 		E823C34E19BA4A7600D2FF5F /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = E823C34B19BA4A7600D2FF5F /* Person.m */; };
@@ -31,6 +39,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		027839001A7AE94800553A86 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E85A516B19BA7643006C63CB;
+			remoteInfo = Realm;
+		};
 		E8FD2E6819BA81D100AAE423 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8F1E81519BA4A3800FAD64E /* Project object */;
@@ -41,6 +56,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		027839021A7C153D00553A86 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				027839061A7C48D500553A86 /* Realm.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E823C33A19BA4A5F00D2FF5F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
@@ -55,6 +80,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		027838D71A7AE77A00553A86 /* Draw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Draw.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		027838DA1A7AE77A00553A86 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		027838DB1A7AE77A00553A86 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		027838DC1A7AE77A00553A86 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		027838DE1A7AE77A00553A86 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		027838E01A7AE77A00553A86 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		027838E31A7AE77A00553A86 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		027838F71A7AE8CC00553A86 /* DrawPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPath.h; sourceTree = "<group>"; };
+		027838F81A7AE8CC00553A86 /* DrawPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPath.m; sourceTree = "<group>"; };
+		027838F91A7AE8CC00553A86 /* DrawPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPoint.h; sourceTree = "<group>"; };
+		027838FA1A7AE8CC00553A86 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
+		027838FB1A7AE8CC00553A86 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
+		027838FC1A7AE8CC00553A86 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 		E823C33C19BA4A5F00D2FF5F /* JSONImport */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONImport; sourceTree = BUILT_PRODUCTS_DIR; };
 		E823C34919BA4A7600D2FF5F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E823C34A19BA4A7600D2FF5F /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -66,6 +104,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		027838D41A7AE77A00553A86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E823C33919BA4A5F00D2FF5F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -79,6 +124,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		027838D81A7AE77A00553A86 /* Draw */ = {
+			isa = PBXGroup;
+			children = (
+				027838DB1A7AE77A00553A86 /* AppDelegate.h */,
+				027838DC1A7AE77A00553A86 /* AppDelegate.m */,
+				027838F71A7AE8CC00553A86 /* DrawPath.h */,
+				027838F81A7AE8CC00553A86 /* DrawPath.m */,
+				027838F91A7AE8CC00553A86 /* DrawPoint.h */,
+				027838FA1A7AE8CC00553A86 /* DrawPoint.m */,
+				027838FB1A7AE8CC00553A86 /* DrawView.h */,
+				027838FC1A7AE8CC00553A86 /* DrawView.m */,
+				027838E01A7AE77A00553A86 /* Images.xcassets */,
+				027838E21A7AE77A00553A86 /* MainMenu.xib */,
+				027838D91A7AE77A00553A86 /* Supporting Files */,
+			);
+			path = Draw;
+			sourceTree = "<group>";
+		};
+		027838D91A7AE77A00553A86 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				027838DA1A7AE77A00553A86 /* Info.plist */,
+				027838DE1A7AE77A00553A86 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		E823C34819BA4A7600D2FF5F /* JSONImport */ = {
 			isa = PBXGroup;
 			children = (
@@ -94,6 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				E823C34819BA4A7600D2FF5F /* JSONImport */,
+				027838D81A7AE77A00553A86 /* Draw */,
 				E8F1E81F19BA4A3800FAD64E /* Frameworks */,
 				E8F1E81E19BA4A3800FAD64E /* Products */,
 			);
@@ -103,6 +176,7 @@
 			isa = PBXGroup;
 			children = (
 				E823C33C19BA4A5F00D2FF5F /* JSONImport */,
+				027838D71A7AE77A00553A86 /* Draw.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,6 +194,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		027838D61A7AE77A00553A86 /* Draw */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 027838F11A7AE77A00553A86 /* Build configuration list for PBXNativeTarget "Draw" */;
+			buildPhases = (
+				027838D31A7AE77A00553A86 /* Sources */,
+				027838D41A7AE77A00553A86 /* Frameworks */,
+				027838D51A7AE77A00553A86 /* Resources */,
+				027839021A7C153D00553A86 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				027839011A7AE94800553A86 /* PBXTargetDependency */,
+			);
+			name = Draw;
+			productName = Draw;
+			productReference = 027838D71A7AE77A00553A86 /* Draw.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E823C33B19BA4A5F00D2FF5F /* JSONImport */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E823C34719BA4A5F00D2FF5F /* Build configuration list for PBXNativeTarget "JSONImport" */;
@@ -146,6 +239,11 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					027838D61A7AE77A00553A86 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
 			};
 			buildConfigurationList = E8F1E81819BA4A3800FAD64E /* Build configuration list for PBXProject "RealmExamples" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -153,6 +251,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = E8F1E81419BA4A3800FAD64E;
 			productRefGroup = E8F1E81E19BA4A3800FAD64E /* Products */;
@@ -161,9 +260,22 @@
 			targets = (
 				E823C33B19BA4A5F00D2FF5F /* JSONImport */,
 				E85A516B19BA7643006C63CB /* Realm */,
+				027838D61A7AE77A00553A86 /* Draw */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		027838D51A7AE77A00553A86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				027838E11A7AE77A00553A86 /* Images.xcassets in Resources */,
+				027838E41A7AE77A00553A86 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		E85A516F19BA7649006C63CB /* Build Realm */ = {
@@ -183,6 +295,18 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		027838D31A7AE77A00553A86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				027838DF1A7AE77A00553A86 /* main.m in Sources */,
+				027838FD1A7AE8CC00553A86 /* DrawPath.m in Sources */,
+				027838FE1A7AE8CC00553A86 /* DrawPoint.m in Sources */,
+				027838DD1A7AE77A00553A86 /* AppDelegate.m in Sources */,
+				027838FF1A7AE8CC00553A86 /* DrawView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E823C33819BA4A5F00D2FF5F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -195,6 +319,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		027839011A7AE94800553A86 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E85A516B19BA7643006C63CB /* Realm */;
+			targetProxy = 027839001A7AE94800553A86 /* PBXContainerItemProxy */;
+		};
 		E8FD2E6919BA81D100AAE423 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E85A516B19BA7643006C63CB /* Realm */;
@@ -202,7 +331,52 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		027838E21A7AE77A00553A86 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				027838E31A7AE77A00553A86 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		027838F21A7AE77A00553A86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = Draw/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		027838F31A7AE77A00553A86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				INFOPLIST_FILE = Draw/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		E823C34519BA4A5F00D2FF5F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -318,6 +492,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		027838F11A7AE77A00553A86 /* Build configuration list for PBXNativeTarget "Draw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				027838F21A7AE77A00553A86 /* Debug */,
+				027838F31A7AE77A00553A86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E823C34719BA4A5F00D2FF5F /* Build configuration list for PBXNativeTarget "JSONImport" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
