@@ -536,7 +536,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"";
+			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"";
 		};
 		29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
