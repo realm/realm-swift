@@ -17,12 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmSwift
 import Security
 import UIKit
 
 // Model definition
-class EncryptionObject: RLMObject {
+class EncryptionObject: Object {
     dynamic var stringProp = ""
 }
 
@@ -45,22 +45,23 @@ class ViewController: UIViewController {
         // Use an autorelease pool to close the Realm at the end of the block, so
         // that we can try to reopen it with different keys
         autoreleasepool {
-            let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
-                encryptionKey: self.getKey(), readOnly: false, error: nil)
+            if let realm = Realm(path: defaultRealmPath(),
+                encryptionKey: self.getKey(), readOnly: false, error: nil) {
 
-            // Add an object
-            realm.transactionWithBlock {
-                let obj = EncryptionObject()
-                obj.stringProp = "abcd"
-                realm.addObject(obj)
+                // Add an object
+                realm.write {
+                    let obj = EncryptionObject()
+                    obj.stringProp = "abcd"
+                    realm.add(obj)
+                }
             }
         }
 
         // Opening with wrong key fails since it decrypts to the wrong thing
         autoreleasepool {
             var error: NSError? = nil
-            RLMRealm(path: RLMRealm.defaultRealmPath(),
-                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
+            Realm(path: defaultRealmPath(),
+                encryptionKey: "1234567890123456789012345678901234567890123456789012345678901234".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!,
                 readOnly: false, error: &error)
             self.log("Open with wrong key: \(error)")
         }
@@ -68,16 +69,19 @@ class ViewController: UIViewController {
         // Opening wihout supplying a key at all fails
         autoreleasepool {
             var error: NSError? = nil
-            RLMRealm(path: RLMRealm.defaultRealmPath(), readOnly: false, error: &error)
+            Realm(path: defaultRealmPath(), readOnly: false, error: &error)
             self.log("Open with no key: \(error)")
         }
 
         // Reopening with the correct key works and can read the data
         autoreleasepool {
-            let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
-                encryptionKey: self.getKey(), readOnly: false, error: nil)
-
-            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject()! as EncryptionObject).stringProp)")
+            var error: NSError? = nil
+            if let realm = Realm(path: defaultRealmPath(),
+                encryptionKey: self.getKey(),
+                readOnly: false,
+                error: &error) {
+                self.log("Saved object: \((objects(EncryptionObject).first!).stringProp)")
+            }
         }
     }
 
