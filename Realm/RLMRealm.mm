@@ -174,12 +174,14 @@ bool isDebuggerAttached() {
 
 NSMutableDictionary *s_serverBaseURLS = [NSMutableDictionary dictionary];
 
-// Access to s_serverFiles (referenced object),
-// s_nextLocalFileIdent, s_serverConnections (referenced
-// object), and s_backgroundOperationQueue (reference) must be
-// synchronized with respect to s_realmsPerPath.
+// Access to s_serverFiles (referenced object), s_nextLocalFileIdent, and
+// s_serverConnections (referenced object), must be synchronized with respect to
+// s_realmsPerPath.
+
+// Maps local path to RLMServerFile instance
 NSMapTable *s_serverFiles = [NSMapTable strongToWeakObjectsMapTable];
-unsigned long s_nextLocalFileIdent = 0;
+
+// Maps "server:port" to RLMServerConnection instance
 NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 } // anonymous namespace
@@ -195,13 +197,16 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 @end
 
 @interface RLMServerConnection : NSObject <NSStreamDelegate>
-@property (readonly, nonatomic) BOOL isConnected;
+@property (readonly, nonatomic) BOOL isOpen;
 @end
 
 @interface RLMServerFile : NSObject
 @property (readonly, nonatomic) RLMServerConnection *connection;
-- (void)connected;
-- (void)handleTransactMessageWithVersion:(Replication::version_type)version andData:(NSData *)data;
+@property (nonatomic) NSNumber *ident;
+@property (readonly, nonatomic) NSString *localPath;
+@property (readonly, nonatomic) NSString *remotePath;
+- (void)connectionIsOpen;
+- (void)handleChangesetMessageWithVersion:(Replication::version_type)version andData:(NSData *)data;
 - (void)handleAcceptMessageWithVersion:(Replication::version_type)version;
 @end
 
@@ -229,7 +234,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 @implementation RLMServerConnection {
-    BOOL _isConnected;
+    BOOL _isOpen;
 
     NSString *_address;
     NSNumber *_port;
@@ -259,18 +264,24 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     const char *_currentOutputBegin;
     const char *_currentOutputEnd;
 
+    unsigned long _prevTempFileIdent;
+
+    // Maps a temporary file identifier to an RLMServerFile instance
+    // that has no server assigned unique identifier yet.
+    NSMapTable *_noIdentFiles;
+
     // Maps a file identifier to an RLMServerFile instance. A file
     // identifier is a locally assigned integer that uniquely
     // identifies the RLMServerFile instance. Two instances must have
     // different identifiers even if their lifetimes do not overlap.
-    NSMapTable *_files;
+    NSMapTable *_filesByIdent;
 }
 
 
 - (instancetype)initWithAddress:(NSString *)address port:(NSNumber *)port {
     self = [super init];
     if (self) {
-        _isConnected = NO;
+        _isOpen = NO;
 
         _address = address;
         _port = port ? port : [NSNumber numberWithInt:7800];
@@ -287,7 +298,9 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
         _nextOutputChunk = nil;
         _outputCompletionHandler = nil;
 
-        _files = [NSMapTable strongToWeakObjectsMapTable];
+        _prevTempFileIdent = 0;
+        _noIdentFiles = [NSMapTable strongToWeakObjectsMapTable];
+        _filesByIdent = [NSMapTable strongToWeakObjectsMapTable];
     }
     return self;
 }
@@ -304,7 +317,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 - (void)open {
-    if (_isConnected)
+    if (_isOpen)
         return;
 
     NSLog(@"Opening connection to %@:%@", _address, _port);
@@ -334,17 +347,20 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
     _outputQueue = [NSMutableArray array];
 
-    _isConnected = YES;
+    _isOpen = YES;
 
-    for(NSNumber *ident in _files) {
-        RLMServerFile *file = [_files objectForKey:ident];
-        [file connected];
+    for (NSNumber *tempIdent in _noIdentFiles)
+        [self sendIdentMessageWithTempIdent:tempIdent];
+
+    for (NSNumber *ident in _filesByIdent) {
+        RLMServerFile *file = [_filesByIdent objectForKey:ident];
+        [file connectionIsOpen];
     }
 }
 
 
 - (void)close {
-    if (!_isConnected)
+    if (!_isOpen)
         return;
 
     [_inputStream close];
@@ -358,7 +374,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     _nextOutputChunk = nil;
     _outputCompletionHandler = nil;
 
-    _isConnected = NO;
+    _isOpen = NO;
 
     NSLog(@"Closed connection to %@:%@", _address, _port);
 
@@ -367,23 +383,38 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 }
 
 
-- (void)addFile:(RLMServerFile *)file withIdent:(NSNumber *)ident {
-    [_files setObject:file forKey:ident];
-    if (_isConnected)
-        [file connected];
+- (void)addFile:(RLMServerFile *)file {
+    if (file.ident) {
+        [_filesByIdent setObject:file forKey:file.ident];
+        if (_isOpen)
+            [file connectionIsOpen];
+        return;
+    }
+    NSNumber *tempIdent = [NSNumber numberWithUnsignedLong:++_prevTempFileIdent];
+    [_noIdentFiles setObject:file forKey:tempIdent];
+    if (_isOpen)
+        [self sendIdentMessageWithTempIdent:tempIdent];
+}
+
+
+- (void)sendIdentMessageWithTempIdent:(NSNumber *)tempIdent {
+    typedef unsigned long long ulonglong;
+    RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
+    msg.head = [NSString stringWithFormat:@"ident %@\n", tempIdent];
+    [self enqueueOutputMessage:msg];
+    NSLog(@"Sending: Get unique client identifier");
 }
 
 
 - (void)sendBindMessageWithIdent:(NSNumber *)ident version:(Replication::version_type)version
                       remotePath:(NSString *)remotePath {
-    typedef unsigned long ulong;
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [remotePath dataUsingEncoding:NSUTF8StringEncoding];
-    msg.head = [NSString stringWithFormat:@"bind %@ %llu %lu\n",
-                         ident, ulonglong(version), ulong(msg.body.length)];
+    msg.head = [NSString stringWithFormat:@"bind %@ %llu %llu\n", ident, ulonglong(version),
+                         ulonglong(msg.body.length)];
     [self enqueueOutputMessage:msg];
-    NSLog(@"Sending: Bind local file #%@ at version %llu to remote file '%@'",
+    NSLog(@"Sending: Bind file %@ at version %llu to remote file '%@'",
           ident, ulonglong(version), remotePath);
 }
 
@@ -398,7 +429,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 - (void)enqueueOutputMessage:(RLMOutputMessage *)msg {
     [_outputQueue addObject:msg];
-    if (_isConnected && !_currentOutputChunk) {
+    if (_isOpen && !_currentOutputChunk) {
         [self resumeOutput];
         [_outputStream scheduleInRunLoop:_runLoop forMode:NSDefaultRunLoopMode];
     }
@@ -484,7 +515,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
                     _messageHandler = nil;
                     __weak RLMServerConnection *weakSelf = self;
-                    if (message_type == "transact") {
+                    if (message_type == "changeset") {
                         // A new foreign changeset is available for download
                         unsigned long fileIdent = 0;
                         Replication::version_type version = 0;
@@ -492,15 +523,15 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
                         char sp1, sp2, sp3;
                         parser >> sp1 >> fileIdent >> sp2 >> version >> sp3 >> logSize;
                         if (!parser || !parser.eof() || sp1 != ' ' || sp2 != ' ' || sp3 != ' ') {
-                            NSLog(@"Bad 'transact' message from server");
+                            NSLog(@"Bad 'changeset' message from server");
                             // FIXME: Report the error, close the connection, and try to reconnect later
                             return;
                         }
                         _messageBodySize = logSize;
                         _messageHandler = ^{
                             NSNumber *fileIdent2 = [NSNumber numberWithUnsignedLong:fileIdent];
-                            [weakSelf handleTransactMessageWithFileIdent:fileIdent2
-                                                              andVersion:version];
+                            [weakSelf handleChangesetMessageWithFileIdent:fileIdent2
+                                                               andVersion:version];
                         };
                     }
                     else if (message_type == "accept") {
@@ -517,6 +548,21 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
                         NSNumber *fileIdent2 = [NSNumber numberWithUnsignedLong:fileIdent];
                         [self handleAcceptMessageWithFileIdent:fileIdent2
                                                     andVersion:version];
+                    }
+                    else if (message_type == "ident") {
+                        // New unique client file identifier from server.
+                        unsigned long tempIdent = 0;
+                        unsigned long fileIdent = 0;
+                        char sp1, sp2;
+                        parser >> sp1 >> tempIdent >> sp2 >> fileIdent;
+                        if (!parser || !parser.eof() || sp1 != ' ' || sp2 != ' ') {
+                            NSLog(@"Bad 'ident' message from server");
+                            // FIXME: Report the error, close the connection, and try to reconnect later
+                            return;
+                        }
+                        NSNumber *tempIdent2 = [NSNumber numberWithUnsignedLong:tempIdent];
+                        NSNumber *fileIdent2 = [NSNumber numberWithUnsignedLong:fileIdent];
+                        [self handleIdentMessageWithTempIdent:tempIdent2 andFileIdent:fileIdent2];
                     }
                     else {
                         NSLog(@"Unknown message from server");
@@ -546,7 +592,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
                     messageHandler = _messageHandler;
                     _messageHandler = nil;
                     messageHandler();
-                    if (!_isConnected)
+                    if (!_isOpen)
                         return;
                 }
                 _inputIsHead = YES;
@@ -594,22 +640,37 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 }
 
 
-- (void)handleTransactMessageWithFileIdent:(NSNumber *)fileIdent
-                                andVersion:(Replication::version_type)version {
+- (void)handleIdentMessageWithTempIdent:(NSNumber *)tempIdent andFileIdent:(NSNumber *)fileIdent {
+
+    RLMServerFile *file = [_noIdentFiles objectForKey:tempIdent];
+
+    // FIXME: Error checking
+
+    typedef unsigned long long ulonglong;
+    NSLog(@"Received: Identify '%@' by %@", file.localPath, fileIdent);
+
+    file.ident = fileIdent;
+    [_noIdentFiles removeObjectForKey:tempIdent];
+    [self addFile:file];
+}
+
+
+- (void)handleChangesetMessageWithFileIdent:(NSNumber *)fileIdent
+                                 andVersion:(Replication::version_type)version {
     typedef unsigned long long ulonglong;
 #ifdef TIGHTDB_DEBUG
     NSLog(@"Received: Foreign changeset %llu -> %llu for local file #%@",
           ulonglong(version-1), ulonglong(version), fileIdent);
 #endif
 
-    RLMServerFile *file = [_files objectForKey:fileIdent];
+    RLMServerFile *file = [_filesByIdent objectForKey:fileIdent];
     if (!file)
         return;
 
     NSData *data = _messageBodyBuffer;
     _messageBodyBuffer = nil;
 
-    [file handleTransactMessageWithVersion:version andData:data];
+    [file handleChangesetMessageWithVersion:version andData:data];
 }
 
 
@@ -621,7 +682,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
           ulonglong(version-1), ulonglong(version), fileIdent);
 #endif
 
-    RLMServerFile *file = [_files objectForKey:fileIdent];
+    RLMServerFile *file = [_filesByIdent objectForKey:fileIdent];
     if (!file)
         return;
 
@@ -632,15 +693,11 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 @implementation RLMServerFile {
-    NSNumber *_ident;
-    NSString *_localPath;
-    NSString *_remotePath;
-
     unique_ptr<SharedGroup> _sharedGroup;
-    unique_ptr<Replication> _transactLogRegistry;
+    unique_ptr<Replication> _changesetRegistry;
 
     unique_ptr<SharedGroup> _backgroundSharedGroup;
-    unique_ptr<Replication> _backgroundTransactLogRegistry;
+    unique_ptr<Replication> _backgroundChangesetRegistry;
 
     Replication::version_type _latestVersionAvailable;
     Replication::version_type _latestVersionUploaded;
@@ -652,24 +709,24 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 - (instancetype)initWithConnection:(RLMServerConnection *)connection
-                        localIdent:(NSNumber *)ident
                          localPath:(NSString *)localPath
                         remotePath:(NSString *)remotePath {
     self = [super init];
     if (self) {
         _connection = connection;
-        _ident = ident;
+        _ident = nil;
         _localPath = localPath;
         _remotePath = remotePath;
 
         bool serverSynchronizationMode = true;
         SharedGroup::DurabilityLevel durability = SharedGroup::durability_Full;
-        _transactLogRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
-                                                         serverSynchronizationMode));
-        _sharedGroup = make_unique<SharedGroup>(*_transactLogRegistry, durability);
-        _backgroundTransactLogRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
-                                                                   serverSynchronizationMode));
-        _backgroundSharedGroup = make_unique<SharedGroup>(*_backgroundTransactLogRegistry, durability);
+        _changesetRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
+                                                      serverSynchronizationMode));
+        _sharedGroup = make_unique<SharedGroup>(*_changesetRegistry, durability);
+        _backgroundChangesetRegistry.reset(makeWriteLogCollector(localPath.UTF8String,
+                                                                 serverSynchronizationMode));
+        _backgroundSharedGroup =
+            make_unique<SharedGroup>(*_backgroundChangesetRegistry, durability);
 
         _uploadInProgress = NO;
 
@@ -683,24 +740,26 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 - (void)mainThreadInit {
     // Called by main thread
-    _latestVersionIntegratedByServer = _transactLogRegistry->get_last_version_synced();
+    _latestVersionIntegratedByServer = _changesetRegistry->get_last_version_synced();
     _latestVersionUploaded = _latestVersionIntegratedByServer;
     _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
     if (_latestVersionUploaded > _latestVersionAvailable) // Transiently possible
         _latestVersionUploaded = _latestVersionAvailable;
 
     [_connection mainThreadInit];
-    [_connection addFile:self withIdent:_ident];
+    [_connection addFile:self];
 }
 
 
 - (void)refreshLatestVersionAvailable {
     _latestVersionAvailable = LangBindHelper::get_current_version(*_sharedGroup);
-    [self resumeUpload];
+    if (_connection.isOpen && _ident)
+        [self resumeUpload];
 }
 
 
-- (void)connected {
+- (void)connectionIsOpen {
+    TIGHTDB_ASSERT(_ident);
     _latestVersionUploaded = _latestVersionIntegratedByServer;
     [_connection sendBindMessageWithIdent:_ident version:_latestVersionIntegratedByServer
                                remotePath:_remotePath];
@@ -709,13 +768,13 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 - (void)resumeUpload {
-    if (_uploadInProgress || !_connection.isConnected)
+    TIGHTDB_ASSERT(_connection.isOpen && _ident);
+    if (_uploadInProgress)
         return;
     _uploadInProgress = YES;
 
-    // Fetch and copy the next changset, and produce an output message
-    // from it.  Set the completionHandler to a block that calls
-    // resumeUpload.
+    // Fetch and copy the next changeset, and produce an output message from it.
+    // Set the completionHandler to a block that calls resumeUpload.
     Replication::version_type uploadVersion;
     Replication::CommitLogEntry changeset;
     for (;;) {
@@ -725,7 +784,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
             return;
         }
         uploadVersion = _latestVersionUploaded + 1;
-        _transactLogRegistry->get_commit_entries(uploadVersion-1, uploadVersion, &changeset);
+        _changesetRegistry->get_commit_entries(uploadVersion-1, uploadVersion, &changeset);
         // Skip changesets that were downloaded from the server
         if (!changeset.is_foreign)
             break;
@@ -735,7 +794,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     typedef unsigned long long ulonglong;
     RLMOutputMessage *msg = [[RLMOutputMessage alloc] init];
     msg.body = [NSData dataWithBytes:changeset.log_data.data() length:changeset.log_data.size()]; // Full copy
-    msg.head = [NSString stringWithFormat:@"transact %@ %llu %lu\n",
+    msg.head = [NSString stringWithFormat:@"changeset %@ %llu %lu\n",
                          _ident, ulonglong(uploadVersion), ulong(msg.body.length)];
 #ifdef TIGHTDB_DEBUG
     NSLog(@"Sending: Changeset %llu -> %llu of size %lu on local file #%@",
@@ -754,12 +813,13 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     _uploadInProgress = NO;
     if (_latestVersionUploaded < version)
         _latestVersionUploaded = version;
-    [self resumeUpload];
+    if (_connection.isOpen)
+        [self resumeUpload];
 }
 
 
-- (void)handleTransactMessageWithVersion:(Replication::version_type)version
-                                 andData:(NSData *)data {
+- (void)handleChangesetMessageWithVersion:(Replication::version_type)version
+                                   andData:(NSData *)data {
     Replication::version_type expectedVersion = _latestVersionIntegratedByServer + 1;
     if (version != expectedVersion) {
         typedef unsigned long long ulonglong;
@@ -770,12 +830,11 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     }
     _latestVersionIntegratedByServer = version;
 
-    // FIXME: Consider whether we should attempt to apply small
-    // transactions immediately on the main thread (right here) if
-    // auto-refresh is enabled, `s_backgroundOperationQueue` is empty,
-    // and a try-lock on the write-transaction mutex succeeds. This
-    // might be an effective way of reducing latency due to context
-    // switches.
+    // FIXME: Consider whether we should attempt to apply small changsesets
+    // immediately on the main thread (right here) if auto-refresh is enabled,
+    // `s_backgroundOperationQueue` is empty, and a try-lock on the
+    // write-transaction mutex succeeds. This might be an effective way of
+    // reducing latency due to context switches.
 
     [self addBackgroundTaskWithVersion:version andData:data];
 }
@@ -822,15 +881,15 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
     Replication::version_type baseVersion = version - 1;
     const char *data2 = static_cast<const char *>(data.bytes);
     size_t size = data.length;
-    BinaryData transactLog(data2, size);
+    BinaryData changeset(data2, size);
     ostream *applyLog = 0;
     BOOL conflict;
     try {
-        Replication &repl = *_backgroundTransactLogRegistry;
+        Replication &repl = *_backgroundChangesetRegistry;
         Replication::version_type serverVersion = 0; // Value is imaterial for now
         Replication::version_type newVersion =
             repl.apply_foreign_changeset(*_backgroundSharedGroup, baseVersion,
-                                         transactLog, serverVersion, applyLog);
+                                         changeset, serverVersion, applyLog);
         conflict = (newVersion == 0);
         TIGHTDB_ASSERT(conflict || newVersion == version);
     }
@@ -849,10 +908,9 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
         return;
     }
 
-    BinaryData changeset(static_cast<const char*>(data.bytes), data.length);
     Replication::CommitLogEntry conflictingChangeset;
-    _backgroundTransactLogRegistry->get_commit_entries(baseVersion, baseVersion+1,
-                                                       &conflictingChangeset);
+    _backgroundChangesetRegistry->get_commit_entries(baseVersion, baseVersion+1,
+                                                     &conflictingChangeset);
     if (conflictingChangeset.is_foreign) {
         // Assuming resend of previously integrated changelog
         TIGHTDB_ASSERT(conflictingChangeset.log_data == changeset);
@@ -861,17 +919,16 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
         return;
     }
 
-    // WARNING: Strictly speaking, the following is not the correct
-    // resulution of the conflict between two identical initial
-    // transactions, but it is done as a temporary workaround to allow
-    // the current version of this binding to carry out an initial
-    // schema creating transaction without getting into an immediate
-    // unrecoverable conflict. It does not work in general as even the
-    // initial transaction is allowed to contain elements that are
-    // additive rather than idempotent.
-    BOOL isInitialTransact = (baseVersion == 1); // Schema creation
-    if (isInitialTransact && conflictingChangeset.log_data == changeset) {
-        NSLog(@"Conflict on identical initial transactions resolved (impropperly)");
+    // WARNING: Strictly speaking, the following is not the correct resulution
+    // of the conflict between two identical initial changesets, but it is done
+    // as a temporary workaround to allow the current version of this binding to
+    // carry out an initial schema creating transaction without getting into an
+    // immediate unrecoverable conflict. It does not work in general as even the
+    // initial changeset is allowed to contain elements that are additive rather
+    // than idempotent.
+    BOOL isInitialChangeset = (baseVersion == 1); // Schema creation
+    if (isInitialChangeset && conflictingChangeset.log_data == changeset) {
+        NSLog(@"Conflict on identical initial changesets resolved (impropperly)");
         return;
     }
 
@@ -882,7 +939,7 @@ NSMapTable *s_serverConnections = [NSMapTable strongToWeakObjectsMapTable];
 
 
 - (void)markVersionIntegratedByServer:(Replication::version_type)version {
-    _transactLogRegistry->set_last_version_synced(version);
+    _changesetRegistry->set_last_version_synced(version);
 }
 
 
@@ -1228,9 +1285,7 @@ NSString * const c_defaultRealmFileName = @"default.realm";
                                                                            port:serverBaseURL.port];
                             [s_serverConnections setObject:conn forKey:hostKey];
                         }
-                        NSNumber *localFileIdent = [NSNumber numberWithUnsignedLong:++s_nextLocalFileIdent];
                         file = [[RLMServerFile alloc] initWithConnection:conn
-                                                              localIdent:localFileIdent
                                                                localPath:realm.path
                                                               remotePath:serverBaseURL.path];
                         [s_serverFiles setObject:file forKey:realm.path];
