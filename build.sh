@@ -273,11 +273,18 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "ios-static")
+        build_combined iOS $CONFIGURATION Realm
+        exit 0
+        ;;
+
     "osx")
         xcrealm "-scheme OSX -configuration $CONFIGURATION"
-        rm -rf build/osx
-        mkdir build/osx
-        cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
+        exit 0
+        ;;
+
+    "osx-swift")
+        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION"
         exit 0
         ;;
 
@@ -287,29 +294,42 @@ case "$COMMAND" in
     "test")
         set +e # Run both sets of tests even if the first fails
         failed=0
-        sh build.sh test-ios || failed=1
-        sh build.sh test-ios-devices || failed=1
-        sh build.sh test-osx || failed=1
+        sh build.sh test-ios $CONFIGURATION || failed=1
+        sh build.sh test-ios-dynamic $CONFIGURATION || failed=1
+        sh build.sh test-ios-swift $CONFIGURATION || failed=1
+        sh build.sh test-ios-devices $CONFIGURATION || failed=1
+        sh build.sh test-osx $CONFIGURATION || failed=1
+        sh build.sh test-osx-swift $CONFIGURATION || failed=1
         exit $failed
         ;;
 
     "test-all")
         set +e
         failed=0
-        sh build.sh test || failed=1
-        sh build.sh test-debug || failed=1
+        sh build.sh test Release || failed=1
+        sh build.sh test Debug || failed=1
         exit $failed
         ;;
 
     "test-ios")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
-        xcrealm "-scheme 'iOS 8' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        exit 0
+        ;;
+
+    "test-ios-dynamic")
+        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        exit 0
+        ;;
+
+
+    "test-ios-swift")
+        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
     "test-ios-devices")
-        test_ios_devices "$CONFIGURATION"
+        test_ios_devices $CONFIGURATION 
         ;;
 
     "test-osx")
@@ -317,39 +337,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    ######################################
-    # Full verification
-    ######################################
-    "verify")
-        sh build.sh verify-docs
-        sh build.sh verify-osx
-        sh build.sh verify-osx-debug
-        sh build.sh verify-ios
-        sh build.sh verify-ios-debug
-        sh build.sh verify-ios-device
-        ;;
-
-    "verify-osx")
-        sh build.sh test-osx
-        sh build.sh test-browser
-        sh build.sh examples-osx
-
-        (
-            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
-            DYLD_FRAMEWORK_PATH=. ./JSONImport
-        ) || exit 1
-        exit 0
-        ;;
-
-    # FIXME: make no-op in al-swift
-    "verify-ios")
-        sh build.sh test-ios
-        sh build.sh examples-ios
-        exit 0
-        ;;
-
-    "verify-ios-device")
-        sh build.sh test-ios-devices
+    "test-osx-swift")
+        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
 
@@ -358,10 +347,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    # FIXME: make not no-ops in al-swift
-    "verify-ios-static")
-        exit 0
-        ;;
+    "verify")
+        sh build.sh docs
+        sh build.sh test-all 
+        sh build.sh examples 
+        sh build.sh browser 
+        sh build.sh test-browser 
 
     "verify-ios-dynamic")
         exit 0
@@ -388,29 +379,22 @@ case "$COMMAND" in
     ######################################
     "examples")
         sh build.sh clean
-        sh build.sh examples-ios
-        sh build.sh examples-osx
-        exit 0
-        ;;
 
-    "examples-ios")
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        cd examples
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Extension -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         exit 0
-        ;;
-
-    "examples-osx")
-        xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration ${CONFIGURATION} build ${CODESIGN_PARAMS}"
         ;;
 
     ######################################
@@ -461,13 +445,19 @@ case "$COMMAND" in
         mv $(readlink tmp) core
         rm tmp
 
-        # CocoaPods doesn't support multiple header_mappings_dir, so combine
-        # both sets of headers into a single directory
-        rm -rf include
-        mv core/include include
-        mkdir -p include/Realm
-        cp Realm/*.h include/Realm
-        touch include/Realm/RLMPlatform.h
+        rm -r include-ios
+        mkdir include-ios
+        cp -R core/include/* include-ios
+        mkdir include-ios/Realm
+        cp Realm/*.{h,hpp} include-ios/Realm
+        cp Realm/ios/*.h include-ios/Realm
+
+        rm -r include-osx
+        mkdir include-osx
+        cp -R core/include/* include-osx
+        mkdir include-osx/Realm
+        cp Realm/*.{h,hpp} include-osx/Realm
+        cp Realm/osx/*.h include-osx/Realm
         ;;
 
     ######################################
@@ -512,10 +502,10 @@ case "$COMMAND" in
         cd tightdb_objc
         sh build.sh test-ios
         sh build.sh examples
-        sh build.sh ios-dynamic
+        sh build.sh ios
 
         cd build/ios
-        zip --symlinks -r realm-framework-ios.zip Realm*
+        zip --symlinks -r realm-framework-ios.zip *.framework
         ;;
 
     "package-osx")
