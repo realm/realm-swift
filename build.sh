@@ -322,7 +322,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-
     "test-ios-swift")
         xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0

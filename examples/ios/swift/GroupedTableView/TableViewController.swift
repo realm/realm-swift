@@ -17,9 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
-class DemoObject: RLMObject {
+class DemoObject: Object {
     dynamic var title = ""
     dynamic var date = NSDate()
     dynamic var sectionTitle = ""
@@ -36,11 +36,11 @@ class Cell: UITableViewCell {
 }
 
 var sectionTitles = ["A", "B", "C"]
-var objectsBySection = [RLMResults]()
+var objectsBySection = [Results<DemoObject>]()
 
 class TableViewController: UITableViewController {
 
-    var notificationToken: RLMNotificationToken?
+    var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,12 +48,12 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = defaultRealm().addNotificationBlock { note, realm in
             self.tableView.reloadData()
         }
         for section in sectionTitles {
-            let unsortedObjects = DemoObject.objectsWhere("sectionTitle == '\(section)'")
-            let sortedObjects = unsortedObjects.sortedResultsUsingProperty("date", ascending: true)
+            let unsortedObjects = objects(DemoObject).filter("sectionTitle == '\(section)'")
+            let sortedObjects = unsortedObjects.sorted("date", ascending: true)
             objectsBySection.append(sortedObjects)
         }
         tableView.reloadData()
@@ -87,7 +87,7 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
 
         let object = objectForIndexPath(indexPath)!
-        cell.textLabel?.text = object.title
+        cell.textLabel.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
         return cell
@@ -95,9 +95,9 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let realm = RLMRealm.defaultRealm()
-            realm.transactionWithBlock {
-                realm.deleteObject(objectForIndexPath(indexPath)!)
+            let realm = defaultRealm()
+            realm.write {
+                realm.delete(objectForIndexPath(indexPath)!)
             }
         }
     }
@@ -109,20 +109,20 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = RLMRealm.defaultRealm()
-            realm.beginWriteTransaction()
+            let realm = defaultRealm()
+            realm.beginWrite()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
                 DemoObject.createInRealm(realm, withObject: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
             }
-            realm.commitWriteTransaction()
+            realm.commitWrite()
         }
     }
 
     func add() {
-        RLMRealm.defaultRealm().transactionWithBlock {
+        defaultRealm().write {
             let object = [randomTitle(), NSDate(), randomSectionTitle()]
-            DemoObject.createInDefaultRealmWithObject(object)
+            DemoObject.createInRealm(defaultRealm(), withObject: object)
         }
     }
 }
@@ -130,7 +130,7 @@ class TableViewController: UITableViewController {
 // Helpers
 
 func objectForIndexPath(indexPath: NSIndexPath) -> DemoObject? {
-    return objectsBySection[indexPath.section][UInt(indexPath.row)] as? DemoObject
+    return objectsBySection[indexPath.section][indexPath.row]
 }
 
 func randomTitle() -> String {
