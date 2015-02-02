@@ -744,7 +744,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/RealmSwift/Build/Products/$(CONFIGURATION)/RealmSwift.framework/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/RealmSwift/Build/Products/$(CONFIGURATION)/RealmSwift.framework/Versions/A/Frameworks";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"REALM_SWIFT=1",
 					"$(inherited)",
