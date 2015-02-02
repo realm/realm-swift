@@ -844,7 +844,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
-					"build/DerivedData/RealmSwift/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)/RealmSwift.framework/Frameworks",
+					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"REALM_SWIFT=1",
@@ -876,7 +876,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
-					"build/DerivedData/RealmSwift/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)/RealmSwift.framework/Frameworks",
+					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"REALM_SWIFT=1",
