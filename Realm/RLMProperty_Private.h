@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProperty.h"
+#import <Realm/RLMProperty.h>
 #import <objc/runtime.h>
 
 @class RLMObjectBase;
