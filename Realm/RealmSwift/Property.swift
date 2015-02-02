@@ -20,12 +20,11 @@ import Realm
 
 // MARK: Equatable
 
-//public func ==(lhs: Property, rhs: Property) -> Bool {
-//    return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
-//}
+public func ==(lhs: Property, rhs: Property) -> Bool {
+    return lhs.rlmProperty.isEqualToProperty(rhs.rlmProperty)
+}
 
-//public class Property: Equatable {
-public class Property {
+public class Property: Equatable {
     // MARK: Properties
 
     var rlmProperty: RLMProperty
