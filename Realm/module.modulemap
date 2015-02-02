@@ -14,5 +14,6 @@ framework module Realm {
         header "RLMObjectSchema_Private.h"
         header "RLMMigration_Private.h"
         header "RLMResults_Private.h"
+        header "RLMProperty_Private.h"
     }
 }
