@@ -90,7 +90,7 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
         migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
 
         // reset old schema
-        migration.realm.schema = savedSchema
+        RLMRealmSetSchema(migration.realm, savedSchema, true)
     }
 }
 
