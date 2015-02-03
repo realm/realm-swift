@@ -178,8 +178,8 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func min<U: MinMaxType>(property: String) -> U {
-        return rlmResults.minOfProperty(property) as U
+    public func min<U: MinMaxType>(property: String) -> U? {
+        return rlmResults.minOfProperty(property) as U?
     }
 
     /**
@@ -191,8 +191,8 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     :returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func max<U: MinMaxType>(property: String) -> U {
-        return rlmResults.maxOfProperty(property) as U
+    public func max<U: MinMaxType>(property: String) -> U? {
+        return rlmResults.maxOfProperty(property) as U?
     }
 
     /**
