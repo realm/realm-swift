@@ -199,15 +199,33 @@ class ListTests: TestCase {
     }
 
     func testSortWithDescriptors() {
-        array.append([str1, str2])
+        let object = SwiftAggregateObjectList.createInRealm(realmWithTestPath(), withObject: [[]])
+        let array = object.list
 
-        var sorted = array.sorted([SortDescriptor(property: "stringCol", ascending: true)])
-        XCTAssertEqual("1", sorted[0].stringCol)
-        XCTAssertEqual("2", sorted[1].stringCol)
+        let obj1 = SwiftAggregateObject()
+        obj1.intCol = 1
+        obj1.floatCol = 1.1
+        obj1.doubleCol = 1.11
+        obj1.dateCol = NSDate(timeIntervalSince1970: 1)
+        obj1.boolCol = false
 
-        sorted = array.sorted([SortDescriptor(property: "stringCol", ascending: false)])
-        XCTAssertEqual("2", sorted[0].stringCol)
-        XCTAssertEqual("1", sorted[1].stringCol)
+        let obj2 = SwiftAggregateObject()
+        obj2.intCol = 2
+        obj2.floatCol = 2.2
+        obj2.doubleCol = 2.22
+        obj2.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj2.boolCol = false
+
+        realmWithTestPath().add([obj1, obj2])
+        array.append([obj1, obj2])
+
+        var sorted = array.sorted([SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(1, sorted[0].intCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+
+        sorted = array.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(2.22, sorted[0].doubleCol)
+        XCTAssertEqual(1.11, sorted[1].doubleCol)
     }
 
     func testFastEnumeration() {
