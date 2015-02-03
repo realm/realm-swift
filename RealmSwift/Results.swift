@@ -54,7 +54,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Properties
 
-    let rlmResults: RLMResults
+    internal let rlmResults: RLMResults
 
     /// Returns the Realm these results are associated with.
     public var realm: Realm { return Realm(rlmRealm: rlmResults.realm) }
@@ -67,7 +67,7 @@ public final class Results<T: Object>: Printable, SequenceType {
 
     // MARK: Initializers
 
-    init(_ rlmResults: RLMResults) {
+    internal init(_ rlmResults: RLMResults) {
         self.rlmResults = rlmResults
     }
 
