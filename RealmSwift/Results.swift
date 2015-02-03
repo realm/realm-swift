@@ -164,7 +164,16 @@ public final class Results<T: Object>: Printable, SequenceType {
     :returns: `Results` with elements sorted by the given property name.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
-        return Results<T>(rlmResults.sortedResultsUsingProperty(property, ascending: ascending))
+        return sorted([SortDescriptor(property: property, ascending: ascending)])
+    }
+
+    /**
+    Returns `Results` with elements sorted by the given sort descriptors.
+    :param: sortDescriptors `SortDescriptor`s to sort by.
+    :returns: `Results` with elements sorted by the given sort descriptors.
+    */
+    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
+        return Results<T>(rlmResults.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
