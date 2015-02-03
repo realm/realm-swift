@@ -186,7 +186,7 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(1), array.filter(pred2).count)
     }
 
-    func testSort() {
+    func testSortWithFormat() {
         array.append([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
@@ -194,6 +194,18 @@ class ListTests: TestCase {
         XCTAssertEqual("2", sorted[1].stringCol)
 
         sorted = array.sorted("stringCol", ascending: false)
+        XCTAssertEqual("2", sorted[0].stringCol)
+        XCTAssertEqual("1", sorted[1].stringCol)
+    }
+
+    func testSortWithDescriptors() {
+        array.append([str1, str2])
+
+        var sorted = array.sorted([SortDescriptor(property: "stringCol", ascending: true)])
+        XCTAssertEqual("1", sorted[0].stringCol)
+        XCTAssertEqual("2", sorted[1].stringCol)
+
+        sorted = array.sorted([SortDescriptor(property: "stringCol", ascending: false)])
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
     }
@@ -208,6 +220,16 @@ class ListTests: TestCase {
         XCTAssertEqual(str, "121")
     }
 
+    func testAppendObject() {
+        for str in [str1, str2, str1] {
+            array.append(str)
+        }
+        XCTAssertEqual(Int(3), array.count)
+        XCTAssertEqual(str1, array[0])
+        XCTAssertEqual(str2, array[1])
+        XCTAssertEqual(str1, array[2])
+    }
+
     func testAppendArray() {
         array.append([str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
@@ -216,7 +238,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[2])
     }
 
-    func testAppendRLMResults() {
+    func testAppendResults() {
         array.append(realmWithTestPath().objects(SwiftStringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
@@ -265,12 +287,18 @@ class ListTests: TestCase {
 
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
+
+        array.removeLast() // should be a no-op
+        XCTAssertEqual(Int(0), array.count)
     }
 
     func testRemoveAll() {
         array.append([str1, str2])
 
         array.removeAll()
+        XCTAssertEqual(Int(0), array.count)
+
+        array.removeAll() // should be a no-op
         XCTAssertEqual(Int(0), array.count)
     }
 
@@ -296,6 +324,26 @@ class ListTests: TestCase {
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
+
+    func testPopulateEmptyArray() {
+        XCTAssertEqual(array.count, 0, "Should start with no array elements.")
+
+        let obj = SwiftStringObject()
+        obj.stringCol = "a"
+        array.append(obj)
+        array.append(SwiftStringObject.createInRealm(realmWithTestPath(), withObject: ["b"]))
+        array.append(obj)
+
+        XCTAssertEqual(array.count, 3)
+        XCTAssertEqual(array[0].stringCol, "a")
+        XCTAssertEqual(array[1].stringCol, "b")
+        XCTAssertEqual(array[2].stringCol, "a")
+
+        // Make sure we can enumerate
+        for obj in array {
+            XCTAssertTrue(countElements(obj.description) > 0, "Object should have description")
+        }
+    }
 }
 
 class ListStandaloneTests: ListTests {
@@ -306,7 +354,8 @@ class ListStandaloneTests: ListTests {
     }
 
     // Things not implemented in standalone
-    override func testSort() { }
+    override func testSortWithFormat() { }
+    override func testSortWithDescriptors() { }
     override func testFilterFormat() { }
     override func testFilterPredicate() { }
     override func testIndexOfFormat() { }
