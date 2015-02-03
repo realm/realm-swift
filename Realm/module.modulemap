@@ -1,0 +1,19 @@
+framework module Realm {
+    umbrella header "Realm.h"
+
+    export *
+    module * { export * }
+
+    explicit module Private {
+        header "RLMRealm_Dynamic.h"
+        header "RLMObjectStore.h"
+        header "RLMListBase.h"
+        header "RLMSchema_Private.h"
+        header "RLMRealm_Private.h"
+        header "RLMObject_Private.h"
+        header "RLMObjectSchema_Private.h"
+        header "RLMMigration_Private.h"
+        header "RLMResults_Private.h"
+        header "RLMProperty_Private.h"
+    }
+}

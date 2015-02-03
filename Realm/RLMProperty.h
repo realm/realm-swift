@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMObject.h>
 
 /**
  This class models properties persisted to Realm in an RLMObjectSchema.
@@ -53,5 +52,10 @@
  Object class name - specify object types for RLMObject and RLMArray properties.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
+
+/**
+ Returns YES if property objects are equal.
+ */
+- (BOOL)isEqualToProperty:(RLMProperty *)property;
 
 @end

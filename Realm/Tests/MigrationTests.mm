@@ -16,15 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-extern "C" {
 #import "RLMTestCase.h"
-#import "RLMSchema_Private.h"
-}
+
 #import "RLMMigration.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
+#import "RLMObjectStore.h"
+
+#import <tightdb/table.hpp>
 
 @interface MigrationObject : RLMObject
 @property int intCol;
@@ -427,7 +428,7 @@ extern "C" {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationPrimaryKeyObject.class];
 
     // create without search index
-    objectSchema.primaryKeyProperty.attributes = 0;
+    objectSchema.primaryKeyProperty.indexed = NO;
 
     // create realm with old schema and populate
     @autoreleasepool {

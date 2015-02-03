@@ -16,24 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import "RLMObject_Private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-#ifdef __cplusplus
+#import <tightdb/link_view.hpp> // required by row.hpp
+#import <tightdb/row.hpp>
+
+// RLMObject accessor and read/write realm
+@interface RLMObjectBase () {
+    @public
+    tightdb::Row _row;
 }
-#endif
-
-@interface RLMTestCase : XCTestCase
-
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-+ (void)deleteFiles;
 
 @end
