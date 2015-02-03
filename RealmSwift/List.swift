@@ -99,7 +99,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+        return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     // MARK: Object Retrieval
