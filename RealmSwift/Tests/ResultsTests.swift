@@ -173,13 +173,15 @@ class ResultsTests: TestCase {
     }
 
     func testSortWithDescriptor() {
-        var sorted = results.sorted([SortDescriptor(property: "stringCol", ascending: true)])
-        XCTAssertEqual("1", sorted[0].stringCol)
-        XCTAssertEqual("2", sorted[1].stringCol)
+        let results = getAggregateableResults()
 
-        sorted = results.sorted([SortDescriptor(property: "stringCol", ascending: false)])
-        XCTAssertEqual("2", sorted[0].stringCol)
-        XCTAssertEqual("1", sorted[1].stringCol)
+        var sorted = results.sorted([SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(1, sorted[0].intCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+
+        sorted = results.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(2.22, sorted[0].doubleCol)
+        XCTAssertEqual(1.11, sorted[1].doubleCol)
     }
 
     func testMin() {
