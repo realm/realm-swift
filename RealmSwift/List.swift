@@ -60,7 +60,7 @@ public final class List<T: Object>: ListBase, SequenceType {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
-    init(_ rlmArray: RLMArray) {
+    internal init(_ rlmArray: RLMArray) {
         super.init(array: rlmArray)
     }
 
