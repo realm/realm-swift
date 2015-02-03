@@ -71,6 +71,7 @@ class SwiftAggregateObject: Object {
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
     dynamic var dateCol = NSDate()
+    dynamic var trueCol = true
 }
 
 class SwiftAllIntSizesObject: Object {

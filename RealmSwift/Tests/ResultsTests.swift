@@ -208,7 +208,7 @@ class ResultsTests: TestCase {
     }
 }
 
-class ResultsFromTableViewTests: ResultsTests {
+class ResultsFromTableTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
         return realmWithTestPath().objects(SwiftStringObject)
     }
@@ -216,6 +216,17 @@ class ResultsFromTableViewTests: ResultsTests {
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         makeAggregateableObjects()
         return realmWithTestPath().objects(SwiftAggregateObject)
+    }
+}
+
+class ResultsFromTableViewTests: ResultsTests {
+    override func getResults() -> Results<SwiftStringObject> {
+        return realmWithTestPath().objects(SwiftStringObject)
+    }
+
+    override func getAggregateableResults() -> Results<SwiftAggregateObject> {
+        makeAggregateableObjects()
+        return realmWithTestPath().objects(SwiftAggregateObject).filter("trueCol == true")
     }
 }
 
