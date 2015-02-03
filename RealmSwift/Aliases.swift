@@ -20,5 +20,33 @@ import Realm
 
 // These types don't change when wrapping in Swift
 // so we just typealias them to remove the 'RLM' prefix
+
+// MARK: Aliases
+
+/**
+An enum of the different property types supported by Realm. Object type.
+
+See [Realm Models](http://realm.io/docs/cocoa/latest/#models).
+
+## Primitive types
+
+* Int
+* Bool
+* Float
+* Double
+
+## Object types
+
+* String
+* Data
+* Date
+
+## Array/Linked object types
+
+* Object
+* Array
+*/
 public typealias PropertyType = RLMPropertyType
+
+/// An opaque token used to unregister notification blocks from Realms.
 public typealias NotificationToken = RLMNotificationToken
