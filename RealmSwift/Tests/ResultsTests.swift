@@ -89,6 +89,10 @@ class ResultsTests: TestCase {
         return super.defaultTestSuite()
     }
 
+    func testRealm() {
+        XCTAssertEqual(results.realm.path, realmWithTestPath().path)
+    }
+
     func testDescription() {
         XCTAssertFalse(results.description.isEmpty)
     }
@@ -158,12 +162,22 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(0), results.filter(pred3).count)
     }
 
-    func testSort() {
+    func testSortWithProperty() {
         var sorted = results.sorted("stringCol", ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
         sorted = results.sorted("stringCol", ascending: false)
+        XCTAssertEqual("2", sorted[0].stringCol)
+        XCTAssertEqual("1", sorted[1].stringCol)
+    }
+
+    func testSortWithDescriptor() {
+        var sorted = results.sorted([SortDescriptor(property: "stringCol", ascending: true)])
+        XCTAssertEqual("1", sorted[0].stringCol)
+        XCTAssertEqual("2", sorted[1].stringCol)
+
+        sorted = results.sorted([SortDescriptor(property: "stringCol", ascending: false)])
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
     }
@@ -232,7 +246,7 @@ class ResultsFromTableViewTests: ResultsTests {
 
 class ResultsFromLinkViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-    let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(),
+        let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(),
         withObject: ["", [str1, str2], []])
         return array.array.filter("stringCol != ''") // i.e. all of them
     }
