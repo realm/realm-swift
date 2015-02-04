@@ -1,3 +1,10 @@
+0.90.5 Release notes (2015-02-04)
+=============================================================
+
+### Bugfixes
+
+* Fix for crashes when encryption is enabled on 64-bit iOS devices.
+
 0.90.4 Release notes (2015-01-29)
 =============================================================
 
