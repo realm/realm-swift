@@ -1,8 +1,5 @@
-
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
-
-?? summary
 
 ### API breaking changes
 
@@ -15,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix for crashes when encryption is enabled on 64-bit iOS devices.
 
 0.90.4 Release notes (2015-01-29)
 =============================================================
