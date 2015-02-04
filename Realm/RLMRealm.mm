@@ -807,6 +807,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
+    if (realmsAtPath(realmPath)) {
+        @throw RLMException(@"Cannot set schema version for Realms that are already open.");
+    }
+
     @synchronized(s_migrationBlocks) {
         if (block) {
             s_migrationBlocks[realmPath] = block;
@@ -850,6 +854,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
+    if (realmsAtPath(realmPath)) {
+        @throw RLMException(@"Cannot migrate Realms that are already open.");
+    }
+
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
     if (error)
