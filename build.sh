@@ -196,17 +196,19 @@ download_core() {
     CORE_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
     if [ ! -f "${CORE_ZIP}" ]; then
         curl -L -s "http://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.zip" -o "${CORE_TMP_ZIP}"
-        mv "${CORE_TMP_ZIP}" "${CORE_ZIP}"
+        if [ -f "${CORE_TMP_ZIP}" ]; then
+          mv "${CORE_TMP_ZIP}" "${CORE_ZIP}"
+        fi
     fi
     (
         cd "${TMP_DIR}"
         rm -rf core
-        unzip "${CORE_ZIP}"
+        unzip "${CORE_ZIP}" -d "${TMP_DIR}"
         mv core core-${REALM_CORE_VERSION}
     )
 
     rm -rf core-${REALM_CORE_VERSION} core
-    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
+    mv "${TMP_DIR}/core-${REALM_CORE_VERSION}" "${SRCROOT}"
     ln -s core-${REALM_CORE_VERSION} core
 }
 
