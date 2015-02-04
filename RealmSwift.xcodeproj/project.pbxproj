@@ -97,6 +97,10 @@
 		C0240C2C1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
 		C0240C2D1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
 		C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */; };
+		C0D8E1331A8196EE0077C784 /* TestUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D8E1311A8196EE0077C784 /* TestUtils.h */; };
+		C0D8E1341A8196EE0077C784 /* TestUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D8E1311A8196EE0077C784 /* TestUtils.h */; };
+		C0D8E1371A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
+		C0D8E1381A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -193,9 +197,12 @@
 		02B822821A532100007F28A5 /* RealmSwift iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0D8E1311A8196EE0077C784 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = RealmSwift/Tests/TestUtils.h; sourceTree = SOURCE_ROOT; };
 		C0D8E12B1A8174090077C784 /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptor.swift; path = RealmSwift/SortDescriptor.swift; sourceTree = SOURCE_ROOT; };
 		C0240C2A1A84090000858BFA /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmTests.swift; path = RealmSwift/Tests/RealmTests.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = RealmSwift/Tests/SortDescriptorTests.swift; sourceTree = SOURCE_ROOT; };
+		C0D8E1321A8196EE0077C784 /* TestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtils.m; path = RealmSwift/Tests/TestUtils.m; sourceTree = SOURCE_ROOT; };
+		C0D8E1391A819B430077C784 /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RealmSwiftTests-BridgingHeader.h"; path = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h"; sourceTree = SOURCE_ROOT; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		E81A1FB41955FCE000FDED82 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -327,6 +334,8 @@
 				020F63DD1A8037DC007CB52E /* TestCase.swift */,
 				E8D89BA81955FC6D00CF2B9A /* Supporting Files */,
 				3F1A5E731992EB7400F45F4C /* TestHost */,
+				C0D8E1311A8196EE0077C784 /* TestUtils.h */,
+				C0D8E1321A8196EE0077C784 /* TestUtils.m */,
 			);
 			name = Tests;
 			path = Realm/Tests;
@@ -336,6 +345,7 @@
 			isa = PBXGroup;
 			children = (
 				E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */,
+				C0D8E1391A819B430077C784 /* RealmSwiftTests-BridgingHeader.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -347,6 +357,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D8E1341A8196EE0077C784 /* TestUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,6 +365,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D8E1331A8196EE0077C784 /* TestUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +603,7 @@
 				C0240C2C1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63EE1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F11A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
+				C0D8E1381A8199420077C784 /* TestUtils.m in Sources */,
 				020F63E81A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E51A8037DC007CB52E /* SwiftArrayTests.swift in Sources */,
 				020F63DF1A8037DC007CB52E /* ListTests.swift in Sources */,
@@ -628,6 +641,7 @@
 				C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63ED1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F01A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
+				C0D8E1371A8199420077C784 /* TestUtils.m in Sources */,
 				020F63E71A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E41A8037DC007CB52E /* SwiftArrayTests.swift in Sources */,
 				020F63DE1A8037DC007CB52E /* ListTests.swift in Sources */,
@@ -761,6 +775,7 @@
 				);
 				PRODUCT_NAME = "RealmSwift OSX Tests";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -790,6 +805,7 @@
 				);
 				PRODUCT_NAME = "RealmSwift OSX Tests";
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -896,6 +912,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -929,6 +946,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALIDATE_PRODUCT = YES;
 			};
