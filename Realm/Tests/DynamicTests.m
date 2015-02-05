@@ -17,8 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-
-//@import Realm.Private;
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
 
