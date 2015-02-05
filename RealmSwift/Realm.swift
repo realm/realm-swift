@@ -43,8 +43,13 @@ The location of the default Realm as a string. Can be overridden.
 
 :returns: Location of the default Realm.
 */
-public func defaultRealmPath() -> String {
-    return RLMRealm.defaultRealmPath()
+public var defaultRealmPath: String {
+    get {
+        return RLMRealm.defaultRealmPath()
+    }
+    set {
+        RLMRealm.setDefaultRealmPath(newValue)
+    }
 }
 
 /**
