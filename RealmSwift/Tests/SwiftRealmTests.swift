@@ -28,7 +28,7 @@ class SwiftRealmTests: TestCase {
     }
 
     func testDefaultRealmPath() {
-        XCTAssertEqual(defaultRealm().path, defaultRealmPath(), "Default Realm path should be correct.")
+        XCTAssertEqual(defaultRealm().path, defaultRealmPath, "Default Realm path should be correct.")
     }
 
     func testEmptyWriteTransaction() {
