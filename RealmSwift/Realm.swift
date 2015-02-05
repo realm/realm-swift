@@ -410,9 +410,9 @@ public final class Realm {
 
     :param: objects A sequence which contains objects to be added to this Realm.
     */
-    public func add<S where S: SequenceType>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-            RLMAddObjectToRealm(obj as Object, rlmRealm, .allZeros)
+            add(obj)
         }
     }
 
@@ -441,9 +441,9 @@ public final class Realm {
 
     :param: objects A sequence of `Object`s to be added to this Realm.
     */
-    public func addOrUpdate<S where S: SequenceType>(objects: S) {
+    public func addOrUpdate<S: SequenceType where S.Generator.Element == Object>(objects: S) {
         for obj in objects {
-            rlmRealm.addOrUpdateObject(obj as RLMObject)
+            addOrUpdate(obj)
         }
     }
 
@@ -461,15 +461,6 @@ public final class Realm {
 
     :param: object The objects to be deleted.
     */
-    public func delete(objects: [Object]) {
-        rlmRealm.deleteObjects(objects)
-    }
-
-    /**
-    Deletes the given objects from this Realm.
-
-    :param: object The objects to be deleted.
-    */
     public func delete(objects: List<Object>) {
         rlmRealm.deleteObjects(objects)
     }
@@ -479,8 +470,10 @@ public final class Realm {
 
     :param: object The objects to be deleted.
     */
-    public func delete(objects: Results<Object>) {
-        rlmRealm.deleteObjects(objects)
+    public func delete<S: SequenceType where S.Generator.Element == Object>(objects: S) {
+        for obj in objects {
+            delete(obj)
+        }
     }
 
     /**
