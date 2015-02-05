@@ -347,9 +347,13 @@ public final class Realm {
     /**
     Update a `Realm` and outstanding objects to point to the most recent
     data for this `Realm`.
+
+    :returns: Whether the realm had any updates.
+              Note that this may return true even if no data has actually changed.
+
     */
-    public func refresh() {
-        rlmRealm.refresh()
+    public func refresh() -> Bool {
+        return rlmRealm.refresh()
     }
 
     // MARK: Invalidation
