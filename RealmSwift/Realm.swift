@@ -57,7 +57,7 @@ directory on OS X.
 :returns: The default `Realm` instance for the current thread.
 */
 public func defaultRealm() -> Realm {
-    return Realm(rlmRealm: RLMRealm.defaultRealm())
+    return Realm(RLMRealm.defaultRealm())
 }
 
 /**
@@ -133,7 +133,7 @@ public class Realm {
 
     // MARK: Initializers
 
-    init(rlmRealm: RLMRealm) {
+    init(_ rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 
@@ -143,7 +143,7 @@ public class Realm {
     :param: path Path to the realm file.
     */
     public convenience init(path: String) {
-        self.init(rlmRealm: RLMRealm(path: path, readOnly: false, error: nil))
+        self.init(RLMRealm(path: path, readOnly: false, error: nil))
     }
 
     /**
@@ -162,7 +162,7 @@ public class Realm {
     :param: identifier A string used to identify a particular in-memory Realm.
     */
     public convenience init(inMemoryIdentifier: String) {
-        self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
+        self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
     /**
@@ -186,9 +186,9 @@ public class Realm {
     */
     public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
+            self.init(rlmRealm)
         } else {
-            self.init(rlmRealm: RLMRealm())
+            self.init(RLMRealm())
             return nil
         }
     }
@@ -213,9 +213,9 @@ public class Realm {
     */
     public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
         if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
+            self.init(rlmRealm)
         } else {
-            self.init(rlmRealm: RLMRealm())
+            self.init(RLMRealm())
             return nil
         }
     }
@@ -520,6 +520,6 @@ public typealias NotificationBlock = (notification: Notification, realm: Realm) 
 
 func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
+        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
     }
 }
