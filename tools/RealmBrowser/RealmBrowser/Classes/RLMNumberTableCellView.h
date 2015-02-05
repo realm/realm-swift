@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 #import "RLMTableCellView.h"
 #import "RLMTextField.h"
 

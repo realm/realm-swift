@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <Realm/Realm.h>
+@import Foundation;
+@import Realm;
 
 @interface RLMDescriptions : NSObject
 

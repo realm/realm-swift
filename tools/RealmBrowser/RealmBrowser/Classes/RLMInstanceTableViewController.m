@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMInstanceTableViewController.h"
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 #import "RLMRealmBrowserWindowController.h"
 #import "RLMArrayNavigationState.h"
@@ -39,7 +39,7 @@
 #import "objc/objc-class.h"
 
 #import "RLMDescriptions.h"
-#import "Realm_Private.h"
+@import Realm.Private;
 
 NSString * const kRLMObjectType = @"RLMObjectType";
 static const NSInteger NOT_A_COLUMN = -1;

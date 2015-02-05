@@ -16,9 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+@import Realm;
+
 #import "RLMApplicationDelegate.h"
 
-#import <Realm/Realm.h>
 #import "RLMTestDataGenerator.h"
 
 #import "TestClasses.h"

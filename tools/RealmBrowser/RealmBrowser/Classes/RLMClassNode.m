@@ -23,7 +23,7 @@
 #import "RLMResultsNode.h"
 
 #import "RLMSidebarTableCellView.h"
-#import "Realm_Private.h"
+@import Realm.Private;
 
 @interface RLMClassNode ()
 
