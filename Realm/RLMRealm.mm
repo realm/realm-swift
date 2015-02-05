@@ -158,6 +158,10 @@ static NSArray *realmsAtPath(NSString *path) {
     }
 }
 
+static bool realmsOpenAtPath(NSString *path) {
+    return realmsAtPath(path).count > 0;
+}
+
 static void clearRealmCache() {
     @synchronized(s_realmsPerPath) {
         for (NSMapTable *map in s_realmsPerPath.allValues) {
@@ -807,7 +811,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
-    if (realmsAtPath(realmPath)) {
+    if (realmsOpenAtPath(realmPath)) {
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
@@ -854,7 +858,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
-    if (realmsAtPath(realmPath)) {
+    if (realmsOpenAtPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
