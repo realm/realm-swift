@@ -311,6 +311,37 @@ public final class Realm {
         rlmRealm.commitWriteTransaction()
     }
 
+    /**
+    Revert all writes made in the current write transaction and end the transaction.
+
+    This rolls back all objects in the Realm to the state they were in at the
+    beginning of the write transaction, and then ends the transaction.
+
+    This restores the data for deleted objects, but does not re-validated deleted
+    accessor objects. Any `Object`s which were added to the Realm will be
+    invalidated rather than switching back to standalone objects.
+    Given the following code:
+
+    ```swift
+    let oldObject = objects(ObjectType).first!
+    let newObject = ObjectType()
+
+    realm.beginWrite()
+    realm.add(newObject)
+    realm.delete(oldObject)
+    realm.cancelWrite()
+    ```
+
+    Both `oldObject` and `newObject` will return `true` for `invalidated`,
+    but re-running the query which provided `oldObject` will once again return
+    the valid object.
+
+    Calling this when not in a write transaction will throw an exception.
+    */
+    public func cancelWrite() {
+        rlmRealm.cancelWriteTransaction()
+    }
+
     // MARK: Refresh
 
     /**
