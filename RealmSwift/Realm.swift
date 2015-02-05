@@ -87,7 +87,7 @@ strong references to it.
           call it in each block which is dispatched, as a queue is not guaranteed to run
           on a consistent thread.
 */
-public class Realm {
+public final class Realm {
 
     // MARK: Properties
 
