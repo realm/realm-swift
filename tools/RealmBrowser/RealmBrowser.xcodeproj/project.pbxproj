@@ -195,7 +195,6 @@
 		84E35A48196AD991007F0344 /* RLMNavigationStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMNavigationStack.m; path = Classes/RLMNavigationStack.m; sourceTree = "<group>"; };
 		84E35A4B196B021B007F0344 /* RLMArrayNavigationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMArrayNavigationState.h; path = Classes/RLMArrayNavigationState.h; sourceTree = "<group>"; };
 		84E35A4C196B021B007F0344 /* RLMArrayNavigationState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMArrayNavigationState.m; path = Classes/RLMArrayNavigationState.m; sourceTree = "<group>"; };
-		E84EB8261A2FC24500EB780E /* Realm_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Realm_Private.h; path = Classes/Realm_Private.h; sourceTree = "<group>"; };
 		E84EB8271A2FC38C00EB780E /* RLMTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		E84EB8281A2FC38C00EB780E /* RLMTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTestObjects.m; sourceTree = "<group>"; };
 		E8E3D63D19E0729B00C67D13 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../build/DerivedData/Realm/Build/Products/Release/Realm.framework; sourceTree = "<group>"; };
@@ -356,7 +355,6 @@
 		84945D5D1945CC380081C67B /* Aux */ = {
 			isa = PBXGroup;
 			children = (
-				E84EB8261A2FC24500EB780E /* Realm_Private.h */,
 				22A55FEF19D19842009178BC /* RLMDescriptions.h */,
 				22A55FF019D19842009178BC /* RLMDescriptions.m */,
 				84925C64195AE8E800EE27B1 /* UI */,

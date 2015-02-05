@@ -44,7 +44,8 @@ command:
   ios-dynamic:             builds iOS dynamic frameworks
   ios-static:              builds a fat iOS static framework
   osx:                     builds OS X framework
-  test-ios:                tests iOS framework
+  test-ios:                tests iOS static framework
+  test-ios-dynamic:        tests iOS dynamic framework
   test-ios-devices:        tests iOS on all attached iOS devices
   test-osx:                tests OSX framework
   test:                    tests iOS and OS X frameworks
@@ -226,7 +227,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -exec rm -r "{}" \;
+        find . -type d -name build -exec rm -r "{}" +\;
         exit 0
         ;;
 
@@ -274,8 +275,8 @@ case "$COMMAND" in
         ;;
 
     "ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphonesimulator -destination 'name=iPhone 6'"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION-dynamic build -sdk iphoneos"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION-dynamic build -sdk iphonesimulator -destination 'name=iPhone 6'"
         exit 0
         ;;
 
@@ -330,7 +331,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-dynamic")
-        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme iOS -configuration $CONFIGURATION-dynamic -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 

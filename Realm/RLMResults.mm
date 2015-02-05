@@ -24,7 +24,6 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMConstants.h"
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
