@@ -22,14 +22,17 @@ import Realm.Private
 // MARK: Object Retrieval
 
 /**
-Returns all objects of the given type in the default Realm.
+Returns all objects of the given type in the specified Realm default realm,
+or in the default realm if the `realm` argument is omitted.
 
-:param: type The type of the objects to be returned.
+:param: type  The type of the objects to be returned.
+:param: realm The Realm instance to query.
+              The default Realm will be used if this argument is omitted.
 
-:returns: Results with all objects of the given type in the default Realm.
+:returns: Results with all objects of the given type in the given Realm.
 */
-public func objects<T: Object>(type: T.Type) -> Results<T> {
-    return Results<T>(RLMGetObjects(RLMRealm.defaultRealm(), T.className(), nil))
+public func objects<T: Object>(type: T.Type, inRealm realm: Realm = defaultRealm()) -> Results<T> {
+    return Results<T>(RLMGetObjects(realm.rlmRealm, T.className(), nil))
 }
 
 // MARK: Default Realm Helpers
@@ -510,19 +513,6 @@ public final class Realm {
     */
     public func removeNotification(notificationToken: NotificationToken) {
         rlmRealm.removeNotification(notificationToken)
-    }
-
-    // MARK: Object Retrieval
-
-    /**
-    Returns all objects of the given type in this Realm.
-
-    :param: type The type of the objects to be returned.
-
-    :returns: Results with all objects of the given type in this Realm.
-    */
-    public func objects<T: Object>(type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
     }
 }
 
