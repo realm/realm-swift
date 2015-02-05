@@ -50,7 +50,7 @@ public final class List<T: Object>: ListBase, SequenceType {
         if _rlmArray.realm == nil {
             return nil
         }
-        return Realm(rlmRealm: _rlmArray.realm)
+        return Realm(_rlmArray.realm)
     }
 
     // MARK: Initializers
