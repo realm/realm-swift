@@ -160,7 +160,7 @@ fi
 
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    TMP_DIR="/tmp/core_bin"
+    TMP_DIR="$TMPDIR/core_bin"
     mkdir -p "${TMP_DIR}"
     CORE_TMP_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip.tmp"
     CORE_ZIP="${TMP_DIR}/core-${REALM_CORE_VERSION}.zip"
@@ -511,7 +511,7 @@ case "$COMMAND" in
         ;;
 
     "package-release")
-        TEMPDIR=$(mktemp -d /tmp/realm-release-package.XXXX)
+        TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package.XXXX)
 
         cd tightdb_objc
         VERSION=$(sh build.sh get-version)
