@@ -93,6 +93,9 @@
 		C0D8E12C1A8174090077C784 /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12B1A8174090077C784 /* SortDescriptor.swift */; };
 		C0D8E12D1A8174090077C784 /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12B1A8174090077C784 /* SortDescriptor.swift */; };
 		C0D8E12F1A81749D0077C784 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */; };
+		C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
+		C0240C2C1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
+		C0240C2D1A84090000858BFA /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0240C2A1A84090000858BFA /* RealmTests.swift */; };
 		C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -191,6 +194,7 @@
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0D8E12B1A8174090077C784 /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptor.swift; path = RealmSwift/SortDescriptor.swift; sourceTree = SOURCE_ROOT; };
+		C0240C2A1A84090000858BFA /* RealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RealmTests.swift; path = RealmSwift/Tests/RealmTests.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = RealmSwift/Tests/SortDescriptorTests.swift; sourceTree = SOURCE_ROOT; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
@@ -310,6 +314,7 @@
 			children = (
 				020F63D41A8037DC007CB52E /* ListTests.swift */,
 				02616BD41A817FC8009919CB /* MigrationTests.swift */,
+				C0240C2A1A84090000858BFA /* RealmTests.swift */,
 				020F63D51A8037DC007CB52E /* ResultsTests.swift */,
 				C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */,
 				020F63D61A8037DC007CB52E /* SwiftArrayTests.swift */,
@@ -583,6 +588,7 @@
 				020F63EB1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
 				C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
 				020F63E21A8037DC007CB52E /* ResultsTests.swift in Sources */,
+				C0240C2C1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63EE1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F11A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
 				020F63E81A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
@@ -619,6 +625,7 @@
 				020F63EA1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
 				C0D8E12F1A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
 				020F63E11A8037DC007CB52E /* ResultsTests.swift in Sources */,
+				C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63ED1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F01A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
 				020F63E71A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
@@ -637,6 +644,7 @@
 				020F63F51A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
 				020F63EC1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
 				020F63E31A8037DC007CB52E /* ResultsTests.swift in Sources */,
+				C0240C2D1A84090000858BFA /* RealmTests.swift in Sources */,
 				020F63EF1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F21A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
 				020F63E91A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
