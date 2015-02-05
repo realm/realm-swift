@@ -113,7 +113,7 @@ public final class Realm {
 
     // MARK: Properties
 
-    var rlmRealm: RLMRealm
+    internal var rlmRealm: RLMRealm
 
     /// Path to the file where this Realm is persisted.
     public var path: String { return rlmRealm.path }
@@ -160,7 +160,7 @@ public final class Realm {
 
     // MARK: Initializers
 
-    init(_ rlmRealm: RLMRealm) {
+    internal init(_ rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
     }
 
@@ -564,7 +564,7 @@ public enum Notification: String {
 /// Closure to run when the data in a Realm was modified.
 public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
 
-func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
+internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
         return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
     }
