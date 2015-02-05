@@ -35,7 +35,7 @@ class SwiftPropertyTypeTest: TestCase {
         SwiftIntObject.createInRealm(realm, withObject: [negativeLongNumber])
         realm.commitWrite()
         
-        let objects = realm.objects(SwiftIntObject)
+        let objects = RealmSwift.objects(SwiftIntObject.self, inRealm: realm)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")
@@ -68,7 +68,7 @@ class SwiftPropertyTypeTest: TestCase {
             realm.add(obj)
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject).first!
+        let obj = objects(SwiftAllIntSizesObject.self, inRealm: realm).first!
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)

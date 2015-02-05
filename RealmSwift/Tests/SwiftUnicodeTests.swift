@@ -29,14 +29,14 @@ class SwiftUnicodeTests: TestCase {
             _  = SwiftStringObject.createInRealm(realm, withObject: [utf8TestString])
         }
 
-        let obj1 = realm.objects(SwiftStringObject).first!
+        let obj1 = objects(SwiftStringObject.self, inRealm: realm).first!
         XCTAssertEqual(obj1.stringCol, utf8TestString)
 
-        let obj2 = realm.objects(SwiftStringObject).filter("stringCol == %@", utf8TestString).first!
+        let obj2 = objects(SwiftStringObject.self, inRealm: realm).filter("stringCol == %@", utf8TestString).first!
         XCTAssertEqual(obj1, obj2)
         XCTAssertEqual(obj2.stringCol, utf8TestString)
 
-        XCTAssertEqual(Int(0), realm.objects(SwiftStringObject).filter("stringCol != %@", utf8TestString).count)
+        XCTAssertEqual(Int(0), objects(SwiftStringObject.self, inRealm: realm).filter("stringCol != %@", utf8TestString).count)
     }
 
     func testUTF8PropertyWithUTF8StringContents() {
@@ -45,11 +45,11 @@ class SwiftUnicodeTests: TestCase {
             _ = SwiftUTF8Object.createInRealm(realm, withObject: [utf8TestString])
         }
 
-        let obj1 = realm.objects(SwiftUTF8Object).first!
+        let obj1 = objects(SwiftUTF8Object.self, inRealm: realm).first!
         XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
 
         // Test fails because of rdar://17735684
-        let obj2 = realm.objects(SwiftUTF8Object).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString).first!
+        let obj2 = objects(SwiftUTF8Object.self, inRealm: realm).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString).first!
         XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 }
