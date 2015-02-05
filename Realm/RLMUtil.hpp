@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMConstants.h"
+#import <Realm/RLMConstants.h>
 #import <objc/runtime.h>
 
 #import <tightdb/binary_data.hpp>
