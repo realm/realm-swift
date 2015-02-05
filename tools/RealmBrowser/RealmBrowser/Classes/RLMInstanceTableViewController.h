@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 #import "RLMViewController.h"
 #import "RLMTableView.h"

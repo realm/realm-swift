@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 @class RLMTextField;
 @interface RLMTableCellView : NSTableCellView
