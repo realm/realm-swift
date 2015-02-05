@@ -211,8 +211,8 @@ public final class Realm {
                      that describes the problem. If you are not interested in
                      possible errors, omit the argument, or pass in `nil`.
     */
-    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
+    public convenience init?(path: String, readOnly: Bool, error: NSErrorPointer = nil) {
+        if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
             self.init(rlmRealm)
         } else {
             self.init(RLMRealm())
