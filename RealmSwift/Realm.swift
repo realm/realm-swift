@@ -239,9 +239,11 @@ public final class Realm {
     :param: error If an error occurs, upon return contains an `NSError` object
                   that describes the problem. If you are not interested in
                   possible errors, omit the argument, or pass in `nil`.
+
+    :returns: Whether the realm was copied successfully.
     */
-    public func writeCopyToPath(path: String, error: NSErrorPointer = nil) {
-        rlmRealm.writeCopyToPath(path, error: error)
+    public func writeCopyToPath(path: String, error: NSErrorPointer = nil) -> Bool {
+        return rlmRealm.writeCopyToPath(path, error: error)
     }
 
     /**
@@ -257,9 +259,11 @@ public final class Realm {
     :param: error         If an error occurs, upon return contains an `NSError` object
                           that describes the problem. If you are not interested in
                           possible errors, omit the argument, or pass in `nil`.
+
+    :returns: Whether the realm was copied successfully.
     */
-    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) {
-        rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
+    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) -> Bool {
+        return rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
     }
 
     // MARK: Transactions
