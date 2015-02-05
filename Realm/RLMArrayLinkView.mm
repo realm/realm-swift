@@ -23,7 +23,6 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMObjectStore.h"
-#import "RLMConstants.h"
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
