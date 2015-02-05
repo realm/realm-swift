@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-@import Cocoa;
 #import "RLMTableCellView.h"
 
 @interface RLMBasicTableCellView : RLMTableCellView
