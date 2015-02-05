@@ -56,10 +56,8 @@
 		026B0F241A780680005E26C8 /* SwiftUnicodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */; };
 		026B0F251A780680005E26C8 /* TransactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD11955FE0100FDED82 /* TransactionTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		026B0F261A780680005E26C8 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
-		026B0F2E1A7806BE005E26C8 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29E3C73A1A71C1C700B62C1D /* Realm.framework */; };
 		028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
 		028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */; };
-		028481F019CD064B0097A416 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
 		02AFB4631A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4641A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
 		02AFB4651A80343600E11938 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4611A80343600E11938 /* PropertyTests.m */; };
@@ -72,6 +70,8 @@
 		02B8EF5A19E601D80045A93D /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5819E601D80045A93D /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5C19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02B8EF5D19E7048D0045A93D /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 02B8EF5B19E7048D0045A93D /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		02DC51531A82E531002A6433 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E856D1D5195614A300FB2FCF /* Realm.framework */; };
+		02DC51541A82E539002A6433 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29E3C73A1A71C1C700B62C1D /* Realm.framework */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		29E3C7081A71C1C700B62C1D /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F641955FC9300FDED82 /* RLMAccessor.mm */; };
 		29E3C7091A71C1C700B62C1D /* RLMArray.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F671955FC9300FDED82 /* RLMArray.mm */; };
@@ -275,33 +275,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		026B0F061A780680005E26C8 /* PBXContainerItemProxy */ = {
+		02DC51511A82E52B002A6433 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E856D1D4195614A300FB2FCF;
+			remoteInfo = iOS;
+		};
+		02DC515B1A82EA39002A6433 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 29E3C7041A71C1C700B62C1D;
-			remoteInfo = "iOS-dynamic";
-		};
-		026B0F081A780680005E26C8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
-			remoteInfo = TestHost;
-		};
-		29EDB8D51A77026600458D80 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 29E3C7041A71C1C700B62C1D;
-			remoteInfo = "iOS-dynamic";
-		};
-		3F1A5E951992FD4800F45F4C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
-			remoteInfo = TestHost;
+			remoteInfo = "iOS Dynamic";
 		};
 		3F3243C119A6C7F90035E94B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -478,7 +464,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				026B0F2E1A7806BE005E26C8 /* Realm.framework in Frameworks */,
+				02DC51541A82E539002A6433 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,7 +488,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				028481F019CD064B0097A416 /* Realm.framework in Frameworks */,
+				02DC51531A82E531002A6433 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -839,12 +825,12 @@
 			buildPhases = (
 				026B0F091A780680005E26C8 /* Sources */,
 				026B0F271A780680005E26C8 /* Frameworks */,
+				02DC515E1A82EBCC002A6433 /* Copy Framework */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				026B0F051A780680005E26C8 /* PBXTargetDependency */,
-				026B0F071A780680005E26C8 /* PBXTargetDependency */,
+				02DC515C1A82EA39002A6433 /* PBXTargetDependency */,
 			);
 			name = "iOS Dynamic Tests";
 			productName = iOSTests;
@@ -933,8 +919,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				29EDB8D61A77026600458D80 /* PBXTargetDependency */,
-				3F1A5E961992FD4800F45F4C /* PBXTargetDependency */,
+				02DC51521A82E52B002A6433 /* PBXTargetDependency */,
 			);
 			name = "iOS Tests";
 			productName = iOSTests;
@@ -1029,8 +1014,8 @@
 				E8D89B971955FC6D00CF2B9A /* OSX */,
 				E8D89BA21955FC6D00CF2B9A /* OSX Tests */,
 				E856D1D4195614A300FB2FCF /* iOS */,
-				29E3C7041A71C1C700B62C1D /* iOS Dynamic */,
 				E856D1DE195614A400FB2FCF /* iOS Tests */,
+				29E3C7041A71C1C700B62C1D /* iOS Dynamic */,
 				026B0F041A780680005E26C8 /* iOS Dynamic Tests */,
 				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
@@ -1066,6 +1051,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+		};
+		02DC515E1A82EBCC002A6433 /* Copy Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rsync -av --filter \"- CVS/\" --filter \"- .svn/\" --filter \"- .git/\" --filter \"- .hg/\" --filter \"- Headers/\" --filter \"- PrivateHeaders/\" \"${BUILD_DIR}/${CONFIGURATION}-${PLATFORM_NAME}-dynamic/Realm.framework\" \"${CONFIGURATION_BUILD_DIR}/iOS Dynamic Tests.xctest/Frameworks\"";
 		};
 		293F98F01A76E05700C0199D /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1371,25 +1370,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		026B0F051A780680005E26C8 /* PBXTargetDependency */ = {
+		02DC51521A82E52B002A6433 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E856D1D4195614A300FB2FCF /* iOS */;
+			targetProxy = 02DC51511A82E52B002A6433 /* PBXContainerItemProxy */;
+		};
+		02DC515C1A82EA39002A6433 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 29E3C7041A71C1C700B62C1D /* iOS Dynamic */;
-			targetProxy = 026B0F061A780680005E26C8 /* PBXContainerItemProxy */;
-		};
-		026B0F071A780680005E26C8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
-			targetProxy = 026B0F081A780680005E26C8 /* PBXContainerItemProxy */;
-		};
-		29EDB8D61A77026600458D80 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 29E3C7041A71C1C700B62C1D /* iOS Dynamic */;
-			targetProxy = 29EDB8D51A77026600458D80 /* PBXContainerItemProxy */;
-		};
-		3F1A5E961992FD4800F45F4C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
-			targetProxy = 3F1A5E951992FD4800F45F4C /* PBXContainerItemProxy */;
+			targetProxy = 02DC515B1A82EA39002A6433 /* PBXContainerItemProxy */;
 		};
 		3F3243C219A6C7F90035E94B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1436,6 +1425,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
+					"$(CONFIGURATION_BUILD_DIR)-dynamic",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1443,7 +1433,6 @@
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-fobjc-arc-exceptions";
@@ -1461,6 +1450,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
+					"$(CONFIGURATION_BUILD_DIR)-dynamic",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1468,7 +1458,6 @@
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-fobjc-arc-exceptions";

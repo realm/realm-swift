@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#import  <tightdb/data_type.hpp>
 #import "RLMUtil.hpp"
+#import  <tightdb/data_type.hpp>
 
 @interface PropertyTypeTests : RLMTestCase
 @end
