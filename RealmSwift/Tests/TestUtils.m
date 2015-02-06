@@ -21,14 +21,14 @@
 @import XCTest;
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber) {
-    BOOL __didThrow = NO;
+    BOOL didThrow = NO;
     @try {
         block();
     }
     @catch (...) {
-        __didThrow = YES;
+        didThrow = YES;
     }
-    if (!__didThrow) {
+    if (!didThrow) {
         NSString *prefix = @"The given expression failed to throw an exception";
         message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
         [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
