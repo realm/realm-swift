@@ -34,7 +34,9 @@ public class Schema: Equatable {
 
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
-    public var objectSchema: [ObjectSchema] { return rlmSchema.objectSchema as [ObjectSchema] }
+    public var objectSchema: [ObjectSchema] {
+        return (rlmSchema.objectSchema as [RLMObjectSchema]).map { ObjectSchema(rlmObjectSchema: $0) }
+    }
 
     // MARK: Initializers
 
