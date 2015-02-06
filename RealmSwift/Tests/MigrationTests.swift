@@ -20,6 +20,7 @@ import XCTest
 import RealmSwift
 import Realm
 import Realm.Private
+import Foundation
 
 private func realmWithCustomSchema(path: String, schema :RLMSchema) -> RLMRealm {
     return RLMRealm(path: path, key: nil, readOnly: false, inMemory: false, dynamic: true, schema: schema, error: nil)!
@@ -194,6 +195,52 @@ class MigrationTests: TestCase {
         }
 
         XCTAssertEqual(objects(SwiftStringObject.self).count, 1)
+    }
+
+    // test getting/setting all property types
+    func testMigrationObject() {
+        defaultRealm().write({
+            var object = SwiftObject()
+            object.boolCol = true
+            object.objectCol = SwiftBoolObject(object:[true])
+            object.arrayCol.append(SwiftBoolObject(object:[false]))
+            defaultRealm().add(object)
+            return
+        })
+
+        self.migrateAndTestRealm(defaultRealmPath(), block: { migration, oldSchemaVersion in
+            var count = 0
+            migration.enumerate("SwiftObject", { oldObj, newObj in
+                XCTAssertEqual(oldObj["boolCol"] as Bool, true)
+                XCTAssertEqual(newObj["boolCol"] as Bool, true)
+                XCTAssertEqual(oldObj["intCol"] as Int, 123)
+                XCTAssertEqual(newObj["intCol"] as Int, 123)
+                XCTAssertEqual(oldObj["floatCol"] as Float, 1.23 as Float)
+                XCTAssertEqual(newObj["floatCol"] as Float, 1.23 as Float)
+                XCTAssertEqual(oldObj["doubleCol"] as Double, 12.3 as Double)
+                XCTAssertEqual(newObj["doubleCol"] as Double, 12.3 as Double)
+
+                var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
+                XCTAssertEqual(oldObj["binaryCol"] as NSData, binaryCol)
+                XCTAssertEqual(newObj["binaryCol"] as NSData, binaryCol)
+
+                var dateCol = NSDate(timeIntervalSince1970: 1)
+                XCTAssertEqual(oldObj["dateCol"] as NSDate, dateCol)
+                XCTAssertEqual(newObj["dateCol"] as NSDate, dateCol)
+
+                // FIXME - test that casting to SwiftBoolObject throws
+                XCTAssertEqual((oldObj["objectCol"] as MigrationObject)["boolCol"] as Bool, true)
+                XCTAssertEqual((newObj["objectCol"] as MigrationObject)["boolCol"] as Bool, true)
+
+                XCTAssertEqual((oldObj["arrayCol"] as List<MigrationObject>).count, 1)
+                XCTAssertEqual((oldObj["arrayCol"] as List<MigrationObject>)[0]["boolCol"] as Bool, false)
+                XCTAssertEqual((newObj["arrayCol"] as List<MigrationObject>).count, 1)
+                XCTAssertEqual((newObj["arrayCol"] as List<MigrationObject>)[0]["boolCol"] as Bool, false)
+
+                count += 1
+            })
+            XCTAssertEqual(count, 1)
+        })
     }
 }
 

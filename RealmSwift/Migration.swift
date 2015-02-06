@@ -213,7 +213,7 @@ public final class Migration {
 /// Object interface which allows untyped getters and setters for Objects during a migration.
 public final class MigrationObject : Object {
 
-    private var listProperties = [String: List<Object>]()
+    private var listProperties = [String: List<MigrationObject>]()
 
     /// Returns the value of the property with the given name.
     subscript(key: String) -> AnyObject? {
@@ -233,7 +233,7 @@ public final class MigrationObject : Object {
     :param: rlmArray `RLMArray` to set.
     */
     public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
-        listProperties[name] = List<Object>(rlmArray)
+        listProperties[name] = List<MigrationObject>(rlmArray)
     }
 }
 
