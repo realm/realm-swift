@@ -209,7 +209,7 @@ class MigrationTests: TestCase {
         })
 
         self.migrateAndTestRealm(defaultRealmPath(), block: { migration, oldSchemaVersion in
-            var count = 0
+            var enumerated = false
             migration.enumerate("SwiftObject", { oldObj, newObj in
                 XCTAssertEqual(oldObj["boolCol"] as Bool, true)
                 XCTAssertEqual(newObj["boolCol"] as Bool, true)
@@ -237,10 +237,45 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj["arrayCol"] as List<MigrationObject>).count, 1)
                 XCTAssertEqual((newObj["arrayCol"] as List<MigrationObject>)[0]["boolCol"] as Bool, false)
 
-                count += 1
+                // edit all values
+                newObj["boolCol"] = false
+                newObj["intCol"] = 1
+                newObj["floatCol"] = 1.0
+                newObj["doubleCol"] = 10.0
+                newObj["binaryCol"] = NSData(bytes: "b", length: 0)
+                newObj["dateCol"] = NSDate(timeIntervalSince1970: 2)
+
+                var list = newObj["arrayCol"] as List<MigrationObject>
+                list[0]["boolCol"] = true
+                list.append(newObj["objectCol"] as MigrationObject)
+                list.append(migration.create(SwiftBoolObject.className(), withObject: [true]))
+
+                newObj["objectCol"] = SwiftBoolObject(object: [false])
+
+                enumerated = true
             })
-            XCTAssertEqual(count, 1)
+            XCTAssertEqual(enumerated, true)
         })
+
+        // refresh to update realm
+        defaultRealm().refresh()
+
+        // check edited values
+        let object = objects(SwiftObject.self).first!
+        XCTAssertEqual(object.boolCol, false)
+        XCTAssertEqual(object.intCol, 1)
+        XCTAssertEqual(object.floatCol, 1.0 as Float)
+        XCTAssertEqual(object.doubleCol, 10.0)
+        XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 0))
+        XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 2))
+        XCTAssertEqual(object.objectCol.boolCol, false)
+        XCTAssertEqual(object.arrayCol.count, 3)
+        XCTAssertEqual(object.arrayCol[0].boolCol, true)
+        XCTAssertEqual(object.arrayCol[1].boolCol, true)
+        XCTAssertEqual(object.arrayCol[2].boolCol, true)
+
+        // make sure we added new bool objects as object property and in the list
+        XCTAssertEqual(objects(SwiftBoolObject).count, 4)
     }
 }
 
