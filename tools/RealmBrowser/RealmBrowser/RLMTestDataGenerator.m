@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestDataGenerator.h"
-#import <Realm/Realm.h>
+@import Realm;
 
 const NSUInteger kMaxItemsInTestArray = 12;
 

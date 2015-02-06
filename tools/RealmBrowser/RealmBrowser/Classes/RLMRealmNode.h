@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 #import "RLMClassNode.h"
 #import "RLMRealmOutlineNode.h"
 

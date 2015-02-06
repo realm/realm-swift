@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import <Realm/Realm.h>
-#import "Realm_Private.h"
+@import XCTest;
+@import Realm;
+@import Realm.Private;
 #import "RLMTestDataGenerator.h"
 #import "RLMTestObjects.h"
 

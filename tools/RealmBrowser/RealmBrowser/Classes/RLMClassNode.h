@@ -16,13 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import "RLMTypeNode.h"
 
 @class RLMObjectNode;
 @class RLMResultsNode;
 @class RLMResults;
+
 @interface RLMClassNode : RLMTypeNode
 
 @property (nonatomic) RLMResults *allObjects;

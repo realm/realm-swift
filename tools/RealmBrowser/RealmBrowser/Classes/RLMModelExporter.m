@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMModelExporter.h"
-#import <Realm/Realm.h>
+@import Realm;
 
 NSString * const kLanguageJava = @"Java";
 NSString * const kLanguageObjC = @"Objective-C";
