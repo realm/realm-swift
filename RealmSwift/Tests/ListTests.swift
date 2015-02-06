@@ -186,7 +186,7 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(1), array.filter(pred2).count)
     }
 
-    func testSortWithFormat() {
+    func testSortWithProperty() {
         array.append([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
@@ -372,7 +372,7 @@ class ListStandaloneTests: ListTests {
     }
 
     // Things not implemented in standalone
-    override func testSortWithFormat() { }
+    override func testSortWithProperty() { }
     override func testSortWithDescriptors() { }
     override func testFilterFormat() { }
     override func testFilterPredicate() { }
