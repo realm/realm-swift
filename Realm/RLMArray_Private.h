@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMArray.h"
+#import <Realm/RLMArray.h>
 
 @interface RLMArray ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
