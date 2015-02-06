@@ -102,19 +102,44 @@ public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBl
 }
 
 /**
+Get the schema version for an encrypted Realm at a given path.
+:param: realmPath     Path to a Realm file.
+:param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
+:param: error         If an error occurs, upon return contains an `NSError` object
+                      that describes the problem. If you are not interested in
+                      possible errors, omit the argument, or pass in `nil`.
+:returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
+*/
+public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt? {
+    let version = RLMRealm.schemaVersionAtPath(realmPath, encryptionKey: encryptionKey, error: error)
+    if version == RLMNotVersioned {
+        return nil
+    }
+    return version
+}
+
+/**
 Performs the registered migration block on a Realm at the given path.
 
 This method is called automatically when opening a Realm for the first time and does
 not need to be called explicitly. You can choose to call this method to control
 exactly when and how migrations are performed.
 
-:param: path The path of the Realm to migrate.
+:param: path          The path of the Realm to migrate.
+:param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
+                      If the Realms at the given path are not encrypted, omit the argument or pass
+                      in `nil`.
 
 :returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
           that occured otherwise.
 */
-public func migrateRealm(path: String) -> NSError? {
-    return RLMRealm.migrateRealmAtPath(path)
+public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
+    if encryptionKey == nil {
+        return RLMRealm.migrateRealmAtPath(path)
+    }
+    else {
+        return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
+    }
 }
 
 /**
@@ -123,7 +148,7 @@ of a `Realm` instance.
 
 This object provides access to the previous and current `Schema`s for this migration.
 */
-public class Migration {
+public final class Migration {
 
     // MARK: Properties
 
@@ -176,17 +201,17 @@ public class Migration {
 
     :param: object Object to be deleted from the Realm being migrated.
     */
-    public func delete(object: RLMObject) {
-        rlmMigration.deleteObject(object)
+    public func delete(object: MigrationObject) {
+        RLMDeleteObjectFromRealm(object)
     }
 
-    init(_ rlmMigration: RLMMigration) {
+    private init(_ rlmMigration: RLMMigration) {
         self.rlmMigration = rlmMigration
     }
 }
 
 /// Object interface which allows untyped getters and setters for Objects during a migration.
-public class MigrationObject : Object {
+public final class MigrationObject : Object {
 
     private var listProperties = [String: List<Object>]()
 
@@ -216,20 +241,15 @@ public class MigrationObject : Object {
 
 private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrationBlock {
     return { migration, oldVersion in
+        // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
             (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
         }
-
-        // copy old schema and reset after enumeration
-        let savedSchema = migration.newSchema.copy() as RLMSchema
         for objectSchema in migration.newSchema.objectSchema {
             (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
         }
 
         // run migration
         migrationBlock(migration: Migration(migration), oldSchemaVersion: oldVersion)
-
-        // reset old schema
-        RLMRealmSetSchema(migration.realm, savedSchema, true)
     }
 }

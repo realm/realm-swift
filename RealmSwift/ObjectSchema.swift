@@ -33,7 +33,9 @@ public class ObjectSchema: Equatable {
     var rlmObjectSchema: RLMObjectSchema
 
     /// Array of persisted `Property` objects for an object.
-    public var properties: [Property] { return rlmObjectSchema.properties as [Property] }
+    public var properties: [Property] {
+        return (rlmObjectSchema.properties as [RLMProperty]).map { Property(rlmProperty: $0) }
+    }
 
     /// The name of the class this schema describes.
     public var className: String { return rlmObjectSchema.className }
