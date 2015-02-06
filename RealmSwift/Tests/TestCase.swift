@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import Realm
 
-public func testRealmPath() -> String {
+internal func testRealmPath() -> String {
     return realmPathForFile("test.realm")
 }
 

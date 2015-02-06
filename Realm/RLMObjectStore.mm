@@ -326,23 +326,24 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
     static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
-    if ([object isKindOfClass:s_swiftObjectClass]) {
-        for (RLMProperty *prop in object.objectSchema.properties) {
-            if (prop.type == RLMPropertyTypeArray) {
-                static Class s_swiftMigrationObjectClass =  NSClassFromString(@"RealmSwift.MigrationObject");
-                BOOL isSwiftMigrationObject = object.class == s_swiftMigrationObjectClass;
-                if (prop.swiftListIvar || isSwiftMigrationObject) {
-                    RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                            view:object->_row.get_linklist(prop.column)
-                                                                           realm:object->_realm];
-                    if (isSwiftMigrationObject) {
-                        [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
-                    }
-                    else {
-                        auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
-                        list._rlmArray = array;
-                    }
-                }
+    if (![object isKindOfClass:s_swiftObjectClass]) {
+        return;
+    }
+
+    for (RLMProperty *prop in object.objectSchema.properties) {
+        if (prop.type == RLMPropertyTypeArray) {
+            static Class s_swiftMigrationObjectClass = NSClassFromString(@"RealmSwift.MigrationObject");
+            if (object.class == s_swiftMigrationObjectClass) {
+                RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                        view:object->_row.get_linklist(prop.column)
+                                                                       realm:object->_realm];
+                [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
+            }
+            else {
+                auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
+                list._rlmArray = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                       view:object->_row.get_linklist(prop.column)
+                                                                      realm:object->_realm];;
             }
         }
     }

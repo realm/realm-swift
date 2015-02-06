@@ -102,7 +102,7 @@ public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBl
 }
 
 /**
-Get the schema version for an encrypted Realm at a given path.
+Get the schema version for a Realm at a given path.
 :param: realmPath     Path to a Realm file.
 :param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
 :param: error         If an error occurs, upon return contains an `NSError` object
@@ -225,11 +225,9 @@ public final class MigrationObject : Object {
         }
         set(value) {
             if (self.objectSchema[key].type == RLMPropertyType.Array) {
-                fatalError("Setting List properties during migrations is unsupported.")
+                fatalError("Setting List properties during migrations is unsupported. Instead you and and remove objects from the current List.")
             }
-            else {
-                super[key] = value
-            }
+            super[key] = value
         }
     }
 
