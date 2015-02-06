@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,26 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import "RLMTestCase.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-#ifdef __cplusplus
-}
-#endif
+@interface RLMMultiProcessTestCase : RLMTestCase
+// if true, this is running the main test process
+@property (nonatomic, readonly) bool isParent;
 
-@interface RLMTestCase : XCTestCase
-
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-- (void)deleteFiles;
-
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
-
+// spawn a child process running the current test and wait for it complete
+// returns the return code of the process
+- (int)runChildAndWait;
 @end
+
+#define RLMRunChildAndWait() \
+    XCTAssertEqual(0, [self runChildAndWait], @"Tests in child process failed")
