@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMArray.h"
+#import "RLMArray_Private.h"
 #import "RLMResults.h"
 
 #import <memory>
