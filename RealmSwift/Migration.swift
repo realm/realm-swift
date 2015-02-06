@@ -225,7 +225,7 @@ public final class MigrationObject : Object {
         }
         set(value) {
             if (self.objectSchema[key].type == RLMPropertyType.Array) {
-                fatalError("Setting List properties during migrations is unsupported. Instead you and and remove objects from the current List.")
+                fatalError("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
             }
             super[key] = value
         }
