@@ -325,10 +325,12 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 
 static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
-    if ([object isKindOfClass:NSClassFromString(@"RealmSwift.Object")]) {
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwift.Object");
+    if ([object isKindOfClass:s_swiftObjectClass]) {
         for (RLMProperty *prop in object.objectSchema.properties) {
             if (prop.type == RLMPropertyTypeArray) {
-                BOOL isSwiftMigrationObject = object.class == NSClassFromString(@"RealmSwift.MigrationObject");
+                static Class s_swiftMigrationObjectClass =  NSClassFromString(@"RealmSwift.MigrationObject");
+                BOOL isSwiftMigrationObject = object.class == s_swiftMigrationObjectClass;
                 if (prop.swiftListIvar || isSwiftMigrationObject) {
                     RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
                                                                             view:object->_row.get_linklist(prop.column)
