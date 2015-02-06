@@ -327,16 +327,19 @@ static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
     if ([object isKindOfClass:NSClassFromString(@"RealmSwift.Object")]) {
         for (RLMProperty *prop in object.objectSchema.properties) {
-            if (prop.swiftListIvar) {
-                RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                        view:object->_row.get_linklist(prop.column)
-                                                                       realm:object->_realm];
-                if (object.class == NSClassFromString(@"RealmSwift.MigrationObject")) {
-                    [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
-                }
-                else {
-                    auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
-                    list._rlmArray = array;
+            if (prop.type == RLMPropertyTypeArray) {
+                BOOL isSwiftMigrationObject = object.class == NSClassFromString(@"RealmSwift.MigrationObject");
+                if (prop.swiftListIvar || isSwiftMigrationObject) {
+                    RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                            view:object->_row.get_linklist(prop.column)
+                                                                           realm:object->_realm];
+                    if (isSwiftMigrationObject) {
+                        [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
+                    }
+                    else {
+                        auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
+                        list._rlmArray = array;
+                    }
                 }
             }
         }
