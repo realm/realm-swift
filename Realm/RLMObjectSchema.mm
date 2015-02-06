@@ -177,7 +177,7 @@
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        Class objectUtil = NSClassFromString(@"RealmSwift.ObjectUtil");
+        static Class objectUtil = NSClassFromString(@"RealmSwift.ObjectUtil");
         for (NSString *propName in [objectUtil getGenericListPropertyNames:swiftObjectInstance]) {
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
