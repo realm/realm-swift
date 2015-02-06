@@ -242,7 +242,7 @@ class MigrationTests: TestCase {
                 newObj["intCol"] = 1
                 newObj["floatCol"] = 1.0
                 newObj["doubleCol"] = 10.0
-                newObj["binaryCol"] = NSData(bytes: "b", length: 0)
+                newObj["binaryCol"] = NSData(bytes: "b", length: 1)
                 newObj["dateCol"] = NSDate(timeIntervalSince1970: 2)
 
                 var list = newObj["arrayCol"] as List<MigrationObject>
@@ -266,7 +266,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.intCol, 1)
         XCTAssertEqual(object.floatCol, 1.0 as Float)
         XCTAssertEqual(object.doubleCol, 10.0)
-        XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 0))
+        XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 1))
         XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 2))
         XCTAssertEqual(object.objectCol.boolCol, false)
         XCTAssertEqual(object.arrayCol.count, 3)
