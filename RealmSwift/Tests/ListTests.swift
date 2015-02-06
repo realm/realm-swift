@@ -216,16 +216,26 @@ class ListTests: TestCase {
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
-        realmWithTestPath().add([obj1, obj2])
-        array.append([obj1, obj2])
+        let obj3 = SwiftAggregateObject()
+        obj3.intCol = 3
+        obj3.floatCol = 2.2
+        obj3.doubleCol = 2.22
+        obj3.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj3.boolCol = false
+
+        realmWithTestPath().add([obj1, obj2, obj3])
+        array.append([obj1, obj2, obj3])
 
         var sorted = array.sorted([SortDescriptor(property: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
         XCTAssertEqual(2, sorted[1].intCol)
 
-        sorted = array.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: true)])
+        sorted = array.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)])
         XCTAssertEqual(2.22, sorted[0].doubleCol)
-        XCTAssertEqual(1.11, sorted[1].doubleCol)
+        XCTAssertEqual(3, sorted[0].intCol)
+        XCTAssertEqual(2.22, sorted[1].doubleCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+        XCTAssertEqual(1.11, sorted[2].doubleCol)
     }
 
     func testFastEnumeration() {
