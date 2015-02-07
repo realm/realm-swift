@@ -20,3 +20,11 @@
 
 @implementation RealmObject1
 @end
+
+@implementation RealmObjectWithoutStoredProperties
+
++ (NSArray *)ignoredProperties {
+    return @[@"stringProp"];
+}
+
+@end
