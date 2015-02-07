@@ -509,6 +509,10 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
+    if (realmsOpenAtPath(path)) {
+        @throw RLMException(@"Cannot set encryption key for Realms that are already open.");
+    }
+
     setKeyForPath(validatedKey(key), path);
 }
 
