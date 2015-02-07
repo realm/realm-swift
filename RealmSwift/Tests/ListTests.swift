@@ -186,7 +186,7 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(1), array.filter(pred2).count)
     }
 
-    func testSort() {
+    func testSortWithProperty() {
         array.append([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
@@ -196,6 +196,46 @@ class ListTests: TestCase {
         sorted = array.sorted("stringCol", ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
+    }
+
+    func testSortWithDescriptors() {
+        let object = SwiftAggregateObjectList.createInRealm(realmWithTestPath(), withObject: [[]])
+        let array = object.list
+
+        let obj1 = SwiftAggregateObject()
+        obj1.intCol = 1
+        obj1.floatCol = 1.1
+        obj1.doubleCol = 1.11
+        obj1.dateCol = NSDate(timeIntervalSince1970: 1)
+        obj1.boolCol = false
+
+        let obj2 = SwiftAggregateObject()
+        obj2.intCol = 2
+        obj2.floatCol = 2.2
+        obj2.doubleCol = 2.22
+        obj2.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj2.boolCol = false
+
+        let obj3 = SwiftAggregateObject()
+        obj3.intCol = 3
+        obj3.floatCol = 2.2
+        obj3.doubleCol = 2.22
+        obj3.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj3.boolCol = false
+
+        realmWithTestPath().add([obj1, obj2, obj3])
+        array.append([obj1, obj2, obj3])
+
+        var sorted = array.sorted([SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(1, sorted[0].intCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+
+        sorted = array.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)])
+        XCTAssertEqual(2.22, sorted[0].doubleCol)
+        XCTAssertEqual(3, sorted[0].intCol)
+        XCTAssertEqual(2.22, sorted[1].doubleCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+        XCTAssertEqual(1.11, sorted[2].doubleCol)
     }
 
     func testFastEnumeration() {
@@ -208,6 +248,16 @@ class ListTests: TestCase {
         XCTAssertEqual(str, "121")
     }
 
+    func testAppendObject() {
+        for str in [str1, str2, str1] {
+            array.append(str)
+        }
+        XCTAssertEqual(Int(3), array.count)
+        XCTAssertEqual(str1, array[0])
+        XCTAssertEqual(str2, array[1])
+        XCTAssertEqual(str1, array[2])
+    }
+
     func testAppendArray() {
         array.append([str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
@@ -216,7 +266,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[2])
     }
 
-    func testAppendRLMResults() {
+    func testAppendResults() {
         array.append(realmWithTestPath().objects(SwiftStringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
@@ -265,12 +315,18 @@ class ListTests: TestCase {
 
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
+
+        array.removeLast() // should be a no-op
+        XCTAssertEqual(Int(0), array.count)
     }
 
     func testRemoveAll() {
         array.append([str1, str2])
 
         array.removeAll()
+        XCTAssertEqual(Int(0), array.count)
+
+        array.removeAll() // should be a no-op
         XCTAssertEqual(Int(0), array.count)
     }
 
@@ -296,6 +352,26 @@ class ListTests: TestCase {
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
+
+    func testPopulateEmptyArray() {
+        XCTAssertEqual(array.count, 0, "Should start with no array elements.")
+
+        let obj = SwiftStringObject()
+        obj.stringCol = "a"
+        array.append(obj)
+        array.append(SwiftStringObject.createInRealm(realmWithTestPath(), withObject: ["b"]))
+        array.append(obj)
+
+        XCTAssertEqual(array.count, 3)
+        XCTAssertEqual(array[0].stringCol, "a")
+        XCTAssertEqual(array[1].stringCol, "b")
+        XCTAssertEqual(array[2].stringCol, "a")
+
+        // Make sure we can enumerate
+        for obj in array {
+            XCTAssertTrue(countElements(obj.description) > 0, "Object should have description")
+        }
+    }
 }
 
 class ListStandaloneTests: ListTests {
@@ -306,7 +382,8 @@ class ListStandaloneTests: ListTests {
     }
 
     // Things not implemented in standalone
-    override func testSort() { }
+    override func testSortWithProperty() { }
+    override func testSortWithDescriptors() { }
     override func testFilterFormat() { }
     override func testFilterPredicate() { }
     override func testIndexOfFormat() { }

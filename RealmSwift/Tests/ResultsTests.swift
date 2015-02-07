@@ -51,8 +51,15 @@ class ResultsTests: TestCase {
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
-        realmWithTestPath().add([obj1, obj2])
-        return [obj1, obj2]
+        let obj3 = SwiftAggregateObject()
+        obj3.intCol = 3
+        obj3.floatCol = 2.2
+        obj3.doubleCol = 2.22
+        obj3.dateCol = NSDate(timeIntervalSince1970: 2)
+        obj3.boolCol = false
+
+        realmWithTestPath().add([obj1, obj2, obj3])
+        return [obj1, obj2, obj3]
     }
 
     override func setUp() {
@@ -87,6 +94,10 @@ class ResultsTests: TestCase {
             return nil
         }
         return super.defaultTestSuite()
+    }
+
+    func testRealm() {
+        XCTAssertEqual(results.realm.path, realmWithTestPath().path)
     }
 
     func testDescription() {
@@ -158,7 +169,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(0), results.filter(pred3).count)
     }
 
-    func testSort() {
+    func testSortWithProperty() {
         var sorted = results.sorted("stringCol", ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
@@ -168,34 +179,49 @@ class ResultsTests: TestCase {
         XCTAssertEqual("1", sorted[1].stringCol)
     }
 
+    func testSortWithDescriptor() {
+        let results = getAggregateableResults()
+
+        var sorted = results.sorted([SortDescriptor(property: "intCol", ascending: true)])
+        XCTAssertEqual(1, sorted[0].intCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+
+        sorted = results.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)])
+        XCTAssertEqual(2.22, sorted[0].doubleCol)
+        XCTAssertEqual(3, sorted[0].intCol)
+        XCTAssertEqual(2.22, sorted[1].doubleCol)
+        XCTAssertEqual(2, sorted[1].intCol)
+        XCTAssertEqual(1.11, sorted[2].doubleCol)
+    }
+
     func testMin() {
         let results = getAggregateableResults()
-        XCTAssertEqual(1, results.min("intCol") as Int)
-        XCTAssertEqual(Float(1.1), results.min("floatCol") as Float)
-        XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double)
-        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate)
+        XCTAssertEqual(1, results.min("intCol") as Int!)
+        XCTAssertEqual(Float(1.1), results.min("floatCol") as Float!)
+        XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
     }
 
     func testMax() {
         let results = getAggregateableResults()
-        XCTAssertEqual(2, results.max("intCol") as Int)
-        XCTAssertEqual(Float(2.2), results.max("floatCol") as Float)
-        XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double)
-        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate)
+        XCTAssertEqual(3, results.max("intCol") as Int!)
+        XCTAssertEqual(Float(2.2), results.max("floatCol") as Float!)
+        XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
+        XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
     }
 
     func testSum() {
         let results = getAggregateableResults()
-        XCTAssertEqual(Int(3), results.sum("intCol") as Int)
-        XCTAssertEqualWithAccuracy(Float(3.3), results.sum("floatCol") as Float, 0.001)
-        XCTAssertEqual(Double(3.33), results.sum("doubleCol") as Double)
+        XCTAssertEqual(Int(6), results.sum("intCol") as Int)
+        XCTAssertEqualWithAccuracy(Float(5.5), results.sum("floatCol") as Float, 0.001)
+        XCTAssertEqualWithAccuracy(Double(5.55), results.sum("doubleCol") as Double, 0.001)
     }
 
     func testAverage() {
         let results = getAggregateableResults()
-        XCTAssertEqual(Int(1), results.average("intCol") as Int)
-        XCTAssertEqualWithAccuracy(Float(1.65), results.average("floatCol") as Float, 0.001)
-        XCTAssertEqual(Double(1.665), results.average("doubleCol") as Double)
+        XCTAssertEqual(Int(2), results.average("intCol") as Int)
+        XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float, 0.001)
+        XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double, 0.001)
     }
 
     func testFastEnumeration() {
@@ -208,7 +234,7 @@ class ResultsTests: TestCase {
     }
 }
 
-class ResultsFromTableViewTests: ResultsTests {
+class ResultsFromTableTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
         return realmWithTestPath().objects(SwiftStringObject)
     }
@@ -219,9 +245,20 @@ class ResultsFromTableViewTests: ResultsTests {
     }
 }
 
+class ResultsFromTableViewTests: ResultsTests {
+    override func getResults() -> Results<SwiftStringObject> {
+        return realmWithTestPath().objects(SwiftStringObject)
+    }
+
+    override func getAggregateableResults() -> Results<SwiftAggregateObject> {
+        makeAggregateableObjects()
+        return realmWithTestPath().objects(SwiftAggregateObject).filter("trueCol == true")
+    }
+}
+
 class ResultsFromLinkViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-    let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(),
+        let array = SwiftArrayPropertyObject.createInRealm(realmWithTestPath(),
         withObject: ["", [str1, str2], []])
         return array.array.filter("stringCol != ''") // i.e. all of them
     }

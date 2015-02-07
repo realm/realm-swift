@@ -60,7 +60,7 @@ public final class List<T: Object>: ListBase, SequenceType {
         super.init(array: RLMArray(objectClassName: T.className()))
     }
 
-    init(_ rlmArray: RLMArray) {
+    internal init(_ rlmArray: RLMArray) {
         super.init(array: rlmArray)
     }
 
@@ -99,7 +99,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: The index of the given object, or `nil` if the object is not in the list.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
-        return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
+        return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
     // MARK: Object Retrieval
@@ -164,7 +164,18 @@ public final class List<T: Object>: ListBase, SequenceType {
     :returns: `Results` containing list elements sorted by the given property.
     */
     public func sorted(property: String, ascending: Bool = true) -> Results<T> {
-        return Results<T>(_rlmArray.sortedResultsUsingProperty(property, ascending: ascending))
+        return sorted([SortDescriptor(property: property, ascending: ascending)])
+    }
+
+    /**
+    Returns `Results` with elements sorted by the given sort descriptors.
+
+    :param: sortDescriptors `SortDescriptor`s to sort by.
+
+    :returns: `Results` with elements sorted by the given sort descriptors.
+    */
+    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T> {
+        return Results<T>(_rlmArray.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Sequence Support
