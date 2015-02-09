@@ -5,6 +5,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * `attributesForProperty:` has been removed from `RLMObject`. You now specify indexed
   properties by implementing the `indexedProperties` method.
+* An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`, 
+  `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:` 
+  when a Realm at the given path is already open.
 
 ### Enhancements
 
