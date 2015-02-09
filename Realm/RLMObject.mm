@@ -31,6 +31,9 @@
 // that).
 @implementation RLMObject
 
+// These properties are synthesized in RLMObjectBase
+@dynamic objectSchema, realm, invalidated;
+
 - (instancetype)init {
     return [super init];
 }
