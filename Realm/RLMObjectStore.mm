@@ -242,7 +242,9 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
 
         // validate versions
         if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
-            @throw RLMException(@"Version of Realm file on disk is higher than current schema version", @{@"path" : realm.path});
+            NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu",
+                                                          realm.path, (unsigned long)oldVersion, (unsigned long)newVersion];
+            @throw RLMException(reason, @{@"path" : realm.path});
         }
 
         // create tables
