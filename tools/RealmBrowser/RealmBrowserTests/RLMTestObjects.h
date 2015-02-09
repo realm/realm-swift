@@ -22,3 +22,7 @@
 @property NSInteger intProp;
 @property NSString *stringProp;
 @end
+
+@interface RealmObjectWithoutStoredProperties : RLMObject
+@property NSString *stringProp;
+@end

@@ -123,10 +123,11 @@
     NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:classCount];
     
     for (NSUInteger index = 0; index < classCount; index++) {
-        RLMObjectSchema *objectSchema = allObjectSchemas[index];        
-        RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
-        
-        [result addObject:tableNode];
+        RLMObjectSchema *objectSchema = allObjectSchemas[index];
+        if (objectSchema.properties.count > 0) {
+            RLMClassNode *tableNode = [[RLMClassNode alloc] initWithSchema:objectSchema inRealm:_realm];
+            [result addObject:tableNode];
+        }
     }
     
     return result;

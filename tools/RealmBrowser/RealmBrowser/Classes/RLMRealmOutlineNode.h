@@ -17,8 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 @import Foundation;
-
-#import "RLMRealmOutlineNode.h"
+@import Cocoa;
 
 @protocol RLMRealmOutlineNode <NSObject>
 

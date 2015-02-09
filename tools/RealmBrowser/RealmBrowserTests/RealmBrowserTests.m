@@ -21,6 +21,7 @@
 @import Realm.Private;
 #import "RLMTestDataGenerator.h"
 #import "RLMTestObjects.h"
+#import "RLMRealmNode.h"
 
 @interface RealmBrowserTests : XCTestCase
 
@@ -47,6 +48,23 @@
     XCTAssertNil(error);
     XCTAssertNotNil(realm);
     XCTAssertEqual(10, [[realm allObjects:[RealmObject1 className]] count]);
+}
+
+- (void)testDoesNotShowObjectsWithNoPersistedProperties {
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [[NSUUID UUID] UUIDString]];
+    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    @autoreleasepool {
+        BOOL success = [RLMTestDataGenerator createRealmAtUrl:fileURL withClassesNamed:@[[RealmObjectWithoutStoredProperties className]] objectCount:10];
+        XCTAssertTrue(success);
+    }
+    NSError *error = nil;
+    RLMRealmNode *realmNode = [[RLMRealmNode alloc] initWithName:@"name" url:fileURL.path];
+    XCTAssertTrue([realmNode connect:&error]);
+    XCTAssertNil(error);
+    XCTAssertNotNil(realmNode.topLevelClasses);
+    for (RLMClassNode *node in realmNode.topLevelClasses) {
+        XCTAssertNotEqualObjects(@"RealmObjectWithoutStoredProperties", node.name);
+    }
 }
 
 @end
