@@ -1077,4 +1077,28 @@ extern "C" {
     flock(fd, LOCK_UN);
     close(fd);
 }
+
+- (void)testCannotSetSchemaVersionWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertThrows([RLMRealm setSchemaVersion:1 forRealmAtPath:path withMigrationBlock:nil]);
+}
+
+- (void)testCannotMigrateRealmWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:path]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:path encryptionKey:[[NSMutableData alloc] initWithLength:64]]);
+}
+
+- (void)testCannotSetEncryptionKeyWhenRealmIsOpen {
+    RLMRealm *realm = [self realmWithTestPath];
+    NSString *path = realm.path;
+
+    XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64] forRealmsAtPath:path]);
+}
+
 @end
