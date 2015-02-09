@@ -8,7 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* The bowser will no longer show objects that have no persisted properties.
 
 ### Bugfixes
 
