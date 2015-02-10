@@ -432,7 +432,7 @@ public final class Realm {
 
     :param: objects A sequence which contains objects to be added to this Realm.
     */
-    public func add<S: SequenceType where S.Generator.Element == Object>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
             add(obj)
         }
@@ -463,7 +463,7 @@ public final class Realm {
 
     :param: objects A sequence of `Object`s to be added to this Realm.
     */
-    public func addOrUpdate<S: SequenceType where S.Generator.Element == Object>(objects: S) {
+    public func addOrUpdate<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
             addOrUpdate(obj)
         }
@@ -492,7 +492,7 @@ public final class Realm {
 
     :param: object The objects to be deleted.
     */
-    public func delete<S: SequenceType where S.Generator.Element == Object>(objects: S) {
+    public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
             delete(obj)
         }
