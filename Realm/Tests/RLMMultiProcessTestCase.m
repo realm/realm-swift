@@ -94,11 +94,11 @@
 
     // Filter the output from the child process to reduce xctest noise
     while (true) {
-        NSUInteger newline = [buffer rangeOfData:delimiter options:0 range:NSMakeRange(0, buffer.length)].location;
-        if (newline != NSNotFound) {
+        NSUInteger newline;
+        while ((newline = [buffer rangeOfData:delimiter options:0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
             // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
             const void *b = buffer.bytes;
-            if (newline < 13 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "     Executed", 13))) {
+            if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {
                 [err writeData:[[NSData alloc] initWithBytesNoCopy:buffer.mutableBytes length:newline + 1 freeWhenDone:NO]];
             }
             [buffer replaceBytesInRange:NSMakeRange(0, newline + 1) withBytes:NULL length:0];
