@@ -966,6 +966,18 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertNoThrow(obj.description);
 }
 
+- (void)testDataObjectDescription {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    char longData[200];
+    [DataObject createInRealm:realm withObject:@[[NSData dataWithBytes:&longData length:200], [NSData data]]];
+    [realm commitWriteTransaction];
+
+    DataObject *obj = [DataObject allObjectsInRealm:realm].firstObject;
+    XCTAssertNotEqual(NSNotFound, [obj.description rangeOfString:@"100 more bytes"].location);
+}
+
 - (void)testDeletedObjectDescription
 {
     RLMRealm *realm = [RLMRealm defaultRealm];

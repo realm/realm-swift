@@ -209,6 +209,18 @@
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
             sub = [object descriptionWithMaxDepth:depth - 1];
         }
+        else if (property.type == RLMPropertyTypeData) {
+            NSData *data = object;
+            NSUInteger length = data.length;
+            if (data.length > 100) {
+                data = [NSData dataWithBytes:data.bytes length:100];
+                NSString *dataDescription = [data description];
+                sub = [NSString stringWithFormat:@"<%@ ... %lu more bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)(length - 100)];
+            }
+            else {
+                sub = [data description];
+            }
+        }
         else {
             sub = [object description];
         }
