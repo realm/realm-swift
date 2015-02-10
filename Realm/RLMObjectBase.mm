@@ -210,12 +210,13 @@
             sub = [object descriptionWithMaxDepth:depth - 1];
         }
         else if (property.type == RLMPropertyTypeData) {
+            static NSUInteger maxPrintedDataLength = 24;
             NSData *data = object;
             NSUInteger length = data.length;
-            if (data.length > 100) {
-                data = [NSData dataWithBytes:data.bytes length:100];
+            if (data.length > maxPrintedDataLength) {
+                data = [NSData dataWithBytes:data.bytes length:maxPrintedDataLength];
                 NSString *dataDescription = [data description];
-                sub = [NSString stringWithFormat:@"<%@ ... %lu more bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)(length - 100)];
+                sub = [NSString stringWithFormat:@"<%@ ... %lu more bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)(length - maxPrintedDataLength)];
             }
             else {
                 sub = [data description];

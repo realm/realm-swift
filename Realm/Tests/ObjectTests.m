@@ -971,7 +971,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     [realm beginWriteTransaction];
     char longData[200];
-    [DataObject createInRealm:realm withObject:@[[NSData dataWithBytes:&longData length:200], [NSData data]]];
+    [DataObject createInRealm:realm withObject:@[[NSData dataWithBytes:&longData length:200], [NSData dataWithBytes:&longData length:2]]];
     [realm commitWriteTransaction];
 
     DataObject *obj = [DataObject allObjectsInRealm:realm].firstObject;
