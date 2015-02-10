@@ -273,4 +273,18 @@
     }
 }
 
+- (void)testRecoverAfterCrash {
+    if (self.isParent) {
+        [self runChildAndWait];
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [realm beginWriteTransaction];
+        [realm commitWriteTransaction];
+    }
+    else {
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [realm beginWriteTransaction];
+        abort();
+    }
+}
+
 @end
