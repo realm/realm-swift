@@ -975,7 +975,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     [realm commitWriteTransaction];
 
     DataObject *obj = [DataObject allObjectsInRealm:realm].firstObject;
-    XCTAssertNotEqual(NSNotFound, [obj.description rangeOfString:@"100 more bytes"].location);
+    XCTAssertNotEqual(NSNotFound, [obj.description rangeOfString:@"200 total bytes"].location);
+    XCTAssertNotEqual(NSNotFound, [obj.description rangeOfString:@"2 total bytes"].location);
 }
 
 - (void)testDeletedObjectDescription

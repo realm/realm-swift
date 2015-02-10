@@ -213,14 +213,11 @@
             static NSUInteger maxPrintedDataLength = 24;
             NSData *data = object;
             NSUInteger length = data.length;
-            if (data.length > maxPrintedDataLength) {
+            if (length > maxPrintedDataLength) {
                 data = [NSData dataWithBytes:data.bytes length:maxPrintedDataLength];
-                NSString *dataDescription = [data description];
-                sub = [NSString stringWithFormat:@"<%@ ... %lu more bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)(length - maxPrintedDataLength)];
             }
-            else {
-                sub = [data description];
-            }
+            NSString *dataDescription = [data description];
+            sub = [NSString stringWithFormat:@"<%@ — %lu total bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)length];
         }
         else {
             sub = [object description];
