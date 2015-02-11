@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(defaultRealmPath(), error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(defaultRealmPath, error: nil)
 
         // Create a standalone object
         var mydog = Dog()
