@@ -922,8 +922,7 @@ extern "C" {
         [IntObject createInRealm:realm withObject:@[@0]];
     }];
 
-    NSError *writeError;
-    XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    NSError *writeError = [realm writeCopyToPath:RLMTestRealmPath()];
     XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
@@ -936,8 +935,7 @@ extern "C" {
         [IntObject createInRealm:realm withObject:@[@0]];
     }];
 
-    NSError *writeError;
-    XCTAssertFalse([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+    NSError *writeError = [realm writeCopyToPath:RLMTestRealmPath()];
     XCTAssertNotNil(writeError);
 }
 
@@ -947,8 +945,7 @@ extern "C" {
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withObject:@[@0]];
 
-        NSError *writeError;
-        XCTAssertTrue([realm writeCopyToPath:RLMTestRealmPath() error:&writeError]);
+        NSError *writeError = [realm writeCopyToPath:RLMTestRealmPath()];
         XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
