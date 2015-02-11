@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = defaultRealmPath
+        let defaultPath = Realm.defaultPath
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
