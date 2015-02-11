@@ -91,6 +91,7 @@ class SwiftRealmTests: TestCase {
         let realm = realmWithTestPath()
 
         let object = SwiftIgnoredPropertiesObject()
+        XCTAssertEqual(object.runtimeDefaultProperty, "property")
         realm.beginWrite()
         object.name = "@fz"
         object.age = 31
@@ -105,6 +106,7 @@ class SwiftRealmTests: TestCase {
         let objects = realm.objects(SwiftIgnoredPropertiesObject)
         XCTAssertEqual(objects.count, Int(1), "There should be 1 object of type SwiftIgnoredPropertiesObject")
         XCTAssertNil(objects[0].runtimeProperty, "Ignored property should be nil")
+        XCTAssertEqual(objects[0].runtimeDefaultProperty, "property")
         XCTAssertEqual(objects[0].name, "@fz", "Value of the name column doesn't match the assigned one.")
     }
 
