@@ -48,7 +48,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = Realm().addNotificationBlock { note, realm in
             self.tableView.reloadData()
         }
         for section in sectionTitles {
@@ -95,7 +95,7 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let realm = defaultRealm()
+            let realm = Realm()
             realm.write {
                 realm.delete(objectForIndexPath(indexPath)!)
             }
@@ -109,7 +109,7 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = defaultRealm()
+            let realm = Realm()
             realm.beginWrite()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
@@ -120,9 +120,9 @@ class TableViewController: UITableViewController {
     }
 
     func add() {
-        defaultRealm().write {
+        Realm().write {
             let object = [randomTitle(), NSDate(), randomSectionTitle()]
-            DemoObject.createInRealm(defaultRealm(), withObject: object)
+            DemoObject.createInRealm(Realm(), withObject: object)
         }
     }
 }
