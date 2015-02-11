@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = defaultRealmPath()
+        let defaultPath = defaultRealmPath
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
@@ -84,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     // give JP a dog
                     if newObject["fullName"] as String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), withObject: ["Jimbo", "dog"])
-                        let dogs = newObject["pets"] as List<Object>
+                        let dogs = newObject["pets"] as List<MigrationObject>
                         dogs.append(jpsDog)
                     }
                 }
@@ -118,9 +118,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the migrated realms
         let realmv1 = Realm(path: realmv1Path)
-        println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
+        println("Migrated objects in the Realm migrated from v1: \(objects(Person.self, inRealm: realmv1))")
         let realmv2 = Realm(path: realmv2Path)
-        println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
+        println("Migrated objects in the Realm migrated from v2: \(objects(Person.self, inRealm: realmv2))")
 
         return true
     }
