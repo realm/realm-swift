@@ -15,7 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* An exception will now be thrown when calling `-beginWriteTransaction` from within a notification
+  triggered by calling `-beginWriteTransaction` elsewhere.
 
 0.90.5 Release notes (2015-02-04)
 =============================================================

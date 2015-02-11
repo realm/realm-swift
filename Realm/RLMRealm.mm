@@ -577,12 +577,12 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
             LangBindHelper::promote_to_write(*_sharedGroup);
 
+            // update state and make all objects in this realm writable
+            _inWriteTransaction = YES;
+
             if (announce) {
                 [self sendNotifications:RLMRealmDidChangeNotification];
             }
-
-            // update state and make all objects in this realm writable
-            _inWriteTransaction = YES;
         }
         catch (std::exception& ex) {
             // File access errors are treated as exceptions here since they should not occur after the shared

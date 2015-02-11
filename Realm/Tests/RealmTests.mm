@@ -484,6 +484,40 @@ extern "C" {
     XCTAssertTrue(notificationFired);
 }
 
+- (void)testBeginWriteTransactionsRefreshesRealm {
+    // auto refresh on by default
+    RLMRealm *realm = [self realmWithTestPath];
+
+    // Set up notification which will be triggered when calling beginWriteTransaction
+    __block bool notificationFired = false;
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
+        XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+        XCTAssertThrows([realm beginWriteTransaction], @"We should already be in a write transaction");
+        notificationFired = true;
+    }];
+
+    // dispatch to background syncronously
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_group_async(group, queue, ^{
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm beginWriteTransaction];
+        [StringObject createInRealm:realm withObject:@[@"string"]];
+        [realm commitWriteTransaction];
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    // notification shouldnt have fired
+    XCTAssertFalse(notificationFired);
+
+    [realm beginWriteTransaction];
+
+    // notification should have fired
+    XCTAssertTrue(notificationFired);
+
+    [realm removeNotification:token];
+}
+
 - (void)testInMemoryRealm
 {
     RLMRealm *inMemoryRealm = [RLMRealm inMemoryRealmWithIdentifier:@"identifier"];
