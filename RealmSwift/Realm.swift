@@ -31,42 +31,12 @@ or in the default realm if the `realm` argument is omitted.
 
 :returns: Results with all objects of the given type in the given Realm.
 */
-public func objects<T: Object>(type: T.Type, inRealm realm: Realm = defaultRealm()) -> Results<T> {
+public func objects<T: Object>(type: T.Type, inRealm realm: Realm = Realm()) -> Results<T> {
     return Results<T>(RLMGetObjects(realm.rlmRealm, T.className(), nil))
 }
 
 // MARK: Default Realm Helpers
 
-/**
-The location of the default Realm as a string. Can be overridden.
-
-`~/Application Support/{bundle ID}/default.realm` on OS X.
-
-`default.realm` in your application's documents directory on iOS.
-
-:returns: Location of the default Realm.
-*/
-public var defaultRealmPath: String {
-    get {
-        return RLMRealm.defaultRealmPath()
-    }
-    set {
-        RLMRealm.setDefaultRealmPath(newValue)
-    }
-}
-
-/**
-Obtains an instance of the default Realm.
-
-The default Realm is persisted as default.realm under the Documents directory of
-your Application on iOS, and in your application's Application Support
-directory on OS X.
-
-:returns: The default `Realm` instance for the current thread.
-*/
-public func defaultRealm() -> Realm {
-    return Realm(RLMRealm.defaultRealm())
-}
 
 /**
 Set the encryption key to use when opening Realms at a certain path.
@@ -74,7 +44,7 @@ Set the encryption key to use when opening Realms at a certain path.
 This can be used as an alternative to explicitly passing the key to
 `Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
 needed. The encryption key will be used any time a Realm is opened with
-`Realm(path:)` or `defaultRealm()`.
+`Realm(path:)` or `Realm()`.
 
 If you do not want Realm to hold on to your encryption keys any longer than
 needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
@@ -83,7 +53,7 @@ method.
 :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
 :param: path          Realm path to set the encryption key for.
 +*/
-public func setEncryptionKey(encryptionKey: NSData?, forRealmsAtPath path: String = defaultRealmPath) {
+public func setEncryptionKey(encryptionKey: NSData?, forRealmsAtPath path: String = Realm.defaultPath) {
     RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: path)
 }
 
@@ -113,8 +83,6 @@ public final class Realm {
 
     // MARK: Properties
 
-    internal var rlmRealm: RLMRealm
-
     /// Path to the file where this Realm is persisted.
     public var path: String { return rlmRealm.path }
 
@@ -125,52 +93,62 @@ public final class Realm {
     public var schema: Schema { return Schema(rlmSchema: rlmRealm.schema) }
 
     /**
-    Whether this Realm automatically updates when changes happen in other threads.
+    The location of the default Realm as a string. Can be overridden.
 
-    If set to YES (the default), changes made on other threads will be reflected
-    in this Realm on the next cycle of the run loop after the changes are
-    committed.  If set to NO, you must manually call -refresh on the Realm to
-    update it to get the latest version.
+    `~/Application Support/{bundle ID}/default.realm` on OS X.
 
-    Even with this enabled, you can still call `refresh()` at any time to update the
-    Realm before the automatic refresh would occur.
+    `default.realm` in your application's documents directory on iOS.
 
-    Notifications are sent when a write transaction is committed whether or not
-    this is enabled.
-
-    Disabling this on an `Realm` without any strong references to it will not
-    have any effect, and it will switch back to YES the next time the `Realm`
-    object is created. This is normally irrelevant as it means that there is
-    nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
-    references to the containing `Realm`), but it means that setting
-    `defaultRealm().autorefresh = false` in
-    `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
-    objects will not work.
-
-    Defaults to true.
+    :returns: Location of the default Realm.
     */
-    public var autorefresh: Bool {
+    public class var defaultPath: String {
         get {
-            return rlmRealm.autorefresh
+            return RLMRealm.defaultRealmPath()
         }
         set {
-            rlmRealm.autorefresh = newValue
+            RLMRealm.setDefaultRealmPath(newValue)
         }
     }
 
     // MARK: Initializers
 
-    internal init(_ rlmRealm: RLMRealm) {
-        self.rlmRealm = rlmRealm
-    }
-
     /**
-    Obtains a Realm instance persisted at the specified file path.
+    Obtains a Realm instance persisted at the specified file path. The default
+    Realm path is used by default.
 
     :param: path Path to the realm file.
     */
-    public convenience init(path: String) {
+    public convenience init(path: String = Realm.defaultPath) {
         self.init(RLMRealm(path: path, readOnly: false, error: nil))
+    }
+    
+    /**
+    Obtains a `Realm` instance with persistence to a specific file path with
+    options.
+
+    Like `init(path:)`, but with the ability to open read-only realms and get
+    errors as an `NSError` inout parameter rather than exceptions.
+
+    :warning: Read-only Realms do not support changes made to the file while the
+              `Realm` exists. This means that you cannot open a Realm as both read-only
+              and read-write at the same time. Read-only Realms should normally only be used
+              on files which cannot be opened in read-write mode, and not just for enforcing
+              correctness in code that should not need to write to the Realm.
+
+    :param: path            Path to the file you want the data saved in.
+    :param: readOnly        Bool indicating if this Realm is read-only (must use for read-only files).
+    :param: encryptionKey   64-byte key to use to encrypt the data.
+    :param: error           If an error occurs, upon return contains an `NSError` object
+                            that describes the problem. If you are not interested in
+                            possible errors, omit the argument, or pass in `nil`.
+    */
+    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
+        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+            self.init(rlmRealm)
+        } else {
+            self.init(RLMRealm())
+            return nil
+        }
     }
 
     /**
@@ -192,81 +170,7 @@ public final class Realm {
         self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
-    /**
-    Obtains a `Realm` instance with persistence to a specific file path with
-    options.
-
-    Like `init(path:)`, but with the ability to open read-only realms and get
-    errors as an `NSError` inout parameter rather than exceptions.
-
-    :warning: Read-only Realms do not support changes made to the file while the
-              `Realm` exists. This means that you cannot open a Realm as both read-only
-              and read-write at the same time. Read-only Realms should normally only be used
-              on files which cannot be opened in read-write mode, and not just for enforcing
-              correctness in code that should not need to write to the Realm.
-
-    :param: path     Path to the file you want the data saved in.
-    :param: readOnly Bool indicating if this Realm is read-only (must use for read-only files).
-    :param: error    If an error occurs, upon return contains an `NSError` object
-                     that describes the problem. If you are not interested in
-                     possible errors, omit the argument, or pass in `nil`.
-    */
-    public convenience init?(path: String, readOnly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm? {
-            self.init(rlmRealm)
-        } else {
-            self.init(RLMRealm())
-            return nil
-        }
-    }
-
-    /**
-    Obtains a `Realm` instance persisted to an encrypted file.
-
-    The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
-    but otherwise they behave like normal persisted Realms.
-
-    Encrypted Realms currently cannot be opened while lldb is attached to the
-    process since lldb cannot forward mach exceptions to the process being
-    debugged. Attempting to open an encrypted Realm with lldb attached will result
-    in an EXC_BAD_ACCESS.
-
-    :param: path          Path to the file you want the data saved in.
-    :param: encryptionKey 64-byte key to use to encrypt the data.
-    :param: readOnly      Bool indicating if this Realm is read-only (must use for read-only files).
-    :param: error         If an error occurs, upon return contains an `NSError` object
-                          that describes the problem. If you are not interested in
-                          possible errors, omit the argument, or pass in `nil`.
-    */
-    public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
-            self.init(rlmRealm)
-        } else {
-            self.init(RLMRealm())
-            return nil
-        }
-    }
-
     // MARK: Writing a Copy
-
-    /**
-    Write a compacted copy of the Realm to the given path.
-
-    The destination file cannot already exist.
-
-    Note that if this is called from within a write transaction it writes the
-    *current* data, and not data when the last write transaction was committed.
-
-    :param: path  Path to save the Realm to.
-    :param: error If an error occurs, upon return contains an `NSError` object
-                  that describes the problem. If you are not interested in
-                  possible errors, omit the argument, or pass in `nil`.
-
-    :returns: Whether the realm was copied successfully.
-    */
-    public func writeCopyToPath(path: String, error: NSErrorPointer = nil) -> Bool {
-        return rlmRealm.writeCopyToPath(path, error: error)
-    }
 
     /**
     Write an encrypted and compacted copy of the Realm to the given path.
@@ -277,15 +181,20 @@ public final class Realm {
     *current* data, and not data when the last write transaction was committed.
 
     :param: path          Path to save the Realm to.
-    :param: encryptionKey 64-byte encryption key to encrypt the new file with.
+    :param: encryptionKey Optional 64-byte encryption key to encrypt the new file with.
     :param: error         If an error occurs, upon return contains an `NSError` object
                           that describes the problem. If you are not interested in
                           possible errors, omit the argument, or pass in `nil`.
 
     :returns: Whether the realm was copied successfully.
     */
-    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) -> Bool {
-        return rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
+    public func writeCopyToPath(path: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> Bool {
+        if let encryptionKey = encryptionKey {
+            return rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
+        }
+        else {
+            return rlmRealm.writeCopyToPath(path, error: error)
+        }
     }
 
     // MARK: Transactions
@@ -364,7 +273,41 @@ public final class Realm {
         rlmRealm.cancelWriteTransaction()
     }
 
-    // MARK: Refresh
+    // MARK: Autorefresh and Refresh
+
+    /**
+    Whether this Realm automatically updates when changes happen in other threads.
+
+    If set to YES (the default), changes made on other threads will be reflected
+    in this Realm on the next cycle of the run loop after the changes are
+    committed.  If set to NO, you must manually call -refresh on the Realm to
+    update it to get the latest version.
+
+    Even with this enabled, you can still call `refresh()` at any time to update the
+    Realm before the automatic refresh would occur.
+
+    Notifications are sent when a write transaction is committed whether or not
+    this is enabled.
+
+    Disabling this on an `Realm` without any strong references to it will not
+    have any effect, and it will switch back to YES the next time the `Realm`
+    object is created. This is normally irrelevant as it means that there is
+    nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
+    references to the containing `Realm`), but it means that setting
+    `Realm().autorefresh = false` in
+    `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
+    objects will not work.
+
+    Defaults to true.
+    */
+    public var autorefresh: Bool {
+        get {
+            return rlmRealm.autorefresh
+        }
+        set {
+            rlmRealm.autorefresh = newValue
+        }
+    }
 
     /**
     Update a `Realm` and outstanding objects to point to the most recent
@@ -404,7 +347,7 @@ public final class Realm {
         rlmRealm.invalidate()
     }
 
-    // MARK: Mutating
+    // MARK: Adding and Deleting objects
 
     /**
     Adds an object to be persisted it in this Realm.
@@ -532,6 +475,14 @@ public final class Realm {
     */
     public func removeNotification(notificationToken: NotificationToken) {
         rlmRealm.removeNotification(notificationToken)
+    }
+
+
+    // MARK: Internal
+    internal var rlmRealm: RLMRealm
+
+    internal init(_ rlmRealm: RLMRealm) {
+        self.rlmRealm = rlmRealm
     }
 }
 

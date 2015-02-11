@@ -25,7 +25,7 @@ internal func testRealmPath() -> String {
 }
 
 private func realmPathForFile(fileName: String) -> String {
-    return defaultRealmPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
+    return Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
 }
 
 private func realmLockPath(path: String) -> String {
@@ -48,7 +48,7 @@ private func deleteRealmFilesAtPath(path: String) {
 
 private func deleteRealmFiles() {
     RLMRealm.resetRealmState()
-    deleteRealmFilesAtPath(defaultRealmPath)
+    deleteRealmFilesAtPath(Realm.defaultPath)
     deleteRealmFilesAtPath(testRealmPath())
 }
 
