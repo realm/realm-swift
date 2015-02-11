@@ -878,8 +878,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, object, RLMCreationOptionsNone);
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
-    BOOL success = YES;
+- (NSError *)writeCopyToPath:(NSString *)path key:(NSData *)key {
     if (validatedKey(key)) {
         validateNotInDebugger();
     }
@@ -888,43 +887,31 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
     }
     catch (File::PermissionDenied &ex) {
-        success = NO;
-        if (error) {
-            *error = RLMMakeError(RLMErrorFilePermissionDenied, ex);
-        }
+        return RLMMakeError(RLMErrorFilePermissionDenied, ex);
     }
     catch (File::Exists &ex) {
-        success = NO;
-        if (error) {
-            *error = RLMMakeError(RLMErrorFileExists, ex);
-        }
+        return RLMMakeError(RLMErrorFileExists, ex);
     }
     catch (File::AccessError &ex) {
-        success = NO;
-        if (error) {
-            *error = RLMMakeError(RLMErrorFileAccessError, ex);
-        }
+        return RLMMakeError(RLMErrorFileAccessError, ex);
     }
     catch (exception &ex) {
-        success = NO;
-        if (error) {
-            *error = RLMMakeError(RLMErrorFail, ex);
-        }
+        return RLMMakeError(RLMErrorFail, ex);
     }
 
-    return success;
+    return nil;
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {
-    return [self writeCopyToPath:path key:nil error:error];
+- (NSError *)writeCopyToPath:(NSString *)path {
+    return [self writeCopyToPath:path key:nil];
 }
 
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error {
+- (NSError *)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key {
     if (!key) {
         @throw RLMException(@"Encryption key must not be nil");
     }
 
-    return [self writeCopyToPath:path key:key error:error];
+    return [self writeCopyToPath:path key:key];
 }
 
 @end

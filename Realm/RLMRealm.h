@@ -347,10 +347,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  *current* data, and not data when the last write transaction was committed.
 
  @param path Path to save the Realm to.
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
+ @return An error if one ocurred. Returns nil otherwise.
 */
-- (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
+- (NSError *)writeCopyToPath:(NSString *)path;
 
 /**
  Write an encrypted and compacted copy of the RLMRealm to the given path.
@@ -362,10 +361,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  @param path Path to save the Realm to.
  @param key 64-byte encryption key to encrypt the new file with
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
+ @return An error if one ocurred. Returns nil otherwise.
 */
-- (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error;
+- (NSError *)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key;
 
 /**
  Invalidate all RLMObjects and RLMResults read from this Realm.
