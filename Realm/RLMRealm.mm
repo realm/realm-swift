@@ -453,7 +453,7 @@ static id RLMAutorelease(id value) {
 }
 
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path {
-    if (realmsOpenAtPath(path)) {
+    if (RLMGetAnyCachedRealmForPath(path)) {
         @throw RLMException(@"Cannot set encryption key for Realms that are already open.");
     }
 
@@ -752,7 +752,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (void)setSchemaVersion:(NSUInteger)version forRealmAtPath:(NSString *)realmPath withMigrationBlock:(RLMMigrationBlock)block {
-    if (realmsOpenAtPath(realmPath)) {
+    if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot set schema version for Realms that are already open.");
     }
 
@@ -799,7 +799,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
-    if (realmsOpenAtPath(realmPath)) {
+    if (RLMGetAnyCachedRealmForPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
 
