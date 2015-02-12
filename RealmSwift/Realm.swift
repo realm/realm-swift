@@ -19,25 +19,6 @@
 import Realm
 import Realm.Private
 
-// MARK: Object Retrieval
-
-/**
-Returns all objects of the given type in the specified Realm default realm,
-or in the default realm if the `realm` argument is omitted.
-
-:param: type  The type of the objects to be returned.
-:param: realm The Realm instance to query.
-              The default Realm will be used if this argument is omitted.
-
-:returns: Results with all objects of the given type in the given Realm.
-*/
-public func objects<T: Object>(type: T.Type, inRealm realm: Realm = Realm()) -> Results<T> {
-    return Results<T>(RLMGetObjects(realm.rlmRealm, T.className(), nil))
-}
-
-// MARK: Default Realm Helpers
-
-
 /**
 Set the encryption key to use when opening Realms at a certain path.
 
@@ -447,6 +428,23 @@ public final class Realm {
     public func deleteAll() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
     }
+
+    // MARK: Object Retrieval
+
+    /**
+    Returns all objects of the given type in the specified Realm default realm,
+    or in the default realm if the `realm` argument is omitted.
+
+    :param: type  The type of the objects to be returned.
+    :param: realm The Realm instance to query.
+                  The default Realm will be used if this argument is omitted.
+
+    :returns: Results with all objects of the given type in the given Realm.
+    */
+    public func objects<T: Object>(type: T.Type) -> Results<T> {
+        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+    }
+
 
     // MARK: Notifications
 
