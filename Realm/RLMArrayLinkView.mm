@@ -143,6 +143,9 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);
+    if (index > _backingLinkView->size()) {
+        @throw RLMException(@"Trying to insert object at invalid index");
+    }
     if (object.realm != self.realm) {
         [self.realm addObject:object];
     }
