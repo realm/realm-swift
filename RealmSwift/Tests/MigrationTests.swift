@@ -172,7 +172,7 @@ class MigrationTests: TestCase {
             XCTAssertEqual(count, 2)
         })
 
-        XCTAssertEqual(objects(SwiftStringObject.self).count, 2)
+        XCTAssertEqual(Realm().objects(SwiftStringObject.self).count, 2)
     }
 
     func testDelete() {
@@ -194,7 +194,7 @@ class MigrationTests: TestCase {
             })
         }
 
-        XCTAssertEqual(objects(SwiftStringObject.self).count, 1)
+        XCTAssertEqual(Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     // test getting/setting all property types
@@ -261,7 +261,7 @@ class MigrationTests: TestCase {
         Realm().refresh()
 
         // check edited values
-        let object = objects(SwiftObject.self).first!
+        let object = Realm().objects(SwiftObject.self).first!
         XCTAssertEqual(object.boolCol, false)
         XCTAssertEqual(object.intCol, 1)
         XCTAssertEqual(object.floatCol, 1.0 as Float)
@@ -275,7 +275,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.arrayCol[2].boolCol, true)
 
         // make sure we added new bool objects as object property and in the list
-        XCTAssertEqual(objects(SwiftBoolObject).count, 4)
+        XCTAssertEqual(Realm().objects(SwiftBoolObject).count, 4)
     }
 }
 

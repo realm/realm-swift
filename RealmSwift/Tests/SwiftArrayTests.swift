@@ -42,7 +42,7 @@ class SwiftArrayTests: TestCase {
 
         realm.commitWrite()
 
-        let results = objects(SwiftAggregateObject.self, inRealm: realm).filter("intCol < 100")
+        let results = realm.objects(SwiftAggregateObject.self).filter("intCol < 100")
         XCTAssertEqual(results.count, Int(10), "10 objects added")
 
         var totalSum = 0
@@ -67,7 +67,7 @@ class SwiftArrayTests: TestCase {
 
         realm.commitWrite()
 
-        let description: NSString = objects(SwiftEmployeeObject.self, inRealm: realm).description
+        let description: NSString = realm.objects(SwiftEmployeeObject.self).description
 
         XCTAssertTrue(description.rangeOfString("name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue(description.rangeOfString("Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -104,7 +104,7 @@ class SwiftArrayTests: TestCase {
 
         let company = SwiftCompanyObject()
         realm.add(company)
-        company.employees.append(objects(SwiftEmployeeObject.self, inRealm: realm))
+        company.employees.append(realm.objects(SwiftEmployeeObject.self))
 
         realm.commitWrite()
 
