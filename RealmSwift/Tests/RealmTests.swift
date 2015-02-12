@@ -59,8 +59,8 @@ class RealmTests: TestCase {
     }
 
     func testSetEncryptionKey() {
-        setEncryptionKey(NSMutableData(length: 64), forRealmsAtPath: Realm.defaultPath)
-        setEncryptionKey(nil, forRealmsAtPath: Realm.defaultPath)
+        Realm.setEncryptionKey(NSMutableData(length: 64))
+        Realm.setEncryptionKey(nil, forPath: Realm.defaultPath)
         XCTAssert(true, "setting those keys should not throw")
     }
 

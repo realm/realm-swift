@@ -20,25 +20,6 @@ import Realm
 import Realm.Private
 
 /**
-Set the encryption key to use when opening Realms at a certain path.
-
-This can be used as an alternative to explicitly passing the key to
-`Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
-needed. The encryption key will be used any time a Realm is opened with
-`Realm(path:)` or `Realm()`.
-
-If you do not want Realm to hold on to your encryption keys any longer than
-needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
-method.
-
-:param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
-:param: path          Realm path to set the encryption key for.
-+*/
-public func setEncryptionKey(encryptionKey: NSData?, forRealmsAtPath path: String = Realm.defaultPath) {
-    RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: path)
-}
-
-/**
 A Realm instance (also referred to as "a realm") represents a Realm
 database.
 
@@ -475,6 +456,25 @@ public final class Realm {
         rlmRealm.removeNotification(notificationToken)
     }
 
+    // MARK: Encryption
+    /**
+    Set the encryption key to use when opening Realms at a certain path.
+
+    This can be used as an alternative to explicitly passing the key to
+    `Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
+    needed. The encryption key will be used any time a Realm is opened with
+    `Realm(path:)` or `Realm()`.
+
+    If you do not want Realm to hold on to your encryption keys any longer than
+    needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
+    method.
+
+    :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
+    :param: path          Realm path to set the encryption key for.
+    +*/
+    public class func setEncryptionKey(encryptionKey: NSData?, forPath: String = Realm.defaultPath) {
+        RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
+    }
 
     // MARK: Internal
     internal var rlmRealm: RLMRealm
