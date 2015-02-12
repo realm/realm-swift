@@ -105,7 +105,7 @@ public final class Realm {
                             possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+        if let rlmRealm = RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil, error: error) as RLMRealm? {
             self.init(rlmRealm)
         } else {
             self.init(RLMRealm())
