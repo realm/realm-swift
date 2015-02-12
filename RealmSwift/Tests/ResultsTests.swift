@@ -131,6 +131,7 @@ class ResultsTests: TestCase {
     }
 
     func testIndexOfFormat() {
+        XCTAssertEqual(Int(0), results.indexOf("stringCol = '1'")!)
         XCTAssertEqual(Int(0), results.indexOf("stringCol = %@", "1")!)
         XCTAssertEqual(Int(1), results.indexOf("stringCol = %@", "2")!)
         XCTAssertNil(results.indexOf("stringCol = %@", "3"))
@@ -139,6 +140,8 @@ class ResultsTests: TestCase {
     func testSubscript() {
         XCTAssertEqual(str1, results[0])
         XCTAssertEqual(str2, results[1])
+
+        assertThrows(results[200])
     }
 
     func testFirst() {
@@ -154,6 +157,7 @@ class ResultsTests: TestCase {
     }
 
     func testFilterFormat() {
+        XCTAssertEqual(Int(1), results.filter("stringCol = '1'").count)
         XCTAssertEqual(Int(1), results.filter("stringCol = %@", "1").count)
         XCTAssertEqual(Int(1), results.filter("stringCol = %@", "2").count)
         XCTAssertEqual(Int(0), results.filter("stringCol = %@", "3").count)
@@ -177,6 +181,8 @@ class ResultsTests: TestCase {
         sorted = results.sorted("stringCol", ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
+
+        assertThrows(results.sorted("noSuchCol"))
     }
 
     func testSortWithDescriptor() {
@@ -192,6 +198,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(2.22, sorted[1].doubleCol)
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
+
+        assertThrows(results.sorted([SortDescriptor(property: "noSuchCol")]))
     }
 
     func testMin() {
@@ -200,6 +208,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Float(1.1), results.min("floatCol") as Float!)
         XCTAssertEqual(Double(1.11), results.min("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 1), results.min("dateCol") as NSDate!)
+
+        assertThrows(results.min("noSuchCol") as Float!)
     }
 
     func testMax() {
@@ -208,6 +218,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Float(2.2), results.max("floatCol") as Float!)
         XCTAssertEqual(Double(2.22), results.max("doubleCol") as Double!)
         XCTAssertEqual(NSDate(timeIntervalSince1970: 2), results.max("dateCol") as NSDate!)
+
+        assertThrows(results.max("noSuchCol") as Float!)
     }
 
     func testSum() {
@@ -215,6 +227,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(6), results.sum("intCol") as Int)
         XCTAssertEqualWithAccuracy(Float(5.5), results.sum("floatCol") as Float, 0.001)
         XCTAssertEqualWithAccuracy(Double(5.55), results.sum("doubleCol") as Double, 0.001)
+
+        assertThrows(results.sum("noSuchCol") as Float)
     }
 
     func testAverage() {
@@ -222,6 +236,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(2), results.average("intCol") as Int)
         XCTAssertEqualWithAccuracy(Float(1.8333), results.average("floatCol") as Float, 0.001)
         XCTAssertEqualWithAccuracy(Double(1.85), results.average("doubleCol") as Double, 0.001)
+
+        assertThrows(results.average("noSuchCol") as Float)
     }
 
     func testFastEnumeration() {
