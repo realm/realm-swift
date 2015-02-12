@@ -35,12 +35,6 @@ class RealmTests: TestCase {
         }
     }
 
-    func testObjects() {
-        XCTAssertEqual(0, objects(SwiftStringObject).count)
-        XCTAssertEqual(3, objects(SwiftIntObject).count)
-        XCTAssertEqual(3, objects(SwiftIntObject.self, inRealm: Realm()).count)
-    }
-
     func testRealmDefaultRealmPath() {
         let defaultPath =  Realm().path
         XCTAssertEqual(Realm.defaultPath, defaultPath)
@@ -81,7 +75,7 @@ class RealmTests: TestCase {
 //
 //        let readOnlyRealm = Realm(path: path, readOnly: true, error: nil)!
 //        XCTAssertEqual(true, readOnlyRealm.readOnly)
-//        XCTAssertEqual(1, objects(SwiftStringObject.self, inRealm: readOnlyRealm).count)
+//        XCTAssertEqual(1, Results(SwiftStringObject.self, inRealm: readOnlyRealm).count)
 //    }
 
     func testSchema() {
@@ -108,104 +102,104 @@ class RealmTests: TestCase {
         XCTAssertNil(realm.writeCopyToPath(path))
         autoreleasepool {
             let copy = Realm(path: path)
-            XCTAssertEqual(1, objects(SwiftObject.self, inRealm: copy).count)
+            XCTAssertEqual(1, Results(type: SwiftObject.self, realm: copy).count)
         }
         NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
     }
 
     func testAddSingleObject() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         realm.write {
             let obj = SwiftObject()
             realm.add(obj)
-            XCTAssertEqual(1, objects(SwiftObject).count)
+            XCTAssertEqual(1, Results(type: SwiftObject.self).count)
         }
-        XCTAssertEqual(1, objects(SwiftObject).count)
+        XCTAssertEqual(1, Results(type: SwiftObject.self).count)
     }
 
     func testAddMultipleObjects() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         realm.write {
             let objs = [SwiftObject(), SwiftObject()]
             realm.add(objs)
-            XCTAssertEqual(2, objects(SwiftObject).count)
+            XCTAssertEqual(2, Results(type: SwiftObject.self).count)
         }
-        XCTAssertEqual(2, objects(SwiftObject).count)
+        XCTAssertEqual(2, Results(type: SwiftObject.self).count)
     }
 
     func testAddOrUpdateSingleObject() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftPrimaryStringObject).count)
+        XCTAssertEqual(0, Results(type: SwiftPrimaryStringObject.self).count)
         realm.write {
             let obj = SwiftPrimaryStringObject()
             realm.addOrUpdate(obj)
-            XCTAssertEqual(1, objects(SwiftPrimaryStringObject).count)
+            XCTAssertEqual(1, Results(type: SwiftPrimaryStringObject.self).count)
         }
-        XCTAssertEqual(1, objects(SwiftPrimaryStringObject).count)
+        XCTAssertEqual(1, Results(type: SwiftPrimaryStringObject.self).count)
     }
 
     func testAddOrUpdateMultipleObjects() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftPrimaryStringObject).count)
+        XCTAssertEqual(0, Results(type: SwiftPrimaryStringObject.self).count)
         realm.write {
             let objs = [SwiftPrimaryStringObject(), SwiftPrimaryStringObject()]
             realm.addOrUpdate(objs)
-            XCTAssertEqual(1, objects(SwiftPrimaryStringObject).count)
+            XCTAssertEqual(1, Results(type: SwiftPrimaryStringObject.self).count)
         }
-        XCTAssertEqual(1, objects(SwiftPrimaryStringObject).count)
+        XCTAssertEqual(1, Results(type: SwiftPrimaryStringObject.self).count)
     }
 
     func testDeleteSingleObject() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         realm.write {
             let obj = SwiftObject()
             realm.add(obj)
-            XCTAssertEqual(1, objects(SwiftObject).count)
+            XCTAssertEqual(1, Results(type: SwiftObject.self).count)
             realm.delete(obj)
-            XCTAssertEqual(0, objects(SwiftObject).count)
+            XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         }
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
     }
 
     func testDeleteListOfObjects() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftCompanyObject).count)
+        XCTAssertEqual(0, Results(type: SwiftCompanyObject.self).count)
         realm.write {
             let obj = SwiftCompanyObject()
             obj.employees.append(SwiftEmployeeObject())
             realm.add(obj)
-            XCTAssertEqual(1, objects(SwiftEmployeeObject).count)
+            XCTAssertEqual(1, Results(type: SwiftEmployeeObject.self).count)
             realm.delete(obj.employees)
-            XCTAssertEqual(0, objects(SwiftEmployeeObject).count)
+            XCTAssertEqual(0, Results(type: SwiftEmployeeObject.self).count)
         }
-        XCTAssertEqual(0, objects(SwiftEmployeeObject).count)
+        XCTAssertEqual(0, Results(type: SwiftEmployeeObject.self).count)
     }
 
     func testDeleteSequenceOfObjects() {
         let realm = Realm()
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         realm.write {
             let objs = [SwiftObject(), SwiftObject()]
             realm.add(objs)
-            XCTAssertEqual(2, objects(SwiftObject).count)
+            XCTAssertEqual(2, Results(type: SwiftObject.self).count)
             realm.delete(objs)
-            XCTAssertEqual(0, objects(SwiftObject).count)
+            XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         }
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
     }
 
     func testDeleteAll() {
         let realm = Realm()
         realm.write {
             realm.add(SwiftObject())
-            XCTAssertEqual(1, objects(SwiftObject).count)
+            XCTAssertEqual(1, Results(type: SwiftObject.self).count)
             realm.deleteAll()
-            XCTAssertEqual(0, objects(SwiftObject).count)
+            XCTAssertEqual(0, Results(type: SwiftObject.self).count)
         }
-        XCTAssertEqual(0, objects(SwiftObject).count)
+        XCTAssertEqual(0, Results(type: SwiftObject.self).count)
     }
 
     func testAddNotificationBlock() {

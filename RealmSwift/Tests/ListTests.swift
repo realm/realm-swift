@@ -267,7 +267,7 @@ class ListTests: TestCase {
     }
 
     func testAppendResults() {
-        array.append(objects(SwiftStringObject.self, inRealm: realmWithTestPath()))
+        array.append(Results(type: SwiftStringObject.self, realm: realmWithTestPath()))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -348,7 +348,7 @@ class ListTests: TestCase {
         if let realm = array.realm {
             array.append([str1, str2])
 
-            let otherArray = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!.array
+            let otherArray = Results(type: SwiftArrayPropertyObject.self, realm: realm).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -421,7 +421,7 @@ class ListRetrievedTests: ListTests {
         realm.beginWrite()
         SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
-        let array = objects(SwiftArrayPropertyObject.self, inRealm: realm).first!
+        let array = Results(type: SwiftArrayPropertyObject.self, realm: realm).first!
 
         XCTAssertNotNil(array.realm)
         return array

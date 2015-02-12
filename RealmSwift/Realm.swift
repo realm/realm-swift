@@ -19,22 +19,6 @@
 import Realm
 import Realm.Private
 
-// MARK: Object Retrieval
-
-/**
-Returns all objects of the given type in the specified Realm default realm,
-or in the default realm if the `realm` argument is omitted.
-
-:param: type  The type of the objects to be returned.
-:param: realm The Realm instance to query.
-              The default Realm will be used if this argument is omitted.
-
-:returns: Results with all objects of the given type in the given Realm.
-*/
-public func objects<T: Object>(type: T.Type, inRealm realm: Realm = Realm()) -> Results<T> {
-    return Results<T>(RLMGetObjects(realm.rlmRealm, T.className(), nil))
-}
-
 // MARK: Default Realm Helpers
 
 
@@ -143,9 +127,18 @@ public final class Realm {
                             possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+        var rlmRealm: RLMRealm?
+        if let key = encryptionKey {
+            rlmRealm = RLMRealm(path: path, encryptionKey: key, readOnly: readOnly, error: error) as RLMRealm?
+        }
+        else {
+            rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm?
+        }
+
+        if let rlmRealm = rlmRealm {
             self.init(rlmRealm)
-        } else {
+        }
+        else {
             self.init(RLMRealm())
             return nil
         }
