@@ -133,6 +133,8 @@ class ListTests: TestCase {
         array.append(str1)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
+
+        assertThrows(array[200])
     }
 
     func testFirst() {
@@ -196,6 +198,8 @@ class ListTests: TestCase {
         sorted = array.sorted("stringCol", ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
+
+        assertThrows(array.sorted("noSuchCol"))
     }
 
     func testSortWithDescriptors() {
@@ -236,6 +240,8 @@ class ListTests: TestCase {
         XCTAssertEqual(2.22, sorted[1].doubleCol)
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
+
+        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
     }
 
     func testFastEnumeration() {
@@ -284,6 +290,8 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
+
+        assertThrows(array.insert(str2, atIndex: 200))
     }
 
     func testRemoveIndex() {
@@ -292,6 +300,8 @@ class ListTests: TestCase {
         array.remove(1)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
+
+        assertThrows(array.remove(200))
     }
 
     func testRemoveObject() {
@@ -342,6 +352,8 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str2, array[1])
+
+        assertThrows(array.replace(200, object: str2))
     }
 
     func testChangesArePersisted() {
