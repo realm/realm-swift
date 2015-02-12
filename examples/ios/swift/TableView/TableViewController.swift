@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = objects(DemoObject).sorted("date")
+    var array = Results(type: DemoObject.self).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {

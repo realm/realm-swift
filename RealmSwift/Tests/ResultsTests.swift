@@ -111,6 +111,16 @@ class ResultsTests: TestCase {
         XCTAssertEqual(Int(0), results.filter("stringCol = '0'").count)
     }
 
+    func testInitializer() {
+        let realm = realmWithTestPath()
+        realm.add([SwiftObject(), SwiftObject(), SwiftObject()])
+        XCTAssertEqual(0, Results(type: SwiftStringObject.self).count)
+        XCTAssertEqual(3, Results(type: SwiftObject.self, realm: realm).count)
+        XCTAssertEqual(3, Results(type: SwiftObject.self, realm: realm, predicate: NSPredicate(format: "boolCol = false")).count)
+        XCTAssertEqual(3, Results(type: SwiftObject.self, realm: realm, predicateFormat: "boolCol = %@", false).count)
+        XCTAssertEqual(3, Results(type: SwiftObject.self, realm: realm, predicateFormat: "boolCol = false").count)
+    }
+
     func testIndexOfObject() {
         XCTAssertEqual(Int(0), results.indexOf(str1)!)
         XCTAssertEqual(Int(1), results.indexOf(str2)!)
@@ -236,23 +246,23 @@ class ResultsTests: TestCase {
 
 class ResultsFromTableTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-        return objects(SwiftStringObject.self, inRealm: realmWithTestPath())
+        return Results(type: SwiftStringObject.self, realm: realmWithTestPath())
     }
 
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         makeAggregateableObjects()
-        return objects(SwiftAggregateObject.self, inRealm: realmWithTestPath())
+        return Results(type: SwiftAggregateObject.self, realm: realmWithTestPath())
     }
 }
 
 class ResultsFromTableViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-        return objects(SwiftStringObject.self, inRealm: realmWithTestPath())
+        return Results(type: SwiftStringObject.self, realm: realmWithTestPath())
     }
 
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         makeAggregateableObjects()
-        return objects(SwiftAggregateObject.self, inRealm: realmWithTestPath()).filter("trueCol == true")
+        return Results(type: SwiftAggregateObject.self, realm: realmWithTestPath()).filter("trueCol == true")
     }
 }
 

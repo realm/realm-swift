@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // Log all dogs and their owners using the "owners" inverse relationship
-        let allDogs = objects(Dog)
+        let allDogs = Results(type: Dog.self)
         for dog in allDogs {
             let ownerNames = dog.owners.map { $0.name }
             println("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")

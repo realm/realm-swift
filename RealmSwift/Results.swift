@@ -71,6 +71,28 @@ public final class Results<T: Object>: Printable, SequenceType {
         self.rlmResults = rlmResults
     }
 
+    /**
+    Returns all objects of the given type in the specified Realm default realm,
+    or in the default realm if the `realm` argument is omitted.
+
+    :param: type  The type of the objects to be returned.
+    :param: realm The Realm instance to query.
+                  The default Realm will be used if this argument is omitted.
+
+    :returns: Results with all objects of the given type in the given Realm.
+    */
+    public convenience init(type: T.Type = T.self, realm: Realm = Realm(), predicate: NSPredicate? = nil) {
+        self.init(RLMGetObjects(realm.rlmRealm, T.className(), predicate))
+    }
+
+    public convenience init(type: T.Type = T.self, realm: Realm = Realm(), predicateFormat: String, _ args: CVarArgType) {
+        self.init(type: type, realm: realm, predicate: NSPredicate(format: predicateFormat, args))
+    }
+
+    public convenience init(type: T.Type = T.self, realm: Realm = Realm(), predicateFormat: String) {
+        self.init(type: type, realm: realm, predicate: NSPredicate(format: predicateFormat))
+    }
+
     // MARK: Index Retrieval
 
     /**
