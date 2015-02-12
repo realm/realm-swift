@@ -31,8 +31,8 @@ class SwiftLinkTests: TestCase {
 
         realm.write { realm.add(owner) }
 
-        let owners = objects(SwiftOwnerObject.self, inRealm: realm)
-        let dogs = objects(SwiftDogObject.self, inRealm: realm)
+        let owners = realm.objects(SwiftOwnerObject.self)
+        let dogs = realm.objects(SwiftDogObject.self)
         XCTAssertEqual(owners.count, Int(1), "Expecting 1 owner")
         XCTAssertEqual(dogs.count, Int(1), "Expecting 1 dog")
         XCTAssertEqual(owners[0].name, "Tim", "Tim is named Tim")
@@ -51,16 +51,16 @@ class SwiftLinkTests: TestCase {
 
         realm.write { realm.add(owner) }
 
-        XCTAssertEqual(objects(SwiftOwnerObject.self, inRealm: realm).count, Int(1), "Expecting 1 owner")
-        XCTAssertEqual(objects(SwiftDogObject.self, inRealm: realm).count, Int(1), "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(SwiftOwnerObject.self).count, Int(1), "Expecting 1 owner")
+        XCTAssertEqual(realm.objects(SwiftDogObject.self).count, Int(1), "Expecting 1 dog")
 
         realm.beginWrite()
         let fiel = SwiftOwnerObject.createInRealm(realm, withObject: ["Fiel", NSNull()])
         fiel.dog = owner.dog
         realm.commitWrite()
 
-        XCTAssertEqual(objects(SwiftOwnerObject.self, inRealm: realm).count, Int(2), "Expecting 2 owners")
-        XCTAssertEqual(objects(SwiftDogObject.self, inRealm: realm).count, Int(1), "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(SwiftOwnerObject.self).count, Int(2), "Expecting 2 owners")
+        XCTAssertEqual(realm.objects(SwiftDogObject.self).count, Int(1), "Expecting 1 dog")
     }
 
     func testLinkRemoval() {
@@ -73,17 +73,17 @@ class SwiftLinkTests: TestCase {
 
         realm.write { realm.add(owner) }
 
-        XCTAssertEqual(objects(SwiftOwnerObject.self, inRealm: realm).count, Int(1), "Expecting 1 owner")
-        XCTAssertEqual(objects(SwiftDogObject.self, inRealm: realm).count, Int(1), "Expecting 1 dog")
+        XCTAssertEqual(realm.objects(SwiftOwnerObject.self).count, Int(1), "Expecting 1 owner")
+        XCTAssertEqual(realm.objects(SwiftDogObject.self).count, Int(1), "Expecting 1 dog")
 
         realm.write { realm.delete(owner.dog) }
 
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
 
         // refresh owner and check
-        let owner2 = objects(SwiftOwnerObject.self, inRealm: realm).first!
+        let owner2 = realm.objects(SwiftOwnerObject.self).first!
         XCTAssertNotNil(owner, "Should have 1 owner")
         XCTAssertNil(owner.dog, "Dog should be nullified when deleted")
-        XCTAssertEqual(objects(SwiftDogObject.self, inRealm: realm).count, Int(0), "Expecting 0 dogs")
+        XCTAssertEqual(realm.objects(SwiftDogObject.self).count, Int(0), "Expecting 0 dogs")
     }
 }
