@@ -143,9 +143,18 @@ public final class Realm {
                             possible errors, omit the argument, or pass in `nil`.
     */
     public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
+        var rlmRealm: RLMRealm?
+        if let key = encryptionKey {
+            rlmRealm = RLMRealm(path: path, encryptionKey: key, readOnly: readOnly, error: error) as RLMRealm?
+        }
+        else {
+            rlmRealm = RLMRealm(path: path, readOnly: readOnly, error: error) as RLMRealm?
+        }
+
+        if let rlmRealm = rlmRealm {
             self.init(rlmRealm)
-        } else {
+        }
+        else {
             self.init(RLMRealm())
             return nil
         }
