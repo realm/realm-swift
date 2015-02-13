@@ -275,4 +275,12 @@ void RLMRealmSetPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClass,
     return YES;
 }
 
+- (NSString *)description {
+    NSMutableString *objectSchemaString = [NSMutableString string];
+    for (RLMObjectSchema *objectSchema in self.objectSchema) {
+        [objectSchemaString appendFormat:@"\t%@\n", [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
+    }
+    return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
+}
+
 @end

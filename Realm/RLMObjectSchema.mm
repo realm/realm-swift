@@ -296,6 +296,14 @@
     return YES;
 }
 
+- (NSString *)description {
+    NSMutableString *propertiesString = [NSMutableString string];
+    for (RLMProperty *property in self.properties) {
+        [propertiesString appendFormat:@"\t%@\n", [property.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
+    }
+    return [NSString stringWithFormat:@"%@ {\n%@}", self.className, propertiesString];
+}
+
 - (tightdb::Table *)table {
     if (!_table) {
         _table = RLMTableForObjectClass(_realm, _className);

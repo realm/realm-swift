@@ -311,4 +311,8 @@
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ {\n\ttype = %@\n\tobjectClassName = %@\n\tindexed = %@\n\tisPrimary = %@\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO"];
+}
+
 @end
