@@ -41,9 +41,14 @@ class RealmTests: TestCase {
     }
 
     func testReadOnly() {
+        autoreleasepool {
+            XCTAssertEqual(Realm().readOnly, false)
+        }
         let readOnlyRealm = Realm(path: Realm.defaultPath, readOnly: true, error: nil)!
         XCTAssertEqual(true, readOnlyRealm.readOnly)
         XCTAssertEqual(3, readOnlyRealm.objects(SwiftIntObject).count)
+
+        assertThrows(Realm(), "Realm has different readOnly settings")
     }
 
     func testSchema() {
