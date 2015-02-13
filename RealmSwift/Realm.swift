@@ -312,14 +312,11 @@ public final class Realm {
     // MARK: Object Retrieval
 
     /**
-    Returns all objects of the given type in the specified Realm default realm,
-    or in the default realm if the `realm` argument is omitted.
+    Returns all objects of the given type in the Realm.
 
     :param: type  The type of the objects to be returned.
-    :param: realm The Realm instance to query.
-                  The default Realm will be used if this argument is omitted.
 
-    :returns: Results with all objects of the given type in the given Realm.
+    :returns: All objects of the given type in Realm.
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
