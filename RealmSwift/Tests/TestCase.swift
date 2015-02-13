@@ -70,4 +70,8 @@ class TestCase: XCTestCase {
 
         deleteRealmFiles()
     }
+
+    func assertThrows<T>(block: @autoclosure () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+        RLMAssertThrows(self, { _ = block() }, message, fileName, lineNumber);
+    }
 }
