@@ -116,20 +116,40 @@ class RealmTests: TestCase {
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
-//    func testWrite() {
-//
-//    }
+    func testWrite() {
+        Realm().write({
+            self.assertThrows(Realm().beginWrite())
+            self.assertThrows(Realm().write({}))
+            SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+            XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+        })
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+    }
 
-//    func testBeginWrite() {
-//    }
+    func testBeginWrite() {
+        Realm().beginWrite()
+        assertThrows(Realm().beginWrite())
+        Realm().cancelWrite()
+        Realm().beginWrite()
+        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+    }
 
-//    func testCommitWrite() {
-//
-//    }
+    func testCommitWrite() {
+        Realm().beginWrite()
+        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        Realm().commitWrite()
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
+        Realm().beginWrite()
+    }
 
-//    func testCancelWrite() {
-//
-//    }
+    func testCancelWrite() {
+        assertThrows(Realm().cancelWrite())
+        Realm().beginWrite()
+        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        Realm().cancelWrite()
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 0)
+    }
 
     func testAddSingleObject() {
         let realm = Realm()
