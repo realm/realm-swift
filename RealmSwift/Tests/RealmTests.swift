@@ -18,6 +18,7 @@
 
 import XCTest
 import RealmSwift
+import Foundation
 
 class RealmTests: TestCase {
     override func setUp() {
@@ -57,25 +58,39 @@ class RealmTests: TestCase {
         XCTAssertEqual(1, schema.objectSchema.filter({ $0.className == "SwiftStringObject" }).count)
     }
 
-    func testRealmDefaultPath() {
+    func testDefaultPath() {
         let defaultPath =  Realm().path
         XCTAssertEqual(Realm.defaultPath, defaultPath)
 
         let newPath = defaultPath.stringByAppendingPathExtension("new")!
         Realm.defaultPath = newPath
         XCTAssertEqual(Realm.defaultPath, newPath)
-
-        // we have to clean up
-        Realm.defaultPath = defaultPath
+        XCTAssertEqual(Realm().path, Realm.defaultPath)
     }
 
-//    func testInit() {
-//
-//    }
+    func testInit() {
+        XCTAssertEqual(Realm().path, Realm.defaultPath)
+        XCTAssertEqual(Realm(path: testRealmPath()).path, testRealmPath())
+        assertThrows(Realm(path: ""))
+    }
 
-//    func testInitFailable() {
-//
-//    }
+    func testInitFailable() {
+        var error: NSError?
+        autoreleasepool({
+            Realm(path: Realm.defaultPath, readOnly: false)
+            XCTAssertNil(error)
+        })
+
+        NSFileManager.defaultManager().createFileAtPath(Realm.defaultPath,
+            contents:"a".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
+            attributes: nil)
+        XCTAssertNil(Realm(path: Realm.defaultPath, readOnly: false, error: &error), "Should not throw with error")
+        XCTAssertNotNil(error)
+
+        assertThrows(Realm(path: Realm.defaultPath, readOnly: false, error: nil))
+        assertThrows(Realm(path: Realm.defaultPath, readOnly: false))
+        assertThrows(Realm(path: Realm.defaultPath, readOnly: false, encryptionKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false), error: &error))
+    }
 
 //    func testInitInMemory() {
 //

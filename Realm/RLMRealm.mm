@@ -51,8 +51,8 @@ using namespace tightdb::util;
 {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
-               "on to the RLMNotificationToken returned from addNotificationBlock and call "
-               "removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+              @"on to the RLMNotificationToken returned from addNotificationBlock and call "
+              @"removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end
@@ -435,7 +435,8 @@ static id RLMAutorelease(id value) {
 + (void)resetRealmState {
     clearMigrationCache();
     clearKeyCache();
-    RLMClearRealmCache();
+
+    s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
