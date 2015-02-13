@@ -100,6 +100,7 @@ class MigrationTests: TestCase {
 
         Realm()
         XCTAssertEqual(UInt(0), schemaVersionAtPath(Realm.defaultPath)!, "Initial version should be 0")
+        assertThrows(schemaVersionAtPath("/dev/null"))
     }
 
     func testMigrateRealm() {
@@ -137,6 +138,8 @@ class MigrationTests: TestCase {
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
                 XCTFail("No objects to enumerate")
             })
+
+            migration.enumerate("NoSuchClass", {oldObj, newObj in}) // shouldn't throw
         })
 
         // add object
@@ -152,6 +155,8 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(oldObj.objectSchema.className, "SwiftStringObject")
                 XCTAssertEqual(newObj["stringCol"] as String, "string")
                 XCTAssertEqual(oldObj["stringCol"] as String, "string")
+                self.assertThrows(oldObj["noSuchCol"] as String)
+                self.assertThrows(newObj["noSuchCol"] as String)
                 count++
             })
             XCTAssertEqual(count, 1)
@@ -162,6 +167,8 @@ class MigrationTests: TestCase {
         migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
             migration.create("SwiftStringObject", withObject:["string"])
             migration.create("SwiftStringObject", withObject:["stringCol": "string"])
+
+            self.assertThrows(migration.create("NoSuchObject", withObject:[]))
 
             var count = 0
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
