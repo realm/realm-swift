@@ -129,12 +129,14 @@ class ListTests: TestCase {
 
         array[0] = str2
         XCTAssertEqual(str2, array[0])
+        assertThrows(array[-1] = str2)
 
         array.append(str1)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
         assertThrows(array[200])
+        assertThrows(array[-200])
     }
 
     func testFirst() {
@@ -292,6 +294,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[1])
 
         assertThrows(array.insert(str2, atIndex: 200))
+        assertThrows(array.insert(str2, atIndex: -200))
     }
 
     func testRemoveIndex() {
@@ -302,6 +305,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[1])
 
         assertThrows(array.remove(200))
+        assertThrows(array.remove(-200))
     }
 
     func testRemoveObject() {
@@ -354,6 +358,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[1])
 
         assertThrows(array.replace(200, object: str2))
+        assertThrows(array.replace(-200, object: str2))
     }
 
     func testChangesArePersisted() {
