@@ -90,11 +90,31 @@ class RealmTests: TestCase {
         assertThrows(Realm(path: Realm.defaultPath, readOnly: false, error: nil))
         assertThrows(Realm(path: Realm.defaultPath, readOnly: false))
         assertThrows(Realm(path: Realm.defaultPath, readOnly: false, encryptionKey: "asdf".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false), error: &error))
+        assertThrows(Realm(path: "", readOnly: false, error: &error))
     }
 
-//    func testInitInMemory() {
-//
-//    }
+    func testInitInMemory() {
+        autoreleasepool({
+            var realm = Realm(inMemoryIdentifier: "identifier")
+            realm.write({
+                SwiftIntObject.createInRealm(realm, withObject: [1])
+                return
+            })
+        })
+        var realm = Realm(inMemoryIdentifier: "identifier")
+        XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
+
+        realm.write({
+            SwiftIntObject.createInRealm(realm, withObject: [1])
+            XCTAssertEqual(realm.objects(SwiftIntObject).count, 1)
+
+            SwiftIntObject.createInRealm(Realm(inMemoryIdentifier: "identifier"), withObject: [1])
+            XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
+        })
+
+        var realm2 = Realm(inMemoryIdentifier: "identifier2")
+        XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
+    }
 
 //    func testWrite() {
 //
