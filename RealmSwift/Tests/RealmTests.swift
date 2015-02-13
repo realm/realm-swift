@@ -36,24 +36,15 @@ class RealmTests: TestCase {
     }
 
     func testPath() {
-        let realm = Realm()
-        XCTAssertEqual(Realm.defaultPath, realm.path)
+        XCTAssertEqual(Realm.defaultPath, Realm().path)
+        XCTAssertEqual(testRealmPath(), realmWithTestPath().path)
     }
 
-//    func testReadOnly() {
-//        var path: String!
-//        autoreleasepool {
-//            let realm = self.realmWithTestPath()
-//            path = realm.path
-//            realm.write {
-//                _ = SwiftStringObject.createInRealm(realm, withObject: ["a"])
-//            }
-//        }
-//
-//        let readOnlyRealm = Realm(path: path, readOnly: true, error: nil)!
-//        XCTAssertEqual(true, readOnlyRealm.readOnly)
-//        XCTAssertEqual(1, readOnlyRealm.objects(SwiftStringObject.self).count)
-//    }
+    func testReadOnly() {
+        let readOnlyRealm = Realm(path: Realm.defaultPath, readOnly: true, error: nil)!
+        XCTAssertEqual(true, readOnlyRealm.readOnly)
+        XCTAssertEqual(3, readOnlyRealm.objects(SwiftIntObject).count)
+    }
 
     func testSchema() {
         let schema = Realm().schema
