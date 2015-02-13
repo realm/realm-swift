@@ -142,6 +142,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual(str2, results[1])
 
         assertThrows(results[200])
+        assertThrows(results[-200])
     }
 
     func testFirst() {
