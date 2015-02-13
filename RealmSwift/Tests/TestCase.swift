@@ -62,6 +62,8 @@ class TestCase: XCTestCase {
 
         autoreleasepool {
             self.setUp()
+        }
+        autoreleasepool {
             self.invocation.invoke()
             self.tearDown()
         }
