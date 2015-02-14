@@ -531,7 +531,7 @@ case "$COMMAND" in
         rm -rf include
         mv core/include include
         mkdir -p include/Realm
-        cp Realm/*.h include/Realm
+        cp Realm/*.{h,hpp} include/Realm
         touch include/Realm/RLMPlatform.h
         ;;
 
