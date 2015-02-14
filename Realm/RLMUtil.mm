@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUtil.hpp"
+#import <Realm/RLMUtil.hpp>
 
 #import "RLMArray_Private.hpp"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
-#import "RLMProperty_Private.h"
-#import "RLMSwiftSupport.h"
-#import "RLMSchema_Private.h"
+#import <Realm/RLMObjectSchema_Private.hpp>
+#import <Realm/RLMObject_Private.h>
+#import <Realm/RLMProperty_Private.h>
+#import <Realm/RLMSwiftSupport.h>
+#import <Realm/RLMSchema_Private.h>
 
 #if !defined(REALM_VERSION)
 #import "RLMVersion.h"

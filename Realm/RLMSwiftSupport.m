@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSwiftSupport.h"
+#import <Realm/RLMSwiftSupport.h>
 
 @implementation RLMSwiftSupport
 

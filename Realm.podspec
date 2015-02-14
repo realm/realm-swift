@@ -1,5 +1,6 @@
 Pod::Spec.new do |s|
   s.name                    = 'Realm'
+  s.module_map              = 'Realm/module.modulemap'
   s.version                 = `sh build.sh get-version`
   s.summary                 = 'Realm is a modern data framework & database for iOS & OSX.'
   s.description             = <<-DESC
@@ -21,25 +22,24 @@ Pod::Spec.new do |s|
   s.documentation_url       = "http://realm.io/docs/cocoa/#{s.version}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
-  public_header_files = 'include/Realm/RLMArray.h',
-                        'include/Realm/RLMCollection.h',
-                        'include/Realm/RLMConstants.h',
-                        'include/Realm/RLMListBase.h',
-                        'include/Realm/RLMMigration.h',
-                        'include/Realm/RLMObject.h',
-                        'include/Realm/RLMObjectBase.h',
-                        'include/Realm/RLMObjectSchema.h',
-                        'include/Realm/RLMPlatform.h',
-                        'include/Realm/RLMProperty.h',
-                        'include/Realm/RLMRealm.h',
-                        'include/Realm/RLMResults.h',
-                        'include/Realm/RLMSchema.h',
-                        'include/Realm/Realm.h'
+  public_header_files       = 'include/Realm/RLMArray.h',
+                              'include/Realm/RLMCollection.h',
+                              'include/Realm/RLMConstants.h',
+                              'include/Realm/RLMListBase.h',
+                              'include/Realm/RLMMigration.h',
+                              'include/Realm/RLMObject.h',
+                              'include/Realm/RLMObjectBase.h',
+                              'include/Realm/RLMObjectSchema.h',
+                              'include/Realm/RLMPlatform.h',
+                              'include/Realm/RLMProperty.h',
+                              'include/Realm/RLMRealm.h',
+                              'include/Realm/RLMResults.h',
+                              'include/Realm/RLMSchema.h',
+                              'include/Realm/Realm.h'
 
   s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.public_header_files     = public_header_files
-  s.source_files            = 'Realm/*.{h,m,mm,hpp}', 'include/**/*.hpp'
+  s.source_files            = 'Realm/*.{m,mm}'
   s.header_mappings_dir     = 'include'
   s.xcconfig                = { 'CLANG_CXX_LANGUAGE_STANDARD' => 'compiler-default',
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
@@ -52,7 +52,8 @@ Pod::Spec.new do |s|
   s.osx.vendored_library    = 'core/libtightdb.a'
 
   s.subspec 'Headers' do |s|
-    s.source_files          = 'include/**/*.h'
+    s.source_files          = 'include/**/*.{h,hpp}'
     s.public_header_files   = public_header_files
+    s.private_header_files  = 'include/Realm/*{ListBase,ObjectStore,Private,Dynamic}.h'
   end
 end

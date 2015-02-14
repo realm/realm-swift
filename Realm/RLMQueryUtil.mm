@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMQueryUtil.hpp"
+#import <Realm/RLMQueryUtil.hpp>
 
-#import "RLMArray.h"
-#import "RLMObjectSchema_Private.hpp"
+#import <Realm/RLMArray.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
 #import "RLMObject_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMSchema_Private.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMProperty_Private.h>
+#import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMUtil.hpp>
 
 #include <tightdb.hpp>
 using namespace tightdb;

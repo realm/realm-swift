@@ -18,15 +18,15 @@
 
 #import "RLMObject_Private.hpp"
 
-#import "RLMAccessor.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMProperty_Private.h"
+#import <Realm/RLMAccessor.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
+#import <Realm/RLMProperty_Private.h>
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
+#import <Realm/RLMSchema_Private.h>
 
-#import "RLMObjectStore.h"
-#import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMObjectStore.h>
+#import <Realm/RLMSwiftSupport.h>
+#import <Realm/RLMUtil.hpp>
 
 @implementation RLMObjectBase
 

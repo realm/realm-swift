@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMRealm_Private.h>
+#import <Realm/RLMUtil.hpp>
 
 #import <tightdb/link_view.hpp>
 #import <tightdb/group.hpp>

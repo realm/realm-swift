@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMListBase.h"
+#import <Realm/RLMListBase.h>
 
 @implementation RLMListBase
 - (instancetype)initWithArray:(RLMArray *)array {

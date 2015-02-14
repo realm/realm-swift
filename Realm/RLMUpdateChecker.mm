@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUpdateChecker.hpp"
+#import <Realm/RLMUpdateChecker.hpp>
 
-#import "RLMRealm.h"
+#import <Realm/RLMRealm.h>
 
 #if TARGET_IPHONE_SIMULATOR && !defined(REALM_VERSION)
 #import "RLMVersion.h"

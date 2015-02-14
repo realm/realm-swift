@@ -18,12 +18,12 @@
 
 #import "RLMArray_Private.hpp"
 
-#import "RLMObject.h"
-#import "RLMObjectStore.h"
-#import "RLMObjectSchema.h"
-#import "RLMQueryUtil.hpp"
-#import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectStore.h>
+#import <Realm/RLMObjectSchema.h>
+#import <Realm/RLMQueryUtil.hpp>
+#import <Realm/RLMSwiftSupport.h>
+#import <Realm/RLMUtil.hpp>
 
 #import <tightdb/link_view.hpp>
 

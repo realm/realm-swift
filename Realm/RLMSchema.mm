@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSchema_Private.h"
+#import <Realm/RLMSchema_Private.h>
 
-#import "RLMAccessor.h"
-#import "RLMObject.h"
-#import "RLMObjectSchema_Private.hpp"
+#import <Realm/RLMAccessor.h>
+#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
 #import "RLMRealm_Private.hpp"
-#import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMSwiftSupport.h>
+#import <Realm/RLMUtil.hpp>
 
 #import <objc/runtime.h>
 #import <tightdb/group.hpp>

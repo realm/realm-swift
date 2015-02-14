@@ -16,13 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProperty_Private.h"
+#import <Realm/RLMProperty_Private.h>
 
-#import "RLMArray.h"
-#import "RLMObject.h"
-#import "RLMSchema_Private.h"
-#import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
+#import <Realm/RLMArray.h>
+#import <Realm/RLMObject.h>
+#import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMSwiftSupport.h>
+#import <Realm/RLMUtil.hpp>
 
 @implementation RLMProperty {
     NSString *_objcRawType;
