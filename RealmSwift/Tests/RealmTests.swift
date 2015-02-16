@@ -259,6 +259,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(0, Realm().objects(SwiftStringObject).count)
         XCTAssertEqual(3, Realm().objects(SwiftIntObject).count)
         XCTAssertEqual(3, Realm().objects(SwiftIntObject.self).count)
+        assertThrows(Realm().objects(Object))
     }
 
     func testAddNotificationBlock() {
@@ -286,21 +287,71 @@ class RealmTests: TestCase {
     }
 
     func testAutorefresh() {
-        let realm = realmWithTestPath()
-        XCTAssertTrue(realm.autorefresh, "Autorefresh should default to true")
-        realm.autorefresh = false
-        XCTAssertFalse(realm.autorefresh)
-        realm.autorefresh = true
-        XCTAssertTrue(realm.autorefresh)
+        XCTAssertTrue(Realm().autorefresh, "Autorefresh should default to true")
+        Realm().autorefresh = false
+        XCTAssertFalse(Realm().autorefresh)
+        Realm().autorefresh = true
+        XCTAssertTrue(Realm().autorefresh)
+
+        // test that autoreresh is applied
+        // we have two notifications, one for opening the realm, and a second when performing our transaction
+        let notificationFired = expectationWithDescription("notification fired")
+        let token = Realm().addNotificationBlock { _, realm in
+            XCTAssertNotNil(realm, "Realm should not be nil")
+            notificationFired.fulfill()
+        }
+
+        dispatch_async(dispatch_queue_create("background", nil)) {
+            Realm().write {
+                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                return
+            }
+        }
+        waitForExpectationsWithTimeout(2, handler: nil)
+        Realm().removeNotification(token)
+
+        // get object
+        let results = Realm().objects(SwiftStringObject.self)
+        XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")
+        XCTAssertEqual(results[0].stringCol, "string", "Value of first column should be 'string'")
     }
 
-//    func testRefresh() {
-//
-//    }
+    func testRefresh() {
+        let realm = Realm()
+        realm.autorefresh = false
 
-//    func testInvalidate() {
-//
-//    }
+        // test that autoreresh is  notapplied
+        // we have two notifications, one for opening the realm, and a second when performing our transaction
+        let notificationFired = expectationWithDescription("notification fired")
+        let token = realm.addNotificationBlock { _, realm in
+            XCTAssertNotNil(realm, "Realm should not be nil")
+            notificationFired.fulfill()
+        }
+
+        let results = realm.objects(SwiftStringObject.self)
+        XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
+
+        dispatch_async(dispatch_queue_create("background", nil)) {
+            Realm().write {
+                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                return
+            }
+        }
+        waitForExpectationsWithTimeout(2, handler: nil)
+        realm.removeNotification(token)
+
+        XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
+
+        // refresh 
+        realm.refresh()
+
+        XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")
+        XCTAssertEqual(results[0].stringCol, "string", "Value of first column should be 'string'")
+    }
+
+    func testInvalidate() {
+
+    }
 
     func testWriteCopyToPath() {
         let realm = Realm()
