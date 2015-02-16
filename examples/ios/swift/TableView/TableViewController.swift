@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = objects(DemoObject).sorted("date")
+    var array = Realm().objects(DemoObject).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -65,7 +65,7 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return Int(array.count)
+        return array.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

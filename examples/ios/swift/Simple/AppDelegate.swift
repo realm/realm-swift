@@ -59,7 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         realm.commitWrite()
 
         // Query
-        var results = objects(Dog).filter(NSPredicate(format:"name contains 'x'")!)
+        var results = realm.objects(Dog).filter(NSPredicate(format:"name contains 'x'")!)
 
         // Queries are chainable!
         var results2 = results.filter("age > 8")
@@ -77,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Multi-threading
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let otherRealm = Realm()
-            var otherResults = objects(Dog).filter(NSPredicate(format:"name contains 'Rex'")!)
+            var otherResults = otherRealm.objects(Dog).filter(NSPredicate(format:"name contains 'Rex'")!)
             println("Number of dogs \(otherResults.count)")
         }
 
