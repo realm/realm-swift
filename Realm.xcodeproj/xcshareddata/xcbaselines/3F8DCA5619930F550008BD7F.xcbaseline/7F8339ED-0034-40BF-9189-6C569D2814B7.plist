@@ -166,7 +166,7 @@
 					<string>Local Baseline</string>
 				</dict>
 			</dict>
-			<key>testRealmCreation</key>
+			<key>testRealmCreationCached</key>
 			<dict>
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
