@@ -350,7 +350,21 @@ class RealmTests: TestCase {
     }
 
     func testInvalidate() {
+        let realm = Realm()
+        let object = SwiftObject()
+        realm.write({
+            realm.add(object)
+            return
+        })
+        realm.invalidate()
+        XCTAssertEqual(object.invalidated, true)
 
+        realm.write({
+            realm.add(SwiftObject())
+            return
+        })
+        XCTAssertEqual(realm.objects(SwiftObject).count, 2)
+        XCTAssertEqual(object.invalidated, true)
     }
 
     func testWriteCopyToPath() {
