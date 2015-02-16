@@ -943,6 +943,7 @@ extern "C" {
     dog.age = 10;
     XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
+    [realm cancelWriteTransaction];
 }
 
 - (void)testWriteCopyOfRealm
