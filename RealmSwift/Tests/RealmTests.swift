@@ -158,9 +158,12 @@ class RealmTests: TestCase {
 
     func testAddSingleObject() {
         let realm = Realm()
+        assertThrows(realm.add(SwiftObject()))
         XCTAssertEqual(0, realm.objects(SwiftObject).count)
         realm.write {
             let obj = SwiftObject()
+            realm.add(obj)
+            XCTAssertEqual(1, realm.objects(SwiftObject).count)
             realm.add(obj)
             XCTAssertEqual(1, realm.objects(SwiftObject).count)
         }
@@ -169,6 +172,7 @@ class RealmTests: TestCase {
 
     func testAddMultipleObjects() {
         let realm = Realm()
+        assertThrows(realm.add([SwiftObject(), SwiftObject()]))
         XCTAssertEqual(0, realm.objects(SwiftObject).count)
         realm.write {
             let objs = [SwiftObject(), SwiftObject()]
