@@ -96,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
-        println("Migrated objects in the default Realm: \(objects(Person))")
+        println("Migrated objects in the default Realm: \(Realm().objects(Person))")
 
         //
         // Migrate a realms at a custom paths
@@ -118,9 +118,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the migrated realms
         let realmv1 = Realm(path: realmv1Path)
-        println("Migrated objects in the Realm migrated from v1: \(objects(Person.self, inRealm: realmv1))")
+        println("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person))")
         let realmv2 = Realm(path: realmv2Path)
-        println("Migrated objects in the Realm migrated from v2: \(objects(Person.self, inRealm: realmv2))")
+        println("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person))")
 
         return true
     }
