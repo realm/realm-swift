@@ -279,7 +279,7 @@ public final class Realm {
     :param: object The object to be deleted.
     */
     public func delete(object: Object) {
-        RLMDeleteObjectFromRealm(object)
+        RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
     /**

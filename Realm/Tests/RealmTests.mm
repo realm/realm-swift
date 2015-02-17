@@ -689,6 +689,34 @@ extern "C" {
     [realm commitWriteTransaction];
 }
 
+- (void)testDelete {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, OwnerObject.allObjects.count);
+    XCTAssertEqual(NO, obj.invalidated);
+
+    XCTAssertThrows([realm deleteObject:obj]);
+
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [testRealm transactionWithBlock:^{
+        XCTAssertThrows([testRealm deleteObject:[[OwnerObject alloc] init]]);
+        [realm transactionWithBlock:^{
+            XCTAssertThrows([testRealm deleteObject:obj]);
+        }];
+    }];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:obj];
+        XCTAssertEqual(YES, obj.invalidated);
+    }];
+
+    XCTAssertEqual(0U, OwnerObject.allObjects.count);
+}
+
 - (void)testDeleteAllObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

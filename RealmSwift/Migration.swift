@@ -202,7 +202,7 @@ public final class Migration {
     :param: object Object to be deleted from the Realm being migrated.
     */
     public func delete(object: MigrationObject) {
-        RLMDeleteObjectFromRealm(object)
+        RLMDeleteObjectFromRealm(object, object.realm)
     }
 
     private init(_ rlmMigration: RLMMigration) {

@@ -75,7 +75,7 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
 void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOptions options);
 
 // delete an object from its realm
-void RLMDeleteObjectFromRealm(RLMObjectBase *object);
+void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);
 
 // deletes all objects from a realm
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm);
