@@ -28,12 +28,12 @@ internal func notFoundToNil(index: UInt) -> Int? {
     return Int(index)
 }
 
-internal func throwException(message: String, userInfo: [String:AnyObject] = [:]) {
+internal func throwRealmException(message: String, userInfo: [String:AnyObject] = [:]) {
     NSException(name: RLMExceptionName, reason: message, userInfo: userInfo).raise()
 }
 
 internal func assertPositive(int: Int, parameterName: String) {
     if int < 0 {
-        throwException("Cannot pass a negative value for '\(parameterName).'")
+        throwRealmException("Cannot pass a negative value for '\(parameterName).'")
     }
 }
