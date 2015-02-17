@@ -76,10 +76,10 @@ class RealmTests: TestCase {
 
     func testInitFailable() {
         var error: NSError?
-        autoreleasepool({
+        autoreleasepool {
             Realm(path: Realm.defaultPath, readOnly: false)
             XCTAssertNil(error)
-        })
+        }
 
         NSFileManager.defaultManager().createFileAtPath(Realm.defaultPath,
             contents:"a".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
@@ -94,35 +94,35 @@ class RealmTests: TestCase {
     }
 
     func testInitInMemory() {
-        autoreleasepool({
+        autoreleasepool {
             var realm = Realm(inMemoryIdentifier: "identifier")
-            realm.write({
+            realm.write {
                 SwiftIntObject.createInRealm(realm, withObject: [1])
                 return
-            })
-        })
+            }
+        }
         var realm = Realm(inMemoryIdentifier: "identifier")
         XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
 
-        realm.write({
+        realm.write {
             SwiftIntObject.createInRealm(realm, withObject: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 1)
 
             SwiftIntObject.createInRealm(Realm(inMemoryIdentifier: "identifier"), withObject: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
-        })
+        }
 
         var realm2 = Realm(inMemoryIdentifier: "identifier2")
         XCTAssertEqual(realm2.objects(SwiftIntObject).count, 0)
     }
 
     func testWrite() {
-        Realm().write({
+        Realm().write {
             self.assertThrows(Realm().beginWrite())
-            self.assertThrows(Realm().write({}))
+            self.assertThrows(Realm().write { })
             SwiftStringObject.createInRealm(Realm(), withObject:["1"])
             XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
-        })
+        }
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
     }
 
@@ -409,17 +409,17 @@ class RealmTests: TestCase {
     func testInvalidate() {
         let realm = Realm()
         let object = SwiftObject()
-        realm.write({
+        realm.write {
             realm.add(object)
             return
-        })
+        }
         realm.invalidate()
         XCTAssertEqual(object.invalidated, true)
 
-        realm.write({
+        realm.write {
             realm.add(SwiftObject())
             return
-        })
+        }
         XCTAssertEqual(realm.objects(SwiftObject).count, 2)
         XCTAssertEqual(object.invalidated, true)
     }
