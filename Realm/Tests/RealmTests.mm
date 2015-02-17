@@ -1100,6 +1100,22 @@ extern "C" {
     XCTAssertEqual(2U, [IntObject allObjects].count);
 }
 
+- (void)testBadEncryptionKeys
+{
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:nil readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm realmWithPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data] readOnly:NO error:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:nil]);
+    XCTAssertThrows([RLMRealm migrateRealmAtPath:RLMRealm.defaultRealmPath encryptionKey:[NSData data]]);
+    XCTAssertThrows([RLMRealm setEncryptionKey:[NSData data] forRealmsAtPath:RLMRealm.defaultRealmPath]);
+}
+
+- (void)testValidEncryptionKeys
+{
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64]
+                                forRealmsAtPath:RLMRealm.defaultRealmPath]);
+    XCTAssertNoThrow([RLMRealm setEncryptionKey:nil forRealmsAtPath:RLMRealm.defaultRealmPath]);
+}
+
 - (void)testInvalidLockFile
 {
     // Create the realm file and lock file
