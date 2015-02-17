@@ -34,6 +34,6 @@ internal func throwRealmException(message: String, userInfo: [String:AnyObject] 
 
 internal func assertPositive(int: Int, parameterName: String) {
     if int < 0 {
-        throwRealmException("Cannot pass a negative value for '\(parameterName).'")
+        throwRealmException("Cannot pass a negative value for '\(parameterName)'.")
     }
 }
