@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * An exception will now be thrown when calling `-beginWriteTransaction` from within a notification
   triggered by calling `-beginWriteTransaction` elsewhere.
+* When calling `delete:` we now verify that the object being deleted is persisted in the target Realm.
 
 0.90.5 Release notes (2015-02-04)
 =============================================================
