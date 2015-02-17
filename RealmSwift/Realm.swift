@@ -483,6 +483,15 @@ public final class Realm {
     }
 }
 
+// MARK: Equatable
+
+extension Realm: Equatable { }
+
+/// Returns whether the two realms are equal.
+public func ==(lhs: Realm, rhs: Realm) -> Bool {
+    return lhs.rlmRealm == rhs.rlmRealm
+}
+
 // MARK: Notifications
 
 /// A notification due to changes to a realm.
