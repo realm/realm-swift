@@ -428,4 +428,20 @@ class RealmTests: TestCase {
         Realm.setEncryptionKey(nil, forPath: Realm.defaultPath)
         XCTAssert(true, "setting those keys should not throw")
     }
+
+    func testEquals() {
+        let realm = Realm()
+        XCTAssertTrue(realm == Realm())
+
+        let testRealm = realmWithTestPath()
+        XCTAssertFalse(realm == testRealm)
+
+        let fired = expectationWithDescription("fired")
+        dispatch_async(dispatch_queue_create("background", nil)) {
+            let otherThreadRealm = Realm()
+            XCTAssertFalse(realm == otherThreadRealm)
+            fired.fulfill()
+        }
+        waitForExpectationsWithTimeout(2, handler: nil)
+    }
 }
