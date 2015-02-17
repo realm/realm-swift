@@ -127,6 +127,23 @@
     XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
 }
 
+-(void)testInsertAtIndex {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[], @[]]];
+    StringObject *child1 = [StringObject createInRealm:realm withObject:@[@"a"]];
+    StringObject *child2 = [[StringObject alloc] init];
+    child2.stringCol = @"b";
+    [obj.array addObject:child2];
+    XCTAssertThrows([obj.array insertObject:child1 atIndex:2]);
+    [realm commitWriteTransaction];
+
+    RLMResults *children = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqual(children.count, (NSUInteger)1);
+    XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
+}
+
 -(void)testStandalone {
     RLMRealm *realm = [self realmWithTestPath];
 
