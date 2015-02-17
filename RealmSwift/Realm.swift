@@ -75,8 +75,8 @@ public final class Realm {
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance persisted at the specified file path. The default
-    Realm path is used by default.
+    Obtains a Realm instance persisted at the specified file path. Defaults to
+    `Realm.defaultPath`
 
     :param: path Path to the realm file.
     */
@@ -213,12 +213,11 @@ public final class Realm {
     /**
     Adds an object to be persisted it in this Realm.
 
-    Once added, this object can be retrieved using the `objects(_:)` free function.
     When added, all linked (child) objects referenced by this object will also be
     added to the Realm if they are not already in it. If the object or any linked
-    objects already belong to a different Realm an exception will be thrown. Use
-    `Object(realm:object:)` to insert a copy of a persisted object
-    into a different Realm.
+    objects already belong to a different Realm an exception will be thrown. Use one
+    of the `create` functions to insert a copy of a persisted object into a different
+    Realm.
 
     The object to be added must be valid and cannot have been previously deleted
     from a Realm (i.e. `invalidated`) must be false.
