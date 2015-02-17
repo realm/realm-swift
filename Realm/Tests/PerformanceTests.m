@@ -324,20 +324,31 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
-- (void)testRealmCreation {
-    [self realmWithTestPath]; // ensure a cached realm for the path
-
+- (void)testRealmCreationCached {
+    __block RLMRealm *realm;
     dispatch_queue_t queue = dispatch_queue_create("test queue", 0);
+    dispatch_async(queue, ^{
+        realm = [self realmWithTestPath]; // ensure a cached realm for the path
+    });
+    dispatch_sync(queue, ^{});
+
     [self measureBlock:^{
         for (int i = 0; i < 250; ++i) {
-            dispatch_async(queue, ^{
-                @autoreleasepool {
-                    [self realmWithTestPath];
-                }
-            });
+            @autoreleasepool {
+                [self realmWithTestPath];
+            }
         }
+    }];
+    [realm path];
+}
 
-        dispatch_sync(queue, ^{});
+- (void)testRealmCreationUncached {
+    [self measureBlock:^{
+        for (int i = 0; i < 50; ++i) {
+            @autoreleasepool {
+                [self realmWithTestPath];
+            }
+        }
     }];
 }
 

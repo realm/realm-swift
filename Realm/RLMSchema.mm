@@ -194,6 +194,10 @@ NSString *RLMRealmPrimaryKeyForObjectClass(RLMRealm *realm, NSString *objectClas
     return RLMStringDataToNSString(table->get_string(c_primaryKeyPropertyNameColumnIndex, row));
 }
 
+bool RLMRealmHasMetadataTables(RLMRealm *realm) {
+    return realm.group->get_table(c_primaryKeyTableName) && realm.group->get_table(c_metadataTableName);
+}
+
 bool RLMRealmCreateMetadataTables(RLMRealm *realm) {
     bool changed = false;
     tightdb::TableRef table = realm.group->get_or_add_table(c_primaryKeyTableName);
