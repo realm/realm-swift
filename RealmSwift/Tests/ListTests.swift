@@ -267,7 +267,7 @@ class ListTests: TestCase {
     }
 
     func testAppendResults() {
-        array.append(realmWithTestPath().objects(SwiftStringObject.self))
+        array.append(realmWithTestPath().objects(SwiftStringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -421,7 +421,7 @@ class ListRetrievedTests: ListTests {
         realm.beginWrite()
         SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject.self).first!
+        let array = realm.objects(SwiftArrayPropertyObject).first!
 
         XCTAssertNotNil(array.realm)
         return array

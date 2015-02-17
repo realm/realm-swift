@@ -252,20 +252,6 @@ class RealmTests: TestCase {
         }
     }
 
-    func testDeleteListOfObjects() {
-        let realm = Realm()
-        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
-        realm.write {
-            let obj = SwiftCompanyObject()
-            obj.employees.append(SwiftEmployeeObject())
-            realm.add(obj)
-            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject).count)
-            realm.delete(obj.employees)
-            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
-        }
-        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
-    }
-
     func testDeleteSequenceOfObjects() {
         let realm = Realm()
         XCTAssertEqual(0, realm.objects(SwiftObject).count)
@@ -284,6 +270,35 @@ class RealmTests: TestCase {
         testRealm.write {
             self.assertThrows(testRealm.delete(objs))
         }
+    }
+
+    func testDeleteListOfObjects() {
+        let realm = Realm()
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
+        realm.write {
+            let obj = SwiftCompanyObject()
+            obj.employees.append(SwiftEmployeeObject())
+            realm.add(obj)
+            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject).count)
+            realm.delete(obj.employees)
+            XCTAssertEqual(0, obj.employees.count)
+            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
+        }
+        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject).count)
+    }
+
+    func testDeleteResults() {
+        let realm = Realm(path: testRealmPath())
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
+        realm.write {
+            realm.add(SwiftIntObject(object: [1]))
+            realm.add(SwiftIntObject(object: [1]))
+            realm.add(SwiftIntObject(object: [2]))
+            XCTAssertEqual(3, realm.objects(SwiftIntObject).count)
+            realm.delete(realm.objects(SwiftIntObject).filter("intCol = 1"))
+            XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
+        }
+        XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
     }
 
     func testDeleteAll() {
