@@ -183,7 +183,7 @@ public final class Realm {
     This rolls back all objects in the Realm to the state they were in at the
     beginning of the write transaction, and then ends the transaction.
 
-    This restores the data for deleted objects, but does not re-validated deleted
+    This restores the data for deleted objects, but does not reinstate deleted
     accessor objects. Any `Object`s which were added to the Realm will be
     invalidated rather than switching back to standalone objects.
     Given the following code:
@@ -284,21 +284,21 @@ public final class Realm {
     /**
     Deletes the given objects from this Realm.
 
-    :param: object The objects to be deleted.
-    */
-    public func delete(objects: List<Object>) {
-        rlmRealm.deleteObjects(objects)
-    }
-
-    /**
-    Deletes the given objects from this Realm.
-
-    :param: object The objects to be deleted.
+    :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
+                   or any other enumerable SequenceType which generates Object.
     */
     public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
             delete(obj)
         }
+    }
+
+    public func delete<T: Object>(objects: List<T>) {
+        rlmRealm.deleteObjects(objects._rlmArray)
+    }
+
+    public func delete<T: Object>(objects: Results<T>) {
+        rlmRealm.deleteObjects(objects.rlmResults)
     }
 
     /**
@@ -357,9 +357,9 @@ public final class Realm {
     /**
     Whether this Realm automatically updates when changes happen in other threads.
 
-    If set to YES (the default), changes made on other threads will be reflected
+    If set to `true` (the default), changes made on other threads will be reflected
     in this Realm on the next cycle of the run loop after the changes are
-    committed.  If set to NO, you must manually call -refresh on the Realm to
+    committed.  If set to `false`, you must manually call -refresh on the Realm to
     update it to get the latest version.
 
     Even with this enabled, you can still call `refresh()` at any time to update the
@@ -368,7 +368,7 @@ public final class Realm {
     Notifications are sent when a write transaction is committed whether or not
     this is enabled.
 
-    Disabling this on an `Realm` without any strong references to it will not
+    Disabling this on a `Realm` without any strong references to it will not
     have any effect, and it will switch back to YES the next time the `Realm`
     object is created. This is normally irrelevant as it means that there is
     nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
