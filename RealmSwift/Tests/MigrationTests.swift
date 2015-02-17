@@ -140,10 +140,10 @@ class MigrationTests: TestCase {
         })
 
         // add object
-        Realm().write({
+        Realm().write {
             SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
             return
-        })
+        }
 
         migrateAndTestRealm(Realm.defaultPath, schemaVersion: 2, block: { migration, oldSchemaVersion in
             var count = 0
@@ -177,11 +177,11 @@ class MigrationTests: TestCase {
 
     func testDelete() {
         autoreleasepool { () -> () in
-            Realm().write({
+            Realm().write {
                 SwiftStringObject.createInRealm(Realm(), withObject: ["string1"])
                 SwiftStringObject.createInRealm(Realm(), withObject: ["string2"])
                 return
-            })
+            }
 
             self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
                 var deleted = false;
@@ -199,14 +199,14 @@ class MigrationTests: TestCase {
 
     // test getting/setting all property types
     func testMigrationObject() {
-        Realm().write({
+        Realm().write {
             var object = SwiftObject()
             object.boolCol = true
             object.objectCol = SwiftBoolObject(object:[true])
             object.arrayCol.append(SwiftBoolObject(object:[false]))
             Realm().add(object)
             return
-        })
+        }
 
         self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
             var enumerated = false
