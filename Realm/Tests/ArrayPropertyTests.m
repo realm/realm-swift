@@ -155,7 +155,10 @@
     XCTAssertEqual([intArray.intArray indexOfObject:intObj], 0U, @"Should be first element");
 
     // test standalone with literals
-    __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
+    ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
+    XCTAssertEqual(obj.name, @"n");
+    XCTAssertNotNil(obj.array, @"Should be able to get an empty array");
+    XCTAssertEqual([obj.intArray[0] intCol], 1);
 }
 
 - (void)testIndexOfObject
