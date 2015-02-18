@@ -81,7 +81,7 @@ class SwiftObjectInterfaceTests: TestCase {
     func testMergedDefaultValuesSwiftObject() {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        SwiftDefaultObject.createInRealm(realm, withObject: NSDictionary())
+        realm.create(SwiftDefaultObject.self, value: NSDictionary())
         realm.commitWrite()
 
         let object = realm.objects(SwiftDefaultObject.self).first

@@ -79,29 +79,6 @@ public class Object : RLMObjectBase, Equatable {
         super.init(object: object)
     }
 
-    // MARK: Constructors
-
-    /**
-    Create an `Object` in the given `Realm` with the given object.
-
-    Creates an instance of this object and adds it to the given `Realm` populating
-    the object with the given object.
-
-    :param: realm  The Realm in which this object is persisted.
-    :param: object The object used to populate the object. This can be any key/value coding compliant
-                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                   or an `Array` with one object for each persisted property. An exception will be
-                   thrown if any required properties are not present and no default is set.
-
-                   When passing in an `Array`, all properties must be present,
-                   valid and in the same order as the properties defined in the model.
-
-    :returns: The created object.
-    */
-    public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
-    }
-
     // MARK: Private Initializers
 
     // FIXME: None of these initializers should be exposed in the public interface.
