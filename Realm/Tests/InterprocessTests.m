@@ -287,4 +287,16 @@
     }
 }
 
+- (void)testCanOpenAndReadWhileOtherProcessHoldsWriteLock {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    if (self.isParent) {
+        [realm beginWriteTransaction];
+        [self runChildAndWait];
+        [realm commitWriteTransaction];
+    }
+    else {
+        XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
+    }
+}
+
 @end
