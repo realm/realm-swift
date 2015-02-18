@@ -272,6 +272,29 @@ public final class Realm {
         }
     }
 
+    // MARK: Constructors
+
+    /**
+    Create an `Object` with the given object.
+
+    Creates an instance of this object and adds it to the `Realm` populating
+    the object represented by value.
+
+    :param: type    The object type to create.
+    :param: value   The value used to populate the object. This can be any key/value coding compliant
+                    object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
+                    or an `Array` with one object for each persisted property. An exception will be
+                    thrown if any required properties are not present and no default is set.
+
+                    When passing in an `Array`, all properties must be present,
+                    valid and in the same order as the properties defined in the model.
+
+    :returns: The created object.
+    */
+    public func create<T: Object>(type: T.Type, value: AnyObject) -> T {
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, .allZeros), T.self)
+    }
+
     /**
     Deletes the given object from this Realm.
 

@@ -147,7 +147,7 @@ class MigrationTests: TestCase {
         autoreleasepool {
             // add object
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                SwiftStringObject.createInRealm(Realm(), value: ["string"])
                 return
             }
         }
@@ -171,8 +171,8 @@ class MigrationTests: TestCase {
 
     func testCreate() {
         migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
-            migration.create("SwiftStringObject", withObject:["string"])
-            migration.create("SwiftStringObject", withObject:["stringCol": "string"])
+            migration.create("SwiftStringObject", value:["string"])
+            migration.create("SwiftStringObject", value:["stringCol": "string"])
 
             self.assertThrows(migration.create("NoSuchObject", withObject:[]))
 
@@ -191,8 +191,8 @@ class MigrationTests: TestCase {
     func testDelete() {
         autoreleasepool { () -> () in
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), withObject: ["string1"])
-                SwiftStringObject.createInRealm(Realm(), withObject: ["string2"])
+                SwiftStringObject.createInRealm(Realm(), value: ["string1"])
+                SwiftStringObject.createInRealm(Realm(), value: ["string2"])
                 return
             }
         }
@@ -263,7 +263,7 @@ class MigrationTests: TestCase {
                 var list = newObj["arrayCol"] as List<MigrationObject>
                 list[0]["boolCol"] = true
                 list.append(newObj["objectCol"] as MigrationObject)
-                list.append(migration.create(SwiftBoolObject.className(), withObject: [true]))
+                list.append(migration.create(SwiftBoolObject.className(), value: [true]))
 
                 newObj["objectCol"] = SwiftBoolObject(object: [false])
 

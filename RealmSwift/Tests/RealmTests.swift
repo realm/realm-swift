@@ -24,15 +24,15 @@ class RealmTests: TestCase {
     override func setUp() {
         super.setUp()
         realmWithTestPath().write {
-            SwiftStringObject.createInRealm(self.realmWithTestPath(), withObject: ["1"])
-            SwiftStringObject.createInRealm(self.realmWithTestPath(), withObject: ["2"])
-            SwiftStringObject.createInRealm(self.realmWithTestPath(), withObject: ["3"])
+            self.realmWithTestPath().create(SwiftStringObject.self, value: ["1"])
+            self.realmWithTestPath().create(SwiftStringObject.self, value: ["2"])
+            self.realmWithTestPath().create(SwiftStringObject.self, value: ["3"])
         }
 
         Realm().write {
-            SwiftIntObject.createInRealm(Realm(), withObject: [100])
-            SwiftIntObject.createInRealm(Realm(), withObject: [200])
-            SwiftIntObject.createInRealm(Realm(), withObject: [300])
+            Realm().create(SwiftIntObject.self, value: [100])
+            Realm().create(SwiftIntObject.self, value: [200])
+            Realm().create(SwiftIntObject.self, value: [300])
         }
     }
 
@@ -97,7 +97,7 @@ class RealmTests: TestCase {
         autoreleasepool {
             var realm = Realm(inMemoryIdentifier: "identifier")
             realm.write {
-                SwiftIntObject.createInRealm(realm, withObject: [1])
+                realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
@@ -105,10 +105,10 @@ class RealmTests: TestCase {
         XCTAssertEqual(realm.objects(SwiftIntObject).count, 0)
 
         realm.write {
-            SwiftIntObject.createInRealm(realm, withObject: [1])
+            realm.create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 1)
 
-            SwiftIntObject.createInRealm(Realm(inMemoryIdentifier: "identifier"), withObject: [1])
+            Realm(inMemoryIdentifier: "identifier").create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.objects(SwiftIntObject).count, 2)
         }
 
@@ -120,7 +120,7 @@ class RealmTests: TestCase {
         Realm().write {
             self.assertThrows(Realm().beginWrite())
             self.assertThrows(Realm().write { })
-            SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+            Realm().create(SwiftStringObject.self, value:["1"])
             XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
         }
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
@@ -131,13 +131,13 @@ class RealmTests: TestCase {
         assertThrows(Realm().beginWrite())
         Realm().cancelWrite()
         Realm().beginWrite()
-        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        Realm().create(SwiftStringObject.self, value:["1"])
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
     }
 
     func testCommitWrite() {
         Realm().beginWrite()
-        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        Realm().create(SwiftStringObject.self, value:["1"])
         Realm().commitWrite()
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 1)
         Realm().beginWrite()
@@ -146,7 +146,7 @@ class RealmTests: TestCase {
     func testCancelWrite() {
         assertThrows(Realm().cancelWrite())
         Realm().beginWrite()
-        SwiftStringObject.createInRealm(Realm(), withObject:["1"])
+        Realm().create(SwiftStringObject.self, value:["1"])
         Realm().cancelWrite()
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 0)
 
@@ -226,6 +226,10 @@ class RealmTests: TestCase {
         testRealm.write {
             self.assertThrows(testRealm.addOrUpdate(realm.objects(SwiftPrimaryStringObject)))
         }
+    }
+
+    func testCreate() {
+
     }
 
     func testDeleteSingleObject() {
@@ -360,7 +364,7 @@ class RealmTests: TestCase {
 
         dispatch_async(dispatch_queue_create("background", nil)) {
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
@@ -390,7 +394,7 @@ class RealmTests: TestCase {
 
         dispatch_async(dispatch_queue_create("background", nil)) {
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
