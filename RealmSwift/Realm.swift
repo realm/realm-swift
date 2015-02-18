@@ -338,6 +338,24 @@ public final class Realm {
         return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
     }
 
+    /**
+    Get an object with the given primary key.
+
+    Returns `nil` if no object exists with the given primary key.
+
+    This method requires that `primaryKey()` be overridden on the receiving subclass.
+
+    :see: Object.primaryKey()
+
+    :param: type    The type of the objects to be returned.
+    :param: key     The primary key of the desired object.
+
+    :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    */
+    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T {
+        return unsafeBitCast(RLMGetObject(rlmRealm, type.className(), key), T.self)
+    }
+
 
     // MARK: Notifications
 

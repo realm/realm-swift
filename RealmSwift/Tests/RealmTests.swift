@@ -327,6 +327,10 @@ class RealmTests: TestCase {
         assertThrows(Realm().objects(Object))
     }
 
+    func testObjectForPrimaryKey() {
+
+    }
+
     func testAddNotificationBlock() {
         let realm = Realm()
         var notificationCalled = false
