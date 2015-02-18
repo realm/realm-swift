@@ -50,8 +50,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let realm = Realm()
         realm.write {
-            Person.createInRealm(realm, withObject: ["John", [["Fido", 1]]])
-            Person.createInRealm(realm, withObject: ["Mary", [["Rex", 2]]])
+            realm.create(Person.self, value: ["John", [["Fido", 1]]])
+            realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
         }
 
         // Log all dogs and their owners using the "owners" inverse relationship
