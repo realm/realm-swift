@@ -255,7 +255,7 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
     return changed;
 }
 
-NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion) {
     NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
 
     // validate versions
@@ -266,12 +266,14 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
         @throw RLMException(reason, @{@"path" : realm.path});
     }
 
-    bool migrating = oldVersion != newVersion;
+    return oldVersion != newVersion;
+}
 
+NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
     // if the schema version matches, try to get all the tables without entering
     // a write transaction
-    if (!migrating && RLMRealmGetTables(realm, targetSchema)) {
-            return nil;
+    if (!RLMMigrationRequired(realm, newVersion) && RLMRealmGetTables(realm, targetSchema)) {
+        return nil;
     }
 
     // either a migration is needed or there's missing tables, so we do need a
@@ -281,7 +283,7 @@ NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, R
     // Recheck the schema version after beginning the write transaction as
     // another process may have done the migration after we opened the read
     // transaction
-    migrating = RLMRealmSchemaVersion(realm) != newVersion;
+    bool migrating = RLMMigrationRequired(realm, newVersion);
 
     @try {
         // create tables
