@@ -79,50 +79,91 @@ public class Object : RLMObjectBase, Equatable {
         super.init(object: object)
     }
 
+
+    // MARK: Properties
+
+    // FIXME: Rename to `realm`
+    /// The `Realm` this object belongs to, or `nil` if the object
+    /// does not belong to a realm (the object is standalone).
+    public var swiftRealm: Realm? {
+        if let rlmRealm = realm {
+            return Realm(rlmRealm)
+        }
+        return nil
+    }
+
+    // FIXME: Rename to `objectSchema`
+    /// The `ObjectSchema` which lists the persisted properties for this object.
+    public var swiftObjectSchema: ObjectSchema { return ObjectSchema(rlmObjectSchema: objectSchema) }
+
+    // FIXME: Rename to `invalidated`
+    /// Indicates if an object can no longer be accessed.
+    public var swiftInvalidated: Bool { return invalidated }
+
+
+    // MARK: Object customization
+
+    /**
+    Override to designate a property as the primary key for an `Object` subclass. Only properties of
+    type String and Int can be designated as the primary key. Primary key
+    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+    Indexes are created automatically for string primary key properties.
+    :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
+    */
+    public override class func primaryKey() -> String? { return nil }
+
+    /**
+    // FIXME: Rename to `ignoredProperties`
+
+    Override to return an array of property names to ignore. These properties will not be persisted
+    and are treated as transient.
+
+    :returns: `Array` of property names to ignore.
+    */
+    public class func swiftIgnoredProperties() -> [String] { return [] }
+
+    /**
+    Return an array of property names for properties which should be indexed. Only supported
+    for string and int properties.
+    :returns: `Array` of property names to index.
+    */
+    public class func indexedProperties() -> [String] { return [] }
+
+
+    // MARK: Inverse Relationships
+
+    /**
+    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    be used to get the inverse relationship value for `Object` and `List` properties.
+    :param: className The type of object on which the relationship to query is defined.
+    :param: property  The name of the property which defines the relationship.
+    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    */
+    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
+        return linkingObjectsOfClass(T.className(), forProperty: propertyName) as [T]
+    }
+
+
     // MARK: Private Initializers
 
     // FIXME: None of these initializers should be exposed in the public interface.
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
-
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
-
-    :param: realm         The realm to which this object belongs.
-    :param: schema        The schema for the object's class.
-    :param: defaultValues Whether the default values for this model should be used.
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(realm: RLMRealm, schema: RLMObjectSchema, defaultValues: Bool) {
         super.init(realm: realm, schema: schema, defaultValues: defaultValues)
     }
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
-
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
-
-    :param: realm  The realm to which this object belongs.
-    :param: schema The realm's schema.
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(object: AnyObject, schema: RLMSchema) {
         super.init(object: object, schema: schema)
     }
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
-
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
-
-    :param: objectSchema The schema for the object's class.
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(objectSchema: RLMObjectSchema) {
         super.init(objectSchema: objectSchema)
