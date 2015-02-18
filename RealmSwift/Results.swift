@@ -57,7 +57,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     internal let rlmResults: RLMResults
 
     /// Returns the Realm these results are associated with.
-    public var realm: Realm { return Realm(rlmRealm: rlmResults.realm) }
+    public var realm: Realm { return Realm(rlmResults.realm) }
 
     /// Returns a human-readable description of the objects contained in these results.
     public var description: String { return rlmResults.description }

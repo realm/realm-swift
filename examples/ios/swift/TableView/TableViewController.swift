@@ -36,7 +36,7 @@ class Cell: UITableViewCell {
 
 class TableViewController: UITableViewController {
 
-    var array = objects(DemoObject).sorted("date")
+    var array = Realm().objects(DemoObject).sorted("date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -45,7 +45,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = Realm().addNotificationBlock { note, realm in
             self.tableView.reloadData()
         }
 
@@ -65,7 +65,7 @@ class TableViewController: UITableViewController {
     // Table view data source
 
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return Int(array.count)
+        return array.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -80,7 +80,7 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let realm = defaultRealm()
+            let realm = Realm()
             realm.beginWrite()
             realm.delete(array[indexPath.row])
             realm.commitWrite()
@@ -94,7 +94,7 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = defaultRealm()
+            let realm = Realm()
             realm.beginWrite()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
@@ -105,7 +105,7 @@ class TableViewController: UITableViewController {
     }
 
     func add() {
-        let realm = defaultRealm()
+        let realm = Realm()
         realm.beginWrite()
         DemoObject.createInRealm(realm, withObject: [TableViewController.randomString(), TableViewController.randomDate()])
         realm.commitWrite()

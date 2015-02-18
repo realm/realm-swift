@@ -45,9 +45,9 @@
 - (void)dealloc
 {
     if (_realm || _block) {
-        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold \
-              on to the RLMNotificationToken returned from addNotificationBlock and call \
-              removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+        NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
+              @"on to the RLMNotificationToken returned from addNotificationBlock and call "
+              @"removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end
@@ -106,8 +106,7 @@ static bool isDebuggerAttached() {
         NSLog(@"sysctl() failed: %s", strerror(errno));
         return false;
     }
-    
-    
+
     return (info.kp_proc.p_flag & P_TRACED) != 0;
 }
 
@@ -512,6 +511,8 @@ static id RLMAutorelease(id value) {
     clearMigrationCache();
     clearRealmCache();
     clearKeyCache();
+
+    s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
@@ -755,7 +756,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    RLMDeleteObjectFromRealm(object);
+    RLMDeleteObjectFromRealm(object, self);
 }
 
 - (void)deleteObjects:(id)array {
@@ -763,7 +764,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         // for arrays and standalone delete each individually
         for (id obj in nsArray) {
             if ([obj isKindOfClass:RLMObjectBase.class]) {
-                RLMDeleteObjectFromRealm(obj);
+                RLMDeleteObjectFromRealm(obj, self);
             }
         }
     }

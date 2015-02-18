@@ -19,47 +19,6 @@
 import Realm
 import Realm.Private
 
-// MARK: Object Retrieval
-
-/**
-Returns all objects of the given type in the default Realm.
-
-:param: type The type of the objects to be returned.
-
-:returns: Results with all objects of the given type in the default Realm.
-*/
-public func objects<T: Object>(type: T.Type) -> Results<T> {
-    return Results<T>(RLMGetObjects(RLMRealm.defaultRealm(), T.className(), nil))
-}
-
-// MARK: Default Realm Helpers
-
-/**
-The location of the default Realm as a string. Can be overridden.
-
-`~/Application Support/{bundle ID}/default.realm` on OS X.
-
-`default.realm` in your application's documents directory on iOS.
-
-:returns: Location of the default Realm.
-*/
-public func defaultRealmPath() -> String {
-    return RLMRealm.defaultRealmPath()
-}
-
-/**
-Obtains an instance of the default Realm.
-
-The default Realm is persisted as default.realm under the Documents directory of
-your Application on iOS, and in your application's Application Support
-directory on OS X.
-
-:returns: The default `Realm` instance for the current thread.
-*/
-public func defaultRealm() -> Realm {
-    return Realm(rlmRealm: RLMRealm.defaultRealm())
-}
-
 /**
 A Realm instance (also referred to as "a realm") represents a Realm
 database.
@@ -82,11 +41,9 @@ strong references to it.
           call it in each block which is dispatched, as a queue is not guaranteed to run
           on a consistent thread.
 */
-public class Realm {
+public final class Realm {
 
     // MARK: Properties
-
-    var rlmRealm: RLMRealm
 
     /// Path to the file where this Realm is persisted.
     public var path: String { return rlmRealm.path }
@@ -98,52 +55,62 @@ public class Realm {
     public var schema: Schema { return Schema(rlmSchema: rlmRealm.schema) }
 
     /**
-    Whether this Realm automatically updates when changes happen in other threads.
+    The location of the default Realm as a string. Can be overridden.
 
-    If set to YES (the default), changes made on other threads will be reflected
-    in this Realm on the next cycle of the run loop after the changes are
-    committed.  If set to NO, you must manually call -refresh on the Realm to
-    update it to get the latest version.
+    `~/Application Support/{bundle ID}/default.realm` on OS X.
 
-    Even with this enabled, you can still call `refresh()` at any time to update the
-    Realm before the automatic refresh would occur.
+    `default.realm` in your application's documents directory on iOS.
 
-    Notifications are sent when a write transaction is committed whether or not
-    this is enabled.
-
-    Disabling this on an `Realm` without any strong references to it will not
-    have any effect, and it will switch back to YES the next time the `Realm`
-    object is created. This is normally irrelevant as it means that there is
-    nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
-    references to the containing `Realm`), but it means that setting
-    `defaultRealm().autorefresh = false` in
-    `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
-    objects will not work.
-
-    Defaults to true.
+    :returns: Location of the default Realm.
     */
-    public var autorefresh: Bool {
+    public class var defaultPath: String {
         get {
-            return rlmRealm.autorefresh
+            return RLMRealm.defaultRealmPath()
         }
         set {
-            rlmRealm.autorefresh = newValue
+            RLMRealm.setDefaultRealmPath(newValue)
         }
     }
 
     // MARK: Initializers
 
-    init(rlmRealm: RLMRealm) {
-        self.rlmRealm = rlmRealm
-    }
-
     /**
-    Obtains a Realm instance persisted at the specified file path.
+    Obtains a Realm instance persisted at the specified file path. Defaults to
+    `Realm.defaultPath`
 
     :param: path Path to the realm file.
     */
-    public convenience init(path: String) {
-        self.init(rlmRealm: RLMRealm(path: path, readOnly: false, error: nil))
+    public convenience init(path: String = Realm.defaultPath) {
+        self.init(RLMRealm(path: path, readOnly: false, error: nil))
+    }
+    
+    /**
+    Obtains a `Realm` instance with persistence to a specific file path with
+    options.
+
+    Like `init(path:)`, but with the ability to open read-only realms and get
+    errors as an `NSError` inout parameter rather than exceptions.
+
+    :warning: Read-only Realms do not support changes made to the file while the
+              `Realm` exists. This means that you cannot open a Realm as both read-only
+              and read-write at the same time. Read-only Realms should normally only be used
+              on files which cannot be opened in read-write mode, and not just for enforcing
+              correctness in code that should not need to write to the Realm.
+
+    :param: path            Path to the file you want the data saved in.
+    :param: readOnly        Bool indicating if this Realm is read-only (must use for read-only files).
+    :param: encryptionKey   64-byte key to use to encrypt the data.
+    :param: error           If an error occurs, upon return contains an `NSError` object
+                            that describes the problem. If you are not interested in
+                            possible errors, omit the argument, or pass in `nil`.
+    */
+    public convenience init?(path: String, readOnly: Bool, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) {
+        if let rlmRealm = RLMRealm(path: path, key: encryptionKey, readOnly: readOnly, inMemory: false, dynamic: false, schema: nil, error: error) as RLMRealm? {
+            self.init(rlmRealm)
+        } else {
+            self.init(RLMRealm())
+            return nil
+        }
     }
 
     /**
@@ -162,99 +129,7 @@ public class Realm {
     :param: identifier A string used to identify a particular in-memory Realm.
     */
     public convenience init(inMemoryIdentifier: String) {
-        self.init(rlmRealm: RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
-    }
-
-    /**
-    Obtains a `Realm` instance with persistence to a specific file path with
-    options.
-
-    Like `init(path:)`, but with the ability to open read-only realms and get
-    errors as an `NSError` inout parameter rather than exceptions.
-
-    :warning: Read-only Realms do not support changes made to the file while the
-              `Realm` exists. This means that you cannot open a Realm as both read-only
-              and read-write at the same time. Read-only Realms should normally only be used
-              on files which cannot be opened in read-write mode, and not just for enforcing
-              correctness in code that should not need to write to the Realm.
-
-    :param: path     Path to the file you want the data saved in.
-    :param: readOnly Bool indicating if this Realm is read-only (must use for read-only files).
-    :param: error    If an error occurs, upon return contains an `NSError` object
-                     that describes the problem. If you are not interested in
-                     possible errors, omit the argument, or pass in `nil`.
-    */
-    public convenience init?(path: String, readOnly readonly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, readOnly: readonly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
-        } else {
-            self.init(rlmRealm: RLMRealm())
-            return nil
-        }
-    }
-
-    /**
-    Obtains a `Realm` instance persisted to an encrypted file.
-
-    The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
-    but otherwise they behave like normal persisted Realms.
-
-    Encrypted Realms currently cannot be opened while lldb is attached to the
-    process since lldb cannot forward mach exceptions to the process being
-    debugged. Attempting to open an encrypted Realm with lldb attached will result
-    in an EXC_BAD_ACCESS.
-
-    :param: path          Path to the file you want the data saved in.
-    :param: encryptionKey 64-byte key to use to encrypt the data.
-    :param: readOnly      Bool indicating if this Realm is read-only (must use for read-only files).
-    :param: error         If an error occurs, upon return contains an `NSError` object
-                          that describes the problem. If you are not interested in
-                          possible errors, omit the argument, or pass in `nil`.
-    */
-    public convenience init?(path: String, encryptionKey: NSData, readOnly: Bool, error: NSErrorPointer = nil) {
-        if let rlmRealm = RLMRealm(path: path, encryptionKey: encryptionKey, readOnly: readOnly, error: error) as RLMRealm? {
-            self.init(rlmRealm: rlmRealm)
-        } else {
-            self.init(rlmRealm: RLMRealm())
-            return nil
-        }
-    }
-
-    // MARK: Writing a Copy
-
-    /**
-    Write a compacted copy of the Realm to the given path.
-
-    The destination file cannot already exist.
-
-    Note that if this is called from within a write transaction it writes the
-    *current* data, and not data when the last write transaction was committed.
-
-    :param: path  Path to save the Realm to.
-    :param: error If an error occurs, upon return contains an `NSError` object
-                  that describes the problem. If you are not interested in
-                  possible errors, omit the argument, or pass in `nil`.
-    */
-    public func writeCopyToPath(path: String, error: NSErrorPointer = nil) {
-        rlmRealm.writeCopyToPath(path, error: error)
-    }
-
-    /**
-    Write an encrypted and compacted copy of the Realm to the given path.
-
-    The destination file cannot already exist.
-
-    Note that if this is called from within a write transaction it writes the
-    *current* data, and not data when the last write transaction was committed.
-
-    :param: path          Path to save the Realm to.
-    :param: encryptionKey 64-byte encryption key to encrypt the new file with.
-    :param: error         If an error occurs, upon return contains an `NSError` object
-                          that describes the problem. If you are not interested in
-                          possible errors, omit the argument, or pass in `nil`.
-    */
-    public func writeCopyToPath(path: String, encryptionKey: NSData, error: NSErrorPointer = nil) {
-        rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: error)
+        self.init(RLMRealm.inMemoryRealmWithIdentifier(inMemoryIdentifier))
     }
 
     // MARK: Transactions
@@ -302,53 +177,47 @@ public class Realm {
         rlmRealm.commitWriteTransaction()
     }
 
-    // MARK: Refresh
-
     /**
-    Update a `Realm` and outstanding objects to point to the most recent
-    data for this `Realm`.
+    Revert all writes made in the current write transaction and end the transaction.
+
+    This rolls back all objects in the Realm to the state they were in at the
+    beginning of the write transaction, and then ends the transaction.
+
+    This restores the data for deleted objects, but does not reinstate deleted
+    accessor objects. Any `Object`s which were added to the Realm will be
+    invalidated rather than switching back to standalone objects.
+    Given the following code:
+
+    ```swift
+    let oldObject = objects(ObjectType).first!
+    let newObject = ObjectType()
+
+    realm.beginWrite()
+    realm.add(newObject)
+    realm.delete(oldObject)
+    realm.cancelWrite()
+    ```
+
+    Both `oldObject` and `newObject` will return `true` for `invalidated`,
+    but re-running the query which provided `oldObject` will once again return
+    the valid object.
+
+    Calling this when not in a write transaction will throw an exception.
     */
-    public func refresh() {
-        rlmRealm.refresh()
+    public func cancelWrite() {
+        rlmRealm.cancelWriteTransaction()
     }
 
-    // MARK: Invalidation
-
-    /**
-    Invalidate all `Object`s and `Results` read from this Realm.
-
-    A Realm holds a read lock on the version of the data accessed by it, so
-    that changes made to the Realm on different threads do not modify or delete the
-    data seen by this Realm. Calling this method releases the read lock,
-    allowing the space used on disk to be reused by later write transactions rather
-    than growing the file. This method should be called before performing long
-    blocking operations on a background thread on which you previously read data
-    from the Realm which you no longer need.
-
-    All `Object`, `Results` and `List` instances obtained from this
-    `Realm` on the current thread are invalidated, and can not longer be used.
-    The `Realm` itself remains valid, and a new read transaction is implicitly
-    begun the next time data is read from the Realm.
-
-    Calling this method multiple times in a row without reading any data from the
-    Realm, or before ever reading any data from the Realm is a no-op. This method
-    cannot be called on a read-only Realm.
-    */
-    public func invalidate() {
-        rlmRealm.invalidate()
-    }
-
-    // MARK: Mutating
+    // MARK: Adding and Deleting objects
 
     /**
     Adds an object to be persisted it in this Realm.
 
-    Once added, this object can be retrieved using the `objects(_:)` free function.
     When added, all linked (child) objects referenced by this object will also be
     added to the Realm if they are not already in it. If the object or any linked
-    objects already belong to a different Realm an exception will be thrown. Use
-    `Object(realm:object:)` to insert a copy of a persisted object
-    into a different Realm.
+    objects already belong to a different Realm an exception will be thrown. Use one
+    of the `create` functions to insert a copy of a persisted object into a different
+    Realm.
 
     The object to be added must be valid and cannot have been previously deleted
     from a Realm (i.e. `invalidated`) must be false.
@@ -366,9 +235,9 @@ public class Realm {
 
     :param: objects A sequence which contains objects to be added to this Realm.
     */
-    public func add<S where S: SequenceType>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
-            RLMAddObjectToRealm(obj as Object, rlmRealm, .allZeros)
+            add(obj)
         }
     }
 
@@ -397,9 +266,9 @@ public class Realm {
 
     :param: objects A sequence of `Object`s to be added to this Realm.
     */
-    public func addOrUpdate<S where S: SequenceType>(objects: S) {
+    public func addOrUpdate<S: SequenceType where S.Generator.Element: Object>(objects: S) {
         for obj in objects {
-            rlmRealm.addOrUpdateObject(obj as RLMObject)
+            addOrUpdate(obj)
         }
     }
 
@@ -409,34 +278,27 @@ public class Realm {
     :param: object The object to be deleted.
     */
     public func delete(object: Object) {
-        RLMDeleteObjectFromRealm(object)
+        RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
     /**
     Deletes the given objects from this Realm.
 
-    :param: object The objects to be deleted.
+    :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
+                   or any other enumerable SequenceType which generates Object.
     */
-    public func delete(objects: [Object]) {
-        rlmRealm.deleteObjects(objects)
+    public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+        for obj in objects {
+            delete(obj)
+        }
     }
 
-    /**
-    Deletes the given objects from this Realm.
-
-    :param: object The objects to be deleted.
-    */
-    public func delete(objects: List<Object>) {
-        rlmRealm.deleteObjects(objects)
+    public func delete<T: Object>(objects: List<T>) {
+        rlmRealm.deleteObjects(objects._rlmArray)
     }
 
-    /**
-    Deletes the given objects from this Realm.
-
-    :param: object The objects to be deleted.
-    */
-    public func delete(objects: Results<Object>) {
-        rlmRealm.deleteObjects(objects)
+    public func delete<T: Object>(objects: Results<T>) {
+        rlmRealm.deleteObjects(objects.rlmResults)
     }
 
     /**
@@ -445,6 +307,20 @@ public class Realm {
     public func deleteAll() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
     }
+
+    // MARK: Object Retrieval
+
+    /**
+    Returns all objects of the given type in the Realm.
+
+    :param: type  The type of the objects to be returned.
+
+    :returns: All objects of the given type in Realm.
+    */
+    public func objects<T: Object>(type: T.Type) -> Results<T> {
+        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+    }
+
 
     // MARK: Notifications
 
@@ -475,18 +351,144 @@ public class Realm {
         rlmRealm.removeNotification(notificationToken)
     }
 
-    // MARK: Object Retrieval
+
+    // MARK: Autorefresh and Refresh
 
     /**
-    Returns all objects of the given type in this Realm.
+    Whether this Realm automatically updates when changes happen in other threads.
 
-    :param: type The type of the objects to be returned.
+    If set to `true` (the default), changes made on other threads will be reflected
+    in this Realm on the next cycle of the run loop after the changes are
+    committed.  If set to `false`, you must manually call -refresh on the Realm to
+    update it to get the latest version.
 
-    :returns: Results with all objects of the given type in this Realm.
+    Even with this enabled, you can still call `refresh()` at any time to update the
+    Realm before the automatic refresh would occur.
+
+    Notifications are sent when a write transaction is committed whether or not
+    this is enabled.
+
+    Disabling this on a `Realm` without any strong references to it will not
+    have any effect, and it will switch back to YES the next time the `Realm`
+    object is created. This is normally irrelevant as it means that there is
+    nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
+    references to the containing `Realm`), but it means that setting
+    `Realm().autorefresh = false` in
+    `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
+    objects will not work.
+
+    Defaults to true.
     */
-    public func objects<T: Object>(type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+    public var autorefresh: Bool {
+        get {
+            return rlmRealm.autorefresh
+        }
+        set {
+            rlmRealm.autorefresh = newValue
+        }
     }
+
+    /**
+    Update a `Realm` and outstanding objects to point to the most recent
+    data for this `Realm`.
+
+    :returns: Whether the realm had any updates.
+              Note that this may return true even if no data has actually changed.
+
+    */
+    public func refresh() -> Bool {
+        return rlmRealm.refresh()
+    }
+
+    // MARK: Invalidation
+
+    /**
+    Invalidate all `Object`s and `Results` read from this Realm.
+
+    A Realm holds a read lock on the version of the data accessed by it, so
+    that changes made to the Realm on different threads do not modify or delete the
+    data seen by this Realm. Calling this method releases the read lock,
+    allowing the space used on disk to be reused by later write transactions rather
+    than growing the file. This method should be called before performing long
+    blocking operations on a background thread on which you previously read data
+    from the Realm which you no longer need.
+
+    All `Object`, `Results` and `List` instances obtained from this
+    `Realm` on the current thread are invalidated, and can not longer be used.
+    The `Realm` itself remains valid, and a new read transaction is implicitly
+    begun the next time data is read from the Realm.
+
+    Calling this method multiple times in a row without reading any data from the
+    Realm, or before ever reading any data from the Realm is a no-op. This method
+    cannot be called on a read-only Realm.
+    */
+    public func invalidate() {
+        rlmRealm.invalidate()
+    }
+
+    // MARK: Writing a Copy
+
+    /**
+    Write an encrypted and compacted copy of the Realm to the given path.
+
+    The destination file cannot already exist.
+
+    Note that if this is called from within a write transaction it writes the
+    *current* data, and not data when the last write transaction was committed.
+
+    :param: path          Path to save the Realm to.
+    :param: encryptionKey Optional 64-byte encryption key to encrypt the new file with.
+    :returns:             If an error occurs, returns an `NSError` object, otherwise `nil`.
+
+    :returns: Whether the realm was copied successfully.
+    */
+    public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) -> NSError? {
+        var error: NSError?
+        if let encryptionKey = encryptionKey {
+            rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: &error)
+        }
+        else {
+            rlmRealm.writeCopyToPath(path, error: &error)
+        }
+        return error
+    }
+
+    // MARK: Encryption
+
+    /**
+    Set the encryption key to use when opening Realms at a certain path.
+
+    This can be used as an alternative to explicitly passing the key to
+    `Realm(path:, encryptionKey:, readOnly:, error:)` each time a Realm instance is
+    needed. The encryption key will be used any time a Realm is opened with
+    `Realm(path:)` or `Realm()`.
+
+    If you do not want Realm to hold on to your encryption keys any longer than
+    needed, then use `Realm(path:, encryptionKey:, readOnly:, error:)` rather than this
+    method.
+
+    :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
+    :param: path          Realm path to set the encryption key for.
+    +*/
+    public class func setEncryptionKey(encryptionKey: NSData?, forPath: String = Realm.defaultPath) {
+        RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
+    }
+
+    // MARK: Internal
+    internal var rlmRealm: RLMRealm
+
+    internal init(_ rlmRealm: RLMRealm) {
+        self.rlmRealm = rlmRealm
+    }
+}
+
+// MARK: Equatable
+
+extension Realm: Equatable { }
+
+/// Returns whether the two realms are equal.
+public func ==(lhs: Realm, rhs: Realm) -> Bool {
+    return lhs.rlmRealm == rhs.rlmRealm
 }
 
 // MARK: Notifications
@@ -518,8 +520,8 @@ public enum Notification: String {
 /// Closure to run when the data in a Realm was modified.
 public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
 
-func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
+internal func rlmNotificationBlockFromNotificationBlock(notificationBlock: NotificationBlock) -> RLMNotificationBlock {
     return { rlmNotification, rlmRealm in
-        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm: rlmRealm))
+        return notificationBlock(notification: Notification(rawValue: rlmNotification)!, realm: Realm(rlmRealm))
     }
 }

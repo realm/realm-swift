@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultPath = defaultRealmPath()
+        let defaultPath = Realm.defaultPath
         let defaultParentPath = defaultPath.stringByDeletingLastPathComponent
 
         let v0Path = NSBundle.mainBundle().resourcePath!.stringByAppendingPathComponent("default-v0.realm")
@@ -84,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     // give JP a dog
                     if newObject["fullName"] as String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), withObject: ["Jimbo", "dog"])
-                        let dogs = newObject["pets"] as List<Object>
+                        let dogs = newObject["pets"] as List<MigrationObject>
                         dogs.append(jpsDog)
                     }
                 }
@@ -96,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
-        println("Migrated objects in the default Realm: \(objects(Person))")
+        println("Migrated objects in the default Realm: \(Realm().objects(Person))")
 
         //
         // Migrate a realms at a custom paths
