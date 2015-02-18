@@ -208,10 +208,14 @@ public final class Realm {
         rlmRealm.cancelWriteTransaction()
     }
 
-    // MARK: Adding and Deleting objects
+    // MARK: Adding and Creating objects
 
     /**
-    Adds an object to be persisted it in this Realm.
+    Adds or updates an object to be persisted it in this Realm.
+
+    When 'update' is 'true', the object must have a primary key. If no objects exist in
+    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    the existing object is updated with any changed values.
 
     When added, all linked (child) objects referenced by this object will also be
     added to the Realm if they are not already in it. If the object or any linked
@@ -223,62 +227,42 @@ public final class Realm {
     from a Realm (i.e. `invalidated`) must be false.
 
     :param: object Object to be added to this Realm.
+    :param: update If true will try to update existing objects with the same primary key.
     */
-    public func add(object: Object) {
-        RLMAddObjectToRealm(object, rlmRealm, .allZeros)
+    public func add(object: Object, update: Bool = false) {
+        var options : RLMCreationOptions = .allZeros
+        if update == true {
+            options = RLMCreationOptions.UpdateOrCreate
+            if object.objectSchema.primaryKeyProperty == nil {
+                fatalError("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+            }
+        }
+        RLMAddObjectToRealm(object, rlmRealm, options)
     }
 
     /**
-    Adds objects in the given sequence to be persisted it in this Realm.
+    Adds or updates objects in the given sequence to be persisted it in this Realm.
 
-    :see: add(object:)
+    :see: add(object:update:)
 
     :param: objects A sequence which contains objects to be added to this Realm.
+    :param: update If true will try to update existing objects with the same primary key.
     */
-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
         for obj in objects {
-            add(obj)
+            add(obj, update: update)
         }
     }
-
-    /**
-    Adds or updates an object to be persisted it in this Realm. The object provided must have a designated
-    primary key. If no objects exist in the Realm instance with the same primary key value, the object is
-    inserted. Otherwise, the existing object is updated with any changed values.
-
-    As with `add`, the object cannot already be persisted in a different
-    Realm. Use `createOrUpdate` to copy values to a different Realm.
-
-    :param: object Object to be added or updated.
-    */
-    public func addOrUpdate(object: Object) {
-        if object.objectSchema.primaryKeyProperty == nil {
-            fatalError("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
-        }
-
-        RLMAddObjectToRealm(object, rlmRealm, RLMCreationOptions.UpdateOrCreate)
-    }
-
-    /**
-    Adds or updates objects in the given array to be persisted it in this Realm.
-
-    :see: addOrUpdate(object:)
-
-    :param: objects A sequence of `Object`s to be added to this Realm.
-    */
-    public func addOrUpdate<S: SequenceType where S.Generator.Element: Object>(objects: S) {
-        for obj in objects {
-            addOrUpdate(obj)
-        }
-    }
-
-    // MARK: Constructors
 
     /**
     Create an `Object` with the given object.
 
-    Creates an instance of this object and adds it to the `Realm` populating
+    Creates or updates an instance of this object and adds it to the `Realm` populating
     the object represented by value.
+    
+    When 'update' is 'true', the object must have a primary key. If no objects exist in
+    the Realm instance with the same primary key value, the object is inserted. Otherwise, 
+    the existing object is updated with any changed values.
 
     :param: type    The object type to create.
     :param: value   The value used to populate the object. This can be any key/value coding compliant
@@ -288,12 +272,22 @@ public final class Realm {
 
                     When passing in an `Array`, all properties must be present,
                     valid and in the same order as the properties defined in the model.
+    :param: update  If true will try to update existing objects with the same primary key.
 
     :returns: The created object.
     */
-    public func create<T: Object>(type: T.Type, value: AnyObject) -> T {
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, .allZeros), T.self)
+    public func create<T: Object>(type: T.Type, value: AnyObject, update: Bool = false) -> T {
+        var options : RLMCreationOptions = .allZeros
+        if update == true {
+            options = RLMCreationOptions.UpdateOrCreate
+            if schema[T.className()]?.primaryKeyProperty == nil {
+                fatalError("'\(T.className())' does not have a primary key and can not be updated")
+            }
+        }
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, options), T.self)
     }
+
+    // MARK: Deleting objects
 
     /**
     Deletes the given object from this Realm.
