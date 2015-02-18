@@ -199,7 +199,7 @@ class ListTests: TestCase {
     }
 
     func testSortWithDescriptors() {
-        let object = SwiftAggregateObjectList.createInRealm(realmWithTestPath(), withObject: [[]])
+        let object = realmWithTestPath().create(SwiftAggregateObjectList.self, value: [[]])
         let array = object.list
 
         let obj1 = SwiftAggregateObject()
@@ -359,7 +359,7 @@ class ListTests: TestCase {
         let obj = SwiftStringObject()
         obj.stringCol = "a"
         array.append(obj)
-        array.append(SwiftStringObject.createInRealm(realmWithTestPath(), withObject: ["b"]))
+        array.append(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
         array.append(obj)
 
         XCTAssertEqual(array.count, 3)
@@ -407,7 +407,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
+        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -419,7 +419,7 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
+        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
         let array = realm.objects(SwiftArrayPropertyObject).first!
 
