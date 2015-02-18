@@ -113,7 +113,7 @@ class TableViewController: UITableViewController {
             realm.beginWrite()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                DemoObject.createInRealm(realm, withObject: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
+                realm.create(DemoObject.self, value: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
             }
             realm.commitWrite()
         }
@@ -122,7 +122,7 @@ class TableViewController: UITableViewController {
     func add() {
         Realm().write {
             let object = [randomTitle(), NSDate(), randomSectionTitle()]
-            DemoObject.createInRealm(Realm(), withObject: object)
+            Realm().create(DemoObject.self, value: object)
         }
     }
 }
