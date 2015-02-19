@@ -269,3 +269,7 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         @throw RLMException(error.localizedDescription, error.userInfo);
     }
 }
+
+BOOL RLMIsObjectSubclass(Class klass) {
+    return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+}

@@ -70,6 +70,9 @@ static inline BOOL RLMIsSubclass(Class class1, Class class2) {
     return RLMIsKindOfclass(class1, class2);
 }
 
+// Returns whether the class is an indirect descendant of RLMObjectBase
+BOOL RLMIsObjectSubclass(Class klass);
+
 template<typename T>
 static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
     if ([obj isKindOfClass:[T class]]) {
