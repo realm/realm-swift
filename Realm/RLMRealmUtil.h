@@ -29,7 +29,7 @@ RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
 
-@interface RLMWeakNotifier : NSObject
+@interface RLMNotifier : NSObject
 // listens to changes to the realm's file and notifies it when they occur
 // does not retain the Realm
 - (instancetype)initWithRealm:(RLMRealm *)realm;

@@ -398,7 +398,7 @@ static id RLMAutorelease(id value) {
     }
 
     if (!readonly) {
-        realm.notifier = [[RLMWeakNotifier alloc] initWithRealm:realm];
+        realm.notifier = [[RLMNotifier alloc] initWithRealm:realm];
     }
 
     return RLMAutorelease(realm);
