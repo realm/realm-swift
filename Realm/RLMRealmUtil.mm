@@ -57,16 +57,31 @@ void RLMClearRealmCache() {
     }
 }
 
-@implementation RLMNotifier {
-    __weak RLMRealm *_realm;
-    int _notifyFd;
-    int _shutdownFd;
-}
-
 static void checkError(int ret) {
     if (ret < 0 && errno != EEXIST) {
         @throw RLMException(@(strerror(errno)));
     }
+}
+
+static void notifyFd(int fd) {
+    while (true) {
+        char c = 0;
+        ssize_t ret = write(fd, &c, 1);
+        if (ret == 1) {
+            break;
+        }
+        assert(ret == -1 && errno == EAGAIN);
+
+        // pipe is full so read some data from it to make space
+        char buff[1024];
+        read(fd, buff, sizeof buff);
+    }
+}
+
+@implementation RLMNotifier {
+    __weak RLMRealm *_realm;
+    int _notifyFd;
+    int _shutdownFd;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm {
@@ -99,7 +114,7 @@ static void checkError(int ret) {
         };
         CFRunLoopSourceRef signal = CFRunLoopSourceCreate(0, 0, &ctx);
         CFRunLoopAddSource(runLoop, signal, kCFRunLoopDefaultMode);
-        CFRelease(signal);
+        CFRelease(signal); // the runloop retains the signal
 
         int kq = kqueue();
         checkError(kq);
@@ -140,21 +155,6 @@ static void checkError(int ret) {
         });
     }
     return self;
-}
-
-static void notifyFd(int fd) {
-    while (true) {
-        char c = 0;
-        ssize_t ret = write(fd, &c, 1);
-        if (ret == 1) {
-            break;
-        }
-        assert(ret == -1 && errno == EAGAIN);
-
-        // pipe is full so read some data from it to make space
-        char buff[1024];
-        read(fd, buff, sizeof buff);
-    }
 }
 
 - (void)stop {
