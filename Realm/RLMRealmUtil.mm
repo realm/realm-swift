@@ -57,7 +57,7 @@ void RLMClearRealmCache() {
     }
 }
 
-@implementation RLMWeakNotifier {
+@implementation RLMNotifier {
     __weak RLMRealm *_realm;
     int _notifyFd;
     int _shutdownFd;
@@ -92,7 +92,7 @@ static void checkError(int ret) {
         CFRunLoopSourceContext ctx{};
         ctx.info = (__bridge void *)self;
         ctx.perform = [](void *info) {
-            RLMWeakNotifier *notifier = (__bridge RLMWeakNotifier *)info;
+            RLMNotifier *notifier = (__bridge RLMNotifier *)info;
             if (RLMRealm *realm = notifier->_realm) {
                 [realm handleExternalCommit];
             }
