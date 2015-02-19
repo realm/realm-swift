@@ -162,6 +162,24 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
     }
 }
 
+// try to set table references on targetSchema and return true if all tables exist
+static bool RLMRealmGetTables(RLMRealm *realm, RLMSchema *targetSchema) {
+    if (!RLMRealmHasMetadataTables(realm)) {
+        return false;
+    }
+
+    for (RLMObjectSchema *objectSchema in targetSchema.objectSchema) {
+        NSString *tableName = RLMTableNameForClass(objectSchema.className);
+        TableRef table = realm.group->get_table(tableName.UTF8String);
+        if (!table) {
+            return false;
+        }
+        objectSchema.table = table.get();
+    }
+
+    return true;
+}
+
 static bool RLMPropertyHasChanged(RLMProperty *p1, RLMProperty *p2) {
     return p2 == nil
         || p1.type != p2.type
@@ -169,7 +187,7 @@ static bool RLMPropertyHasChanged(RLMProperty *p1, RLMProperty *p2) {
         || (p1.objectClassName != p2.objectClassName && ![p1.objectClassName isEqualToString:p2.objectClassName]);
 }
 
-// sets a realm's schema to a copy of targetSchema and creates/updates tables
+// set references to tables on targetSchema and create/update any missing or out-of-date tables
 // if update existing is true, updates existing tables, otherwise validates existing tables
 // NOTE: must be called from within write transaction
 static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool updateExisting) {
@@ -228,29 +246,44 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
     // FIXME - remove deleted tables
 
-    // set and validate final schema
-    RLMRealmSetSchema(realm, targetSchema, true);
-
     return changed;
 }
 
+static bool RLMMigrationRequired(RLMRealm *realm, NSUInteger newVersion) {
+    NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
+
+    // validate versions
+    if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
+        NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu. "
+                                                      @"You must call setSchemaVersion: or setDefaultRealmSchemaVersion: before accessing an upgraded Realm.",
+                            realm.path, (unsigned long)oldVersion, (unsigned long)newVersion];
+        @throw RLMException(reason, @{@"path" : realm.path});
+    }
+
+    return oldVersion != newVersion;
+}
+
 NSError *RLMUpdateRealmToSchemaVersion(RLMRealm *realm, NSUInteger newVersion, RLMSchema *targetSchema, NSError *(^migrationBlock)()) {
+    // if the schema version matches, try to get all the tables without entering
+    // a write transaction
+    if (!RLMMigrationRequired(realm, newVersion) && RLMRealmGetTables(realm, targetSchema)) {
+        RLMRealmSetSchema(realm, targetSchema, true);
+        return nil;
+    }
+
+    // either a migration is needed or there's missing tables, so we do need a
+    // write transaction
     [realm beginWriteTransaction];
 
+    // Recheck the schema version after beginning the write transaction as
+    // another process may have done the migration after we opened the read
+    // transaction
+    bool migrating = RLMMigrationRequired(realm, newVersion);
+
     @try {
-        NSUInteger oldVersion = RLMRealmSchemaVersion(realm);
-
-        // validate versions
-        if (oldVersion > newVersion && oldVersion != RLMNotVersioned) {
-            NSString *reason = [NSString stringWithFormat:@"Realm at path '%@' has version number %lu which is greater than the current schema version %lu. "
-                                                          @"You must call setSchemaVersion: or setDefaultRealmSchemaVersion: before accessing an upgraded Realm.",
-                                                          realm.path, (unsigned long)oldVersion, (unsigned long)newVersion];
-            @throw RLMException(reason, @{@"path" : realm.path});
-        }
-
         // create tables
-        bool migrating = oldVersion != newVersion;
         bool changed = RLMRealmCreateTables(realm, targetSchema, migrating);
+        RLMRealmSetSchema(realm, targetSchema, true);
 
         if (migrating) {
             // apply migration block if provided
