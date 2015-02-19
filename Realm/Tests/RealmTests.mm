@@ -723,6 +723,60 @@ extern "C" {
     [realm commitWriteTransaction];
 }
 
+- (void)testDelete {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    OwnerObject *obj = [OwnerObject createInDefaultRealmWithObject:@[@"deeter", @[@"barney", @2]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, OwnerObject.allObjects.count);
+    XCTAssertEqual(NO, obj.invalidated);
+
+    XCTAssertThrows([realm deleteObject:obj]);
+
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [testRealm transactionWithBlock:^{
+        XCTAssertThrows([testRealm deleteObject:[[OwnerObject alloc] init]]);
+        [realm transactionWithBlock:^{
+            XCTAssertThrows([testRealm deleteObject:obj]);
+        }];
+    }];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:obj];
+        XCTAssertEqual(YES, obj.invalidated);
+    }];
+
+    XCTAssertEqual(0U, OwnerObject.allObjects.count);
+}
+
+- (void)testDeleteObjects {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    CompanyObject *obj = [CompanyObject createInDefaultRealmWithObject:@[@"deeter", @[@[@"barney", @2, @YES]]]];
+    NSArray *objects = @[obj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(1U, CompanyObject.allObjects.count);
+
+    XCTAssertThrows([realm deleteObjects:objects]);
+    XCTAssertThrows([realm deleteObjects:[CompanyObject allObjectsInRealm:realm]]);
+    XCTAssertThrows([realm deleteObjects:obj.employees]);
+
+    RLMRealm *testRealm = [self realmWithTestPath];
+    [testRealm transactionWithBlock:^{
+        [realm transactionWithBlock:^{
+            XCTAssertThrows([testRealm deleteObjects:objects]);
+            XCTAssertThrows([testRealm deleteObjects:[CompanyObject allObjectsInRealm:realm]]);
+            XCTAssertThrows([testRealm deleteObjects:obj.employees]);
+        }];
+    }];
+
+    XCTAssertEqual(1U, CompanyObject.allObjects.count);
+}
+
 - (void)testDeleteAllObjects {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

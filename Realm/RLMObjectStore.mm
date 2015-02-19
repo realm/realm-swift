@@ -497,7 +497,11 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     return object;
 }
 
-void RLMDeleteObjectFromRealm(RLMObjectBase *object) {
+void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm) {
+    if (realm != object.realm) {
+        @throw RLMException(@"Can only delete an object from the Realm it belongs to.");
+    }
+
     RLMVerifyInWriteTransaction(object.realm);
 
     // move last row to row we are deleting
