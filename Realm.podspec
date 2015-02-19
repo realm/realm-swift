@@ -45,10 +45,10 @@ Pod::Spec.new do |s|
                                 'OTHER_CPLUSPLUSFLAGS' => '-std=c++1y $(inherited)' }
   s.preserve_paths          = %w(build.sh)
 
-  s.ios.deployment_target   = '6.0'
+  s.ios.deployment_target   = '7.0'
   s.ios.vendored_library    = 'core/libtightdb-ios.a'
 
-  s.osx.deployment_target   = '10.8'
+  s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/libtightdb.a'
 
   s.subspec 'Headers' do |s|
