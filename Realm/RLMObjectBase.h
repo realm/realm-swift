@@ -23,8 +23,6 @@
 @class RLMObjectSchema;
 
 @interface RLMObjectBase : NSObject
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 - (instancetype)init;

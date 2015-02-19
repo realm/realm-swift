@@ -30,6 +30,9 @@
 
 @implementation RLMObjectBase
 
+@synthesize rlmRealm = _realm;
+@synthesize rlmObjectSchema = _objectSchema;
+
 // standalone init
 - (instancetype)init {
     return [self initWithObjectSchema:[self.class sharedSchema]];
@@ -40,7 +43,7 @@
         self = [self initWithRealm:nil schema:schema defaultValues:YES];
 
         // set standalone accessor class
-        object_setClass(self, self.objectSchema.standaloneClass);
+        object_setClass(self, self.rlmObjectSchema.standaloneClass);
     }
     else {
         // if schema not initialized
@@ -133,6 +136,26 @@
     return RLMSchema.sharedSchema[self.className];
 }
 
+//void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm) {
+//    if (object) {
+//        object->_realm = realm;
+//    }
+//}
+//
+//RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object) {
+//    return object ? object->_realm : nil;
+//}
+//
+//void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema) {
+//    if (object) {
+//        object->_objectSchema = objectSchema;
+//    }
+//}
+//
+//RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object) {
+//    return object ? object->_objectSchema : nil;
+//}
+
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     if (!_realm) {
         @throw RLMException(@"Linking object only available for objects in a Realm.");
@@ -199,7 +222,7 @@
         return @"<Maximum depth exceeded>";
     }
 
-    RLMObjectSchema *objectSchema = self.objectSchema;
+    RLMObjectSchema *objectSchema = self.rlmObjectSchema;
     NSString *baseClassName = objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
@@ -231,7 +254,7 @@
 
 - (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
-    return self.class == self.objectSchema.accessorClass && !_row.is_attached();
+    return self.class == self.rlmObjectSchema.accessorClass && !_row.is_attached();
 }
 
 - (BOOL)isDeletedFromRealm {
@@ -244,7 +267,7 @@
         return YES;
     }
     // if not in realm or differing realms
-    if (_realm == nil || _realm != object.realm) {
+    if (_realm == nil || _realm != object.rlmRealm) {
         return NO;
     }
     // if either are detached
