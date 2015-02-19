@@ -238,4 +238,105 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
     XCTAssertThrows(RLMSchema.sharedSchema[@"RLMObject"]);
 }
 
+- (void)testDescription {
+    NSArray *expectedTypes = @[@"AllTypesObject",
+                               @"StringObject",
+                               @"IntObject"];
+
+    NSMutableArray *objectSchema = [NSMutableArray array];
+    for (NSString *className in expectedTypes) {
+        [objectSchema addObject:[RLMObjectSchema schemaForObjectClass:NSClassFromString(className)]];
+    }
+
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    schema.objectSchema = objectSchema;
+
+    XCTAssertEqualObjects(schema.description, @"Schema {\n"
+                                              @"\tAllTypesObject {\n"
+                                              @"\t\tboolCol {\n"
+                                              @"\t\t\ttype = bool\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tintCol {\n"
+                                              @"\t\t\ttype = int\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tfloatCol {\n"
+                                              @"\t\t\ttype = float\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tdoubleCol {\n"
+                                              @"\t\t\ttype = double\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tbinaryCol {\n"
+                                              @"\t\t\ttype = data\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tdateCol {\n"
+                                              @"\t\t\ttype = date\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tcBoolCol {\n"
+                                              @"\t\t\ttype = bool\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tlongCol {\n"
+                                              @"\t\t\ttype = int\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tmixedCol {\n"
+                                              @"\t\t\ttype = any\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t\tobjectCol {\n"
+                                              @"\t\t\ttype = object\n"
+                                              @"\t\t\tobjectClassName = StringObject\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"\tStringObject {\n"
+                                              @"\t\tstringCol {\n"
+                                              @"\t\t\ttype = string\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"\tIntObject {\n"
+                                              @"\t\tintCol {\n"
+                                              @"\t\t\ttype = int\n"
+                                              @"\t\t\tobjectClassName = (null)\n"
+                                              @"\t\t\tindexed = NO\n"
+                                              @"\t\t\tisPrimary = NO\n"
+                                              @"\t\t}\n"
+                                              @"\t}\n"
+                                              @"}");
+}
+
 @end

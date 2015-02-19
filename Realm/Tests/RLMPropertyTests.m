@@ -10,12 +10,25 @@
 
 #import <objc/runtime.h>
 #import "RLMProperty_Private.h"
+#import "RLMObject.h"
 
 @interface RLMPropertyTests : RLMTestCase
 
 @end
 
 @implementation RLMPropertyTests
+
+- (void)testDescription {
+    AllTypesObject *object = [[AllTypesObject alloc] init];
+    RLMProperty *property = object.objectSchema[@"objectCol"];
+
+    XCTAssertEqualObjects(property.description, @"objectCol {\n"
+                                                @"\ttype = object\n"
+                                                @"\tobjectClassName = StringObject\n"
+                                                @"\tindexed = NO\n"
+                                                @"\tisPrimary = NO\n"
+                                                @"}");
+}
 
 - (void)testTwoPropertiesAreEqual {
     const char *name = "intCol";
