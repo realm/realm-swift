@@ -64,8 +64,8 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }
-static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *expected) {
-    NSString *objectClassName = obj.objectSchema.className;
+static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSString *expected) {
+    NSString *objectClassName = obj.rlmObjectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
         @throw RLMException(@"Attempting to insert wrong object type", @{@"expected class" : expected, @"actual class" : objectClassName});
     }
@@ -134,7 +134,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);
-    if (object.realm != self.realm) {
+    if (object.rlmRealm != self.realm) {
         [self.realm addObject:object];
     }
     _backingLinkView->add(object->_row.get_index());
@@ -144,7 +144,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     RLMValidateObjectClass(object, self.objectClassName);
-    if (object.realm != self.realm) {
+    if (object.rlmRealm != self.realm) {
         [self.realm addObject:object];
     }
     _backingLinkView->insert(index, object->_row.get_index());
@@ -181,7 +181,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     if (index >= _backingLinkView->size()) {
         @throw RLMException(@"Trying to replace object at invalid index");
     }
-    if (object.realm != self.realm) {
+    if (object.rlmRealm != self.realm) {
         [self.realm addObject:object];
     }
     _backingLinkView->set(index, object->_row.get_index());
@@ -195,7 +195,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __
     }
 
     // check that object types align
-    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
+    if (![_objectClassName isEqualToString:object.rlmObjectSchema.className]) {
         @throw RLMException(@"Object type does not match RLMArray");
     }
 

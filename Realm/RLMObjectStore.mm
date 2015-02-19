@@ -324,7 +324,7 @@ static inline void RLMVerifyInWriteTransaction(RLMRealm *realm) {
 
 static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
     // switch List<> properties to linkviews from standalone arrays
-    for (RLMProperty *prop in object.objectSchema.properties) {
+    for (RLMProperty *prop in object.rlmObjectSchema.properties) {
         if (prop.swiftListIvar) {
             auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
             list._rlmArray = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
@@ -375,8 +375,8 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
     if (object.invalidated) {
         @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
     }
-    if (object.realm) {
-        if (object.realm == realm) {
+    if (object.rlmRealm) {
+        if (object.rlmRealm == realm) {
             // no-op
             return;
         }
@@ -385,10 +385,10 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
     }
 
     // set the realm and schema
-    NSString *objectClassName = object.objectSchema.className;
+    NSString *objectClassName = object.rlmObjectSchema.className;
     RLMObjectSchema *schema = realm.schema[objectClassName];
-    object.objectSchema = schema;
-    object.realm = realm;
+    object.rlmObjectSchema = schema;
+    object.rlmRealm = realm;
 
     // get or create row
     bool created;
@@ -440,7 +440,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
     if (RLMIsSubclass([value class], RLMObjectBase.class) &&
         [[[(RLMObjectBase *)value class] className] isEqualToString:className] &&
-        [(RLMObjectBase *)value realm] == realm) {
+        [(RLMObjectBase *)value rlmRealm] == realm) {
         // This is a no-op if value is an RLMObject of the same type already backed by the target realm.
         return value;
     }
@@ -498,11 +498,11 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 }
 
 void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm) {
-    if (realm != object.realm) {
+    if (realm != object.rlmRealm) {
         @throw RLMException(@"Can only delete an object from the Realm it belongs to.");
     }
 
-    RLMVerifyInWriteTransaction(object.realm);
+    RLMVerifyInWriteTransaction(object.rlmRealm);
 
     // move last row to row we are deleting
     if (object->_row.is_attached()) {
@@ -510,7 +510,7 @@ void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm) {
     }
 
     // set realm to nil
-    object.realm = nil;
+    object.rlmRealm = nil;
 }
 
 void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {

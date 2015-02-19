@@ -31,8 +31,16 @@
 // that).
 @implementation RLMObject
 
-// These properties are synthesized in RLMObjectBase
-@dynamic objectSchema, realm, invalidated;
+// This property is synthesized in RLMObjectBase
+@dynamic invalidated;
+
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (RLMObjectSchema *)objectSchema {
+    return _objectSchema;
+}
 
 - (instancetype)init {
     return [super init];
