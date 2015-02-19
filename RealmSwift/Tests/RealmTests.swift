@@ -328,7 +328,14 @@ class RealmTests: TestCase {
     }
 
     func testObjectForPrimaryKey() {
+        let realm = Realm()
+        realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
+        }
 
+        XCTAssertNotNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a"))
+        XCTAssertNil(realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z"))
     }
 
     func testAddNotificationBlock() {
