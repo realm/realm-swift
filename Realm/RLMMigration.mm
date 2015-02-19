@@ -16,17 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMigration_Private.h"
+#import <Realm/RLMMigration_Private.h>
 
-#import "RLMAccessor.h"
-#import "RLMObject.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.h"
-#import "RLMProperty_Private.h"
-#import "RLMRealm_Dynamic.h"
+#import <Realm/RLMAccessor.h>
+#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
+#import <Realm/RLMObjectStore.h>
+#import <Realm/RLMProperty_Private.h>
+#import <Realm/RLMRealm_Dynamic.h>
 #import "RLMRealm_Private.hpp"
-#import "RLMResults_Private.h"
-#import "RLMSchema_Private.h"
+#import <Realm/RLMResults_Private.h>
+#import <Realm/RLMSchema_Private.h>
 
 #import <tightdb/link_view.hpp>
 #import <tightdb/table_view.hpp>

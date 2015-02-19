@@ -16,15 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMResults_Private.h"
+#import <Realm/RLMResults_Private.h>
 #import "RLMObject_Private.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.h"
-#import "RLMQueryUtil.hpp"
-#import "RLMUtil.hpp"
+#import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
+#import <Realm/RLMObjectStore.h>
+#import <Realm/RLMQueryUtil.hpp>
+#import <Realm/RLMUtil.hpp>
 
 #import <objc/runtime.h>
 #import <tightdb/table_view.hpp>

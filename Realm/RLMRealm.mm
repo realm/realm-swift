@@ -19,14 +19,14 @@
 #import "RLMRealm_Private.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMMigration_Private.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMObjectStore.h"
-#import "RLMObject_Private.h"
-#import "RLMQueryUtil.hpp"
-#import "RLMSchema_Private.h"
-#import "RLMUpdateChecker.hpp"
-#import "RLMUtil.hpp"
+#import <Realm/RLMMigration_Private.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
+#import <Realm/RLMObjectStore.h>
+#import <Realm/RLMObject_Private.h>
+#import <Realm/RLMQueryUtil.hpp>
+#import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMUpdateChecker.hpp>
+#import <Realm/RLMUtil.hpp>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>

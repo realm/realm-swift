@@ -16,19 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectStore.h"
+#import <Realm/RLMObjectStore.h>
 
-#import "RLMAccessor.h"
+#import <Realm/RLMAccessor.h>
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
-#import "RLMObjectSchema_Private.hpp"
+#import <Realm/RLMListBase.h>
+#import <Realm/RLMObjectSchema_Private.hpp>
 #import "RLMObject_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMQueryUtil.hpp"
+#import <Realm/RLMProperty_Private.h>
+#import <Realm/RLMQueryUtil.hpp>
 #import "RLMRealm_Private.hpp"
-#import "RLMSchema_Private.h"
-#import "RLMUtil.hpp"
-#import "RLMSwiftSupport.h"
+#import <Realm/RLMSchema_Private.h>
+#import <Realm/RLMUtil.hpp>
+#import <Realm/RLMSwiftSupport.h>
 
 #import <objc/message.h>
 

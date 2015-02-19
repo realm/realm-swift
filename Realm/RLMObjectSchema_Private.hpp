@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMObjectSchema_Private.h"
+#import <Realm/RLMObjectSchema_Private.h>
 
 namespace tightdb {
     class Table;
