@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+0.90.6 Release notes (2015-02-20)
 =============================================================
 
 ### Enhancements
