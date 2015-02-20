@@ -1,3 +1,16 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+
+* Improve compatiblity of encrypted Realms with third-party crash reporters.
+
+### Bugfixes
+
+* Fix incorrect results when using aggregate functions on sorted RLMResults.
+* Fix data corruption when using writeCopyToPath:encryptionKey:.
+* Maybe fix some assertion failures.
+
 0.90.5 Release notes (2015-02-04)
 =============================================================
 
