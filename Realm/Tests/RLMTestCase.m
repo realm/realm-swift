@@ -58,14 +58,15 @@ static NSString *RLMLockPath(NSString *path) {
 }
 
 static void RLMDeleteRealmFilesAtPath(NSString *path) {
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
-    }
-
-    [[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:nil];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:RLMLockPath(path)]) {
-        @throw [NSException exceptionWithName:@"RLMTestException" reason:@"Unable to delete realm" userInfo:nil];
+    NSError *error;
+    if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error] ||
+        ![[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:&error] ||
+        ![[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@".note"] error:&error]) {
+        if (error.code != NSFileNoSuchFileError) {
+            @throw [NSException exceptionWithName:@"RLMTestException"
+                                           reason:[@"Unable to delete realm: " stringByAppendingString:error.description]
+                                         userInfo:nil];
+        }
     }
 }
 
