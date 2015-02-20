@@ -12,13 +12,22 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * The bowser will no longer show objects that have no persisted properties.
-* Improve compatiblity of encrypted Realms with third-party crash reporters.
 
 ### Bugfixes
 
 * An exception will now be thrown when calling `-beginWriteTransaction` from within a notification
   triggered by calling `-beginWriteTransaction` elsewhere.
 * When calling `delete:` we now verify that the object being deleted is persisted in the target Realm.
+
+0.90.6 Release notes (2015-02-20)
+=============================================================
+
+### Enhancements
+
+* Improve compatiblity of encrypted Realms with third-party crash reporters.
+
+### Bugfixes
+
 * Fix incorrect results when using aggregate functions on sorted RLMResults.
 * Fix data corruption when using writeCopyToPath:encryptionKey:.
 * Maybe fix some assertion failures.
