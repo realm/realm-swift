@@ -314,6 +314,60 @@
                     @"Adding an object during fast enumeration did not throw");
 }
 
+- (void)testValueForKey {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    XCTAssertEqualObjects([company.employees valueForKey:@"name"], @[]);
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
+
+    NSMutableArray *ages = [NSMutableArray array];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(i)];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        [company.employees addObject:eo];
+    }
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+}
+
+- (void)testSetValueForKey {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+
+    [company.employees setValue:@"name" forKey:@"name"];
+    XCTAssertEqualObjects([company.employees valueForKey:@"name"], @[]);
+
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows([company.employees setValue:@10 forKey:@"age"]);
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
+
+    NSMutableArray *ages = [NSMutableArray array];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(20)];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        [company.employees addObject:eo];
+    }
+
+    [company.employees setValue:@20 forKey:@"age"];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+}
+
 - (void)testCrossThreadAccess
 {
     CompanyObject *company = [[CompanyObject alloc] init];

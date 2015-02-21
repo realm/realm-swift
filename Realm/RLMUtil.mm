@@ -20,7 +20,8 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
+#import "RLMObjectStore.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
@@ -247,6 +248,44 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     }
     return outArray;
 };
+
+NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)()) {
+    if (count == 0) {
+        return @[];
+    }
+    BOOL keyIsSelf = [key isEqualToString:@"self"];
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
+    RLMObjectBase *accessor = RLMCreateObjectAccessor(realm, objectSchema, 0);
+    tightdb::Table *table = objectSchema.table;
+    for (size_t i = 0; i < count; i++) {
+        size_t rowIndex = indexGenerator();
+        id value;
+        if (keyIsSelf) {
+            value = RLMCreateObjectAccessor(realm, objectSchema, rowIndex);
+        }
+        else {
+            accessor->_row = (*table)[rowIndex];
+            value = [accessor valueForKey:key];
+        }
+
+        [results addObject:value ?: NSNull.null];
+    }
+
+    return results;
+}
+
+void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)()) {
+    if (count == 0) {
+        return;
+    }
+    RLMObjectBase *accessor = RLMCreateObjectAccessor(realm, objectSchema, 0);
+    tightdb::Table *table = objectSchema.table;
+    for (size_t i = 0; i < count; i++) {
+        size_t rowIndex = indexGenerator();
+        accessor->_row = (*table)[rowIndex];
+        [accessor setValue:value forKey:key];
+    }
+}
 
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];

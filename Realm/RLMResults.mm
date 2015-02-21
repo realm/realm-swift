@@ -245,6 +245,24 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return result;
 }
 
+- (id)valueForKey:(NSString *)key {
+    RLMResultsValidate(self);
+    const size_t size = _backingView.size();
+    __block size_t index = 0;
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t{
+        return _backingView.get(index++).get_index();
+    });
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMResultsValidateInWriteTransaction(self);
+    const size_t size = _backingView.size();
+    __block size_t index = 0;
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t{
+        return _backingView.get(index++).get_index();
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     // validate predicate
     va_list args;
@@ -482,6 +500,24 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     return _table->size();
 }
 
+- (id)valueForKey:(NSString *)key {
+    RLMResultsValidate(self);
+    const size_t size = _table->size();
+    __block size_t index = 0;
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t{
+        return _table->get(index++).get_index();
+    });
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMResultsValidateInWriteTransaction(self);
+    const size_t size = _table->size();
+    __block size_t index = 0;
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t{
+        return _table->get(index++).get_index();
+    });
+}
+
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     RLMCheckThread(_realm);
     if (object.invalidated) {
@@ -559,6 +595,15 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (id)objectAtIndex:(NSUInteger)index {
     @throw RLMException(@"Index is out of bounds.", @{@"index": @(index)});
+}
+
+- (id)valueForKey:(NSString *)key {
+    RLMResultsValidate(self);
+    return @[];
+}
+
+- (void)setValue:(__unused id)value forKey:(__unused NSString *)key {
+    RLMResultsValidateInWriteTransaction(self);
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
