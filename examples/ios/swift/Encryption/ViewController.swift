@@ -77,7 +77,7 @@ class ViewController: UIViewController {
             let realm = RLMRealm(path: RLMRealm.defaultRealmPath(),
                 encryptionKey: self.getKey(), readOnly: false, error: nil)
 
-            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject()! as EncryptionObject).stringProp)")
+            self.log("Saved object: \((EncryptionObject.allObjectsInRealm(realm).firstObject()! as! EncryptionObject).stringProp)")
         }
     }
 
@@ -101,7 +101,7 @@ class ViewController: UIViewController {
         var dataTypeRef: Unmanaged<AnyObject>?
         var status = SecItemCopyMatching(query, &dataTypeRef)
         if status == errSecSuccess {
-            return dataTypeRef?.takeUnretainedValue() as NSData
+            return dataTypeRef?.takeUnretainedValue() as! NSData
         }
 
         // No pre-existing key from this application, so generate a new one
