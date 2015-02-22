@@ -27,6 +27,7 @@
     [[NSFileManager defaultManager] removeItemAtPath:[RLMRealm defaultRealmPath] error:nil];
     [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
                        serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/draw"];
+    [RLMRealm setServerSyncLogLevel:2]; // `level >= 2` means "everything"
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];

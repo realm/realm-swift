@@ -589,6 +589,14 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 */
 + (void)enableServerSyncOnPath:(NSString *)path serverBaseURL:(NSString *)serverBaseURL;
 
+/**
+ Set the log level for the synchronization network protocol. A value
+ less than, or equal to 1 is understood as "normal level", and a value
+ greater than, or equal to 2 means "log everything". The log level may
+ be changed at any time, and by any thread.
+*/
++ (void)setServerSyncLogLevel:(int)level;
+
 #pragma mark -
 
 //---------------------------------------------------------------------------------------
