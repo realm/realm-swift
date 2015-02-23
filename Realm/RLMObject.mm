@@ -31,6 +31,14 @@
 // that).
 @implementation RLMObject
 
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (RLMObjectSchema *)objectSchema {
+    return _objectSchema;
+}
+
 - (instancetype)init {
     return [super init];
 }

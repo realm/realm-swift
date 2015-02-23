@@ -82,23 +82,22 @@ public class Object : RLMObjectBase, Equatable {
 
     // MARK: Properties
 
-    // FIXME: Rename to `realm`
     /// The `Realm` this object belongs to, or `nil` if the object
     /// does not belong to a realm (the object is standalone).
-    public var swiftRealm: Realm? {
-        if let rlmRealm = realm {
-            return Realm(rlmRealm)
+    public var realm: Realm? {
+        if let rlmReam = RLMObjectBaseRealm(self) {
+            return Realm(rlmReam)
         }
         return nil
     }
 
-    // FIXME: Rename to `objectSchema`
     /// The `ObjectSchema` which lists the persisted properties for this object.
-    public var swiftObjectSchema: ObjectSchema { return ObjectSchema(rlmObjectSchema: objectSchema) }
+    public var objectSchema: ObjectSchema {
+        return ObjectSchema(rlmObjectSchema: RLMObjectBaseObjectSchema(self))
+    }
 
-    // FIXME: Rename to `invalidated`
     /// Indicates if an object can no longer be accessed.
-    public var swiftInvalidated: Bool { return invalidated }
+    public override var invalidated: Bool { return super.invalidated }
 
 
     // MARK: Object customization
