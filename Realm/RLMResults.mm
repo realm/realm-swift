@@ -249,7 +249,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidate(self);
     const size_t size = _backingView.size();
     return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index){
-        return _backingView.get(index).get_index();
+        return _backingView.get_source_ndx(index);
     });
 }
 
@@ -257,7 +257,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMResultsValidateInWriteTransaction(self);
     const size_t size = _backingView.size();
     RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index){
-        return _backingView.get(index).get_index();
+        return _backingView.get_source_ndx(index);
     });
 }
 
