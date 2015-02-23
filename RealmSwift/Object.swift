@@ -85,14 +85,13 @@ public class Object : RLMObjectBase, Equatable {
     /// The `Realm` this object belongs to, or `nil` if the object
     /// does not belong to a realm (the object is standalone).
     public var realm: Realm? {
-        if let rlmRealm = rlmRealm {
-            return Realm(rlmRealm)
-        }
-        return nil
+        return Realm(RLMObjectBaseRealm(self))
     }
 
     /// The `ObjectSchema` which lists the persisted properties for this object.
-    public var objectSchema: ObjectSchema { return ObjectSchema(rlmObjectSchema: rlmObjectSchema) }
+    public var objectSchema: ObjectSchema {
+        return ObjectSchema(rlmObjectSchema: RLMObjectBaseObjectSchema(self))
+    }
 
     /// Indicates if an object can no longer be accessed.
     public override var invalidated: Bool { return super.invalidated }
