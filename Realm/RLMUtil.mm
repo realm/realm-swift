@@ -249,7 +249,7 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     return outArray;
 };
 
-NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)()) {
+NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t)) {
     if (count == 0) {
         return @[];
     }
@@ -262,7 +262,7 @@ NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchem
         table = objectSchema.table;
     }
     for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = indexGenerator();
+        size_t rowIndex = indexGenerator(i);
         id value;
         if (keyIsSelf) {
             value = RLMCreateObjectAccessor(realm, objectSchema, rowIndex);
@@ -279,14 +279,14 @@ NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchem
     return results;
 }
 
-void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)()) {
+void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t)) {
     if (count == 0) {
         return;
     }
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
     tightdb::Table *table = objectSchema.table;
     for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = indexGenerator();
+        size_t rowIndex = indexGenerator(i);
         accessor->_row = (*table)[rowIndex];
         RLMInitializeSwiftListAccessor(accessor);
         [accessor setValue:value forKey:key];
