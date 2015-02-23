@@ -202,7 +202,7 @@ public final class Migration {
     :param: object Object to be deleted from the Realm being migrated.
     */
     public func delete(object: MigrationObject) {
-        RLMDeleteObjectFromRealm(object, object.realm)
+        RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
     }
 
     private init(_ rlmMigration: RLMMigration) {
@@ -218,13 +218,13 @@ public final class MigrationObject : Object {
     /// Returns the value of the property with the given name.
     subscript(key: String) -> AnyObject? {
         get {
-            if (self.objectSchema[key]?.type == RLMPropertyType.Array) {
+            if (RLMObjectBaseObjectSchema(self)[key].type == RLMPropertyType.Array) {
                 return listProperties[key]
             }
             return super[key]
         }
         set(value) {
-            if (self.objectSchema[key]?.type == RLMPropertyType.Array) {
+            if (RLMObjectBaseObjectSchema(self)[key].type == RLMPropertyType.Array) {
                 fatalError("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
             }
             super[key] = value

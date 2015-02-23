@@ -30,9 +30,6 @@
 
 @implementation RLMObjectBase
 
-@synthesize rlmRealm = _realm;
-@synthesize rlmObjectSchema = _objectSchema;
-
 // standalone init
 - (instancetype)init {
     return [self initWithObjectSchema:[self.class sharedSchema]];
@@ -43,7 +40,7 @@
         self = [self initWithRealm:nil schema:schema defaultValues:YES];
 
         // set standalone accessor class
-        object_setClass(self, self.rlmObjectSchema.standaloneClass);
+        object_setClass(self, schema.standaloneClass);
     }
     else {
         // if schema not initialized
@@ -136,25 +133,25 @@
     return RLMSchema.sharedSchema[self.className];
 }
 
-//void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm) {
-//    if (object) {
-//        object->_realm = realm;
-//    }
-//}
-//
-//RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object) {
-//    return object ? object->_realm : nil;
-//}
-//
-//void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema) {
-//    if (object) {
-//        object->_objectSchema = objectSchema;
-//    }
-//}
-//
-//RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object) {
-//    return object ? object->_objectSchema : nil;
-//}
+void RLMObjectBaseSetRealm(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMRealm *realm) {
+    if (object) {
+        object->_realm = realm;
+    }
+}
+
+RLMRealm *RLMObjectBaseRealm(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_realm : nil;
+}
+
+void RLMObjectBaseSetObjectSchema(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMObjectSchema *objectSchema) {
+    if (object) {
+        object->_objectSchema = objectSchema;
+    }
+}
+
+RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_objectSchema : nil;
+}
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
     if (!_realm) {
@@ -222,11 +219,10 @@
         return @"<Maximum depth exceeded>";
     }
 
-    RLMObjectSchema *objectSchema = self.rlmObjectSchema;
-    NSString *baseClassName = objectSchema.className;
+    NSString *baseClassName = _objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
-    for (RLMProperty *property in objectSchema.properties) {
+    for (RLMProperty *property in _objectSchema.properties) {
         id object = self[property.name];
         NSString *sub;
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
@@ -254,7 +250,7 @@
 
 - (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
-    return self.class == self.rlmObjectSchema.accessorClass && !_row.is_attached();
+    return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
 - (BOOL)isDeletedFromRealm {
@@ -262,12 +258,15 @@
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {
+    if (!object) {
+        return NO;
+    }
     // if identical object
     if (self == object) {
         return YES;
     }
     // if not in realm or differing realms
-    if (_realm == nil || _realm != object.rlmRealm) {
+    if (_realm == nil || _realm != object->_realm) {
         return NO;
     }
     // if either are detached
