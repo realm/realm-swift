@@ -85,7 +85,10 @@ public class Object : RLMObjectBase, Equatable {
     /// The `Realm` this object belongs to, or `nil` if the object
     /// does not belong to a realm (the object is standalone).
     public var realm: Realm? {
-        return Realm(RLMObjectBaseRealm(self))
+        if let rlmReam = RLMObjectBaseRealm(self) {
+            return Realm(rlmReam)
+        }
+        return nil
     }
 
     /// The `ObjectSchema` which lists the persisted properties for this object.
