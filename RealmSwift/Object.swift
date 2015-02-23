@@ -109,7 +109,7 @@ public class Object : RLMObjectBase, Equatable {
     Indexes are created automatically for string primary key properties.
     :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
     */
-    public override class func primaryKey() -> String? { return nil }
+    public class func primaryKey() -> String? { return nil }
 
     /**
     // FIXME: Rename to `ignoredProperties`
@@ -119,7 +119,7 @@ public class Object : RLMObjectBase, Equatable {
 
     :returns: `Array` of property names to ignore.
     */
-    public class func swiftIgnoredProperties() -> [String] { return [] }
+    public class func ignoredProperties() -> [String] { return [] }
 
     /**
     Return an array of property names for properties which should be indexed. Only supported
@@ -178,6 +178,25 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
 
 /// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
+    @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
+        if let type = type as? Object.Type {
+            return type.primaryKey()
+        }
+        return nil
+    }
+    @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
+        if let type = type as? Object.Type {
+            return type.ignoredProperties() as NSArray?
+        }
+        return nil
+    }
+    @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
+        if let type = type as? Object.Type {
+            return type.indexedProperties() as NSArray?
+        }
+        return nil
+    }
+
     // Get the names of all properties in the object which are of type List<>
     @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
         let reflection = reflect(obj)
@@ -195,5 +214,4 @@ public class ObjectUtil : NSObject {
 
         return properties
     }
-
 }

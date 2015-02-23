@@ -88,35 +88,15 @@
     if (self) {
         _realm = realm;
         _objectSchema = schema;
-        if (useDefaults) {
+        if (useDefaults && !schema.isSwiftClass) {
             // set default values
-            NSDictionary *dict = [self.class defaultPropertyValues];
+            NSDictionary *dict = RLMDefaultValuesForObjectSchema(schema);
             for (NSString *key in dict) {
                 [self setValue:dict[key] forKey:key];
             }
         }
     }
     return self;
-}
-
-// default indexed properties implementation
-+ (NSArray *)indexedProperties {
-    return @[];
-}
-
-// default default values implementation
-+ (NSDictionary *)defaultPropertyValues {
-    return nil;
-}
-
-// default ignored properties implementation
-+ (NSArray *)ignoredProperties {
-    return nil;
-}
-
-// default primaryKey implementation
-+ (NSString *)primaryKey {
-    return nil;
 }
 
 // overridden at runtime per-class for performance
@@ -296,6 +276,34 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     else {
         return [super hash];
     }
+}
+
+@end
+
+
+
+Class RLMObjectUtilClass(bool isSwift) {
+    static Class objectUtilObjc = [RLMObjectUtil class];
+    static Class objectUtilSwift = NSClassFromString(@"RealmSwift.ObjectUtil");
+    return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
+}
+
+@implementation RLMObjectUtil
+
++ (NSString *)primaryKeyForClass:(Class)cls {
+    return [cls primaryKey];
+}
+
++ (NSArray *)ignoredPropertiesForClass:(Class)cls {
+    return [cls ignoredProperties];
+}
+
++ (NSArray *)indexedPropertiesForClass:(Class)cls {
+    return [cls indexedProperties];
+}
+
++ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
 }
 
 @end

@@ -38,8 +38,18 @@
 
 + (NSString *)className;
 
-+ (NSDictionary *)defaultPropertyValues;
-+ (NSString *)primaryKey;
-+ (NSArray *)ignoredProperties;
+@end
+
+
+
+Class RLMObjectUtilClass(bool isSwift);
+
+@interface RLMObjectUtil : NSObject
+
++ (NSString *)primaryKeyForClass:(Class)cls;
++ (NSArray *)ignoredPropertiesForClass:(Class)cls;
++ (NSArray *)indexedPropertiesForClass:(Class)cls;
+
++ (NSArray *)getGenericListPropertyNames:(id)obj;
 
 @end
