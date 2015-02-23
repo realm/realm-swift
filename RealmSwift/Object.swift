@@ -112,8 +112,6 @@ public class Object : RLMObjectBase, Equatable {
     public class func primaryKey() -> String? { return nil }
 
     /**
-    // FIXME: Rename to `ignoredProperties`
-
     Override to return an array of property names to ignore. These properties will not be persisted
     and are treated as transient.
 

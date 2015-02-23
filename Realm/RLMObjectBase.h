@@ -42,7 +42,7 @@
 
 
 
-Class RLMObjectUtilClass(bool isSwift);
+Class RLMObjectUtilClass(BOOL isSwift);
 
 @interface RLMObjectUtil : NSObject
 

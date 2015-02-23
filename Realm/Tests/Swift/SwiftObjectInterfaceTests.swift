@@ -109,8 +109,8 @@ class SwiftObjectInterfaceTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let object = SwiftDefaultObject.allObjectsInRealm(realm).firstObject() as SwiftDefaultObject
-        XCTAssertEqual(object.intCol, 1, "defaultPropertyValues should override native property default value")
-        XCTAssertEqual(object.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
+        XCTAssertEqual(object.intCol, 1)
+        XCTAssertEqual(object.boolCol, true)
     }
 
     func testSubclass() {
