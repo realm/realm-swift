@@ -282,7 +282,7 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
 
 
 
-Class RLMObjectUtilClass(bool isSwift) {
+Class RLMObjectUtilClass(BOOL isSwift) {
     static Class objectUtilObjc = [RLMObjectUtil class];
     static Class objectUtilSwift = NSClassFromString(@"RealmSwift.ObjectUtil");
     return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
