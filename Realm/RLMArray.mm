@@ -104,7 +104,7 @@
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
-    if (![array->_objectClassName isEqualToString:object.rlmObjectSchema.className]) {
+    if (!object || ![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
         @throw RLMException(@"Object type does not match RLMArray");
     }
 }

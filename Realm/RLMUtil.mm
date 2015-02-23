@@ -133,8 +133,11 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            BOOL isValidObject = [RLMDynamicCast<RLMObjectBase>(obj).rlmObjectSchema.className isEqualToString:property.objectClassName];
-            return isValidObject || obj == nil || obj == NSNull.null;
+            if (obj == nil || obj == NSNull.null) {
+                return YES;
+            }
+            RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
+            return objBase && [objBase->_objectSchema.className isEqualToString:property.objectClassName];
         }
         case RLMPropertyTypeArray: {
             if (RLMArray *array = RLMDynamicCast<RLMArray>(obj)) {
@@ -143,7 +146,8 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance
                 for (id el in array) {
-                    if (![RLMDynamicCast<RLMObjectBase>(el).rlmObjectSchema.className isEqualToString:property.objectClassName]) {
+                    RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(el);
+                    if (!obj || ![obj->_objectSchema.className isEqualToString:property.objectClassName]) {
                         return NO;
                     }
                 }
