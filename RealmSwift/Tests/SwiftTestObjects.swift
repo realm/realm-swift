@@ -116,7 +116,7 @@ class SwiftIgnoredPropertiesObject: Object {
     dynamic var runtimeDefaultProperty = "property"
     dynamic var readOnlyProperty: Int { return 0 }
 
-    override class func ignoredProperties() -> [AnyObject]! {
+    override class func ignoredProperties() -> [String] {
         return ["runtimeProperty", "runtimeDefaultProperty"]
     }
 }

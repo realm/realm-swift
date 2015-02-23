@@ -192,14 +192,10 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
         return [objectSchema.objectClass defaultPropertyValues];
     }
 
-    // for swift merge
-    // FIXME: for new apis only return swift initialized values
-    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
     RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
     for (RLMProperty *prop in objectSchema.properties) {
-        if (!defaults[prop.name] && defaultObject[prop.name]) {
-            defaults[prop.name] = defaultObject[prop.name];
-        }
+        defaults[prop.name] = defaultObject[prop.name];
     }
     return defaults;
 }

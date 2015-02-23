@@ -22,10 +22,6 @@ import RealmSwift
 class SwiftDefaultObject: Object {
     dynamic var intCol = 1
     dynamic var boolCol = true
-
-    override class func defaultPropertyValues() -> [NSObject : AnyObject]! {
-        return ["intCol": 2]
-    }
 }
 
 class SwiftObjectInterfaceTests: TestCase {
@@ -78,15 +74,15 @@ class SwiftObjectInterfaceTests: TestCase {
         XCTAssertEqual(firstObj.arrayCol.count, Int(0), "array count should be zero")
     }
 
-    func testMergedDefaultValuesSwiftObject() {
+    func testCreateWithDefaultValuesSwiftObject() {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
         realm.create(SwiftDefaultObject.self, value: NSDictionary())
         realm.commitWrite()
 
         let object = realm.objects(SwiftDefaultObject.self).first
-        XCTAssertEqual(object!.intCol, 2, "defaultPropertyValues should override native property default value")
-        XCTAssertEqual(object!.boolCol, true, "native property default value should be used if defaultPropertyValues doesn't contain that key")
+        XCTAssertEqual(object!.intCol, 1)
+        XCTAssertEqual(object!.boolCol, true)
     }
 
     func testOptionalSwiftProperties() {
