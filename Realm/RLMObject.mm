@@ -133,15 +133,15 @@
 }
 
 + (NSDictionary *)defaultPropertyValues {
-    return [super defaultPropertyValues];
+    return nil;
 }
 
 + (NSString *)primaryKey {
-    return [super primaryKey];
+    return nil;
 }
 
 + (NSArray *)ignoredProperties {
-    return [super ignoredProperties];
+    return nil;
 }
 
 @end
