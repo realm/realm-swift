@@ -141,9 +141,9 @@ public class Object : RLMObjectBase, Equatable {
     }
 
 
-    // MARK: Private Initializers
+    // MARK: Private functions
 
-    // FIXME: None of these initializers should be exposed in the public interface.
+    // FIXME: None of these functions should be exposed in the public interface.
 
     /**
     WARNING: This is an internal initializer not intended for public use.
@@ -164,6 +164,31 @@ public class Object : RLMObjectBase, Equatable {
     */
     public override init(objectSchema: RLMObjectSchema) {
         super.init(objectSchema: objectSchema)
+    }
+
+    // Get RLMArray values when getting array properties
+    public override func valueForKey(key: String) -> AnyObject? {
+        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
+            if prop.type == .Array {
+                let list = object_getIvar(self, prop.swiftListIvar) as RLMListBase
+                return list._rlmArray
+            }
+        }
+        return super.valueForKey(key)
+    }
+
+    // Support setting RLMArray values
+    public override func setValue(value: AnyObject?, forKey: String) {
+        if let prop = RLMObjectBaseObjectSchema(self)?[forKey] {
+            if prop.type == .Array {
+                let list = object_getIvar(self, prop.swiftListIvar) as RLMListBase
+                if let value = value as? RLMArray {
+                    list._rlmArray = value
+                    return
+                }
+            }
+        }
+        super.setValue(value, forKey: forKey)
     }
 }
 
