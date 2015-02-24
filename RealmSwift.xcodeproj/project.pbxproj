@@ -84,6 +84,9 @@
 		C0D8E1341A8196EE0077C784 /* TestUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D8E1311A8196EE0077C784 /* TestUtils.h */; };
 		C0D8E1371A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
 		C0D8E1381A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
+		C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
+		C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
+		C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,6 +180,7 @@
 		C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = RealmSwift/Tests/SortDescriptorTests.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E1321A8196EE0077C784 /* TestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtils.m; path = RealmSwift/Tests/TestUtils.m; sourceTree = SOURCE_ROOT; };
 		C0D8E1391A819B430077C784 /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RealmSwiftTests-BridgingHeader.h"; path = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h"; sourceTree = SOURCE_ROOT; };
+		C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectTests.swift; path = RealmSwift/Tests/ObjectTests.swift; sourceTree = SOURCE_ROOT; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1FB31955FCE000FDED82 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = CHANGELOG.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		E81A1FB41955FCE000FDED82 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -344,6 +348,9 @@
 			isa = PBXGroup;
 			children = (
 				020F63D41A8037DC007CB52E /* ListTests.swift */,
+				02616BD41A817FC8009919CB /* MigrationTests.swift */,
+				C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */,
+				C0240C2A1A84090000858BFA /* RealmTests.swift */,
 				020F63D51A8037DC007CB52E /* ResultsTests.swift */,
 				C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */,
 				020F63D61A8037DC007CB52E /* SwiftArrayTests.swift */,
@@ -621,6 +628,7 @@
 				020F63F41A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
 				020F63EB1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
 				C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
+				C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
 				020F63E21A8037DC007CB52E /* ResultsTests.swift in Sources */,
 				020F63EE1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F11A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
@@ -657,6 +665,7 @@
 				020F63F31A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
 				020F63EA1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
 				C0D8E12F1A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
+				C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
 				020F63E11A8037DC007CB52E /* ResultsTests.swift in Sources */,
 				020F63ED1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
 				020F63F01A8037DC007CB52E /* SwiftRealmTests.swift in Sources */,
@@ -671,6 +680,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				020F63F81A8037DC007CB52E /* SwiftUnicodeTests.swift in Sources */,
+				020F63FB1A8037DC007CB52E /* TestCase.swift in Sources */,
+				020F63F51A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
+				020F63EC1A8037DC007CB52E /* SwiftObjectInterfaceTests.swift in Sources */,
+				020F63E31A8037DC007CB52E /* ResultsTests.swift in Sources */,
+				C0240C2D1A84090000858BFA /* RealmTests.swift in Sources */,
+				020F63EF1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
+				020F63E91A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
+				020F63E01A8037DC007CB52E /* ListTests.swift in Sources */,
+				C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
+				02616BD71A817FC8009919CB /* MigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
