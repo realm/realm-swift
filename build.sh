@@ -296,18 +296,43 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    ######################################
+    # Full verification
+    ######################################
     "verify")
-        sh build.sh docs
-        sh build.sh test-all "$XCMODE"
-        sh build.sh examples "$XCMODE"
-        sh build.sh browser "$XCMODE"
-        sh build.sh test-browser "$XCMODE"
+        sh build.sh verify-docs
+        sh build.sh verify-osx
+        sh build.sh verify-osx-debug
+        sh build.sh verify-ios
+        sh build.sh verify-ios-debug
+        sh build.sh verify-ios-device
+        ;;
+
+    "verify-osx")
+        CONFIGURATION="$CONFIGURATION" sh build.sh test-osx "$XCMODE"
+        CONFIGURATION="$CONFIGURATION" sh build.sh test-browser "$XCMODE"
+        CONFIGURATION="$CONFIGURATION" sh build.sh examples-osx "$XCMODE"
 
         (
-            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/Release
+            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
             DYLD_FRAMEWORK_PATH=. ./JSONImport
         ) || exit 1
+        exit 0
+        ;;
 
+    "verify-ios")
+        CONFIGURATION="$CONFIGURATION" sh build.sh test-ios "$XCMODE"
+        CONFIGURATION="$CONFIGURATION" sh build.sh examples-ios "$XCMODE"
+        exit 0
+        ;;
+
+    "verify-ios-device")
+        CONFIGURATION="$CONFIGURATION" sh build.sh test-ios-devices "$XCMODE"
+        exit 0
+        ;;
+
+    "verify-docs")
+        sh scripts/build-docs.sh
         exit 0
         ;;
 
@@ -323,22 +348,29 @@ case "$COMMAND" in
     # Examples
     ######################################
     "examples")
-        sh build.sh clean
-
-        cd examples
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        CONFIGURATION="$CONFIGURATION" sh build.sh clean
+        CONFIGURATION="$CONFIGURATION" sh build.sh examples-ios
+        CONFIGURATION="$CONFIGURATION" sh build.sh examples-osx
         exit 0
+        ;;
+
+    "examples-ios")
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/objc/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Simple -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme TableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Migration -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
+        exit 0
+        ;;
+
+    "examples-osx")
+        xc "-project examples/osx/objc/RealmExamples.xcodeproj -scheme JSONImport -configuration ${CONFIGURATION} build ${CODESIGN_PARAMS}"
         ;;
 
     ######################################
