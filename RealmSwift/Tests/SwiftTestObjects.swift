@@ -129,3 +129,12 @@ class SwiftPrimaryStringObject: Object {
         return "stringCol"
     }
 }
+
+class SwiftIndexedPropertiesObject: Object {
+    dynamic var stringCol = ""
+    dynamic var intCol = 0
+
+    override class func indexedProperties() -> [String] {
+        return ["stringCol", "intCol"]
+    }
+}
