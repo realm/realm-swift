@@ -121,7 +121,7 @@ public class Object : RLMObjectBase, Equatable {
 
     /**
     Return an array of property names for properties which should be indexed. Only supported
-    for string and int properties.
+    for string properties.
     :returns: `Array` of property names to index.
     */
     public class func indexedProperties() -> [String] { return [] }
