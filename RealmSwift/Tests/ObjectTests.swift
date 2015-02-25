@@ -42,7 +42,9 @@ class ObjectTests: TestCase {
 
         let data = "a".dataUsingEncoding(NSUTF8StringEncoding)!
         XCTAssertEqual(object.binaryCol, data)
-        XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 1))
+
+        let date = NSDate(timeIntervalSince1970: 1)
+        XCTAssertEqual(object.dateCol, date)
         XCTAssertEqual(object.objectCol.boolCol, false)
         XCTAssertNil(object.objectCol.realm)
         XCTAssertEqual(object.arrayCol.count, 0)
@@ -64,7 +66,18 @@ class ObjectTests: TestCase {
         let objectWithKVCObject = SwiftObject(object: objectWithInt)
         XCTAssertEqual(objectWithKVCObject.intCol, 200)
 
-        // FIXME - test with nested objects
+        // test with array literal
+        let arrayObject = SwiftObject(object: [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true], [[true], [false]]])
+        XCTAssertEqual(arrayObject.boolCol, true)
+        XCTAssertEqual(arrayObject.intCol, 1)
+        XCTAssertEqual(arrayObject.floatCol, 1.1 as Float)
+        XCTAssertEqual(arrayObject.doubleCol, 11.1)
+        XCTAssertEqual(arrayObject.stringCol, "b")
+        XCTAssertEqual(arrayObject.binaryCol, data)
+        XCTAssertEqual(arrayObject.dateCol, date)
+        XCTAssertEqual(arrayObject.objectCol.boolCol, true)
+        XCTAssertEqual(arrayObject.arrayCol.count, 2)
+        XCTAssertEqual(arrayObject.arrayCol[0].boolCol, true)
     }
 
     func testRealm() {
