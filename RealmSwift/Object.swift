@@ -168,27 +168,35 @@ public class Object : RLMObjectBase, Equatable {
 
     // Get RLMArray values when getting array properties
     public override func valueForKey(key: String) -> AnyObject? {
-        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
-            if prop.type == .Array {
-                let list = object_getIvar(self, prop.swiftListIvar) as RLMListBase
-                return list._rlmArray
-            }
+        if let list = listProperty(key) {
+            return list
         }
         return super.valueForKey(key)
     }
 
     // Support setting RLMArray values
     public override func setValue(value: AnyObject?, forKey: String) {
-        if let prop = RLMObjectBaseObjectSchema(self)?[forKey] {
-            if prop.type == .Array {
-                let list = object_getIvar(self, prop.swiftListIvar) as RLMListBase
-                if let value = value as? RLMArray {
-                    list._rlmArray = value
-                    return
-                }
+        if let list = listProperty(forKey) {
+            if let value = value as? RLMArray {
+                list._rlmArray = value
+                return
+            }
+            if let value = value as? RLMListBase {
+                list._rlmArray = value._rlmArray
+                return
             }
         }
         super.setValue(value, forKey: forKey)
+    }
+
+    // Helper for getting a list property for the given key
+    private func listProperty(forKey: String) -> RLMListBase? {
+        if let prop = RLMObjectBaseObjectSchema(self)?[forKey] {
+            if prop.type == .Array {
+                return object_getIvar(self, prop.swiftListIvar) as RLMListBase?
+            }
+        }
+        return nil
     }
 }
 
