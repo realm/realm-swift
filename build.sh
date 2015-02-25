@@ -257,6 +257,9 @@ case "$COMMAND" in
 
     "osx")
         xcrealm "-scheme OSX -configuration $CONFIGURATION"
+        rm -rf build/osx
+        mkdir build/osx
+        cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
         exit 0
         ;;
 
