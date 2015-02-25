@@ -175,8 +175,8 @@ public class Object : RLMObjectBase, Equatable {
     }
 
     // Support setting RLMArray values
-    public override func setValue(value: AnyObject?, forKey: String) {
-        if let list = listProperty(forKey) {
+    public override func setValue(value: AnyObject?, forKey key: String) {
+        if let list = listProperty(key) {
             if let value = value as? RLMArray {
                 list._rlmArray = value
                 return
@@ -186,12 +186,12 @@ public class Object : RLMObjectBase, Equatable {
                 return
             }
         }
-        super.setValue(value, forKey: forKey)
+        super.setValue(value, forKey: key)
     }
 
     // Helper for getting a list property for the given key
-    private func listProperty(forKey: String) -> RLMListBase? {
-        if let prop = RLMObjectBaseObjectSchema(self)?[forKey] {
+    private func listProperty(key: String) -> RLMListBase? {
+        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
             if prop.type == .Array {
                 return object_getIvar(self, prop.swiftListIvar) as RLMListBase?
             }
