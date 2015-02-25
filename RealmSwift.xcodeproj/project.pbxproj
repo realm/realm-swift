@@ -103,6 +103,9 @@
 		027A95801A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A957F1A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift */; };
 		027A95811A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A957F1A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift */; };
 		027A95821A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A957F1A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift */; };
+		027A95841A9E73FB00825574 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A95831A9E73FB00825574 /* ObjectCreationTests.swift */; };
+		027A95851A9E73FB00825574 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A95831A9E73FB00825574 /* ObjectCreationTests.swift */; };
+		027A95861A9E73FB00825574 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027A95831A9E73FB00825574 /* ObjectCreationTests.swift */; };
 		02B822901A532133007F28A5 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 023B19A81A4234380067FB81 /* RealmSwift.framework */; };
 		294E7AE81A7C604F0056642C /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0201B27B1A54C68C004CFB6F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29FA58751A79B6C000A222E5 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 023B19A81A4234380067FB81 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -217,6 +220,7 @@
 		02616BD41A817FC8009919CB /* MigrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MigrationTests.swift; path = RealmSwift/Tests/MigrationTests.swift; sourceTree = SOURCE_ROOT; };
 		027A957B1A9E6C0900825574 /* ObjectAccessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectAccessorTests.swift; sourceTree = "<group>"; };
 		027A957F1A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectSchemaInitializationTests.swift; sourceTree = "<group>"; };
+		027A95831A9E73FB00825574 /* ObjectCreationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectCreationTests.swift; sourceTree = "<group>"; };
 		02B822821A532100007F28A5 /* RealmSwift iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmSwift iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02B9CCA71A48DB2E00330649 /* TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
@@ -398,6 +402,7 @@
 				02616BD41A817FC8009919CB /* MigrationTests.swift */,
 				C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */,
 				027A957B1A9E6C0900825574 /* ObjectAccessorTests.swift */,
+				027A95831A9E73FB00825574 /* ObjectCreationTests.swift */,
 				027A957F1A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift */,
 				C0240C2A1A84090000858BFA /* RealmTests.swift */,
 				020F63D51A8037DC007CB52E /* ResultsTests.swift */,
@@ -683,6 +688,7 @@
 				020F63E81A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E51A8037DC007CB52E /* SwiftArrayTests.swift in Sources */,
 				020F63DF1A8037DC007CB52E /* ListTests.swift in Sources */,
+				027A95851A9E73FB00825574 /* ObjectCreationTests.swift in Sources */,
 				02616BD61A817FC8009919CB /* MigrationTests.swift in Sources */,
 				027A95811A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift in Sources */,
 			);
@@ -721,6 +727,7 @@
 				020F63E71A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E41A8037DC007CB52E /* SwiftArrayTests.swift in Sources */,
 				020F63DE1A8037DC007CB52E /* ListTests.swift in Sources */,
+				027A95841A9E73FB00825574 /* ObjectCreationTests.swift in Sources */,
 				02616BD51A817FC8009919CB /* MigrationTests.swift in Sources */,
 				027A95801A9E6C7C00825574 /* ObjectSchemaInitializationTests.swift in Sources */,
 			);
@@ -741,6 +748,7 @@
 				020F63E91A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E01A8037DC007CB52E /* ListTests.swift in Sources */,
 				C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
+				027A95861A9E73FB00825574 /* ObjectCreationTests.swift in Sources */,
 				02616BD71A817FC8009919CB /* MigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

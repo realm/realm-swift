@@ -276,7 +276,7 @@ public final class Realm {
 
     :returns: The created object.
     */
-    public func create<T: Object>(type: T.Type, value: AnyObject, update: Bool = false) -> T {
+    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         var options : RLMCreationOptions = .allZeros
         if update == true {
             options = RLMCreationOptions.UpdateOrCreate
