@@ -20,6 +20,7 @@
 #import <Realm/RLMArray.h>
 
 @implementation RLMListBase
+
 - (instancetype)initWithArray:(RLMArray *)array {
     self = [super init];
     if (self) {
@@ -31,4 +32,5 @@
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
     return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
 }
+
 @end
