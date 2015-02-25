@@ -135,6 +135,6 @@ class SwiftIndexedPropertiesObject: Object {
     dynamic var intCol = 0
 
     override class func indexedProperties() -> [String] {
-        return ["stringCol", "intCol"]
+        return ["stringCol"] // Add "intCol" when integer indexing is supported
     }
 }

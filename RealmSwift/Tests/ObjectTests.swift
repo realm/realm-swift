@@ -144,9 +144,8 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 2)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 1)
         XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["intCol"]!.indexed)
     }
 
     func testLinkingObjects() {
