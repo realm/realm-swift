@@ -228,25 +228,7 @@ class RealmTests: TestCase {
         }
     }
 
-    func testCreate() {
-        let realm = Realm()
-        assertThrows(realm.create(SwiftObject.self, value: [:]))
-        let objects = realm.objects(SwiftObject)
-        XCTAssertEqual(0, objects.count)
-        var defaultRealmObject: SwiftObject!
-        realm.write {
-            defaultRealmObject = realm.create(SwiftObject.self, value: [:])
-            XCTAssertEqual(1, objects.count)
-            defaultRealmObject = realm.create(SwiftObject.self, value: ["boolCol" : true])
-        }
-        XCTAssertEqual(2, objects.count)
-        XCTAssertEqual(objects[0].boolCol, false)
-        XCTAssertEqual(objects[1].boolCol, true)
-    }
-
-    func testCreateWithUpdate() {
-
-    }
+    // create() tests are in ObjectCreationTests.swift
 
     func testDeleteSingleObject() {
         let realm = Realm()

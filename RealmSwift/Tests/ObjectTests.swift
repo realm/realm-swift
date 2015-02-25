@@ -21,65 +21,11 @@ import RealmSwift
 import Foundation
 
 class ObjectTests: TestCase {
-    func testInitStandaloneObject() {
-        let object = SwiftObject()
 
-        XCTAssertNil(object.realm)
-        XCTAssertEqual(object.stringCol, "a", "Should be initialized with default value")
-        XCTAssertEqual(object.arrayCol.count, 0)
-        XCTAssertNil(object.arrayCol.realm)
-    }
+    // init() Tests are in ObjectCreationTests.swift
 
-    func testInitStandaloneObjectWithObject() {
-        // test with all defaults
-        let object = SwiftObject(object: [:])
-        XCTAssertNil(object.realm)
-        XCTAssertEqual(object.boolCol, false)
-        XCTAssertEqual(object.intCol, 123)
-        XCTAssertEqual(object.floatCol, 1.23 as Float)
-        XCTAssertEqual(object.doubleCol, 12.3)
-        XCTAssertEqual(object.stringCol, "a")
-
-        let data = "a".dataUsingEncoding(NSUTF8StringEncoding)!
-        XCTAssertEqual(object.binaryCol, data)
-
-        let date = NSDate(timeIntervalSince1970: 1)
-        XCTAssertEqual(object.dateCol, date)
-        XCTAssertEqual(object.objectCol.boolCol, false)
-        XCTAssertNil(object.objectCol.realm)
-        XCTAssertEqual(object.arrayCol.count, 0)
-        XCTAssertNil(object.arrayCol.realm)
-
-        // test with dictionary with mix of default and one specified value
-        let objectWithInt = SwiftObject(object: ["intCol": 200])
-        XCTAssertEqual(objectWithInt.intCol, 200)
-
-        let objectWithListLiteral = SwiftObject(object: ["arrayCol" : [[true]]])
-        XCTAssertEqual(objectWithListLiteral.arrayCol.count, 1)
-        XCTAssertEqual(objectWithListLiteral.arrayCol.first!.boolCol, true)
-        XCTAssertNil(objectWithListLiteral.arrayCol.realm)
-
-        let objectWithObjectLiteral = SwiftObject(object: ["objectCol" : ["boolCol" : true]])
-        XCTAssertEqual(objectWithObjectLiteral.objectCol.boolCol, true)
-
-        // test with kvc object
-        let objectWithKVCObject = SwiftObject(object: objectWithInt)
-        XCTAssertEqual(objectWithKVCObject.intCol, 200)
-
-        // test with array literal
-        let arrayObject = SwiftObject(object: [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true], [[true], [false]]])
-        XCTAssertEqual(arrayObject.boolCol, true)
-        XCTAssertEqual(arrayObject.intCol, 1)
-        XCTAssertEqual(arrayObject.floatCol, 1.1 as Float)
-        XCTAssertEqual(arrayObject.doubleCol, 11.1)
-        XCTAssertEqual(arrayObject.stringCol, "b")
-        XCTAssertEqual(arrayObject.binaryCol, data)
-        XCTAssertEqual(arrayObject.dateCol, date)
-        XCTAssertEqual(arrayObject.objectCol.boolCol, true)
-        XCTAssertEqual(arrayObject.arrayCol.count, 2)
-        XCTAssertEqual(arrayObject.arrayCol[0].boolCol, true)
-    }
-
+    // init(value:) tests are in ObjectCreationTests.swift
+    
     func testRealm() {
         let standalone = SwiftStringObject()
         XCTAssertNil(standalone.realm)
