@@ -490,28 +490,4 @@ class RealmTests: TestCase {
         }
         waitForExpectationsWithTimeout(2, handler: nil)
     }
-
-    func testInitStandaloneObjectWithObjectWithDefaultArrayProperty() {
-        let object = SwiftObject(object: [
-            "intCol": 200
-        ])
-
-        XCTAssertNil(object.realm)
-        XCTAssertEqual(object.stringCol, "a", "Should be initialized with default value")
-        XCTAssertEqual(object.intCol, 200, "Should be initialized with the passed-in value")
-        XCTAssertEqual(object.arrayCol.count, 0)
-        XCTAssertNil(object.arrayCol.realm)
-    }
-
-    func testInitStandaloneObjectWithObjectWithCustomArrayProperty() {
-        let object = SwiftObject(object: [
-            "arrayCol" : [[true]]
-            ])
-
-        XCTAssertNil(object.realm)
-        XCTAssertEqual(object.arrayCol.count, 1)
-        XCTAssertEqual(object.arrayCol.first!.boolCol, true)
-        XCTAssertNil(object.arrayCol.realm)
-    }
-
 }
