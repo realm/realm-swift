@@ -207,5 +207,11 @@ class ObjectTests: TestCase {
         object.setValue(boolObject, forKey: "objectCol")
         XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
         XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)
+
+        let list = List<SwiftBoolObject>()
+        list.append(boolObject)
+        object.setValue(list, forKey: "arrayCol")
+        XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).first!, boolObject)
     }
 }
