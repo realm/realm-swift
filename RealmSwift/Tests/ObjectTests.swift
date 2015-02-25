@@ -87,7 +87,7 @@ class ObjectTests: TestCase {
     }
 
     func testIgnoredProperties() {
-        XCTAssertEqual(Object.swiftIgnoredProperties(), [], "ignored properties should default to []")
+        XCTAssertEqual(Object.ignoredProperties(), [], "ignored properties should default to []")
         XCTAssertEqual(SwiftIgnoredPropertiesObject.ignoredProperties().count, 2)
         XCTAssertNil(SwiftIgnoredPropertiesObject().objectSchema["runtimeProperty"])
     }
