@@ -853,8 +853,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
+    key = validatedKey(key) ?: keyForPath(path);
+
     try {
-        self.group->write(path.UTF8String, static_cast<const char *>(validatedKey(key).bytes));
+        self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
         return YES;
     }
     catch (File::PermissionDenied &ex) {
