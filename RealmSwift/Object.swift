@@ -177,14 +177,11 @@ public class Object : RLMObjectBase, Equatable {
     // Support setting RLMArray values
     public override func setValue(value: AnyObject?, forKey key: String) {
         if let list = listProperty(key) {
-            if let value = value as? RLMArray {
-                list._rlmArray = value
-                return
+            if let value = value as? NSFastEnumeration {
+                list._rlmArray.removeAllObjects()
+                list._rlmArray.addObjects(value)
             }
-            if let value = value as? RLMListBase {
-                list._rlmArray = value._rlmArray
-                return
-            }
+            return
         }
         super.setValue(value, forKey: key)
     }
