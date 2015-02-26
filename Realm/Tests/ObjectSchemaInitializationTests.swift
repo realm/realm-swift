@@ -31,6 +31,10 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testIgnoredProperties() {
+        let schema = SwiftIgnoredPropertiesObject().objectSchema
+        XCTAssertNil(schema["runtimeProperty"], "The object schema shouldn't contain ignored properties")
+        XCTAssertNil(schema["runtimeDefaultProperty"], "The object schema shouldn't contain ignored properties")
+        XCTAssertNil(schema["readOnlyProperty"], "The object schema shouldn't contain read-only properties")
     }
 
     func testIndexedProperties() {
