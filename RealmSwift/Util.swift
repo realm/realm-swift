@@ -32,7 +32,7 @@ internal func throwRealmException(message: String, userInfo: [String:AnyObject] 
     NSException(name: RLMExceptionName, reason: message, userInfo: userInfo).raise()
 }
 
-internal func assertPositive(int: Int, parameterName: String) {
+internal func checkNonNegative(int: Int, parameterName: String) {
     if int < 0 {
         throwRealmException("Cannot pass a negative value for '\(parameterName)'.")
     }

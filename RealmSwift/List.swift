@@ -116,11 +116,11 @@ public final class List<T: Object>: ListBase, SequenceType {
     */
     public subscript(index: Int) -> T {
         get {
-            assertPositive(index, "index")
+            checkNonNegative(index, "index")
             return _rlmArray[UInt(index)] as T
         }
         set {
-            assertPositive(index, "index")
+            checkNonNegative(index, "index")
             return _rlmArray[UInt(index)] = newValue
         }
     }
@@ -231,7 +231,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :param: index  The index at which to insert the object.
     */
     public func insert(object: T, atIndex index: Int) {
-        assertPositive(index, "index")
+        checkNonNegative(index, "index")
         _rlmArray.insertObject(unsafeBitCast(object, RLMObject.self), atIndex: UInt(index))
     }
 
@@ -245,7 +245,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :param: index The index at which to remove the object.
     */
     public func remove(index: Int) {
-        assertPositive(index, "index")
+        checkNonNegative(index, "index")
         _rlmArray.removeObjectAtIndex(UInt(index))
     }
 
@@ -291,7 +291,7 @@ public final class List<T: Object>: ListBase, SequenceType {
     :param: object An object to replace at the specified index.
     */
     public func replace(index: Int, object: T) {
-        assertPositive(index, "index")
+        checkNonNegative(index, "index")
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
 }
