@@ -832,13 +832,15 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Encryption key must not be nil");
     }
 
-    return [self migrateRealmAtPath:realmPath key:validatedKey(key)];
+    return [self migrateRealmAtPath:realmPath key:key];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
     if (realmsOpenAtPath(realmPath)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");
     }
+
+    key = validatedKey(key) ?: keyForPath(realmPath);
 
     NSError *error;
     RLMRealm *realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:NO inMemory:NO dynamic:YES error:&error];
