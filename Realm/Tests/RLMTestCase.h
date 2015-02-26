@@ -25,6 +25,7 @@ extern "C" {
 NSString *RLMTestRealmPath(void);
 NSString *RLMDefaultRealmPath(void);
 NSString *RLMRealmPathForFile(NSString *);
+NSData *RLMGenerateKey(void);
 #ifdef __cplusplus
 }
 #endif

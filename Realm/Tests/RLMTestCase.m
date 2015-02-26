@@ -69,6 +69,22 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
     }
 }
 
+NSData *RLMGenerateKey() {
+    uint8_t buffer[64];
+    SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+    return [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
+}
+
+static BOOL encryptTests() {
+    static BOOL encryptAll = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (getenv("REALM_ENCRYPT_ALL")) {
+            encryptAll = YES;
+        }
+    });
+    return encryptAll;
+}
 
 @implementation RLMTestCase
 
@@ -79,6 +95,11 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
     // Delete Realm files
     RLMDeleteRealmFilesAtPath(RLMDefaultRealmPath());
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
+
+    if (encryptTests()) {
+        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
+        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+    }
 }
 
 - (void)tearDown
