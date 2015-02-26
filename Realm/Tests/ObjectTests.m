@@ -1064,24 +1064,16 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     // Standalone can be accessed from other threads
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    OSSpinLockLock(&spinlock);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertNoThrow(obj.intCol = 5);
-        OSSpinLockUnlock(&spinlock);
-    });
-    OSSpinLockLock(&spinlock);
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{ XCTAssertNoThrow(obj.intCol = 5); });
+    dispatch_sync(queue, ^{});
 
     [RLMRealm.defaultRealm beginWriteTransaction];
     [RLMRealm.defaultRealm addObject:obj];
     [RLMRealm.defaultRealm commitWriteTransaction];
 
-    XCTAssertNoThrow(obj.intCol);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows(obj.intCol);
-        OSSpinLockUnlock(&spinlock);
-    });
-    OSSpinLockLock(&spinlock);
+    dispatch_async(queue, ^{ XCTAssertThrows(obj.intCol); });
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testIsDeleted {

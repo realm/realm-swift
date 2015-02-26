@@ -18,7 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#import <libkern/OSAtomic.h>
 #import <mach/mach.h>
 
 @interface ResultsTests : RLMTestCase
@@ -420,13 +419,12 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([queryResults lastObject]);
 
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
         XCTAssertThrows([results lastObject]);
         XCTAssertThrows([queryResults lastObject]);
-        OSSpinLockUnlock(&spinlock);
     });
-    OSSpinLockLock(&spinlock);
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testDeleteAllObjects
