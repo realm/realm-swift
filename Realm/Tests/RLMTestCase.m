@@ -98,11 +98,9 @@ static void RLMDeleteRealmFilesAtPath(NSString *path) {
 
 - (void)invokeTest
 {
-    [self setUp];
-    @autoreleasepool {
-        [super invokeTest];
-    }
-    [self tearDown];
+    @autoreleasepool { [self setUp]; }
+    @autoreleasepool { [super invokeTest]; }
+    @autoreleasepool { [self tearDown]; }
 }
 
 - (RLMRealm *)realmWithTestPath
