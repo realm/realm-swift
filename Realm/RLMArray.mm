@@ -99,7 +99,7 @@
 
 
 //
-// Stanalone RLMArray implementation
+// Standalone RLMArray implementation
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
