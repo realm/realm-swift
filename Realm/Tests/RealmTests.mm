@@ -25,8 +25,6 @@ extern "C" {
 #import "RLMSchema_Private.h"
 }
 
-#import <libkern/OSAtomic.h>
-
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
 @end
@@ -497,15 +495,14 @@ extern "C" {
     }];
 
     // dispatch to background syncronously
-    dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_group_async(group, queue, ^{
+    dispatch_async(queue, ^{
         RLMRealm *realm = [self realmWithTestPath];
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withObject:@[@"string"]];
         [realm commitWriteTransaction];
     });
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    dispatch_sync(queue, ^{});
 
     // notification shouldnt have fired
     XCTAssertFalse(notificationFired);
@@ -515,6 +512,7 @@ extern "C" {
     // notification should have fired
     XCTAssertTrue(notificationFired);
 
+    [realm cancelWriteTransaction];
     [realm removeNotification:token];
 }
 
@@ -562,15 +560,13 @@ extern "C" {
     RLMRealm *realm = RLMRealm.defaultRealm;
 
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    OSSpinLockLock(&spinlock);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
         XCTAssertThrows([realm beginWriteTransaction]);
         XCTAssertThrows([IntObject allObjectsInRealm:realm]);
         XCTAssertThrows([IntObject objectsInRealm:realm where:@"intCol = 0"]);
-        OSSpinLockUnlock(&spinlock);
     });
-    OSSpinLockLock(&spinlock);
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testReadOnlyFile

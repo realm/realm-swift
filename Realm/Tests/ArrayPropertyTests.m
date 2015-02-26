@@ -18,8 +18,6 @@
 
 #import "RLMTestCase.h"
 
-#import <libkern/OSAtomic.h>
-
 @implementation DogArrayObject
 @end
 
@@ -276,14 +274,12 @@
 
     // Standalone can be accessed from other threads
     // Using dispatch_async to ensure it actually lands on another thread
-    __block OSSpinLock spinlock = OS_SPINLOCK_INIT;
-    OSSpinLockLock(&spinlock);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
         XCTAssertNoThrow(company.employees);
         XCTAssertNoThrow([employees lastObject]);
-        OSSpinLockUnlock(&spinlock);
     });
-    OSSpinLockLock(&spinlock);
+    dispatch_sync(queue, ^{});
 
     [RLMRealm.defaultRealm beginWriteTransaction];
     [RLMRealm.defaultRealm addObject:company];
@@ -292,12 +288,11 @@
     employees = company.employees;
     XCTAssertNoThrow(company.employees);
     XCTAssertNoThrow([employees lastObject]);
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(queue, ^{
         XCTAssertThrows(company.employees);
         XCTAssertThrows([employees lastObject]);
-        OSSpinLockUnlock(&spinlock);
     });
-    OSSpinLockLock(&spinlock);
+    dispatch_sync(queue, ^{});
 }
 
 - (void)testSortByMultipleColumns {
