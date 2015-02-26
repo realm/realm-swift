@@ -92,36 +92,9 @@ static void clearKeyCache() {
     }
 }
 
-static bool isDebuggerAttached() {
-    int name[] = {
-        CTL_KERN,
-        KERN_PROC,
-        KERN_PROC_PID,
-        getpid()
-    };
-
-    struct kinfo_proc info;
-    size_t info_size = sizeof(info);
-    if (sysctl(name, sizeof(name)/sizeof(name[0]), &info, &info_size, NULL, 0) == -1) {
-        NSLog(@"sysctl() failed: %s", strerror(errno));
-        return false;
-    }
-    
-    
-    return (info.kp_proc.p_flag & P_TRACED) != 0;
-}
-
-static void validateNotInDebugger() {
-    if (isDebuggerAttached()) {
-        @throw RLMException(@"Cannot open an encrypted Realm with a debugger attached to the process");
-    }
-}
-
 static NSData *validatedKey(NSData *key) {
-    if (key) {
-        if ([key length] != 64) {
-            @throw RLMException(@"Encryption key must be exactly 64 bytes long");
-        }
+    if (key && key.length != 64) {
+        @throw RLMException(@"Encryption key must be exactly 64 bytes long");
     }
     return key;
 }
@@ -257,11 +230,6 @@ NSString * const c_defaultRealmFileName = @"default.realm";
 
         NSError *error = nil;
         try {
-            // NOTE: we do these checks here as is this is the first time encryption keys are used
-            if (validatedKey(key)) {
-                validateNotInDebugger();
-            }
-
             if (readonly) {
                 _readGroup = make_unique<Group>(path.UTF8String, static_cast<const char *>(key.bytes));
                 _group = _readGroup.get();
@@ -441,7 +409,7 @@ static id RLMAutorelease(id value) {
         return RLMAutorelease(realm);
     }
 
-    key = key ?: keyForPath(path);
+    key = validatedKey(key) ?: keyForPath(path);
     realm = [[RLMRealm alloc] initWithPath:path key:key readOnly:readonly inMemory:inMemory dynamic:dynamic error:outError];
     if (outError && *outError) {
         return nil;
@@ -864,7 +832,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
         @throw RLMException(@"Encryption key must not be nil");
     }
 
-    return [self migrateRealmAtPath:realmPath key:key];
+    return [self migrateRealmAtPath:realmPath key:validatedKey(key)];
 }
 
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath key:(NSData *)key {
@@ -885,40 +853,32 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path key:(NSData *)key error:(NSError **)error {
-    BOOL success = YES;
-    if (validatedKey(key)) {
-        validateNotInDebugger();
-    }
-
     try {
-        self.group->write(path.UTF8String, static_cast<const char *>(key.bytes));
+        self.group->write(path.UTF8String, static_cast<const char *>(validatedKey(key).bytes));
+        return YES;
     }
     catch (File::PermissionDenied &ex) {
-        success = NO;
         if (error) {
             *error = RLMMakeError(RLMErrorFilePermissionDenied, ex);
         }
     }
     catch (File::Exists &ex) {
-        success = NO;
         if (error) {
             *error = RLMMakeError(RLMErrorFileExists, ex);
         }
     }
     catch (File::AccessError &ex) {
-        success = NO;
         if (error) {
             *error = RLMMakeError(RLMErrorFileAccessError, ex);
         }
     }
     catch (exception &ex) {
-        success = NO;
         if (error) {
             *error = RLMMakeError(RLMErrorFail, ex);
         }
     }
 
-    return success;
+    return NO;
 }
 
 - (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error {

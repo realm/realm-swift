@@ -99,11 +99,6 @@
  The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
  but otherwise they behave like normal persisted Realms.
 
- Encrypted Realms currently cannot be opened while lldb is attached to the
- process since lldb cannot forward mach exceptions to the process being
- debugged. Attempting to open an encrypted Realm with lldb attached will result
- in an EXC_BAD_ACCESS.
-
  @param path        Path to the file you want the data saved in.
  @param key         64-byte key to use to encrypt the data.
  @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
