@@ -111,52 +111,64 @@ class ObjectTests: TestCase {
     }
 
     func testValueForKey() {
-        let object = SwiftObject()
+        let test: (SwiftObject) -> () = { object in
+            XCTAssertEqual(object.valueForKey("boolCol") as Bool!, false)
+            XCTAssertEqual(object.valueForKey("intCol") as Int!, 123)
+            XCTAssertEqual(object.valueForKey("floatCol") as Float!, 1.23 as Float)
+            XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 12.3)
+            XCTAssertEqual(object.valueForKey("stringCol") as String!, "a")
+            XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+            XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 1))
+            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, false)
+            XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
+        }
 
-        XCTAssertEqual(object.valueForKey("boolCol") as Bool!, false)
-        XCTAssertEqual(object.valueForKey("intCol") as Int!, 123)
-        XCTAssertEqual(object.valueForKey("floatCol") as Float!, 1.23 as Float)
-        XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 12.3)
-        XCTAssertEqual(object.valueForKey("stringCol") as String!, "a")
-        XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
-        XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 1))
-        XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, false)
-        XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
+        test(SwiftObject())
+        Realm().write {
+            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+            test(persistedObject)
+        }
     }
 
     func testSetValueForKey() {
-        let object = SwiftObject()
+        let test: (SwiftObject) -> () = { object in
+            object.setValue(true, forKey: "boolCol")
+            XCTAssertEqual(object.valueForKey("boolCol") as Bool!, true)
 
-        object.setValue(true, forKey: "boolCol")
-        XCTAssertEqual(object.valueForKey("boolCol") as Bool!, true)
+            object.setValue(321, forKey: "intCol")
+            XCTAssertEqual(object.valueForKey("intCol") as Int!, 321)
 
-        object.setValue(321, forKey: "intCol")
-        XCTAssertEqual(object.valueForKey("intCol") as Int!, 321)
+            object.setValue(32.1 as Float, forKey: "floatCol")
+            XCTAssertEqual(object.valueForKey("floatCol") as Float!, 32.1 as Float)
 
-        object.setValue(32.1 as Float, forKey: "floatCol")
-        XCTAssertEqual(object.valueForKey("floatCol") as Float!, 32.1 as Float)
+            object.setValue(3.21, forKey: "doubleCol")
+            XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 3.21)
 
-        object.setValue(3.21, forKey: "doubleCol")
-        XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 3.21)
+            object.setValue("z", forKey: "stringCol")
+            XCTAssertEqual(object.valueForKey("stringCol") as String!, "z")
 
-        object.setValue("z", forKey: "stringCol")
-        XCTAssertEqual(object.valueForKey("stringCol") as String!, "z")
+            object.setValue("z".dataUsingEncoding(NSUTF8StringEncoding), forKey: "binaryCol")
+            XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
 
-        object.setValue("z".dataUsingEncoding(NSUTF8StringEncoding), forKey: "binaryCol")
-        XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+            object.setValue(NSDate(timeIntervalSince1970: 333), forKey: "dateCol")
+            XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
 
-        object.setValue(NSDate(timeIntervalSince1970: 333), forKey: "dateCol")
-        XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
+            let boolObject = SwiftBoolObject(object: [true])
+            object.setValue(boolObject, forKey: "objectCol")
+            XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
+            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)
 
-        let boolObject = SwiftBoolObject(object: [true])
-        object.setValue(boolObject, forKey: "objectCol")
-        XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
-        XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)
+            let list = List<SwiftBoolObject>()
+            list.append(boolObject)
+            object.setValue(list, forKey: "arrayCol")
+            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).count, 1)
+            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+        }
 
-        let list = List<SwiftBoolObject>()
-        list.append(boolObject)
-        object.setValue(list, forKey: "arrayCol")
-        XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+        test(SwiftObject())
+        Realm().write {
+            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+            test(persistedObject)
+        }
     }
 }
