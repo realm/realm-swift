@@ -42,7 +42,7 @@ public class Property: Equatable {
     public var indexed: Bool { return rlmProperty.indexed }
 
     /// Object class name - specify object types for `Object` and `List` properties.
-    public var objectClassName: String { return rlmProperty.objectClassName }
+    public var objectClassName: String? { return rlmProperty.objectClassName }
 
     // MARK: Initializers
 
