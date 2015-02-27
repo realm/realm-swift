@@ -28,8 +28,8 @@
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults;
 - (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 

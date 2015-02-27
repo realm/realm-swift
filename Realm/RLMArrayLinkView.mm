@@ -50,13 +50,13 @@
 //
 // validation helpers
 //
-static inline void RLMLinkViewArrayValidateAttached(__unsafe_unretained RLMArrayLinkView *ar) {
+static inline void RLMLinkViewArrayValidateAttached(__unsafe_unretained RLMArrayLinkView *const ar) {
     if (!ar->_backingLinkView->is_attached()) {
         @throw RLMException(@"RLMArray is no longer valid");
     }
     RLMCheckThread(ar->_realm);
 }
-static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretained RLMArrayLinkView *ar) {
+static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretained RLMArrayLinkView *const ar) {
     // first verify attached
     RLMLinkViewArrayValidateAttached(ar);
 
@@ -64,7 +64,7 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
         @throw RLMException(@"Can't mutate a persisted array outside of a write transaction.");
     }
 }
-static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *obj, __unsafe_unretained NSString *expected) {
+static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *const obj, __unsafe_unretained NSString *const expected) {
     NSString *objectClassName = obj.objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
         @throw RLMException(@"Attempting to insert wrong object type", @{@"expected class" : expected, @"actual class" : objectClassName});
