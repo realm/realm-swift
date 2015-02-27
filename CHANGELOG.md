@@ -18,6 +18,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * An exception will now be thrown when calling `-beginWriteTransaction` from within a notification
   triggered by calling `-beginWriteTransaction` elsewhere.
 * When calling `delete:` we now verify that the object being deleted is persisted in the target Realm.
+* Fix crash when calling `createOrUpdate:inRealm` with nested linked objects.
 
 0.90.6 Release notes (2015-02-20)
 =============================================================

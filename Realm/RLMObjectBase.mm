@@ -81,8 +81,8 @@
     return self;
 }
 
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *)schema
+- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults {
     self = [super init];
     if (self) {

@@ -589,9 +589,9 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 }
 
 // Create accessor and register with realm
-RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *realm,
-                                   	   __unsafe_unretained RLMObjectSchema *objectSchema,
-                                  	   NSUInteger index) {
+RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
+                                       __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                       NSUInteger index) {
     RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
     accessor->_row = (*objectSchema.table)[index];
     RLMInitializeSwiftListAccessor(accessor);
