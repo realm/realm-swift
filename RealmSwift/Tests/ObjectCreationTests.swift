@@ -227,6 +227,15 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithKVCObject() {
+        // test with kvc object
+        Realm().beginWrite()
+        let objectWithInt = Realm().create(SwiftObject.self, value: ["intCol": 200])
+        let objectWithKVCObject = Realm().create(SwiftObject.self, value: objectWithInt)
+        var valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
+        Realm().commitWrite()
+
+        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
+        XCTAssertEqual(Realm().objects(SwiftObject).count, 2, "Object should have been copied")
     }
 
     func testCreateWithNestedObjects() {
@@ -298,7 +307,7 @@ class ObjectCreationTests: TestCase {
     // return an array of valid values that can be used to initialize each type
     private func validValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         switch type {
-            case .Bool:     return [true]
+            case .Bool:     return [true, 0 as Int, 1 as Int]
             case .Int:      return [1 as Int]
             case .Float:    return [1 as Int, 1.1 as Float, 11.1 as Double]
             case .Double:   return [1 as Int, 1.1 as Float, 11.1 as Double]
@@ -314,7 +323,7 @@ class ObjectCreationTests: TestCase {
 
     private func invalidValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
         switch type {
-            case .Bool:     return ["invalid"] // 1 as Int, 2 as Int, 1.1 as Float, 11.1 as Double]
+            case .Bool:     return ["invalid", 2 as Int, 1.1 as Float, 11.1 as Double]
             case .Int:      return ["invalid", true, false, 1.1 as Float, 11.1 as Double]
             case .Float:    return ["invalid", true, false]
             case .Double:   return ["invalid", true, false]
