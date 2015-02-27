@@ -344,6 +344,7 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    # FIXME: make no-op in al-swift
     "verify-ios")
         CONFIGURATION="$CONFIGURATION" sh build.sh test-ios
         CONFIGURATION="$CONFIGURATION" sh build.sh examples-ios
@@ -357,6 +358,23 @@ case "$COMMAND" in
 
     "verify-docs")
         sh scripts/build-docs.sh
+        exit 0
+        ;;
+
+    # FIXME: make not no-ops in al-swift
+    "verify-ios-static")
+        exit 0
+        ;;
+
+    "verify-ios-dynamic")
+        exit 0
+        ;;
+
+    "verify-ios-swift")
+        exit 0
+        ;;
+
+    "verify-osx-swift")
         exit 0
         ;;
 
