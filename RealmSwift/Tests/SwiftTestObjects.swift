@@ -37,17 +37,21 @@ class SwiftObject: Object {
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
     dynamic var stringCol = "a"
-    dynamic var binaryCol = SwiftObject.defaultBinaryCol()
-    dynamic var dateCol = SwiftObject.defaultDateCol()
+    dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
+    dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
-    class func defaultBinaryCol() -> NSData {
-        return "a".dataUsingEncoding(NSUTF8StringEncoding)!
-    }
-
-    class func defaultDateCol() -> NSDate {
-        return NSDate(timeIntervalSince1970: 1)
+    class func defaultValues() -> [String: AnyObject] {
+        return  ["boolCol": false as AnyObject,
+            "intCol": 123 as AnyObject,
+            "floatCol": 1.23 as AnyObject,
+            "doubleCol": 12.3 as AnyObject,
+            "stringCol": "a" as AnyObject,
+            "binaryCol":  "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "dateCol": NSDate(timeIntervalSince1970: 1) as NSDate,
+            "objectCol": [false],
+            "arrayCol": [] as NSArray]
     }
 }
 

@@ -27,15 +27,9 @@ class ObjectCreationTests: TestCase {
         // test all properties are defaults
         let object = SwiftObject()
         XCTAssertNil(object.realm)
-        XCTAssertEqual(object.boolCol, false)
-        XCTAssertEqual(object.intCol, 123)
-        XCTAssertEqual(object.floatCol, 1.23 as Float)
-        XCTAssertEqual(object.doubleCol, 12.3)
-        XCTAssertEqual(object.stringCol, "a")
-        XCTAssertEqual(object.binaryCol, SwiftObject.defaultBinaryCol())
-        XCTAssertEqual(object.dateCol, SwiftObject.defaultDateCol())
-        XCTAssertEqual(object.objectCol.boolCol, false)
-        XCTAssertEqual(object.arrayCol.count, 0)
+
+        // test defaults values
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false, boolObjectListValues: [])
 
         // test realm properties are nil for standalone
         XCTAssertNil(object.realm)
@@ -45,28 +39,18 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithDictionaryLiteral() {
         // dictionary with all values specified
-        let date = NSDate(timeIntervalSince1970: 2)
-        let data = "b".dataUsingEncoding(NSUTF8StringEncoding)!
-        let boolObj = SwiftBoolObject(object: [true])
-        let object = SwiftObject(object: ["boolCol": true,
-            "intCol": 1,
-            "floatCol": 1.1 as Float,
-            "doubleCol": 11.1,
-            "stringCol": "b",
-            "binaryCol": data,
-            "dateCol": date,
-            "objectCol": SwiftBoolObject(object: [true]),
-            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]
-        ])
-        XCTAssertEqual(object.boolCol, true)
-        XCTAssertEqual(object.intCol, 1)
-        XCTAssertEqual(object.floatCol, 1.1 as Float)
-        XCTAssertEqual(object.doubleCol, 11.1)
-        XCTAssertEqual(object.stringCol, "b")
-        XCTAssertEqual(object.binaryCol, data)
-        XCTAssertEqual(object.dateCol, date)
-        XCTAssertEqual(object.objectCol.boolCol, true)
-        XCTAssertEqual(object.arrayCol.count, 2)
+        let value: [String: AnyObject] = ["boolCol": true as NSNumber,
+            "intCol": 1 as NSNumber,
+            "floatCol": 1.1 as NSNumber,
+            "doubleCol": 11.1 as NSNumber,
+            "stringCol": "b" as NSString,
+            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+            "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
+            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]  as AnyObject
+        ]
+        let object = SwiftObject(object: value)
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: value, boolObjectValue: true, boolObjectListValues: [false, false])
     }
 
     func testInitWithDefaultsAndDictionaryLiteral() {
@@ -80,17 +64,9 @@ class ObjectCreationTests: TestCase {
         // test with array literal
         let date = NSDate(timeIntervalSince1970: 2)
         let data = "b".dataUsingEncoding(NSUTF8StringEncoding)!
-        let arrayObject = SwiftObject(object: [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true], [[true], [false]]])
-        XCTAssertEqual(arrayObject.boolCol, true)
-        XCTAssertEqual(arrayObject.intCol, 1)
-        XCTAssertEqual(arrayObject.floatCol, 1.1 as Float)
-        XCTAssertEqual(arrayObject.doubleCol, 11.1)
-        XCTAssertEqual(arrayObject.stringCol, "b")
-        XCTAssertEqual(arrayObject.binaryCol, data)
-        XCTAssertEqual(arrayObject.dateCol, date)
-        XCTAssertEqual(arrayObject.objectCol.boolCol, true)
-        XCTAssertEqual(arrayObject.arrayCol.count, 2)
-        XCTAssertEqual(arrayObject.arrayCol[0].boolCol, true)
+        let value = [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true], [[true], [false]]]
+        let arrayObject = SwiftObject(object: value)
+        verifySwiftObjectWithArrayLiteral(arrayObject, array: value, boolObjectValue: true, boolObjectListValues: [true, false])
 
         // test with invalid array literals
         assertThrows(SwiftObject(object: [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true]]), "Missing properties")
@@ -117,17 +93,9 @@ class ObjectCreationTests: TestCase {
             object = realm.create(SwiftObject.self)
             return
         }
-        XCTAssertEqual(object.boolCol, false)
-        XCTAssertEqual(object.intCol, 123)
-        XCTAssertEqual(object.floatCol, 1.23 as Float)
-        XCTAssertEqual(object.doubleCol, 12.3)
-        XCTAssertEqual(object.stringCol, "a")
-        XCTAssertEqual(object.binaryCol, SwiftObject.defaultBinaryCol())
-        XCTAssertEqual(object.dateCol, SwiftObject.defaultDateCol())
-        XCTAssertEqual(object.objectCol.boolCol, false)
-        XCTAssertEqual(object.arrayCol.count, 0)
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false, boolObjectListValues: [])
 
-        // test realm properties
+        // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
         XCTAssertEqual(object.objectCol.realm!, realm)
         XCTAssertEqual(object.arrayCol.realm!, realm)
@@ -138,10 +106,7 @@ class ObjectCreationTests: TestCase {
         let date = NSDate(timeIntervalSince1970: 2)
         let data = "b".dataUsingEncoding(NSUTF8StringEncoding)!
         let boolObj = SwiftBoolObject(object: [true])
-
-        let realm = Realm()
-        realm.beginWrite()
-        let object = realm.create(SwiftObject.self, value: ["boolCol": true,
+        let dict = ["boolCol": true,
             "intCol": 1,
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
@@ -149,21 +114,25 @@ class ObjectCreationTests: TestCase {
             "binaryCol": data,
             "dateCol": date,
             "objectCol": SwiftBoolObject(object: [true]),
-            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]])
+            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]]
+
+        let realm = Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftObject.self, value: dict)
         realm.commitWrite()
 
-        XCTAssertEqual(object.boolCol, true)
-        XCTAssertEqual(object.intCol, 1)
-        XCTAssertEqual(object.floatCol, 1.1 as Float)
-        XCTAssertEqual(object.doubleCol, 11.1)
-        XCTAssertEqual(object.stringCol, "b")
-        XCTAssertEqual(object.binaryCol, data)
-        XCTAssertEqual(object.dateCol, date)
-        XCTAssertEqual(object.objectCol.boolCol, true)
-        XCTAssertEqual(object.arrayCol.count, 2)
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: dict, boolObjectValue: true, boolObjectListValues: [false, false])
     }
 
     func testCreateWithDefaultsAndDictionaryLiteral() {
+        // test with dictionary with mix of default and one specified value
+        let realm = Realm()
+        realm.beginWrite()
+        let objectWithInt = realm.create(SwiftObject.self, value: ["intCol": 200])
+        realm.commitWrite()
+
+        XCTAssertEqual(objectWithInt.intCol, 200)
+        XCTAssertEqual(objectWithInt.stringCol, "a")
     }
 
     func testCreateWithArrayLiteral() {
@@ -186,6 +155,9 @@ class ObjectCreationTests: TestCase {
 
     // test NSNull for object
     // test NSNull for list
+    // test null object
+    // test null list
+    // test literals with standalone objects
     // test literals with existing objects
     // test literals with existing lists
 
@@ -194,5 +166,35 @@ class ObjectCreationTests: TestCase {
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {
+    }
+
+    // MARK: Private utilities
+    private func verifySwiftObjectWithArrayLiteral(object: SwiftObject, array: [AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
+        XCTAssertEqual(object.boolCol, array[0] as Bool)
+        XCTAssertEqual(object.intCol, array[1] as Int)
+        XCTAssertEqual(object.floatCol, array[2] as Float)
+        XCTAssertEqual(object.doubleCol, array[3] as Double)
+        XCTAssertEqual(object.stringCol, array[4] as String)
+        XCTAssertEqual(object.binaryCol, array[5] as NSData)
+        XCTAssertEqual(object.dateCol, array[6] as NSDate)
+        XCTAssertEqual(object.objectCol.boolCol, boolObjectValue)
+        XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        for i in 0..<boolObjectListValues.count {
+            XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+        }
+    }
+    private func verifySwiftObjectWithDictionaryLiteral(object: SwiftObject, dictionary: [String:AnyObject], boolObjectValue: Bool, boolObjectListValues: [Bool]) {
+        XCTAssertEqual(object.boolCol, dictionary["boolCol"] as Bool)
+        XCTAssertEqual(object.intCol, dictionary["intCol"] as Int)
+        XCTAssertEqual(object.floatCol, dictionary["floatCol"] as Float)
+        XCTAssertEqual(object.doubleCol, dictionary["doubleCol"] as Double)
+        XCTAssertEqual(object.stringCol, dictionary["stringCol"] as String)
+        XCTAssertEqual(object.binaryCol, dictionary["binaryCol"] as NSData)
+        XCTAssertEqual(object.dateCol, dictionary["dateCol"] as NSDate)
+        XCTAssertEqual(object.objectCol.boolCol, boolObjectValue)
+        XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        for i in 0..<boolObjectListValues.count {
+            XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+        }
     }
 }
