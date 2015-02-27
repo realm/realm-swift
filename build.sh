@@ -631,6 +631,7 @@ EOF
         ;;
 
     *)
+        echo "Unknown command '$COMMAND'"
         usage
         exit 1
         ;;
