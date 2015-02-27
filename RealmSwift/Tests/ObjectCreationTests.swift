@@ -55,9 +55,10 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithDefaultsAndDictionaryLiteral() {
         // test with dictionary with mix of default and one specified value
-        let objectWithInt = SwiftObject(object: ["intCol": 200])
-        XCTAssertEqual(objectWithInt.intCol, 200)
-        XCTAssertEqual(objectWithInt.stringCol, "a")
+        let object = SwiftObject(object: ["intCol": 200])
+        var valueDict = SwiftObject.defaultValues()
+        valueDict["intCol"] = 200
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
     func testInitWithArrayLiteral() {
@@ -77,7 +78,9 @@ class ObjectCreationTests: TestCase {
         // test with kvc object
         let objectWithInt = SwiftObject(object: ["intCol": 200])
         let objectWithKVCObject = SwiftObject(object: objectWithInt)
-        XCTAssertEqual(objectWithKVCObject.intCol, 200)
+        var valueDict = SwiftObject.defaultValues()
+        valueDict["intCol"] = 200
+        verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
     // MARK: Creation tests
@@ -131,8 +134,9 @@ class ObjectCreationTests: TestCase {
         let objectWithInt = realm.create(SwiftObject.self, value: ["intCol": 200])
         realm.commitWrite()
 
-        XCTAssertEqual(objectWithInt.intCol, 200)
-        XCTAssertEqual(objectWithInt.stringCol, "a")
+        var valueDict = SwiftObject.defaultValues()
+        valueDict["intCol"] = 200
+        verifySwiftObjectWithDictionaryLiteral(objectWithInt, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
     func testCreateWithArrayLiteral() {
