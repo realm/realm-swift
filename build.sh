@@ -334,8 +334,8 @@ case "$COMMAND" in
 
     "verify-osx")
         CONFIGURATION="$CONFIGURATION" sh build.sh test-osx
-        CONFIGURATION="$CONFIGURATION" sh build.sh test-browse
-        CONFIGURATION="$CONFIGURATION" sh build.sh examples-os
+        CONFIGURATION="$CONFIGURATION" sh build.sh test-browser
+        CONFIGURATION="$CONFIGURATION" sh build.sh examples-osx
 
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
