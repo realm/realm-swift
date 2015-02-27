@@ -37,7 +37,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertNil(object.arrayCol.realm)
     }
 
-    func testInitWithDictionaryLiteral() {
+    func testInitWithDictionary() {
         // dictionary with all values specified
         let valueCreator =  {
            ["boolCol": true as NSNumber,
@@ -48,52 +48,64 @@ class ObjectCreationTests: TestCase {
             "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
             "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
             "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
-            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]  as AnyObject
+            "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject
            ]
         }
-        let value = valueCreator()
-        let object = SwiftObject(object: value)
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: value, boolObjectValue: true, boolObjectListValues: [false, false])
 
-        // TODO - test all valid value types for each property type (list and object)
+        // test with valid dictionary literals
+        let props = Realm().schema["SwiftObject"]!.properties
+        for propNum in 0..<props.count {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with valid value and init
+                var values = valueCreator()
+                values[props[propNum].name] = validValue
+                let object = SwiftObject(object: values)
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+            }
+        }
 
         // test with invalid dictionary literals
-        let invalidValues = ["invalid", "invalid", "invalid", "invalid", 0x17A71D, "invalid", "invalid", "invalid", "invalid"]
-        let props = object.objectSchema.properties
         for propNum in 0..<props.count {
-            var invalidValue = valueCreator()
-            invalidValue[props[propNum].name] = invalidValues[propNum]
-            assertThrows(SwiftObject(object: invalidValue), "Invalid property value")
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with invalid value and init
+                var values = valueCreator()
+                values[props[propNum].name] = invalidValue
+                assertThrows(SwiftObject(object: values), "Invalid property value")
+            }
         }
     }
 
-    func testInitWithDefaultsAndDictionaryLiteral() {
+    func testInitWithDefaultsAndDictionary() {
         // test with dictionary with mix of default and one specified value
         let object = SwiftObject(object: ["intCol": 200])
         var valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
-    func testInitWithArrayLiteral() {
-        // test with array literal
-        let date = NSDate(timeIntervalSince1970: 2)
-        let data = "b".dataUsingEncoding(NSUTF8StringEncoding)!
-        let valueCreator = { [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true], [[true], [false]]] }
-        let value = valueCreator()
-        let arrayObject = SwiftObject(object: value)
-        verifySwiftObjectWithArrayLiteral(arrayObject, array: value, boolObjectValue: true, boolObjectListValues: [true, false])
+    func testInitWithArray() {
+        // array with all values specified
+        let valueCreator = { [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject] }
 
-        // TODO - test all valid value types for each property type (list and object)
-
-        // test with invalid array literals
-        assertThrows(SwiftObject(object: [true, 1, 1.1, 11.1, "b", data, date, ["boolCol": true]]), "Missing properties")
-
-        let invalidValues = ["invalid", "invalid", "invalid", "invalid", 0x17A71D, "invalid", "invalid", "invalid", "invalid"]
-        let props = arrayObject.objectSchema.properties
+        // test with valid dictionary literals
+        let props = Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            var invalidValue = valueCreator()
-            invalidValue[propNum] = invalidValues[propNum]
-            assertThrows(SwiftObject(object: invalidValue), "Invalid property value")
+            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with valid value and init
+                var values = valueCreator()
+                values[propNum] = validValue
+                let object = SwiftObject(object: values)
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+            }
+        }
+
+        // test with invalid dictionary literals
+        for propNum in 0..<props.count {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with invalid value and init
+                var values = valueCreator()
+                values[propNum] = invalidValue
+                assertThrows(SwiftObject(object: values), "Invalid property value")
+            }
         }
     }
 
@@ -127,30 +139,50 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.arrayCol.realm!, realm)
     }
 
-    func testCreateWithDictionaryLiteral() {
-        // test create with partial dictionary literal
-        let date = NSDate(timeIntervalSince1970: 2)
-        let data = "b".dataUsingEncoding(NSUTF8StringEncoding)!
-        let boolObj = SwiftBoolObject(object: [true])
-        let dict = ["boolCol": true,
-            "intCol": 1,
-            "floatCol": 1.1 as Float,
-            "doubleCol": 11.1,
-            "stringCol": "b",
-            "binaryCol": data,
-            "dateCol": date,
-            "objectCol": SwiftBoolObject(object: [true]),
-            "arrayCol": [SwiftBoolObject(), SwiftBoolObject()]]
+    func testCreateWithDictionary() {
+        // dictionary with all values specified
+        let valueCreator =  {
+            ["boolCol": true as NSNumber,
+                "intCol": 1 as NSNumber,
+                "floatCol": 1.1 as NSNumber,
+                "doubleCol": 11.1 as NSNumber,
+                "stringCol": "b" as NSString,
+                "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+                "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+                "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
+                "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject
+            ]
+        }
 
-        let realm = Realm()
-        realm.beginWrite()
-        let object = realm.create(SwiftObject.self, value: dict)
-        realm.commitWrite()
+        // test with valid dictionary literals
+        let props = Realm().schema["SwiftObject"]!.properties
+        for propNum in 0..<props.count {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with valid value and init
+                var values = valueCreator()
+                values[props[propNum].name] = validValue
+                Realm().beginWrite()
+                let object = Realm().create(SwiftObject.self, value: values)
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                Realm().commitWrite()
+                verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+            }
+        }
 
-        verifySwiftObjectWithDictionaryLiteral(object, dictionary: dict, boolObjectValue: true, boolObjectListValues: [false, false])
+        // test with invalid dictionary literals
+        for propNum in 0..<props.count {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with invalid value and init
+                var values = valueCreator()
+                values[props[propNum].name] = invalidValue
+                Realm().beginWrite()
+                assertThrows(Realm().create(SwiftObject.self, value: values), "Invalid property value")
+                Realm().cancelWrite()
+            }
+        }
     }
 
-    func testCreateWithDefaultsAndDictionaryLiteral() {
+    func testCreateWithDefaultsAndDictionary() {
         // test with dictionary with mix of default and one specified value
         let realm = Realm()
         realm.beginWrite()
@@ -161,7 +193,37 @@ class ObjectCreationTests: TestCase {
         verifySwiftObjectWithDictionaryLiteral(objectWithInt, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
 
-    func testCreateWithArrayLiteral() {
+    func testCreateWithArray() {
+        // array with all values specified
+        let valueCreator = { [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject] }
+
+        // test with valid dictionary literals
+        let props = Realm().schema["SwiftObject"]!.properties
+        for propNum in 0..<props.count {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with valid value and init
+                var values = valueCreator()
+                values[propNum] = validValue
+                Realm().beginWrite()
+                let object = Realm().create(SwiftObject.self, value: values)
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+                Realm().commitWrite()
+                verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
+            }
+        }
+
+        // test with invalid array literals
+        for propNum in 0..<props.count {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+                // update dict with invalid value and init
+                var values = valueCreator()
+                values[propNum] = invalidValue
+
+                Realm().beginWrite()
+                assertThrows(Realm().create(SwiftObject.self, value: values), "Invalid property value '\(invalidValue)' for property number \(propNum)")
+                Realm().cancelWrite()
+            }
+        }
     }
 
     func testCreateWithKVCObject() {
@@ -232,4 +294,38 @@ class ObjectCreationTests: TestCase {
         }
         return valueDict
     }
+
+    // return an array of valid values that can be used to initialize each type
+    private func validValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
+        switch type {
+            case .Bool:     return [true]
+            case .Int:      return [1 as Int]
+            case .Float:    return [1 as Int, 1.1 as Float, 11.1 as Double]
+            case .Double:   return [1 as Int, 1.1 as Float, 11.1 as Double]
+            case .String:   return ["b"]
+            case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
+            case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
+            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(object: [true])]
+            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(object: [true]), SwiftBoolObject(object: [false])]]
+            case .Any:      XCTFail("not supported")
+        }
+        return []
+    }
+
+    private func invalidValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
+        switch type {
+            case .Bool:     return ["invalid"] // 1 as Int, 2 as Int, 1.1 as Float, 11.1 as Double]
+            case .Int:      return ["invalid", true, false, 1.1 as Float, 11.1 as Double]
+            case .Float:    return ["invalid", true, false]
+            case .Double:   return ["invalid", true, false]
+            case .String:   return [0x197A71D, true, false]
+            case .Data:     return ["invalid"]
+            case .Date:     return ["invalid"]
+            case .Object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
+            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]]]
+            case .Any:      XCTFail("not supported")
+        }
+        return []
+    }
 }
+

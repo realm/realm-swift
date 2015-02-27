@@ -97,10 +97,14 @@ class ObjectSchemaInitializationTests: TestCase {
         let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self) // Should be able to get a schema for a non-RLMObjectBase subclass
         XCTAssertEqual(schema.properties.count, 1)
 
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
-        RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self) // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
-        RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self) // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        // FIXME - disable any and make sure this fails
+        RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
+
+        RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
     }
 
     func testPrimaryKey() {
@@ -133,6 +137,10 @@ class SwiftFakeObject : NSObject {
 
 class SwiftObjectWithNSURL : SwiftFakeObject {
     dynamic var URL: NSURL = NSURL(string: "http://realm.io")!
+}
+
+class SwiftObjectWithAnyObject : SwiftFakeObject {
+    dynamic var anyObject: AnyObject = NSString(string: "")
 }
 
 enum SwiftEnum {
@@ -174,3 +182,4 @@ class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
         return ["boolCol", "intCol", "floatCol", "doubleCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
     }
 }
+
