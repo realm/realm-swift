@@ -21,9 +21,57 @@ import RealmSwift
 import Foundation
 
 class ObjectAccessorTests: TestCase {
+    func setAndTestAllProperties(object: SwiftObject) {
+        object.boolCol = true
+        XCTAssertEqual(object.boolCol, true)
+        object.boolCol = false
+        XCTAssertEqual(object.boolCol, false)
+
+        object.intCol = -1
+        XCTAssertEqual(object.intCol, -1)
+        object.intCol = 0
+        XCTAssertEqual(object.intCol, 0)
+        object.intCol = 1
+        XCTAssertEqual(object.intCol, 1)
+
+        object.floatCol = 20
+        XCTAssertEqual(object.floatCol, 20 as Float)
+        object.floatCol = 20.2
+        XCTAssertEqual(object.floatCol, 20.2 as Float)
+
+        object.doubleCol = 20
+        XCTAssertEqual(object.doubleCol, 20)
+        object.doubleCol = 20.2
+        XCTAssertEqual(object.doubleCol, 20.2)
+
+        object.stringCol = ""
+        XCTAssertEqual(object.stringCol, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        object.stringCol = utf8TestString
+        XCTAssertEqual(object.stringCol, utf8TestString)
+
+        let data = "b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+        object.binaryCol = data
+        XCTAssertEqual(object.binaryCol, data)
+
+        let date = NSDate(timeIntervalSinceReferenceDate: 2) as NSDate
+        object.dateCol = date
+        XCTAssertEqual(object.dateCol, date)
+
+        object.objectCol = SwiftBoolObject(object: [true])
+        XCTAssertEqual(object.objectCol.boolCol, true)
+    }
+
     func testStandaloneAccessors() {
+        var object = SwiftObject()
+        setAndTestAllProperties(object)
     }
 
     func testPersistedAccessors() {
+        var object = SwiftObject()
+        Realm().beginWrite()
+        Realm().create(SwiftObject.self)
+        setAndTestAllProperties(object)
+        Realm().commitWrite()
     }
 }
