@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestObjects.h"
-#import "RLMTestCase.h"
 #import "RLMPredicateUtil.h"
 
 @implementation RLMPredicateUtil

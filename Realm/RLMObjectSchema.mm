@@ -26,9 +26,6 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
-
-#import <tightdb/group.hpp>
 
 @interface RLMObjectBase (Swift)
 + (NSArray *)getGenericListPropertyNames:(id)obj;

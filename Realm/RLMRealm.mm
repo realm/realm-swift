@@ -26,12 +26,9 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
-#import "RLMUtil.hpp"
 
-#include <sys/types.h>
 #include <sys/sysctl.h>
 
-#include <tightdb/version.hpp>
 #include <tightdb/commit_log.hpp>
 
 // Notification Token

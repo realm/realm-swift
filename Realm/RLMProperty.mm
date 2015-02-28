@@ -21,7 +21,6 @@
 #import "RLMArray.h"
 #import "RLMObject.h"
 #import "RLMSchema_Private.h"
-#import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 @implementation RLMProperty {
