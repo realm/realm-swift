@@ -26,7 +26,6 @@
 
 #import "RLMObjectStore.h"
 #import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
 
 @implementation RLMObjectBase
 

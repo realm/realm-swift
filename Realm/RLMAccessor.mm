@@ -25,9 +25,6 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMUtil.hpp"
-
-#import <objc/runtime.h>
 
 // verify attached
 static inline void RLMVerifyAttached(__unsafe_unretained RLMObjectBase *const obj) {

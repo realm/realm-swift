@@ -22,7 +22,6 @@
 #import "RLMObjectStore.h"
 #import "RLMObjectSchema.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
 #import <tightdb/link_view.hpp>

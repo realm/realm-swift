@@ -25,10 +25,8 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
-#import "RLMSchema_Private.h"
 
 #import <algorithm>
-#import <objc/runtime.h>
 
 @interface SchemaTestClassBase : RLMObject
 @property IntObject *baseCol;

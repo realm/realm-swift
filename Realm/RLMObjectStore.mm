@@ -27,7 +27,6 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMUtil.hpp"
 
 #import <objc/message.h>
 
