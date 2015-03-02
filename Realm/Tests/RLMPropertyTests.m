@@ -23,10 +23,10 @@
     RLMProperty *property = object.objectSchema[@"objectCol"];
 
     XCTAssertEqualObjects(property.description, @"objectCol {\n"
-                                                @"\ttype = object\n"
-                                                @"\tobjectClassName = StringObject\n"
-                                                @"\tindexed = NO\n"
-                                                @"\tisPrimary = NO\n"
+                                                @"\ttype = object;\n"
+                                                @"\tobjectClassName = StringObject;\n"
+                                                @"\tindexed = NO;\n"
+                                                @"\tisPrimary = NO;\n"
                                                 @"}");
 }
 
