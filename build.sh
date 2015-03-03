@@ -31,25 +31,25 @@ cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  download-core:           downloads core library (binary version)
-  clean:                   clean up/remove all generated files
-  build: [settings]        builds iOS and OS X frameworks
-  ios: [settings]          builds iOS frameworks
-  ios-dynamic: [settings]  builds iOS dynamic frameworks
-  ios-static: [settings]   builds a fat iOS static framework
-  osx: [settings]          builds OS X framework
-  test-ios: [settings]     tests iOS framework
-  test-ios-devices:        tests iOS on all attached iOS devices
-  test-osx: [settings]     tests OSX framework
-  test: [settings]         tests iOS and OS X frameworks
-  test-all: [settings]     tests iOS and OS X frameworks with debug and release configurations
-  examples: [settings]     builds all examples in examples/
-  browser: [settings]      builds the Realm Browser OSX app
-  test-browser: [settings] tests the Realm Browser OSX app
-  verify: [settings]       cleans, removes docs/output/, then runs docs, test-all, examples & browser
-  docs:                    builds docs in docs/output
-  get-version:             get the current version
-  set-version version:     set the version
+  download-core:               downloads core library (binary version)
+  clean:                       clean up/remove all generated files
+  build [settings]:            builds iOS and OS X frameworks
+  ios [settings]:              builds iOS frameworks
+  ios-dynamic [settings]:      builds iOS dynamic frameworks
+  ios-static [settings]:       builds a fat iOS static framework
+  osx [settings]:              builds OS X framework
+  test-ios [settings]:         tests iOS framework
+  test-ios-devices [settings]: tests iOS on all attached iOS devices
+  test-osx [settings]:         tests OSX framework
+  test [settings]:             tests iOS and OS X frameworks
+  test-all [settings]:         tests iOS and OS X frameworks with debug and release configurations
+  examples [settings]:         builds all examples in examples/
+  browser [settings]:          builds the Realm Browser OSX app
+  test-browser [settings]:     tests the Realm Browser OSX app
+  verify [settings]:           cleans, removes docs/output/, then runs docs, test-all, examples & browser
+  docs:                        builds docs in docs/output
+  get-version:                 get the current version
+  set-version version:         set the version
 
 argument:
   version: version in the x.y.z format
