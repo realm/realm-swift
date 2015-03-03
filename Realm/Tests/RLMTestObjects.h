@@ -93,7 +93,7 @@ RLM_ARRAY_TYPE(IntObject)
 @property NSData       *binaryCol;
 @property NSDate       *dateCol;
 @property bool          cBoolCol;
-@property int64_t     longCol;
+@property int64_t       longCol;
 @property id            mixedCol;
 @property StringObject *objectCol;
 
