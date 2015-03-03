@@ -333,9 +333,9 @@ case "$COMMAND" in
         ;;
 
     "verify-osx")
-        CONFIGURATION="$CONFIGURATION" sh build.sh test-osx
-        CONFIGURATION="$CONFIGURATION" sh build.sh test-browser
-        CONFIGURATION="$CONFIGURATION" sh build.sh examples-osx
+        sh build.sh test-osx
+        sh build.sh test-browser
+        sh build.sh examples-osx
 
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
@@ -346,13 +346,13 @@ case "$COMMAND" in
 
     # FIXME: make no-op in al-swift
     "verify-ios")
-        CONFIGURATION="$CONFIGURATION" sh build.sh test-ios
-        CONFIGURATION="$CONFIGURATION" sh build.sh examples-ios
+        sh build.sh test-ios
+        sh build.sh examples-ios
         exit 0
         ;;
 
     "verify-ios-device")
-        CONFIGURATION="$CONFIGURATION" sh build.sh test-ios-devices
+        sh build.sh test-ios-devices
         exit 0
         ;;
 
@@ -390,9 +390,9 @@ case "$COMMAND" in
     # Examples
     ######################################
     "examples")
-        CONFIGURATION="$CONFIGURATION" sh build.sh clean
-        CONFIGURATION="$CONFIGURATION" sh build.sh examples-ios
-        CONFIGURATION="$CONFIGURATION" sh build.sh examples-osx
+        sh build.sh clean
+        sh build.sh examples-ios
+        sh build.sh examples-osx
         exit 0
         ;;
 
