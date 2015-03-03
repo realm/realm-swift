@@ -57,12 +57,13 @@ void RLMClearRealmCache() {
     }
 }
 
-// Convert 'return -1 and set errno' error reporting to exception throws
-static int checkError(int ret) {
-    if (ret < 0 && errno != EEXIST) {
-        @throw RLMException(@(strerror(errno)));
+// Convert an error code to either an NSError or an exception
+static id handleError(int err, NSError **error) {
+    if (!error) {
+        @throw RLMException(@(strerror(err)));
     }
-    return ret;
+    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil];
+    return nil;
 }
 
 // Write a byte to a pipe to notify anyone waiting for data on the pipe
@@ -149,25 +150,40 @@ public:
     FdHolder _shutdownWriteFd;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm {
+- (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error {
     self = [super init];
     if (self) {
         _realm = realm;
         _runLoop = CFRunLoopGetCurrent();
-        _kq = checkError(kqueue());
+        _kq = kqueue();
+        if (_kq == -1) {
+            return handleError(errno, error);
+        }
 
         const char *path = [realm.path stringByAppendingString:@".note"].UTF8String;
 
         // Create and open the named pipe
-        checkError(mkfifo(path, 0600));
-        _notifyFd = checkError(open(path, O_RDWR));
+        int ret = mkfifo(path, 0600);
+        if (ret == -1 && errno != EEXIST) {
+            return handleError(errno, error);
+        }
+
+        _notifyFd = open(path, O_RDWR);
+        if (_notifyFd == -1) {
+            return handleError(errno, error);
+        }
+
         // Make writing to the pipe return -1 when the pipe's buffer is full
         // rather than blocking until there's space available
         fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
 
         // Create the anonymous pipe
         int pipeFd[2];
-        checkError(pipe(pipeFd));
+        ret = pipe(pipeFd);
+        if (ret == -1) {
+            return handleError(errno, error);
+        }
+
         _shutdownReadFd = pipeFd[0];
         _shutdownWriteFd = pipeFd[1];
 

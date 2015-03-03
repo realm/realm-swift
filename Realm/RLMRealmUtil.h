@@ -32,7 +32,7 @@ void RLMClearRealmCache();
 @interface RLMNotifier : NSObject
 // listens to changes to the realm's file and notifies it when they occur
 // does not retain the Realm
-- (instancetype)initWithRealm:(RLMRealm *)realm;
+- (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error;
 // stop listening for changes
 - (void)stop;
 // notify other Realm instances for the same path that a change has occurred
