@@ -1050,10 +1050,10 @@
 				E8D89B971955FC6D00CF2B9A /* OSX */,
 				E8D89BA21955FC6D00CF2B9A /* OSX Tests */,
 				E856D1D4195614A300FB2FCF /* iOS */,
-				3F6B894319EF3C06004E8EA8 /* iOS 8 */,
 				E856D1DE195614A400FB2FCF /* iOS Tests */,
-				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
+				3F6B894319EF3C06004E8EA8 /* iOS 8 */,
 				3F512D8919F9A1F300746016 /* iOS 8 Tests */,
+				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 			);
 		};
@@ -1454,7 +1454,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Realm/Tests/TestHost/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1469,7 +1468,6 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/Realm/Tests/TestHost/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1629,7 +1627,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1647,7 +1644,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1677,7 +1673,6 @@
 				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = staticlib;
@@ -1708,7 +1703,6 @@
 				);
 				INFOPLIST_FILE = "Realm/Realm-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = staticlib;
@@ -1738,7 +1732,6 @@
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-fobjc-arc-exceptions";
@@ -1763,7 +1756,6 @@
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-fobjc-arc-exceptions";
@@ -1818,6 +1810,7 @@
 					"$(inherited)",
 					core/include,
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				METAL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1866,6 +1859,7 @@
 					"$(inherited)",
 					core/include,
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				METAL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "";
@@ -1895,7 +1889,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = Realm;
@@ -1924,7 +1917,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
 				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = Realm;
