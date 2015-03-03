@@ -11,6 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* Added support for bulk operations with `setValue:forKey:` to RLMResults.
 * The bowser will no longer show objects that have no persisted properties.
 
 ### Bugfixes

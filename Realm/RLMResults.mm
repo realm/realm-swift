@@ -22,6 +22,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+#import "RLMProperty_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMConstants.h"
@@ -402,6 +403,155 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
     }
 }
 
+static inline size_t RLMAddLinkedObject(__unsafe_unretained RLMObject *link,
+                                        __unsafe_unretained RLMRealm *realm,
+                                        __unsafe_unretained NSString *objectClassName) {
+    if (link.isInvalidated) {
+        @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
+    }
+    
+    // make sure it is the correct type
+    if (![objectClassName isEqualToString:link.objectSchema.className]) {
+        NSString *reason = [NSString stringWithFormat:@"Can't set object of type '%@' to property of type '%@'", link.objectSchema.className, objectClassName];
+        @throw RLMException(reason);
+    }
+    
+    if (link.realm != realm) {
+        [realm addObject:link];
+    }
+    
+    return link->_row.get_index();
+}
+
+template<typename TableType>
+static void setProperty(TableType& table, RLMRealm *realm, id value, NSString *objectClassName, NSString *property) {
+    
+    // Check that this is a valid property
+    RLMObjectSchema *desc = realm.schema[objectClassName];
+    RLMProperty *prop = desc[property];
+    if (!prop) {
+        @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                       reason:@"No property of that name"
+                                     userInfo:nil];
+    }
+    
+    // Check not primary key
+    if (prop.isPrimary) {
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"Primary key properties cannot be bulk updated"
+                                         userInfo:nil];
+    }
+    
+    size_t table_size = table.size();
+    if (table_size == 0) {
+        return;
+    }
+    
+    NSUInteger colIndex = RLMValidatedColumnIndex(realm.schema[objectClassName], property);
+    RLMPropertyType colType = RLMPropertyType(table.get_column_type(colIndex));
+    
+    switch (colType) {
+        case RLMPropertyTypeBool:
+        {
+            bool val = [value boolValue];
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_bool(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeInt:
+        {
+            int64_t val = [value longLongValue];
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_int(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeFloat:
+        {
+            float val = [value floatValue];
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_float(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeDouble:
+        {
+            double val = [value doubleValue];
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_double(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeDate:
+        {
+            std::time_t time = ((NSDate*)value).timeIntervalSince1970;
+            tightdb::DateTime val(time);
+            
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_datetime(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeString:
+        {
+            tightdb::StringData val = RLMStringDataWithNSString(value);
+            
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_string(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeData:
+        {
+            tightdb::BinaryData val = RLMBinaryDataForNSData(value);
+            
+            for (size_t i = 0; i < table_size; ++i) {
+                table.set_binary(colIndex, i, val);
+            }
+            break;
+        }
+        case RLMPropertyTypeObject:
+        {
+            if (!value || value == NSNull.null) {
+                // if null
+                for (size_t i = 0; i < table_size; ++i) {
+                    table.nullify_link(colIndex, i);
+                }
+            }
+            else {
+                RLMObject *obj = (RLMObject *)value;
+                size_t obj_ref = RLMAddLinkedObject(obj, realm, prop.objectClassName);
+                
+                for (size_t i = 0; i < table_size; ++i) {
+                    table.set_link(colIndex, i, obj_ref);
+                }
+            }
+            break;
+        }
+        case RLMPropertyTypeArray:
+        {
+            id<NSFastEnumeration> array = value;
+            for (size_t i = 0; i < table_size; ++i) {
+                tightdb::LinkViewRef linkView = table.get(i).get_linklist(colIndex);
+                linkView->clear();
+                
+                for (RLMObject *link in array) {
+                    size_t obj_ref = RLMAddLinkedObject(link, realm, prop.objectClassName);
+                    linkView->add(obj_ref);
+                }
+            }
+            break;
+        }
+
+        default:
+            @throw [NSException exceptionWithName:@"RLMOperationNotSupportedException"
+                                           reason:@"invalid property type for bulk operation"
+                                         userInfo:nil];
+    }
+}
+
+
 -(NSNumber *)averageOfProperty:(NSString *)property {
     RLMResultsValidate(self);
     return averageOfProperty(_backingView, _realm, _objectClassName, property);
@@ -460,6 +610,11 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (NSUInteger)indexInSource:(NSUInteger)index {
     return _backingView.get_source_ndx(index);
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMResultsValidateInWriteTransaction(self);
+    setProperty(_backingView, _realm, value, _objectClassName, key);
 }
 
 @end
@@ -528,6 +683,12 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 - (NSUInteger)indexInSource:(NSUInteger)index {
     return index;
 }
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMResultsValidateInWriteTransaction(self);
+    setProperty(*_table, _realm, value, _objectClassName, key);
+}
+
 @end
 
 @implementation RLMEmptyResults

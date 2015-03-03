@@ -453,4 +453,197 @@ static vm_size_t get_resident_size() {
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:realm].count);
 }
 
+- (void)testBulkOperations
+{
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    // Create initial dataset
+    NSArray *testData = @[@NO, @2, @2.2f, @2.22, @"", [NSData dataWithBytes:"b" length:1], NSDate.date, @NO, @22, @0, NSNull.null];
+    [realm transactionWithBlock:^{
+        for (size_t i = 0; i < 20; ++i) {
+            [AllTypesObject createInRealm:realm withObject:testData];
+        }
+        
+        for (size_t i = 0; i < 20; ++i) {
+            [CompanyObject createInRealm:realm withObject:@{@"name": @"company"}];
+        }
+    }];
+    
+    RLMResults *all = [AllTypesObject allObjectsInRealm:realm];
+    XCTAssertEqual(20U, all.count);
+    
+    RLMResults *allCompanies = [CompanyObject allObjectsInRealm:realm];
+    XCTAssertEqual(20U, allCompanies.count);
+    
+    // Test bulk setting values in tables
+    {
+        XCTAssertThrows([all setValue:@YES forKey:@"boolCol"], @"Bulk operations outside a transaction should throw");
+        
+        // Bulk set booleans
+        [realm transactionWithBlock:^{
+            [all setValue:@YES forKey:@"boolCol"];
+        }];
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"boolCol == YES"].count);
+        
+        // Bulk set integers
+        [realm transactionWithBlock:^{
+            [all setValue:@5 forKey:@"intCol"];
+        }];
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"intCol == 5"].count);
+        
+        // Bulk set floats
+        [realm transactionWithBlock:^{
+            [all setValue:@0.5f forKey:@"floatCol"];
+        }];
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"floatCol == 0.5"].count);
+        
+        // Bulk set doubles
+        [realm transactionWithBlock:^{
+            [all setValue:@1.5f forKey:@"doubleCol"];
+        }];
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"doubleCol == 1.5"].count);
+        
+        // Bulk set dates
+        NSDate *newDate = [NSDate dateWithTimeIntervalSinceNow:5];
+        [realm transactionWithBlock:^{
+            [all setValue:newDate forKey:@"dateCol"];
+        }];
+        XCTAssertEqual(20U, ([AllTypesObject objectsInRealm:realm where:@"dateCol == %@", newDate].count));
+        
+        // Bulk set strings
+        [realm transactionWithBlock:^{
+            [all setValue:@"test" forKey:@"stringCol"];
+        }];
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"stringCol == 'test'"].count);
+        
+        // Bulk set binary
+        NSData *data = [NSData dataWithBytes:"a" length:1];
+        [realm transactionWithBlock:^{
+            [all setValue:data forKey:@"binaryCol"];
+        }];
+        XCTAssertEqual(20U, ([AllTypesObject objectsInRealm:realm where:@"binaryCol == %@", data].count));
+        
+        // Bulk set link
+        StringObject *obj = [[StringObject alloc] init];
+        obj.stringCol = @"Test string";
+        [realm transactionWithBlock:^{
+            [all setValue:obj forKey:@"objectCol"];
+        }];
+        XCTAssertEqual(20U, ([AllTypesObject objectsInRealm:realm where:@"objectCol == %@", obj].count));
+        
+        // Bulk set linklists
+        [realm transactionWithBlock:^{
+            EmployeeObject *e1 = [EmployeeObject createInRealm:realm withObject:@[@"A", @34, @YES]];
+            EmployeeObject *e2 = [EmployeeObject createInRealm:realm withObject:@[@"B", @16, @NO]];
+            NSArray* list = @[e1, e2];
+            
+            [allCompanies setValue:list forKey:@"employees"];
+        }];
+        for (CompanyObject* obj in allCompanies) {
+            XCTAssertEqual(2U, obj.employees.count);
+        }
+    }
+    
+    // For the next test we want to work with a subset of the objects
+    // through a view, so we mark every other object for the query to find.
+    [realm transactionWithBlock:^{
+        for (size_t i = 0; i < all.count; i += 2) {
+            ((AllTypesObject*)all[i]).boolCol = NO;
+        }
+        
+        for (size_t i = 0; i < allCompanies.count; i += 2) {
+            ((CompanyObject*)allCompanies[i]).name = @"B";
+        }
+    }];
+    XCTAssertEqual(10U, [AllTypesObject objectsInRealm:realm where:@"boolCol == YES"].count);
+    
+    // Test bulk setting values in views
+    {
+        RLMResults *view = [AllTypesObject objectsInRealm:realm where:@"boolCol == NO"];
+        XCTAssertEqual(10U, view.count);
+        
+        XCTAssertThrows([view setValue:@YES forKey:@"boolCol"], @"Bulk operations outside a transaction should throw");
+
+        
+        // Bulk set integers
+        [realm transactionWithBlock:^{
+            [view setValue:@10 forKey:@"intCol"];
+        }];
+        XCTAssertEqual(10U, [AllTypesObject objectsInRealm:realm where:@"intCol == 10"].count);
+        
+        // Bulk set floats
+        [realm transactionWithBlock:^{
+            [view setValue:@7.1f forKey:@"floatCol"];
+        }];
+        XCTAssertEqual(10U, [AllTypesObject objectsInRealm:realm where:@"floatCol == 7.1"].count);
+        
+        // Bulk set doubles
+        [realm transactionWithBlock:^{
+            [view setValue:@9.1 forKey:@"doubleCol"];
+        }];
+        XCTAssertEqual(10U, [AllTypesObject objectsInRealm:realm where:@"doubleCol == 9.1"].count);
+        
+        // Bulk set dates
+        NSDate *newDate = [NSDate dateWithTimeIntervalSinceNow:10];
+        [realm transactionWithBlock:^{
+            [view setValue:newDate forKey:@"dateCol"];
+        }];
+        XCTAssertEqual(10U, ([AllTypesObject objectsInRealm:realm where:@"dateCol == %@", newDate].count));
+        
+        // Bulk set strings
+        [realm transactionWithBlock:^{
+            [view setValue:@"more test" forKey:@"stringCol"];
+        }];
+        XCTAssertEqual(10U, [AllTypesObject objectsInRealm:realm where:@"stringCol == 'more test'"].count);
+        
+        // Bulk set binary
+        NSData *data = [NSData dataWithBytes:"c" length:1];
+        [realm transactionWithBlock:^{
+            [view setValue:data forKey:@"binaryCol"];
+        }];
+        XCTAssertEqual(10U, ([AllTypesObject objectsInRealm:realm where:@"binaryCol == %@", data].count));
+        
+        // Bulk set links
+        StringObject *obj = ((AllTypesObject*)view[0]).objectCol;
+        [realm transactionWithBlock:^{
+            [view setValue:NSNull.null forKey:@"objectCol"];
+        }];
+        XCTAssertEqual(10U, ([AllTypesObject objectsInRealm:realm where:@"objectCol == %@", obj].count));
+        [realm transactionWithBlock:^{
+            [view setValue:obj forKey:@"objectCol"];
+        }];
+        XCTAssertEqual(20U, ([AllTypesObject objectsInRealm:realm where:@"objectCol == %@", obj].count));
+        
+        // Bulk set booleans as the last action, as it will change the view
+        // (no more objects will match the query)
+        [realm transactionWithBlock:^{
+            [view setValue:@YES forKey:@"boolCol"];
+        }];
+        XCTAssertEqual(0U, view.count);
+        XCTAssertEqual(20U, [AllTypesObject objectsInRealm:realm where:@"boolCol == YES"].count);
+        
+        
+        RLMResults *view2 = [CompanyObject objectsInRealm:realm where:@"name == 'B'"];
+        
+        // Bulk clear linklists
+        [realm transactionWithBlock:^{
+            [view2 setValue:@[] forKey:@"employees"];
+        }];
+        for (CompanyObject* obj in view2) {
+            XCTAssertEqual(0U, obj.employees.count);
+        }
+        
+        // Bulk set linklists
+        [realm transactionWithBlock:^{
+            EmployeeObject *e1 = [EmployeeObject createInRealm:realm withObject:@[@"C", @40, @YES]];
+            NSArray* list = @[e1];
+            
+            [view2 setValue:list forKey:@"employees"];
+        }];
+        for (CompanyObject* obj in view2) {
+            XCTAssertEqual(1U, obj.employees.count);
+        }
+    }
+}
+
 @end

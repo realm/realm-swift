@@ -225,6 +225,16 @@
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
+/**
+ Bulk update values by invoking `setValue:forKey:` on each of the array's items using the specified `value` and `key`.
+ 
+ @warning This method can only be called during a write transaction.
+ 
+ @param value The object value.
+ @param key The name of the property.
+ */
+- (void)setValue:(id)value forKey:(NSString *)key;
+
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
