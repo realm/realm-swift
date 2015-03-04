@@ -116,6 +116,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return _backingArray.count;
 }
 
+- (BOOL)isInvalidated {
+    return NO;
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     return [_backingArray countByEnumeratingWithState:state objects:buffer count:len];
 }

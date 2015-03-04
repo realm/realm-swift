@@ -79,6 +79,10 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *const o
     return _backingLinkView->size();
 }
 
+- (BOOL)isInvalidated {
+    return !_backingLinkView->is_attached();
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     RLMLinkViewArrayValidateAttached(self);
 

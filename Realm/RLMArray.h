@@ -56,6 +56,11 @@
  */
 @property (nonatomic, readonly) RLMRealm *realm;
 
+/**
+ Indicates if an array can no longer be accessed.
+ */
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
 #pragma mark -
 
 /**---------------------------------------------------------------------------------------
