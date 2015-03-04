@@ -80,7 +80,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObject *const o
 }
 
 - (BOOL)isInvalidated {
-    return !_backingLinkView->is_attached() || !RLMMatchesThread(_realm);
+    return !_backingLinkView->is_attached();
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {

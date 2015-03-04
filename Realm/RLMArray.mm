@@ -97,6 +97,7 @@
     [self replaceObjectAtIndex:index withObject:newValue];
 }
 
+
 //
 // Standalone RLMArray implementation
 //

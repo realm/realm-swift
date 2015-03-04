@@ -31,14 +31,9 @@ namespace tightdb {
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
 @end
 
-// Whether the realm is being used from the right thread
-static inline bool RLMMatchesThread(__unsafe_unretained RLMRealm *const realm) {
-    return realm->_threadID == pthread_mach_thread_np(pthread_self());
-}
-
 // throw an exception if the realm is being used from the wrong thread
 static inline void RLMCheckThread(__unsafe_unretained RLMRealm *const realm) {
-    if (!RLMMatchesThread(realm)) {
+    if (realm->_threadID != pthread_mach_thread_np(pthread_self())) {
         @throw RLMException(@"Realm accessed from incorrect thread");
     }
 }
