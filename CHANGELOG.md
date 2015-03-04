@@ -8,6 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * An exception will be thrown when calling `setEncryptionKey:forRealmsAtPath:`, 
   `setSchemaVersion:forRealmAtPath:withMigrationBlock:`, and `migrateRealmAtPath:` 
   when a Realm at the given path is already open.
+* Object and array properties of type `RLMObject` will no longer be allowed.
 
 ### Enhancements
 

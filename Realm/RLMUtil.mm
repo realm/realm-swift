@@ -269,3 +269,13 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
         @throw RLMException(error.localizedDescription, error.userInfo);
     }
 }
+
+// Determines if class1 descends from class2
+static inline BOOL RLMIsSubclass(Class class1, Class class2) {
+    class1 = class_getSuperclass(class1);
+    return RLMIsKindOfclass(class1, class2);
+}
+
+BOOL RLMIsObjectSubclass(Class klass) {
+    return RLMIsSubclass(class_getSuperclass(klass), RLMObjectBase.class);
+}

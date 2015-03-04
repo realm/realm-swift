@@ -438,7 +438,7 @@ void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, RLMCreationOpti
 
 
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, RLMCreationOptions options) {
-    if (RLMIsSubclass([value class], RLMObjectBase.class) &&
+    if (RLMIsObjectSubclass([value class]) &&
         [[[(RLMObjectBase *)value class] className] isEqualToString:className] &&
         [(RLMObjectBase *)value realm] == realm) {
         // This is a no-op if value is an RLMObject of the same type already backed by the target realm.
