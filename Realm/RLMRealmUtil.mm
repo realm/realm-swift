@@ -186,63 +186,63 @@ public:
         _shutdownReadFd = pipeFd[0];
         _shutdownWriteFd = pipeFd[1];
 
-        [self listen];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self listen];
+        });
     }
     return self;
 }
 
 - (void)listen {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // Create the runloop source
-        CFRunLoopSourceContext ctx{};
-        ctx.info = (__bridge void *)self;
-        ctx.perform = [](void *info) {
-            RLMNotifier *notifier = (__bridge RLMNotifier *)info;
-            if (RLMRealm *realm = notifier->_realm) {
-                [realm handleExternalCommit];
-            }
-        };
-
-        CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
-        CFRunLoopAddSource(_runLoop, signal, kCFRunLoopDefaultMode);
-        CFRelease(signal); // the runloop retains the signal
-
-        // Set up the kqueue
-        // EVFILT_READ indicates that we care about data being available to read
-        // on the given file descriptor.
-        // EV_CLEAR makes it wait for the amount of data available to be read to
-        // change rather than just returning when there is any data to read.
-        struct kevent ke[2];
-        EV_SET(&ke[0], _notifyFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
-        EV_SET(&ke[1], _shutdownReadFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
-        kevent(_kq, ke, 2, nullptr, 0, nullptr);
-
-        while (true) {
-            struct kevent event;
-            // Wait for data to become on either fd
-            // Return code is number of bytes available or -1 on error
-            int ret = kevent(_kq, nullptr, 0, &event, 1, nullptr);
-            assert(ret >= 0);
-            if (ret == 0) {
-                // Spurious wakeup; just wait again
-                continue;
-            }
-
-            // Check which file descriptor had activity: if it's the shutdown
-            // pipe, then someone called -stop; otherwise it's the named pipe
-            // and someone committed a write transaction
-            if (event.ident == (uint32_t)_shutdownReadFd) {
-                CFRunLoopSourceInvalidate(signal);
-                return;
-            }
-
-            CFRunLoopSourceSignal(signal);
-            // Signalling the source makes it run the next time the runloop gets
-            // to it, but doesn't make the runloop start if it's currently idle
-            // waiting for events
-            CFRunLoopWakeUp(_runLoop);
+    // Create the runloop source
+    CFRunLoopSourceContext ctx{};
+    ctx.info = (__bridge void *)self;
+    ctx.perform = [](void *info) {
+        RLMNotifier *notifier = (__bridge RLMNotifier *)info;
+        if (RLMRealm *realm = notifier->_realm) {
+            [realm handleExternalCommit];
         }
-    });
+    };
+
+    CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
+    CFRunLoopAddSource(_runLoop, signal, kCFRunLoopDefaultMode);
+    CFRelease(signal); // the runloop retains the signal
+
+    // Set up the kqueue
+    // EVFILT_READ indicates that we care about data being available to read
+    // on the given file descriptor.
+    // EV_CLEAR makes it wait for the amount of data available to be read to
+    // change rather than just returning when there is any data to read.
+    struct kevent ke[2];
+    EV_SET(&ke[0], _notifyFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
+    EV_SET(&ke[1], _shutdownReadFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
+    kevent(_kq, ke, 2, nullptr, 0, nullptr);
+
+    while (true) {
+        struct kevent event;
+        // Wait for data to become on either fd
+        // Return code is number of bytes available or -1 on error
+        int ret = kevent(_kq, nullptr, 0, &event, 1, nullptr);
+        assert(ret >= 0);
+        if (ret == 0) {
+            // Spurious wakeup; just wait again
+            continue;
+        }
+
+        // Check which file descriptor had activity: if it's the shutdown
+        // pipe, then someone called -stop; otherwise it's the named pipe
+        // and someone committed a write transaction
+        if (event.ident == (uint32_t)_shutdownReadFd) {
+            CFRunLoopSourceInvalidate(signal);
+            return;
+        }
+
+        CFRunLoopSourceSignal(signal);
+        // Signalling the source makes it run the next time the runloop gets
+        // to it, but doesn't make the runloop start if it's currently idle
+        // waiting for events
+        CFRunLoopWakeUp(_runLoop);
+    }
 }
 
 - (void)stop {
