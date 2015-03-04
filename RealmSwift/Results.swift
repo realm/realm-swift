@@ -119,7 +119,7 @@ public final class Results<T: Object>: Printable, SequenceType {
     */
     public subscript(index: Int) -> T {
         get {
-            checkNonNegative(index, "index")
+            throwForNegativeIndex(index)
             return rlmResults[UInt(index)] as T
         }
     }
