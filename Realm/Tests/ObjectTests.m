@@ -1032,6 +1032,8 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMRealm *otherRealm = [self realmWithTestPath];
 
+    XCTAssertFalse([obj isEqual:[NSObject new]], @"Comparing an RLMObject to a non-RLMObject should be false.");
+    XCTAssertFalse([obj isEqualToObject:(RLMObject *)[NSObject new]], @"Comparing an RLMObject to a non-RLMObject should be false.");
     XCTAssertTrue([obj isEqual:obj], @"Same instance.");
     XCTAssertTrue([obj isEqualToObject:obj], @"Same instance.");
     XCTAssertFalse([obj isEqualToObject:otherObj], @"Comparison outside of realm.");
