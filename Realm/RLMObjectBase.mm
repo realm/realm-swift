@@ -256,12 +256,12 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (_objectSchema.primaryKeyProperty) {
-        return [self isEqualToObject:object];
+    if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
+	if (_objectSchema.primaryKeyProperty) {
+	    return [self isEqualToObject:other];
+	}
     }
-    else {
-        return [super isEqual:object];
-    }
+    return [super isEqual:object];
 }
 
 - (NSUInteger)hash {
