@@ -39,7 +39,6 @@
         _objectClassName = objectClassName;
         _indexed = indexed;
         [self setObjcCodeFromType];
-        [self updateAccessors];
     }
 
     return self;
