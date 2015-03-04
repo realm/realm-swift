@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * The bowser will no longer show objects that have no persisted properties.
 * `RLMSchema`, `RLMObjectSchema`, & `RLMProperty` now have more useful descriptions.
+* Opening an encrypted Realm while a debugger is attached to the process no
+  longer throws an exception.
 
 ### Bugfixes
 
@@ -21,6 +23,8 @@ x.x.x Release notes (yyyy-MM-dd)
   triggered by calling `-beginWriteTransaction` elsewhere.
 * When calling `delete:` we now verify that the object being deleted is persisted in the target Realm.
 * Fix crash when calling `createOrUpdate:inRealm` with nested linked objects.
+* Use the key from `+[RLMRealm setEncryptionKey:forRealmsAtPath:]` in
+  `-writeCopyToPath:error:` and `+migrateRealmAtPath:`.
 
 0.90.6 Release notes (2015-02-20)
 =============================================================
