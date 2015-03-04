@@ -97,7 +97,6 @@
     [self replaceObjectAtIndex:index withObject:newValue];
 }
 
-
 //
 // Standalone RLMArray implementation
 //
@@ -114,6 +113,10 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
 
 - (NSUInteger)count {
     return _backingArray.count;
+}
+
+- (BOOL)isInvalidated {
+    return NO;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {

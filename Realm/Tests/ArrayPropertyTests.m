@@ -77,6 +77,26 @@
     XCTAssertThrows([array addObject:obj], @"Adding array object outside a transaction should throw");
 }
 
+- (void)testDeleteStandaloneObjectWithArrayProperty {
+    ArrayPropertyObject *arObj = [[ArrayPropertyObject alloc] initWithObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    RLMArray *stringArray = arObj.array;
+    XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after creation.");
+    arObj = nil;
+    XCTAssertFalse(stringArray.isInvalidated, @"stringArray should still be valid after parent deletion.");
+}
+
+- (void)testDeleteObjectWithArrayProperty {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    RLMArray *stringArray = arObj.array;
+    XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after creation.");
+    [realm deleteObject:arObj];
+    XCTAssertTrue(stringArray.isInvalidated, @"stringArray should be invalid after parent deletion.");
+    [realm commitWriteTransaction];
+}
+
 -(void)testInsertMultiple {
     RLMRealm *realm = [self realmWithTestPath];
 
