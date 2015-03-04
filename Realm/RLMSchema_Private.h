@@ -39,14 +39,14 @@ extern const char * const c_primaryKeyTableName;
 extern const char * const c_versionColumnName;
 extern const size_t c_versionColumnIndex;
 
-inline NSString *RLMClassForTableName(NSString *tableName) {
+static inline NSString *RLMClassForTableName(NSString *tableName) {
     if ([tableName hasPrefix:c_objectTableNamePrefix]) {
         return [tableName substringFromIndex:6];
     }
     return nil;
 }
 
-inline NSString *RLMTableNameForClass(NSString *className) {
+static inline NSString *RLMTableNameForClass(NSString *className) {
     return [c_objectTableNamePrefix stringByAppendingString:className];
 }
 
