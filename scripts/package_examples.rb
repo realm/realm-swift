@@ -53,7 +53,7 @@ objc_examples.each do |example|
   File.open(filepath, "w") do |file|
     file.puts contents.gsub("/build/ios", "/ios")
                       .gsub("Realm/Swift", "Swift")
-                      .gsub("build/DerivedData/Realm/Build/Products/Release", "osx")
+                      .gsub("/build/osx", "/osx")
   end
 end
 
