@@ -137,7 +137,6 @@ public:
     __weak RLMRealm *_realm;
     // Runloop which notifications are delivered on
     CFRunLoopRef _runLoop;
-    CFRunLoopSourceRef _signal;
 
     // Read-write file descriptor for the named pipe which is waited on for
     // changes and written to when a commit is made
@@ -187,6 +186,13 @@ public:
         _shutdownReadFd = pipeFd[0];
         _shutdownWriteFd = pipeFd[1];
 
+        [self listen];
+    }
+    return self;
+}
+
+- (void)listen {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // Create the runloop source
         CFRunLoopSourceContext ctx{};
         ctx.info = (__bridge void *)self;
@@ -197,17 +203,10 @@ public:
             }
         };
 
-        _signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
-        CFRunLoopAddSource(_runLoop, _signal, kCFRunLoopDefaultMode);
-        CFRelease(_signal); // the runloop retains the signal
+        CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
+        CFRunLoopAddSource(_runLoop, signal, kCFRunLoopDefaultMode);
+        CFRelease(signal); // the runloop retains the signal
 
-        [self listen];
-    }
-    return self;
-}
-
-- (void)listen {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // Set up the kqueue
         // EVFILT_READ indicates that we care about data being available to read
         // on the given file descriptor.
@@ -233,11 +232,11 @@ public:
             // pipe, then someone called -stop; otherwise it's the named pipe
             // and someone committed a write transaction
             if (event.ident == (uint32_t)_shutdownReadFd) {
-                CFRunLoopSourceInvalidate(_signal);
+                CFRunLoopSourceInvalidate(signal);
                 return;
             }
 
-            CFRunLoopSourceSignal(_signal);
+            CFRunLoopSourceSignal(signal);
             // Signalling the source makes it run the next time the runloop gets
             // to it, but doesn't make the runloop start if it's currently idle
             // waiting for events
