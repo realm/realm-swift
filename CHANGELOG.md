@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * The bowser will no longer show objects that have no persisted properties.
+* `RLMSchema`, `RLMObjectSchema`, & `RLMProperty` now have more useful descriptions.
 
 ### Bugfixes
 
