@@ -187,7 +187,10 @@ public:
 
         // Make writing to the pipe return -1 when the pipe's buffer is full
         // rather than blocking until there's space available
-        fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
+        ret = fcntl(_notifyFd, F_SETFL, O_NONBLOCK);
+        if (ret == -1) {
+            return handleError(errno, error);
+        }
 
         // Create the anonymous pipe
         int pipeFd[2];
