@@ -19,11 +19,11 @@
 #import "RLMTestCase.h"
 #import "RLMObjectSchema_Private.h"
 
-@interface RLMObjectSchemaTests : RLMTestCase
+@interface ObjectSchemaTests : RLMTestCase
 
 @end
 
-@implementation RLMObjectSchemaTests
+@implementation ObjectSchemaTests
 
 - (void)testDescription {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];

@@ -181,18 +181,18 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FE79FF819BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		3FE79FF919BA6A5900780C9A /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
-		C0269E231A801FE70036E048 /* RLMPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* RLMPropertyTests.m */; };
-		C0269E241A801FE70036E048 /* RLMPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* RLMPropertyTests.m */; };
-		C0269E251A801FE70036E048 /* RLMPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* RLMPropertyTests.m */; };
-		C0269E261A801FE70036E048 /* RLMPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* RLMPropertyTests.m */; };
-		C07F00481A95786200BE484E /* RLMObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */; };
-		C07F00491A95786200BE484E /* RLMObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */; };
-		C07F004A1A95786200BE484E /* RLMObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */; };
-		C07F004B1A95786200BE484E /* RLMObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */; };
-		C0FE75C11A79B60800326886 /* RLMUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* RLMUtilTests.mm */; };
-		C0FE75C21A79B60800326886 /* RLMUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* RLMUtilTests.mm */; };
-		C0FE75C31A79B60800326886 /* RLMUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* RLMUtilTests.mm */; };
-		C0FE75C41A79B60800326886 /* RLMUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* RLMUtilTests.mm */; };
+		C0269E231A801FE70036E048 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* PropertyTests.m */; };
+		C0269E241A801FE70036E048 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* PropertyTests.m */; };
+		C0269E251A801FE70036E048 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* PropertyTests.m */; };
+		C0269E261A801FE70036E048 /* PropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0269E221A801FE70036E048 /* PropertyTests.m */; };
+		C07F00481A95786200BE484E /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* ObjectSchemaTests.m */; };
+		C07F00491A95786200BE484E /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* ObjectSchemaTests.m */; };
+		C07F004A1A95786200BE484E /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* ObjectSchemaTests.m */; };
+		C07F004B1A95786200BE484E /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C07F00471A95786200BE484E /* ObjectSchemaTests.m */; };
+		C0FE75C11A79B60800326886 /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* UtilTests.mm */; };
+		C0FE75C21A79B60800326886 /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* UtilTests.mm */; };
+		C0FE75C31A79B60800326886 /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* UtilTests.mm */; };
+		C0FE75C41A79B60800326886 /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0FE75C01A79B60800326886 /* UtilTests.mm */; };
 		E81A1F851955FC9300FDED82 /* RLMAccessor.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F631955FC9300FDED82 /* RLMAccessor.h */; };
 		E81A1F861955FC9300FDED82 /* RLMAccessor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E81A1F641955FC9300FDED82 /* RLMAccessor.mm */; };
 		E81A1F881955FC9300FDED82 /* RLMArray_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F651955FC9300FDED82 /* RLMArray_Private.hpp */; };
@@ -411,9 +411,9 @@
 		3F7792361A60A646004E4CA6 /* ResultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultsTests.m; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
-		C0269E221A801FE70036E048 /* RLMPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPropertyTests.m; sourceTree = "<group>"; };
-		C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMObjectSchemaTests.m; sourceTree = "<group>"; };
-		C0FE75C01A79B60800326886 /* RLMUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUtilTests.mm; sourceTree = "<group>"; };
+		C0269E221A801FE70036E048 /* PropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PropertyTests.m; sourceTree = "<group>"; };
+		C07F00471A95786200BE484E /* ObjectSchemaTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectSchemaTests.m; sourceTree = "<group>"; };
+		C0FE75C01A79B60800326886 /* UtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UtilTests.mm; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -594,25 +594,24 @@
 				0207AB85195DFA15007EFB12 /* MigrationTests.mm */,
 				E81A1FBD1955FE0100FDED82 /* MixedTests.m */,
 				E81A1FBE1955FE0100FDED82 /* ObjectInterfaceTests.m */,
+				C07F00471A95786200BE484E /* ObjectSchemaTests.m */,
 				E81A1FBF1955FE0100FDED82 /* ObjectTests.m */,
 				3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */,
+				C0269E221A801FE70036E048 /* PropertyTests.m */,
 				E81A1FC01955FE0100FDED82 /* PropertyTypeTest.mm */,
 				E81A1FC11955FE0100FDED82 /* QueryTests.m */,
 				E81A1FC31955FE0100FDED82 /* RealmTests.mm */,
 				3F7792361A60A646004E4CA6 /* ResultsTests.m */,
-				C07F00471A95786200BE484E /* RLMObjectSchemaTests.m */,
 				E8A543AD195C9C9E00990A20 /* RLMPredicateUtil.h */,
 				E8A543AE195C9C9E00990A20 /* RLMPredicateUtil.m */,
-				C0269E221A801FE70036E048 /* RLMPropertyTests.m */,
-				C0269E221A801FE70036E048 /* RLMPropertyTests.m */,
 				E81A1FC41955FE0100FDED82 /* RLMTestCase.h */,
 				E81A1FC51955FE0100FDED82 /* RLMTestCase.m */,
 				3F44109E19953F5900223146 /* RLMTestObjects.h */,
 				E81A1FC71955FE0100FDED82 /* RLMTestObjects.m */,
-				C0FE75C01A79B60800326886 /* RLMUtilTests.mm */,
 				0207AB86195DFA15007EFB12 /* SchemaTests.mm */,
 				E81A1FD11955FE0100FDED82 /* TransactionTests.m */,
 				E8917597197A1B350068ACC6 /* UnicodeTests.m */,
+				C0FE75C01A79B60800326886 /* UtilTests.mm */,
 			);
 			name = "Objective-C";
 			sourceTree = "<group>";
@@ -1166,18 +1165,17 @@
 				3F512D9819F9A1F300746016 /* MigrationTests.mm in Sources */,
 				3F512D9919F9A1F300746016 /* MixedTests.m in Sources */,
 				3F512D9A19F9A1F300746016 /* ObjectInterfaceTests.m in Sources */,
+				C07F004B1A95786200BE484E /* ObjectSchemaTests.m in Sources */,
 				3F512D9B19F9A1F300746016 /* ObjectTests.m in Sources */,
+				C0269E261A801FE70036E048 /* PropertyTests.m in Sources */,
 				3F512D9C19F9A1F300746016 /* PropertyTypeTest.mm in Sources */,
 				3F512D9D19F9A1F300746016 /* QueryTests.m in Sources */,
 				3F512D9E19F9A1F300746016 /* RealmTests.mm in Sources */,
 				3F77923A1A60A646004E4CA6 /* ResultsTests.m in Sources */,
-				C07F004B1A95786200BE484E /* RLMObjectSchemaTests.m in Sources */,
 				3F512D9F19F9A1F300746016 /* RLMPredicateUtil.m in Sources */,
-				C0269E261A801FE70036E048 /* RLMPropertyTests.m in Sources */,
 				02689E021A572DCA00C8AE9D /* RLMSupport.swift in Sources */,
 				3F512DA119F9A1F300746016 /* RLMTestCase.m in Sources */,
 				3F512DA219F9A1F300746016 /* RLMTestObjects.m in Sources */,
-				C0FE75C41A79B60800326886 /* RLMUtilTests.mm in Sources */,
 				3F512DA319F9A1F300746016 /* SchemaTests.mm in Sources */,
 				3F512DA419F9A1F300746016 /* SwiftArrayPropertyTests.swift in Sources */,
 				3F512DA519F9A1F300746016 /* SwiftArrayTests.swift in Sources */,
@@ -1192,6 +1190,7 @@
 				3F512DAE19F9A1F300746016 /* SwiftUnicodeTests.swift in Sources */,
 				3F512DAF19F9A1F300746016 /* TransactionTests.m in Sources */,
 				3F512DB019F9A1F300746016 /* UnicodeTests.m in Sources */,
+				C0FE75C41A79B60800326886 /* UtilTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1232,21 +1231,21 @@
 				3F8DCA6C19930F960008BD7F /* MigrationTests.mm in Sources */,
 				3F8DCA6D19930F960008BD7F /* MixedTests.m in Sources */,
 				3F8DCA6E19930F960008BD7F /* ObjectInterfaceTests.m in Sources */,
+				C07F004A1A95786200BE484E /* ObjectSchemaTests.m in Sources */,
 				3F8DCA6F19930F960008BD7F /* ObjectTests.m in Sources */,
 				3F8DCA7019930F960008BD7F /* PerformanceTests.m in Sources */,
+				C0269E251A801FE70036E048 /* PropertyTests.m in Sources */,
 				3F8DCA7119930F960008BD7F /* PropertyTypeTest.mm in Sources */,
 				3F8DCA7219930F960008BD7F /* QueryTests.m in Sources */,
 				3F8DCA7319930F960008BD7F /* RealmTests.mm in Sources */,
 				3F7792391A60A646004E4CA6 /* ResultsTests.m in Sources */,
-				C07F004A1A95786200BE484E /* RLMObjectSchemaTests.m in Sources */,
 				3F8DCA6219930F8E0008BD7F /* RLMPredicateUtil.m in Sources */,
-				C0269E251A801FE70036E048 /* RLMPropertyTests.m in Sources */,
 				3F8DCA6319930F8E0008BD7F /* RLMTestCase.m in Sources */,
 				3F8DCA81199310D40008BD7F /* RLMTestObjects.m in Sources */,
-				C0FE75C31A79B60800326886 /* RLMUtilTests.mm in Sources */,
 				3F8DCA6519930F8E0008BD7F /* SchemaTests.mm in Sources */,
 				3F8DCA6619930F8E0008BD7F /* TransactionTests.m in Sources */,
 				3F8DCA6719930F8E0008BD7F /* UnicodeTests.m in Sources */,
+				C0FE75C31A79B60800326886 /* UtilTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1287,18 +1286,17 @@
 				0207AB88195DFA15007EFB12 /* MigrationTests.mm in Sources */,
 				E856D219195615A900FB2FCF /* MixedTests.m in Sources */,
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
+				C07F00491A95786200BE484E /* ObjectSchemaTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
+				C0269E241A801FE70036E048 /* PropertyTests.m in Sources */,
 				E856D21C195615A900FB2FCF /* PropertyTypeTest.mm in Sources */,
 				E856D21D195615A900FB2FCF /* QueryTests.m in Sources */,
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
 				3F7792381A60A646004E4CA6 /* ResultsTests.m in Sources */,
-				C07F00491A95786200BE484E /* RLMObjectSchemaTests.m in Sources */,
 				E8A5DEEE1968E521006A50F6 /* RLMPredicateUtil.m in Sources */,
-				C0269E241A801FE70036E048 /* RLMPropertyTests.m in Sources */,
 				3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */,
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
-				C0FE75C21A79B60800326886 /* RLMUtilTests.mm in Sources */,
 				0207AB8A195DFA15007EFB12 /* SchemaTests.mm in Sources */,
 				3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */,
 				3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */,
@@ -1313,6 +1311,7 @@
 				3F8DCA7E19930FCB0008BD7F /* SwiftUnicodeTests.swift in Sources */,
 				E856D213195615A900FB2FCF /* TransactionTests.m in Sources */,
 				E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */,
+				C0FE75C21A79B60800326886 /* UtilTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1353,18 +1352,17 @@
 				0207AB87195DFA15007EFB12 /* MigrationTests.mm in Sources */,
 				E81A1FDF1955FE0100FDED82 /* MixedTests.m in Sources */,
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
+				C07F00481A95786200BE484E /* ObjectSchemaTests.m in Sources */,
 				E81A1FE31955FE0100FDED82 /* ObjectTests.m in Sources */,
+				C0269E231A801FE70036E048 /* PropertyTests.m in Sources */,
 				E81A1FE51955FE0100FDED82 /* PropertyTypeTest.mm in Sources */,
 				E81A1FE71955FE0100FDED82 /* QueryTests.m in Sources */,
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				3F7792371A60A646004E4CA6 /* ResultsTests.m in Sources */,
-				C07F00481A95786200BE484E /* RLMObjectSchemaTests.m in Sources */,
 				E8A5DEED1968E520006A50F6 /* RLMPredicateUtil.m in Sources */,
-				C0269E231A801FE70036E048 /* RLMPropertyTests.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
 				E81A1FEE1955FE0100FDED82 /* RLMTestCase.m in Sources */,
 				028481EF19CD032C0097A416 /* RLMTestObjects.m in Sources */,
-				C0FE75C11A79B60800326886 /* RLMUtilTests.mm in Sources */,
 				0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */,
 				3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */,
 				3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */,
@@ -1379,6 +1377,7 @@
 				3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */,
 				E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */,
 				E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */,
+				C0FE75C11A79B60800326886 /* UtilTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
