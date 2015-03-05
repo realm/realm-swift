@@ -163,8 +163,21 @@ public:
 
         // Create and open the named pipe
         int ret = mkfifo(path, 0600);
-        if (ret == -1 && errno != EEXIST) {
-            return handleError(errno, error);
+        if (ret == -1) {
+            int err = errno;
+            if (err == ENOTSUP) {
+                // Filesystem doesn't support named pipes, so try putting it in tmp instead
+                // Hash collisions are okay here because they just result in doing
+                // extra work, as opposed to correctness problems
+                static NSString *tmpDir = NSTemporaryDirectory();
+                path = [tmpDir stringByAppendingFormat:@"realm_%llu.note", (unsigned long long)[realm.path hash]].UTF8String;
+                ret = mkfifo(path, 0600);
+                err = errno;
+            }
+            // the fifo already existing isn't an error
+            if (ret == -1 && err != EEXIST) {
+                return handleError(err, error);
+            }
         }
 
         _notifyFd = open(path, O_RDWR);
