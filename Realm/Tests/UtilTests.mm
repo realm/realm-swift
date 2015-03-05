@@ -22,7 +22,7 @@
 #import "RLMUtil.hpp"
 #import "RLMVersion.h"
 
-@interface RLMUtilTests : RLMTestCase
+@interface UtilTests : RLMTestCase
 
 @end
 
@@ -30,7 +30,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
     return [actual.name isEqualToString:expected.name] && [actual.reason isEqualToString:expected.reason] && [actual.userInfo isEqual:expected.userInfo];
 }
 
-@implementation RLMUtilTests
+@implementation UtilTests
 
 - (void)testRLMExceptionWithReasonAndUserInfo {
     NSString *reason = @"Reason";
