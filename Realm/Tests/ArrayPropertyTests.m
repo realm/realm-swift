@@ -97,6 +97,20 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testDeleteObjectInArrayProperty {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *arObj = [ArrayPropertyObject createInRealm:realm withObject:@[@"arrayObject", @[@[@"a"]], @[]]];
+    RLMArray *stringArray = arObj.array;
+    StringObject *firstObject = stringArray.firstObject;
+    [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
+    XCTAssertFalse(stringArray.isInvalidated, @"stringArray should be valid after member object deletion.");
+    XCTAssertTrue(firstObject.isInvalidated, @"firstObject should be invalid after deletion.");
+    XCTAssertEqual(stringArray.count, 0U, @"stringArray.count should be zero after deleting its only member.");
+    [realm commitWriteTransaction];
+}
+
 -(void)testInsertMultiple {
     RLMRealm *realm = [self realmWithTestPath];
 
