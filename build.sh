@@ -176,9 +176,6 @@ fi
 # Variables
 ######################################
 
-# Xcode sets this variable - set to current directory if running standalone
-: ${SRCROOT:$(pwd)}
-
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
