@@ -47,21 +47,21 @@ NSString *RLMTestRealmPath() {
     return RLMRealmPathForFile(@"test.realm");
 }
 
-static NSString *RLMLockPath(NSString *path) {
-    return [path stringByAppendingString:@".lock"];
-}
-
-static void RLMDeleteRealmFilesAtPath(NSString *path) {
+static void deleteOrThrow(NSString *path) {
     NSError *error;
-    if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error] ||
-        ![[NSFileManager defaultManager] removeItemAtPath:RLMLockPath(path) error:&error] ||
-        ![[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@".note"] error:&error]) {
+    if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
         if (error.code != NSFileNoSuchFileError) {
             @throw [NSException exceptionWithName:@"RLMTestException"
                                            reason:[@"Unable to delete realm: " stringByAppendingString:error.description]
                                          userInfo:nil];
         }
     }
+}
+
+static void RLMDeleteRealmFilesAtPath(NSString *path) {
+    deleteOrThrow(path);
+    deleteOrThrow([path stringByAppendingString:@".lock"]);
+    deleteOrThrow([path stringByAppendingString:@".note"]);
 }
 
 NSData *RLMGenerateKey() {
