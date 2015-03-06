@@ -109,10 +109,10 @@ static NSMutableDictionary *s_localNameToClass;
         }
         // NSStringFromClass demangles the names for top-level Swift classes
         // but not for nested classes. _T indicates it's a Swift symbol, t
-        // indicates it's a type, and CC indicates it's a class within a
-        // class (further nesting will add more Cs)
-        else if ([className hasPrefix:@"_TtCC"]) {
-            @throw RLMException(@"RLMObject subclasses cannot be nested within other classes");
+        // indicates it's a type, and C indicates it's a class.
+        else if ([className hasPrefix:@"_TtC"]) {
+            NSString *message = [NSString stringWithFormat:@"RLMObject subclasses cannot be nested within other declarations. Please move %@ to global scope.", className];
+            @throw RLMException(message);
         }
         else {
             s_localNameToClass[className] = cls;
