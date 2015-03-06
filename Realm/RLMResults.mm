@@ -189,11 +189,16 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    RLMResults *objects = [self objectsWithPredicate:predicate];
-    if ([objects count] == 0) {
+    RLMResultsValidate(self);
+
+    // copy array and apply new predicate creating a new query and view
+    auto query = [self cloneQuery];
+    RLMUpdateQueryWithPredicate(query.get(), predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    size_t index = query->find();
+    if (index == realm::not_found) {
         return NSNotFound;
     }
-    return [self indexOfObject:[objects firstObject]];
+    return _backingView.find_by_source_ndx(index);
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
@@ -517,8 +522,15 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
         @throw RLMException(@"Object type does not match RLMResults");
     }
 
-    size_t ndx = object->_row.get_index();
-    return ndx == realm::not_found ? NSNotFound : ndx;
+    return RLMConvertNotFound(object->_row.get_index());
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
+    RLMResultsValidate(self);
+
+    Query query = _table->where();
+    RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
+    return RLMConvertNotFound(query.find());
 }
 
 - (id)minOfProperty:(NSString *)property {
@@ -578,6 +590,10 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (NSUInteger)indexOfObject:(RLMObject *)object {
+    return NSNotFound;
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     return NSNotFound;
 }
 
