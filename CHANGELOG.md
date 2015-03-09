@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* The bowser will no longer show objects that have no persisted properties.
+* The browser will no longer show objects that have no persisted properties.
 * `RLMSchema`, `RLMObjectSchema`, and `RLMProperty` now have more useful descriptions.
 * Opening an encrypted Realm while a debugger is attached to the process no
   longer throws an exception.
