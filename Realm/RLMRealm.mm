@@ -335,7 +335,7 @@ static id RLMAutorelease(id value) {
     }
 
     // try to reuse existing realm first
-    RLMRealm *realm = RLMGetCurrentThreadCachedRealmForPath(path);
+    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(path);
     if (realm) {
         if (realm->_readOnly != readonly) {
             @throw RLMException(@"Realm at path already opened with different read permissions", @{@"path":realm.path});
@@ -752,7 +752,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
     key = validatedKey(key) ?: keyForPath(realmPath);
-    RLMRealm *realm = RLMGetCurrentThreadCachedRealmForPath(realmPath);
+    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
     if (!realm) {
         NSError *error;
         realm = [[RLMRealm alloc] initWithPath:realmPath key:key readOnly:YES inMemory:NO dynamic:YES error:&error];

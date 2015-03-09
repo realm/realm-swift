@@ -23,7 +23,7 @@
 // Add a Realm to the weak cache
 void RLMCacheRealm(RLMRealm *realm);
 // Get a Realm for the given path which can be used on the current thread
-RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path);
+RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path);
 // Get a Realm for the given path
 RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
 // Clear the weak cache of Realms

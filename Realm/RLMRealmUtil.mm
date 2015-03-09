@@ -44,7 +44,7 @@ RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path) {
     }
 }
 
-RLMRealm *RLMGetCurrentThreadCachedRealmForPath(NSString *path) {
+RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectForKey:@(threadID)];
