@@ -134,33 +134,39 @@ class MigrationTests: TestCase {
     }
 
     func testEnumerate() {
-        self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
-            migration.enumerate("SwiftStringObject", { oldObj, newObj in
-                XCTFail("No objects to enumerate")
+        autoreleasepool {
+            self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
+                migration.enumerate("SwiftStringObject", { oldObj, newObj in
+                    XCTFail("No objects to enumerate")
+                })
+
+                migration.enumerate("NoSuchClass", {oldObj, newObj in}) // shouldn't throw
             })
-
-            migration.enumerate("NoSuchClass", {oldObj, newObj in}) // shouldn't throw
-        })
-
-        // add object
-        Realm().write {
-            SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
-            return
         }
 
-        migrateAndTestRealm(Realm.defaultPath, schemaVersion: 2, block: { migration, oldSchemaVersion in
-            var count = 0
-            migration.enumerate("SwiftStringObject", { oldObj, newObj in
-                XCTAssertEqual(newObj.objectSchema.className, "SwiftStringObject")
-                XCTAssertEqual(oldObj.objectSchema.className, "SwiftStringObject")
-                XCTAssertEqual(newObj["stringCol"] as String, "string")
-                XCTAssertEqual(oldObj["stringCol"] as String, "string")
-                self.assertThrows(oldObj["noSuchCol"] as String)
-                self.assertThrows(newObj["noSuchCol"] as String)
-                count++
+        autoreleasepool {
+            // add object
+            Realm().write {
+                SwiftStringObject.createInRealm(Realm(), withObject: ["string"])
+                return
+            }
+        }
+
+        autoreleasepool {
+            self.migrateAndTestRealm(Realm.defaultPath, schemaVersion: 2, block: { migration, oldSchemaVersion in
+                var count = 0
+                migration.enumerate("SwiftStringObject", { oldObj, newObj in
+                    XCTAssertEqual(newObj.objectSchema.className, "SwiftStringObject")
+                    XCTAssertEqual(oldObj.objectSchema.className, "SwiftStringObject")
+                    XCTAssertEqual(newObj["stringCol"] as String, "string")
+                    XCTAssertEqual(oldObj["stringCol"] as String, "string")
+                    self.assertThrows(oldObj["noSuchCol"] as String)
+                    self.assertThrows(newObj["noSuchCol"] as String)
+                    count++
+                })
+                XCTAssertEqual(count, 1)
             })
-            XCTAssertEqual(count, 1)
-        })
+        }
     }
 
     func testCreate() {
@@ -189,30 +195,32 @@ class MigrationTests: TestCase {
                 SwiftStringObject.createInRealm(Realm(), withObject: ["string2"])
                 return
             }
-
-            self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
-                var deleted = false;
-                migration.enumerate("SwiftStringObject", { oldObj, newObj in
-                    if deleted == false {
-                        migration.delete(newObj)
-                        deleted = true
-                    }
-                })
-            })
         }
+
+        self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
+            var deleted = false;
+            migration.enumerate("SwiftStringObject", { oldObj, newObj in
+                if deleted == false {
+                    migration.delete(newObj)
+                    deleted = true
+                }
+            })
+        })
 
         XCTAssertEqual(Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     // test getting/setting all property types
     func testMigrationObject() {
-        Realm().write {
-            var object = SwiftObject()
-            object.boolCol = true
-            object.objectCol = SwiftBoolObject(object:[true])
-            object.arrayCol.append(SwiftBoolObject(object:[false]))
-            Realm().add(object)
-            return
+        autoreleasepool {
+            Realm().write {
+                var object = SwiftObject()
+                object.boolCol = true
+                object.objectCol = SwiftBoolObject(object:[true])
+                object.arrayCol.append(SwiftBoolObject(object:[false]))
+                Realm().add(object)
+                return
+            }
         }
 
         self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
