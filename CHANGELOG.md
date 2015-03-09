@@ -29,6 +29,8 @@ x.x.x Release notes (yyyy-MM-dd)
   `-writeCopyToPath:error:` and `+migrateRealmAtPath:`.
 * Improved error message when an `RLMObject` subclass is defined nested within
   another Swift declaration.
+* Fix crash when the process is terminated by the OS on iOS while encrypted realms are open.
+* Fix crash after large commits to encrypted realms.
 
 0.90.6 Release notes (2015-02-20)
 =============================================================
