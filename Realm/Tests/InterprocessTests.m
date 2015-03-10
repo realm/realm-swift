@@ -280,7 +280,9 @@
         [self runChildAndWait];
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
+        [IntObject createInRealm:realm withObject:@[@0]];
         [realm commitWriteTransaction];
+        XCTAssertEqual(1U, [IntObject allObjects].count);
     }
     else {
         RLMRealm *realm = RLMRealm.defaultRealm;
