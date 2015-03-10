@@ -40,7 +40,7 @@ public class Schema: Equatable {
 
     // MARK: Initializers
 
-    init(rlmSchema: RLMSchema) {
+    init(_ rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }
 

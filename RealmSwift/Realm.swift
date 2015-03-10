@@ -52,7 +52,7 @@ public final class Realm {
     public var readOnly: Bool { return rlmRealm.readOnly }
 
     /// The Schema used by this realm.
-    public var schema: Schema { return Schema(rlmSchema: rlmRealm.schema) }
+    public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /**
     The location of the default Realm as a string. Can be overridden.
