@@ -30,7 +30,7 @@ public final class Schema {
 
     // MARK: Properties
 
-    internal var rlmSchema: RLMSchema
+    internal let rlmSchema: RLMSchema
 
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.

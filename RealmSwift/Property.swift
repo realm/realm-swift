@@ -30,7 +30,7 @@ public final class Property {
 
     // MARK: Properties
 
-    internal var rlmProperty: RLMProperty
+    internal let rlmProperty: RLMProperty
 
     /// Property name.
     public var name: String { return rlmProperty.name }

@@ -30,7 +30,7 @@ public final class ObjectSchema {
 
     // MARK: Properties
 
-    internal var rlmObjectSchema: RLMObjectSchema
+    internal let rlmObjectSchema: RLMObjectSchema
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] {
