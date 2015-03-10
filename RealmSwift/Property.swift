@@ -30,7 +30,7 @@ public final class Property: Equatable {
 
     // MARK: Properties
 
-    var rlmProperty: RLMProperty
+    internal var rlmProperty: RLMProperty
 
     /// Property name.
     public var name: String { return rlmProperty.name }
@@ -46,7 +46,7 @@ public final class Property: Equatable {
 
     // MARK: Initializers
 
-    init(_ rlmProperty: RLMProperty) {
+    internal init(_ rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }
 }
