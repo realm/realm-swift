@@ -328,7 +328,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices")
-        test_ios_devices "$CONFIGURATION"
+        test_ios_devices "$CONFIGURATION" || failed=1
         ;;
 
     "test-osx")
@@ -344,9 +344,12 @@ case "$COMMAND" in
         sh build.sh verify-docs
         sh build.sh verify-osx
         sh build.sh verify-osx-debug
-        sh build.sh verify-ios
-        sh build.sh verify-ios-debug
+        sh build.sh verify-ios-static
+        sh build.sh verify-ios-static-debug
+        sh build.sh verify-ios-swift
+        sh build.sh verify-ios-swift-debug
         sh build.sh verify-ios-device
+        sh build.sh verify-docs
         ;;
 
     "verify-osx")
