@@ -234,7 +234,7 @@ public final class Realm {
         if update == true {
             options = RLMCreationOptions.UpdateOrCreate
             if object.objectSchema.primaryKeyProperty == nil {
-                fatalError("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+                throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
             }
         }
         RLMAddObjectToRealm(object, rlmRealm, options)
@@ -281,7 +281,7 @@ public final class Realm {
         if update == true {
             options = RLMCreationOptions.UpdateOrCreate
             if schema[T.className()]?.primaryKeyProperty == nil {
-                fatalError("'\(T.className())' does not have a primary key and can not be updated")
+                throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
             }
         }
         return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, options), T.self)

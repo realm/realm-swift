@@ -228,7 +228,7 @@ public final class MigrationObject : Object {
         set(value) {
             if let prop = RLMObjectBaseObjectSchema(self)[key] {
                 if prop.type == RLMPropertyType.Array {
-                    fatalError("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
+                    throwRealmException("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
                 }
             }
             super[key] = value
