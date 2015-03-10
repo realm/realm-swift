@@ -166,7 +166,7 @@ public class Object : RLMObjectBase, Equatable {
         super.init(objectSchema: objectSchema)
     }
 
-    // Get RLMArray values when getting array properties
+    /// Get RLMArray values when getting array properties
     public override func valueForKey(key: String) -> AnyObject? {
         if let list = listProperty(key) {
             return list
@@ -174,7 +174,7 @@ public class Object : RLMObjectBase, Equatable {
         return super.valueForKey(key)
     }
 
-    // Support setting RLMArray values
+    /// Support setting RLMArray values
     public override func setValue(value: AnyObject?, forKey key: String) {
         if let list = listProperty(key) {
             if let value = value as? NSFastEnumeration {
