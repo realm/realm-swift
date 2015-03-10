@@ -257,9 +257,9 @@
 
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
-	if (_objectSchema.primaryKeyProperty) {
-	    return [self isEqualToObject:other];
-	}
+        if (_objectSchema.primaryKeyProperty) {
+            return [self isEqualToObject:other];
+        }
     }
     return [super isEqual:object];
 }
