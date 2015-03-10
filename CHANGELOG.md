@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* Add support for sharing Realm files between processes.
 * The browser will no longer show objects that have no persisted properties.
 * `RLMSchema`, `RLMObjectSchema`, and `RLMProperty` now have more useful descriptions.
 * Opening an encrypted Realm while a debugger is attached to the process no

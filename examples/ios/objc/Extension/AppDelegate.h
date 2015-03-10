@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,27 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import <UIKit/UIKit.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-NSData *RLMGenerateKey(void);
-#ifdef __cplusplus
-}
-#endif
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@interface RLMTestCase : XCTestCase
+@property (strong, nonatomic) UIWindow *window;
 
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-- (void)deleteFiles;
-
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
 
 @end
+

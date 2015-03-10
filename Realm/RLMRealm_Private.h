@@ -18,6 +18,8 @@
 
 #import <Realm/RLMRealm.h>
 
+@class RLMNotifier;
+
 // RLMRealm private members
 @interface RLMRealm () {
     @public
@@ -28,6 +30,7 @@
 @property (nonatomic, readonly) BOOL inWriteTransaction;
 @property (nonatomic, readonly) BOOL dynamic;
 @property (nonatomic, readwrite) RLMSchema *schema;
+@property (nonatomic, strong) RLMNotifier *notifier;
 
 + (void)resetRealmState;
 

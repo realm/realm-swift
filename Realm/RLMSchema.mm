@@ -65,16 +65,9 @@ static NSMutableDictionary *s_localNameToClass;
     return schema;
 }
 
-- (id)init {
-    self = [super init];
-    if (self) {
-        _objectSchemaByName = [NSMutableDictionary dictionary];
-    }
-    return self;
-}
-
 - (void)setObjectSchema:(NSArray *)objectSchema {
     _objectSchema = objectSchema;
+    _objectSchemaByName = [NSMutableDictionary dictionaryWithCapacity:objectSchema.count];
     for (RLMObjectSchema *object in objectSchema) {
         [(NSMutableDictionary *)_objectSchemaByName setObject:object forKey:object.className];
     }

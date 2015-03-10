@@ -29,6 +29,7 @@ namespace tightdb {
 
 @interface RLMRealm ()
 @property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
+- (void)handleExternalCommit;
 @end
 
 // throw an exception if the realm is being used from the wrong thread

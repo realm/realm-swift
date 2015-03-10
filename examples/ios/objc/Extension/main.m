@@ -16,27 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <XCTest/XCTest.h>
-#import "RLMTestObjects.h"
+#import <UIKit/UIKit.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-NSString *RLMTestRealmPath(void);
-NSString *RLMDefaultRealmPath(void);
-NSString *RLMRealmPathForFile(NSString *);
-NSData *RLMGenerateKey(void);
-#ifdef __cplusplus
+#import "AppDelegate.h"
+
+int main(int argc, char * argv[])
+{
+    @autoreleasepool {
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+    }
 }
-#endif
-
-@interface RLMTestCase : XCTestCase
-
-- (RLMRealm *)realmWithTestPath;
-- (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema;
-
-- (void)deleteFiles;
-
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block;
-
-@end

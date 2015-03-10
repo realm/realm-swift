@@ -345,26 +345,6 @@ extern "C" {
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
-- (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
-    XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, RLMRealm *realm) {
-        XCTAssertNotNil(realm, @"Realm should not be nil");
-        if (note == expectedNote) {
-            [notificationFired fulfill];
-        }
-    }];
-
-    dispatch_queue_t queue = dispatch_queue_create("background", 0);
-    dispatch_async(queue, block);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // wait for queue to finish
-    dispatch_sync(queue, ^{});
-
-    [realm removeNotification:token];
-}
-
 - (void)testAutorefreshAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -963,6 +943,7 @@ extern "C" {
     dog.age = 10;
     XCTAssertNoThrow([realm addObjects:@[dog]], @"should allow RLMObject in array");
     XCTAssertEqual(1U, [[DogObject allObjectsInRealm:realm] count]);
+    [realm cancelWriteTransaction];
 }
 
 - (void)testWriteCopyOfRealm
@@ -1167,6 +1148,14 @@ extern "C" {
 
     XCTAssertThrows([RLMRealm setEncryptionKey:nil forRealmsAtPath:path]);
     XCTAssertThrows([RLMRealm setEncryptionKey:[[NSMutableData alloc] initWithLength:64] forRealmsAtPath:path]);
+}
+
+- (void)testNotificationPipeBufferOverfull {
+    RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@"test"];
+    // pipes have a 8 KB buffer on OS X, so verify we don't block after 8192 commits
+    for (int i = 0; i < 9000; ++i) {
+        [realm transactionWithBlock:^{}];
+    }
 }
 
 @end
