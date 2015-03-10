@@ -139,7 +139,7 @@
     XCTAssertThrows([obj.array insertObject:child1 atIndex:2]);
     [realm commitWriteTransaction];
 
-    RLMResults *children = [StringObject allObjectsInRealm:realm];
+    RLMArray *children = obj.array;
     XCTAssertEqual(children.count, (NSUInteger)1);
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
