@@ -46,7 +46,7 @@ public class Property: Equatable {
 
     // MARK: Initializers
 
-    init(rlmProperty: RLMProperty) {
+    init(_ rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }
 }
