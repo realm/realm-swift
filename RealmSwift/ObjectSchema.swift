@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Object schemas map to tables in the core database.
 */
-public final class ObjectSchema: Equatable {
+public final class ObjectSchema {
 
     // MARK: Properties
 
@@ -66,6 +66,8 @@ public final class ObjectSchema: Equatable {
 }
 
 // MARK: Equatable
+
+extension ObjectSchema: Equatable {}
 
 /// Returns whether the two object schemas are equal.
 public func ==(lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
