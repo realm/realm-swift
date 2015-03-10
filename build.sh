@@ -96,7 +96,7 @@ xcrealmswift() {
     PROJECT=RealmSwift.xcodeproj
     xc "-project $PROJECT $@"
 }
-    
+
 build_combined() {
     local scheme="$1"
     local config="$2"
@@ -322,8 +322,8 @@ case "$COMMAND" in
 
    "test-ios-swift")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
-        xcrealmswift "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
@@ -386,11 +386,11 @@ case "$COMMAND" in
     "verify-ios")
         exit 0
         ;;
-        
+
     "verify-osx-swift")
         exit 0
         ;;
-        
+
     "verify-ios-dynamic")
         exit 0
         ;;
