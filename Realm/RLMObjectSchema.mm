@@ -195,7 +195,7 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                               objectClassName:nil
-						      indexed:table->has_search_index(col)];
+                                                      indexed:table->has_search_index(col)];
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
@@ -272,8 +272,11 @@
     NSArray *otherProperties = objectSchema.properties;
     for (NSUInteger i = 0; i < _properties.count; i++) {
         RLMProperty *p1 = _properties[i], *p2 = otherProperties[i];
-	if (![p1 isEqualToProperty:p2] ||
-	    p1.column != p2.column) {
+        if (p1.type != p2.type ||
+            p1.column != p2.column ||
+            p1.isPrimary != p2.isPrimary ||
+            ![p1.name isEqualToString:p2.name] ||
+            !(p1.objectClassName == p2.objectClassName || [p1.objectClassName isEqualToString:p2.objectClassName])) {
             return NO;
         }
     }

@@ -66,7 +66,16 @@
     NSError *error = nil;
     RLMSchema *dynamicSchema = [[RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
     XCTAssertNil(error);
-    XCTAssertTrue([dynamicSchema isEqualToSchema:expectedSchema]);
+    XCTAssertEqual(dynamicSchema.objectSchema.count, expectedSchema.objectSchema.count);
+    for (RLMObjectSchema *expectedObjectSchema in expectedSchema.objectSchema) {
+        RLMObjectSchema *dynamicObjectSchema = dynamicSchema[expectedObjectSchema.className];
+        XCTAssertEqual(dynamicObjectSchema.properties.count, expectedObjectSchema.properties.count);
+        for (NSUInteger propertyIndex = 0; propertyIndex < expectedObjectSchema.properties.count; propertyIndex++) {
+            RLMProperty *dynamicProperty = dynamicObjectSchema.properties[propertyIndex];
+            RLMProperty *expectedProperty = expectedObjectSchema.properties[propertyIndex];
+            XCTAssertTrue([dynamicProperty isEqualToProperty:expectedProperty]);
+        }
+    }
 }
 
 - (void)testDynamicSchema {
