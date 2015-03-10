@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Schemas map to collections of tables in the core database.
 */
-public final class Schema: Equatable {
+public final class Schema {
 
     // MARK: Properties
 
@@ -56,6 +56,8 @@ public final class Schema: Equatable {
 }
 
 // MARK: Equatable
+
+extension Schema: Equatable {}
 
 /// Returns whether the two schemas are equal.
 public func ==(lhs: Schema, rhs: Schema) -> Bool {
