@@ -232,7 +232,7 @@ public final class Realm {
     public func add(object: Object, update: Bool = false) {
         var options : RLMCreationOptions = .allZeros
         if update == true {
-            options = RLMCreationOptions.UpdateOrCreate
+            options = .UpdateOrCreate
             if object.objectSchema.primaryKeyProperty == nil {
                 throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
             }
@@ -279,7 +279,7 @@ public final class Realm {
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         var options : RLMCreationOptions = .allZeros
         if update == true {
-            options = RLMCreationOptions.UpdateOrCreate
+            options = .UpdateOrCreate
             if schema[T.className()]?.primaryKeyProperty == nil {
                 throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
             }
