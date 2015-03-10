@@ -30,7 +30,7 @@ public final class Schema: Equatable {
 
     // MARK: Properties
 
-    var rlmSchema: RLMSchema
+    internal var rlmSchema: RLMSchema
 
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
@@ -40,7 +40,7 @@ public final class Schema: Equatable {
 
     // MARK: Initializers
 
-    init(_ rlmSchema: RLMSchema) {
+    internal init(_ rlmSchema: RLMSchema) {
         self.rlmSchema = rlmSchema
     }
 
