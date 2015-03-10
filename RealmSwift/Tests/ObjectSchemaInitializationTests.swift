@@ -136,7 +136,7 @@ class SwiftFakeObject : NSObject {
 }
 
 class SwiftObjectWithNSURL : SwiftFakeObject {
-    dynamic var URL: NSURL = NSURL(string: "http://realm.io")!
+    dynamic var URL = NSURL(string: "http://realm.io")!
 }
 
 class SwiftObjectWithAnyObject : SwiftFakeObject {
