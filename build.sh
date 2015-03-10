@@ -333,7 +333,7 @@ case "$COMMAND" in
 
     "test-osx")
         xcrealm "-scheme OSX -configuration $CONFIGURATION test"
-        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION"
+        xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
 
