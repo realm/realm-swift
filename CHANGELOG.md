@@ -1,3 +1,11 @@
+Master Release notes
+=============================================================
+
+### Enhancements
+
+* The browser will automatically refresh when the Realm has been modified
+  from another process.
+
 0.91.0 Release notes (2015-03-10)
 =============================================================
 
