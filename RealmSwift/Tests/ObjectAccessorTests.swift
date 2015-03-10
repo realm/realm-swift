@@ -63,12 +63,12 @@ class ObjectAccessorTests: TestCase {
     }
 
     func testStandaloneAccessors() {
-        var object = SwiftObject()
+        let object = SwiftObject()
         setAndTestAllProperties(object)
     }
 
     func testPersistedAccessors() {
-        var object = SwiftObject()
+        let object = SwiftObject()
         Realm().beginWrite()
         Realm().create(SwiftObject.self)
         setAndTestAllProperties(object)
