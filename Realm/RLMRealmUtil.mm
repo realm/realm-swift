@@ -97,9 +97,14 @@ class FdHolder {
         fd = -1;
     }
 
+    FdHolder& operator=(FdHolder const&) = delete;
+    FdHolder(FdHolder const&) = delete;
+
 public:
+    FdHolder() { }
     ~FdHolder() { close(); }
     operator int() const { return fd; }
+
     FdHolder& operator=(int newFd) {
         close();
         fd = newFd;
@@ -154,6 +159,8 @@ public:
     if (self) {
         _realm = realm;
         _runLoop = CFRunLoopGetCurrent();
+        CFRetain(_runLoop);
+
         _kq = kqueue();
         if (_kq == -1) {
             return handleError(errno, error);
@@ -250,6 +257,7 @@ public:
         // and someone committed a write transaction
         if (event.ident == (uint32_t)_shutdownReadFd) {
             CFRunLoopSourceInvalidate(signal);
+            CFRelease(_runLoop);
             return;
         }
 
