@@ -17,6 +17,14 @@
 		0207AB88195DFA15007EFB12 /* MigrationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB85195DFA15007EFB12 /* MigrationTests.mm */; };
 		0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB86195DFA15007EFB12 /* SchemaTests.mm */; };
 		0207AB8A195DFA15007EFB12 /* SchemaTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0207AB86195DFA15007EFB12 /* SchemaTests.mm */; };
+		021A88321AAFB5C800EEAC84 /* EncryptionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */; };
+		021A88331AAFB5C900EEAC84 /* EncryptionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */; };
+		021A88341AAFB5CA00EEAC84 /* EncryptionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */; };
+		021A88351AAFB5CB00EEAC84 /* EncryptionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */; };
+		021A88361AAFB5CD00EEAC84 /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */; };
+		021A88371AAFB5CE00EEAC84 /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */; };
+		021A88381AAFB5CF00EEAC84 /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */; };
+		021A88391AAFB5CF00EEAC84 /* ObjectSchemaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */; };
 		0237B5431A856F4B004ACD57 /* RLMArray_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0237B5421A856F06004ACD57 /* RLMArray_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0237B5441A856F52004ACD57 /* RLMArray_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0237B5421A856F06004ACD57 /* RLMArray_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0237B5451A856F59004ACD57 /* RLMArray_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0237B5421A856F06004ACD57 /* RLMArray_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -370,6 +378,9 @@
 		0207AB85195DFA15007EFB12 /* MigrationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MigrationTests.mm; sourceTree = "<group>"; };
 		0207AB86195DFA15007EFB12 /* SchemaTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SchemaTests.mm; sourceTree = "<group>"; };
 		0217D7B819CD0ACD00DE5C32 /* Swift-Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swift-Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncryptionTests.m; sourceTree = "<group>"; };
+		021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectSchemaTests.m; sourceTree = "<group>"; };
+		021A88311AAFB5BE00EEAC84 /* UtilTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UtilTests.mm; sourceTree = "<group>"; };
 		0237B5421A856F06004ACD57 /* RLMArray_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMArray_Private.h; sourceTree = "<group>"; };
 		023B19551A3BA90D0067FB81 /* RLMListBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMListBase.h; sourceTree = "<group>"; };
 		023B19561A3BA90D0067FB81 /* RLMListBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMListBase.m; sourceTree = "<group>"; };
@@ -561,6 +572,9 @@
 		E81A20061955FE1600FDED82 /* Objective-C */ = {
 			isa = PBXGroup;
 			children = (
+				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.m */,
+				021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */,
+				021A88311AAFB5BE00EEAC84 /* UtilTests.mm */,
 				02AFB4611A80343600E11938 /* PropertyTests.m */,
 				02AFB4621A80343600E11938 /* ResultsTests.m */,
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
@@ -1154,6 +1168,7 @@
 				026B0F101A780680005E26C8 /* ObjectInterfaceTests.m in Sources */,
 				02AFB4691A80343600E11938 /* ResultsTests.m in Sources */,
 				026B0F111A780680005E26C8 /* ObjectTests.m in Sources */,
+				021A88341AAFB5CA00EEAC84 /* EncryptionTests.m in Sources */,
 				026B0F121A780680005E26C8 /* PropertyTypeTest.mm in Sources */,
 				026B0F131A780680005E26C8 /* QueryTests.m in Sources */,
 				026B0F141A780680005E26C8 /* RealmTests.mm in Sources */,
@@ -1167,6 +1182,7 @@
 				026B0F1C1A780680005E26C8 /* SwiftDynamicTests.swift in Sources */,
 				026B0F1D1A780680005E26C8 /* SwiftLinkTests.swift in Sources */,
 				026B0F1E1A780680005E26C8 /* SwiftMixedTests.swift in Sources */,
+				021A88381AAFB5CF00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				026B0F1F1A780680005E26C8 /* SwiftObjectInterfaceTests.swift in Sources */,
 				026B0F201A780680005E26C8 /* SwiftPropertyTypeTest.swift in Sources */,
 				026B0F211A780680005E26C8 /* SwiftRealmTests.swift in Sources */,
@@ -1215,6 +1231,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				021A88351AAFB5CB00EEAC84 /* EncryptionTests.m in Sources */,
 				02AFB4661A80343600E11938 /* PropertyTests.m in Sources */,
 				3F8DCA6419930F8E0008BD7F /* ArrayPropertyTests.m in Sources */,
 				3F8DCA6919930F960008BD7F /* DynamicTests.m in Sources */,
@@ -1227,6 +1244,7 @@
 				3F8DCA7019930F960008BD7F /* PerformanceTests.m in Sources */,
 				02AFB46A1A80343600E11938 /* ResultsTests.m in Sources */,
 				3F8DCA7119930F960008BD7F /* PropertyTypeTest.mm in Sources */,
+				021A88391AAFB5CF00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				3F8DCA7219930F960008BD7F /* QueryTests.m in Sources */,
 				3F8DCA7319930F960008BD7F /* RealmTests.mm in Sources */,
 				3F8DCA6219930F8E0008BD7F /* RLMPredicateUtil.m in Sources */,
@@ -1277,6 +1295,7 @@
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
 				02AFB4681A80343600E11938 /* ResultsTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
+				021A88331AAFB5C900EEAC84 /* EncryptionTests.m in Sources */,
 				E856D21C195615A900FB2FCF /* PropertyTypeTest.mm in Sources */,
 				E856D21D195615A900FB2FCF /* QueryTests.m in Sources */,
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
@@ -1290,6 +1309,7 @@
 				3F8DCA7819930FCB0008BD7F /* SwiftDynamicTests.swift in Sources */,
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
 				3F8DCA7A19930FCB0008BD7F /* SwiftMixedTests.swift in Sources */,
+				021A88371AAFB5CE00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
 				3F8DCA7C19930FCB0008BD7F /* SwiftPropertyTypeTest.swift in Sources */,
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
@@ -1340,6 +1360,7 @@
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
 				02AFB4671A80343600E11938 /* ResultsTests.m in Sources */,
 				E81A1FE31955FE0100FDED82 /* ObjectTests.m in Sources */,
+				021A88321AAFB5C800EEAC84 /* EncryptionTests.m in Sources */,
 				E81A1FE51955FE0100FDED82 /* PropertyTypeTest.mm in Sources */,
 				E81A1FE71955FE0100FDED82 /* QueryTests.m in Sources */,
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
@@ -1353,6 +1374,7 @@
 				3FB4FA1A19F5D2740020D53B /* SwiftDynamicTests.swift in Sources */,
 				3FB4FA1B19F5D2740020D53B /* SwiftLinkTests.swift in Sources */,
 				3FB4FA1C19F5D2740020D53B /* SwiftMixedTests.swift in Sources */,
+				021A88361AAFB5CD00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				3FB4FA1D19F5D2740020D53B /* SwiftObjectInterfaceTests.swift in Sources */,
 				3FB4FA1E19F5D2740020D53B /* SwiftPropertyTypeTest.swift in Sources */,
 				3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */,
