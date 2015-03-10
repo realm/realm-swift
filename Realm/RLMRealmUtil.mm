@@ -237,13 +237,14 @@ public:
     struct kevent ke[2];
     EV_SET(&ke[0], _notifyFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
     EV_SET(&ke[1], _shutdownReadFd, EVFILT_READ, EV_ADD | EV_CLEAR, 0, 0, 0);
-    kevent(_kq, ke, 2, nullptr, 0, nullptr);
+    int ret = kevent(_kq, ke, 2, nullptr, 0, nullptr);
+    assert(ret == 0);
 
     while (true) {
         struct kevent event;
         // Wait for data to become on either fd
         // Return code is number of bytes available or -1 on error
-        int ret = kevent(_kq, nullptr, 0, &event, 1, nullptr);
+        ret = kevent(_kq, nullptr, 0, &event, 1, nullptr);
         assert(ret >= 0);
         if (ret == 0) {
             // Spurious wakeup; just wait again
@@ -258,6 +259,7 @@ public:
             CFRelease(_runLoop);
             return;
         }
+        assert(event.ident == (uint32_t)_notifyFd);
 
         CFRunLoopSourceSignal(signal);
         // Signalling the source makes it run the next time the runloop gets
