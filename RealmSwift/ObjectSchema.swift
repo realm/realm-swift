@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Object schemas map to tables in the core database.
 */
-public class ObjectSchema: Equatable {
+public final class ObjectSchema: Equatable {
 
     // MARK: Properties
 
