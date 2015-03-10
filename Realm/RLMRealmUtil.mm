@@ -222,9 +222,7 @@ public:
     ctx.info = (__bridge void *)self;
     ctx.perform = [](void *info) {
         RLMNotifier *notifier = (__bridge RLMNotifier *)info;
-        if (RLMRealm *realm = notifier->_realm) {
-            [realm handleExternalCommit];
-        }
+        [notifier->_realm handleExternalCommit];
     };
 
     CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
