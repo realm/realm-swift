@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Schemas map to collections of tables in the core database.
 */
-public class Schema: Equatable {
+public final class Schema: Equatable {
 
     // MARK: Properties
 
