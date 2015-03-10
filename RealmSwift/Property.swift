@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 These properties map to columns in the core database.
 */
-public final class Property: Equatable {
+public final class Property {
 
     // MARK: Properties
 
@@ -52,6 +52,8 @@ public final class Property: Equatable {
 }
 
 // MARK: Equatable
+
+extension Property: Equatable {}
 
 /// Returns whether the two properties are equal.
 public func ==(lhs: Property, rhs: Property) -> Bool {
