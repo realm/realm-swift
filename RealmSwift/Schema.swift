@@ -35,7 +35,7 @@ public class Schema: Equatable {
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
     public var objectSchema: [ObjectSchema] {
-        return (rlmSchema.objectSchema as [RLMObjectSchema]).map { ObjectSchema(rlmObjectSchema: $0) }
+        return (rlmSchema.objectSchema as [RLMObjectSchema]).map { ObjectSchema($0) }
     }
 
     // MARK: Initializers
@@ -49,7 +49,7 @@ public class Schema: Equatable {
     /// Returns the object schema with the given class name, if it exists.
     public subscript(className: String) -> ObjectSchema? {
         if let rlmObjectSchema = rlmSchema.schemaForClassName(className) {
-            return ObjectSchema(rlmObjectSchema: rlmObjectSchema)
+            return ObjectSchema(rlmObjectSchema)
         }
         return nil
     }

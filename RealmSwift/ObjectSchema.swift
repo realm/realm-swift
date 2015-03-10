@@ -50,7 +50,7 @@ public class ObjectSchema: Equatable {
 
     // MARK: Initializers
 
-    init(rlmObjectSchema: RLMObjectSchema) {
+    init(_ rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
 
