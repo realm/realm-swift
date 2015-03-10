@@ -34,7 +34,7 @@ public class ObjectSchema: Equatable {
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] {
-        return (rlmObjectSchema.properties as [RLMProperty]).map { Property(rlmProperty: $0) }
+        return (rlmObjectSchema.properties as [RLMProperty]).map { Property($0) }
     }
 
     /// The name of the class this schema describes.
@@ -43,7 +43,7 @@ public class ObjectSchema: Equatable {
     /// The property that serves as the primary key, if there is a primary key.
     public var primaryKeyProperty: Property? {
         if let rlmProperty = rlmObjectSchema.primaryKeyProperty {
-            return Property(rlmProperty: rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }
@@ -59,7 +59,7 @@ public class ObjectSchema: Equatable {
     /// Returns the property with the given name, if it exists.
     public subscript(propertyName: String) -> Property? {
         if let rlmProperty = rlmObjectSchema[propertyName] {
-            return Property(rlmProperty: rlmProperty)
+            return Property(rlmProperty)
         }
         return nil
     }
