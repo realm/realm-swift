@@ -147,7 +147,7 @@ class MigrationTests: TestCase {
         autoreleasepool {
             // add object
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), value: ["string"])
+                Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
@@ -174,7 +174,7 @@ class MigrationTests: TestCase {
             migration.create("SwiftStringObject", value:["string"])
             migration.create("SwiftStringObject", value:["stringCol": "string"])
 
-            self.assertThrows(migration.create("NoSuchObject", withObject:[]))
+            self.assertThrows(migration.create("NoSuchObject", value:[]))
 
             var count = 0
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
@@ -191,8 +191,8 @@ class MigrationTests: TestCase {
     func testDelete() {
         autoreleasepool { () -> () in
             Realm().write {
-                SwiftStringObject.createInRealm(Realm(), value: ["string1"])
-                SwiftStringObject.createInRealm(Realm(), value: ["string2"])
+                Realm().create(SwiftStringObject.self, value: ["string1"])
+                Realm().create(SwiftStringObject.self, value: ["string2"])
                 return
             }
         }
