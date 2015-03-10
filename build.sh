@@ -356,7 +356,7 @@ case "$COMMAND" in
 
         (
             cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
-            DYLD_FRAMEWORK_PATH=. ./JSONImport
+            DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
         ) || exit 1
         exit 0
         ;;
