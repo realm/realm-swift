@@ -218,14 +218,18 @@ public final class MigrationObject : Object {
     /// Returns the value of the property with the given name.
     subscript(key: String) -> AnyObject? {
         get {
-            if (RLMObjectBaseObjectSchema(self)[key].type == RLMPropertyType.Array) {
-                return listProperties[key]
+            if let prop = RLMObjectBaseObjectSchema(self)[key] {
+                if prop.type == RLMPropertyType.Array {
+                    return listProperties[key]
+                }
             }
             return super[key]
         }
         set(value) {
-            if (RLMObjectBaseObjectSchema(self)[key].type == RLMPropertyType.Array) {
-                fatalError("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
+            if let prop = RLMObjectBaseObjectSchema(self)[key] {
+                if prop.type == RLMPropertyType.Array {
+                    fatalError("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
+                }
             }
             super[key] = value
         }
