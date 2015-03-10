@@ -27,6 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix crash when calling `createOrUpdate:inRealm` with nested linked objects.
 * Use the key from `+[RLMRealm setEncryptionKey:forRealmsAtPath:]` in
   `-writeCopyToPath:error:` and `+migrateRealmAtPath:`.
+* Comparing an RLMObject to a non-RLMObject using `-[RLMObject isEqual:]` or
+  `-isEqualToObject:` now returns NO instead of crashing.
 * Improved error message when an `RLMObject` subclass is defined nested within
   another Swift declaration.
 * Fix crash when the process is terminated by the OS on iOS while encrypted realms are open.
