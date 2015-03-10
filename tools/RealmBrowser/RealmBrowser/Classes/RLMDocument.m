@@ -26,7 +26,7 @@
 
 @interface RLMDocument ()
 
-@property (nonatomic, retain) RLMNotificationToken *changeNotificationToken;
+@property (nonatomic) RLMNotificationToken *changeNotificationToken;
 
 @end
 
