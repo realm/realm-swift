@@ -30,7 +30,7 @@ public final class ObjectSchema: Equatable {
 
     // MARK: Properties
 
-    var rlmObjectSchema: RLMObjectSchema
+    internal var rlmObjectSchema: RLMObjectSchema
 
     /// Array of persisted `Property` objects for an object.
     public var properties: [Property] {
@@ -50,7 +50,7 @@ public final class ObjectSchema: Equatable {
 
     // MARK: Initializers
 
-    init(_ rlmObjectSchema: RLMObjectSchema) {
+    internal init(_ rlmObjectSchema: RLMObjectSchema) {
         self.rlmObjectSchema = rlmObjectSchema
     }
 
