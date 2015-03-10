@@ -54,12 +54,12 @@
                       @"Array class should by a dynamic object class");
 }
 
-- (void)testDynamicSchema {
+- (void)testDynamicSchemaMatchesRegularSchema {
     RLMSchema *expectedSchema = nil;
     // Force create and close realm
     @autoreleasepool {
-	RLMRealm *realm = self.realmWithTestPath;
-	expectedSchema = realm.schema;
+        RLMRealm *realm = self.realmWithTestPath;
+        expectedSchema = realm.schema;
     }
     XCTAssertNotNil(expectedSchema);
 
@@ -67,6 +67,19 @@
     RLMSchema *dynamicSchema = [[RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
     XCTAssertNil(error);
     XCTAssertTrue([dynamicSchema isEqualToSchema:expectedSchema]);
+}
+
+- (void)testDynamicSchema {
+    RLMSchema *schema = [[RLMSchema alloc] init];
+    RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"
+                                                     type:RLMPropertyTypeInt
+                                          objectClassName:nil
+                                                  indexed:NO];
+    RLMObjectSchema *objectSchema = [[RLMObjectSchema alloc] initWithClassName:@"TrulyDynamicObject"
+                                                                   objectClass:RLMObject.class properties:@[prop]];
+    schema.objectSchema = @[objectSchema];
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:schema];
+    XCTAssertNotNil(dyrealm, @"dynamic realm shouldn't be nil");
 }
 
 - (void)testDynamicProperties {
