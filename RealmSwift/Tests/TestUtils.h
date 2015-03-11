@@ -20,4 +20,4 @@
 
 @class XCTestCase;
 
-void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);
+FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);

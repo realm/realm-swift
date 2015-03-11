@@ -75,7 +75,7 @@
 		020F63FB1A8037DC007CB52E /* TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020F63DD1A8037DC007CB52E /* TestCase.swift */; };
 		020F63FE1A803895007CB52E /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 023B19A81A4234380067FB81 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		023B19F81A423BD20067FB81 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 023B19F71A423BD20067FB81 /* libc++.dylib */; };
-		0253CDAC1AAE667000AF9E6C /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
+		0253CDAC1AAE667000AF9E6C /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.mm */; };
 		02616BD51A817FC8009919CB /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02616BD41A817FC8009919CB /* MigrationTests.swift */; };
 		02616BD61A817FC8009919CB /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02616BD41A817FC8009919CB /* MigrationTests.swift */; };
 		02616BD71A817FC8009919CB /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02616BD41A817FC8009919CB /* MigrationTests.swift */; };
@@ -102,8 +102,8 @@
 		C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */; };
 		C0D8E1331A8196EE0077C784 /* TestUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D8E1311A8196EE0077C784 /* TestUtils.h */; };
 		C0D8E1341A8196EE0077C784 /* TestUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0D8E1311A8196EE0077C784 /* TestUtils.h */; };
-		C0D8E1371A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
-		C0D8E1381A8199420077C784 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.m */; };
+		C0D8E1371A8199420077C784 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.mm */; };
+		C0D8E1381A8199420077C784 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D8E1321A8196EE0077C784 /* TestUtils.mm */; };
 		C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
 		C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */; };
@@ -211,7 +211,7 @@
 		C0D8E12B1A8174090077C784 /* SortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptor.swift; path = RealmSwift/SortDescriptor.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E12E1A81749D0077C784 /* SortDescriptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDescriptorTests.swift; path = RealmSwift/Tests/SortDescriptorTests.swift; sourceTree = SOURCE_ROOT; };
 		C0D8E1311A8196EE0077C784 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = RealmSwift/Tests/TestUtils.h; sourceTree = SOURCE_ROOT; };
-		C0D8E1321A8196EE0077C784 /* TestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestUtils.m; path = RealmSwift/Tests/TestUtils.m; sourceTree = SOURCE_ROOT; };
+		C0D8E1321A8196EE0077C784 /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TestUtils.mm; path = RealmSwift/Tests/TestUtils.mm; sourceTree = SOURCE_ROOT; };
 		C0D8E1391A819B430077C784 /* RealmSwiftTests-BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "RealmSwiftTests-BridgingHeader.h"; path = "RealmSwift/Tests/RealmSwiftTests-BridgingHeader.h"; sourceTree = SOURCE_ROOT; };
 		C0FE465B1A9BE7A6006E0539 /* ObjectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ObjectTests.swift; path = RealmSwift/Tests/ObjectTests.swift; sourceTree = SOURCE_ROOT; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
@@ -351,7 +351,7 @@
 				E8D89BA81955FC6D00CF2B9A /* Supporting Files */,
 				3F1A5E731992EB7400F45F4C /* TestHost */,
 				C0D8E1311A8196EE0077C784 /* TestUtils.h */,
-				C0D8E1321A8196EE0077C784 /* TestUtils.m */,
+				C0D8E1321A8196EE0077C784 /* TestUtils.mm */,
 			);
 			name = Tests;
 			path = Realm/Tests;
@@ -621,8 +621,8 @@
 				C0240C2C1A84090000858BFA /* RealmTests.swift in Sources */,
 				C0027B0C1AAF736700F013A2 /* ObjectSchemaTests.swift in Sources */,
 				020F63EE1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
-				C0D8E1381A8199420077C784 /* TestUtils.m in Sources */,
 				C0027B081AAF6FBC00F013A2 /* SchemaTests.swift in Sources */,
+				C0D8E1381A8199420077C784 /* TestUtils.mm in Sources */,
 				020F63E81A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63DF1A8037DC007CB52E /* ListTests.swift in Sources */,
 				02616BD61A817FC8009919CB /* MigrationTests.swift in Sources */,
@@ -661,8 +661,8 @@
 				C0240C2B1A84090000858BFA /* RealmTests.swift in Sources */,
 				C0027B0B1AAF736700F013A2 /* ObjectSchemaTests.swift in Sources */,
 				020F63ED1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
-				C0D8E1371A8199420077C784 /* TestUtils.m in Sources */,
 				C0027B071AAF6FBC00F013A2 /* SchemaTests.swift in Sources */,
+				C0D8E1371A8199420077C784 /* TestUtils.mm in Sources */,
 				020F63E71A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63DE1A8037DC007CB52E /* ListTests.swift in Sources */,
 				02616BD51A817FC8009919CB /* MigrationTests.swift in Sources */,
@@ -682,8 +682,8 @@
 				C0240C2D1A84090000858BFA /* RealmTests.swift in Sources */,
 				C0027B0D1AAF736700F013A2 /* ObjectSchemaTests.swift in Sources */,
 				020F63EF1A8037DC007CB52E /* SwiftPropertyTypeTest.swift in Sources */,
-				0253CDAC1AAE667000AF9E6C /* TestUtils.m in Sources */,
 				C0027B091AAF6FBC00F013A2 /* SchemaTests.swift in Sources */,
+				0253CDAC1AAE667000AF9E6C /* TestUtils.mm in Sources */,
 				020F63E91A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E01A8037DC007CB52E /* ListTests.swift in Sources */,
 				C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,

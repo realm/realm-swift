@@ -17,8 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "TestUtils.h"
-
-@import XCTest;
+#import <XCTest/XCTest.h>
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;
