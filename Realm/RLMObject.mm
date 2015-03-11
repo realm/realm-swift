@@ -32,7 +32,7 @@
 @implementation RLMObject
 
 // These properties are synthesized in RLMObjectBase
-@dynamic objectSchema, realm, invalidated;
+@dynamic invalidated;
 
 - (instancetype)init {
     return [super init];
@@ -70,6 +70,14 @@
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
     [super setObject:obj forKeyedSubscript:key];
+}
+
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (RLMObjectSchema *)objectSchema {
+    return _objectSchema;
 }
 
 + (RLMResults *)allObjects {
@@ -133,15 +141,15 @@
 }
 
 + (NSDictionary *)defaultPropertyValues {
-    return [super defaultPropertyValues];
+    return nil;
 }
 
 + (NSString *)primaryKey {
-    return [super primaryKey];
+    return nil;
 }
 
 + (NSArray *)ignoredProperties {
-    return [super ignoredProperties];
+    return nil;
 }
 
 @end

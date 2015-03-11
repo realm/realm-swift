@@ -208,10 +208,14 @@ public final class Realm {
         rlmRealm.cancelWriteTransaction()
     }
 
-    // MARK: Adding and Deleting objects
+    // MARK: Adding and Creating objects
 
     /**
-    Adds an object to be persisted it in this Realm.
+    Adds or updates an object to be persisted it in this Realm.
+
+    When 'update' is 'true', the object must have a primary key. If no objects exist in
+    the Realm instance with the same primary key value, the object is inserted. Otherwise,
+    the existing object is updated with any changed values.
 
     When added, all linked (child) objects referenced by this object will also be
     added to the Realm if they are not already in it. If the object or any linked
@@ -223,54 +227,67 @@ public final class Realm {
     from a Realm (i.e. `invalidated`) must be false.
 
     :param: object Object to be added to this Realm.
+    :param: update If true will try to update existing objects with the same primary key.
     */
-    public func add(object: Object) {
-        RLMAddObjectToRealm(object, rlmRealm, .allZeros)
+    public func add(object: Object, update: Bool = false) {
+        var options : RLMCreationOptions = .allZeros
+        if update == true {
+            options = .UpdateOrCreate
+            if object.objectSchema.primaryKeyProperty == nil {
+                throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+            }
+        }
+        RLMAddObjectToRealm(object, rlmRealm, options)
     }
 
     /**
-    Adds objects in the given sequence to be persisted it in this Realm.
+    Adds or updates objects in the given sequence to be persisted it in this Realm.
 
-    :see: add(object:)
+    :see: add(object:update:)
 
     :param: objects A sequence which contains objects to be added to this Realm.
+    :param: update If true will try to update existing objects with the same primary key.
     */
-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S) {
+    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false) {
         for obj in objects {
-            add(obj)
+            add(obj, update: update)
         }
     }
 
     /**
-    Adds or updates an object to be persisted it in this Realm. The object provided must have a designated
-    primary key. If no objects exist in the Realm instance with the same primary key value, the object is
-    inserted. Otherwise, the existing object is updated with any changed values.
+    Create an `Object` with the given object.
 
-    As with `add`, the object cannot already be persisted in a different
-    Realm. Use `createOrUpdate` to copy values to a different Realm.
+    Creates or updates an instance of this object and adds it to the `Realm` populating
+    the object represented by value.
+    
+    When 'update' is 'true', the object must have a primary key. If no objects exist in
+    the Realm instance with the same primary key value, the object is inserted. Otherwise, 
+    the existing object is updated with any changed values.
 
-    :param: object Object to be added or updated.
+    :param: type    The object type to create.
+    :param: value   The value used to populate the object. This can be any key/value coding compliant
+                    object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
+                    or an `Array` with one object for each persisted property. An exception will be
+                    thrown if any required properties are not present and no default is set.
+
+                    When passing in an `Array`, all properties must be present,
+                    valid and in the same order as the properties defined in the model.
+    :param: update  If true will try to update existing objects with the same primary key.
+
+    :returns: The created object.
     */
-    public func addOrUpdate(object: Object) {
-        if object.objectSchema.primaryKeyProperty == nil {
-            fatalError("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
+        var options : RLMCreationOptions = .allZeros
+        if update == true {
+            options = .UpdateOrCreate
+            if schema[T.className()]?.primaryKeyProperty == nil {
+                throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
+            }
         }
-
-        RLMAddObjectToRealm(object, rlmRealm, RLMCreationOptions.UpdateOrCreate)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, options), T.self)
     }
 
-    /**
-    Adds or updates objects in the given array to be persisted it in this Realm.
-
-    :see: addOrUpdate(object:)
-
-    :param: objects A sequence of `Object`s to be added to this Realm.
-    */
-    public func addOrUpdate<S: SequenceType where S.Generator.Element: Object>(objects: S) {
-        for obj in objects {
-            addOrUpdate(obj)
-        }
-    }
+    // MARK: Deleting objects
 
     /**
     Deletes the given object from this Realm.
@@ -319,6 +336,24 @@ public final class Realm {
     */
     public func objects<T: Object>(type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, T.className(), nil))
+    }
+
+    /**
+    Get an object with the given primary key.
+
+    Returns `nil` if no object exists with the given primary key.
+
+    This method requires that `primaryKey()` be overridden on the receiving subclass.
+
+    :see: Object.primaryKey()
+
+    :param: type    The type of the objects to be returned.
+    :param: key     The primary key of the desired object.
+
+    :returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
+    */
+    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, type.className(), key), Optional<T>.self)
     }
 
 

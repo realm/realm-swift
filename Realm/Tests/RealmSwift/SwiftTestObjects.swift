@@ -41,18 +41,6 @@ class SwiftObject: Object {
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
     dynamic var objectCol = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
-
-    class func defaultValues() -> [String: AnyObject] {
-        return  ["boolCol": false as AnyObject,
-            "intCol": 123 as AnyObject,
-            "floatCol": 1.23 as AnyObject,
-            "doubleCol": 12.3 as AnyObject,
-            "stringCol": "a" as AnyObject,
-            "binaryCol":  "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
-            "dateCol": NSDate(timeIntervalSince1970: 1) as NSDate,
-            "objectCol": [false],
-            "arrayCol": [] as NSArray]
-    }
 }
 
 class SwiftOptionalObject: Object {
@@ -83,7 +71,6 @@ class SwiftAggregateObject: Object {
     dynamic var doubleCol = 0.0
     dynamic var boolCol = false
     dynamic var dateCol = NSDate()
-    dynamic var trueCol = true
 }
 
 class SwiftAllIntSizesObject: Object {
@@ -125,11 +112,10 @@ class SwiftIgnoredPropertiesObject: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var runtimeProperty: AnyObject?
-    dynamic var runtimeDefaultProperty = "property"
     dynamic var readOnlyProperty: Int { return 0 }
 
-    override class func ignoredProperties() -> [String] {
-        return ["runtimeProperty", "runtimeDefaultProperty"]
+    override class func ignoredProperties() -> [AnyObject]! {
+        return ["runtimeProperty"]
     }
 }
 
@@ -139,14 +125,5 @@ class SwiftPrimaryStringObject: Object {
 
     override class func primaryKey() -> String {
         return "stringCol"
-    }
-}
-
-class SwiftIndexedPropertiesObject: Object {
-    dynamic var stringCol = ""
-    dynamic var intCol = 0
-
-    override class func indexedProperties() -> [String] {
-        return ["stringCol"] // Add "intCol" when integer indexing is supported
     }
 }

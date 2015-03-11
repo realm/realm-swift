@@ -40,7 +40,7 @@
         self = [self initWithRealm:nil schema:schema defaultValues:YES];
 
         // set standalone accessor class
-        object_setClass(self, self.objectSchema.standaloneClass);
+        object_setClass(self, schema.standaloneClass);
     }
     else {
         // if schema not initialized
@@ -88,35 +88,15 @@
     if (self) {
         _realm = realm;
         _objectSchema = schema;
-        if (useDefaults) {
+        if (useDefaults && !schema.isSwiftClass) {
             // set default values
-            NSDictionary *dict = [self.class defaultPropertyValues];
+            NSDictionary *dict = RLMDefaultValuesForObjectSchema(schema);
             for (NSString *key in dict) {
                 [self setValue:dict[key] forKey:key];
             }
         }
     }
     return self;
-}
-
-// default indexed properties implementation
-+ (NSArray *)indexedProperties {
-    return @[];
-}
-
-// default default values implementation
-+ (NSDictionary *)defaultPropertyValues {
-    return nil;
-}
-
-// default ignored properties implementation
-+ (NSArray *)ignoredProperties {
-    return nil;
-}
-
-// default primaryKey implementation
-+ (NSString *)primaryKey {
-    return nil;
 }
 
 // overridden at runtime per-class for performance
@@ -131,6 +111,26 @@
 // overridden at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
     return RLMSchema.sharedSchema[self.className];
+}
+
+void RLMObjectBaseSetRealm(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMRealm *realm) {
+    if (object) {
+        object->_realm = realm;
+    }
+}
+
+RLMRealm *RLMObjectBaseRealm(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_realm : nil;
+}
+
+void RLMObjectBaseSetObjectSchema(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMObjectSchema *objectSchema) {
+    if (object) {
+        object->_objectSchema = objectSchema;
+    }
+}
+
+RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_objectSchema : nil;
 }
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
@@ -199,11 +199,10 @@
         return @"<Maximum depth exceeded>";
     }
 
-    RLMObjectSchema *objectSchema = self.objectSchema;
-    NSString *baseClassName = objectSchema.className;
+    NSString *baseClassName = _objectSchema.className;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
-    for (RLMProperty *property in objectSchema.properties) {
+    for (RLMProperty *property in _objectSchema.properties) {
         id object = self[property.name];
         NSString *sub;
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
@@ -231,7 +230,7 @@
 
 - (BOOL)isInvalidated {
     // if not standalone and our accessor has been detached, we have been deleted
-    return self.class == self.objectSchema.accessorClass && !_row.is_attached();
+    return self.class == _objectSchema.accessorClass && !_row.is_attached();
 }
 
 - (BOOL)isDeletedFromRealm {
@@ -239,12 +238,15 @@
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {
+    if (!object) {
+        return NO;
+    }
     // if identical object
     if (self == object) {
         return YES;
     }
     // if not in realm or differing realms
-    if (_realm == nil || _realm != object.realm) {
+    if (_realm == nil || _realm != object->_realm) {
         return NO;
     }
     // if either are detached
@@ -274,6 +276,34 @@
     else {
         return [super hash];
     }
+}
+
+@end
+
+
+
+Class RLMObjectUtilClass(BOOL isSwift) {
+    static Class objectUtilObjc = [RLMObjectUtil class];
+    static Class objectUtilSwift = NSClassFromString(@"RealmSwift.ObjectUtil");
+    return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
+}
+
+@implementation RLMObjectUtil
+
++ (NSString *)primaryKeyForClass:(Class)cls {
+    return [cls primaryKey];
+}
+
++ (NSArray *)ignoredPropertiesForClass:(Class)cls {
+    return [cls ignoredProperties];
+}
+
++ (NSArray *)indexedPropertiesForClass:(Class)cls {
+    return [cls indexedProperties];
+}
+
++ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
+    return nil;
 }
 
 @end

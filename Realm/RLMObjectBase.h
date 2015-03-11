@@ -23,8 +23,6 @@
 @class RLMObjectSchema;
 
 @interface RLMObjectBase : NSObject
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 - (instancetype)init;
@@ -40,8 +38,18 @@
 
 + (NSString *)className;
 
-+ (NSDictionary *)defaultPropertyValues;
-+ (NSString *)primaryKey;
-+ (NSArray *)ignoredProperties;
+@end
+
+
+
+Class RLMObjectUtilClass(BOOL isSwift);
+
+@interface RLMObjectUtil : NSObject
+
++ (NSString *)primaryKeyForClass:(Class)cls;
++ (NSArray *)ignoredPropertiesForClass:(Class)cls;
++ (NSArray *)indexedPropertiesForClass:(Class)cls;
+
++ (NSArray *)getGenericListPropertyNames:(id)obj;
 
 @end

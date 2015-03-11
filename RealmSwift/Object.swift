@@ -79,76 +79,121 @@ public class Object : RLMObjectBase, Equatable {
         super.init(object: object)
     }
 
-    // MARK: Constructors
 
-    /**
-    Create an `Object` in the given `Realm` with the given object.
+    // MARK: Properties
 
-    Creates an instance of this object and adds it to the given `Realm` populating
-    the object with the given object.
-
-    :param: realm  The Realm in which this object is persisted.
-    :param: object The object used to populate the object. This can be any key/value coding compliant
-                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                   or an `Array` with one object for each persisted property. An exception will be
-                   thrown if any required properties are not present and no default is set.
-
-                   When passing in an `Array`, all properties must be present,
-                   valid and in the same order as the properties defined in the model.
-
-    :returns: The created object.
-    */
-    public class func createInRealm(realm: Realm, withObject object: AnyObject) -> Self {
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(realm.rlmRealm, className(), object, .allZeros), self)
+    /// The `Realm` this object belongs to, or `nil` if the object
+    /// does not belong to a realm (the object is standalone).
+    public var realm: Realm? {
+        if let rlmReam = RLMObjectBaseRealm(self) {
+            return Realm(rlmReam)
+        }
+        return nil
     }
 
-    // MARK: Private Initializers
+    /// The `ObjectSchema` which lists the persisted properties for this object.
+    public var objectSchema: ObjectSchema {
+        return ObjectSchema(rlmObjectSchema: RLMObjectBaseObjectSchema(self))
+    }
 
-    // FIXME: None of these initializers should be exposed in the public interface.
+    /// Indicates if an object can no longer be accessed.
+    public override var invalidated: Bool { return super.invalidated }
+
+
+    // MARK: Object customization
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
+    Override to designate a property as the primary key for an `Object` subclass. Only properties of
+    type String and Int can be designated as the primary key. Primary key
+    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
+    Indexes are created automatically for string primary key properties.
+    :returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
+    */
+    public class func primaryKey() -> String? { return nil }
 
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
+    /**
+    Override to return an array of property names to ignore. These properties will not be persisted
+    and are treated as transient.
 
-    :param: realm         The realm to which this object belongs.
-    :param: schema        The schema for the object's class.
-    :param: defaultValues Whether the default values for this model should be used.
+    :returns: `Array` of property names to ignore.
+    */
+    public class func ignoredProperties() -> [String] { return [] }
+
+    /**
+    Return an array of property names for properties which should be indexed. Only supported
+    for string properties.
+    :returns: `Array` of property names to index.
+    */
+    public class func indexedProperties() -> [String] { return [] }
+
+
+    // MARK: Inverse Relationships
+
+    /**
+    Get an `Array` of objects of type `className` which have this object as the given property value. This can
+    be used to get the inverse relationship value for `Object` and `List` properties.
+    :param: className The type of object on which the relationship to query is defined.
+    :param: property  The name of the property which defines the relationship.
+    :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
+    */
+    public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
+        return linkingObjectsOfClass(T.className(), forProperty: propertyName) as [T]
+    }
+
+
+    // MARK: Private functions
+
+    // FIXME: None of these functions should be exposed in the public interface.
+
+    /**
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(realm: RLMRealm, schema: RLMObjectSchema, defaultValues: Bool) {
         super.init(realm: realm, schema: schema, defaultValues: defaultValues)
     }
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
-
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
-
-    :param: realm  The realm to which this object belongs.
-    :param: schema The realm's schema.
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(object: AnyObject, schema: RLMSchema) {
         super.init(object: object, schema: schema)
     }
 
     /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is
-             not intended to be used directly.
-
-    This initializer is called by the Objective-C accessor creation code, and if it's
-    not overridden in Swift, the inline property initializers don't get called,
-    and we require them for `List<>` properties.
-
-    :param: objectSchema The schema for the object's class.
+    WARNING: This is an internal initializer not intended for public use.
     */
     public override init(objectSchema: RLMObjectSchema) {
         super.init(objectSchema: objectSchema)
+    }
+
+    /// Get RLMArray values when getting array properties
+    public override func valueForKey(key: String) -> AnyObject? {
+        if let list = listProperty(key) {
+            return list
+        }
+        return super.valueForKey(key)
+    }
+
+    /// Support setting RLMArray values
+    public override func setValue(value: AnyObject?, forKey key: String) {
+        if let list = listProperty(key) {
+            if let value = value as? NSFastEnumeration {
+                list._rlmArray.removeAllObjects()
+                list._rlmArray.addObjects(value)
+            }
+            return
+        }
+        super.setValue(value, forKey: key)
+    }
+
+    // Helper for getting a list property for the given key
+    private func listProperty(key: String) -> RLMListBase? {
+        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
+            if prop.type == .Array {
+                return object_getIvar(self, prop.swiftListIvar) as RLMListBase?
+            }
+        }
+        return nil
     }
 }
 
@@ -161,6 +206,25 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
 
 /// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
+    @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
+        if let type = type as? Object.Type {
+            return type.primaryKey()
+        }
+        return nil
+    }
+    @objc private class func ignoredPropertiesForClass(type: AnyClass) -> NSArray? {
+        if let type = type as? Object.Type {
+            return type.ignoredProperties() as NSArray?
+        }
+        return nil
+    }
+    @objc private class func indexedPropertiesForClass(type: AnyClass) -> NSArray? {
+        if let type = type as? Object.Type {
+            return type.indexedProperties() as NSArray?
+        }
+        return nil
+    }
+
     // Get the names of all properties in the object which are of type List<>
     @objc private class func getGenericListPropertyNames(obj: AnyObject) -> NSArray {
         let reflection = reflect(obj)
@@ -178,5 +242,4 @@ public class ObjectUtil : NSObject {
 
         return properties
     }
-
 }

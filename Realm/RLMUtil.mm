@@ -133,8 +133,11 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
         case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
-            BOOL isValidObject = [RLMDynamicCast<RLMObjectBase>(obj).objectSchema.className isEqualToString:property.objectClassName];
-            return isValidObject || obj == nil || obj == NSNull.null;
+            if (obj == nil || obj == NSNull.null) {
+                return YES;
+            }
+            RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
+            return objBase && [objBase->_objectSchema.className isEqualToString:property.objectClassName];
         }
         case RLMPropertyTypeArray: {
             if (RLMArray *array = RLMDynamicCast<RLMArray>(obj)) {
@@ -143,7 +146,8 @@ BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *property) {
             if (NSArray *array = RLMDynamicCast<NSArray>(obj)) {
                 // check each element for compliance
                 for (id el in array) {
-                    if (![RLMDynamicCast<RLMObjectBase>(el).objectSchema.className isEqualToString:property.objectClassName]) {
+                    RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(el);
+                    if (!obj || ![obj->_objectSchema.className isEqualToString:property.objectClassName]) {
                         return NO;
                     }
                 }
@@ -188,14 +192,10 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
         return [objectSchema.objectClass defaultPropertyValues];
     }
 
-    // for swift merge
-    // FIXME: for new apis only return swift initialized values
-    NSMutableDictionary *defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
     RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
     for (RLMProperty *prop in objectSchema.properties) {
-        if (!defaults[prop.name] && defaultObject[prop.name]) {
-            defaults[prop.name] = defaultObject[prop.name];
-        }
+        defaults[prop.name] = defaultObject[prop.name];
     }
     return defaults;
 }

@@ -129,14 +129,10 @@ class ListTests: TestCase {
 
         array[0] = str2
         XCTAssertEqual(str2, array[0])
-        assertThrows(array[-1] = str2)
 
         array.append(str1)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
-
-        assertThrows(array[200])
-        assertThrows(array[-200])
     }
 
     func testFirst() {
@@ -190,7 +186,7 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(1), array.filter(pred2).count)
     }
 
-    func testSortWithProperty() {
+    func testSort() {
         array.append([str1, str2])
 
         var sorted = array.sorted("stringCol", ascending: true)
@@ -200,50 +196,6 @@ class ListTests: TestCase {
         sorted = array.sorted("stringCol", ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
-
-        assertThrows(array.sorted("noSuchCol"))
-    }
-
-    func testSortWithDescriptors() {
-        let object = realmWithTestPath().create(SwiftAggregateObjectList.self, value: [[]])
-        let array = object.list
-
-        let obj1 = SwiftAggregateObject()
-        obj1.intCol = 1
-        obj1.floatCol = 1.1
-        obj1.doubleCol = 1.11
-        obj1.dateCol = NSDate(timeIntervalSince1970: 1)
-        obj1.boolCol = false
-
-        let obj2 = SwiftAggregateObject()
-        obj2.intCol = 2
-        obj2.floatCol = 2.2
-        obj2.doubleCol = 2.22
-        obj2.dateCol = NSDate(timeIntervalSince1970: 2)
-        obj2.boolCol = false
-
-        let obj3 = SwiftAggregateObject()
-        obj3.intCol = 3
-        obj3.floatCol = 2.2
-        obj3.doubleCol = 2.22
-        obj3.dateCol = NSDate(timeIntervalSince1970: 2)
-        obj3.boolCol = false
-
-        realmWithTestPath().add([obj1, obj2, obj3])
-        array.append([obj1, obj2, obj3])
-
-        var sorted = array.sorted([SortDescriptor(property: "intCol", ascending: true)])
-        XCTAssertEqual(1, sorted[0].intCol)
-        XCTAssertEqual(2, sorted[1].intCol)
-
-        sorted = array.sorted([SortDescriptor(property: "doubleCol", ascending: false), SortDescriptor(property: "intCol", ascending: false)])
-        XCTAssertEqual(2.22, sorted[0].doubleCol)
-        XCTAssertEqual(3, sorted[0].intCol)
-        XCTAssertEqual(2.22, sorted[1].doubleCol)
-        XCTAssertEqual(2, sorted[1].intCol)
-        XCTAssertEqual(1.11, sorted[2].doubleCol)
-
-        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
     }
 
     func testFastEnumeration() {
@@ -256,16 +208,6 @@ class ListTests: TestCase {
         XCTAssertEqual(str, "121")
     }
 
-    func testAppendObject() {
-        for str in [str1, str2, str1] {
-            array.append(str)
-        }
-        XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str1, array[2])
-    }
-
     func testAppendArray() {
         array.append([str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
@@ -274,7 +216,7 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[2])
     }
 
-    func testAppendResults() {
+    func testAppendRLMResults() {
         array.append(realmWithTestPath().objects(SwiftStringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
@@ -292,9 +234,6 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
-
-        assertThrows(array.insert(str2, atIndex: 200))
-        assertThrows(array.insert(str2, atIndex: -200))
     }
 
     func testRemoveIndex() {
@@ -303,9 +242,6 @@ class ListTests: TestCase {
         array.remove(1)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
-
-        assertThrows(array.remove(200))
-        assertThrows(array.remove(-200))
     }
 
     func testRemoveObject() {
@@ -329,18 +265,12 @@ class ListTests: TestCase {
 
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
-
-        array.removeLast() // should be a no-op
-        XCTAssertEqual(Int(0), array.count)
     }
 
     func testRemoveAll() {
         array.append([str1, str2])
 
         array.removeAll()
-        XCTAssertEqual(Int(0), array.count)
-
-        array.removeAll() // should be a no-op
         XCTAssertEqual(Int(0), array.count)
     }
 
@@ -356,9 +286,6 @@ class ListTests: TestCase {
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str2, array[1])
-
-        assertThrows(array.replace(200, object: str2))
-        assertThrows(array.replace(-200, object: str2))
     }
 
     func testChangesArePersisted() {
@@ -367,26 +294,6 @@ class ListTests: TestCase {
 
             let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
-        }
-    }
-
-    func testPopulateEmptyArray() {
-        XCTAssertEqual(array.count, 0, "Should start with no array elements.")
-
-        let obj = SwiftStringObject()
-        obj.stringCol = "a"
-        array.append(obj)
-        array.append(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
-        array.append(obj)
-
-        XCTAssertEqual(array.count, 3)
-        XCTAssertEqual(array[0].stringCol, "a")
-        XCTAssertEqual(array[1].stringCol, "b")
-        XCTAssertEqual(array[2].stringCol, "a")
-
-        // Make sure we can enumerate
-        for obj in array {
-            XCTAssertTrue(countElements(obj.description) > 0, "Object should have description")
         }
     }
 }
@@ -399,8 +306,7 @@ class ListStandaloneTests: ListTests {
     }
 
     // Things not implemented in standalone
-    override func testSortWithProperty() { }
-    override func testSortWithDescriptors() { }
+    override func testSort() { }
     override func testFilterFormat() { }
     override func testFilterPredicate() { }
     override func testIndexOfFormat() { }
@@ -424,7 +330,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        let array = SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -436,7 +342,7 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        SwiftArrayPropertyObject.createInRealm(realm, withObject: ["name", [], []])
         realm.commitWrite()
         let array = realm.objects(SwiftArrayPropertyObject).first!
 
