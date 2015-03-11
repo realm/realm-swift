@@ -50,7 +50,7 @@ filter query results.
 
 Results cannot be created directly.
 */
-public final class Results<T: Object>: Printable, SequenceType {
+public final class Results<T: Object>: Printable, CollectionType {
 
     // MARK: Properties
 
@@ -244,4 +244,16 @@ public final class Results<T: Object>: Printable, SequenceType {
             }
         }
     }
+
+    // MARK: Collection Support
+
+    typealias Index = Int
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { return 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    public var endIndex: Int { return count }
 }
