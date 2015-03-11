@@ -169,7 +169,7 @@ public class Object : RLMObjectBase, Equatable {
     /// Get RLMArray values when getting array properties
     public override func valueForKey(key: String) -> AnyObject? {
         if let list = listProperty(key) {
-            return list
+	    return Optional.Some(list)
         }
         return super.valueForKey(key)
     }
