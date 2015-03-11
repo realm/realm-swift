@@ -168,14 +168,13 @@ public class Object : RLMObjectBase, Equatable {
 
     /// Get RLMArray values when getting array properties
     public override func valueForKey(key: String) -> AnyObject? {
-	let list = listProperty(key)
-	if list != nil {
-	    // Swift technically allows returning non-optionals where
-	    // optionals are expected, but this occasionally leads to
-	    // runtime crashes. Return Optional<ListBase> instead.
-	    return list
-	}
-	return super.valueForKey(key)
+        if let list = listProperty(key) {
+            // Swift technically allows returning non-optionals where
+            // optionals are expected, but this occasionally leads to
+            // runtime crashes. Return Optional<ListBase> instead.
+            return Optional.Some(list)
+        }
+        return super.valueForKey(key)
     }
 
     /// Support setting RLMArray values
