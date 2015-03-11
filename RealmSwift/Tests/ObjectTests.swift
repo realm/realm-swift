@@ -40,12 +40,11 @@ class ObjectTests: TestCase {
         XCTAssertNotNil(persisted.realm)
         XCTAssertEqual(realm, persisted.realm!)
 
-        let group = dispatch_group_create()
         let queue = dispatch_queue_create("background", DISPATCH_QUEUE_SERIAL)
         dispatch_async(queue) {
             XCTAssertNotEqual(Realm(), persisted.realm!)
         }
-        dispatch_group_wait(group, DISPATCH_TIME_FOREVER)
+        dispatch_sync(queue, {})
     }
 
     func testObjectSchema() {
