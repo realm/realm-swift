@@ -34,7 +34,6 @@ command:
   download-core:               downloads core library (binary version)
   clean:                       clean up/remove all generated files
   build [settings]:            builds iOS and OS X frameworks
-  ios [settings]:              builds iOS frameworks
   ios-dynamic [settings]:      builds iOS dynamic frameworks
   ios-static [settings]:       builds a fat iOS static framework
   osx [settings]:              builds OS X framework
@@ -455,7 +454,6 @@ case "$COMMAND" in
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Backlink -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme GroupedTableView -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
-        xc "-project examples/ios/swift/RealmExamples.xcodeproj -scheme Encryption -configuration $CONFIGURATION build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
