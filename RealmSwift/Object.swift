@@ -93,7 +93,7 @@ public class Object : RLMObjectBase, Equatable {
 
     /// The `ObjectSchema` which lists the persisted properties for this object.
     public var objectSchema: ObjectSchema {
-        return ObjectSchema(rlmObjectSchema: RLMObjectBaseObjectSchema(self))
+        return ObjectSchema(RLMObjectBaseObjectSchema(self))
     }
 
     /// Indicates if an object can no longer be accessed.
