@@ -19,10 +19,7 @@
 import XCTest
 import RealmSwift
 import Realm
-
-internal func testRealmPath() -> String {
-    return realmPathForFile("test.realm")
-}
+import Foundation
 
 private func realmPathForFile(fileName: String) -> String {
     return Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
@@ -46,12 +43,6 @@ private func deleteRealmFilesAtPath(path: String) {
     }
 }
 
-private func deleteRealmFiles() {
-    RLMRealm.resetRealmState()
-    deleteRealmFilesAtPath(Realm.defaultPath)
-    deleteRealmFilesAtPath(testRealmPath())
-}
-
 class TestCase: XCTestCase {
     func realmWithTestPath() -> Realm {
         return Realm(path: testRealmPath())
@@ -61,6 +52,7 @@ class TestCase: XCTestCase {
         deleteRealmFiles()
 
         autoreleasepool {
+            Realm.defaultPath = realmPathForFile("\(self.name).default.realm")
             self.setUp()
         }
         autoreleasepool {
@@ -73,5 +65,20 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(block: @autoclosure () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
         RLMAssertThrows(self, { _ = block() }, message, fileName, lineNumber);
+    }
+
+    private func realmFilePrefix() -> String {
+        let remove = NSCharacterSet(charactersInString: "-[]")
+        return self.name.stringByTrimmingCharactersInSet(remove)
+    }
+
+    private func deleteRealmFiles() {
+        RLMRealm.resetRealmState()
+        deleteRealmFilesAtPath(Realm.defaultPath)
+        deleteRealmFilesAtPath(testRealmPath())
+    }
+
+    internal func testRealmPath() -> String {
+        return realmPathForFile("\(realmFilePrefix()).realm")
     }
 }
