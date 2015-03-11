@@ -979,7 +979,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../../../\nif [[ ! -d \"ios/Realm.framework\" && ! -d \"build/ios/Realm.framework\" ]]; then\n    sh build.sh ios\nfi\n";
+			shellScript = "cd ../../../\nif [[ ! -d \"ios/Realm.framework\" && ! -d \"build/ios/Realm.framework\" ]]; then\n    sh build.sh ios-static\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

@@ -34,7 +34,6 @@ command:
   download-core:               downloads core library (binary version)
   clean:                       clean up/remove all generated files
   build [settings]:            builds iOS and OS X frameworks
-  ios [settings]:              builds iOS frameworks
   ios-dynamic [settings]:      builds iOS dynamic frameworks
   ios-static [settings]:       builds a fat iOS static framework
   osx [settings]:              builds OS X framework
