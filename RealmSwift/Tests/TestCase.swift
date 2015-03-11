@@ -28,7 +28,7 @@ class TestCase: XCTestCase {
 
     override func invokeTest() {
         Realm.defaultPath = realmPathForFile("\(realmFilePrefix()).default.realm")
-        NSFileManager.defaultManager().createDirectoryAtPath(Realm.defaultPath.stringByDeletingLastPathComponent, withIntermediateDirectories: true, attributes: nil, error: nil)
+        NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil, error: nil)
 
         autoreleasepool {
             self.setUp()
@@ -39,6 +39,7 @@ class TestCase: XCTestCase {
         }
 
         deleteRealmFiles()
+        RLMRealm.resetRealmState()
     }
 
     func assertThrows<T>(block: @autoclosure () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
@@ -53,8 +54,6 @@ class TestCase: XCTestCase {
     private func deleteRealmFiles() {
         let succeeded = NSFileManager.defaultManager().removeItemAtPath(realmPathForFile(""), error: nil)
         assert(succeeded, "Unable to delete realm files")
-
-        RLMRealm.resetRealmState()
     }
 
     internal func testRealmPath() -> String {
