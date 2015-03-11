@@ -40,7 +40,7 @@ Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
 When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
-public final class List<T: Object>: ListBase, CollectionType {
+public final class List<T: Object>: ListBase, ExtensibleCollectionType {
 
     // MARK: Properties
 
@@ -206,6 +206,9 @@ public final class List<T: Object>: ListBase, CollectionType {
     /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
     public var endIndex: Int { return count }
 
+    /// This method has no effect.
+    public func reserveCapacity(capacity: Int) { }
+
     // MARK: Mutation
 
     /**
@@ -226,9 +229,9 @@ public final class List<T: Object>: ListBase, CollectionType {
 
     :param: objects A sequence of objects.
     */
-    public func append<S where S: SequenceType>(objects: S) {
-        for obj in objects {
-            _rlmArray.addObject(unsafeBitCast(obj as T, RLMObject.self))
+    public func extend<S: SequenceType where S.Generator.Element == T>(objects: S) {
+        for obj in SequenceOf<T>(objects) {
+            _rlmArray.addObject(unsafeBitCast(obj, RLMObject.self))
         }
     }
 
