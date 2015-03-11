@@ -26,11 +26,11 @@ introspecting the database's schema.
 
 These properties map to columns in the core database.
 */
-public class Property: Equatable {
+public final class Property {
 
     // MARK: Properties
 
-    var rlmProperty: RLMProperty
+    internal let rlmProperty: RLMProperty
 
     /// Property name.
     public var name: String { return rlmProperty.name }
@@ -46,12 +46,14 @@ public class Property: Equatable {
 
     // MARK: Initializers
 
-    init(rlmProperty: RLMProperty) {
+    internal init(_ rlmProperty: RLMProperty) {
         self.rlmProperty = rlmProperty
     }
 }
 
 // MARK: Equatable
+
+extension Property: Equatable {}
 
 /// Returns whether the two properties are equal.
 public func ==(lhs: Property, rhs: Property) -> Bool {

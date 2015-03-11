@@ -153,10 +153,10 @@ public final class Migration {
     // MARK: Properties
 
     /// The migration's old `Schema`, describing the `Realm` before applying a migration.
-    public var oldSchema: Schema { return Schema(rlmSchema: rlmMigration.oldSchema) }
+    public var oldSchema: Schema { return Schema(rlmMigration.oldSchema) }
 
     /// The migration's new `Schema`, describing the `Realm` after applying a migration.
-    public var newSchema: Schema { return Schema(rlmSchema: rlmMigration.newSchema) }
+    public var newSchema: Schema { return Schema(rlmMigration.newSchema) }
 
     private var rlmMigration: RLMMigration
 
