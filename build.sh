@@ -259,12 +259,15 @@ case "$COMMAND" in
     # Building
     ######################################
     "build")
-        sh build.sh ios
+        sh build.sh ios-static
+        sh build.sh ios-dynamic
+        sh build.sh ios-swift
         sh build.sh osx
+        sh build.sh osx-swift
         exit 0
         ;;
 
-    "ios")
+    "ios-static")
         build_combined iOS "$CONFIGURATION" Realm
         exit 0
         ;;
@@ -300,9 +303,12 @@ case "$COMMAND" in
     "test")
         set +e # Run both sets of tests even if the first fails
         failed=0
-        sh build.sh test-ios || failed=1
+        sh build.sh test-ios-static || failed=1
+        sh build.sh test-ios-dynamic || failed=1
+        sh build.sh test-ios-swift || failed=1
         sh build.sh test-ios-devices || failed=1
         sh build.sh test-osx || failed=1
+        sh build.sh test-osx-swift || failed=1
         exit $failed
         ;;
 
@@ -314,14 +320,19 @@ case "$COMMAND" in
         exit $failed
         ;;
 
-    "test-ios")
+    "test-ios-static")
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealm "-scheme iOS -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
         ;;
 
-   "test-ios-swift")
+    "test-ios-dynamic")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
+        exit 0
+        ;;
+
+    "test-ios-swift")
         xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 4S' test"
         exit 0
@@ -329,10 +340,15 @@ case "$COMMAND" in
 
     "test-ios-devices")
         test_ios_devices "$CONFIGURATION" || failed=1
+#FIXME - add swift device tests
         ;;
 
     "test-osx")
         xcrealm "-scheme OSX -configuration $CONFIGURATION test"
+        exit 0
+        ;;
+
+    "test-osx-swift")
         xcrealmswift "-scheme 'RealmSwift OSX' -configuration $CONFIGURATION test"
         exit 0
         ;;
@@ -344,8 +360,12 @@ case "$COMMAND" in
         sh build.sh verify-docs
         sh build.sh verify-osx
         sh build.sh verify-osx-debug
+        sh build.sh verify-osx-swift
+        sh build.sh verify-osx-swift-debug
         sh build.sh verify-ios-static
         sh build.sh verify-ios-static-debug
+        sh build.sh verify-ios-dynamic
+        sh build.sh verify-ios-dynamic-debug
         sh build.sh verify-ios-swift
         sh build.sh verify-ios-swift-debug
         sh build.sh verify-ios-device
@@ -364,9 +384,18 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "verify-osx-swift")
+        sh build.sh test-osx-swift
+        exit 0
+        ;;
+
     "verify-ios-static")
-        sh build.sh test-ios
+        sh build.sh test-ios-static
         sh build.sh examples-ios
+        ;;
+
+    "verify-ios-dynamic")
+        sh build.sh test-ios-dynamic
         ;;
 
     "verify-ios-swift")
@@ -387,14 +416,6 @@ case "$COMMAND" in
 
     # FIXME: remove these targets from ci
     "verify-ios")
-        exit 0
-        ;;
-
-    "verify-osx-swift")
-        exit 0
-        ;;
-
-    "verify-ios-dynamic")
         exit 0
         ;;
 
