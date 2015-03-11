@@ -27,7 +27,7 @@ class TestCase: XCTestCase {
     }
 
     override func invokeTest() {
-        Realm.defaultPath = realmPathForFile("\(self.name).default.realm")
+        Realm.defaultPath = realmPathForFile("\(realmFilePrefix()).default.realm")
         NSFileManager.defaultManager().createDirectoryAtPath(Realm.defaultPath.stringByDeletingLastPathComponent, withIntermediateDirectories: true, attributes: nil, error: nil)
 
         autoreleasepool {
