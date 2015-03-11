@@ -247,8 +247,6 @@ public final class Results<T: Object>: Printable, CollectionType {
 
     // MARK: Collection Support
 
-    typealias Index = Int
-
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
     public var startIndex: Int { return 0 }
