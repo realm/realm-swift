@@ -21,38 +21,16 @@ import RealmSwift
 import Realm
 import Foundation
 
-private func realmPathForFile(fileName: String) -> String {
-    return Realm.defaultPath.stringByDeletingLastPathComponent.stringByAppendingPathComponent(fileName)
-}
-
-private func realmLockPath(path: String) -> String {
-    return path + ".lock"
-}
-
-private func deleteRealmFilesAtPath(path: String) {
-    let fileManager = NSFileManager.defaultManager()
-    if fileManager.fileExistsAtPath(path) {
-        let succeeded = NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
-        assert(succeeded, "Unable to delete realm")
-    }
-
-    let lockPath = realmLockPath(path)
-    if fileManager.fileExistsAtPath(lockPath) {
-        let succeeded = NSFileManager.defaultManager().removeItemAtPath(lockPath, error: nil)
-        assert(succeeded, "Unable to delete realm")
-    }
-}
-
 class TestCase: XCTestCase {
     func realmWithTestPath() -> Realm {
         return Realm(path: testRealmPath())
     }
 
     override func invokeTest() {
-        deleteRealmFiles()
+        Realm.defaultPath = realmPathForFile("\(self.name).default.realm")
+        NSFileManager.defaultManager().createDirectoryAtPath(Realm.defaultPath.stringByDeletingLastPathComponent, withIntermediateDirectories: true, attributes: nil, error: nil)
 
         autoreleasepool {
-            Realm.defaultPath = realmPathForFile("\(self.name).default.realm")
             self.setUp()
         }
         autoreleasepool {
@@ -73,12 +51,21 @@ class TestCase: XCTestCase {
     }
 
     private func deleteRealmFiles() {
+        let succeeded = NSFileManager.defaultManager().removeItemAtPath(realmPathForFile(""), error: nil)
+        assert(succeeded, "Unable to delete realm files")
+
         RLMRealm.resetRealmState()
-        deleteRealmFilesAtPath(Realm.defaultPath)
-        deleteRealmFilesAtPath(testRealmPath())
     }
 
     internal func testRealmPath() -> String {
         return realmPathForFile("\(realmFilePrefix()).realm")
     }
+}
+
+private func realmPathForFile(fileName: String) -> String {
+    var path = Realm.defaultPath.stringByDeletingLastPathComponent
+    if path.lastPathComponent != "testRealms" {
+        path = path.stringByAppendingPathComponent("testRealms")
+    }
+    return path.stringByAppendingPathComponent(fileName)
 }
