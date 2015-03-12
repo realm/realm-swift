@@ -22,19 +22,27 @@
 
 // Add a Realm to the weak cache
 void RLMCacheRealm(RLMRealm *realm);
+
 // Get a Realm for the given path which can be used on the current thread
 RLMRealm *RLMGetThreadLocalCachedRealmForPath(NSString *path);
+
 // Get a Realm for the given path
 RLMRealm *RLMGetAnyCachedRealmForPath(NSString *path);
+
 // Clear the weak cache of Realms
 void RLMClearRealmCache();
+
+// Clear the weak cache of Realms
+void RLMThrowIfCacheIsNotEmpty();
 
 @interface RLMNotifier : NSObject
 // listens to changes to the realm's file and notifies it when they occur
 // does not retain the Realm
 - (instancetype)initWithRealm:(RLMRealm *)realm error:(NSError **)error;
+
 // stop listening for changes
 - (void)stop;
+
 // notify other Realm instances for the same path that a change has occurred
 - (void)notifyOtherRealms;
 @end

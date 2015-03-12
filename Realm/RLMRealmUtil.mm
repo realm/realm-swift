@@ -57,6 +57,16 @@ void RLMClearRealmCache() {
     }
 }
 
+void RLMThrowIfCacheIsNotEmpty() {
+    @synchronized(s_realmsPerPath) {
+        for (NSMapTable *map in s_realmsPerPath.allValues) {
+            if (map.objectEnumerator.nextObject != nil) {
+                @throw RLMException(@"Cache should be empty");
+            }
+        }
+    }
+}
+
 // Convert an error code to either an NSError or an exception
 static id handleError(int err, NSError **error) {
     if (!error) {
