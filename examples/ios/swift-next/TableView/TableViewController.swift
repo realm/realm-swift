@@ -17,12 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
-class DemoObject: RLMObject {
+class DemoObject: Object {
     dynamic var title = ""
     dynamic var date = NSDate()
-    dynamic var sectionTitle = ""
 }
 
 class Cell: UITableViewCell {
@@ -35,12 +34,10 @@ class Cell: UITableViewCell {
     }
 }
 
-var sectionTitles = ["A", "B", "C"]
-var objectsBySection = [RLMResults]()
-
 class TableViewController: UITableViewController {
 
-    var notificationToken: RLMNotificationToken?
+    var array = Realm().objects(DemoObject).sorted("date")
+    var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,14 +45,10 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = Realm().addNotificationBlock { note, realm in
             self.tableView.reloadData()
         }
-        for section in sectionTitles {
-            let unsortedObjects = DemoObject.objectsWhere("sectionTitle == '\(section)'")
-            let sortedObjects = unsortedObjects.sortedResultsUsingProperty("date", ascending: true)
-            objectsBySection.append(sortedObjects)
-        }
+
         tableView.reloadData()
     }
 
@@ -64,29 +57,21 @@ class TableViewController: UITableViewController {
     func setupUI() {
         tableView.registerClass(Cell.self, forCellReuseIdentifier: "cell")
 
-        self.title = "GroupedTableView"
+        self.title = "TableView"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "BG Add", style: .Plain, target: self, action: "backgroundAdd")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
     }
 
     // Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return sectionTitles.count
-    }
-
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles[section]
-    }
-
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
-        return Int(objectsBySection[section].count)
+        return array.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as Cell
 
-        let object = objectForIndexPath(indexPath)!
+        let object = array[indexPath.row]
         cell.textLabel?.text = object.title
         cell.detailTextLabel?.text = object.date.description
 
@@ -95,10 +80,10 @@ class TableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let realm = RLMRealm.defaultRealm()
-            realm.transactionWithBlock {
-                realm.deleteObject(objectForIndexPath(indexPath)!)
-            }
+            let realm = Realm()
+            realm.beginWrite()
+            realm.delete(array[indexPath.row])
+            realm.commitWrite()
         }
     }
 
@@ -109,34 +94,30 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         dispatch_async(queue) {
             // Get new realm and table since we are in a new thread
-            let realm = RLMRealm.defaultRealm()
-            realm.beginWriteTransaction()
+            let realm = Realm()
+            realm.beginWrite()
             for index in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                DemoObject.createInRealm(realm, withObject: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
+                realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
-            realm.commitWriteTransaction()
+            realm.commitWrite()
         }
     }
 
     func add() {
-        RLMRealm.defaultRealm().transactionWithBlock {
-            let object = [randomTitle(), NSDate(), randomSectionTitle()]
-            DemoObject.createInDefaultRealmWithObject(object)
-        }
+        let realm = Realm()
+        realm.beginWrite()
+        realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
+        realm.commitWrite()
     }
-}
 
-// Helpers
+    // Helpers
 
-func objectForIndexPath(indexPath: NSIndexPath) -> DemoObject? {
-    return objectsBySection[indexPath.section][UInt(indexPath.row)] as? DemoObject
-}
+    class func randomString() -> String {
+        return "Title \(arc4random())"
+    }
 
-func randomTitle() -> String {
-    return "Title \(arc4random())"
-}
-
-func randomSectionTitle() -> String {
-    return sectionTitles[Int(arc4random()) % sectionTitles.count]
+    class func randomDate() -> NSDate {
+        return NSDate(timeIntervalSince1970: NSTimeInterval(arc4random()))
+    }
 }

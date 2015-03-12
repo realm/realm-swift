@@ -17,16 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import UIKit
-import Realm
+import RealmSwift
 
-class Dog: RLMObject {
+class Dog: Object {
     dynamic var name = ""
     dynamic var age = 0
 }
 
-class Person: RLMObject {
+class Person: Object {
     dynamic var name = ""
-    dynamic var dogs = RLMArray(objectClassName: Dog.className())
+    let dogs = List<Dog>()
 }
 
 @UIApplicationMain
@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = UIViewController()
         self.window!.makeKeyAndVisible()
 
-        NSFileManager.defaultManager().removeItemAtPath(RLMRealm.defaultRealmPath(), error: nil)
+        NSFileManager.defaultManager().removeItemAtPath(Realm.defaultPath, error: nil)
 
         // Create a standalone object
         var mydog = Dog()
@@ -51,33 +51,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         println("Name of dog: \(mydog.name)")
 
         // Realms are used to group data together
-        let realm = RLMRealm.defaultRealm() // Create realm pointing to default file
+        let realm = Realm() // Create realm pointing to default file
 
         // Save your object
-        realm.beginWriteTransaction()
-        realm.addObject(mydog)
-        realm.commitWriteTransaction()
+        realm.beginWrite()
+        realm.add(mydog)
+        realm.commitWrite()
 
         // Query
-        var results = Dog.objectsInRealm(realm, withPredicate: NSPredicate(format: "name contains 'x'"))
+        var results = realm.objects(Dog).filter(NSPredicate(format:"name contains 'x'")!)
 
         // Queries are chainable!
-        var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
+        var results2 = results.filter("age > 8")
         println("Number of dogs: \(results.count)")
 
         // Link objects
         var person = Person()
         person.name = "Tim"
-        person.dogs.addObject(mydog)
+        person.dogs.append(mydog)
 
-        realm.transactionWithBlock() {
-            realm.addObject(person)
+        realm.write {
+            realm.add(person)
         }
 
         // Multi-threading
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            let otherRealm = RLMRealm.defaultRealm()
-            var otherResults = Dog.objectsInRealm(otherRealm, withPredicate: NSPredicate(format:"name contains 'Rex'"))
+            let otherRealm = Realm()
+            var otherResults = otherRealm.objects(Dog).filter(NSPredicate(format:"name contains 'Rex'")!)
             println("Number of dogs \(otherResults.count)")
         }
 
