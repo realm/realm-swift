@@ -20,6 +20,20 @@
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C0E04FC21AB2366200DCC8C0"
+               BuildableName = "TestHostTests.xctest"
+               BlueprintName = "TestHostTests"
+               ReferencedContainer = "container:RealmSwift.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -35,6 +49,16 @@
                BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
                BuildableName = "iOS Device Tests.xctest"
                BlueprintName = "iOS Device Tests"
+               ReferencedContainer = "container:RealmSwift.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C0E04FC21AB2366200DCC8C0"
+               BuildableName = "TestHostTests.xctest"
+               BlueprintName = "TestHostTests"
                ReferencedContainer = "container:RealmSwift.xcodeproj">
             </BuildableReference>
          </TestableReference>

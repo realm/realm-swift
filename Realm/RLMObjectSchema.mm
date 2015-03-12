@@ -91,7 +91,7 @@
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
     NSArray *props = @[];
-    while (superClass != RLMObjectBase.class) {
+    while (superClass && superClass != RLMObjectBase.class) {
         props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
         cls = superClass;
         superClass = class_getSuperclass(superClass);
