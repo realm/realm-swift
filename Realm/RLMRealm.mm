@@ -435,7 +435,7 @@ static id RLMAutorelease(id value) {
 + (void)resetRealmState {
     clearMigrationCache();
     clearKeyCache();
-
+    RLMClearRealmCache();
     s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
 }
 
