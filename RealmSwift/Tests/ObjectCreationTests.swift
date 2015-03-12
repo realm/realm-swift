@@ -237,15 +237,74 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithNestedObjects() {
+        let standalone = SwiftPrimaryStringObject(object: ["11", 11])
+        Realm().beginWrite()
+        let objectWithNestedObjects = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["11", ["11", 11], [standalone]])
+        Realm().commitWrite()
+
+        let stringObjects = Realm().objects(SwiftPrimaryStringObject)
+        XCTAssertEqual(stringObjects.count, 1)
+        let persistedObject = stringObjects.first!
+
+        XCTAssertNotEqual(standalone, persistedObject)
+        XCTAssertEqual(objectWithNestedObjects.object!, persistedObject)
+        XCTAssertEqual(objectWithNestedObjects.objects.first!, persistedObject)
     }
 
     func testUpdateWithNestedObjects() {
+        let standalone = SwiftPrimaryStringObject(object: ["11", 11])
+        Realm().beginWrite()
+        let object = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["12", standalone, [["11", 12]]], update: true)
+        Realm().commitWrite()
+
+        let stringObjects = Realm().objects(SwiftPrimaryStringObject)
+        XCTAssertEqual(stringObjects.count, 1)
+        let persistedObject = object.object!
+
+        XCTAssertEqual(persistedObject.intCol, 12)
+        XCTAssertNil(standalone.realm)
+        XCTAssertEqual(object.object!, persistedObject)
+        XCTAssertEqual(object.objects.first!, persistedObject)
     }
 
-    func testCreateWithObjectsFromAnotherRealm() {
-    }
+    // This doesn't yet work, as RLMIsObjectValidForProperty doesn't take into account the target Realm,
+    // so we end up trying to just add a link to another Realm, which raises an exception.
+//    func testCreateWithObjectsFromAnotherRealm() {
+//        let values = [
+//            "boolCol": true as NSNumber,
+//            "intCol": 1 as NSNumber,
+//            "floatCol": 1.1 as NSNumber,
+//            "doubleCol": 11.1 as NSNumber,
+//            "stringCol": "b" as NSString,
+//            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+//            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+//            "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
+//            "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject,
+//        ]
+//
+//        realmWithTestPath().beginWrite()
+//        let otherRealmObject = realmWithTestPath().create(SwiftObject.self, value: values)
+//        realmWithTestPath().commitWrite()
+//
+//        Realm().beginWrite()
+//        let object = Realm().create(SwiftObject.self, value: otherRealmObject)
+//        Realm().commitWrite()
+//
+//        XCTAssertNotEqual(otherRealmObject, object)
+//        verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+//    }
 
     func testUpdateWithObjectsFromAnotherRealm() {
+        realmWithTestPath().beginWrite()
+        let otherRealmObject = realmWithTestPath().create(SwiftLinkToPrimaryStringObject.self, value: ["1", NSNull(), [["2", 2], ["4", 4]]])
+        realmWithTestPath().commitWrite()
+
+        Realm().beginWrite()
+        Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["1", ["10", 10], [["11", 11]]])
+        let object = Realm().create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: true)
+        Realm().commitWrite()
+
+        XCTAssertNotEqual(otherRealmObject, object)
     }
 
     // test NSNull for object
@@ -304,6 +363,9 @@ class ObjectCreationTests: TestCase {
 
     // return an array of valid values that can be used to initialize each type
     private func validValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
+        Realm().beginWrite()
+        let persistedObject = Realm().create(SwiftBoolObject.self, value: [true])
+        Realm().commitWrite()
         switch type {
             case .Bool:     return [true, 0 as Int, 1 as Int]
             case .Int:      return [1 as Int]
@@ -312,7 +374,7 @@ class ObjectCreationTests: TestCase {
             case .String:   return ["b"]
             case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
             case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
-            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true], NSNull())]
+            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
             case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])]]
             case .Any:      XCTFail("not supported")
         }
@@ -320,6 +382,9 @@ class ObjectCreationTests: TestCase {
     }
 
     private func invalidValuesForSwiftObjectType(type: PropertyType) -> [AnyObject] {
+        Realm().beginWrite()
+        let persistedObject = Realm().create(SwiftIntObject)
+        Realm().commitWrite()
         switch type {
             case .Bool:     return ["invalid", 2 as Int, 1.1 as Float, 11.1 as Double]
             case .Int:      return ["invalid", true, false, 1.1 as Float, 11.1 as Double]
@@ -329,7 +394,7 @@ class ObjectCreationTests: TestCase {
             case .Data:     return ["invalid"]
             case .Date:     return ["invalid"]
             case .Object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]]]
+            case .Array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
             case .Any:      XCTFail("not supported")
         }
         return []

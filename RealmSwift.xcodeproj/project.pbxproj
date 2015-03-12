@@ -671,6 +671,7 @@
 				C0E04F9E1AB235CE00DCC8C0 /* ObjectAccessorTests.swift in Sources */,
 				020F63FA1A8037DC007CB52E /* TestCase.swift in Sources */,
 				020F63F41A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
+				C0E04F9B1AB20A1A00DCC8C0 /* ObjectCreationTests.swift in Sources */,
 				C0E04FA41AB235D800DCC8C0 /* ObjectSchemaInitializationTests.swift in Sources */,
 				C0D8E1301A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
 				C0FE465D1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
@@ -714,6 +715,7 @@
 				C0E04F9D1AB235CC00DCC8C0 /* ObjectAccessorTests.swift in Sources */,
 				020F63F91A8037DC007CB52E /* TestCase.swift in Sources */,
 				020F63F31A8037DC007CB52E /* SwiftTestObjects.swift in Sources */,
+				C0E04F9A1AB20A1900DCC8C0 /* ObjectCreationTests.swift in Sources */,
 				C0E04FA31AB235D700DCC8C0 /* ObjectSchemaInitializationTests.swift in Sources */,
 				C0D8E12F1A81749D0077C784 /* SortDescriptorTests.swift in Sources */,
 				C0FE465C1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
@@ -750,6 +752,7 @@
 				0253CDAC1AAE667000AF9E6C /* TestUtils.mm in Sources */,
 				020F63E91A8037DC007CB52E /* SwiftLinkTests.swift in Sources */,
 				020F63E01A8037DC007CB52E /* ListTests.swift in Sources */,
+				C0E04F9C1AB20A1B00DCC8C0 /* ObjectCreationTests.swift in Sources */,
 				C0FE465E1A9BE7A6006E0539 /* ObjectTests.swift in Sources */,
 				02616BD71A817FC8009919CB /* MigrationTests.swift in Sources */,
 			);
