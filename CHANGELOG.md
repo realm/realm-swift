@@ -1,10 +1,14 @@
-Master Release notes
+0.91.1 Release notes (2015-03-12)
 =============================================================
 
 ### Enhancements
 
 * The browser will automatically refresh when the Realm has been modified
   from another process.
+
+### Bugfixes
+
+* Fix a crash in CFRunLoopSourceInvalidate.
 
 0.91.0 Release notes (2015-03-10)
 =============================================================

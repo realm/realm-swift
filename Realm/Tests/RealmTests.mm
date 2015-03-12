@@ -1158,4 +1158,22 @@ extern "C" {
     }
 }
 
+- (void)testHoldRealmAfterSourceThreadIsDestroyed {
+    __block RLMRealm *realm;
+
+    // Using an NSThread to ensure the thread (and thus runloop) is actually destroyed
+    NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(runBlock:) object:^{
+        realm = [RLMRealm defaultRealm];
+    }];
+    [thread start];
+    while (!thread.isFinished)
+        usleep(100);
+
+    [realm path]; // ensure ARC releases the object after the thread has finished
+}
+
+- (void)runBlock:(void (^)())block {
+    block();
+}
+
 @end
