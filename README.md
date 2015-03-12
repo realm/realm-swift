@@ -21,11 +21,11 @@ The API reference is located at [realm.io/docs/cocoa/api](http://realm.io/docs/c
 
 ## Getting Help
 
-- Attend our monthly [**Online Office Hours**](http://j.mp/realm-office-hours) to ask questions or show us your app.
 - **Reproducible Bugs & Feature Requests** should be filed directly against our [Github Issues](https://github.com/realm/realm-cocoa/issues).
 - **Discussions & Support**: [realm-cocoa@googlegroups.com](https://groups.google.com/d/forum/realm-cocoa).
 - **StackOverflow**: look for previous questions under the tag [#realm](https://stackoverflow.com/questions/tagged/realm?sort=newest) — or [open a new one](http://stackoverflow.com/questions/ask?tags=realm).
 - Sign up for our [**Community Newsletter**](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
+- Attend our monthly [**Online Office Hours**](https://attendee.gotowebinar.com/rt/1182038037080364033) to ask questions directly to the team.
 
 ## Building Realm
 
