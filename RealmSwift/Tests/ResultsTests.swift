@@ -282,7 +282,7 @@ class ResultsFromLinkViewTests: ResultsTests {
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
         let list = SwiftAggregateObjectList()
         realmWithTestPath().add(list)
-        list.list.append(makeAggregateableObjects())
+        list.list.extend(makeAggregateableObjects())
         return list.list.filter("intCol != 0") // i.e. all of them
     }
 }
