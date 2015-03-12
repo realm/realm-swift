@@ -137,7 +137,7 @@ public class Object : RLMObjectBase, Equatable {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return linkingObjectsOfClass(T.className(), forProperty: propertyName) as [T]
+	return RLMLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
     }
 
 

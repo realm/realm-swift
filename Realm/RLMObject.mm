@@ -125,7 +125,7 @@
 }
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
-    return [super linkingObjectsOfClass:className forProperty:property];
+    return RLMLinkingObjectsOfClass(self, className, property);
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {

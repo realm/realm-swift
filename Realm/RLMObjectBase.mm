@@ -133,24 +133,28 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     return object ? object->_objectSchema : nil;
 }
 
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
-    if (!_realm) {
+NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
+    if (!object) {
+	return nil;
+    }
+
+    if (!object->_realm) {
         @throw RLMException(@"Linking object only available for objects in a Realm.");
     }
-    RLMCheckThread(_realm);
+    RLMCheckThread(object->_realm);
 
-    if (!_row.is_attached()) {
+    if (!object->_row.is_attached()) {
         @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
     }
 
-    RLMObjectSchema *schema = _realm.schema[className];
+    RLMObjectSchema *schema = object->_realm.schema[className];
     RLMProperty *prop = schema[property];
     if (!prop) {
         @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
     }
 
-    if (![prop.objectClassName isEqualToString:_objectSchema.className]) {
-        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, _objectSchema.className]);
+    if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
+	@throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
     }
 
     Table *table = schema.table;
@@ -159,10 +163,10 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     }
     
     size_t col = prop.column;
-    NSUInteger count = _row.get_backlink_count(*table, col);
+    NSUInteger count = object->_row.get_backlink_count(*table, col);
     NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(_realm, schema, _row.get_backlink(*table, col, i))];
+	[links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
     }
     return [links copy];
 }

@@ -37,7 +37,6 @@
 - (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 - (BOOL)isEqualToObject:(RLMObjectBase *)object;
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
@@ -48,3 +47,4 @@ FOUNDATION_EXTERN void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *re
 FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
 FOUNDATION_EXTERN void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema);
 FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
+FOUNDATION_EXTERN NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
