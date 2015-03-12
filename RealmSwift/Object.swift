@@ -137,7 +137,7 @@ public class Object : RLMObjectBase, Equatable {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-	return RLMLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
+	return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
     }
 
 
@@ -201,7 +201,7 @@ public class Object : RLMObjectBase, Equatable {
 
 /// Returns whether both objects are equal.
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
-    return lhs.isEqualToObject(rhs)
+    return RLMObjectBaseAreEqual(lhs, rhs)
 }
 
 /// Internal class. Do not use directly.

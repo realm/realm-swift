@@ -35,15 +35,22 @@
 - (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
 - (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
-- (BOOL)isEqualToObject:(RLMObjectBase *)object;
-
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
 
 @end
 
+//
+// Getters and setters for RLMObjectBase ivars for realm and objectSchema
+//
 FOUNDATION_EXTERN void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm);
 FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
 FOUNDATION_EXTERN void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema);
 FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
-FOUNDATION_EXTERN NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
+
+// Get linking objects for an RLMObjectBase
+FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
+
+// Compare two RLObjectBases
+FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
+

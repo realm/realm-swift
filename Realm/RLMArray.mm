@@ -143,7 +143,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     RLMValidateMatchingObjectType(self, object);
     NSUInteger index = 0;
     for (RLMObject *cmp in _backingArray) {
-        if ([object isEqualToObject:cmp]) {
+	if (RLMObjectBaseAreEqual(object, cmp)) {
             return index;
         }
         index++;

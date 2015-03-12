@@ -129,7 +129,7 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     return object ? object->_objectSchema : nil;
 }
 
-NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
+NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
     if (!object) {
 	return nil;
     }
@@ -166,6 +166,34 @@ NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NS
     }
     return [links copy];
 }
+
+
+FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
+    // if not the correct types throw
+    if ((o1 && ![o1 isKindOfClass:RLMObjectBase.class]) || (o2 && ![o2 isKindOfClass:RLMObjectBase.class])) {
+	@throw RLMException(@"Can only compare objects of class RLMObjectBase");
+    }
+    // if identical object
+    if (o1 == o2) {
+	return YES;
+    }
+    // if one is nil
+    if (!!o1 != !!o2) {
+	return NO;
+    }
+    // if not in realm or differing realms
+    if (o1->_realm == nil || o1->_realm != o2->_realm) {
+	return NO;
+    }
+    // if either are detached
+    if (!o1->_row.is_attached() || !o2->_row.is_attached()) {
+	return NO;
+    }
+    // if table and index are the same
+    return o1->_row.get_table() == o2->_row.get_table() &&
+	   o1->_row.get_index() == o2->_row.get_index();
+}
+
 
 - (id)objectForKeyedSubscript:(NSString *)key {
     if (_realm) {
@@ -237,30 +265,10 @@ NSArray *RLMLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NS
     return self.isInvalidated;
 }
 
-- (BOOL)isEqualToObject:(RLMObject *)object {
-    if (!object) {
-        return NO;
-    }
-    // if identical object
-    if (self == object) {
-        return YES;
-    }
-    // if not in realm or differing realms
-    if (_realm == nil || _realm != object->_realm) {
-        return NO;
-    }
-    // if either are detached
-    if (!_row.is_attached() || !object->_row.is_attached()) {
-        return NO;
-    }
-    // if table and index are the same
-    return _row.get_table() == object->_row.get_table() && _row.get_index() == object->_row.get_index();
-}
-
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
         if (_objectSchema.primaryKeyProperty) {
-            return [self isEqualToObject:other];
+	    return RLMObjectBaseAreEqual(self, other);
         }
     }
     return [super isEqual:object];
