@@ -175,7 +175,7 @@ id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schema) {
             RLMObjectSchema *objSchema = schema[prop.objectClassName];
             RLMArray *objects = [[RLMArray alloc] initWithObjectClassName: objSchema.className standalone:YES];
             for (id el in obj) {
-		[objects addObject:[[objSchema.objectClass alloc] initWithObject:el schema:schema]];
+                [objects addObject:[[objSchema.objectClass alloc] initWithObject:el schema:schema]];
             }
             return objects;
         }

@@ -33,11 +33,11 @@
 // standalone init
 - (instancetype)init {
     if (RLMSchema.sharedSchema) {
-	RLMObjectSchema *objectSchema = [self.class sharedSchema];
-	self = [self initWithRealm:nil schema:objectSchema defaultValues:YES];
+        RLMObjectSchema *objectSchema = [self.class sharedSchema];
+        self = [self initWithRealm:nil schema:objectSchema defaultValues:YES];
 
         // set standalone accessor class
-	object_setClass(self, objectSchema.standaloneClass);
+        object_setClass(self, objectSchema.standaloneClass);
     }
     else {
         // if schema not initialized
@@ -128,7 +128,7 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
 
 NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
     if (!object) {
-	return nil;
+        return nil;
     }
 
     if (!object->_realm) {
@@ -147,7 +147,7 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     }
 
     if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
-	@throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
+        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
     }
 
     Table *table = schema.table;
@@ -159,7 +159,7 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     NSUInteger count = object->_row.get_backlink_count(*table, col);
     NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger i = 0; i < count; i++) {
-	[links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
+        [links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
     }
     return [links copy];
 }
@@ -168,27 +168,27 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
     // if not the correct types throw
     if ((o1 && ![o1 isKindOfClass:RLMObjectBase.class]) || (o2 && ![o2 isKindOfClass:RLMObjectBase.class])) {
-	@throw RLMException(@"Can only compare objects of class RLMObjectBase");
+        @throw RLMException(@"Can only compare objects of class RLMObjectBase");
     }
     // if identical object
     if (o1 == o2) {
-	return YES;
+        return YES;
     }
     // if one is nil
     if (!!o1 != !!o2) {
-	return NO;
+        return NO;
     }
     // if not in realm or differing realms
     if (o1->_realm == nil || o1->_realm != o2->_realm) {
-	return NO;
+        return NO;
     }
     // if either are detached
     if (!o1->_row.is_attached() || !o2->_row.is_attached()) {
-	return NO;
+        return NO;
     }
     // if table and index are the same
     return o1->_row.get_table() == o2->_row.get_table() &&
-	   o1->_row.get_index() == o2->_row.get_index();
+        o1->_row.get_index() == o2->_row.get_index();
 }
 
 
@@ -265,7 +265,7 @@ FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
         if (_objectSchema.primaryKeyProperty) {
-	    return RLMObjectBaseAreEqual(self, other);
+            return RLMObjectBaseAreEqual(self, other);
         }
     }
     return [super isEqual:object];
