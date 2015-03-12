@@ -227,7 +227,6 @@ public:
 
     CFRunLoopSourceRef signal = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &ctx);
     CFRunLoopAddSource(_runLoop, signal, kCFRunLoopDefaultMode);
-    CFRelease(signal); // the runloop retains the signal
 
     // Set up the kqueue
     // EVFILT_READ indicates that we care about data being available to read
@@ -256,6 +255,7 @@ public:
         // and someone committed a write transaction
         if (event.ident == (uint32_t)_shutdownReadFd) {
             CFRunLoopSourceInvalidate(signal);
+            CFRelease(signal);
             CFRelease(_runLoop);
             return;
         }
