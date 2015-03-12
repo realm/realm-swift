@@ -31,7 +31,13 @@
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
                        schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults;
+
+- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
+- (instancetype)initWithObject:(id)object;
 - (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
+
+- (BOOL)isEqualToObject:(RLMObjectBase *)object;
+- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
