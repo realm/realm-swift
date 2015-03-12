@@ -26,7 +26,6 @@
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 - (instancetype)init;
-- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
 
 - (id)objectForKeyedSubscript:(NSString *)key;
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;

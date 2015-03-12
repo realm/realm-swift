@@ -28,12 +28,13 @@
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
+// standalone initializer
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
+
+// liver accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
                        schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults;
-
-- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
-- (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;

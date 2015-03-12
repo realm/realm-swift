@@ -159,13 +159,6 @@ public class Object : RLMObjectBase, Equatable {
         super.init(object: object, schema: schema)
     }
 
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    */
-    public override init(objectSchema: RLMObjectSchema) {
-        super.init(objectSchema: objectSchema)
-    }
-
     /// Get RLMArray values when getting array properties
     public override func valueForKey(key: String) -> AnyObject? {
         if let list = listProperty(key) {

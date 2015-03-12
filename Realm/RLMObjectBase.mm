@@ -32,15 +32,12 @@
 
 // standalone init
 - (instancetype)init {
-    return [self initWithObjectSchema:[self.class sharedSchema]];
-}
-
-- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema {
     if (RLMSchema.sharedSchema) {
-        self = [self initWithRealm:nil schema:schema defaultValues:YES];
+	RLMObjectSchema *objectSchema = [self.class sharedSchema];
+	self = [self initWithRealm:nil schema:objectSchema defaultValues:YES];
 
         // set standalone accessor class
-        object_setClass(self, schema.standaloneClass);
+	object_setClass(self, objectSchema.standaloneClass);
     }
     else {
         // if schema not initialized
