@@ -17,17 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-
-@interface RLMRealm ()
-+ (instancetype)realmWithPath:(NSString *)path
-                          key:(NSData *)key
-                     readOnly:(BOOL)readonly
-                     inMemory:(BOOL)inMemory
-                      dynamic:(BOOL)dynamic
-                       schema:(RLMSchema *)customSchema
-                        error:(NSError **)outError;
-+ (void)resetRealmState;
-@end
+#import <Realm/RLMRealm_Private.h>
 
 NSString *RLMRealmPathForFile(NSString *fileName) {
 #if TARGET_OS_IPHONE
@@ -83,8 +73,7 @@ static BOOL encryptTests() {
 
 @implementation RLMTestCase
 
-- (void)setUp
-{
+- (void)setUp {
     [super setUp];
     [self deleteFiles];
 
@@ -94,9 +83,9 @@ static BOOL encryptTests() {
     }
 }
 
-- (void)tearDown
-{
+- (void)tearDown {
     [super tearDown];
+    [RLMRealm ensureEmptyCache];
     [self deleteFiles];
 }
 
@@ -109,15 +98,13 @@ static BOOL encryptTests() {
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
-- (void)invokeTest
-{
+- (void)invokeTest {
     @autoreleasepool { [self setUp]; }
     @autoreleasepool { [super invokeTest]; }
     @autoreleasepool { [self tearDown]; }
 }
 
-- (RLMRealm *)realmWithTestPath
-{
+- (RLMRealm *)realmWithTestPath {
     return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
 }
 

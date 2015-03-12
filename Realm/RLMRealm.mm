@@ -439,6 +439,10 @@ static id RLMAutorelease(id value) {
     s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
 }
 
++ (void)ensureEmptyCache {
+    RLMThrowIfCacheIsNotEmpty();
+}
+
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {
     if (realm->_readOnly) {
         @throw RLMException(msg);

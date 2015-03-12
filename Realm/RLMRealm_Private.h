@@ -33,6 +33,7 @@
 @property (nonatomic, strong) RLMNotifier *notifier;
 
 + (void)resetRealmState;
++ (void)ensureEmptyCache;
 
 - (instancetype)initWithPath:(NSString *)path key:(NSData *)key readOnly:(BOOL)readonly inMemory:(BOOL)inMemory dynamic:(BOOL)dynamic error:(NSError **)error;
 
