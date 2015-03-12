@@ -51,10 +51,6 @@
     return self;
 }
 
-- (instancetype)initWithObject:(id)value {
-    return [self initWithObject:value schema:RLMSchema.sharedSchema];
-}
-
 - (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema {
     self = [self init];
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {

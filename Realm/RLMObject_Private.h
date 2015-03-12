@@ -33,7 +33,6 @@
                 defaultValues:(BOOL)useDefaults;
 
 - (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
-- (instancetype)initWithObject:(id)object;
 - (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 - (BOOL)isEqualToObject:(RLMObjectBase *)object;

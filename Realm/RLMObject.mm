@@ -16,12 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMRealm_Private.hpp"
 #import "RLMObject_Private.h"
-
+#import "RLMSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
+
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealm_Private.hpp"
 
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
@@ -39,7 +40,7 @@
 }
 
 - (instancetype)initWithObject:(id)object {
-    return [super initWithObject:object];
+    return [super initWithObject:object schema:RLMSchema.sharedSchema];
 }
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
