@@ -160,9 +160,9 @@ test_ios_devices() {
         fi
         exit 1
     fi
-    configuration="$1"
+    configuration="$2"
     for device in "${serial_numbers[@]}"; do
-        xcrealm "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test"
+        $1 "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test"
     done
     exit 0
 }
@@ -338,8 +338,8 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices")
-        test_ios_devices "$CONFIGURATION" || failed=1
-#FIXME - add swift device tests
+        test_ios_devices xcrealm "$CONFIGURATION" || failed=1
+        test_ios_devices xcrealmswift "$CONFIGURATION" || failed=1
         ;;
 
     "test-osx")
