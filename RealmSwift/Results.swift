@@ -50,7 +50,7 @@ filter query results.
 
 Results cannot be created directly.
 */
-public final class Results<T: Object>: Printable, CollectionType {
+public final class Results<T: Object>: Printable {
 
     // MARK: Properties
 
@@ -244,9 +244,9 @@ public final class Results<T: Object>: Printable, CollectionType {
             }
         }
     }
+}
 
-    // MARK: Collection Support
-
+extension Results: CollectionType {
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
     public var startIndex: Int { return 0 }

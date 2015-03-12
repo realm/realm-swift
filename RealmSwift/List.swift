@@ -40,7 +40,7 @@ Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
 When added as a property on `Object` models, the property must be declared as `let` and cannot be `dynamic`.
 */
-public final class List<T: Object>: ListBase, ExtensibleCollectionType {
+public final class List<T: Object>: ListBase {
 
     // MARK: Properties
 
@@ -194,19 +194,6 @@ public final class List<T: Object>: ListBase, ExtensibleCollectionType {
         }
     }
 
-    // MARK: Collection Support
-
-    /// The position of the first element in a non-empty collection.
-    /// Identical to endIndex in an empty collection.
-    public var startIndex: Int { return 0 }
-
-    /// The collection's "past the end" position.
-    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
-    public var endIndex: Int { return count }
-
-    /// This method has no effect.
-    public func reserveCapacity(capacity: Int) { }
-
     // MARK: Mutation
 
     /**
@@ -307,4 +294,17 @@ public final class List<T: Object>: ListBase, ExtensibleCollectionType {
         throwForNegativeIndex(index)
         _rlmArray.replaceObjectAtIndex(UInt(index), withObject: unsafeBitCast(object, RLMObject.self))
     }
+}
+
+extension List : ExtensibleCollectionType {
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { return 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by zero or more applications of successor().
+    public var endIndex: Int { return count }
+
+    /// This method has no effect.
+    public func reserveCapacity(capacity: Int) { }
 }
