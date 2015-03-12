@@ -162,10 +162,11 @@ test_ios_devices() {
     fi
     cmd="$1"
     configuration="$2"
+    failed=0
     for device in "${serial_numbers[@]}"; do
-        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test"
+        $cmd "-scheme 'iOS Device Tests' -configuration $configuration -destination 'id=$device' test" || failed=1
     done
-    exit 0
+    return $failed
 }
 
 ######################################
