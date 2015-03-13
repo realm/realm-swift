@@ -398,7 +398,7 @@ class ObjectCreationTests: TestCase {
             case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
             case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
             case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])]]
+            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])], [persistedObject, [false]]]
             case .Any:      XCTFail("not supported")
         }
         return []
