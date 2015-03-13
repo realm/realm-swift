@@ -122,7 +122,7 @@
  `realmWithPath:` or `defaultRealm`.
 
  If you do not want Realm to hold on to your encryption keys any longer than
- needed, then use `encryptedRealmWithPath:key:readOnly:error:` rather than this
+ needed, then use `realmWithPath:encryptionKey:readOnly:error:` rather than this
  method.
 
  @param key     64-byte encryption key to use, or `nil` to unset.
