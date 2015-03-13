@@ -58,7 +58,7 @@ class ObjectAccessorTests: TestCase {
         object.dateCol = date
         XCTAssertEqual(object.dateCol, date)
 
-        object.objectCol = SwiftBoolObject(object: [true])
+        object.objectCol = SwiftBoolObject(value: [true])
         XCTAssertEqual(object.objectCol.boolCol, true)
     }
 

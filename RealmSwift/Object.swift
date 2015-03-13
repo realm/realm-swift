@@ -70,13 +70,13 @@ public class Object : RLMObjectBase, Equatable {
     Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or `Dictionary<String, AnyObject>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
-    :param: object  The value used to populate the object. This can be any key/value coding compliant
-		    object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-		    or an `Array` with one object for each persisted property. An exception will be
-		    thrown if any required properties are not present and no default is set.
+    :param: value   The value used to populate the object. This can be any key/value coding compliant
+                    object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+                    or an `Array` with one object for each persisted property. An exception will be
+                    thrown if any required properties are not present and no default is set.
     */
-    public init(object: AnyObject) {
-	super.init(object: object, schema: RLMSchema.sharedSchema())
+    public init(value: AnyObject) {
+        super.init(object: value, schema: RLMSchema.sharedSchema())
     }
 
 

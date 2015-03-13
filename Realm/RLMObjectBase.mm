@@ -165,7 +165,7 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
 }
 
 
-FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
+BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
     // if not the correct types throw
     if ((o1 && ![o1 isKindOfClass:RLMObjectBase.class]) || (o2 && ![o2 isKindOfClass:RLMObjectBase.class])) {
         @throw RLMException(@"Can only compare objects of class RLMObjectBase");

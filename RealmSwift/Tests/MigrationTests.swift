@@ -216,8 +216,8 @@ class MigrationTests: TestCase {
             Realm().write {
                 var object = SwiftObject()
                 object.boolCol = true
-                object.objectCol = SwiftBoolObject(object:[true])
-                object.arrayCol.append(SwiftBoolObject(object:[false]))
+                object.objectCol = SwiftBoolObject(value:[true])
+                object.arrayCol.append(SwiftBoolObject(value:[false]))
                 Realm().add(object)
                 return
             }
@@ -265,7 +265,7 @@ class MigrationTests: TestCase {
                 list.append(newObj["objectCol"] as MigrationObject)
                 list.append(migration.create(SwiftBoolObject.className(), value: [true]))
 
-                newObj["objectCol"] = SwiftBoolObject(object: [false])
+                newObj["objectCol"] = SwiftBoolObject(value: [false])
 
                 enumerated = true
             })
