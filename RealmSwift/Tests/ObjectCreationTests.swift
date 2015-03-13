@@ -39,7 +39,7 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithDictionary() {
         // dictionary with all values specified
-        let valueCreator =
+        let baselineValues =
            ["boolCol": true as NSNumber,
             "intCol": 1 as NSNumber,
             "floatCol": 1.1 as NSNumber,
@@ -56,7 +56,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for validValue in validValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with valid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[props[propNum].name] = validValue
                 let object = SwiftObject(value: values)
                 verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
@@ -67,7 +67,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with invalid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[props[propNum].name] = invalidValue
                 assertThrows(SwiftObject(value: values), "Invalid property value")
             }
@@ -83,14 +83,14 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithArray() {
         // array with all values specified
-        let valueCreator = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
 
         // test with valid dictionary literals
         let props = Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
             for validValue in validValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with valid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[propNum] = validValue
                 let object = SwiftObject(value: values)
                 verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
@@ -101,7 +101,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with invalid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[propNum] = invalidValue
                 assertThrows(SwiftObject(value: values), "Invalid property value")
             }
@@ -140,7 +140,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithDictionary() {
         // dictionary with all values specified
-        let valueCreator =
+        let baselineValues =
             ["boolCol": true as NSNumber,
                 "intCol": 1 as NSNumber,
                 "floatCol": 1.1 as NSNumber,
@@ -157,7 +157,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for validValue in validValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with valid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[props[propNum].name] = validValue
                 Realm().beginWrite()
                 let object = Realm().create(SwiftObject.self, value: values)
@@ -171,7 +171,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with invalid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[props[propNum].name] = invalidValue
                 Realm().beginWrite()
                 assertThrows(Realm().create(SwiftObject.self, value: values), "Invalid property value")
@@ -193,14 +193,14 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let valueCreator = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
+        let baselineValues = [true, 1, 1.1, 11.1, "b", "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData, NSDate(timeIntervalSince1970: 2) as NSDate, ["boolCol": true], [[true], [false]]] as [AnyObject]
 
         // test with valid dictionary literals
         let props = Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
             for validValue in validValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with valid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[propNum] = validValue
                 Realm().beginWrite()
                 let object = Realm().create(SwiftObject.self, value: values)
@@ -214,7 +214,7 @@ class ObjectCreationTests: TestCase {
         for propNum in 0..<props.count {
             for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
                 // update dict with invalid value and init
-                var values = valueCreator
+                var values = baselineValues
                 values[propNum] = invalidValue
 
                 Realm().beginWrite()
