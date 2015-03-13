@@ -332,7 +332,7 @@ static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
 
     for (RLMProperty *prop in object->_objectSchema.properties) {
         if (prop.type == RLMPropertyTypeArray) {
-			// FIXME - try to move some of this logic to swift
+            // FIXME - try to move some of this logic to swift
             static Class s_swiftMigrationObjectClass = NSClassFromString(@"RealmSwift.MigrationObject");
             if (object.class == s_swiftMigrationObjectClass) {
                 RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName

@@ -28,17 +28,30 @@
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
+// standalone initializer
+- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
+
+// liver accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
                        schema:(__unsafe_unretained RLMObjectSchema *const)schema
                 defaultValues:(BOOL)useDefaults;
-- (instancetype)initWithObject:(id)object schema:(RLMSchema *)schema;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;
 
 @end
 
+//
+// Getters and setters for RLMObjectBase ivars for realm and objectSchema
+//
 FOUNDATION_EXTERN void RLMObjectBaseSetRealm(RLMObjectBase *object, RLMRealm *realm);
 FOUNDATION_EXTERN RLMRealm *RLMObjectBaseRealm(RLMObjectBase *object);
 FOUNDATION_EXTERN void RLMObjectBaseSetObjectSchema(RLMObjectBase *object, RLMObjectSchema *objectSchema);
 FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *object);
+
+// Get linking objects for an RLMObjectBase
+FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
+
+// Compare two RLObjectBases
+FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
+

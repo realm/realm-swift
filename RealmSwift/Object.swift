@@ -70,13 +70,13 @@ public class Object : RLMObjectBase, Equatable {
     Initialize a standalone (unpersisted) `Object` with values from an `Array<AnyObject>` or `Dictionary<String, AnyObject>`.
     Call `add(_:)` on a `Realm` to add standalone objects to a realm.
 
-    :param: object The object used to populate the object. This can be any key/value coding compliant
-                   object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
-                   or an `Array` with one object for each persisted property. An exception will be
-                   thrown if any required properties are not present and no default is set.
+    :param: object  The value used to populate the object. This can be any key/value coding compliant
+		    object, or a JSON object such as those returned from the methods in `NSJSONSerialization`,
+		    or an `Array` with one object for each persisted property. An exception will be
+		    thrown if any required properties are not present and no default is set.
     */
-    public override init(object: AnyObject) {
-        super.init(object: object)
+    public init(object: AnyObject) {
+	super.init(object: object, schema: RLMSchema.sharedSchema())
     }
 
 
@@ -137,7 +137,7 @@ public class Object : RLMObjectBase, Equatable {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-        return linkingObjectsOfClass(T.className(), forProperty: propertyName) as [T]
+	return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
     }
 
 
@@ -157,13 +157,6 @@ public class Object : RLMObjectBase, Equatable {
     */
     public override init(object: AnyObject, schema: RLMSchema) {
         super.init(object: object, schema: schema)
-    }
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    */
-    public override init(objectSchema: RLMObjectSchema) {
-        super.init(objectSchema: objectSchema)
     }
 
     /// Get RLMArray values when getting array properties
@@ -201,7 +194,7 @@ public class Object : RLMObjectBase, Equatable {
 
 /// Returns whether both objects are equal.
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
-    return lhs.isEqualToObject(rhs)
+    return RLMObjectBaseAreEqual(lhs, rhs)
 }
 
 /// Internal class. Do not use directly.
