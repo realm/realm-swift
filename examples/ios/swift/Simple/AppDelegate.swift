@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Queries are chainable!
         var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
-        println("Number of dogs: \(results.count)")
+        println("Number of dogs older than 8: \(results2.count)")
 
         // Link objects
         var person = Person()
