@@ -47,8 +47,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b" as NSString,
             "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
             "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-            "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
-            "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject
+            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]  as AnyObject
            ]
 
         // test with valid dictionary literals
@@ -58,7 +58,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with valid value and init
                 var values = valueCreator
                 values[props[propNum].name] = validValue
-                let object = SwiftObject(object: values)
+                let object = SwiftObject(value: values)
                 verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
             }
         }
@@ -69,14 +69,14 @@ class ObjectCreationTests: TestCase {
                 // update dict with invalid value and init
                 var values = valueCreator
                 values[props[propNum].name] = invalidValue
-                assertThrows(SwiftObject(object: values), "Invalid property value")
+                assertThrows(SwiftObject(value: values), "Invalid property value")
             }
         }
     }
 
     func testInitWithDefaultsAndDictionary() {
         // test with dictionary with mix of default and one specified value
-        let object = SwiftObject(object: ["intCol": 200])
+        let object = SwiftObject(value: ["intCol": 200])
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
@@ -92,7 +92,7 @@ class ObjectCreationTests: TestCase {
                 // update dict with valid value and init
                 var values = valueCreator
                 values[propNum] = validValue
-                let object = SwiftObject(object: values)
+                let object = SwiftObject(value: values)
                 verifySwiftObjectWithArrayLiteral(object, array: values, boolObjectValue: true, boolObjectListValues: [true, false])
             }
         }
@@ -103,15 +103,15 @@ class ObjectCreationTests: TestCase {
                 // update dict with invalid value and init
                 var values = valueCreator
                 values[propNum] = invalidValue
-                assertThrows(SwiftObject(object: values), "Invalid property value")
+                assertThrows(SwiftObject(value: values), "Invalid property value")
             }
         }
     }
 
     func testInitWithKVCObject() {
         // test with kvc object
-        let objectWithInt = SwiftObject(object: ["intCol": 200])
-        let objectWithKVCObject = SwiftObject(object: objectWithInt)
+        let objectWithInt = SwiftObject(value: ["intCol": 200])
+        let objectWithKVCObject = SwiftObject(value: objectWithInt)
         let valueDict = defaultSwiftObjectValuesWithReplacements(["intCol": 200])
         verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false, boolObjectListValues: [])
     }
@@ -148,8 +148,8 @@ class ObjectCreationTests: TestCase {
                 "stringCol": "b" as NSString,
                 "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
                 "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-                "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
-                "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject
+                "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
+                "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]  as AnyObject
             ]
 
         // test with valid dictionary literals
@@ -312,8 +312,8 @@ class ObjectCreationTests: TestCase {
             case .String:   return ["b"]
             case .Data:     return ["b".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)! as NSData]
             case .Date:     return [NSDate(timeIntervalSince1970: 2) as AnyObject]
-            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(object: [true])]
-            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(object: [true]), SwiftBoolObject(object: [false])]]
+            case .Object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true])]
+            case .Array:    return [[[true], [false]], [["boolCol": true], ["boolCol": false]], [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])]]
             case .Any:      XCTFail("not supported")
         }
         return []

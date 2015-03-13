@@ -26,7 +26,7 @@ class Dog: Object {
     var owners: [Person] {
         // Realm doesn't persist this property because it only has a getter defined
         // Define "owners" as the inverse relationship to Person.dogs
-        return linkingObjectsOfClass("Person", forProperty: "dogs") as [Person]
+        return linkingObjects(Person.self, forProperty: "dogs")
     }
 }
 

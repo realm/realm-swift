@@ -152,7 +152,7 @@ class ObjectTests: TestCase {
             object.setValue(NSDate(timeIntervalSince1970: 333), forKey: "dateCol")
             XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
 
-            let boolObject = SwiftBoolObject(object: [true])
+            let boolObject = SwiftBoolObject(value: [true])
             object.setValue(boolObject, forKey: "objectCol")
             XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
             XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)

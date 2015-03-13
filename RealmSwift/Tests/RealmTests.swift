@@ -293,9 +293,9 @@ class RealmTests: TestCase {
         let realm = Realm(path: testRealmPath())
         XCTAssertEqual(0, realm.objects(SwiftCompanyObject).count)
         realm.write {
-            realm.add(SwiftIntObject(object: [1]))
-            realm.add(SwiftIntObject(object: [1]))
-            realm.add(SwiftIntObject(object: [2]))
+            realm.add(SwiftIntObject(value: [1]))
+            realm.add(SwiftIntObject(value: [1]))
+            realm.add(SwiftIntObject(value: [2]))
             XCTAssertEqual(3, realm.objects(SwiftIntObject).count)
             realm.delete(realm.objects(SwiftIntObject).filter("intCol = 1"))
             XCTAssertEqual(1, realm.objects(SwiftIntObject).count)
