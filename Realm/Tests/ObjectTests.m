@@ -1002,6 +1002,27 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
     XCTAssertFalse(ageProperty.indexed, @"non-indexed property shouldn't have an index");
 }
 
+- (void)testIndexedPropertyRejectsNullBytesInString
+{
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    IndexedObject *io = [IndexedObject createInDefaultRealmWithObject:@[@"", @0]];
+    XCTAssertThrows(io.name = @"a\0b");
+    XCTAssertThrows(([IndexedObject createInDefaultRealmWithObject:@[@"a\0b", @0]]));
+    [realm cancelWriteTransaction];
+}
+
+- (void)testNullBytesWorkInUnindexedString
+{
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInDefaultRealmWithObject:@[@""]];
+    XCTAssertNoThrow(so.stringCol = @"a\0b");
+    XCTAssertEqual(3U, so.stringCol.length);
+    XCTAssertEqualObjects(@"a\0b", so.stringCol);
+    [realm cancelWriteTransaction];
+}
+
 - (void)testRetainedRealmObjectUnknownKey
 {
     IntObject *obj = [[IntObject alloc] init];

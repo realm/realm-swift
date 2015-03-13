@@ -307,6 +307,7 @@
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
         && _isPrimary == property->_isPrimary
+        && _indexed == property->_indexed // FIXME: maybe remove this when string indexes stop needing special logic in the setter
         && [_name isEqualToString:property->_name]
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);
 }
