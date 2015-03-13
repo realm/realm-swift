@@ -237,7 +237,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithNestedObjects() {
-        let standalone = SwiftPrimaryStringObject(object: ["primary", 11])
+        let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
         Realm().beginWrite()
         let objectWithNestedObjects = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["primary", 11], [standalone]])
         Realm().commitWrite()
@@ -252,7 +252,7 @@ class ObjectCreationTests: TestCase {
     }
 
     func testUpdateWithNestedObjects() {
-        let standalone = SwiftPrimaryStringObject(object: ["primary", 11])
+        let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
         Realm().beginWrite()
         let object = Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", standalone, [["primary", 12]]], update: true)
         Realm().commitWrite()
@@ -322,7 +322,7 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
 
         Realm().beginWrite()
-        let object = SwiftObject(object: ["objectCol" : existingObject])
+        let object = SwiftObject(value: ["objectCol" : existingObject])
         Realm().add(object)
         Realm().commitWrite()
 
@@ -336,7 +336,7 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
 
         Realm().beginWrite()
-        let object = SwiftLinkToPrimaryStringObject(object: ["primary", ["primary", 2], []])
+        let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2], []])
         Realm().add(object, update: true)
         Realm().commitWrite()
 
