@@ -164,6 +164,32 @@ NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *cla
     return [links copy];
 }
 
+id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
+    if (!object) {
+        return nil;
+    }
+
+    if (object->_realm) {
+        return RLMDynamicGet(object, key);
+    }
+    else {
+        return [object valueForKey:key];
+    }
+}
+
+void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj) {
+    if (!object) {
+        return;
+    }
+
+    if (object->_realm) {
+        RLMDynamicValidatedSet(object, key, obj);
+    }
+    else {
+        [object setValue:obj forKey:key];
+    }
+}
+
 
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
     // if not the correct types throw
@@ -191,25 +217,6 @@ FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o
         o1->_row.get_index() == o2->_row.get_index();
 }
 
-
-- (id)objectForKeyedSubscript:(NSString *)key {
-    if (_realm) {
-        return RLMDynamicGet(self, key);
-    }
-    else {
-        return [self valueForKey:key];
-    }
-}
-
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    if (_realm) {
-        RLMDynamicValidatedSet(self, key, obj);
-    }
-    else {
-        [self setValue:obj forKey:key];
-    }
-}
-
 - (NSString *)description
 {
     if (self.isInvalidated) {
@@ -228,7 +235,7 @@ FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
     for (RLMProperty *property in _objectSchema.properties) {
-        id object = self[property.name];
+        id object = RLMObjectBaseObjectForKeyedSubscript(self, property.name);
         NSString *sub;
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
             sub = [object descriptionWithMaxDepth:depth - 1];

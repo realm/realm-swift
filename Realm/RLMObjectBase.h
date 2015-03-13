@@ -23,27 +23,11 @@
 @class RLMObjectSchema;
 
 @interface RLMObjectBase : NSObject
+
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 - (instancetype)init;
 
-- (id)objectForKeyedSubscript:(NSString *)key;
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
-
 + (NSString *)className;
-
-@end
-
-
-
-Class RLMObjectUtilClass(BOOL isSwift);
-
-@interface RLMObjectUtil : NSObject
-
-+ (NSString *)primaryKeyForClass:(Class)cls;
-+ (NSArray *)ignoredPropertiesForClass:(Class)cls;
-+ (NSArray *)indexedPropertiesForClass:(Class)cls;
-
-+ (NSArray *)getGenericListPropertyNames:(id)obj;
 
 @end
