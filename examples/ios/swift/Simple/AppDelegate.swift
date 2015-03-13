@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Queries are chainable!
         var results2 = results.objectsWithPredicate(NSPredicate(format: "age > 8"))
-        println("Number of dogs: \(results.count)")
+        println("Number of dogs: \(results2.count)")
 
         // Link objects
         var person = Person()
@@ -78,7 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let otherRealm = RLMRealm.defaultRealm()
             var otherResults = Dog.objectsInRealm(otherRealm, withPredicate: NSPredicate(format:"name contains 'Rex'"))
-            println("Number of dogs \(otherResults.count)")
+            println("Number of dogs: \(otherResults.count)")
         }
 
         return true
