@@ -317,9 +317,32 @@ class ObjectCreationTests: TestCase {
 
     // MARK: Add tests
     func testAddWithExisingNestedObjects() {
+        Realm().beginWrite()
+        let existingObject = Realm().create(SwiftBoolObject)
+        Realm().commitWrite()
+
+        Realm().beginWrite()
+        let object = SwiftObject(object: ["objectCol" : existingObject])
+        Realm().add(object)
+        Realm().commitWrite()
+
+        XCTAssertNotNil(object.realm)
+        XCTAssertEqual(object.objectCol, existingObject)
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {
+        Realm().beginWrite()
+        let existingObject = Realm().create(SwiftPrimaryStringObject.self, value: ["1", 1])
+        Realm().commitWrite()
+
+        Realm().beginWrite()
+        let object = SwiftLinkToPrimaryStringObject(object: ["1", ["1", 2], []])
+        Realm().add(object, update: true)
+        Realm().commitWrite()
+
+        XCTAssertNotNil(object.realm)
+        XCTAssertEqual(object.object!, existingObject)
+        XCTAssertEqual(existingObject.intCol, 2)
     }
 
     // MARK: Private utilities
