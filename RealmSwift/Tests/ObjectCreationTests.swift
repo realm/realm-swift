@@ -305,6 +305,8 @@ class ObjectCreationTests: TestCase {
         Realm().commitWrite()
 
         XCTAssertNotEqual(otherRealmObject, object) // the object from the other realm should be copied into this realm
+        XCTAssertEqual(Realm().objects(SwiftLinkToPrimaryStringObject).count, 1)
+        XCTAssertEqual(Realm().objects(SwiftPrimaryStringObject).count, 4)
     }
 
     // test NSNull for object
