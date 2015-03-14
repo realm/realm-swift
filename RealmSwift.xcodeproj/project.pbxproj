@@ -593,7 +593,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic \"LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'\"\n";
+			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n";
 		};
 		295C17A41A7C55DA000E5F54 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -67,7 +67,7 @@ EOF
 
 xcode() {
     mkdir -p build/DerivedData
-    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@ $BUILD_SETTINGS"
+    CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
     echo "Building with command:" $CMD
     eval $CMD
 }
@@ -82,7 +82,7 @@ xc() {
             exit 1
         }
     elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool "$@" "$BUILD_SETTINGS"
+        xctool "$@"
     fi
 }
 
@@ -205,7 +205,6 @@ download_core() {
 }
 
 COMMAND="$1"
-BUILD_SETTINGS="$2"
 
 # Use Debug config if command ends with -debug, otherwise default to Release
 case "$COMMAND" in
