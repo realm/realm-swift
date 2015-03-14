@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		026B0EFB1A780414005E26C8 /* Realm iOS Dynamic */ = {
+		026B0EFB1A780414005E26C8 /* Realm iOS */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 026B0EFC1A780414005E26C8 /* Build configuration list for PBXAggregateTarget "Realm iOS Dynamic" */;
+			buildConfigurationList = 026B0EFC1A780414005E26C8 /* Build configuration list for PBXAggregateTarget "Realm iOS" */;
 			buildPhases = (
 				026B0EFF1A78041A005E26C8 /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = "Realm iOS Dynamic";
+			name = "Realm iOS";
 			productName = Realm;
 		};
 		295C17A31A7C55DA000E5F54 /* Realm OSX */ = {
@@ -564,7 +564,7 @@
 				0201B2661A54C68C004CFB6F /* RealmSwift OSX */,
 				0201B27D1A54C697004CFB6F /* RealmSwift OSX Tests */,
 				3F8DCA5619930F550008BD7F /* iOS Device Tests */,
-				026B0EFB1A780414005E26C8 /* Realm iOS Dynamic */,
+				026B0EFB1A780414005E26C8 /* Realm iOS */,
 				295C17A31A7C55DA000E5F54 /* Realm OSX */,
 				C0E04FAA1AB2366200DCC8C0 /* TestHost */,
 			);
@@ -593,7 +593,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic \"LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm'\"\n";
+			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n";
 		};
 		295C17A41A7C55DA000E5F54 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -606,7 +606,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh osx \"LD_DYLIB_INSTALL_NAME='@rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm'\"\n";
+			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh osx\n";
 		};
 		29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -622,7 +622,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"";
+			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 		};
 		29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -638,7 +638,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"";
+			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Realm @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -773,7 +773,7 @@
 		};
 		026B0F011A780521005E26C8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 026B0EFB1A780414005E26C8 /* Realm iOS Dynamic */;
+			target = 026B0EFB1A780414005E26C8 /* Realm iOS */;
 			targetProxy = 026B0F001A780521005E26C8 /* PBXContainerItemProxy */;
 		};
 		02B8228F1A532125007F28A5 /* PBXTargetDependency */ = {
@@ -1291,7 +1291,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		026B0EFC1A780414005E26C8 /* Build configuration list for PBXAggregateTarget "Realm iOS Dynamic" */ = {
+		026B0EFC1A780414005E26C8 /* Build configuration list for PBXAggregateTarget "Realm iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				026B0EFD1A780414005E26C8 /* Debug */,
