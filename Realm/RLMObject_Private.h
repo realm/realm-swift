@@ -52,6 +52,22 @@ FOUNDATION_EXTERN RLMObjectSchema *RLMObjectBaseObjectSchema(RLMObjectBase *obje
 // Get linking objects for an RLMObjectBase
 FOUNDATION_EXTERN NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property);
 
+// Dynamic access to RLMObjectBase properties
+FOUNDATION_EXTERN id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key);
+FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj);
+
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
+
+FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
+
+@interface RLMObjectUtil : NSObject
+
++ (NSString *)primaryKeyForClass:(Class)cls;
++ (NSArray *)ignoredPropertiesForClass:(Class)cls;
++ (NSArray *)indexedPropertiesForClass:(Class)cls;
+
++ (NSArray *)getGenericListPropertyNames:(id)obj;
+
+@end
 

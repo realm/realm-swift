@@ -179,6 +179,15 @@ public class Object : RLMObjectBase, Equatable {
         super.setValue(value, forKey: key)
     }
 
+    public subscript(key: String) -> AnyObject? {
+        get {
+            return RLMObjectBaseObjectForKeyedSubscript(self, key)
+        }
+        set(value) {
+            RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
+        }
+    }
+
     // Helper for getting a list property for the given key
     private func listProperty(key: String) -> RLMListBase? {
         if let prop = RLMObjectBaseObjectSchema(self)?[key] {

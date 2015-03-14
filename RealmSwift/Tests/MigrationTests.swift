@@ -179,7 +179,7 @@ class MigrationTests: TestCase {
             var count = 0
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
                 XCTAssertEqual(newObj["stringCol"] as String, "string")
-                XCTAssertNil(oldObj["stringCol"], "Objects created during migration have nil oldObj")
+                XCTAssertNil(oldObj, "Objects created during migration have nil oldObj")
                 count++
             })
             XCTAssertEqual(count, 2)
