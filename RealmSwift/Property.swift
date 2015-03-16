@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 These properties map to columns in the core database.
 */
-public final class Property {
+public final class Property: Printable {
 
     // MARK: Properties
 
@@ -43,6 +43,9 @@ public final class Property {
 
     /// Object class name - specify object types for `Object` and `List` properties.
     public var objectClassName: String? { return rlmProperty.objectClassName }
+
+    /// Returns a human-readable description of this property.
+    public var description: String { return rlmProperty.description }
 
     // MARK: Initializers
 

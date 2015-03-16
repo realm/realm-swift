@@ -52,7 +52,7 @@ the `objects(_:)` instance method on `Realm`.
 
 See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
-public class Object : RLMObjectBase, Equatable {
+public class Object : RLMObjectBase, Equatable, Printable {
 
     // MARK: Initializers
 
@@ -98,6 +98,9 @@ public class Object : RLMObjectBase, Equatable {
 
     /// Indicates if an object can no longer be accessed.
     public override var invalidated: Bool { return super.invalidated }
+
+    /// Returns a human-readable description of this object.
+    public override var description: String { return super.description }
 
 
     // MARK: Object customization
