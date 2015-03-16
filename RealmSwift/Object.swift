@@ -220,11 +220,11 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
 public final class DynamicObject : Object {
     private var listProperties = [String: List<DynamicObject>]()
 
-    /// Returns the value of the property with the given name.
+    /// Returns or sets the value of the property with the given name.
     public override subscript(key: String) -> AnyObject? {
         get {
             if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == RLMPropertyType.Array {
+                if prop.type == .Array {
                     // get it or set it
                     if let list = listProperties[key] {
                         return list
@@ -239,8 +239,8 @@ public final class DynamicObject : Object {
         }
         set(value) {
             if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == RLMPropertyType.Array {
-                    throwRealmException("Setting List properties is unsupported. Instead you can remove objects from the current List.")
+                if prop.type == .Array {
+                    throwRealmException("Setting List properties is unsupported. Instead you can add or remove objects from the current List.")
                 }
             }
             RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
