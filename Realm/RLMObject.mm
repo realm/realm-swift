@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealm_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 
 #import "RLMObjectStore.h"
@@ -32,7 +32,7 @@
 // that).
 @implementation RLMObject
 
-// These properties are synthesized in RLMObjectBase
+// synthesized in RLMObjectBase
 @dynamic invalidated;
 
 - (instancetype)init {

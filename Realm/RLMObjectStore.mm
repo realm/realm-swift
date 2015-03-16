@@ -27,8 +27,8 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMUtil.hpp"
 #import "RLMSwiftSupport.h"
+#import "RLMUtil.hpp"
 
 #import <objc/message.h>
 
@@ -457,7 +457,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     // create the object
     RLMSchema *schema = realm.schema;
     RLMObjectSchema *objectSchema = schema[className];
-    RLMObjectBase *object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+    RLMObjectBase *object = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
 
     // validate values, create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
@@ -598,7 +598,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
 RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm,
                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
                                        NSUInteger index) {
-    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema defaultValues:NO];
+    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
     accessor->_row = (*objectSchema.table)[index];
     RLMInitializeSwiftListAccessor(accessor);
     return accessor;

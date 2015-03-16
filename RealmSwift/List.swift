@@ -79,11 +79,11 @@ public final class List<T: Object>: ListBase {
 
     /**
     Returns the index of the first object matching the given predicate,
-    or `nil` if the object is not in the list.
+    or `nil` no objects match.
 
-    :param: predicate The predicate to filter the objects.
+    :param: predicate The `NSPredicate` used to filter the objects.
 
-    :returns: The index of the given object, or `nil` if the object is not in the list.
+    :returns: The index of the given object, or `nil` if no objects match.
     */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(_rlmArray.indexOfObjectWithPredicate(predicate))
@@ -91,12 +91,12 @@ public final class List<T: Object>: ListBase {
 
     /**
     Returns the index of the first object matching the given predicate,
-    or `nil` if the object is not in the list.
+    or `nil` if no objects match.
 
     :param: predicateFormat The predicate format string, optionally followed by a variable number
                             of arguments.
 
-    :returns: The index of the given object, or `nil` if the object is not in the list.
+    :returns: The index of the given object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
         return indexOf(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
@@ -197,7 +197,8 @@ public final class List<T: Object>: ListBase {
     // MARK: Mutation
 
     /**
-    Appends the given object to the end of the list.
+    Appends the given object to the end of the list. If the object is from a
+    different Realm it is copied to the List's Realm.
 
     :warning: This method can only be called during a write transaction.
 
@@ -224,8 +225,8 @@ public final class List<T: Object>: ListBase {
     Inserts the given object at the given index.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index smaller than zero or greater than the
-              number of objects in the list.
+    :warning: Throws an exception when called with an index smaller than zero or greater than 
+              or equal to the number of objects in the list.
 
     :param: object An object.
     :param: index  The index at which to insert the object.
@@ -239,8 +240,8 @@ public final class List<T: Object>: ListBase {
     Removes the object at the given index from the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index smaller than zero or greater than the
-              number of objects in the list.
+    :warning: Throws an exception when called with an index smaller than zero or greater than
+              or equal to the number of objects in the list.
 
     :param: index The index at which to remove the object.
     */
@@ -250,7 +251,7 @@ public final class List<T: Object>: ListBase {
     }
 
     /**
-    Removes the given object from the list. Does not remove the object from the Realm.
+    Removes the first instance of the given object from the list. Does not remove the object from the Realm.
 
     :warning: This method can only be called during a write transaction.
 
@@ -284,8 +285,8 @@ public final class List<T: Object>: ListBase {
     Replaces an object at the given index with a new object.
 
     :warning: This method can only be called during a write transaction.
-    :warning: Throws an exception when called with an index smaller than zero or greater than the
-              number of objects in the list.
+    :warning: Throws an exception when called with an index smaller than zero or greater than
+              or equal to the number of objects in the list.
 
     :param: index  The list index of the object to be replaced.
     :param: object An object to replace at the specified index.

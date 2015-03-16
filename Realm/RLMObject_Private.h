@@ -31,10 +31,9 @@
 // standalone initializer
 - (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
 
-// liver accessor initializer
+// live accessor initializer
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema
-                defaultValues:(BOOL)useDefaults;
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema;
 
 // shared schema for this class
 + (RLMObjectSchema *)sharedSchema;

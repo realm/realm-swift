@@ -140,7 +140,7 @@
     [realm commitWriteTransaction];
 
     RLMArray *children = obj.array;
-    XCTAssertEqual(children.count, (NSUInteger)1);
+    XCTAssertEqual(children.count, 1U);
     XCTAssertEqualObjects([children[0] stringCol], @"b", @"Only child should be 'b'");
 }
 

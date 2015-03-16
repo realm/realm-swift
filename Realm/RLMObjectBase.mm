@@ -34,7 +34,15 @@
 - (instancetype)init {
     if (RLMSchema.sharedSchema) {
         RLMObjectSchema *objectSchema = [self.class sharedSchema];
-        self = [self initWithRealm:nil schema:objectSchema defaultValues:YES];
+        self = [self initWithRealm:nil schema:objectSchema];
+
+        // set default values
+        if (!objectSchema.isSwiftClass) {
+            NSDictionary *dict = RLMDefaultValuesForObjectSchema(objectSchema);
+            for (NSString *key in dict) {
+                [self setValue:dict[key] forKey:key];
+            }
+        }
 
         // set standalone accessor class
         object_setClass(self, objectSchema.standaloneClass);
@@ -75,19 +83,11 @@
 }
 
 - (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(__unsafe_unretained RLMObjectSchema *const)schema
-                defaultValues:(BOOL)useDefaults {
+                       schema:(__unsafe_unretained RLMObjectSchema *const)schema {
     self = [super init];
     if (self) {
         _realm = realm;
         _objectSchema = schema;
-        if (useDefaults && !schema.isSwiftClass) {
-            // set default values
-            NSDictionary *dict = RLMDefaultValuesForObjectSchema(schema);
-            for (NSString *key in dict) {
-                [self setValue:dict[key] forKey:key];
-            }
-        }
     }
     return self;
 }
@@ -104,117 +104,6 @@
 // overridden at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
     return RLMSchema.sharedSchema[self.className];
-}
-
-void RLMObjectBaseSetRealm(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMRealm *realm) {
-    if (object) {
-        object->_realm = realm;
-    }
-}
-
-RLMRealm *RLMObjectBaseRealm(__unsafe_unretained RLMObjectBase *object) {
-    return object ? object->_realm : nil;
-}
-
-void RLMObjectBaseSetObjectSchema(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMObjectSchema *objectSchema) {
-    if (object) {
-        object->_objectSchema = objectSchema;
-    }
-}
-
-RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *object) {
-    return object ? object->_objectSchema : nil;
-}
-
-NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
-    if (!object) {
-        return nil;
-    }
-
-    if (!object->_realm) {
-        @throw RLMException(@"Linking object only available for objects in a Realm.");
-    }
-    RLMCheckThread(object->_realm);
-
-    if (!object->_row.is_attached()) {
-        @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
-    }
-
-    RLMObjectSchema *schema = object->_realm.schema[className];
-    RLMProperty *prop = schema[property];
-    if (!prop) {
-        @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
-    }
-
-    if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
-    }
-
-    Table *table = schema.table;
-    if (!table) {
-        return @[];
-    }
-    
-    size_t col = prop.column;
-    NSUInteger count = object->_row.get_backlink_count(*table, col);
-    NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
-    for (NSUInteger i = 0; i < count; i++) {
-        [links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
-    }
-    return [links copy];
-}
-
-id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
-    if (!object) {
-        return nil;
-    }
-
-    if (object->_realm) {
-        return RLMDynamicGet(object, key);
-    }
-    else {
-        return [object valueForKey:key];
-    }
-}
-
-void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj) {
-    if (!object) {
-        return;
-    }
-
-    if (object->_realm) {
-        RLMDynamicValidatedSet(object, key, obj);
-    }
-    else {
-        [object setValue:obj forKey:key];
-    }
-}
-
-
-BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
-    // if not the correct types throw
-    if ((o1 && ![o1 isKindOfClass:RLMObjectBase.class]) || (o2 && ![o2 isKindOfClass:RLMObjectBase.class])) {
-        @throw RLMException(@"Can only compare objects of class RLMObjectBase");
-    }
-    // if identical object
-    if (o1 == o2) {
-        return YES;
-    }
-    // if one is nil
-    if (!!o1 != !!o2) {
-        return NO;
-    }
-    // if not in realm or differing realms
-    if (o1->_realm == nil || o1->_realm != o2->_realm) {
-        return NO;
-    }
-    // if either are detached
-    if (!o1->_row.is_attached() || !o2->_row.is_attached()) {
-        return NO;
-    }
-    // if table and index are the same
-    return o1->_row.get_table() == o2->_row.get_table() &&
-        o1->_row.get_index() == o2->_row.get_index();
 }
 
 - (NSString *)description
@@ -292,6 +181,118 @@ BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
 
 @end
 
+
+
+void RLMObjectBaseSetRealm(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMRealm *realm) {
+    if (object) {
+        object->_realm = realm;
+    }
+}
+
+RLMRealm *RLMObjectBaseRealm(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_realm : nil;
+}
+
+void RLMObjectBaseSetObjectSchema(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained RLMObjectSchema *objectSchema) {
+    if (object) {
+        object->_objectSchema = objectSchema;
+    }
+}
+
+RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *object) {
+    return object ? object->_objectSchema : nil;
+}
+
+NSArray *RLMObjectBaseLinkingObjectsOfClass(RLMObjectBase *object, NSString *className, NSString *property) {
+    if (!object) {
+        return nil;
+    }
+
+    if (!object->_realm) {
+        @throw RLMException(@"Linking object only available for objects in a Realm.");
+    }
+    RLMCheckThread(object->_realm);
+
+    if (!object->_row.is_attached()) {
+        @throw RLMException(@"Object has been deleted or invalidated and is no longer valid.");
+    }
+
+    RLMObjectSchema *schema = object->_realm.schema[className];
+    RLMProperty *prop = schema[property];
+    if (!prop) {
+        @throw RLMException([NSString stringWithFormat:@"Invalid property '%@'", property]);
+    }
+
+    if (![prop.objectClassName isEqualToString:object->_objectSchema.className]) {
+        @throw RLMException([NSString stringWithFormat:@"Property '%@' of '%@' expected to be an RLMObject or RLMArray property pointing to type '%@'", property, className, object->_objectSchema.className]);
+    }
+
+    Table *table = schema.table;
+    if (!table) {
+        return @[];
+    }
+
+    size_t col = prop.column;
+    NSUInteger count = object->_row.get_backlink_count(*table, col);
+    NSMutableArray *links = [NSMutableArray arrayWithCapacity:count];
+    for (NSUInteger i = 0; i < count; i++) {
+        [links addObject:RLMCreateObjectAccessor(object->_realm, schema, object->_row.get_backlink(*table, col, i))];
+    }
+    return [links copy];
+}
+
+id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
+    if (!object) {
+        return nil;
+    }
+
+    if (object->_realm) {
+        return RLMDynamicGet(object, key);
+    }
+    else {
+        return [object valueForKey:key];
+    }
+}
+
+void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *key, id obj) {
+    if (!object) {
+        return;
+    }
+
+    if (object->_realm) {
+        RLMDynamicValidatedSet(object, key, obj);
+    }
+    else {
+        [object setValue:obj forKey:key];
+    }
+}
+
+
+BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
+    // if not the correct types throw
+    if ((o1 && ![o1 isKindOfClass:RLMObjectBase.class]) || (o2 && ![o2 isKindOfClass:RLMObjectBase.class])) {
+        @throw RLMException(@"Can only compare objects of class RLMObjectBase");
+    }
+    // if identical object (or both are nil)
+    if (o1 == o2) {
+        return YES;
+    }
+    // if one is nil
+    if (o1 == nil || o2 == nil) {
+        return NO;
+    }
+    // if not in realm or differing realms
+    if (o1->_realm == nil || o1->_realm != o2->_realm) {
+        return NO;
+    }
+    // if either are detached
+    if (!o1->_row.is_attached() || !o2->_row.is_attached()) {
+        return NO;
+    }
+    // if table and index are the same
+    return o1->_row.get_table() == o2->_row.get_table() &&
+    o1->_row.get_index() == o2->_row.get_index();
+}
 
 
 Class RLMObjectUtilClass(BOOL isSwift) {

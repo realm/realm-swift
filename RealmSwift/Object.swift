@@ -20,7 +20,7 @@ import Realm
 import Realm.Private
 
 /**
-In Realm you define your model classes by subclassing RLMObject and adding properties to be persisted.
+In Realm you define your model classes by subclassing `Object` and adding properties to be persisted.
 You then instantiate and use your custom subclasses instead of using the RLMObject class directly.
 
 ```swift
@@ -148,8 +148,8 @@ public class Object : RLMObjectBase, Equatable {
     /**
     WARNING: This is an internal initializer not intended for public use.
     */
-    public override init(realm: RLMRealm, schema: RLMObjectSchema, defaultValues: Bool) {
-        super.init(realm: realm, schema: schema, defaultValues: defaultValues)
+    public override init(realm: RLMRealm, schema: RLMObjectSchema) {
+        super.init(realm: realm, schema: schema)
     }
 
     /**

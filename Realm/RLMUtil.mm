@@ -22,8 +22,8 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
-#import "RLMSwiftSupport.h"
 #import "RLMSchema_Private.h"
+#import "RLMSwiftSupport.h"
 
 #if !defined(REALM_VERSION)
 #import "RLMVersion.h"

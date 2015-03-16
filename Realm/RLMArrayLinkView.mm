@@ -65,12 +65,12 @@ static inline void RLMLinkViewArrayValidateInWriteTransaction(__unsafe_unretaine
 }
 static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained NSString *const expected) {
     if (!obj) {
-        @throw RLMException(@"Trying to add `nil` object");
+        @throw RLMException(@"Object is `nil`", @{@"expected class" : expected});
     }
 
     NSString *objectClassName = obj->_objectSchema.className;
     if (![objectClassName isEqualToString:expected]) {
-        @throw RLMException(@"Attempting to insert wrong object type", @{@"expected class" : expected, @"actual class" : objectClassName});
+        @throw RLMException(@"Object type is incorrect.", @{@"expected class" : expected, @"actual class" : objectClassName});
     }
 }
 
@@ -110,7 +110,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     Class accessorClass = _objectSchema.accessorClass;
     tightdb::Table &table = *_objectSchema.table;
     while (index < count && batchCount < len) {
-        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema defaultValues:NO];
+        RLMObject *accessor = [[accessorClass alloc] initWithRealm:_realm schema:_objectSchema];
         accessor->_row = table[_backingLinkView->get(index++).get_index()];
         items->array[batchCount] = accessor;
         buffer[batchCount] = accessor;
@@ -139,8 +139,8 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
 - (void)addObject:(RLMObject *)object {
     RLMLinkViewArrayValidateInWriteTransaction(self);
-
     RLMValidateObjectClass(object, self.objectClassName);
+
     if (object->_realm != self.realm) {
         [self.realm addObject:object];
     }
@@ -149,8 +149,8 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
 - (void)insertObject:(RLMObject *)object atIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateInWriteTransaction(self);
-
     RLMValidateObjectClass(object, self.objectClassName);
+
     if (index > _backingLinkView->size()) {
         @throw RLMException(@"Trying to insert object at invalid index");
     }
@@ -186,8 +186,8 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
     RLMLinkViewArrayValidateInWriteTransaction(self);
-
     RLMValidateObjectClass(object, self.objectClassName);
+
     if (index >= _backingLinkView->size()) {
         @throw RLMException(@"Trying to replace object at invalid index");
     }
@@ -200,14 +200,9 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 - (NSUInteger)indexOfObject:(RLMObject *)object {
     // check attached for table and object
     RLMLinkViewArrayValidateAttached(self);
-    RLMValidateObjectClass(object, self.objectClassName);
+
     if (object->_realm && !object->_row.is_attached()) {
         @throw RLMException(@"RLMObject is no longer valid");
-    }
-
-    // check that object types align
-    if (![_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Object type does not match RLMArray");
     }
 
     // if different tables then no match

@@ -87,15 +87,6 @@ You should call this method before accessing any `Realm` instances which
 require migration. After registering your migration block, Realm will call your
 block automatically as needed.
 
-:warning: Unsuccessful migrations will throw exceptions when the migration block is applied.
-          This will happen in the following cases:
-
-          - The migration block was run and returns a schema version which is not higher
-            than the previous schema version.
-          - A new property without a default was added to an object and not initialized
-            during the migration. You are required to either supply a default value or to
-            manually populate added properties during a migration.
-
 :param: version   The current schema version.
 :param: realmPath The path of the Realms to migrate.
 :param: block     The block which migrates the Realm to the current version.
@@ -169,10 +160,6 @@ public final class Migration {
     /**
     Enumerates objects of a given type in this Realm, providing both the old and new versions of
     each object. Object properties can be accessed using subscripting.
-
-    :warning: All objects returned are of a type specific to the current migration and should not be
-              casted to the normal object type. Instead you should access them as `Object`s and use
-              subscripting to access properties.
     
     :param: className The name of the `Object` class to enumerate.
     :param: block     The block providing both the old and new versions of an object in this Realm.
