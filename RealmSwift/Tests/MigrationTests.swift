@@ -43,7 +43,7 @@ class MigrationTests: TestCase {
 
     // create realm at path and test version is 0
     private func createAndTestRealmAtPath(realmPath: String) {
-        autoreleasepool { () -> () in
+        autoreleasepool {
             Realm(path: realmPath)
             return
         }
@@ -171,10 +171,10 @@ class MigrationTests: TestCase {
 
     func testCreate() {
         migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
-            migration.create("SwiftStringObject", value:["string"])
-            migration.create("SwiftStringObject", value:["stringCol": "string"])
+            migration.create("SwiftStringObject", value: ["string"])
+            migration.create("SwiftStringObject", value: ["stringCol": "string"])
 
-            self.assertThrows(migration.create("NoSuchObject", value:[]))
+            self.assertThrows(migration.create("NoSuchObject", value: []))
 
             var count = 0
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
@@ -216,8 +216,8 @@ class MigrationTests: TestCase {
             Realm().write {
                 var object = SwiftObject()
                 object.boolCol = true
-                object.objectCol = SwiftBoolObject(value:[true])
-                object.arrayCol.append(SwiftBoolObject(value:[false]))
+                object.objectCol = SwiftBoolObject(value: [true])
+                object.arrayCol.append(SwiftBoolObject(value: [false]))
                 Realm().add(object)
                 return
             }

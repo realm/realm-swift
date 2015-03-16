@@ -31,24 +31,24 @@ cat <<EOF
 Usage: sh $0 command [argument]
 
 command:
-  download-core:               downloads core library (binary version)
-  clean:                       clean up/remove all generated files
-  build [settings]:            builds iOS and OS X frameworks
-  ios-dynamic [settings]:      builds iOS dynamic frameworks
-  ios-static [settings]:       builds a fat iOS static framework
-  osx [settings]:              builds OS X framework
-  test-ios [settings]:         tests iOS framework
-  test-ios-devices [settings]: tests iOS on all attached iOS devices
-  test-osx [settings]:         tests OSX framework
-  test [settings]:             tests iOS and OS X frameworks
-  test-all [settings]:         tests iOS and OS X frameworks with debug and release configurations
-  examples [settings]:         builds all examples in examples/
-  browser [settings]:          builds the Realm Browser OSX app
-  test-browser [settings]:     tests the Realm Browser OSX app
-  verify [settings]:           cleans, removes docs/output/, then runs docs, test-all, examples & browser
-  docs:                        builds docs in docs/output
-  get-version:                 get the current version
-  set-version version:         set the version
+  download-core:        downloads core library (binary version)
+  clean:                clean up/remove all generated files
+  build:            	builds iOS and OS X frameworks
+  ios-dynamic:     	builds iOS dynamic frameworks
+  ios-static:       	builds a fat iOS static framework
+  osx:              	builds OS X framework
+  test-ios:         	tests iOS framework
+  test-ios-devices: 	tests iOS on all attached iOS devices
+  test-osx:         	tests OSX framework
+  test:             	tests iOS and OS X frameworks
+  test-all:         	tests iOS and OS X frameworks with debug and release configurations
+  examples:         	builds all examples in examples/
+  browser:         	builds the Realm Browser OSX app
+  test-browser:     	tests the Realm Browser OSX app
+  verify:           	cleans, removes docs/output/, then runs docs, test-all, examples & browser
+  docs:                 builds docs in docs/output
+  get-version:          get the current version
+  set-version version:  set the version
 
 argument:
   version: version in the x.y.z format
@@ -173,7 +173,7 @@ test_ios_devices() {
 # Input Validation
 ######################################
 
-if [ "$#" -eq 0 -o "$#" -gt 3 ]; then
+if [ "$#" -eq 0 -o "$#" -gt 2 ]; then
     usage
     exit 1
 fi

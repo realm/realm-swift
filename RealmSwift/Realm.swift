@@ -27,9 +27,9 @@ Realms can either be stored on disk (see `init(path:)`) or in
 memory (see `init(inMemoryIdentifier:)`).
 
 Realm instances are cached internally, and constructing equivalent Realm
-objects (with the same path or identifier) multiple times on a single thread
-within a single iteration of the run loop will normally return the same
-Realm object. If you specifically want to ensure a Realm object is
+objects (with the same path or identifier) produces limitid overhead. 
+
+If you specifically want to ensure a Realm object is
 destroyed (for example, if you wish to open a realm, check some property, and
 then possibly delete the realm file and re-open it), place the code which uses
 the realm within an `autoreleasepool {}` and ensure you have no other
@@ -231,7 +231,7 @@ public final class Realm {
     */
     public func add(object: Object, update: Bool = false) {
         var options : RLMCreationOptions = .allZeros
-        if update == true {
+        if update {
             options = .UpdateOrCreate
             if object.objectSchema.primaryKeyProperty == nil {
                 throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
@@ -278,7 +278,7 @@ public final class Realm {
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
         var options : RLMCreationOptions = .allZeros
-        if update == true {
+        if update {
             options = .UpdateOrCreate
             if schema[T.className()]?.primaryKeyProperty == nil {
                 throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
@@ -343,7 +343,7 @@ public final class Realm {
 
     Returns `nil` if no object exists with the given primary key.
 
-    This method requires that `primaryKey()` be overridden on the receiving subclass.
+    This method requires that `primaryKey()` be overridden on the given subclass.
 
     :see: Object.primaryKey()
 

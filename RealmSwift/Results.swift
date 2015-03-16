@@ -86,11 +86,11 @@ public final class Results<T: Object>: Printable {
 
     /**
     Returns the index of the first object matching the given predicate,
-    or `nil` if the object is not in the results.
+    or `nil` if no objects match.
 
     :param: predicate The predicate to filter the objects.
 
-    :returns: The index of the given object, or `nil` if the object is not in the results.
+    :returns: The index of the given object, or `nil` if no objects match.
     */
     public func indexOf(predicate: NSPredicate) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(predicate))
@@ -98,11 +98,11 @@ public final class Results<T: Object>: Printable {
 
     /**
     Returns the index of the first object matching the given predicate,
-    or `nil` if the object is not in the results.
+    or `nil` if no objects match.
 
     :param: predicateFormat The predicate format string which can accept variable arguments.
 
-    :returns: The index of the given object, or `nil` if the object is not in the results.
+    :returns: The index of the given object, or `nil` if no objects match.
     */
     public func indexOf(predicateFormat: String, _ args: CVarArgType...) -> Int? {
         return notFoundToNil(rlmResults.indexOfObjectWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args))))
