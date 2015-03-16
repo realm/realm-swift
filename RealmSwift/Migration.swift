@@ -30,7 +30,7 @@ Migration block used to migrate a Realm.
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
 
 /// Object class used during migrations
-public typealias MigrationObject=DynamicObject
+public typealias MigrationObject = DynamicObject
 
 /**
 Provides both the old and new versions of an object in this Realm. Objects properties can only be
