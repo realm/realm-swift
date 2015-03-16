@@ -52,7 +52,7 @@ using namespace tightdb::util;
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
                "on to the RLMNotificationToken returned from addNotificationBlock and call "
-               "removeNotification: when you no longer wish to recieve RLMRealm notifications.");
+               "removeNotification: when you no longer wish to receive RLMRealm notifications.");
     }
 }
 @end
