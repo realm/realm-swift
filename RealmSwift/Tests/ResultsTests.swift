@@ -264,7 +264,7 @@ class ResultsFromTableTests: ResultsTests {
 
 class ResultsFromTableViewTests: ResultsTests {
     override func getResults() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject.self)
+        return realmWithTestPath().objects(SwiftStringObject.self).filter("stringCol != ''")
     }
 
     override func getAggregateableResults() -> Results<SwiftAggregateObject> {
