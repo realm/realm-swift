@@ -27,7 +27,7 @@ Realms can either be stored on disk (see `init(path:)`) or in
 memory (see `init(inMemoryIdentifier:)`).
 
 Realm instances are cached internally, and constructing equivalent Realm
-objects (with the same path or identifier) produces limitid overhead. 
+objects (with the same path or identifier) produces limited overhead.
 
 If you specifically want to ensure a Realm object is
 destroyed (for example, if you wish to open a realm, check some property, and
