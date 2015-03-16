@@ -135,6 +135,10 @@ class MigrationTests: TestCase {
 
     func testEnumerate() {
         autoreleasepool {
+            _ = Realm()
+        }
+
+        autoreleasepool {
             self.migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
                 migration.enumerate("SwiftStringObject", { oldObj, newObj in
                     XCTFail("No objects to enumerate")
@@ -170,33 +174,35 @@ class MigrationTests: TestCase {
     }
 
     func testCreate() {
+        autoreleasepool {
+            _ = Realm()
+        }
+
         migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
             migration.create("SwiftStringObject", value: ["string"])
             migration.create("SwiftStringObject", value: ["stringCol": "string"])
             migration.create("SwiftStringObject")
 
             self.assertThrows(migration.create("NoSuchObject", value: []))
-
-            var count = 0
-            migration.enumerate("SwiftStringObject", { oldObj, newObj in
-                if count == 0 {
-                    // first object has default value of empty string
-                    XCTAssertEqual(newObj!["stringCol"] as! String, "")
-                }
-                else {
-                    XCTAssertEqual(newObj!["stringCol"] as! String, "string")
-                    XCTAssertNil(oldObj, "Objects created during migration have nil oldObj")
-                }
-                count++
-            })
-            XCTAssertEqual(count, 3)
         })
 
         XCTAssertEqual(Realm().objects(SwiftStringObject).count, 3)
+
+        var i = 0
+        for obj in Realm().objects(SwiftStringObject) {
+            if i == 2 {
+                // last object has default value of empty string
+                XCTAssertEqual("", obj.stringCol)
+            }
+            else {
+                XCTAssertEqual("string", obj.stringCol)
+            }
+            ++i
+        }
     }
 
     func testDelete() {
-        autoreleasepool { () -> () in
+        autoreleasepool {
             Realm().write {
                 Realm().create(SwiftStringObject.self, value: ["string1"])
                 Realm().create(SwiftStringObject.self, value: ["string2"])
