@@ -245,22 +245,9 @@ public final class List<T: Object>: ListBase {
 
     :param: index The index at which to remove the object.
     */
-    public func remove(index: Int) {
+    public func removeAtIndex(index: Int) {
         throwForNegativeIndex(index)
         _rlmArray.removeObjectAtIndex(UInt(index))
-    }
-
-    /**
-    Removes the first instance of the given object from the list. Does not remove the object from the Realm.
-
-    :warning: This method can only be called during a write transaction.
-
-    :param: object An object.
-    */
-    public func remove(object: T) {
-        if let index = indexOf(object) {
-            remove(index)
-        }
     }
 
     /**

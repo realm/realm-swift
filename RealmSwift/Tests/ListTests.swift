@@ -297,27 +297,15 @@ class ListTests: TestCase {
         assertThrows(array.insert(str2, atIndex: -200))
     }
 
-    func testRemoveIndex() {
+    func testRemoveAtIndex() {
         array.extend([str1, str2, str1])
 
-        array.remove(1)
+        array.removeAtIndex(1)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(array.remove(200))
-        assertThrows(array.remove(-200))
-    }
-
-    func testRemoveObject() {
-        array.extend([str1, str2])
-
-        array.remove(str1)
-        XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str2, array[0])
-
-        array.remove(str1) // should be a no-op
-        XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str2, array[0])
+        assertThrows(array.removeAtIndex(200))
+        assertThrows(array.removeAtIndex(-200))
     }
 
     func testRemoveLast() {
