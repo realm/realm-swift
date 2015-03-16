@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,23 @@
 #import <objc/runtime.h>
 #import "RLMProperty_Private.h"
 
-@interface RLMPropertyTests : RLMTestCase
+@interface PropertyTests : RLMTestCase
 
 @end
 
-@implementation RLMPropertyTests
+@implementation PropertyTests
+
+- (void)testDescription {
+    AllTypesObject *object = [[AllTypesObject alloc] init];
+    RLMProperty *property = object.objectSchema[@"objectCol"];
+
+    XCTAssertEqualObjects(property.description, @"objectCol {\n"
+                                                @"\ttype = object;\n"
+                                                @"\tobjectClassName = StringObject;\n"
+                                                @"\tindexed = NO;\n"
+                                                @"\tisPrimary = NO;\n"
+                                                @"}");
+}
 
 - (void)testTwoPropertiesAreEqual {
     const char *name = "intCol";
