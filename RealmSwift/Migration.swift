@@ -29,6 +29,9 @@ Migration block used to migrate a Realm.
 */
 public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt) -> Void
 
+/// Object class used during migrations
+public typealias MigrationObject=DynamicObject
+
 /**
 Provides both the old and new versions of an object in this Realm. Objects properties can only be
 accessed using subscripting.
@@ -142,6 +145,7 @@ public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError?
     }
 }
 
+
 /**
 `Migration` is the object passed into a user-defined `MigrationBlock` when updating the version
 of a `Realm` instance.
@@ -210,44 +214,6 @@ public final class Migration {
     }
 }
 
-/// Object interface which allows untyped getters and setters for Objects during a migration.
-public final class MigrationObject : Object {
-
-    private var listProperties = [String: List<MigrationObject>]()
-
-    /// Returns the value of the property with the given name.
-    public override subscript(key: String) -> AnyObject? {
-        get {
-            if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == RLMPropertyType.Array {
-                    return listProperties[key]
-                }
-            }
-            return super[key]
-        }
-        set(value) {
-            if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == RLMPropertyType.Array {
-                    throwRealmException("Setting List properties during migrations is unsupported. Instead you can remove objects from the current List.")
-                }
-            }
-            super[key] = value
-        }
-    }
-
-    /**
-    WARNING: This is an internal initializer for Realm that must be `public`, but is not intended to
-             be used directly.
-
-    Sets a list property by passing in its name and `RLMArray` to be wrapped.
-
-    :param: name     Name of the list property to set.
-    :param: rlmArray `RLMArray` to set.
-    */
-    public func initalizeListPropertyWithName(name: String, rlmArray: RLMArray) {
-        listProperties[name] = List<MigrationObject>(rlmArray)
-    }
-}
 
 // MARK: Private Helpers
 
