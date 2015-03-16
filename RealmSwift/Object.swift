@@ -289,9 +289,7 @@ public class ObjectUtil : NSObject {
     }
 
     @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
-        if let object = object as? Object {
-            let list = object[property!.name]! as RLMListBase
-            list._rlmArray = array
-        }
+        let list = (object as Object)[property!.name]! as RLMListBase
+        list._rlmArray = array
     }
 }
