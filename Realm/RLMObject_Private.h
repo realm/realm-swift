@@ -59,8 +59,10 @@ FOUNDATION_EXTERN void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *ob
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2);
 
+// Get ObjectUil class for objc or swift
 FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
+@class RLMProperty, RLMArray;
 @interface RLMObjectUtil : NSObject
 
 + (NSString *)primaryKeyForClass:(Class)cls;
@@ -68,6 +70,7 @@ FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 + (NSArray *)indexedPropertiesForClass:(Class)cls;
 
 + (NSArray *)getGenericListPropertyNames:(id)obj;
++ (void)initializeListProperty:(RLMObjectBase *)object property:(RLMProperty *)property array:(RLMArray *)array;
 
 @end
 

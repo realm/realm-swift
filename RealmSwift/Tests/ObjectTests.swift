@@ -170,4 +170,8 @@ class ObjectTests: TestCase {
             test(persistedObject)
         }
     }
+
+    func testSubscript() {
+
+    }
 }

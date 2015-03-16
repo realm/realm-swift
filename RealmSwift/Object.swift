@@ -137,7 +137,7 @@ public class Object : RLMObjectBase, Equatable {
     :returns: An `Array` of objects of type `className` which have this object as their value for the `propertyName` property.
     */
     public func linkingObjects<T: Object>(type: T.Type, forProperty propertyName: String) -> [T] {
-	return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
+        return RLMObjectBaseLinkingObjectsOfClass(self, T.className(), propertyName) as [T]
     }
 
 
@@ -181,9 +181,19 @@ public class Object : RLMObjectBase, Equatable {
 
     public subscript(key: String) -> AnyObject? {
         get {
+            if let list = listProperty(key) {
+                return list
+            }
             return RLMObjectBaseObjectForKeyedSubscript(self, key)
         }
         set(value) {
+            if let list = listProperty(key) {
+                if let value = value as? NSFastEnumeration {
+                    list._rlmArray.removeAllObjects()
+                    list._rlmArray.addObjects(value)
+                }
+                return
+            }
             RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
         }
     }
@@ -206,7 +216,40 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return RLMObjectBaseAreEqual(lhs, rhs)
 }
 
-/// Internal class. Do not use directly.
+/// Object interface which allows untyped getters and setters for Objects.
+public final class DynamicObject : Object {
+    private var listProperties = [String: List<DynamicObject>]()
+
+    /// Returns or sets the value of the property with the given name.
+    public override subscript(key: String) -> AnyObject? {
+        get {
+            if let prop = RLMObjectBaseObjectSchema(self)[key] {
+                if prop.type == .Array {
+                    // get it or set it
+                    if let list = listProperties[key] {
+                        return list
+                    }
+                    let list = List<DynamicObject>()
+                    listProperties[key] = list
+                    return list
+
+                }
+            }
+            return RLMObjectBaseObjectForKeyedSubscript(self, key)
+        }
+        set(value) {
+            if let prop = RLMObjectBaseObjectSchema(self)[key] {
+                if prop.type == .Array {
+                    throwRealmException("Setting List properties is unsupported. Instead you can add or remove objects from the current List.")
+                }
+            }
+            RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
+        }
+    }
+}
+
+
+// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
     @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
         if let type = type as? Object.Type {
@@ -243,5 +286,10 @@ public class ObjectUtil : NSObject {
         }
 
         return properties
+    }
+
+    @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
+        let list = (object as Object)[property!.name]! as RLMListBase
+        list._rlmArray = array
     }
 }

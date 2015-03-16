@@ -332,20 +332,9 @@ static inline void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
 
     for (RLMProperty *prop in object->_objectSchema.properties) {
         if (prop.type == RLMPropertyTypeArray) {
-            // FIXME - try to move some of this logic to swift
-            static Class s_swiftMigrationObjectClass = NSClassFromString(@"RealmSwift.MigrationObject");
-            if (object.class == s_swiftMigrationObjectClass) {
-                RLMArray *array = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                        view:object->_row.get_linklist(prop.column)
-                                                                       realm:object->_realm];
-                [(id<RLMSwiftMigrationObject>)object initalizeListPropertyWithName:prop.name rlmArray:array];
-            }
-            else {
-                auto list = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftListIvar));
-                list._rlmArray = [RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
-                                                                       view:object->_row.get_linklist(prop.column)
-                                                                      realm:object->_realm];;
-            }
+            [RLMObjectUtilClass(YES) initializeListProperty:object property:prop array:[RLMArrayLinkView arrayWithObjectClassName:prop.objectClassName
+                                                                                                                             view:object->_row.get_linklist(prop.column)
+                                                                                                                            realm:object->_realm]];
         }
     }
 }

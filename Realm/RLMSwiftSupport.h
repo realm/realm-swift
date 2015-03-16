@@ -26,9 +26,3 @@
 + (NSString *)demangleClassName:(NSString *)className;
 
 @end
-
-@protocol RLMSwiftMigrationObject <NSObject>
-
-- (void)initalizeListPropertyWithName:(NSString *)name rlmArray:(RLMArray *)rlmArray;
-
-@end
