@@ -192,10 +192,18 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema) {
         return [objectSchema.objectClass defaultPropertyValues];
     }
 
-    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
+    NSMutableDictionary *defaults = nil;
+    if ([objectSchema.objectClass isSubclassOfClass:RLMObject.class]) {
+        defaults = [NSMutableDictionary dictionaryWithDictionary:[objectSchema.objectClass defaultPropertyValues]];
+    }
+    else {
+        defaults = [NSMutableDictionary dictionary];
+    }
     RLMObject *defaultObject = [[objectSchema.objectClass alloc] init];
     for (RLMProperty *prop in objectSchema.properties) {
-        defaults[prop.name] = defaultObject[prop.name];
+        if (!defaults[prop.name] && defaultObject[prop.name]) {
+            defaults[prop.name] = defaultObject[prop.name];
+        }
     }
     return defaults;
 }
