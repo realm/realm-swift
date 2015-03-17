@@ -386,14 +386,43 @@ class ListStandaloneTests: ListTests {
         return array
     }
 
-    // Things not implemented in standalone
-    override func testSortWithProperty() { }
-    override func testSortWithDescriptors() { }
-    override func testFilterFormat() { }
-    override func testFilterPredicate() { }
-    override func testIndexOfFormat() { }
-    override func testIndexOfObject() { }
-    override func testIndexOfPredicate() { }
+    // MARK: Things not implemented in standalone
+
+    override func testSortWithProperty() {
+        assertThrows(array.sorted("stringCol", ascending: true))
+        assertThrows(array.sorted("noSuchCol"))
+    }
+
+    override func testSortWithDescriptors() {
+        assertThrows(array.sorted([SortDescriptor(property: "intCol", ascending: true)]))
+        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
+    }
+
+    override func testFilterFormat() {
+        assertThrows(array.filter("stringCol = '1'"))
+        assertThrows(array.filter("noSuchCol = '1'"))
+    }
+
+    override func testFilterPredicate() {
+        let pred1 = NSPredicate(format: "stringCol = '1'")!
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")!
+
+        assertThrows(array.filter(pred1))
+        assertThrows(array.filter(pred2))
+    }
+
+    override func testIndexOfFormat() {
+        assertThrows(array.indexOf("stringCol = %@", "1"))
+        assertThrows(array.indexOf("noSuchCol = %@", "1"))
+    }
+
+    override func testIndexOfPredicate() {
+        let pred1 = NSPredicate(format: "stringCol = '1'")!
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")!
+
+        assertThrows(array.indexOf(pred1))
+        assertThrows(array.indexOf(pred2))
+    }
 }
 
 class ListNewlyAddedTests: ListTests {
