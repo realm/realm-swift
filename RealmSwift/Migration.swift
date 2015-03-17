@@ -39,7 +39,7 @@ accessed using subscripting.
 :param: oldObject Object in original `Realm` (read-only)
 :param: newObject Object in migrated `Realm` (read-write)
 */
-public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject, newObject: MigrationObject) -> Void
+public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
 
 /**
 Specify a schema version and an associated migration block which is applied when
