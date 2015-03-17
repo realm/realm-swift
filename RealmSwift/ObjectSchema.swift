@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Object schemas map to tables in the core database.
 */
-public final class ObjectSchema {
+public final class ObjectSchema: Printable {
 
     // MARK: Properties
 
@@ -47,6 +47,9 @@ public final class ObjectSchema {
         }
         return nil
     }
+
+    /// Returns a human-readable description of the properties contained in this object schema.
+    public var description: String { return rlmObjectSchema.description }
 
     // MARK: Initializers
 

@@ -42,6 +42,10 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(Realm().schema["SwiftPrimaryStringObject"]!.primaryKeyProperty!.name, "stringCol")
     }
 
+    func testDescription() {
+        XCTAssertEqual(objectSchema.description, "SwiftObject {\n\tboolCol {\n\t\ttype = bool;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tintCol {\n\t\ttype = int;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tfloatCol {\n\t\ttype = float;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tdoubleCol {\n\t\ttype = double;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tstringCol {\n\t\ttype = string;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tbinaryCol {\n\t\ttype = data;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tdateCol {\n\t\ttype = date;\n\t\tobjectClassName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tobjectCol {\n\t\ttype = object;\n\t\tobjectClassName = SwiftBoolObject;\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n\tarrayCol {\n\t\ttype = array;\n\t\tobjectClassName = SwiftBoolObject;\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t}\n}")
+    }
+
     func testSubscript() {
         XCTAssertNil(objectSchema["noSuchProperty"])
         XCTAssertEqual(objectSchema["boolCol"]!.name, "boolCol")

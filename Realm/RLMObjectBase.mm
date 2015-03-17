@@ -142,7 +142,7 @@
         else {
             sub = [object description];
         }
-        [mString appendFormat:@"\t%@ = %@;\n", property.name, sub];
+        [mString appendFormat:@"\t%@ = %@;\n", property.name, [sub stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
     }
     [mString appendString:@"}"];
 

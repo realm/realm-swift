@@ -26,7 +26,7 @@ introspecting the database's schema.
 
 Schemas map to collections of tables in the core database.
 */
-public final class Schema {
+public final class Schema: Printable {
 
     // MARK: Properties
 
@@ -37,6 +37,9 @@ public final class Schema {
     public var objectSchema: [ObjectSchema] {
         return (rlmSchema.objectSchema as [RLMObjectSchema]).map { ObjectSchema($0) }
     }
+
+    /// Returns a human-readable description of the object schemas contained in this schema.
+    public var description: String { return rlmSchema.description }
 
     // MARK: Initializers
 
