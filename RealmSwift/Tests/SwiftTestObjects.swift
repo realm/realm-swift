@@ -133,6 +133,16 @@ class SwiftIgnoredPropertiesObject: Object {
     }
 }
 
+class SwiftLinkToPrimaryStringObject: Object {
+    dynamic var pk = ""
+    dynamic var object: SwiftPrimaryStringObject?
+    let objects = List<SwiftPrimaryStringObject>()
+
+    override class func primaryKey() -> String? {
+        return "pk"
+    }
+}
+
 class SwiftPrimaryStringObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
