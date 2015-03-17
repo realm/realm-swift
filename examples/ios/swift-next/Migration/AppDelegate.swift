@@ -73,18 +73,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     if oldSchemaVersion < 1 {
                         // combine name fields into a single field
-                        let firstName = oldObject["firstName"] as String
-                        let lastName = oldObject["lastName"] as String
-                        newObject["fullName"] = "\(firstName) \(lastName)"
+                        let firstName = oldObject!["firstName"] as String
+                        let lastName = oldObject!["lastName"] as String
+                        newObject!["fullName"] = "\(firstName) \(lastName)"
                     }
                 }
             }
             if oldSchemaVersion < 2 {
                 migration.enumerate(Person.className()) { oldObject, newObject in
                     // give JP a dog
-                    if newObject["fullName"] as String == "JP McDonald" {
+                    if newObject!["fullName"] as String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])
-                        let dogs = newObject["pets"] as List<MigrationObject>
+                        let dogs = newObject!["pets"] as List<MigrationObject>
                         dogs.append(jpsDog)
                     }
                 }
