@@ -152,8 +152,12 @@ class RealmTests: TestCase {
 
         Realm().write {
             self.assertThrows(self.realmWithTestPath().cancelWrite())
+            let object = Realm().create(SwiftStringObject)
             Realm().cancelWrite()
+            XCTAssertTrue(object.invalidated)
+            XCTAssertEqual(Realm().objects(SwiftStringObject).count, 0)
         }
+        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 0)
     }
 
     func testAddSingleObject() {
