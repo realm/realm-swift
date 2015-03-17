@@ -796,7 +796,7 @@
 					"$(inherited)",
 					"REALM_SWIFT=1",
 				);
-				INFOPLIST_FILE = "Realm/Realm-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -823,7 +823,7 @@
 					"$(inherited)",
 					"REALM_SWIFT=1",
 				);
-				INFOPLIST_FILE = "Realm/Realm-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -850,7 +850,7 @@
 					"$(inherited)",
 					core/include,
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/../Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
@@ -880,7 +880,7 @@
 					"$(inherited)",
 					core/include,
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/../Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
@@ -910,7 +910,7 @@
 					"$(inherited)",
 					"REALM_SWIFT=1",
 				);
-				INFOPLIST_FILE = "Realm/Realm-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -938,7 +938,7 @@
 					"$(inherited)",
 					"REALM_SWIFT=1",
 				);
-				INFOPLIST_FILE = "Realm/Realm-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -984,7 +984,7 @@
 					"$(inherited)",
 					core/include,
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
@@ -1018,7 +1018,7 @@
 					"$(inherited)",
 					core/include,
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
@@ -1067,7 +1067,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1094,7 +1094,7 @@
 					"$(inherited)",
 					"$(CONFIGURATION_BUILD_DIR)/RealmSwift.framework/Frameworks",
 				);
-				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
+				INFOPLIST_FILE = "RealmSwift/Tests/RealmSwiftTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
