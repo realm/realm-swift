@@ -580,7 +580,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\n";
+			shellScript = "if [[ ! -d \"dynamic_frameworks\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\nfi\n";
 		};
 		295C17A41A7C55DA000E5F54 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -593,7 +593,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CONFIGURATION=$CONFIGURATION sh build.sh osx\n";
+			shellScript = "if [[ ! -d \"../osx/Realm.framework\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh osx\nfi\n";
 		};
 		29A03F0F1A7C499C00C0D92E /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -602,6 +602,7 @@
 			);
 			inputPaths = (
 				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)/Realm.framework",
+				../osx/Realm.framework,
 			);
 			name = "Embed Dynamic/Realm.framework";
 			outputPaths = (
@@ -609,7 +610,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
+			shellScript = "if [[ ! -d \"dynamic_frameworks\" ]]; then\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\nelse\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_1}\"\nfi\n\nrm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Versions/A/Realm @rpath/RealmSwift.framework/Versions/A/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 		};
 		29E3C6C31A718C5A00B62C1D /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -618,6 +619,7 @@
 			);
 			inputPaths = (
 				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic/Realm.framework",
+				"dynamic_frameworks/$(PLATFORM_NAME)/Realm.framework",
 			);
 			name = "Embed Dynamic/Realm.framework";
 			outputPaths = (
@@ -625,7 +627,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Realm @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
+			shellScript = "if [[ ! -d \"dynamic_frameworks\" ]]; then\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_0}\"\nelse\n  DYNAMIC_FRAMEWORK=\"${SCRIPT_INPUT_FILE_1}\"\nfi\n\nrm -rf \"${SCRIPT_OUTPUT_FILE_0}\"\nmkdir -p \"${SCRIPT_OUTPUT_FILE_0}\"\ncp -R \"${DYNAMIC_FRAMEWORK}\" \"${SCRIPT_OUTPUT_FILE_0}/\"\n\ninstall_name_tool -id @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${SCRIPT_OUTPUT_FILE_0}/Realm.framework/Realm\"\ninstall_name_tool -change @rpath/Realm.framework/Realm @rpath/RealmSwift.framework/Frameworks/Realm.framework/Realm \"${CONFIGURATION_BUILD_DIR}/${EXECUTABLE_PATH}\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -791,7 +793,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
+					../osx,
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
@@ -818,7 +823,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
+					../osx,
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
@@ -905,7 +913,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic";
+				FRAMEWORK_SEARCH_PATHS = (
+					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic",
+					"dynamic_frameworks/$(PLATFORM_NAME)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
@@ -933,7 +944,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic";
+				FRAMEWORK_SEARCH_PATHS = (
+					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic",
+					"dynamic_frameworks/$(PLATFORM_NAME)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"REALM_SWIFT=1",
