@@ -173,19 +173,26 @@ class MigrationTests: TestCase {
         migrateAndTestRealm(Realm.defaultPath, block: { migration, oldSchemaVersion in
             migration.create("SwiftStringObject", value: ["string"])
             migration.create("SwiftStringObject", value: ["stringCol": "string"])
+            migration.create("SwiftStringObject")
 
             self.assertThrows(migration.create("NoSuchObject", value: []))
 
             var count = 0
             migration.enumerate("SwiftStringObject", { oldObj, newObj in
-                XCTAssertEqual(newObj!["stringCol"] as String, "string")
-                XCTAssertNil(oldObj, "Objects created during migration have nil oldObj")
+                if count == 0 {
+                    // first object has default value of empty string
+                    XCTAssertEqual(newObj!["stringCol"] as String, "")
+                }
+                else {
+                    XCTAssertEqual(newObj!["stringCol"] as String, "string")
+                    XCTAssertNil(oldObj, "Objects created during migration have nil oldObj")
+                }
                 count++
             })
-            XCTAssertEqual(count, 2)
+            XCTAssertEqual(count, 3)
         })
 
-        XCTAssertEqual(Realm().objects(SwiftStringObject.self).count, 2)
+        XCTAssertEqual(Realm().objects(SwiftStringObject.self).count, 3)
     }
 
     func testDelete() {
