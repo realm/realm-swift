@@ -32,6 +32,10 @@ class SchemaTests: TestCase {
         XCTAssertTrue(objectSchema.count > 0)
     }
 
+    func testDescription() {
+        XCTAssert(schema.description as Any is String)
+    }
+
     func testSubscript() {
         XCTAssertEqual(schema["SwiftObject"]!.className, "SwiftObject")
         XCTAssertNil(schema["NoSuchClass"])

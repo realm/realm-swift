@@ -228,7 +228,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
 
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <%p> (\n", self];
     unsigned long index = 0, skipped = 0;
     for (id obj in self) {
         NSString *sub;
