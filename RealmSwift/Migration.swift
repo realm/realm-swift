@@ -59,8 +59,7 @@ block automatically as needed.
 :warning: Unsuccessful migrations will throw exceptions when the migration block is applied.
           This will happen in the following cases:
 
-          - The migration block was run and returns a schema version which is not higher
-            than the previous schema version.
+          - The given `schemaVersion` is lower than the target Realm's current schema version.
           - A new property without a default was added to an object and not initialized
             during the migration. You are required to either supply a default value or to
             manually populate added properties during a migration.

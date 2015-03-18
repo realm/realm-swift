@@ -180,20 +180,6 @@ public final class List<T: Object>: ListBase {
         return Results<T>(_rlmArray.sortedResultsUsingDescriptors(map(sortDescriptors) { $0.rlmSortDescriptorValue }))
     }
 
-    // MARK: Sequence Support
-
-    /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
-    public func generate() -> GeneratorOf<T> {
-        var i: UInt = 0
-        return GeneratorOf<T>() {
-            if (i >= self._rlmArray.count) {
-                return .None
-            } else {
-                return self._rlmArray[i++] as? T
-            }
-        }
-    }
-
     // MARK: Mutation
 
     /**
@@ -284,7 +270,23 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List : ExtensibleCollectionType {
+extension List: ExtensibleCollectionType {
+    // MARK: Sequence Support
+
+    /// Returns a `GeneratorOf<T>` that yields successive elements in the list.
+    public func generate() -> GeneratorOf<T> {
+        var i: UInt = 0
+        return GeneratorOf<T>() {
+            if (i >= self._rlmArray.count) {
+                return .None
+            } else {
+                return self._rlmArray[i++] as? T
+            }
+        }
+    }
+
+    // MARK: ExtensibleCollection Support
+
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
     public var startIndex: Int { return 0 }

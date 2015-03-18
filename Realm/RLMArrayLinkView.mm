@@ -18,11 +18,11 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObject_Private.hpp"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
+#import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMObjectStore.h"
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 

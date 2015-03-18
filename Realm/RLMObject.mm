@@ -17,11 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
 #import "RLMSchema_Private.h"
 #import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema_Private.hpp"
-
-#import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"
 
 // We declare things in RLMObject which are actually implemented in RLMObjectBase

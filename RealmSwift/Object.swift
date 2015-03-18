@@ -162,6 +162,11 @@ public class Object : RLMObjectBase, Equatable, Printable {
         super.init(object: object, schema: schema)
     }
 
+    /**
+    Returns the value for the property identified by the given key.
+    :param: key The name of one of the receiver's properties.
+    :retuns: The value for the property identified by `key`.
+    */
     public override func valueForKey(key: String) -> AnyObject? {
         if let list = listProperty(key) {
             return list
@@ -169,6 +174,11 @@ public class Object : RLMObjectBase, Equatable, Printable {
         return super.valueForKey(key)
     }
 
+    /**
+    Sets the property of the receiver specified by the given key to the given value.
+    :param: value The value for the property identified by `key`.
+    :param: key   The name of one of the receiver's properties.
+    */
     public override func setValue(value: AnyObject?, forKey key: String) {
         if let list = listProperty(key) {
             if let value = value as? NSFastEnumeration {
@@ -180,6 +190,7 @@ public class Object : RLMObjectBase, Equatable, Printable {
         super.setValue(value, forKey: key)
     }
 
+    /// Returns or sets the value of the property with the given name.
     public subscript(key: String) -> AnyObject? {
         get {
             if let list = listProperty(key) {
@@ -213,6 +224,8 @@ public class Object : RLMObjectBase, Equatable, Printable {
 // MARK: Equatable
 
 /// Returns whether both objects are equal.
+/// Objects are considered equal when they are both from the same Realm
+/// and point to the same underlying object in the database.
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return RLMObjectBaseAreEqual(lhs, rhs)
 }
@@ -250,7 +263,7 @@ public final class DynamicObject : Object {
 }
 
 
-// Internal class. Do not use directly.
+/// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
     @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
         if let type = type as? Object.Type {
