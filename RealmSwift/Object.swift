@@ -224,6 +224,8 @@ public class Object : RLMObjectBase, Equatable, Printable {
 // MARK: Equatable
 
 /// Returns whether both objects are equal.
+/// Objects are considered equal when they are both from the same Realm
+/// and point to the same underlying object in the database.
 public func == <T: Object>(lhs: T, rhs: T) -> Bool {
     return RLMObjectBaseAreEqual(lhs, rhs)
 }
@@ -261,7 +263,7 @@ public final class DynamicObject : Object {
 }
 
 
-// Internal class. Do not use directly.
+/// Internal class. Do not use directly.
 public class ObjectUtil : NSObject {
     @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
         if let type = type as? Object.Type {

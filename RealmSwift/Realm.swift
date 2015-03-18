@@ -224,7 +224,7 @@ public final class Realm {
     Realm.
 
     The object to be added must be valid and cannot have been previously deleted
-    from a Realm (i.e. `invalidated`) must be false.
+    from a Realm (i.e. `invalidated` must be false).
 
     :param: object Object to be added to this Realm.
     :param: update If true will try to update existing objects with the same primary key.
