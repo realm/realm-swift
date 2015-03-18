@@ -473,8 +473,7 @@ public final class Realm {
         var error: NSError?
         if let encryptionKey = encryptionKey {
             rlmRealm.writeCopyToPath(path, encryptionKey: encryptionKey, error: &error)
-        }
-        else {
+        } else {
             rlmRealm.writeCopyToPath(path, error: &error)
         }
         return error
