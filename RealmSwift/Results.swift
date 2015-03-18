@@ -230,7 +230,9 @@ public final class Results<T: Object>: Printable {
     public func average<U: AddableType>(property: String) -> U {
         return rlmResults.averageOfProperty(property) as AnyObject as U
     }
+}
 
+extension Results: CollectionType {
     // MARK: Sequence Support
 
     /// Returns a `GeneratorOf<T>` that yields successive elements in the results.
@@ -244,9 +246,9 @@ public final class Results<T: Object>: Printable {
             }
         }
     }
-}
 
-extension Results: CollectionType {
+    // MARK: Collection Support
+
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
     public var startIndex: Int { return 0 }
