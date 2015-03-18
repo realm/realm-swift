@@ -232,33 +232,23 @@ public func == <T: Object>(lhs: T, rhs: T) -> Bool {
 
 /// Object interface which allows untyped getters and setters for Objects.
 public final class DynamicObject : Object {
-    private var listProperties = [String: List<DynamicObject>]()
+    private var listProperties = [String: Optional<List<DynamicObject>>]()
 
-    /// Returns or sets the value of the property with the given name.
-    public override subscript(key: String) -> AnyObject? {
-        get {
-            if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == .Array {
-                    // get it or set it
-                    if let list = listProperties[key] {
-                        return list
-                    }
-                    let list = List<DynamicObject>()
-                    listProperties[key] = list
-                    return list
+    private override func listProperty(key: String) -> RLMListBase? {
+        // get it or set it
+        if let list = listProperties[key] {
+            return list
+        }
+        if let prop = RLMObjectBaseObjectSchema(self)?[key] {
+            if prop.type == .Array {
+                let list = List<DynamicObject>(RLMObjectBaseObjectForKeyedSubscript(self, key) as RLMArray)
+                listProperties[key] = list
+                return list
+            }
+        }
 
-                }
-            }
-            return RLMObjectBaseObjectForKeyedSubscript(self, key)
-        }
-        set(value) {
-            if let prop = RLMObjectBaseObjectSchema(self)[key] {
-                if prop.type == .Array {
-                    throwRealmException("Setting List properties is unsupported. Instead you can add or remove objects from the current List.")
-                }
-            }
-            RLMObjectBaseSetObjectForKeyedSubscript(self, key, value)
-        }
+        listProperties[key] = nil
+        return nil
     }
 }
 
