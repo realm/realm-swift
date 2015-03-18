@@ -205,6 +205,11 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
         @throw RLMException(@"RLMObject is no longer valid");
     }
 
+    // check that object types align
+    if (![_objectClassName isEqualToString:object.objectSchema.className]) {
+        @throw RLMException(@"Object type does not match RLMArray");
+    }
+
     // if different tables then no match
     if (object->_row.get_table() != &_backingLinkView->get_target_table()) {
         return NSNotFound;
