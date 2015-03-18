@@ -52,7 +52,7 @@ the `objects(_:)` instance method on `Realm`.
 
 See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
-public class Object : RLMObjectBase, Equatable, Printable {
+public class Object: RLMObjectBase, Equatable, Printable {
 
     // MARK: Initializers
 
@@ -264,7 +264,7 @@ public final class DynamicObject : Object {
 
 
 /// Internal class. Do not use directly.
-public class ObjectUtil : NSObject {
+public class ObjectUtil: NSObject {
     @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {
         if let type = type as? Object.Type {
             return type.primaryKey()
