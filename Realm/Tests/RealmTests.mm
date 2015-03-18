@@ -401,7 +401,7 @@ extern "C" {
         // notify main thread that we're ready for it to commit
         [bgReady fulfill];
 
-        // run for two seconds or until we recieve notification
+        // run for two seconds or until we receive notification
         NSDate *end = [NSDate dateWithTimeIntervalSinceNow:5.0];
         while (!fulfilled) {
             [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:end];
