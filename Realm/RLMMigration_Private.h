@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMMigration.h>
-#import <Realm/RLMRealm.h>
 #import <Realm/RLMObjectBase.h>
+#import <Realm/RLMRealm.h>
 
 typedef void (^RLMObjectBaseMigrationBlock)(RLMObjectBase *oldObject, RLMObjectBase *newObject);
 
