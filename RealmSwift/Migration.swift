@@ -126,11 +126,10 @@ exactly when and how migrations are performed.
 :returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
           that occured otherwise.
 */
-public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
+public func migrateRealm(path: String = Realm.defaultPath, encryptionKey: NSData? = nil) -> NSError? {
     if encryptionKey == nil {
         return RLMRealm.migrateRealmAtPath(path)
-    }
-    else {
+    } else {
         return RLMRealm.migrateRealmAtPath(path, encryptionKey: encryptionKey)
     }
 }
@@ -164,9 +163,9 @@ public final class Migration {
     :param: block     The block providing both the old and new versions of an object in this Realm.
     */
     public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
-        rlmMigration.enumerateObjects(objectClassName, block: {
-            block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self));
-        })
+        rlmMigration.enumerateObjects(objectClassName) {
+            block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self))
+        }
     }
 
     /**
