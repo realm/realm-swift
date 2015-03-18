@@ -207,7 +207,8 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
     // check that object types align
     if (![_objectClassName isEqualToString:object.objectSchema.className]) {
-        @throw RLMException(@"Object type does not match RLMArray");
+        @throw RLMException([NSString stringWithFormat:@"Object of type (%@) does not match RLMArray type (%@)",
+                             object.objectSchema.className, _objectClassName]);
     }
 
     // if different tables then no match
