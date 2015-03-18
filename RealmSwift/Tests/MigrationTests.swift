@@ -186,19 +186,11 @@ class MigrationTests: TestCase {
             self.assertThrows(migration.create("NoSuchObject", value: []))
         })
 
-        XCTAssertEqual(Realm().objects(SwiftStringObject).count, 3)
-
-        var i = 0
-        for obj in Realm().objects(SwiftStringObject) {
-            if i == 2 {
-                // last object has default value of empty string
-                XCTAssertEqual("", obj.stringCol)
-            }
-            else {
-                XCTAssertEqual("string", obj.stringCol)
-            }
-            ++i
-        }
+        let objects = Realm().objects(SwiftStringObject)
+        XCTAssertEqual(objects.count, 3)
+        XCTAssertEqual(objects[0].stringCol, "string")
+        XCTAssertEqual(objects[1].stringCol, "string")
+        XCTAssertEqual(objects[2].stringCol, "")
     }
 
     func testDelete() {
