@@ -230,14 +230,10 @@ public final class Realm {
     :param: update If true will try to update existing objects with the same primary key.
     */
     public func add(object: Object, update: Bool = false) {
-        var options : RLMCreationOptions = .allZeros
-        if update {
-            options = .UpdateOrCreate
-            if object.objectSchema.primaryKeyProperty == nil {
-                throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
-            }
+        if update && object.objectSchema.primaryKeyProperty == nil {
+            throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
-        RLMAddObjectToRealm(object, rlmRealm, options)
+        RLMAddObjectToRealm(object, rlmRealm, update ? .UpdateOrCreate : .allZeros)
     }
 
     /**
@@ -277,14 +273,10 @@ public final class Realm {
     :returns: The created object.
     */
     public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T {
-        var options : RLMCreationOptions = .allZeros
-        if update {
-            options = .UpdateOrCreate
-            if schema[T.className()]?.primaryKeyProperty == nil {
-                throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
-            }
+        if update && schema[T.className()]?.primaryKeyProperty == nil {
+          throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, options), T.self)
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update ? .UpdateOrCreate : .allZeros), T.self)
     }
 
     // MARK: Deleting objects
