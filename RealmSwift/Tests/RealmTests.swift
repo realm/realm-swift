@@ -394,7 +394,7 @@ class RealmTests: TestCase {
         let realm = Realm()
         realm.autorefresh = false
 
-        // test that autoreresh is  notapplied
+        // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectationWithDescription("notification fired")
         let token = realm.addNotificationBlock { _, realm in
