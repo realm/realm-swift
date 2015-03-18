@@ -40,9 +40,7 @@ command:
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
-  ios-dynamic-fat:      builds fat iOS dynamic framework
   ios-swift:            builds RealmSwift frameworks for iOS
-  ios-swift-fat:        builds fat RealmSwift framework for iOS
   osx:                  builds OS X framework
   osx-swift:            builds RealmSwift framework for OS X
   test:                 tests all iOS and OS X frameworks
@@ -288,28 +286,18 @@ case "$COMMAND" in
     "ios-dynamic")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphoneos"
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-        exit 0
-        ;;
-
-    "ios-dynamic-fat")
-	build_combined "iOS Dynamic" "$CONFIGURATION" Realm -dynamic
 	exit 0
 	;;
 
     "ios-swift")
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
-        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-        exit 0
-        ;;
-
-    "ios-swift-fat")
-	build_combined "RealmSwift iOS" "$CONFIGURATION" RealmSwift
+	xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
+	xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
 	exit 0
 	;;
 
     "osx")
-        xcrealm "-scheme OSX -configuration $CONFIGURATION"
-        rm -rf build/osx
+	xcrealm "-scheme OSX -configuration $CONFIGURATION"
+	rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
         exit 0
