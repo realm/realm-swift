@@ -286,18 +286,18 @@ case "$COMMAND" in
     "ios-dynamic")
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphoneos"
         xcrealm "-scheme 'iOS Dynamic' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-	exit 0
-	;;
+        exit 0
+        ;;
 
     "ios-swift")
-	xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
-	xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
-	exit 0
-	;;
+        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphoneos"
+        xcrealmswift "-scheme 'RealmSwift iOS' -configuration $CONFIGURATION build -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO"
+        exit 0
+        ;;
 
     "osx")
-	xcrealm "-scheme OSX -configuration $CONFIGURATION"
-	rm -rf build/osx
+        xcrealm "-scheme OSX -configuration $CONFIGURATION"
+        rm -rf build/osx
         mkdir build/osx
         cp -R build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework build/osx
         exit 0
@@ -568,10 +568,10 @@ case "$COMMAND" in
     "package-examples")
         cd tightdb_objc
         ./scripts/package_examples.rb
-	if [[ $PACKAGE_REALM_SWIFT == false ]]; then
-	    rm -rf examples/ios/swift-next
-	fi
-	zip --symlinks -r realm-examples.zip examples
+        if [[ $PACKAGE_REALM_SWIFT == false ]]; then
+          rm -rf examples/ios/swift-next
+        fi
+        zip --symlinks -r realm-examples.zip examples
         ;;
 
     "package-test-examples")
@@ -580,23 +580,23 @@ case "$COMMAND" in
 
         cp $0 realm-cocoa-${VERSION}
         cd realm-cocoa-${VERSION}
-	if [[ $PACKAGE_REALM_SWIFT == false ]]; then
-	  sh build.sh examples-ios
-	  sh build.sh examples-osx
-	else
-	  sh build.sh examples
-	fi
+        if [[ $PACKAGE_REALM_SWIFT == false ]]; then
+          sh build.sh examples-ios
+          sh build.sh examples-osx
+        else
+          sh build.sh examples
+        fi
         cd ..
-	rm -rf realm-cocoa-${VERSION}
+        rm -rf realm-cocoa-${VERSION}
         ;;
 
     "package-ios-static")
         cd tightdb_objc
-	sh build.sh test-ios-static
-	sh build.sh ios-static
+        sh build.sh test-ios-static
+        sh build.sh ios-static
 
         cd build/ios
-	zip --symlinks -r realm-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
     "package-osx")
@@ -608,16 +608,16 @@ case "$COMMAND" in
         ;;
 
     "package-swift-source")
-	cd tightdb_objc
-	sh build.sh ios-dynamic
-	mkdir -p dynamic_frameworks/iphoneos dynamic_frameworks/iphonesimulator
-	cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos-dynamic/Realm.framework dynamic_frameworks/iphoneos/Realm.framework/
-	cp -R build/DerivedData/Realm/Build/Products/Release-iphonesimulator-dynamic/Realm.framework dynamic_frameworks/iphonesimulator/Realm.framework/
-	rm RealmSwift/RealmSwift-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
-	cp Realm/Realm-Info.plist RealmSwift/RealmSwift-Info.plist
-	cp Realm/Tests/RealmTests-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
-	zip --symlinks -r realm-swift-source.zip RealmSwift.xcodeproj RealmSwift dynamic_frameworks
-	;;
+        cd tightdb_objc
+        sh build.sh ios-dynamic
+        mkdir -p dynamic_frameworks/iphoneos dynamic_frameworks/iphonesimulator
+        cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos-dynamic/Realm.framework dynamic_frameworks/iphoneos/Realm.framework/
+        cp -R build/DerivedData/Realm/Build/Products/Release-iphonesimulator-dynamic/Realm.framework dynamic_frameworks/iphonesimulator/Realm.framework/
+        rm RealmSwift/RealmSwift-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
+        cp Realm/Realm-Info.plist RealmSwift/RealmSwift-Info.plist
+        cp Realm/Tests/RealmTests-Info.plist RealmSwift/Tests/RealmSwiftTests-Info.plist
+        zip --symlinks -r realm-swift-source.zip RealmSwift.xcodeproj RealmSwift dynamic_frameworks
+    ;;
 
     "package-release")
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package.XXXX)
@@ -629,7 +629,7 @@ case "$COMMAND" in
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/browser
-	mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/swift
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/swift
 
         (
             cd ${TEMPDIR}/realm-cocoa-${VERSION}/osx
@@ -647,23 +647,23 @@ case "$COMMAND" in
         )
 
         (
-	    if [[ $PACKAGE_REALM_SWIFT == true ]]; then
-	      cd ${TEMPDIR}/realm-cocoa-${VERSION}/swift
-	      unzip ${WORKSPACE}/realm-swift-source.zip
-	    fi
+            if [[ $PACKAGE_REALM_SWIFT == true ]]; then
+              cd ${TEMPDIR}/realm-cocoa-${VERSION}/swift
+              unzip ${WORKSPACE}/realm-swift-source.zip
+            fi
         )
 
-	(
-	    cd ${WORKSPACE}/tightdb_objc
-	    cp -R plugin ${TEMPDIR}/realm-cocoa-${VERSION}
-	    cp LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
-	    cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/swift/
-	)
+        (
+            cd ${WORKSPACE}/tightdb_objc
+            cp -R plugin ${TEMPDIR}/realm-cocoa-${VERSION}
+            cp LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
+            cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/swift/
+        )
 
-	(
-	    cd ${TEMPDIR}/realm-cocoa-${VERSION}
-	    unzip ${WORKSPACE}/realm-examples.zip
-	)
+        (
+            cd ${TEMPDIR}/realm-cocoa-${VERSION}
+            unzip ${WORKSPACE}/realm-examples.zip
+        )
 
         cat > ${TEMPDIR}/realm-cocoa-${VERSION}/docs.webloc <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -700,8 +700,8 @@ EOF
         cd $WORKSPACE
         git clone $REALM_SOURCE tightdb_objc
 
-	echo 'Packaging iOS static'
-	sh tightdb_objc/build.sh package-ios-static
+        echo 'Packaging iOS static'
+        sh tightdb_objc/build.sh package-ios-static
         cp tightdb_objc/build/ios/realm-framework-ios.zip .
 
         echo 'Packaging OS X'
@@ -718,28 +718,28 @@ EOF
         cd ../..
 
         sh tightdb_objc/build.sh package-examples
-	cp tightdb_objc/realm-examples.zip .
+        cp tightdb_objc/realm-examples.zip .
 
         echo 'Packaging browser'
         sh tightdb_objc/build.sh package-browser
 
-	echo 'Packaging Swift source'
-	(
-	    # Reset repo state
-	    cd tightdb_objc
-	    git reset --hard
-	    git clean -xdf
-	)
-	sh tightdb_objc/build.sh package-swift-source
-	cp tightdb_objc/realm-swift-source.zip .
+        echo 'Packaging Swift source'
+        (
+            # Reset repo state
+            cd tightdb_objc
+            git reset --hard
+            git clean -xdf
+        )
+        sh tightdb_objc/build.sh package-swift-source
+        cp tightdb_objc/realm-swift-source.zip .
 
         echo 'Building final release package'
-	(
-	    # Reset repo state
-	    cd tightdb_objc
-	    git reset --hard
-	    git clean -xdf
-	)
+        (
+            # Reset repo state
+            cd tightdb_objc
+            git reset --hard
+            git clean -xdf
+        )
         sh tightdb_objc/build.sh package-release
 
         echo 'Testing packaged examples'
