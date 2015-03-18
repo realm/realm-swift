@@ -17,11 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.h"
-
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMQueryUtil.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMQueryUtil.hpp"
 
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
@@ -31,15 +31,15 @@
 // that).
 @implementation RLMObject
 
-// These properties are synthesized in RLMObjectBase
-@dynamic objectSchema, realm, invalidated;
+// synthesized in RLMObjectBase
+@dynamic invalidated;
 
 - (instancetype)init {
     return [super init];
 }
 
 - (instancetype)initWithObject:(id)object {
-    return [super initWithObject:object];
+    return [super initWithObject:object schema:RLMSchema.sharedSchema];
 }
 
 + (instancetype)createInDefaultRealmWithObject:(id)object {
@@ -65,11 +65,19 @@
 }
 
 - (id)objectForKeyedSubscript:(NSString *)key {
-    return [super objectForKeyedSubscript:key];
+    return RLMObjectBaseObjectForKeyedSubscript(self, key);
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    [super setObject:obj forKeyedSubscript:key];
+    RLMObjectBaseSetObjectForKeyedSubscript(self, key, obj);
+}
+
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (RLMObjectSchema *)objectSchema {
+    return _objectSchema;
 }
 
 + (RLMResults *)allObjects {
@@ -117,11 +125,11 @@
 }
 
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property {
-    return [super linkingObjectsOfClass:className forProperty:property];
+    return RLMObjectBaseLinkingObjectsOfClass(self, className, property);
 }
 
 - (BOOL)isEqualToObject:(RLMObject *)object {
-    return [super isEqualToObject:object];
+    return [object isKindOfClass:RLMObject.class] && RLMObjectBaseAreEqual(self, object);
 }
 
 + (NSString *)className {
@@ -133,15 +141,15 @@
 }
 
 + (NSDictionary *)defaultPropertyValues {
-    return [super defaultPropertyValues];
+    return nil;
 }
 
 + (NSString *)primaryKey {
-    return [super primaryKey];
+    return nil;
 }
 
 + (NSArray *)ignoredProperties {
-    return [super ignoredProperties];
+    return nil;
 }
 
 @end

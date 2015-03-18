@@ -19,6 +19,7 @@
 #import "RLMArray_Private.hpp"
 
 #import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectStore.h"
 #import "RLMObjectSchema.h"
 #import "RLMQueryUtil.hpp"
@@ -103,7 +104,7 @@
 //
 
 static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
-    if (![array->_objectClassName isEqualToString:object.objectSchema.className]) {
+    if (!object || ![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
         @throw RLMException(@"Object type does not match RLMArray");
     }
 }
@@ -142,7 +143,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     RLMValidateMatchingObjectType(self, object);
     NSUInteger index = 0;
     for (RLMObject *cmp in _backingArray) {
-        if ([object isEqualToObject:cmp]) {
+        if (RLMObjectBaseAreEqual(object, cmp)) {
             return index;
         }
         index++;
@@ -227,7 +228,7 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     }
 
     const NSUInteger maxObjects = 100;
-    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <0x%lx> (\n", (long)self];
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMArray <%p> (\n", self];
     unsigned long index = 0, skipped = 0;
     for (id obj in self) {
         NSString *sub;

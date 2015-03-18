@@ -20,7 +20,6 @@
 
 #import <objc/runtime.h>
 #import "RLMProperty_Private.h"
-#import "RLMObject.h"
 
 @interface PropertyTests : RLMTestCase
 

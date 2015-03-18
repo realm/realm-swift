@@ -74,7 +74,7 @@ This simple app demonstrates how to define models with inverse relationships usi
 
 ***RubyMotion support is experimental. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
 
-In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
+In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios-static` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
 
 To use Realm in your own RubyMotion iOS or OSX app, you must define your models in Objective-C and place them in the `models/` directory. Then in your `Rakefile`, define the following `vendor_project`s:
 

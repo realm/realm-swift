@@ -23,25 +23,11 @@
 @class RLMObjectSchema;
 
 @interface RLMObjectBase : NSObject
-@property (nonatomic, readonly) RLMRealm *realm;
-@property (nonatomic, readonly) RLMObjectSchema *objectSchema;
+
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 - (instancetype)init;
-- (instancetype)initWithObject:(id)object;
-- (instancetype)initWithObject:(id)value schema:(RLMSchema *)schema;
-- (instancetype)initWithObjectSchema:(RLMObjectSchema *)schema;
-
-- (BOOL)isEqualToObject:(RLMObjectBase *)object;
-- (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
-
-- (id)objectForKeyedSubscript:(NSString *)key;
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
 + (NSString *)className;
-
-+ (NSDictionary *)defaultPropertyValues;
-+ (NSString *)primaryKey;
-+ (NSArray *)ignoredProperties;
 
 @end

@@ -20,20 +20,20 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMMigration_Private.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMObject_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmUtil.h"
 #import "RLMSchema_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
-#include <sys/types.h>
 #include <sys/sysctl.h>
+#include <sys/types.h>
 
-#include <tightdb/version.hpp>
 #include <tightdb/commit_log.hpp>
+#include <tightdb/version.hpp>
 
 using namespace std;
 using namespace tightdb;
@@ -51,8 +51,8 @@ using namespace tightdb::util;
 {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
-               "on to the RLMNotificationToken returned from addNotificationBlock and call "
-               "removeNotification: when you no longer wish to receive RLMRealm notifications.");
+              @"on to the RLMNotificationToken returned from addNotificationBlock and call "
+              @"removeNotification: when you no longer wish to recieve RLMRealm notifications.");
     }
 }
 @end
@@ -436,6 +436,7 @@ static id RLMAutorelease(id value) {
     clearMigrationCache();
     clearKeyCache();
     RLMClearRealmCache();
+    s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
 }
 
 static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a read-only Realm") {

@@ -131,6 +131,9 @@
 
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
+        // copy old schema and reset after migration
+        RLMSchema *savedSchema = [_realm.schema copy];
+
         // disable all primary keys for migration
         for (RLMObjectSchema *objectSchema in _realm.schema.objectSchema) {
             objectSchema.primaryKeyProperty.isPrimary = NO;
@@ -142,6 +145,9 @@
 
         // verify uniqueness for any new unique columns before committing
         [self verifyPrimaryKeyUniqueness];
+
+        // reset schema to saved schema since it has been altered
+        RLMRealmSetSchema(_realm, savedSchema, true);
     }
 }
 

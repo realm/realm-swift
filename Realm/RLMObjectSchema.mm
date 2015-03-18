@@ -20,7 +20,7 @@
 
 #import "RLMArray.h"
 #import "RLMListBase.h"
-#import "RLMObject.h"
+#import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
@@ -29,20 +29,6 @@
 #import "RLMUtil.hpp"
 
 #import <tightdb/group.hpp>
-
-@interface RLMObjectBase (Swift)
-+ (NSArray *)getGenericListPropertyNames:(id)obj;
-@end
-
-@implementation RLMObjectBase (Swift)
-// We need to implement this method in Swift, but we don't want the obj-c and
-// Swift in the same target to avoid polluting the RealmSwift namespace with
-// obj-c stuff. As such, this method is overridden in RealmSwift.Object to
-// supply the real implementation at runtime without a compile-time dependency.
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-@end
 
 // private properties
 @interface RLMObjectSchema ()
@@ -105,7 +91,7 @@
     Class cls = objectClass;
     Class superClass = class_getSuperclass(cls);
     NSArray *props = @[];
-    while (superClass != RLMObjectBase.class) {
+    while (superClass && superClass != RLMObjectBase.class) {
         props = [[RLMObjectSchema propertiesForClass:cls isSwift:isSwift] arrayByAddingObjectsFromArray:props];
         cls = superClass;
         superClass = class_getSuperclass(superClass);
@@ -141,7 +127,8 @@
 }
 
 + (NSArray *)propertiesForClass:(Class)objectClass isSwift:(bool)isSwiftClass {
-    NSArray *ignoredProperties = [objectClass ignoredProperties];
+    Class objectUtil = RLMObjectUtilClass(isSwiftClass);
+    NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
 
     // For Swift classes we need an instance of the object when parsing properties
     id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
@@ -149,7 +136,7 @@
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
-    NSSet *indexed = [[NSSet alloc] initWithArray:[objectClass indexedProperties]];
+    NSSet *indexed = [[NSSet alloc] initWithArray:[objectUtil indexedPropertiesForClass:objectClass]];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = @(property_getName(props[i]));
         if ([ignoredProperties containsObject:propertyName]) {
@@ -177,7 +164,7 @@
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        for (NSString *propName in [objectClass getGenericListPropertyNames:swiftObjectInstance]) {
+        for (NSString *propName in [objectUtil getGenericListPropertyNames:swiftObjectInstance]) {
             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
             id value = object_getIvar(swiftObjectInstance, ivar);
             NSString *className = [value _rlmArray].objectClassName;

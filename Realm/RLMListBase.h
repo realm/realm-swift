@@ -22,7 +22,7 @@
 
 // A base class for Swift generic Lists to make it possible to interact with
 // them from obj-c
-@interface RLMListBase : NSObject
+@interface RLMListBase : NSObject <NSFastEnumeration>
 @property (nonatomic, strong) RLMArray *_rlmArray;
 
 - (instancetype)initWithArray:(RLMArray *)array;
