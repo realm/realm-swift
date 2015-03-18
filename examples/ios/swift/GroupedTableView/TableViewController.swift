@@ -48,7 +48,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set realm notification block
-        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { note, realm in
+        notificationToken = RLMRealm.defaultRealm().addNotificationBlock { [unowned self] note, realm in
             self.tableView.reloadData()
         }
         for section in sectionTitles {
