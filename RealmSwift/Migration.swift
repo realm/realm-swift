@@ -126,7 +126,7 @@ exactly when and how migrations are performed.
 :returns: `nil` if the migration was successful, or an `NSError` object that describes the problem
           that occured otherwise.
 */
-public func migrateRealm(path: String = Realm.defaultPath, encryptionKey: NSData? = nil) -> NSError? {
+public func migrateRealm(path: String, encryptionKey: NSData? = nil) -> NSError? {
     if encryptionKey == nil {
         return RLMRealm.migrateRealmAtPath(path)
     } else {
