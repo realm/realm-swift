@@ -112,11 +112,6 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
 
-class SwiftDynamicObject: Object {
-    dynamic var stringCol = "a"
-    dynamic var intCol = 0
-}
-
 class SwiftUTF8Object: Object {
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
