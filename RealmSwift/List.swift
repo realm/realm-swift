@@ -19,6 +19,7 @@
 import Realm
 import Realm.Private
 
+/// :nodoc:
 /// Internal class. Do not use directly.
 public class ListBase: RLMListBase, Printable {
     // Printable requires a description property defined in Swift (and not obj-c),

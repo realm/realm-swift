@@ -150,6 +150,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
 
     /**
     WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
     */
     public override init(realm: RLMRealm, schema: RLMObjectSchema) {
         super.init(realm: realm, schema: schema)
@@ -157,6 +158,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
 
     /**
     WARNING: This is an internal initializer not intended for public use.
+    :nodoc:
     */
     public override init(object: AnyObject, schema: RLMSchema) {
         super.init(object: object, schema: schema)
@@ -262,7 +264,7 @@ public final class DynamicObject : Object {
     }
 }
 
-
+/// :nodoc:
 /// Internal class. Do not use directly.
 public class ObjectUtil: NSObject {
     @objc private class func primaryKeyForClass(type: AnyClass) -> NSString? {

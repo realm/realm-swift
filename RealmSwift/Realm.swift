@@ -302,10 +302,26 @@ public final class Realm {
         }
     }
 
+    /**
+    Deletes the given objects from this Realm.
+
+    :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
+                   or any other enumerable SequenceType which generates Object.
+    
+    :nodoc:
+    */
     public func delete<T: Object>(objects: List<T>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
+    /**
+    Deletes the given objects from this Realm.
+
+    :param: object The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
+                   or any other enumerable SequenceType which generates Object.
+    
+    :nodoc:
+    */
     public func delete<T: Object>(objects: Results<T>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
