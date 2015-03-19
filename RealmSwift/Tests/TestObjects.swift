@@ -19,19 +19,19 @@
 import Foundation
 import RealmSwift
 
-class SwiftStringObject: Object {
+class StringObject: Object {
     dynamic var stringCol = ""
 }
 
-class SwiftBoolObject: Object {
+class BoolObject: Object {
     dynamic var boolCol = false
 }
 
-class SwiftIntObject: Object {
+class IntObject: Object {
     dynamic var intCol = 0
 }
 
-class SwiftObject: Object {
+class AllTypesObject: Object {
     dynamic var boolCol = false
     dynamic var intCol = 123
     dynamic var floatCol = 1.23 as Float
@@ -39,8 +39,8 @@ class SwiftObject: Object {
     dynamic var stringCol = "a"
     dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
-    dynamic var objectCol = SwiftBoolObject()
-    let arrayCol = List<SwiftBoolObject>()
+    dynamic var objectCol = BoolObject()
+    let arrayCol = List<BoolObject>()
 
     class func defaultValues() -> [String: AnyObject] {
         return  ["boolCol": false as AnyObject,
@@ -55,7 +55,7 @@ class SwiftObject: Object {
     }
 }
 
-class SwiftOptionalObject: Object {
+class OptionalObject: Object {
     // FIXME: Support all optional property types
 //    dynamic var optBoolCol: Bool?
 //    dynamic var optIntCol: Int?
@@ -64,20 +64,20 @@ class SwiftOptionalObject: Object {
 //    dynamic var optStringCol: String?
 //    dynamic var optBinaryCol: NSData?
 //    dynamic var optDateCol: NSDate?
-    dynamic var optObjectCol: SwiftBoolObject?
-//    let arrayCol = List<SwiftBoolObject>()
+    dynamic var optObjectCol: BoolObject?
+//    let arrayCol = List<BoolObject>()
 }
 
-class SwiftDogObject: Object {
+class DogObject: Object {
     dynamic var dogName = ""
 }
 
-class SwiftOwnerObject: Object {
+class OwnerObject: Object {
     dynamic var name = ""
-    dynamic var dog = SwiftDogObject()
+    dynamic var dog = DogObject()
 }
 
-class SwiftAggregateObject: Object {
+class AggregateObject: Object {
     dynamic var intCol = 0
     dynamic var floatCol = 0 as Float
     dynamic var doubleCol = 0.0
@@ -86,37 +86,37 @@ class SwiftAggregateObject: Object {
     dynamic var trueCol = true
 }
 
-class SwiftAllIntSizesObject: Object {
+class AllIntSizesObject: Object {
     dynamic var int16 : Int16 = 0
     dynamic var int32 : Int32 = 0
     dynamic var int64 : Int64 = 0
 }
 
-class SwiftEmployeeObject: Object {
+class EmployeeObject: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var hired = false
 }
 
-class SwiftCompanyObject: Object {
-    let employees = List<SwiftEmployeeObject>()
+class CompanyObject: Object {
+    let employees = List<EmployeeObject>()
 }
 
-class SwiftArrayPropertyObject: Object {
+class ArrayPropertyObject: Object {
     dynamic var name = ""
-    let array = List<SwiftStringObject>()
-    let intArray = List<SwiftIntObject>()
+    let array = List<StringObject>()
+    let intArray = List<IntObject>()
 }
 
-class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
-    let boolArray = List<SwiftBoolObject>()
+class ArrayPropertySubclassObject: ArrayPropertyObject {
+    let boolArray = List<BoolObject>()
 }
 
-class SwiftUTF8Object: Object {
+class UTF8Object: Object {
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
-class SwiftIgnoredPropertiesObject: Object {
+class IgnoredPropertiesObject: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var runtimeProperty: AnyObject?
@@ -128,17 +128,17 @@ class SwiftIgnoredPropertiesObject: Object {
     }
 }
 
-class SwiftLinkToPrimaryStringObject: Object {
+class LinkToPrimaryStringObject: Object {
     dynamic var pk = ""
-    dynamic var object: SwiftPrimaryStringObject?
-    let objects = List<SwiftPrimaryStringObject>()
+    dynamic var object: PrimaryStringObject?
+    let objects = List<PrimaryStringObject>()
 
     override class func primaryKey() -> String? {
         return "pk"
     }
 }
 
-class SwiftPrimaryStringObject: Object {
+class PrimaryStringObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 
@@ -147,7 +147,7 @@ class SwiftPrimaryStringObject: Object {
     }
 }
 
-class SwiftIndexedPropertiesObject: Object {
+class IndexedPropertiesObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 

@@ -19,39 +19,39 @@
 import XCTest
 import RealmSwift
 
-class SwiftAggregateObjectList: Object {
-    let list = List<SwiftAggregateObject>()
+class AggregateObjectList: Object {
+    let list = List<AggregateObject>()
 }
 
 class ResultsTests: TestCase {
-    var str1: SwiftStringObject!
-    var str2: SwiftStringObject!
-    var results: Results<SwiftStringObject>!
+    var str1: StringObject!
+    var str2: StringObject!
+    var results: Results<StringObject>!
 
-    func getResults() -> Results<SwiftStringObject> {
+    func getResults() -> Results<StringObject> {
         fatalError("abstract")
     }
 
-    func getAggregateableResults() -> Results<SwiftAggregateObject> {
+    func getAggregateableResults() -> Results<AggregateObject> {
         fatalError("abstract")
     }
 
-    func makeAggregateableObjects() -> [SwiftAggregateObject] {
-        let obj1 = SwiftAggregateObject()
+    func makeAggregateableObjects() -> [AggregateObject] {
+        let obj1 = AggregateObject()
         obj1.intCol = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
         obj1.dateCol = NSDate(timeIntervalSince1970: 1)
         obj1.boolCol = false
 
-        let obj2 = SwiftAggregateObject()
+        let obj2 = AggregateObject()
         obj2.intCol = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
-        let obj3 = SwiftAggregateObject()
+        let obj3 = AggregateObject()
         obj3.intCol = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
@@ -65,9 +65,9 @@ class ResultsTests: TestCase {
     override func setUp() {
         super.setUp()
 
-        str1 = SwiftStringObject()
+        str1 = StringObject()
         str1.stringCol = "1"
-        str2 = SwiftStringObject()
+        str2 = StringObject()
         str2.stringCol = "2"
 
         let realm = realmWithTestPath()
@@ -104,7 +104,7 @@ class ResultsTests: TestCase {
         let regex = NSRegularExpression(pattern: "RLMResults <0x[a-z0-9]+>", options: nil, error: nil)
         let rawDescription = results.description
         let description = regex!.stringByReplacingMatchesInString(rawDescription, options: nil, range: NSRange(location: 0, length: countElements(rawDescription)), withTemplate: "RLMResults <0x0>")
-        XCTAssertEqual(description, "RLMResults <0x0> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        XCTAssertEqual(description, "RLMResults <0x0> (\n\t[0] StringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] StringObject {\n\t\tstringCol = 2;\n\t}\n)")
     }
 
     func testCount() {
@@ -255,35 +255,35 @@ class ResultsTests: TestCase {
 }
 
 class ResultsFromTableTests: ResultsTests {
-    override func getResults() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject.self)
+    override func getResults() -> Results<StringObject> {
+        return realmWithTestPath().objects(StringObject.self)
     }
 
-    override func getAggregateableResults() -> Results<SwiftAggregateObject> {
+    override func getAggregateableResults() -> Results<AggregateObject> {
         makeAggregateableObjects()
-        return realmWithTestPath().objects(SwiftAggregateObject.self)
+        return realmWithTestPath().objects(AggregateObject.self)
     }
 }
 
 class ResultsFromTableViewTests: ResultsTests {
-    override func getResults() -> Results<SwiftStringObject> {
-        return realmWithTestPath().objects(SwiftStringObject.self).filter("stringCol != ''")
+    override func getResults() -> Results<StringObject> {
+        return realmWithTestPath().objects(StringObject.self).filter("stringCol != ''")
     }
 
-    override func getAggregateableResults() -> Results<SwiftAggregateObject> {
+    override func getAggregateableResults() -> Results<AggregateObject> {
         makeAggregateableObjects()
-        return realmWithTestPath().objects(SwiftAggregateObject.self).filter("trueCol == true")
+        return realmWithTestPath().objects(AggregateObject.self).filter("trueCol == true")
     }
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
-    override func getResults() -> Results<SwiftStringObject> {
-        let array = realmWithTestPath().create(SwiftArrayPropertyObject.self, value: ["", [str1, str2], []])
+    override func getResults() -> Results<StringObject> {
+        let array = realmWithTestPath().create(ArrayPropertyObject.self, value: ["", [str1, str2], []])
         return array.array.filter("stringCol != ''") // i.e. all of them
     }
 
-    override func getAggregateableResults() -> Results<SwiftAggregateObject> {
-        let list = SwiftAggregateObjectList()
+    override func getAggregateableResults() -> Results<AggregateObject> {
+        let list = AggregateObjectList()
         realmWithTestPath().add(list)
         list.list.extend(makeAggregateableObjects())
         return list.list.filter("intCol != 0") // i.e. all of them

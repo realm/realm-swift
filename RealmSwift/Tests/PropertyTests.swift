@@ -27,9 +27,9 @@ class PropertyTests: TestCase {
     override func setUp() {
         super.setUp()
         let schema = Realm().schema
-        primitiveProperty = schema["SwiftObject"]!["intCol"]!
-        linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
-        primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+        primitiveProperty = schema["AllTypesObject"]!["intCol"]!
+        linkProperty = schema["OptionalObject"]!["optObjectCol"]!
+        primaryProperty = schema["PrimaryStringObject"]!["stringCol"]!
     }
 
     func testName() {
@@ -52,12 +52,12 @@ class PropertyTests: TestCase {
 
     func testObjectClassName() {
         XCTAssertNil(primitiveProperty.objectClassName)
-        XCTAssertEqual(linkProperty.objectClassName!, "SwiftBoolObject")
+        XCTAssertEqual(linkProperty.objectClassName!, "BoolObject")
         XCTAssertNil(primaryProperty.objectClassName)
     }
 
     func testEquals() {
-        XCTAssert(primitiveProperty == Realm().schema["SwiftObject"]!["intCol"]!)
+        XCTAssert(primitiveProperty == Realm().schema["AllTypesObject"]!["intCol"]!)
         XCTAssert(primitiveProperty != linkProperty)
     }
 }
