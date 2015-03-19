@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Don't allow setting indexed properties to strings with embedded nulls.
+
 0.91.1 Release notes (2015-03-12)
 =============================================================
 
