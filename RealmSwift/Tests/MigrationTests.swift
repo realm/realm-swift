@@ -267,12 +267,25 @@ class MigrationTests: TestCase {
                 newObj!["binaryCol"] = NSData(bytes: "b", length: 1)
                 newObj!["dateCol"] = NSDate(timeIntervalSince1970: 2)
 
+                let falseObj = SwiftBoolObject(value: [false])
+                newObj!["objectCol"] = falseObj
+
                 var list = newObj!["arrayCol"] as List<MigrationObject>
                 list[0]["boolCol"] = true
                 list.append(newObj!["objectCol"] as MigrationObject)
-                list.append(migration.create(SwiftBoolObject.className(), value: [true]))
 
-                newObj!["objectCol"] = SwiftBoolObject(value: [false])
+                let trueObj = migration.create(SwiftBoolObject.className(), value: [true])
+                list.append(trueObj)
+
+                // verify list property
+                list = newObj!["arrayCol"] as List<MigrationObject>
+                XCTAssertEqual(list.count, 3)
+                XCTAssertEqual(list[0]["boolCol"] as Bool, true)
+                XCTAssertEqual(list[1]["boolCol"] as Bool, false)
+                XCTAssertEqual(list[2]["boolCol"] as Bool, true)
+
+                // set it again
+                newObj!["arrayCol"] = [falseObj, trueObj]
 
                 enumerated = true
             })
@@ -291,10 +304,9 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.binaryCol, NSData(bytes: "b", length: 1))
         XCTAssertEqual(object.dateCol, NSDate(timeIntervalSince1970: 2))
         XCTAssertEqual(object.objectCol.boolCol, false)
-        XCTAssertEqual(object.arrayCol.count, 3)
-        XCTAssertEqual(object.arrayCol[0].boolCol, true)
+        XCTAssertEqual(object.arrayCol.count, 2)
+        XCTAssertEqual(object.arrayCol[0].boolCol, false)
         XCTAssertEqual(object.arrayCol[1].boolCol, true)
-        XCTAssertEqual(object.arrayCol[2].boolCol, true)
 
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(Realm().objects(SwiftBoolObject).count, 4)
