@@ -239,6 +239,9 @@
     // non realm employee
     EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithObject:@[@"NoName", @1, @NO]];
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:notInRealm]);
+
+    // invalid object
+    XCTAssertThrows([company.employees indexOfObject:company]);
 }
 
 - (void)testFastEnumeration
