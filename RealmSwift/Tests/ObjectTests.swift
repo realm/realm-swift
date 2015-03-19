@@ -137,49 +137,77 @@ class ObjectTests: TestCase {
         }
     }
 
+    func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> (), getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
+        setter(object, true, "boolCol")
+        XCTAssertEqual(getter(object, "boolCol") as Bool!, true)
+
+        setter(object, 321, "intCol")
+        XCTAssertEqual(getter(object, "intCol") as Int!, 321)
+
+        setter(object, 32.1 as Float, "floatCol")
+        XCTAssertEqual(getter(object, "floatCol") as Float!, 32.1 as Float)
+
+        setter(object, 3.21, "doubleCol")
+        XCTAssertEqual(getter(object, "doubleCol") as Double!, 3.21)
+
+        setter(object, "z", "stringCol")
+        XCTAssertEqual(getter(object, "stringCol") as String!, "z")
+
+        setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
+        XCTAssertEqual(getter(object, "binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+
+        setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
+        XCTAssertEqual(getter(object, "dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
+
+        let boolObject = SwiftBoolObject(value: [true])
+        setter(object, boolObject, "objectCol")
+        XCTAssertEqual(getter(object, "objectCol") as SwiftBoolObject, boolObject)
+        XCTAssertEqual((getter(object, "objectCol")! as SwiftBoolObject).boolCol, true)
+
+        let list = List<SwiftBoolObject>()
+        list.append(boolObject)
+        setter(object, list, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+
+        list.removeAll();
+        setter(object, list, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+    }
+
     func testSetValueForKey() {
-        let test: (SwiftObject) -> () = { object in
-            object.setValue(true, forKey: "boolCol")
-            XCTAssertEqual(object.valueForKey("boolCol") as Bool!, true)
-
-            object.setValue(321, forKey: "intCol")
-            XCTAssertEqual(object.valueForKey("intCol") as Int!, 321)
-
-            object.setValue(32.1 as Float, forKey: "floatCol")
-            XCTAssertEqual(object.valueForKey("floatCol") as Float!, 32.1 as Float)
-
-            object.setValue(3.21, forKey: "doubleCol")
-            XCTAssertEqual(object.valueForKey("doubleCol") as Double!, 3.21)
-
-            object.setValue("z", forKey: "stringCol")
-            XCTAssertEqual(object.valueForKey("stringCol") as String!, "z")
-
-            object.setValue("z".dataUsingEncoding(NSUTF8StringEncoding), forKey: "binaryCol")
-            XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
-
-            object.setValue(NSDate(timeIntervalSince1970: 333), forKey: "dateCol")
-            XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
-
-            let boolObject = SwiftBoolObject(value: [true])
-            object.setValue(boolObject, forKey: "objectCol")
-            XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
-            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)
-
-            let list = List<SwiftBoolObject>()
-            list.append(boolObject)
-            object.setValue(list, forKey: "arrayCol")
-            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).count, 1)
-            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+        let setter : (SwiftObject, AnyObject?, String) -> () = { object, value, key in
+            object.setValue(value, forKey: key)
+            return
+        }
+        let getter : (SwiftObject, String) -> (AnyObject?) = { object, key in
+            object.valueForKey(key)
         }
 
-        test(SwiftObject())
+        setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         Realm().write {
             let persistedObject = Realm().create(SwiftObject.self, value: [:])
-            test(persistedObject)
+            self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
 
     func testSubscript() {
+        let setter : (SwiftObject, AnyObject?, String) -> () = { object, value, key in
+            object[key] = value
+            return
+        }
+        let getter : (SwiftObject, String) -> (AnyObject?) = { object, key in
+            object[key]
+        }
 
+        setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
+        Realm().write {
+            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+            self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
+        }
     }
 }
