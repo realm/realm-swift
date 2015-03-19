@@ -1,6 +1,10 @@
 0.91.1 Release notes (2015-03-12)
 =============================================================
 
+### API breaking changes
+
+* Search indexes are no longer automatically created for string primary key properties.
+
 ### Enhancements
 
 * The browser will automatically refresh when the Realm has been modified

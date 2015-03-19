@@ -31,7 +31,7 @@
                                                     @"\tstringCol {\n"
                                                     @"\t\ttype = string;\n"
                                                     @"\t\tobjectClassName = (null);\n"
-                                                    @"\t\tindexed = YES;\n"
+                                                    @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
