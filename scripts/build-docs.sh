@@ -40,6 +40,12 @@ mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 ${jazzy} \
   --skip-undocumented \
   --min-acl public \
+  -m RealmSwift -a Realm \
+  -u http://realm.io \
   -x "-project,${SRCROOT}/RealmSwift.xcodeproj" \
+  -g https://github.com/realm/realm-cocoa \
+  --github-file-prefix https://github.com/realm/realm-cocoa/tree/v${realm_version} \
+  --module-version ${realm_version} \
+  -r http://realm.io/docs/swift/api/ \
   -o "${SRCROOT}/docs/swift_output" \
   --clean
