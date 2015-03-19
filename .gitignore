@@ -40,6 +40,7 @@ bin
 
 # sh build.sh docs
 /docs/output
+/docs/swift_output
 
 # XCode
 *.bak

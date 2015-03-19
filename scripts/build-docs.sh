@@ -1,4 +1,5 @@
 #!/bin/sh
+jazzy="$(which jazzy)"
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/libexec
 
 if [ -z "${SRCROOT}" ]; then
@@ -35,3 +36,10 @@ appledoc \
 mkdir -p ${SRCROOT}/docs/output
 rm -rf ${SRCROOT}/docs/output/${realm_version}
 mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
+
+${jazzy} \
+  --skip-undocumented \
+  --min-acl public \
+  -x "-project,${SRCROOT}/RealmSwift.xcodeproj" \
+  -o "${SRCROOT}/docs/swift_output" \
+  --clean
