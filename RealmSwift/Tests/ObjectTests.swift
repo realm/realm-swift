@@ -169,6 +169,14 @@ class ObjectTests: TestCase {
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+
+        list.removeAll();
+        setter(object, list, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
     }
 
     func testSetValueForKey() {
