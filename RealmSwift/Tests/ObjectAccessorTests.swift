@@ -21,7 +21,7 @@ import RealmSwift
 import Foundation
 
 class ObjectAccessorTests: TestCase {
-    func setAndTestAllProperties(object: SwiftObject) {
+    func setAndTestAllProperties(object: AllTypesObject) {
         object.boolCol = true
         XCTAssertEqual(object.boolCol, true)
         object.boolCol = false
@@ -62,19 +62,19 @@ class ObjectAccessorTests: TestCase {
         object.dateCol = date
         XCTAssertEqual(object.dateCol, date)
 
-        object.objectCol = SwiftBoolObject(value: [true])
+        object.objectCol = BoolObject(value: [true])
         XCTAssertEqual(object.objectCol.boolCol, true)
     }
 
     func testStandaloneAccessors() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         setAndTestAllProperties(object)
     }
 
     func testPersistedAccessors() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         Realm().beginWrite()
-        Realm().create(SwiftObject.self)
+        Realm().create(AllTypesObject.self)
         setAndTestAllProperties(object)
         Realm().commitWrite()
     }
@@ -87,7 +87,7 @@ class ObjectAccessorTests: TestCase {
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
         realm.write {
-            let obj = SwiftAllIntSizesObject()
+            let obj = AllIntSizesObject()
 
             obj.int16 = v16
             XCTAssertEqual(obj.int16, v16)
@@ -99,7 +99,7 @@ class ObjectAccessorTests: TestCase {
             realm.add(obj)
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject.self).first!
+        let obj = realm.objects(AllIntSizesObject.self).first!
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
@@ -114,12 +114,12 @@ class ObjectAccessorTests: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.create(SwiftIntObject.self, value: [longNumber])
-        realm.create(SwiftIntObject.self, value: [intNumber])
-        realm.create(SwiftIntObject.self, value: [negativeLongNumber])
+        realm.create(IntObject.self, value: [longNumber])
+        realm.create(IntObject.self, value: [intNumber])
+        realm.create(IntObject.self, value: [negativeLongNumber])
         realm.commitWrite()
 
-        let objects = realm.objects(SwiftIntObject.self)
+        let objects = realm.objects(IntObject.self)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")

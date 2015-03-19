@@ -23,7 +23,7 @@ import Foundation
 
 class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         let objectSchema = object.objectSchema
 
         let noSuchCol = objectSchema["noSuchCol"]
@@ -83,80 +83,80 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(objectCol!.name, "objectCol")
         XCTAssertEqual(objectCol!.type, PropertyType.Object)
         XCTAssertFalse(objectCol!.indexed)
-        XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
+        XCTAssertEqual(objectCol!.objectClassName!, "BoolObject")
 
         let arrayCol = objectSchema["arrayCol"]
         XCTAssertNotNil(arrayCol)
         XCTAssertEqual(arrayCol!.name, "arrayCol")
         XCTAssertEqual(arrayCol!.type, PropertyType.Array)
         XCTAssertFalse(arrayCol!.indexed)
-        XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
+        XCTAssertEqual(objectCol!.objectClassName!, "BoolObject")
     }
 
     func testInvalidObjects() {
-        let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self) // Should be able to get a schema for a non-RLMObjectBase subclass
+        let schema = RLMObjectSchema(forObjectClass: FakeObjectSubclass.self) // Should be able to get a schema for a non-RLMObjectBase subclass
         XCTAssertEqual(schema.properties.count, 1)
 
         // FIXME - disable any and make sure this fails
-        RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
+        RLMObjectSchema(forObjectClass: AllTypesObjectWithAnyObject.self)  // Should throw when not ignoring a property of a type we can't persist
 
-        RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
-        RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        RLMObjectSchema(forObjectClass: AllTypesObjectWithEnum.self)       // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
+        RLMObjectSchema(forObjectClass: AllTypesObjectWithStruct.self)     // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
 
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: AllTypesObjectWithDatePrimaryKey.self), "Should throw when setting a non int/string primary key")
+        assertThrows(RLMObjectSchema(forObjectClass: AllTypesObjectWithNSURL.self), "Should throw when not ignoring a property of a type we can't persist")
     }
 
     func testPrimaryKey() {
-        XCTAssertNil(SwiftObject().objectSchema.primaryKeyProperty, "Object should default to having no primary key property")
-        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+        XCTAssertNil(AllTypesObject().objectSchema.primaryKeyProperty, "Object should default to having no primary key property")
+        XCTAssertEqual(PrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
     }
 
     func testIgnoredProperties() {
-        let schema = SwiftIgnoredPropertiesObject().objectSchema
+        let schema = IgnoredPropertiesObject().objectSchema
         XCTAssertNil(schema["runtimeProperty"], "The object schema shouldn't contain ignored properties")
         XCTAssertNil(schema["runtimeDefaultProperty"], "The object schema shouldn't contain ignored properties")
         XCTAssertNil(schema["readOnlyProperty"], "The object schema shouldn't contain read-only properties")
     }
 
     func testIndexedProperties() {
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
+        XCTAssertTrue(IndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
 
-        let unindexibleSchema = RLMObjectSchema(forObjectClass: SwiftObjectWithUnindexibleProperties.self)
-        for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
+        let unindexibleSchema = RLMObjectSchema(forObjectClass: AllTypesObjectWithUnindexibleProperties.self)
+        for propName in AllTypesObjectWithUnindexibleProperties.indexedProperties() {
             XCTAssertFalse(unindexibleSchema[propName]!.indexed, "Shouldn't mark unindexible property '\(propName)' as indexed")
         }
     }
 }
 
-class SwiftFakeObject : NSObject {
+class FakeObject : NSObject {
     dynamic class func primaryKey() -> String! { return nil }
     dynamic class func ignoredProperties() -> [String] { return [] }
     dynamic class func indexedProperties() -> [String] { return [] }
 }
 
-class SwiftObjectWithNSURL : SwiftFakeObject {
+class AllTypesObjectWithNSURL : FakeObject {
     dynamic var URL = NSURL(string: "http://realm.io")!
 }
 
-class SwiftObjectWithAnyObject : SwiftFakeObject {
+class AllTypesObjectWithAnyObject : FakeObject {
     dynamic var anyObject: AnyObject = NSString(string: "")
 }
 
-enum SwiftEnum {
+enum Enum {
     case Case1
     case Case2
 }
 
-class SwiftObjectWithEnum : SwiftFakeObject {
-    var swiftEnum = SwiftEnum.Case1
+class AllTypesObjectWithEnum : FakeObject {
+    var swiftEnum = Enum.Case1
 }
 
-class SwiftObjectWithStruct : SwiftFakeObject {
+class AllTypesObjectWithStruct : FakeObject {
     var swiftStruct = SortDescriptor(property: "prop")
 }
 
-class SwiftObjectWithDatePrimaryKey : SwiftFakeObject {
+class AllTypesObjectWithDatePrimaryKey : FakeObject {
     dynamic var date = NSDate()
 
     dynamic override class func primaryKey() -> String! {
@@ -164,19 +164,19 @@ class SwiftObjectWithDatePrimaryKey : SwiftFakeObject {
     }
 }
 
-class SwiftFakeObjectSubclass : SwiftFakeObject {
+class FakeObjectSubclass : FakeObject {
     dynamic var dateCol = NSDate()
 }
 
-class SwiftObjectWithUnindexibleProperties : SwiftFakeObject {
+class AllTypesObjectWithUnindexibleProperties : FakeObject {
     dynamic var boolCol = false
     dynamic var intCol = 123
     dynamic var floatCol = 1.23 as Float
     dynamic var doubleCol = 12.3
     dynamic var binaryCol = "a".dataUsingEncoding(NSUTF8StringEncoding)!
     dynamic var dateCol = NSDate(timeIntervalSince1970: 1)
-    dynamic var objectCol = SwiftBoolObject()
-    let arrayCol = List<SwiftBoolObject>()
+    dynamic var objectCol = BoolObject()
+    let arrayCol = List<BoolObject>()
 
     dynamic override class func indexedProperties() -> [String] {
         return ["boolCol", "intCol", "floatCol", "doubleCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]

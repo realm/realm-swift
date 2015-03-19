@@ -20,21 +20,21 @@ import XCTest
 import RealmSwift
 
 class ListTests: TestCase {
-    var str1: SwiftStringObject!
-    var str2: SwiftStringObject!
-    var arrayObject: SwiftArrayPropertyObject!
-    var array: List<SwiftStringObject>!
+    var str1: StringObject!
+    var str2: StringObject!
+    var arrayObject: ArrayPropertyObject!
+    var array: List<StringObject>!
 
-    func createArray() -> SwiftArrayPropertyObject {
+    func createArray() -> ArrayPropertyObject {
         fatalError("abstract")
     }
 
     override func setUp() {
         super.setUp()
 
-        str1 = SwiftStringObject()
+        str1 = StringObject()
         str1.stringCol = "1"
-        str2 = SwiftStringObject()
+        str2 = StringObject()
         str2.stringCol = "2"
         arrayObject = createArray()
         array = arrayObject.array
@@ -205,24 +205,24 @@ class ListTests: TestCase {
     }
 
     func testSortWithDescriptors() {
-        let object = realmWithTestPath().create(SwiftAggregateObjectList.self, value: [[]])
+        let object = realmWithTestPath().create(AggregateObjectList.self, value: [[]])
         let array = object.list
 
-        let obj1 = SwiftAggregateObject()
+        let obj1 = AggregateObject()
         obj1.intCol = 1
         obj1.floatCol = 1.1
         obj1.doubleCol = 1.11
         obj1.dateCol = NSDate(timeIntervalSince1970: 1)
         obj1.boolCol = false
 
-        let obj2 = SwiftAggregateObject()
+        let obj2 = AggregateObject()
         obj2.intCol = 2
         obj2.floatCol = 2.2
         obj2.doubleCol = 2.22
         obj2.dateCol = NSDate(timeIntervalSince1970: 2)
         obj2.boolCol = false
 
-        let obj3 = SwiftAggregateObject()
+        let obj3 = AggregateObject()
         obj3.intCol = 3
         obj3.floatCol = 2.2
         obj3.doubleCol = 2.22
@@ -275,7 +275,7 @@ class ListTests: TestCase {
     }
 
     func testAppendResults() {
-        array.extend(realmWithTestPath().objects(SwiftStringObject))
+        array.extend(realmWithTestPath().objects(StringObject))
         XCTAssertEqual(Int(2), array.count)
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str2, array[1])
@@ -353,7 +353,7 @@ class ListTests: TestCase {
         if let realm = array.realm {
             array.extend([str1, str2])
 
-            let otherArray = realm.objects(SwiftArrayPropertyObject).first!.array
+            let otherArray = realm.objects(ArrayPropertyObject).first!.array
             XCTAssertEqual(Int(2), otherArray.count)
         }
     }
@@ -361,10 +361,10 @@ class ListTests: TestCase {
     func testPopulateEmptyArray() {
         XCTAssertEqual(array.count, 0, "Should start with no array elements.")
 
-        let obj = SwiftStringObject()
+        let obj = StringObject()
         obj.stringCol = "a"
         array.append(obj)
-        array.append(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
+        array.append(realmWithTestPath().create(StringObject.self, value: ["b"]))
         array.append(obj)
 
         XCTAssertEqual(array.count, 3)
@@ -380,8 +380,8 @@ class ListTests: TestCase {
 }
 
 class ListStandaloneTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
-        let array = SwiftArrayPropertyObject()
+    override func createArray() -> ArrayPropertyObject {
+        let array = ArrayPropertyObject()
         XCTAssertNil(array.realm)
         return array
     }
@@ -426,8 +426,8 @@ class ListStandaloneTests: ListTests {
 }
 
 class ListNewlyAddedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
-        let array = SwiftArrayPropertyObject()
+    override func createArray() -> ArrayPropertyObject {
+        let array = ArrayPropertyObject()
         array.name = "name"
         let realm = self.realmWithTestPath()
         realm.write { realm.add(array) }
@@ -438,10 +438,10 @@ class ListNewlyAddedTests: ListTests {
 }
 
 class ListNewlyCreatedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
+    override func createArray() -> ArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        let array = realm.create(ArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -450,12 +450,12 @@ class ListNewlyCreatedTests: ListTests {
 }
 
 class ListRetrievedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
+    override func createArray() -> ArrayPropertyObject {
         let realm = self.realmWithTestPath()
         realm.beginWrite()
-        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        realm.create(ArrayPropertyObject.self, value: ["name", [], []])
         realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject).first!
+        let array = realm.objects(ArrayPropertyObject).first!
 
         XCTAssertNotNil(array.realm)
         return array

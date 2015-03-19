@@ -37,7 +37,7 @@ class SchemaTests: TestCase {
     }
 
     func testSubscript() {
-        XCTAssertEqual(schema["SwiftObject"]!.className, "SwiftObject")
+        XCTAssertEqual(schema["AllTypesObject"]!.className, "AllTypesObject")
         XCTAssertNil(schema["NoSuchClass"])
     }
 

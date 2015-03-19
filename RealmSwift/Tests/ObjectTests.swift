@@ -27,13 +27,13 @@ class ObjectTests: TestCase {
     // init(value:) tests are in ObjectCreationTests.swift
     
     func testRealm() {
-        let standalone = SwiftStringObject()
+        let standalone = StringObject()
         XCTAssertNil(standalone.realm)
 
         let realm = Realm()
-        var persisted: SwiftStringObject!
+        var persisted: StringObject!
         realm.write {
-            persisted = realm.create(SwiftStringObject.self, value: [:])
+            persisted = realm.create(StringObject.self, value: [:])
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
         }
@@ -48,16 +48,16 @@ class ObjectTests: TestCase {
     }
 
     func testObjectSchema() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         let schema = object.objectSchema
         XCTAssert(schema as AnyObject is ObjectSchema)
         XCTAssert(schema.properties as AnyObject is [Property])
-        XCTAssertEqual(schema.className, "SwiftObject")
+        XCTAssertEqual(schema.className, "AllTypesObject")
         XCTAssertEqual(schema.properties.map { $0.name }, ["boolCol", "intCol", "floatCol", "doubleCol", "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"])
     }
 
     func testInvalidated() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         XCTAssertFalse(object.invalidated)
 
         let realm = Realm()
@@ -74,51 +74,51 @@ class ObjectTests: TestCase {
     }
 
     func testDescription() {
-        let object = SwiftObject()
+        let object = AllTypesObject()
         let regex = NSRegularExpression(pattern: "RLMArray <0x[a-z0-9]+>", options: nil, error: nil)
         let rawDescription = object.description
         let description = regex!.stringByReplacingMatchesInString(rawDescription, options: nil, range: NSRange(location: 0, length: countElements(rawDescription)), withTemplate: "RLMArray <0x0>")
-        XCTAssertEqual(description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = RLMArray <0x0> (\n\t\n\t);\n}")
+        XCTAssertEqual(description, "AllTypesObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = BoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = RLMArray <0x0> (\n\t\n\t);\n}")
     }
 
     func testPrimaryKey() {
         XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
-        XCTAssertNil(SwiftStringObject.primaryKey())
-        XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
-        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey(), "stringCol")
-        XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+        XCTAssertNil(StringObject.primaryKey())
+        XCTAssertNil(StringObject().objectSchema.primaryKeyProperty)
+        XCTAssertEqual(PrimaryStringObject.primaryKey(), "stringCol")
+        XCTAssertEqual(PrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
     }
 
     func testIgnoredProperties() {
         XCTAssertEqual(Object.ignoredProperties(), [], "ignored properties should default to []")
-        XCTAssertEqual(SwiftIgnoredPropertiesObject.ignoredProperties().count, 2)
-        XCTAssertNil(SwiftIgnoredPropertiesObject().objectSchema["runtimeProperty"])
+        XCTAssertEqual(IgnoredPropertiesObject.ignoredProperties().count, 2)
+        XCTAssertNil(IgnoredPropertiesObject().objectSchema["runtimeProperty"])
     }
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 1)
-        XCTAssertTrue(SwiftIndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
+        XCTAssertEqual(IndexedPropertiesObject.indexedProperties().count, 1)
+        XCTAssertTrue(IndexedPropertiesObject().objectSchema["stringCol"]!.indexed)
     }
 
     func testLinkingObjects() {
         let realm = Realm()
-        let object = SwiftEmployeeObject()
-        assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees"))
+        let object = EmployeeObject()
+        assertThrows(object.linkingObjects(CompanyObject.self, forProperty: "employees"))
         realm.write {
             realm.add(object)
-            self.assertThrows(object.linkingObjects(SwiftCompanyObject.self, forProperty: "noSuchCol"))
-            XCTAssertEqual(0, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
+            self.assertThrows(object.linkingObjects(CompanyObject.self, forProperty: "noSuchCol"))
+            XCTAssertEqual(0, object.linkingObjects(CompanyObject.self, forProperty: "employees").count)
             for _ in 0..<10 {
-                realm.create(SwiftCompanyObject.self, value: [[object]])
+                realm.create(CompanyObject.self, value: [[object]])
             }
-            XCTAssertEqual(10, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
+            XCTAssertEqual(10, object.linkingObjects(CompanyObject.self, forProperty: "employees").count)
         }
-        XCTAssertEqual(10, object.linkingObjects(SwiftCompanyObject.self, forProperty: "employees").count)
+        XCTAssertEqual(10, object.linkingObjects(CompanyObject.self, forProperty: "employees").count)
     }
 
     func testValueForKey() {
-        let test: (SwiftObject) -> () = { object in
+        let test: (AllTypesObject) -> () = { object in
             XCTAssertEqual(object.valueForKey("boolCol") as Bool!, false)
             XCTAssertEqual(object.valueForKey("intCol") as Int!, 123)
             XCTAssertEqual(object.valueForKey("floatCol") as Float!, 1.23 as Float)
@@ -126,19 +126,19 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.valueForKey("stringCol") as String!, "a")
             XCTAssertEqual(object.valueForKey("binaryCol") as NSData, "a".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
             XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 1))
-            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, false)
-            XCTAssert(object.valueForKey("arrayCol")! is List<SwiftBoolObject>)
+            XCTAssertEqual((object.valueForKey("objectCol")! as BoolObject).boolCol, false)
+            XCTAssert(object.valueForKey("arrayCol")! is List<BoolObject>)
         }
 
-        test(SwiftObject())
+        test(AllTypesObject())
         Realm().write {
-            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+            let persistedObject = Realm().create(AllTypesObject.self, value: [:])
             test(persistedObject)
         }
     }
 
     func testSetValueForKey() {
-        let test: (SwiftObject) -> () = { object in
+        let test: (AllTypesObject) -> () = { object in
             object.setValue(true, forKey: "boolCol")
             XCTAssertEqual(object.valueForKey("boolCol") as Bool!, true)
 
@@ -160,21 +160,21 @@ class ObjectTests: TestCase {
             object.setValue(NSDate(timeIntervalSince1970: 333), forKey: "dateCol")
             XCTAssertEqual(object.valueForKey("dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
 
-            let boolObject = SwiftBoolObject(value: [true])
+            let boolObject = BoolObject(value: [true])
             object.setValue(boolObject, forKey: "objectCol")
-            XCTAssertEqual(object.valueForKey("objectCol") as SwiftBoolObject, boolObject)
-            XCTAssertEqual((object.valueForKey("objectCol")! as SwiftBoolObject).boolCol, true)
+            XCTAssertEqual(object.valueForKey("objectCol") as BoolObject, boolObject)
+            XCTAssertEqual((object.valueForKey("objectCol")! as BoolObject).boolCol, true)
 
-            let list = List<SwiftBoolObject>()
+            let list = List<BoolObject>()
             list.append(boolObject)
             object.setValue(list, forKey: "arrayCol")
-            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).count, 1)
-            XCTAssertEqual((object.valueForKey("arrayCol") as List<SwiftBoolObject>).first!, boolObject)
+            XCTAssertEqual((object.valueForKey("arrayCol") as List<BoolObject>).count, 1)
+            XCTAssertEqual((object.valueForKey("arrayCol") as List<BoolObject>).first!, boolObject)
         }
 
-        test(SwiftObject())
+        test(AllTypesObject())
         Realm().write {
-            let persistedObject = Realm().create(SwiftObject.self, value: [:])
+            let persistedObject = Realm().create(AllTypesObject.self, value: [:])
             test(persistedObject)
         }
     }
