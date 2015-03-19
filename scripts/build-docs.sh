@@ -12,7 +12,7 @@ realm_version="$(PlistBuddy -c "Print :CFBundleVersion" "$realm_version_file")"
 appledoc \
     --project-name Realm \
     --project-company "Realm" \
-    --output ${SRCROOT}/docs \
+    --output "${SRCROOT}/docs" \
     -v ${realm_version} \
     --create-html \
     --no-create-docset \
@@ -29,7 +29,7 @@ appledoc \
     --ignore "Realm/RLMRealm_Dynamic.h" \
     --ignore "Realm/Realm-Bridging-Header.h" \
     --ignore "Realm/Tests" \
-    --template ${SRCROOT}/docs/templates \
+    --template "${SRCROOT}/docs/templates" \
     --exit-threshold 1 \
     Realm
 
