@@ -112,7 +112,7 @@ static BOOL encryptTests() {
 - (void)invokeTest
 {
     @autoreleasepool { [self setUp]; }
-    @autoreleasepool { [super invokeTest]; }
+    @autoreleasepool { [self.invocation invoke]; }
     @autoreleasepool { [self tearDown]; }
 }
 
