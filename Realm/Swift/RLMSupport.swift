@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
-import Realm.Private
+import Realm.SwiftSupport
 
 extension RLMObject {
     // Swift query convenience functions

@@ -17,4 +17,8 @@ framework module Realm {
         header "RLMResults_Private.h"
         header "RLMSchema_Private.h"
     }
+
+    explicit module SwiftSupport {
+        header "RLMArray_Private.h"
+    }
 }
