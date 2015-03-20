@@ -5,6 +5,8 @@
 
 * The browser will automatically refresh when the Realm has been modified
   from another process.
+* Allow using Realm in an embedded framework by setting
+  `APPLICATION_EXTENSION_API_ONLY` to YES.
 
 ### Bugfixes
 
