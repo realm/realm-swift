@@ -38,14 +38,15 @@ rm -rf ${SRCROOT}/docs/output/${realm_version}
 mv ${SRCROOT}/docs/html ${SRCROOT}/docs/output/${realm_version}
 
 ${jazzy} \
-  --skip-undocumented \
-  --min-acl public \
-  -m RealmSwift -a Realm \
-  -u http://realm.io \
-  -x "-project,${SRCROOT}/RealmSwift.xcodeproj" \
-  -g https://github.com/realm/realm-cocoa \
+  --author Realm \
+  --author_url "http://realm.io" \
+  --clean \
+  --github_url https://github.com/realm/realm-cocoa \
   --github-file-prefix https://github.com/realm/realm-cocoa/tree/v${realm_version} \
+  --min-acl public \
+  --module RealmSwift \
   --module-version ${realm_version} \
-  -r http://realm.io/docs/swift/api/ \
-  -o "${SRCROOT}/docs/swift_output" \
-  --clean
+  --output "${SRCROOT}/docs/swift_output" \
+  --root-url http://realm.io/docs/swift/api/ \
+  --skip-undocumented \
+  --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj" \
