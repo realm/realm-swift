@@ -18,6 +18,11 @@
 
 #import "RLMTestCase.h"
 
+@interface XCTest ()
+- (id)internalImplementation;
+- (void)setNumberOfTestIterations:(NSUInteger)num;
+@end
+
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
@@ -111,6 +116,10 @@ static BOOL encryptTests() {
 
 - (void)invokeTest
 {
+    // `measureBlock:` requires that this be set explicitly, but it doesn't
+    // seem to be possible to do so via the public API
+    [[self internalImplementation] setNumberOfTestIterations:1];
+
     @autoreleasepool { [self setUp]; }
     @autoreleasepool { [self.invocation invoke]; }
     @autoreleasepool { [self tearDown]; }
