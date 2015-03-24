@@ -48,5 +48,4 @@ ${jazzy} \
   --module-version ${realm_version} \
   --output "${SRCROOT}/docs/swift_output" \
   --root-url http://realm.io/docs/swift/api/ \
-  --skip-undocumented \
   --xcodebuild-arguments "-project,${SRCROOT}/RealmSwift.xcodeproj" \
