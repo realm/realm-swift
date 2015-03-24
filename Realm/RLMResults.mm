@@ -100,7 +100,7 @@ static inline void RLMResultsValidateAttached(__unsafe_unretained RLMResults *co
         ar->_backingView = ar->_backingQuery->find_all();
         ar->_viewCreated = YES;
         if (!ar->_sortOrder.m_columns.empty()) {
-            ar->_backingView.sort(ar->_sortOrder.m_columns, ar->_sortOrder.m_ascending);
+            ar->_backingView.sort(ar->_sortOrder.m_column_indexes, ar->_sortOrder.m_ascending);
         }
     }
     // otherwise we're backed by a table and don't need to update anything
