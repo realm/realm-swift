@@ -35,7 +35,7 @@ private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
 
-class PerformanceTests: TestCase {
+class SwiftPerformanceTests: TestCase {
     override class func setUp() {
         super.setUp()
         smallRealm = createStringObjects(1)
