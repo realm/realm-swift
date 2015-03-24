@@ -100,6 +100,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "3F8DCA5619930F550008BD7F"
+            BuildableName = "iOS Device Tests.xctest"
+            BlueprintName = "iOS Device Tests"
+            ReferencedContainer = "container:Realm.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

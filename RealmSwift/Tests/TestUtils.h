@@ -17,8 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <XCTest/XCTestCase.h>
 
-@class XCTestCase;
+@interface XCTestCase ()
+- (instancetype)internalImplementation;
+- (void)setNumberOfTestIterations:(NSUInteger)num;
+@end
 
 FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);
 
