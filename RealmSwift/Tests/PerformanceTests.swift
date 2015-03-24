@@ -147,7 +147,7 @@ class PerformanceTests: TestCase {
         measureBlock {
             let results = realm.objects(SwiftStringObject)
             for i in 0..<results.count {
-                _ = results[i].stringCol
+                let string = results[i].stringCol
             }
         }
     }
@@ -294,7 +294,8 @@ class PerformanceTests: TestCase {
         let realm = realmWithTestPath()
         realm.write {
             for _ in 0..<2000 {
-                realm.create(SwiftIntObject.self, value: [Int(arc4random())])
+                let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
+                realm.create(SwiftIntObject.self, value: [randomNumber])
             }
         }
         measureBlock {
