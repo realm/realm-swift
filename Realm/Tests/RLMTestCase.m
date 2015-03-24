@@ -18,11 +18,6 @@
 
 #import "RLMTestCase.h"
 
-@interface XCTest ()
-- (id)internalImplementation;
-- (void)setNumberOfTestIterations:(NSUInteger)num;
-@end
-
 @interface RLMRealm ()
 + (instancetype)realmWithPath:(NSString *)path
                           key:(NSData *)key
@@ -88,21 +83,23 @@ static BOOL encryptTests() {
 
 @implementation RLMTestCase
 
-- (void)setUp
-{
-    [super setUp];
-    [self deleteFiles];
+- (void)setUp {
+    @autoreleasepool {
+        [super setUp];
+        [self deleteFiles];
 
-    if (encryptTests()) {
-        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+        if (encryptTests()) {
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+        }
     }
 }
 
-- (void)tearDown
-{
-    [super tearDown];
-    [self deleteFiles];
+- (void)tearDown {
+    @autoreleasepool {
+        [super tearDown];
+        [self deleteFiles];
+    }
 }
 
 - (void)deleteFiles {
@@ -114,15 +111,10 @@ static BOOL encryptTests() {
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
-- (void)invokeTest
-{
-    // `measureBlock:` requires that this be set explicitly, but it doesn't
-    // seem to be possible to do so via the public API
-    [[self internalImplementation] setNumberOfTestIterations:1];
-
-    @autoreleasepool { [self setUp]; }
-    @autoreleasepool { [self.invocation invoke]; }
-    @autoreleasepool { [self tearDown]; }
+- (void)invokeTest {
+    @autoreleasepool {
+        [super invokeTest];
+    }
 }
 
 - (RLMRealm *)realmWithTestPath
