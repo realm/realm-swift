@@ -98,10 +98,10 @@ class ViewController: UIViewController {
             kSecReturnData: true
         ]
 
-        var dataTypeRef: Unmanaged<AnyObject>?
-        var status = SecItemCopyMatching(query, &dataTypeRef)
+        var dataTypeRef: AnyObject?
+        var status = withUnsafeMutablePointer(&dataTypeRef) { SecItemCopyMatching(query, UnsafeMutablePointer($0)) }
         if status == errSecSuccess {
-            return dataTypeRef?.takeUnretainedValue() as NSData
+            return dataTypeRef as NSData
         }
 
         // No pre-existing key from this application, so generate a new one
