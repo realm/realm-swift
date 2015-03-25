@@ -36,7 +36,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
     NSString *reason = @"Reason";
     NSDictionary *userInfo = @{ @"key" : @"value" };
     NSDictionary *expectedUserInfo = @{
-                                       RLMRealmVersionKey : REALM_VERSION,
+                                       RLMRealmVersionKey : REALM_COCOA_VERSION,
                                        RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                                        };
 
@@ -45,7 +45,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
 
     expectedUserInfo = @{
                          @"key" : @"value",
-                         RLMRealmVersionKey : REALM_VERSION,
+                         RLMRealmVersionKey : REALM_COCOA_VERSION,
                          RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                          };
     XCTAssertTrue(RLMEqualExceptions(RLMException(reason, userInfo), [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
@@ -54,7 +54,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) { \
 - (void)testRLMExceptionWithCPlusPlusException {
     std::runtime_error exception("Reason");
     NSDictionary *expectedUserInfo = @{
-                                       RLMRealmVersionKey : REALM_VERSION,
+                                       RLMRealmVersionKey : REALM_COCOA_VERSION,
                                        RLMRealmCoreVersionKey : @TIGHTDB_VERSION,
                                        };
 

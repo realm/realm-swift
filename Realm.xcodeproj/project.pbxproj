@@ -1096,7 +1096,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
 		293F98F01A76E05700C0199D /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1112,7 +1112,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
 		293F98F11A76E05A00C0199D /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1142,7 +1142,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"#define REALM_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
+			shellScript = "echo \"#define REALM_COCOA_VERSION @\\\"$(sh build.sh get-version)\\\"\" > ${DERIVED_FILE_DIR}/RLMVersion.h";
 		};
 		E81A1FB71955FCE700FDED82 /* Download Core */ = {
 			isa = PBXShellScriptBuildPhase;

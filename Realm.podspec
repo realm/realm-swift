@@ -36,7 +36,7 @@ Pod::Spec.new do |s|
                         'include/Realm/RLMSchema.h',
                         'include/Realm/Realm.h'
 
-  s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_VERSION='@\"#{s.version}\"'"
+  s.compiler_flags          = "-DTIGHTDB_HAVE_CONFIG -DREALM_SWIFT=0 -DREALM_COCOA_VERSION='@\"#{s.version}\"'"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.public_header_files     = public_header_files
   s.source_files            = 'Realm/*.{h,m,mm,hpp}', 'include/**/*.hpp'

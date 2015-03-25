@@ -26,7 +26,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 
-#if !defined(REALM_VERSION)
+#if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
 #endif
 
@@ -293,7 +293,7 @@ void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMOb
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];
     [info addEntriesFromDictionary:@{
-                                     RLMRealmVersionKey : REALM_VERSION,
+                                     RLMRealmVersionKey : REALM_COCOA_VERSION,
                                      RLMRealmCoreVersionKey : @TIGHTDB_VERSION
                                      }];
 
