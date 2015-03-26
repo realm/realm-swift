@@ -21,7 +21,6 @@
 
 #import <tightdb/binary_data.hpp>
 #import <tightdb/string_data.hpp>
-#import <tightdb/table.hpp>
 
 @class RLMObjectSchema;
 @class RLMProperty;
