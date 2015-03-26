@@ -326,6 +326,7 @@
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
 
+    // persisted
     NSMutableArray *ages = [NSMutableArray array];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
@@ -334,6 +335,17 @@
         [company.employees addObject:eo];
     }
     [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+
+    // standalone
+    company = [[CompanyObject alloc] init];
+    ages = [NSMutableArray array];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(i)];
+        EmployeeObject *eo = [[EmployeeObject alloc] initWithObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        [company.employees addObject:eo];
+    }
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
 }
@@ -354,6 +366,7 @@
     XCTAssertThrows([company.employees setValue:@10 forKey:@"age"]);
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
 
+    // persisted
     NSMutableArray *ages = [NSMutableArray array];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
@@ -364,6 +377,19 @@
 
     [company.employees setValue:@20 forKey:@"age"];
     [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+
+    // standalone
+    company = [[CompanyObject alloc] init];
+    ages = [NSMutableArray array];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(20)];
+        EmployeeObject *eo = [[EmployeeObject alloc] initWithObject:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        [company.employees addObject:eo];
+    }
+
+    [company.employees setValue:@20 forKey:@"age"];
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
 }
