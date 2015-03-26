@@ -1,6 +1,10 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+### Enhancements
+
+* `RLMCollection` supports collection KVC operations.
+
 ### Bugfixes
 
 * `+[RLMSchema dynamicSchemaForRealm:]` now respects search indexes.
