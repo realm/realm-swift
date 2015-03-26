@@ -17,7 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "TestUtils.h"
-#import <XCTest/XCTest.h>
+
+#import <Realm/Realm.h>
+#import <Realm/RLMRealmUtil.h>
+#import <XCTest/XCTestCase.h>
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;
@@ -31,5 +34,25 @@ void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message
         NSString *prefix = @"The given expression failed to throw an exception";
         message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
         [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+    }
+}
+
+void RLMDeallocateRealm(NSString *path) {
+    __weak RLMRealm *realm;
+
+    @autoreleasepool {
+        realm = RLMGetThreadLocalCachedRealmForPath(path);
+        if (!realm) {
+            return;
+        }
+    }
+
+    while (true) {
+        @autoreleasepool {
+            if (!realm) {
+                return;
+            }
+        }
+        CFRelease((__bridge void *)realm);
     }
 }

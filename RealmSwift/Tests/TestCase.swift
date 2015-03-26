@@ -38,6 +38,8 @@ class TestCase: XCTestCase {
             self.tearDown()
         }
 
+        RLMDeallocateRealm(Realm.defaultPath)
+        RLMDeallocateRealm(testRealmPath())
         deleteRealmFiles()
         RLMRealm.resetRealmState()
     }
