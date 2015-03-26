@@ -132,6 +132,31 @@ public final class List<T: Object>: ListBase {
     /// Returns the last object in the list, or `nil` if empty.
     public var last: T? { return _rlmArray.lastObject() as T? }
 
+    // MARK: KVC
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    :param: key The name of the property.
+
+    :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    public override func valueForKey(key: String) -> AnyObject? {
+        return _rlmArray.valueForKey(key)
+    }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    :param: value The object value.
+    :param: key   The name of the property.
+    */
+    public override func setValue(value: AnyObject?, forKey key: String) {
+        return _rlmArray.setValue(value, forKey: key)
+    }
+
     // MARK: Filtering
 
     /**

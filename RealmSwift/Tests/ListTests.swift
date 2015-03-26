@@ -161,6 +161,19 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array.last!)
     }
 
+    func testValueForKey() {
+        let expected = map(array) { $0.stringCol }
+        let actual = array.valueForKey("stringCol") as [String]!
+        XCTAssertEqual(expected, actual)
+    }
+
+    func testSetValueForKey() {
+        array.setValue("hi there!", forKey: "stringCol")
+        let expected = map(array as List<SwiftStringObject>) { _ in "hi there!" }
+        let actual = map(array) { $0.stringCol }
+        XCTAssertEqual(expected, actual)
+    }
+
     func testFilterFormat() {
         XCTAssertEqual(Int(0), array.filter("stringCol = '1'").count)
         XCTAssertEqual(Int(0), array.filter("stringCol = '2'").count)

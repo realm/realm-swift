@@ -131,6 +131,31 @@ public final class Results<T: Object>: Printable {
     /// Returns the last object in the results, or `nil` if empty.
     public var last: T? { return rlmResults.lastObject() as T? }
 
+    // MARK: KVC
+
+    /**
+    Returns an Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+    :param: key The name of the property.
+
+    :returns: Array containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+    */
+    public func valueForKey(key: String) -> AnyObject? {
+        return rlmResults.valueForKey(key)
+    }
+
+    /**
+    Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+    :warning: This method can only be called during a write transaction.
+
+    :param: value The object value.
+    :param: key   The name of the property.
+    */
+    public func setValue(value: AnyObject?, forKey key: String) {
+        return rlmResults.setValue(value, forKey: key)
+    }
+
     // MARK: Filtering
 
     /**
