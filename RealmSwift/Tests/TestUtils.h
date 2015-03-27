@@ -21,3 +21,7 @@
 @class XCTestCase;
 
 FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);
+
+// Forcibly deallocate the RLMRealm for the given path on the main thread
+// Will cause crashes if it's alive for a reason other than being leaked by RLMAssertThrows
+FOUNDATION_EXTERN void RLMDeallocateRealm(NSString *path);
