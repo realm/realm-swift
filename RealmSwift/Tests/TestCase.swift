@@ -19,9 +19,12 @@
 import XCTest
 import RealmSwift
 import Realm
+import Realm.Private
 import Foundation
 
 class TestCase: XCTestCase {
+    var exceptionThrown = false
+
     func realmWithTestPath() -> Realm {
         return Realm(path: testRealmPath())
     }
@@ -29,6 +32,8 @@ class TestCase: XCTestCase {
     override func invokeTest() {
         Realm.defaultPath = realmPathForFile("\(realmFilePrefix()).default.realm")
         NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil, error: nil)
+
+        exceptionThrown = false
 
         autoreleasepool {
             self.setUp()
@@ -38,13 +43,20 @@ class TestCase: XCTestCase {
             self.tearDown()
         }
 
-        RLMDeallocateRealm(Realm.defaultPath)
-        RLMDeallocateRealm(testRealmPath())
+        if exceptionThrown {
+            RLMDeallocateRealm(Realm.defaultPath)
+            RLMDeallocateRealm(testRealmPath())
+        }
+        else {
+            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(Realm.defaultPath))
+            XCTAssertNil(RLMGetThreadLocalCachedRealmForPath(testRealmPath()))
+        }
         deleteRealmFiles()
         RLMRealm.resetRealmState()
     }
 
     func assertThrows<T>(block: @autoclosure () -> T, _ message: String? = nil, fileName: String = __FILE__, lineNumber: UInt = __LINE__) {
+        exceptionThrown = true
         RLMAssertThrows(self, { _ = block() }, message, fileName, lineNumber);
     }
 

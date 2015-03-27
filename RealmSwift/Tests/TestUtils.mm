@@ -42,9 +42,6 @@ void RLMDeallocateRealm(NSString *path) {
 
     @autoreleasepool {
         realm = RLMGetThreadLocalCachedRealmForPath(path);
-        if (!realm) {
-            return;
-        }
     }
 
     while (true) {
