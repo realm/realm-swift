@@ -248,7 +248,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (id)valueForKey:(NSString *)key {
     RLMResultsValidate(self);
     const size_t size = _backingView.size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index){
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return _backingView.get_source_ndx(index);
     });
 }
@@ -256,7 +256,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (void)setValue:(id)value forKey:(NSString *)key {
     RLMResultsValidateInWriteTransaction(self);
     const size_t size = _backingView.size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index){
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return _backingView.get_source_ndx(index);
     });
 }
@@ -501,7 +501,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 - (id)valueForKey:(NSString *)key {
     RLMResultsValidate(self);
     const size_t size = _table->size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index){
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return index;
     });
 }
@@ -509,7 +509,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 - (void)setValue:(id)value forKey:(NSString *)key {
     RLMResultsValidateInWriteTransaction(self);
     const size_t size = _table->size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index){
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return index;
     });
 }

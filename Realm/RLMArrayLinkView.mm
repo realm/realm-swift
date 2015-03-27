@@ -229,7 +229,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 - (id)valueForKey:(NSString *)key {
     RLMLinkViewArrayValidateAttached(self);
     const size_t size = _backingLinkView->size();
-    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index){
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return _backingLinkView->get(index).get_index();
     });
 }
@@ -237,7 +237,7 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 - (void)setValue:(id)value forKey:(NSString *)key {
     RLMLinkViewArrayValidateInWriteTransaction(self);
     const size_t size = _backingLinkView->size();
-    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index){
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
         return _backingLinkView->get(index).get_index();
     });
 }
