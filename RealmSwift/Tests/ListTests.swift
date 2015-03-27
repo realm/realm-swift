@@ -169,7 +169,7 @@ class ListTests: TestCase {
 
     func testSetValueForKey() {
         array.setValue("hi there!", forKey: "stringCol")
-        let expected = map(array as List<SwiftStringObject>) { _ in "hi there!" }
+        let expected = map(array!) { _ in "hi there!" }
         let actual = map(array) { $0.stringCol }
         XCTAssertEqual(expected, actual)
     }
