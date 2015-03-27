@@ -337,6 +337,8 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+    XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
+    XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
 
     // standalone
     company = [[CompanyObject alloc] init];
@@ -348,6 +350,8 @@
     }
 
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
+    XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
+    XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
 }
 
 - (void)testSetValueForKey {

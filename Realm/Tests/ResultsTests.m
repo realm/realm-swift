@@ -111,7 +111,12 @@
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
 
     XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].firstObject]);
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].lastObject]);
+
     XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"], (@[@0, @0, @0, @0, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].firstObject]);
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].lastObject]);
 
     [realm commitWriteTransaction];
 
