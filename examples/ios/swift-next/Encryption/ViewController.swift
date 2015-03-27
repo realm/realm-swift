@@ -102,10 +102,12 @@ class ViewController: UIViewController {
             kSecReturnData: true
         ]
 
-        var dataTypeRef: Unmanaged<AnyObject>?
-        var status = SecItemCopyMatching(query, &dataTypeRef)
+        // To avoid Swift optimization bug, should use withUnsafeMutablePointer() function to retrieve the keychain item
+        // See also: http://stackoverflow.com/questions/24145838/querying-ios-keychain-using-swift/27721328#27721328
+        var dataTypeRef: AnyObject?
+        var status = withUnsafeMutablePointer(&dataTypeRef) { SecItemCopyMatching(query, UnsafeMutablePointer($0)) }
         if status == errSecSuccess {
-            return dataTypeRef?.takeUnretainedValue() as NSData
+            return dataTypeRef as NSData
         }
 
         // No pre-existing key from this application, so generate a new one
