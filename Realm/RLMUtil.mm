@@ -253,27 +253,24 @@ NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchem
     if (count == 0) {
         return @[];
     }
-    BOOL keyIsSelf = [key isEqualToString:@"self"];
+
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
-    RLMObjectBase *accessor;
-    tightdb::Table *table = nullptr;
-    if (!keyIsSelf) {
-        accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
-        table = objectSchema.table;
+
+    if ([key isEqualToString:@"self"]) {
+        for (size_t i = 0; i < count; i++) {
+            size_t rowIndex = indexGenerator(i);
+            [results addObject:RLMCreateObjectAccessor(realm, objectSchema, rowIndex) ?: NSNull.null];
+        }
+        return results;
     }
+
+    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
+    tightdb::Table *table = objectSchema.table;
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = indexGenerator(i);
-        id value;
-        if (keyIsSelf) {
-            value = RLMCreateObjectAccessor(realm, objectSchema, rowIndex);
-        }
-        else {
-            accessor->_row = (*table)[rowIndex];
-            RLMInitializeSwiftListAccessor(accessor);
-            value = [accessor valueForKey:key];
-        }
-
-        [results addObject:value ?: NSNull.null];
+        accessor->_row = (*table)[rowIndex];
+        RLMInitializeSwiftListAccessor(accessor);
+        [results addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
 
     return results;
