@@ -167,7 +167,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
     /**
     Returns the value for the property identified by the given key.
     :param: key The name of one of the receiver's properties.
-    :retuns: The value for the property identified by `key`.
+    :returns: The value for the property identified by `key`.
     */
     public override func valueForKey(key: String) -> AnyObject? {
         if let list = listProperty(key) {
