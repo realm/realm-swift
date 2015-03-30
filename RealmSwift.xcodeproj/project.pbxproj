@@ -6,31 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		24CBD82935847103D0D36207 /* Realm OSX */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 9C8C2B9D1C8548E0D3D70BF8 /* Build configuration list for PBXAggregateTarget "Realm OSX" */;
-			buildPhases = (
-				19AF9027433D8DF3244F941B /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = "Realm OSX";
-			productName = Realm;
-		};
-		EA2E3718B83CDB76F9B26F50 /* Realm iOS */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 7F5D25C5CBFFCECC1705A169 /* Build configuration list for PBXAggregateTarget "Realm iOS" */;
-			buildPhases = (
-				63E63A6677FCA3EA9E9D4A01 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = "Realm iOS";
-			productName = Realm;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		06202D345EB39CE89AED6B52 /* Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2CD29B79E8B0ADE3E160651 /* Aliases.swift */; };
 		0AF95CAFB714B7F69DA0AE1A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E124D96601C4123CD6200A7 /* libc++.dylib */; };
@@ -508,7 +483,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				294135481AC9596E0071D420 /* PBXTargetDependency */,
+				294135651AC9606C0071D420 /* PBXTargetDependency */,
 				7A6EB48B7F18C3DECE7F78F3 /* PBXTargetDependency */,
 			);
 			name = "RealmSwift iOS";
@@ -528,7 +503,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				6636BA938EACA17FAC94163D /* PBXTargetDependency */,
+				294135671AC9625F0071D420 /* PBXTargetDependency */,
 			);
 			name = "RealmSwift OSX";
 			productName = RealmSwift;
@@ -623,12 +598,69 @@
 				80908EA0BCC2C9911EC870B2 /* RealmSwift OSX */,
 				C6EA1D5F54D9730B744E052E /* RealmSwift OSX Tests */,
 				BADD98D6EE4B7B74816B67F6 /* iOS Device Tests */,
-				EA2E3718B83CDB76F9B26F50 /* Realm iOS */,
-				24CBD82935847103D0D36207 /* Realm OSX */,
 				BBAC62990C8EDE0C3978B90A /* TestHost */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		294135551AC9603E0071D420 /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = 294135541AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		294135571AC9603E0071D420 /* OSX Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "OSX Tests.xctest";
+			remoteRef = 294135561AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		294135591AC9603E0071D420 /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = 294135581AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2941355B1AC9603E0071D420 /* iOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Tests.xctest";
+			remoteRef = 2941355A1AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2941355D1AC9603E0071D420 /* Realm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Realm.framework;
+			remoteRef = 2941355C1AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2941355F1AC9603E0071D420 /* iOS Dynamic Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Dynamic Tests.xctest";
+			remoteRef = 2941355E1AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		294135611AC9603E0071D420 /* iOS Device Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "iOS Device Tests.xctest";
+			remoteRef = 294135601AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		294135631AC9603E0071D420 /* TestHost.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestHost.app;
+			remoteRef = 294135621AC9603E0071D420 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D7700733A1C4572E64C348B1 /* Resources */ = {
@@ -641,39 +673,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		19AF9027433D8DF3244F941B /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ ! -d \"../osx/Realm.framework\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh osx\nfi\n";
-		};
-		63E63A6677FCA3EA9E9D4A01 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ ! -d \"dynamic_frameworks\" ]]; then\n  CONFIGURATION=$CONFIGURATION sh build.sh ios-dynamic\nfi\n";
-		};
 		C9DE71684C482EE4F6730F02 /* Embed Dynamic/Realm.framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)/Realm.framework",
+				"$(CONFIGURATION_BUILD_DIR)/Realm.framework",
 				../osx/Realm.framework,
 			);
 			name = "Embed Dynamic/Realm.framework";
@@ -690,7 +696,7 @@
 			files = (
 			);
 			inputPaths = (
-				"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic/Realm.framework",
+				"$(CONFIGURATION_BUILD_DIR)-dynamic/Realm.framework",
 				"dynamic_frameworks/$(PLATFORM_NAME)/Realm.framework",
 			);
 			name = "Embed Dynamic/Realm.framework";
@@ -824,20 +830,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		294135481AC9596E0071D420 /* PBXTargetDependency */ = {
+		294135651AC9606C0071D420 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EA2E3718B83CDB76F9B26F50 /* Realm iOS */;
-			targetProxy = 294135471AC9596E0071D420 /* PBXContainerItemProxy */;
+			name = "iOS Dynamic";
+			targetProxy = 294135641AC9606C0071D420 /* PBXContainerItemProxy */;
+		};
+		294135671AC9625F0071D420 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OSX;
+			targetProxy = 294135661AC9625F0071D420 /* PBXContainerItemProxy */;
 		};
 		5BF666245D7D3ACD20E0FF7E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3FAA4D299949CB2258082DBD /* RealmSwift iOS */;
 			targetProxy = B0EE8A10A99AA9DF828BAF39 /* PBXContainerItemProxy */;
-		};
-		6636BA938EACA17FAC94163D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 24CBD82935847103D0D36207 /* Realm OSX */;
-			targetProxy = 100C352F504F9E5374D989AE /* PBXContainerItemProxy */;
 		};
 		7A6EB48B7F18C3DECE7F78F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -856,31 +862,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		03E36A0D21B5CE0EFEEDD714 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = macosx;
-			};
-			name = Release;
-		};
-		0C5DC0AAD12F9D7BFBBFD0A7 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		18CD5D3222E0622B06C5AFA3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = macosx;
-			};
-			name = Debug;
-		};
 		30E8D1BE73702EBCB54ACB4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -921,8 +902,8 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
 					../osx,
+					"$(CONFIGURATION_BUILD_DIR)",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -952,8 +933,8 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)",
 					../osx,
+					"$(CONFIGURATION_BUILD_DIR)",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -999,8 +980,8 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic",
 					"dynamic_frameworks/$(PLATFORM_NAME)",
+					"$(CONFIGURATION_BUILD_DIR)-dynamic",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -1017,13 +998,6 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		BA99971FEDFCF3E997AAA58D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
@@ -1266,8 +1240,8 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = (
-					"build/DerivedData/Realm/Build/Products/$(CONFIGURATION)-$(PLATFORM_NAME)-dynamic",
 					"dynamic_frameworks/$(PLATFORM_NAME)",
+					"$(CONFIGURATION_BUILD_DIR)-dynamic",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -1368,24 +1342,6 @@
 			buildConfigurations = (
 				505DD40F55E465B02D0B9266 /* Debug */,
 				E3F7D1A2CDE62932F2FEAAE8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7F5D25C5CBFFCECC1705A169 /* Build configuration list for PBXAggregateTarget "Realm iOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BA99971FEDFCF3E997AAA58D /* Debug */,
-				0C5DC0AAD12F9D7BFBBFD0A7 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9C8C2B9D1C8548E0D3D70BF8 /* Build configuration list for PBXAggregateTarget "Realm OSX" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				18CD5D3222E0622B06C5AFA3 /* Debug */,
-				03E36A0D21B5CE0EFEEDD714 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
