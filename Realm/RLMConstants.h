@@ -94,7 +94,7 @@ extern NSString * const RLMRealmDidChangeNotification;
 #endif
 
 typedef NS_ENUM(NSInteger, RLMError) {
-    /** Retuned by RLMRealm if no other specific error is returned when a realm is opened. */
+    /** Returned by RLMRealm if no other specific error is returned when a realm is opened. */
     RLMErrorFail                  = 1,
     /** Returned by RLMRealm for any I/O related exception scenarios when a realm is opened. */
     RLMErrorFileAccessError       = 2,
