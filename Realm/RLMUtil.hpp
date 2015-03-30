@@ -24,6 +24,7 @@
 
 @class RLMObjectSchema;
 @class RLMProperty;
+@class RLMRealm;
 @class RLMSchema;
 
 NSException *RLMException(NSString *message, NSDictionary *userInfo = nil);
@@ -54,6 +55,10 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
 // throws for missing properties when allowMissing is false
 // returns dictionary with default values and allocates child objects when applicable
 NSDictionary *RLMValidatedDictionaryForObjectSchema(id value, RLMObjectSchema *objectSchema, RLMSchema *schema, bool allowMissing = false);
+
+NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
+
+void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t index));
 
 // C version of isKindOfClass
 static inline BOOL RLMIsKindOfclass(Class class1, Class class2) {

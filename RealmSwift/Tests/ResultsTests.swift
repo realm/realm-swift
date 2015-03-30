@@ -160,6 +160,21 @@ class ResultsTests: TestCase {
         XCTAssertNil(results.filter("stringCol = '3'").last)
     }
 
+    func testValueForKey() {
+        let expected = map(results) { $0.stringCol }
+        let actual = results.valueForKey("stringCol") as [String]!
+        XCTAssertEqual(expected, actual)
+
+        XCTAssertEqual(map(results) { $0 }, results.valueForKey("self") as [SwiftStringObject])
+    }
+
+    func testSetValueForKey() {
+        results.setValue("hi there!", forKey: "stringCol")
+        let expected = map(results as Results<SwiftStringObject>) { _ in "hi there!" }
+        let actual = map(results) { $0.stringCol }
+        XCTAssertEqual(expected, actual)
+    }
+
     func testFilterFormat() {
         XCTAssertEqual(Int(1), results.filter("stringCol = '1'").count)
         XCTAssertEqual(Int(1), results.filter("stringCol = %@", "1").count)

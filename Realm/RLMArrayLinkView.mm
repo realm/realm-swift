@@ -226,6 +226,22 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     return result;
 }
 
+- (id)valueForKey:(NSString *)key {
+    RLMLinkViewArrayValidateAttached(self);
+    const size_t size = _backingLinkView->size();
+    return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
+        return _backingLinkView->get(index).get_index();
+    });
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+    const size_t size = _backingLinkView->size();
+    RLMCollectionSetValueForKey(value, key, _realm, _objectSchema, size, ^size_t(size_t index) {
+        return _backingLinkView->get(index).get_index();
+    });
+}
+
 - (void)deleteObjectsFromRealm {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 

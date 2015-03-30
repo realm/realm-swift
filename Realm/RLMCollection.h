@@ -38,4 +38,23 @@
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
 
+/**
+ Returns an NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+
+ @param key The name of the property.
+
+ @return NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+ */
+- (id)valueForKey:(NSString *)key;
+
+/**
+ Invokes `setValue:forKey:` on each of the collection's objects using the specified value and key.
+
+ @warning This method can only be called during a write transaction.
+
+ @param value The object value.
+ @param key   The name of the property.
+ */
+- (void)setValue:(id)value forKey:(NSString *)key;
+
 @end

@@ -20,7 +20,8 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMObject_Private.h"
+#import "RLMObject_Private.hpp"
+#import "RLMObjectStore.h"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
@@ -247,6 +248,47 @@ NSArray *RLMValidatedArrayForObjectSchema(NSArray *array, RLMObjectSchema *objec
     }
     return outArray;
 };
+
+NSArray *RLMCollectionValueForKey(NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t)) {
+    if (count == 0) {
+        return @[];
+    }
+
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
+
+    if ([key isEqualToString:@"self"]) {
+        for (size_t i = 0; i < count; i++) {
+            size_t rowIndex = indexGenerator(i);
+            [results addObject:RLMCreateObjectAccessor(realm, objectSchema, rowIndex) ?: NSNull.null];
+        }
+        return results;
+    }
+
+    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
+    tightdb::Table *table = objectSchema.table;
+    for (size_t i = 0; i < count; i++) {
+        size_t rowIndex = indexGenerator(i);
+        accessor->_row = (*table)[rowIndex];
+        RLMInitializeSwiftListAccessor(accessor);
+        [results addObject:[accessor valueForKey:key] ?: NSNull.null];
+    }
+
+    return results;
+}
+
+void RLMCollectionSetValueForKey(id value, NSString *key, RLMRealm *realm, RLMObjectSchema *objectSchema, size_t count, size_t (^indexGenerator)(size_t)) {
+    if (count == 0) {
+        return;
+    }
+    RLMObjectBase *accessor = [[objectSchema.accessorClass alloc] initWithRealm:realm schema:objectSchema];
+    tightdb::Table *table = objectSchema.table;
+    for (size_t i = 0; i < count; i++) {
+        size_t rowIndex = indexGenerator(i);
+        accessor->_row = (*table)[rowIndex];
+        RLMInitializeSwiftListAccessor(accessor);
+        [accessor setValue:value forKey:key];
+    }
+}
 
 NSException *RLMException(NSString *reason, NSDictionary *userInfo) {
     NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:userInfo];

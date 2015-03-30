@@ -99,6 +99,7 @@ RLMObjectBase *RLMCreateObjectAccessor(__unsafe_unretained RLMRealm *const realm
                                        __unsafe_unretained RLMObjectSchema *const objectSchema,
                                        NSUInteger index);
 
+void RLMInitializeSwiftListAccessor(RLMObjectBase *object);
 
 #ifdef __cplusplus
 }

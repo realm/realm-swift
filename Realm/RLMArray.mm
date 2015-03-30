@@ -169,6 +169,14 @@ static void RLMValidateMatchingObjectType(RLMArray *array, RLMObject *object) {
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
+- (id)valueForKey:(NSString *)key {
+    return [_backingArray valueForKey:key];
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    [_backingArray setValue:value forKey:key];
+}
+
 //
 // Methods unsupported on standalone RLMArray instances
 //

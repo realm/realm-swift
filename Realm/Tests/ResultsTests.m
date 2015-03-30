@@ -88,6 +88,74 @@
                     @"Adding an object during fast enumeration did not throw");
 }
 
+- (void)testValueForKey {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], @[]);
+
+    // Truncate to seconds so it round-trips exactly
+    NSDate *dateMinInput = [NSDate dateWithTimeIntervalSince1970:(int64_t)[[NSDate date] timeIntervalSince1970]];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].firstObject]);
+    XCTAssertTrue([[[[AggregateObject allObjectsInRealm:realm] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject allObjectsInRealm:realm].lastObject]);
+
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"], (@[@0, @0, @0, @0, @0, @0]));
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] firstObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].firstObject]);
+    XCTAssertTrue([[[[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"self"] lastObject] isEqualToObject:[AggregateObject objectsInRealm:realm where:@"intCol != 1"].lastObject]);
+
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@0, @1, @0, @1, @0, @1, @0, @1, @0, @0]));
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"intCol != 1"] valueForKey:@"intCol"], (@[@0, @0, @0, @0, @0, @0]));
+}
+
+- (void)testSetValueForKey {
+    RLMRealm *realm = self.realmWithTestPath;
+
+    [realm beginWriteTransaction];
+
+    // Truncate to seconds so it round-trips exactly
+    NSDate *dateMinInput = [NSDate dateWithTimeIntervalSince1970:(int64_t)[[NSDate date] timeIntervalSince1970]];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+
+    [[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"];
+    XCTAssertEqualObjects([[AggregateObject allObjectsInRealm:realm] valueForKey:@"intCol"], (@[@25, @25, @25, @25, @25, @25, @25, @25, @25, @25]));
+
+    [[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] setValue:@10 forKey:@"intCol"];
+    XCTAssertEqualObjects([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] valueForKey:@"intCol"], (@[@10, @10, @10, @10, @10, @10]));
+
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows([[AggregateObject allObjectsInRealm:realm] setValue:@25 forKey:@"intCol"]);
+    XCTAssertThrows([[AggregateObject objectsInRealm:realm where:@"floatCol > 1"] setValue:@10 forKey:@"intCol"]);
+}
+
 - (void)testObjectAggregate
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
