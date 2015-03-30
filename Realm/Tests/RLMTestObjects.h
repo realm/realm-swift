@@ -78,6 +78,10 @@
 @property NSString *柱колоéнǢкƱаم;
 @end
 
+@interface IndexedStringObject : RLMObject
+@property NSString *stringCol;
+@end
+
 RLM_ARRAY_TYPE(StringObject)
 RLM_ARRAY_TYPE(IntObject)
 

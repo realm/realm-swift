@@ -1,3 +1,11 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Bugfixes
+
+* `+[RLMSchema dynamicSchemaForRealm:]` now respects search indexes.
+* `+[RLMProperty isEqualToProperty:]` now checks for equal `indexed` properties.
+
 0.91.1 Release notes (2015-03-12)
 =============================================================
 

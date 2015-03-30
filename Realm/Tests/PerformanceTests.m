@@ -18,17 +18,6 @@
 
 #import "RLMTestCase.h"
 
-@interface IndexedStringObject : RLMObject
-@property NSString *stringCol;
-@end
-
-@implementation IndexedStringObject
-+ (NSArray *)indexedProperties
-{
-    return @[@"stringCol"];
-}
-@end
-
 #if !DEBUG
 
 @interface PerformanceTests : RLMTestCase

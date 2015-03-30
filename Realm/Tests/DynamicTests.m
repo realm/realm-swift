@@ -54,6 +54,30 @@
                       @"Array class should by a dynamic object class");
 }
 
+- (void)testDynamicSchemaMatchesRegularSchema {
+    RLMSchema *expectedSchema = nil;
+    // Force create and close realm
+    @autoreleasepool {
+        RLMRealm *realm = self.realmWithTestPath;
+        expectedSchema = realm.schema;
+    }
+    XCTAssertNotNil(expectedSchema);
+
+    NSError *error = nil;
+    RLMSchema *dynamicSchema = [[RLMRealm realmWithPath:RLMTestRealmPath() key:nil readOnly:NO inMemory:NO dynamic:YES schema:nil error:&error] schema];
+    XCTAssertNil(error);
+    XCTAssertEqual(dynamicSchema.objectSchema.count, expectedSchema.objectSchema.count);
+    for (RLMObjectSchema *expectedObjectSchema in expectedSchema.objectSchema) {
+        RLMObjectSchema *dynamicObjectSchema = dynamicSchema[expectedObjectSchema.className];
+        XCTAssertEqual(dynamicObjectSchema.properties.count, expectedObjectSchema.properties.count);
+        for (NSUInteger propertyIndex = 0; propertyIndex < expectedObjectSchema.properties.count; propertyIndex++) {
+            RLMProperty *dynamicProperty = dynamicObjectSchema.properties[propertyIndex];
+            RLMProperty *expectedProperty = expectedObjectSchema.properties[propertyIndex];
+            XCTAssertTrue([dynamicProperty isEqualToProperty:expectedProperty]);
+        }
+    }
+}
+
 - (void)testDynamicSchema {
     RLMSchema *schema = [[RLMSchema alloc] init];
     RLMProperty *prop = [[RLMProperty alloc] initWithName:@"a"

@@ -306,6 +306,7 @@
 
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
+        && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
         && [_name isEqualToString:property->_name]
         && (_objectClassName == property->_objectClassName  || [_objectClassName isEqualToString:property->_objectClassName]);

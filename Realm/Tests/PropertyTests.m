@@ -39,6 +39,47 @@
                                                 @"}");
 }
 
+- (void)testEqualityFromObjectSchema {
+    // Test all property types
+    {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[AllTypesObject class]];
+        NSDictionary *expectedProperties = @{
+                                             @"boolCol":   [[RLMProperty alloc] initWithName:@"boolCol"   type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO],
+                                             @"intCol":    [[RLMProperty alloc] initWithName:@"intCol"    type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO],
+                                             @"floatCol":  [[RLMProperty alloc] initWithName:@"floatCol"  type:RLMPropertyTypeFloat  objectClassName:nil             indexed:NO],
+                                             @"doubleCol": [[RLMProperty alloc] initWithName:@"doubleCol" type:RLMPropertyTypeDouble objectClassName:nil             indexed:NO],
+                                             @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil             indexed:NO],
+                                             @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol" type:RLMPropertyTypeData   objectClassName:nil             indexed:NO],
+                                             @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"   type:RLMPropertyTypeDate   objectClassName:nil             indexed:NO],
+                                             @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"  type:RLMPropertyTypeBool   objectClassName:nil             indexed:NO],
+                                             @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"   type:RLMPropertyTypeInt    objectClassName:nil             indexed:NO],
+                                             @"mixedCol":  [[RLMProperty alloc] initWithName:@"mixedCol"  type:RLMPropertyTypeAny    objectClassName:nil             indexed:NO],
+                                             @"objectCol": [[RLMProperty alloc] initWithName:@"objectCol" type:RLMPropertyTypeObject objectClassName:@"StringObject" indexed:NO]
+                                             };
+        XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
+        for (NSString *propertyName in expectedProperties) {
+            RLMProperty *schemaProperty = objectSchema[propertyName];
+            RLMProperty *expectedProperty = expectedProperties[propertyName];
+            XCTAssertTrue([schemaProperty isEqualToProperty:expectedProperty]);
+        }
+    }
+    // Test indexed property
+    {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[IndexedStringObject class]];
+        RLMProperty *stringProperty = objectSchema[@"stringCol"];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES];
+        XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
+    }
+    // Test primary key property
+    {
+        RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];
+        RLMProperty *stringProperty = objectSchema[@"stringCol"];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil indexed:YES];
+        expectedProperty.isPrimary = YES;
+        XCTAssertTrue([stringProperty isEqualToProperty:expectedProperty]);
+    }
+}
+
 - (void)testTwoPropertiesAreEqual {
     const char *name = "intCol";
     objc_property_t objcProperty1 = class_getProperty(AllTypesObject.class, name);

@@ -50,6 +50,13 @@
 @implementation UTF8Object
 @end
 
+@implementation IndexedStringObject
++ (NSArray *)indexedProperties
+{
+    return @[@"stringCol"];
+}
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject

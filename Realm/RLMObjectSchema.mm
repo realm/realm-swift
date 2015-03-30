@@ -195,7 +195,7 @@
         RLMProperty *prop = [[RLMProperty alloc] initWithName:name
                                                          type:RLMPropertyType(table->get_column_type(col))
                                               objectClassName:nil
-                                                      indexed:NO];
+                                                      indexed:table->has_search_index(col)];
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
