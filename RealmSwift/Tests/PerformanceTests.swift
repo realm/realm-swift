@@ -155,7 +155,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayProperty() {
         let realm = getStringObjects(5)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject), []])
         realm.commitWrite()
 
         measureBlock {
@@ -168,7 +168,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = getStringObjects(5)
         realm.beginWrite()
-        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", realm.objects(SwiftStringObject), []])
         realm.commitWrite()
 
         measureBlock {
