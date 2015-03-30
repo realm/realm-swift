@@ -83,21 +83,23 @@ static BOOL encryptTests() {
 
 @implementation RLMTestCase
 
-- (void)setUp
-{
-    [super setUp];
-    [self deleteFiles];
+- (void)setUp {
+    @autoreleasepool {
+        [super setUp];
+        [self deleteFiles];
 
-    if (encryptTests()) {
-        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
-        [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+        if (encryptTests()) {
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMDefaultRealmPath()];
+            [RLMRealm setEncryptionKey:RLMGenerateKey() forRealmsAtPath:RLMTestRealmPath()];
+        }
     }
 }
 
-- (void)tearDown
-{
-    [super tearDown];
-    [self deleteFiles];
+- (void)tearDown {
+    @autoreleasepool {
+        [super tearDown];
+        [self deleteFiles];
+    }
 }
 
 - (void)deleteFiles {
@@ -109,11 +111,10 @@ static BOOL encryptTests() {
     RLMDeleteRealmFilesAtPath(RLMTestRealmPath());
 }
 
-- (void)invokeTest
-{
-    @autoreleasepool { [self setUp]; }
-    @autoreleasepool { [super invokeTest]; }
-    @autoreleasepool { [self tearDown]; }
+- (void)invokeTest {
+    @autoreleasepool {
+        [super invokeTest];
+    }
 }
 
 - (RLMRealm *)realmWithTestPath
