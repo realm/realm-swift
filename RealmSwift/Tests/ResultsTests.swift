@@ -164,6 +164,8 @@ class ResultsTests: TestCase {
         let expected = map(results) { $0.stringCol }
         let actual = results.valueForKey("stringCol") as [String]!
         XCTAssertEqual(expected, actual)
+
+        XCTAssertEqual(map(results) { $0 }, results.valueForKey("self") as [SwiftStringObject])
     }
 
     func testSetValueForKey() {
