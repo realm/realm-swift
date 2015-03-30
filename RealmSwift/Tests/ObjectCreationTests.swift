@@ -267,32 +267,30 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objects.first!, persistedObject)
     }
 
-    // This doesn't yet work, as RLMIsObjectValidForProperty doesn't take into account the target Realm,
-    // so we end up trying to just add a link to another Realm, which raises an exception.
-//    func testCreateWithObjectsFromAnotherRealm() {
-//        let values = [
-//            "boolCol": true as NSNumber,
-//            "intCol": 1 as NSNumber,
-//            "floatCol": 1.1 as NSNumber,
-//            "doubleCol": 11.1 as NSNumber,
-//            "stringCol": "b" as NSString,
-//            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
-//            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
-//            "objectCol": SwiftBoolObject(object: [true]) as AnyObject,
-//            "arrayCol": [SwiftBoolObject(object: [true]), SwiftBoolObject()]  as AnyObject,
-//        ]
-//
-//        realmWithTestPath().beginWrite()
-//        let otherRealmObject = realmWithTestPath().create(SwiftObject.self, value: values)
-//        realmWithTestPath().commitWrite()
-//
-//        Realm().beginWrite()
-//        let object = Realm().create(SwiftObject.self, value: otherRealmObject)
-//        Realm().commitWrite()
-//
-//        XCTAssertNotEqual(otherRealmObject, object)
-//        verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
-//    }
+    func testCreateWithObjectsFromAnotherRealm() {
+        let values = [
+            "boolCol": true as NSNumber,
+            "intCol": 1 as NSNumber,
+            "floatCol": 1.1 as NSNumber,
+            "doubleCol": 11.1 as NSNumber,
+            "stringCol": "b" as NSString,
+            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+            "objectCol": SwiftBoolObject(value: [true]) as AnyObject,
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()] as AnyObject,
+        ]
+
+        realmWithTestPath().beginWrite()
+        let otherRealmObject = realmWithTestPath().create(SwiftObject.self, value: values)
+        realmWithTestPath().commitWrite()
+
+        Realm().beginWrite()
+        let object = Realm().create(SwiftObject.self, value: otherRealmObject)
+        Realm().commitWrite()
+
+        XCTAssertNotEqual(otherRealmObject, object)
+        verifySwiftObjectWithDictionaryLiteral(object, dictionary: values, boolObjectValue: true, boolObjectListValues: [true, false])
+    }
 
     func testUpdateWithObjectsFromAnotherRealm() {
         realmWithTestPath().beginWrite()
