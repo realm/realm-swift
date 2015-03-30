@@ -323,7 +323,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testRealmCreationUncached() {
         measureBlock {
-            for _ in 0..<75 {
+            for _ in 0..<50 {
                 autoreleasepool {
                     _ = self.realmWithTestPath()
                 }
