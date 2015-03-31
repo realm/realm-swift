@@ -24,7 +24,9 @@ class ObjectSchemaTests: TestCase {
 
     override func setUp() {
         super.setUp()
-        objectSchema = Realm().schema["SwiftObject"]
+        autoreleasepool {
+            self.objectSchema = Realm().schema["SwiftObject"]
+        }
     }
 
     func testProperties() {

@@ -39,7 +39,7 @@ class ListTests: TestCase {
         arrayObject = createArray()
         array = arrayObject.array
 
-        let realm = realmWithTestPath()
+        let realm = self.realmWithTestPath()
         realm.write {
             realm.add(self.str1)
             realm.add(self.str2)

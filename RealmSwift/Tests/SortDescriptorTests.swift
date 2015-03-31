@@ -21,13 +21,8 @@ import RealmSwift
 
 class SortDescriptorTests: TestCase {
 
-    var sortDescriptor: SortDescriptor!
+    let sortDescriptor = SortDescriptor(property: "property")
 
-    override func setUp() {
-        super.setUp()
-        sortDescriptor = SortDescriptor(property: "property")
-    }
-    
     func testAscendingDefaultsToTrue() {
         XCTAssertTrue(sortDescriptor.ascending)
     }
