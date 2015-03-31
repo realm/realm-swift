@@ -40,6 +40,10 @@
 
 @end
 
+@interface RLMDynamicObject : RLMObject
+
+@end
+
 //
 // Getters and setters for RLMObjectBase ivars for realm and objectSchema
 //

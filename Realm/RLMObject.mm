@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMAccessor.h"
 #import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -150,6 +151,18 @@
 
 + (NSArray *)ignoredProperties {
     return nil;
+}
+
+@end
+
+@implementation RLMDynamicObject
+
+- (id)valueForKey:(NSString *)key {
+    return RLMDynamicGet(self, key);
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    RLMDynamicValidatedSet(self, key, value);
 }
 
 @end

@@ -19,6 +19,7 @@
 #import "RLMTestCase.h"
 
 #import "RLMMigration.h"
+#import "RLMObject_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
@@ -683,7 +684,7 @@
         // class despite being in the object schema
         RLMObjectSchema *missingTableSchema = realm.schema[StringObject.className];
         XCTAssertNotNil(missingTableSchema);
-        XCTAssertEqual(missingTableSchema.accessorClass, RLMObject.class);
+        XCTAssertEqual(missingTableSchema.accessorClass, RLMDynamicObject.class);
     }
 
     @autoreleasepool {
@@ -742,6 +743,26 @@
     @autoreleasepool {
         XCTAssertTrue(columnIsIndexed([RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES error:nil]));
     }
+}
+
+- (void)testEnumeratedObjectsDuringMigration {
+    // initialize realm
+    @autoreleasepool {
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [StringObject createInDefaultRealmWithObject:@[@"string"]];
+        }];
+    }
+
+    [RLMRealm setDefaultRealmSchemaVersion:1
+                        withMigrationBlock:^(RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                            [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+                                XCTAssertEqualObjects([oldObject valueForKey:@"stringCol"], oldObject[@"stringCol"]);
+                                [newObject setValue:@"otherString" forKey:@"stringCol"];
+                            }];
+                        }];
+
+    // implicit migration
+    XCTAssertEqualObjects(@"otherString", [StringObject.allObjects.firstObject stringCol]);
 }
 
 @end

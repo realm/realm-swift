@@ -84,7 +84,7 @@
     }
     schema.className = className;
     schema.objectClass = objectClass;
-    schema.accessorClass = RLMObject.class;
+    schema.accessorClass = RLMDynamicObject.class;
     schema.isSwiftClass = isSwift;
 
     // create array of RLMProperties, inserting properties of superclasses first
@@ -223,7 +223,7 @@
 
     // for dynamic schema use vanilla RLMObject accessor classes
     schema.objectClass = RLMObject.class;
-    schema.accessorClass = RLMObject.class;
+    schema.accessorClass = RLMDynamicObject.class;
     schema.standaloneClass = RLMObject.class;
 
     return schema;
