@@ -70,14 +70,12 @@ class ResultsTests: TestCase {
         str2 = SwiftStringObject()
         str2.stringCol = "2"
 
-        autoreleasepool {
-            let realm = self.realmWithTestPath()
-            realm.beginWrite()
-            realm.add(self.str1)
-            realm.add(self.str2)
+        let realm = self.realmWithTestPath()
+        realm.beginWrite()
+        realm.add(self.str1)
+        realm.add(self.str2)
 
-            self.results = self.getResults()
-        }
+        self.results = self.getResults()
     }
 
     override func tearDown() {
