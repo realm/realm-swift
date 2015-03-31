@@ -221,7 +221,7 @@
         }
     }
 
-    // for dynamic schema use vanilla RLMObject accessor classes
+    // for dynamic schema use vanilla RLMDynamicObject accessor classes
     schema.objectClass = RLMObject.class;
     schema.accessorClass = RLMDynamicObject.class;
     schema.standaloneClass = RLMObject.class;
