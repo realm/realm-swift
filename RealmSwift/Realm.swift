@@ -276,7 +276,8 @@ public final class Realm {
         if update && schema[T.className()]?.primaryKeyProperty == nil {
           throwRealmException("'\(T.className())' does not have a primary key and can not be updated")
         }
-        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, update ? .UpdateOrCreate : .allZeros), T.self)
+        let creationOptions: RLMCreationOptions = (update ? .UpdateOrCreate : .allZeros) | .AllowCopy
+        return unsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, T.className(), value, creationOptions), T.self)
     }
 
     // MARK: Deleting objects
