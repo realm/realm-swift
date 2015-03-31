@@ -250,6 +250,16 @@ public final class DynamicObject : Object {
         }
         return nil
     }
+
+    /// :nodoc:
+    public override func valueForKey(key: String) -> AnyObject? {
+        return self[key]
+    }
+
+    /// :nodoc:
+    public override func setValue(value: AnyObject?, forKey key: String) {
+        self[key] = value
+    }
 }
 
 /// :nodoc:

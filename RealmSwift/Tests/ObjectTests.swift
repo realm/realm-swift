@@ -180,13 +180,80 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as List<SwiftBoolObject>).first!, boolObject)
     }
 
+    func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (), getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject, boolObject: DynamicObject) {
+        setter(object, true, "boolCol")
+        XCTAssertEqual(getter(object, "boolCol") as Bool!, true)
+
+        setter(object, 321, "intCol")
+        XCTAssertEqual(getter(object, "intCol") as Int!, 321)
+
+        setter(object, 32.1 as Float, "floatCol")
+        XCTAssertEqual(getter(object, "floatCol") as Float!, 32.1 as Float)
+
+        setter(object, 3.21, "doubleCol")
+        XCTAssertEqual(getter(object, "doubleCol") as Double!, 3.21)
+
+        setter(object, "z", "stringCol")
+        XCTAssertEqual(getter(object, "stringCol") as String!, "z")
+
+        setter(object, "z".dataUsingEncoding(NSUTF8StringEncoding), "binaryCol")
+        XCTAssertEqual(getter(object, "binaryCol") as NSData, "z".dataUsingEncoding(NSUTF8StringEncoding)! as NSData)
+
+        setter(object, NSDate(timeIntervalSince1970: 333), "dateCol")
+        XCTAssertEqual(getter(object, "dateCol") as NSDate!, NSDate(timeIntervalSince1970: 333))
+
+        setter(object, boolObject, "objectCol")
+        XCTAssertEqual(getter(object, "objectCol") as DynamicObject, boolObject)
+        XCTAssertEqual((getter(object, "objectCol")! as DynamicObject)["boolCol"]! as NSNumber, true as NSNumber)
+
+        setter(object, [boolObject], "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).first!, boolObject)
+
+        let list = getter(object, "arrayCol") as List<DynamicObject>
+        list.removeAll();
+        setter(object, list, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 0)
+
+        setter(object, [boolObject], "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).count, 1)
+        XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).first!, boolObject)
+    }
+
+    private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
+        autoreleasepool {
+            let realm = self.realmWithTestPath()
+            realm.write {
+                _ = realm.create(SwiftObject)
+            }
+        }
+        autoreleasepool {
+            var enumerated = false
+            setSchemaVersion(1, self.testRealmPath()) { migration, _ in
+                migration.enumerate(SwiftObject.className()) { oldObject, newObject in
+                    if let newObject = newObject {
+                        block(newObject, migration)
+                        enumerated = true
+                    }
+                }
+            }
+            self.realmWithTestPath()
+            XCTAssert(enumerated)
+        }
+    }
+
     func testSetValueForKey() {
-        let setter : (SwiftObject, AnyObject?, String) -> () = { object, value, key in
+        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
-        let getter : (SwiftObject, String) -> (AnyObject?) = { object, key in
+        let getter : (Object, String) -> (AnyObject?) = { object, key in
             object.valueForKey(key)
+        }
+
+        withMigrationObject { migrationObject, migration in
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
+            self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
@@ -197,12 +264,17 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter : (SwiftObject, AnyObject?, String) -> () = { object, value, key in
+        let setter : (Object, AnyObject?, String) -> () = { object, value, key in
             object[key] = value
             return
         }
-        let getter : (SwiftObject, String) -> (AnyObject?) = { object, key in
+        let getter : (Object, String) -> (AnyObject?) = { object, key in
             object[key]
+        }
+
+        withMigrationObject { migrationObject, migration in
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
+            self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
