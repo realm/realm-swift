@@ -39,13 +39,15 @@ class ListTests: TestCase {
         arrayObject = createArray()
         array = arrayObject.array
 
-        let realm = realmWithTestPath()
-        realm.write {
-            realm.add(self.str1)
-            realm.add(self.str2)
-        }
+        autoreleasepool {
+            let realm = self.realmWithTestPath()
+            realm.write {
+                realm.add(self.str1)
+                realm.add(self.str2)
+            }
 
-        realm.beginWrite()
+            realm.beginWrite()
+        }
     }
 
     override func tearDown() {
