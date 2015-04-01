@@ -234,7 +234,7 @@
     XCTAssertEqualObjects(array.array[0], stringObj1, @"Objects should be equal");
     XCTAssertEqualObjects(array.array[1], stringObj2, @"Objects should be equal");
     XCTAssertEqualObjects(array.array[2], stringObj3, @"Objects should be equal");
-    XCTAssertEqual(array.array.count, 3U, @"Should have three elements in string array");
+    XCTAssertEqual(array.array.count, 3U, @"Should have 3 elements in string array");
 
     XCTAssertEqualObjects(array.intArray[0], intObj1, @"Objects should be equal");
     XCTAssertEqualObjects(array.intArray[1], intObj2, @"Objects should be equal");
@@ -257,7 +257,7 @@
     XCTAssertEqual(array.array.count, 0U, @"Should have 0 elements in string array");
 
     [array.intArray removeAllObjects];
-    XCTAssertEqual(array.intArray.count, 0U, @"Should have 0 elements in string array");
+    XCTAssertEqual(array.intArray.count, 0U, @"Should have 0 elements in int array");
 }
 
 - (void)testIndexOfObject
