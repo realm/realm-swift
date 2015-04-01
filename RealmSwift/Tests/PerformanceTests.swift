@@ -52,6 +52,22 @@ class SwiftPerformanceTests: TestCase {
         super.tearDown()
     }
 
+    override func measureBlock(block: (() -> Void)!) {
+        super.measureBlock {
+            autoreleasepool {
+                block()
+            }
+        }
+    }
+
+    override func measureMetrics(metrics: [AnyObject]!, automaticallyStartMeasuring: Bool, forBlock block: (() -> Void)!) {
+        super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
+            autoreleasepool {
+                block()
+            }
+        }
+    }
+
     func inMeasureBlock(block: () -> ()) {
         measureMetrics(self.dynamicType.defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
             _ = block()
@@ -78,7 +94,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
-            for _ in 0..<500 {
+            for _ in 0..<50 {
                 realm.write {
                     _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
