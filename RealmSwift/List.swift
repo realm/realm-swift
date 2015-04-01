@@ -26,7 +26,10 @@ public class ListBase: RLMListBase, Printable {
     // and it has to be defined as @objc override, which can't be done in a
     // generic class.
     /// Returns a human-readable description of the objects contained in the list.
-    @objc public override var description: String { return _rlmArray.description }
+    @objc public override var description: String {
+        let type = "List<\(_rlmArray.objectClassName)>"
+        return gsub("RLMArray <0x[a-z0-9]+>", type, _rlmArray.description) ?? type
+    }
 
     /// Returns the number of objects in this list.
     public var count: Int { return Int(_rlmArray.count) }

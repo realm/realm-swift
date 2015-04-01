@@ -61,7 +61,10 @@ public final class Results<T: Object>: Printable {
     public var realm: Realm { return Realm(rlmResults.realm) }
 
     /// Returns a human-readable description of the objects contained in these results.
-    public var description: String { return rlmResults.description }
+    public var description: String {
+        let type = "Results<\(T.className())>"
+        return gsub("RLMResults <0x[a-z0-9]+>", type, rlmResults.description) ?? type
+    }
 
     /// Returns the number of objects in these results.
     public var count: Int { return Int(rlmResults.count) }

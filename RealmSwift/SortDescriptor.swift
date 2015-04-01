@@ -59,3 +59,13 @@ public struct SortDescriptor {
         return SortDescriptor(property: property, ascending: !ascending)
     }
 }
+
+// MARK: Printable
+
+extension SortDescriptor: Printable {
+    /// Returns a human-readable description of the sort descriptor.
+    public var description: String {
+        let direction = ascending ? "ascending" : "descending"
+        return "SortDescriptor (property: \(property), direction: \(direction))"
+    }
+}

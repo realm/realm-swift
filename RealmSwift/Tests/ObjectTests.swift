@@ -75,10 +75,7 @@ class ObjectTests: TestCase {
 
     func testDescription() {
         let object = SwiftObject()
-        let regex = NSRegularExpression(pattern: "RLMArray <0x[a-z0-9]+>", options: nil, error: nil)
-        let rawDescription = object.description
-        let description = regex!.stringByReplacingMatchesInString(rawDescription, options: nil, range: NSRange(location: 0, length: countElements(rawDescription)), withTemplate: "RLMArray <0x0>")
-        XCTAssertEqual(description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = RLMArray <0x0> (\n\t\n\t);\n}")
+        XCTAssertEqual(object.description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tarrayCol = List<SwiftBoolObject> (\n\t\n\t);\n}")
     }
 
     func testPrimaryKey() {
