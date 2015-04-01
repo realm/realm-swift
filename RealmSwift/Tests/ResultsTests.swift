@@ -101,10 +101,7 @@ class ResultsTests: TestCase {
     }
 
     func testDescription() {
-        let regex = NSRegularExpression(pattern: "RLMResults <0x[a-z0-9]+>", options: nil, error: nil)
-        let rawDescription = results.description
-        let description = regex!.stringByReplacingMatchesInString(rawDescription, options: nil, range: NSRange(location: 0, length: countElements(rawDescription)), withTemplate: "RLMResults <0x0>")
-        XCTAssertEqual(description, "RLMResults <0x0> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
+        XCTAssertEqual(results.description, "Results<SwiftStringObject> (\n\t[0] SwiftStringObject {\n\t\tstringCol = 1;\n\t},\n\t[1] SwiftStringObject {\n\t\tstringCol = 2;\n\t}\n)")
     }
 
     func testCount() {

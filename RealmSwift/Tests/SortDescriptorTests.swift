@@ -39,4 +39,7 @@ class SortDescriptorTests: TestCase {
         XCTAssertTrue(reversed.reversed().ascending)
     }
 
+    func testDescription() {
+        XCTAssertEqual(sortDescriptor.description, "SortDescriptor (property: property, direction: ascending)")
+    }
 }
