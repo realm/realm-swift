@@ -61,6 +61,8 @@ FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o
 // Get ObjectUil class for objc or swift
 FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
+FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
+
 @class RLMProperty, RLMArray;
 @interface RLMObjectUtil : NSObject
 

@@ -432,21 +432,13 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 }
 
 - (NSString *)description {
-    return [self descriptionWithMaxDepth:5];
-}
-
-- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
-    if (depth == 0) {
-        return @"<Maximum depth exceeded>";
-    }
-
     const NSUInteger maxObjects = 100;
     NSMutableString *mString = [NSMutableString stringWithFormat:@"RLMResults <0x%lx> (\n", (long)self];
     unsigned long index = 0, skipped = 0;
     for (id obj in self) {
         NSString *sub;
         if ([obj respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
-            sub = [obj descriptionWithMaxDepth:depth - 1];
+            sub = [obj descriptionWithMaxDepth:RLMDescriptionMaxDepth - 1];
         }
         else {
             sub = [obj description];
