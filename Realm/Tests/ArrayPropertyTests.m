@@ -207,6 +207,59 @@
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithObject:@[@"n", @[], @[[[IntObject alloc] initWithObject:@[@1]]]]];
 }
 
+- (void)testDeleteObjectInStandaloneArray {
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
+    array.name = @"name";
+
+    StringObject *stringObj1 = [[StringObject alloc] init];
+    stringObj1.stringCol = @"a";
+    StringObject *stringObj2 = [[StringObject alloc] init];
+    stringObj2.stringCol = @"b";
+    StringObject *stringObj3 = [[StringObject alloc] init];
+    stringObj3.stringCol = @"c";
+    [array.array addObject:stringObj1];
+    [array.array addObject:stringObj2];
+    [array.array addObject:stringObj3];
+
+    IntObject *intObj1 = [[IntObject alloc] init];
+    intObj1.intCol = 0;
+    IntObject *intObj2 = [[IntObject alloc] init];
+    intObj2.intCol = 1;
+    IntObject *intObj3 = [[IntObject alloc] init];
+    intObj3.intCol = 2;
+    [array.intArray addObject:intObj1];
+    [array.intArray addObject:intObj2];
+    [array.intArray addObject:intObj3];
+
+    XCTAssertEqualObjects(array.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(array.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(array.array[2], stringObj3, @"Objects should be equal");
+    XCTAssertEqual(array.array.count, 3U, @"Should have 3 elements in string array");
+
+    XCTAssertEqualObjects(array.intArray[0], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(array.intArray[1], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(array.intArray[2], intObj3, @"Objects should be equal");
+    XCTAssertEqual(array.intArray.count, 3U, @"Should have 3 elements in int array");
+
+    [array.array removeLastObject];
+
+    XCTAssertEqualObjects(array.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(array.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertEqual(array.array.count, 2U, @"Should have 2 elements in string array");
+
+    [array.array removeLastObject];
+
+    XCTAssertEqualObjects(array.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqual(array.array.count, 1U, @"Should have 1 elements in string array");
+
+    [array.array removeLastObject];
+
+    XCTAssertEqual(array.array.count, 0U, @"Should have 0 elements in string array");
+
+    [array.intArray removeAllObjects];
+    XCTAssertEqual(array.intArray.count, 0U, @"Should have 0 elements in int array");
+}
+
 - (void)testIndexOfObject
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
