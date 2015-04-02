@@ -96,11 +96,13 @@ public func setSchemaVersion(schemaVersion: UInt, realmPath: String, migrationBl
 
 /**
 Get the schema version for a Realm at a given path.
+
 :param: realmPath     Path to a Realm file.
 :param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
 :param: error         If an error occurs, upon return contains an `NSError` object
                       that describes the problem. If you are not interested in
                       possible errors, omit the argument, or pass in `nil`.
+
 :returns: The version of the Realm at `realmPath` or `nil` if the version cannot be read.
 */
 public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> UInt? {
@@ -109,6 +111,21 @@ public func schemaVersionAtPath(realmPath: String, encryptionKey: NSData? = nil,
         return nil
     }
     return version
+}
+
+/**
+Returns whether or not the realm at the given path can be accessed without performing a migration.
+
+:param: realmPath     Path to a Realm file.
+:param: encryptionKey Optional 64-byte encryption key for encrypted Realms.
+:param: error         If an error occurs, upon return contains an `NSError` object
+                      that describes the problem. If you are not interested in
+                      possible errors, omit the argument, or pass in `nil`.
+
+:returns: Whether or not the schema of the Realm at `realmPath` matches the current schema.
+*/
+public func migrationRequiredAtPath(realmPath: String, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> Bool {
+    return RLMRealm.migrationRequiredAtPath(realmPath, encryptionKey: encryptionKey, error: error)
 }
 
 /**

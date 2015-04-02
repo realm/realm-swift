@@ -516,21 +516,6 @@ public final class Realm {
         RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
     }
 
-    /**
-    Returns whether or not the realm at the given path can be accessed without performing a migration.
-    
-    :param: path          Path to a Realm file.
-    :param: encryptionKey Optional 64-byte encryption key.
-    :param: error         If an error occurs, upon return contains an `NSError` object
-                          that describes the problem. If you are not interested in
-                          possible errors, omit the argument, or pass in `nil`.
-
-    :returns:             Whether or not the schema of the Realm at `path` matches the current schema.
-    */
-    public class func migrationRequired(atPath path: String = defaultPath, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> Bool {
-        return RLMRealm.migrationRequiredAtPath(path, encryptionKey: encryptionKey, error: error)
-    }
-
     // MARK: Internal
     internal var rlmRealm: RLMRealm
 

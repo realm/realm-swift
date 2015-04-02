@@ -465,20 +465,6 @@ class RealmTests: TestCase {
         XCTAssert(true, "setting those keys should not throw")
     }
 
-    func testMigrationRequired() {
-        let path1 = realmPathForFile("1")
-        autoreleasepool {
-            _ = Realm(path: path1)
-        }
-        XCTAssertFalse(Realm.migrationRequired(atPath: path1), "should return false immediately after creating a realm.")
-        let path2 = realmPathForFile("2")
-        autoreleasepool {
-            let prop = RLMProperty(name: "stringCol", type: .Int, objectClassName: nil, indexed: false)
-            realmWithSingleClassProperties(path2, "SwiftStringObject", [prop])
-        }
-        XCTAssert(Realm.migrationRequired(atPath: path2), "should return true immediately after creating a realm with a custom schema.")
-    }
-
     func testEquals() {
         let realm = Realm()
         XCTAssertTrue(realm == Realm())

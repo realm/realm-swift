@@ -32,7 +32,7 @@ private func realmWithSingleClass(path: String, objectSchema: RLMObjectSchema) -
     return realmWithCustomSchema(path, schema)
 }
 
-internal func realmWithSingleClassProperties(path: String, className: String, properties: [AnyObject]) -> RLMRealm {
+private func realmWithSingleClassProperties(path: String, className: String, properties: [AnyObject]) -> RLMRealm {
     let objectSchema = RLMObjectSchema(className: className, objectClass: MigrationObject.self, properties: properties)
     return realmWithSingleClass(path, objectSchema)
 }
@@ -53,7 +53,7 @@ class MigrationTests: TestCase {
     // migrate realm at path and ensure migration
     private func migrateAndTestRealm(realmPath: String, isNecessary: Bool = false, shouldRun: Bool = true, schemaVersion: UInt = 1, autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var error: NSError? = nil
-        XCTAssertEqual(Realm.migrationRequired(atPath: realmPath, error: &error), isNecessary)
+        XCTAssertEqual(migrationRequiredAtPath(realmPath, error: &error), isNecessary)
         var didRun = false
         setSchemaVersion(schemaVersion, realmPath, { migration, oldSchemaVersion in
             if let block = block {
@@ -71,10 +71,22 @@ class MigrationTests: TestCase {
         }
 
         XCTAssertEqual(didRun, shouldRun)
-        XCTAssertFalse(Realm.migrationRequired(atPath: realmPath))
+        XCTAssertFalse(migrationRequiredAtPath(realmPath))
     }
 
     // MARK: Test cases
+
+    func testMigrationRequired() {
+        autoreleasepool {
+            _ = Realm()
+        }
+        XCTAssertFalse(migrationRequiredAtPath(Realm.defaultPath), "should return false immediately after creating a realm.")
+        autoreleasepool {
+            let prop = RLMProperty(name: "stringCol", type: .Int, objectClassName: nil, indexed: false)
+            realmWithSingleClassProperties(self.testRealmPath(), "SwiftStringObject", [prop])
+        }
+        XCTAssert(migrationRequiredAtPath(testRealmPath()), "should return true immediately after creating a realm with a custom schema.")
+    }
 
     func testSetDefaultRealmSchemaVersion() {
         createAndTestRealmAtPath(Realm.defaultPath)
