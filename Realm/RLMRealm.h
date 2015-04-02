@@ -554,7 +554,7 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  Returns whether or not the realm at the given path can be accessed without performing a migration.
 
  @param realmPath   Path to a Realm file.
- @param key         64-byte encryption key.
+ @param key         64-byte encryption key or nil for unencrypted Realms.
  @param error       If an error occurs, upon return contains an `NSError` object
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.

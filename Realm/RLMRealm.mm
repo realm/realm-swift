@@ -810,7 +810,7 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
 }
 
 + (BOOL)migrationRequiredAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)outError {
-    RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(realmPath);
+    RLMRealm *realm = RLMGetAnyCachedRealmForPath(realmPath);
     if (realm) {
         // we've already successfully opened a realm, so a migration isn't necessary.
         return NO;
@@ -826,6 +826,10 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
     for (RLMObjectSchema *objectSchema in [[RLMSchema sharedSchema] objectSchema]) {
         RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
+        if (tableSchema == nil) {
+            // creating missing tables doesn't require a migration.
+            continue;
+        }
         NSString *errorMessage = RLMVerifyAndAlignColumns(tableSchema, objectSchema, true);
         if (errorMessage != nil) {
             return YES;
