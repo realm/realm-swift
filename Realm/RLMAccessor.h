@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase;
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMRealm;
 
 typedef NSUInteger RLMCreationOptions;
 

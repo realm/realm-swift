@@ -431,8 +431,10 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 - (void)deleteObjectsFromRealm {
     RLMResultsValidateInWriteTransaction(self);
 
-    // call clear to remove all from the realm
-    _backingView.clear();
+    RLMTrackDeletions(_realm, ^{
+        // call clear to remove all from the realm
+        _backingView.clear();
+    });
 }
 
 - (NSString *)description {
@@ -558,7 +560,7 @@ static NSNumber *averageOfProperty(TableType const& table, RLMRealm *realm, NSSt
 
 - (void)deleteObjectsFromRealm {
     RLMResultsValidateInWriteTransaction(self);
-    _table->clear();
+    RLMClearTable(_objectSchema);
 }
 
 - (std::unique_ptr<Query>)cloneQuery {

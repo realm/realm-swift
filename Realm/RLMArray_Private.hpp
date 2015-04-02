@@ -34,6 +34,7 @@ namespace realm {
 }
 
 @class RLMObjectSchema;
+@class RLMObjectBase;
 
 struct RLMSortOrder {
     std::vector<size_t> columnIndices;
@@ -44,16 +45,18 @@ struct RLMSortOrder {
     }
 };
 
-// RLMArray private properties/ivars for all subclasses
 @interface RLMArray () {
   @protected
-    // accessor ivars
-    RLMRealm *_realm;
     NSString *_objectClassName;
+  @public
+    // The name of the property which this RLMArray represents
+    NSString *_key;
 }
 
 // initializer
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName standalone:(BOOL)standalone;
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName
+                           parentObject:(RLMObjectBase *)object
+                                    key:(NSString *)key;
 @end
 
 
@@ -61,9 +64,10 @@ struct RLMSortOrder {
 // LinkView backed RLMArray subclass
 //
 @interface RLMArrayLinkView : RLMArray
-+ (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(realm::LinkViewRef)view
-                                   realm:(RLMRealm *)realm;
++ (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
+                                          view:(realm::LinkViewRef)view
+                                         realm:(RLMRealm *)realm
+                                           key:(NSString *)key;
 
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;

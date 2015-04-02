@@ -33,16 +33,19 @@
 //
 @implementation RLMArrayLinkView {
     realm::LinkViewRef _backingLinkView;
-    RLMObjectSchema *_objectSchema;
+    RLMRealm *_realm;
+    __unsafe_unretained RLMObjectSchema *_objectSchema;
+    std::unique_ptr<RLMObservationInfo2> _observable;
 }
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
                                           view:(realm::LinkViewRef)view
-                                         realm:(RLMRealm *)realm {
-    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName standalone:NO];
+                                         realm:(RLMRealm *)realm
+                                           key:(NSString *)key {
+    RLMArrayLinkView *ar = [[RLMArrayLinkView alloc] initWithObjectClassName:objectClassName parentObject:nil key:key];
     ar->_backingLinkView = view;
     ar->_realm = realm;
-    ar->_objectSchema = realm.schema[objectClassName];
+    ar->_objectSchema = ar->_realm.schema[objectClassName];
     return ar;
 }
 
@@ -74,9 +77,67 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     }
 }
 
+static const RLMObservationInfo2 *getObservable(__unsafe_unretained RLMArrayLinkView *const ar, bool create = false) {
+    if (ar->_observable) {
+        return ar->_observable.get();
+    }
+
+    for (const RLMObservationInfo2 *info : ar->_objectSchema->_observedObjects) {
+        if (info->row.get_index() == ar->_backingLinkView->get_origin_row_index()) {
+            return info;
+        }
+    }
+
+    if (create) {
+        ar->_observable = std::make_unique<RLMObservationInfo2>(ar->_objectSchema, ar->_backingLinkView->get_origin_row_index(), ar);
+        return ar->_observable.get();
+    }
+
+    return nullptr;
+}
+
+static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
+    if (auto o = getObservable(ar)) {
+        NSIndexSet *is = [NSIndexSet indexSetWithIndex:index];
+        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+        f();
+        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+    }
+    else {
+        f();
+    }
+}
+
+static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
+    if (auto o = getObservable(ar)) {
+        NSIndexSet *is = [NSIndexSet indexSetWithIndexesInRange:range];
+        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+        f();
+        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+    }
+    else {
+        f();
+    }
+}
+
+static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
+    if (auto o = getObservable(ar)) {
+        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+        f();
+        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
+    }
+    else {
+        f();
+    }
+}
+
 //
 // public method implementations
 //
+- (RLMRealm *)realm {
+    return _realm;
+}
+
 - (NSUInteger)count {
     RLMLinkViewArrayValidateAttached(self);
     return _backingLinkView->size();
@@ -84,6 +145,19 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
 
 - (BOOL)isInvalidated {
     return !_backingLinkView->is_attached();
+}
+
+// These two methods take advantage of that LinkViews are interned, so there's
+// only ever at most one LinkView object per SharedGroup for a given row+col.
+- (BOOL)isEqual:(id)object {
+    if (RLMArrayLinkView *linkView = RLMDynamicCast<RLMArrayLinkView>(object)) {
+        return linkView->_backingLinkView.get() == _backingLinkView.get();
+    }
+    return NO;
+}
+
+- (NSUInteger)hash {
+    return reinterpret_cast<NSUInteger>(_backingLinkView.get());
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
@@ -161,7 +235,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
         RLMVerifyAttached(object);
     }
 
-    ar->_backingLinkView->insert(index, object->_row.get_index());
+    changeArray(ar, NSKeyValueChangeInsertion, index, ^{
+        ar->_backingLinkView->insert(index, object->_row.get_index());
+    });
 }
 
 - (void)addObject:(RLMObject *)object {
@@ -172,25 +248,70 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     RLMInsertObject(self, object, index);
 }
 
+- (void)insertObjects:(id<NSFastEnumeration>)objects atIndexes:(NSIndexSet *)indexes {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
+    changeArray(self, NSKeyValueChangeInsertion, indexes, ^{
+        NSUInteger index = [indexes firstIndex];
+        for (RLMObject *obj in objects) {
+            if (index > _backingLinkView->size()) {
+                @throw RLMException(@"Trying to insert object at invalid index");
+            }
+            if (obj->_realm != _realm) {
+                [_realm addObject:obj];
+            }
+            else {
+                RLMVerifyAttached(obj);
+            }
+            _backingLinkView->insert(index, obj->_row.get_index());
+            index = [indexes indexGreaterThanIndex:index];
+        }
+    });
+}
+
+
 - (void)removeObjectAtIndex:(NSUInteger)index {
     RLMLinkViewArrayValidateInWriteTransaction(self);
     RLMValidateArrayBounds(self, index);
-    _backingLinkView->remove(index);
+    changeArray(self, NSKeyValueChangeRemoval, index, ^{
+        _backingLinkView->remove(index);
+    });
 }
 
-- (void)removeLastObject {
+- (void)removeObjectsAtIndexes:(NSIndexSet *)indexes {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
-    size_t size = _backingLinkView->size();
-    if (size > 0){
-        _backingLinkView->remove(size-1);
-    }
+    changeArray(self, NSKeyValueChangeRemoval, indexes, ^{
+        for (NSUInteger index = [indexes lastIndex]; index != NSNotFound; index = [indexes indexLessThanIndex:index]) {
+            if (index >= _backingLinkView->size()) {
+                @throw RLMException(@"Trying to remove object at invalid index");
+            }
+            _backingLinkView->remove(index);
+        }
+    });
+}
+
+- (void)addObjectsFromArray:(NSArray *)array {
+    RLMLinkViewArrayValidateInWriteTransaction(self);
+
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(_backingLinkView->size(), array.count), ^{
+        for (RLMObject *obj in array) {
+            RLMValidateObjectClass(obj, _objectClassName);
+            if (obj->_realm != _realm) {
+                [_realm addObject:obj];
+            }
+
+            _backingLinkView->add(obj->_row.get_index());
+        }
+    });
 }
 
 - (void)removeAllObjects {
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
-    _backingLinkView->clear();
+    changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingLinkView->size()), ^{
+        _backingLinkView->clear();
+    });
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)object {
@@ -201,7 +322,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     if (object->_realm != self.realm) {
         [self.realm addObject:object];
     }
-    _backingLinkView->set(index, object->_row.get_index());
+
+    changeArray(self, NSKeyValueChangeReplacement, index, ^{
+        _backingLinkView->set(index, object->_row.get_index());
+    });
 }
 
 - (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
@@ -245,6 +369,11 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 }
 
 - (id)valueForKey:(NSString *)key {
+    // FIXME: change to "@invalidated"?
+    if ([key isEqualToString:@"invalidated"]) {
+        return @(!_backingLinkView->is_attached());
+    }
+
     RLMLinkViewArrayValidateAttached(self);
     const size_t size = _backingLinkView->size();
     return RLMCollectionValueForKey(key, _realm, _objectSchema, size, ^size_t(size_t index) {
@@ -264,11 +393,12 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     RLMLinkViewArrayValidateInWriteTransaction(self);
 
     // delete all target rows from the realm
-    self->_backingLinkView->remove_all_target_rows();
+    changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingLinkView->size()), ^{
+        _backingLinkView->remove_all_target_rows();
+    });
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
-{
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
     RLMLinkViewArrayValidateAttached(self);
 
     auto query = std::make_unique<realm::Query>(_backingLinkView->get_target_table().where(_backingLinkView));
@@ -295,6 +425,22 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     realm::Query query = _backingLinkView->get_target_table().where(_backingLinkView);
     RLMUpdateQueryWithPredicate(&query, predicate, _realm.schema, _realm.schema[self.objectClassName]);
     return RLMConvertNotFound(query.find());
+}
+
+- (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {
+    // FIXME: this is used by KVO to add/remove observers from the objects
+    // in the array when using the bulk observation stuff
+    return nil;
+}
+
+- (void)addObserver:(id)observer
+         forKeyPath:(NSString *)keyPath
+            options:(NSKeyValueObservingOptions)options
+            context:(void *)context {
+    if (!_observable && [keyPath isEqualToString:@"invalidated"]) {
+        _observable = std::make_unique<RLMObservationInfo2>(_objectSchema, _backingLinkView->get_origin_row_index(), self);
+    }
+    [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 @end
