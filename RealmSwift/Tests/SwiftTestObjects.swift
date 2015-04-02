@@ -138,6 +138,10 @@ class SwiftLinkToPrimaryStringObject: Object {
     }
 }
 
+class SwiftRecursiveObject: Object {
+    let objects = List<SwiftRecursiveObject>()
+}
+
 class SwiftPrimaryStringObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
