@@ -157,11 +157,11 @@
 
 @implementation RLMDynamicObject
 
-- (id)valueForKey:(NSString *)key {
+- (id)valueForUndefinedKey:(NSString *)key {
     return RLMDynamicGet(self, key);
 }
 
-- (void)setValue:(id)value forKey:(NSString *)key {
+- (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     RLMDynamicValidatedSet(self, key, value);
 }
 
