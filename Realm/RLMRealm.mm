@@ -814,6 +814,9 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     if (realm) {
         // we've already successfully opened a realm, so a migration isn't necessary.
         return NO;
+    } else if (![[NSFileManager defaultManager] fileExistsAtPath:realmPath]) {
+        // paths with no realm files never require a migration.
+        return NO;
     } else {
         NSError *error;
         key = validatedKey(key) ?: keyForPath(realmPath);

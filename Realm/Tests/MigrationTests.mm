@@ -90,13 +90,10 @@
 }
 
 - (void)testMigrationRequiredAtPath {
-    XCTAssertThrows([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:nil],
-                    @"should throw if there is no realm file at the given path and no error parameter is passed in");
-
     NSError *error;
     XCTAssertFalse([RLMRealm migrationRequiredAtPath:RLMRealm.defaultRealmPath encryptionKey:nil error:&error],
-                   @"should return NO if there is no realm file at the given path and an error parameter is passed in");
-    XCTAssertNotNil(error, @"error should be set after checking if a migration is required while there is no realm file at the given path");
+                   @"should return NO if there is no realm file at the given path");
+    XCTAssertNil(error, @"error should be nil after checking if a migration is required while there is no realm file at the given path");
 
     @autoreleasepool {
         [RLMRealm defaultRealm];
