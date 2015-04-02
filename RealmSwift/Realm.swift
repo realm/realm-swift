@@ -482,9 +482,8 @@ public final class Realm {
 
     :param: path          Path to save the Realm to.
     :param: encryptionKey Optional 64-byte encryption key to encrypt the new file with.
+    
     :returns:             If an error occurs, returns an `NSError` object, otherwise `nil`.
-
-    :returns: Whether the realm was copied successfully.
     */
     public func writeCopyToPath(path: String, encryptionKey: NSData? = nil) -> NSError? {
         var error: NSError?
@@ -512,9 +511,24 @@ public final class Realm {
 
     :param: encryptionKey 64-byte encryption key to use, or `nil` to unset.
     :param: path          Realm path to set the encryption key for.
-    +*/
+    */
     public class func setEncryptionKey(encryptionKey: NSData?, forPath: String = Realm.defaultPath) {
         RLMRealm.setEncryptionKey(encryptionKey, forRealmsAtPath: forPath)
+    }
+
+    /**
+    Returns whether or not the realm at the given path can be accessed without performing a migration.
+    
+    :param: path          Path to a Realm file.
+    :param: encryptionKey Optional 64-byte encryption key.
+    :param: error         If an error occurs, upon return contains an `NSError` object
+                          that describes the problem. If you are not interested in
+                          possible errors, omit the argument, or pass in `nil`.
+
+    :returns:             Whether or not the schema of the Realm at `path` matches the current schema.
+    */
+    public class func migrationRequired(atPath path: String = defaultPath, encryptionKey: NSData? = nil, error: NSErrorPointer = nil) -> Bool {
+        return RLMRealm.migrationRequiredAtPath(path, encryptionKey: encryptionKey, error: error)
     }
 
     // MARK: Internal

@@ -20,6 +20,7 @@ x.xx.x Release notes (yyyy-MM-dd)
 * `Int8` properties defined in Swift are now treated as integers, rather than
   booleans.
 * NSPredicates created using +predicateWithValue: are now supported.
+* Added `+[RLMRealm migrationRequiredAtPath:encryptionKey:error:]`.
 
 ### Bugfixes
 

@@ -68,7 +68,7 @@ class TestCase: RLMAutoreleasePoolTestCase {
     }
 }
 
-private func realmPathForFile(fileName: String) -> String {
+internal func realmPathForFile(fileName: String) -> String {
     var path = Realm.defaultPath.stringByDeletingLastPathComponent
     if path.lastPathComponent != "testRealms" {
         path = path.stringByAppendingPathComponent("testRealms")

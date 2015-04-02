@@ -34,34 +34,34 @@
 
 extern "C" {
 
-static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema) {
+NSString *RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSchema *objectSchema, bool alignColumns) {
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
-    NSMutableArray *exceptionMessages = [NSMutableArray array];
+    NSMutableArray *errorMessages = [NSMutableArray array];
 
     // check to see if properties are the same
     for (RLMProperty *tableProp in tableSchema.properties) {
         RLMProperty *schemaProp = objectSchema[tableProp.name];
         if (!schemaProp) {
-            [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is missing from latest object model.", tableProp.name]];
+            [errorMessages addObject:[NSString stringWithFormat:@"Property '%@' is missing from latest object model.", tableProp.name]];
             continue;
         }
         if (tableProp.type != schemaProp.type) {
-            [exceptionMessages addObject:[NSString stringWithFormat:@"Property types for '%@' property do not match. Old type '%@', new type '%@'.",
-                                          tableProp.name, RLMTypeToString(tableProp.type), RLMTypeToString(schemaProp.type)]];
+            [errorMessages addObject:[NSString stringWithFormat:@"Property types for '%@' property do not match. Old type '%@', new type '%@'.",
+                                      tableProp.name, RLMTypeToString(tableProp.type), RLMTypeToString(schemaProp.type)]];
             continue;
         }
         if (tableProp.type == RLMPropertyTypeObject || tableProp.type == RLMPropertyTypeArray) {
             if (![tableProp.objectClassName isEqualToString:schemaProp.objectClassName]) {
-                [exceptionMessages addObject:[NSString stringWithFormat:@"Target object type for property '%@' does not match. Old type '%@', new type '%@'.",
-                                              tableProp.name, tableProp.objectClassName, schemaProp.objectClassName]];
+                [errorMessages addObject:[NSString stringWithFormat:@"Target object type for property '%@' does not match. Old type '%@', new type '%@'.",
+                                          tableProp.name, tableProp.objectClassName, schemaProp.objectClassName]];
             }
         }
         if (tableProp.isPrimary != schemaProp.isPrimary) {
             if (tableProp.isPrimary) {
-                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is no longer a primary key.", tableProp.name]];
+                [errorMessages addObject:[NSString stringWithFormat:@"Property '%@' is no longer a primary key.", tableProp.name]];
             }
             else {
-                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made a primary key.", tableProp.name]];
+                [errorMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made a primary key.", tableProp.name]];
             }
         }
 
@@ -73,18 +73,20 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
     // check for new missing properties
     for (RLMProperty *schemaProp in objectSchema.properties) {
         if (!tableSchema[schemaProp.name]) {
-            [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been added to latest object model.", schemaProp.name]];
+            [errorMessages addObject:[NSString stringWithFormat:@"Property '%@' has been added to latest object model.", schemaProp.name]];
         }
     }
 
-    // throw if errors
-    if (exceptionMessages.count) {
-        @throw RLMException([NSString stringWithFormat:@"Migration is required for object type '%@' due to the following errors:\n- %@",
-                             objectSchema.className, [exceptionMessages componentsJoinedByString:@"\n- "]]);
+    if (errorMessages.count > 0) {
+        return [NSString stringWithFormat:@"Migration is required for object type '%@' due to the following errors:\n- %@",
+                objectSchema.className, [errorMessages componentsJoinedByString:@"\n- "]];
+    }
+    else if (alignColumns) {
+        // set new properties array with correct column alignment
+        objectSchema.properties = properties;
     }
 
-    // set new properties array with correct column alignment
-    objectSchema.properties = properties;
+    return nil;
 }
 
 // ensure all search indexes for all tables are up-to-date
@@ -176,7 +178,10 @@ void RLMRealmSetSchema(RLMRealm *realm, RLMSchema *targetSchema, bool verify) {
         // read-only realms may be missing tables entirely
         if (verify && objectSchema.table) {
             RLMObjectSchema *tableSchema = [RLMObjectSchema schemaFromTableForClassName:objectSchema.className realm:realm];
-            RLMVerifyAndAlignColumns(tableSchema, objectSchema);
+            NSString *errorMessage = RLMVerifyAndAlignColumns(tableSchema, objectSchema, true);
+            if (errorMessage != nil) {
+                @throw RLMException(errorMessage);
+            }
         }
     }
 }
