@@ -220,6 +220,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as List<DynamicObject>).first!, boolObject)
     }
 
+    /// Yields a read-write migration `SwiftObject` to the given block
     private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
