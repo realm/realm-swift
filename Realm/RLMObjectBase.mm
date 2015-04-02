@@ -28,6 +28,8 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+const NSUInteger RLMDescriptionMaxDepth = 5;
+
 @implementation RLMObjectBase
 
 // standalone init
@@ -112,7 +114,7 @@
         return @"[invalid object]";
     }
 
-    return [self descriptionWithMaxDepth:5];
+    return [self descriptionWithMaxDepth:RLMDescriptionMaxDepth];
 }
 
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
