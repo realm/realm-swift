@@ -758,6 +758,9 @@
                             [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                                 XCTAssertEqualObjects([oldObject valueForKey:@"stringCol"], oldObject[@"stringCol"]);
                                 [newObject setValue:@"otherString" forKey:@"stringCol"];
+                                XCTAssertEqualObjects([oldObject valueForKey:@"realm"], oldObject.realm);
+                                XCTAssertThrows([oldObject valueForKey:@"noSuchKey"]);
+                                XCTAssertThrows([newObject setValue:@1 forKey:@"noSuchKey"]);
                             }];
                         }];
 
