@@ -23,41 +23,16 @@
 #import <realm/link_view.hpp> // required by row.hpp
 #import <realm/row.hpp>
 
-struct RLMObservationInfo2 {
-    RLMObservationInfo2 *next = nullptr;
-    RLMObservationInfo2 *prev = nullptr;
-    realm::Row row;
-    __unsafe_unretained id object;
-    RLMObjectSchema *objectSchema;
-    void *kvoInfo = nullptr;
-    bool returnNil = false;
-
-    RLMObservationInfo2(RLMObjectSchema *objectSchema, std::size_t row, id object);
-    ~RLMObservationInfo2();
-
-    void setReturnNil(bool value) {
-        for (auto info = this; info; info = info->next)
-            info->returnNil = value;
-    }
-
-    void setRow(size_t newRow);
-};
-
-template<typename F>
-void for_each(const RLMObservationInfo2 *info, F&& f) {
-    for (; info; info = info->next)
-        f(info->object);
-}
+struct RLMObservationInfo;
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
     @public
     realm::Row _row;
-    NSMutableArray *_standaloneObservers;
+    std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
 + (BOOL)shouldPersistToRealm;
-
 @end
 
 // throw an exception if the object is invalidated or on the wrong thread
@@ -77,9 +52,3 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase
         @throw RLMException(@"Attempting to modify object outside of a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
 }
-
-
-void RLMOverrideStandaloneMethods(Class cls);
-
-void RLMForEachObserver(RLMObjectBase *obj, void (^block)(RLMObjectBase*));
-void RLMTrackDeletions(RLMRealm *realm, dispatch_block_t block);

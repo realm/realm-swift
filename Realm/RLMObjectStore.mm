@@ -21,6 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMNotification.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
@@ -285,11 +286,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
 
     // unregister all observers of the standalone object
     // has to be done before any linked standalone objects are added
-    NSMutableArray *observers = object->_standaloneObservers;
-    object->_standaloneObservers = nil;
-
-    for (RLMObservationInfo *info in observers) {
-        [object removeObserver:info.observer forKeyPath:info.key context:info.context];
+    if (object->_observationInfo) {
+        object->_observationInfo->removeObservers();
     }
 
     // populate all properties
@@ -331,11 +329,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     object_setClass(object, schema.accessorClass);
 
     // re-add the observers
-    for (RLMObservationInfo *info in observers) {
-        [object addObserver:info.observer
-                 forKeyPath:info.key
-                    options:info.options & ~NSKeyValueObservingOptionInitial
-                    context:info.context];
+    if (object->_observationInfo) {
+        object->_observationInfo->restoreObservers();
     }
 
     RLMInitializeSwiftListAccessor(object);

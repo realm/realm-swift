@@ -17,9 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray_Private.hpp"
-#import "RLMObject_Private.hpp"
+
+#import "RLMNotification.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
+#import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
@@ -32,10 +34,11 @@
 // RLMArray implementation
 //
 @implementation RLMArrayLinkView {
+@public
     realm::LinkViewRef _backingLinkView;
     RLMRealm *_realm;
     __unsafe_unretained RLMObjectSchema *_objectSchema;
-    std::unique_ptr<RLMObservationInfo2> _observable;
+    std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
 + (RLMArrayLinkView *)arrayWithObjectClassName:(NSString *)objectClassName
@@ -77,58 +80,31 @@ static inline void RLMValidateObjectClass(__unsafe_unretained RLMObjectBase *con
     }
 }
 
-static const RLMObservationInfo2 *getObservable(__unsafe_unretained RLMArrayLinkView *const ar, bool create = false) {
-    if (ar->_observable) {
-        return ar->_observable.get();
+template<typename IndexSetMaker>
+static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, dispatch_block_t f, IndexSetMaker&& is) {
+    RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo, ar->_backingLinkView->get_origin_row_index(), ar->_objectSchema);
+    if (info) {
+        NSIndexSet *indexes = is();
+        NSString *key = ar->_key;
+        for_each(info, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:indexes forKey:key]; });
+        f();
+        for_each(info, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:indexes forKey:key]; });
     }
-
-    for (const RLMObservationInfo2 *info : ar->_objectSchema->_observedObjects) {
-        if (info->row.get_index() == ar->_backingLinkView->get_origin_row_index()) {
-            return info;
-        }
+    else {
+        f();
     }
-
-    if (create) {
-        ar->_observable = std::make_unique<RLMObservationInfo2>(ar->_objectSchema, ar->_backingLinkView->get_origin_row_index(), ar);
-        return ar->_observable.get();
-    }
-
-    return nullptr;
 }
 
 static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
-    if (auto o = getObservable(ar)) {
-        NSIndexSet *is = [NSIndexSet indexSetWithIndex:index];
-        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-        f();
-        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-    }
-    else {
-        f();
-    }
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
 }
 
 static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
-    if (auto o = getObservable(ar)) {
-        NSIndexSet *is = [NSIndexSet indexSetWithIndexesInRange:range];
-        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-        f();
-        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-    }
-    else {
-        f();
-    }
+    changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
 }
 
 static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
-    if (auto o = getObservable(ar)) {
-        for_each(o, [&](__unsafe_unretained id const o) { [o willChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-        f();
-        for_each(o, [&](__unsafe_unretained id const o) { [o didChange:kind valuesAtIndexes:is forKey:ar->_key]; });
-    }
-    else {
-        f();
-    }
+    changeArray(ar, kind, f, [=] { return is; });
 }
 
 //
@@ -437,8 +413,8 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    if (!_observable && [keyPath isEqualToString:@"invalidated"]) {
-        _observable = std::make_unique<RLMObservationInfo2>(_objectSchema, _backingLinkView->get_origin_row_index(), self);
+    if (!_observationInfo && [keyPath isEqualToString:@"invalidated"]) {
+        _observationInfo = std::make_unique<RLMObservationInfo>(_objectSchema, _backingLinkView->get_origin_row_index(), self);
     }
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }

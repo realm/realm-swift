@@ -30,10 +30,12 @@ namespace realm {
     typedef BasicTableRef<Table> TableRef;
 }
 
+struct RLMObservationInfo;
+
 // RLMObjectSchema private
 @interface RLMObjectSchema () {
     @public
-    std::vector<RLMObservationInfo2 *> _observedObjects;
+    std::vector<RLMObservationInfo *> _observedObjects;
 }
 @property (nonatomic) realm::Table *table;
 

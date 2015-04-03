@@ -83,10 +83,3 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 + (NSArray *)requiredPropertiesForClass:(Class)cls;
 
 @end
-
-@interface RLMObservationInfo : NSObject
-@property (nonatomic, unsafe_unretained) id observer;
-@property (nonatomic) NSKeyValueObservingOptions options;
-@property (nonatomic) void *context;
-@property (nonatomic) NSString *key;
-@end
