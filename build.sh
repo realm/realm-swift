@@ -633,7 +633,7 @@ case "$COMMAND" in
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/osx
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/ios
         mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/browser
-        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/swift
+        mkdir -p ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
 
         (
             cd ${TEMPDIR}/realm-cocoa-${VERSION}/osx
@@ -652,7 +652,7 @@ case "$COMMAND" in
 
         (
             if [[ $PACKAGE_REALM_SWIFT == true ]]; then
-              cd ${TEMPDIR}/realm-cocoa-${VERSION}/swift
+              cd ${TEMPDIR}/realm-cocoa-${VERSION}/Swift
               unzip ${WORKSPACE}/realm-swift-source.zip
             fi
         )
@@ -661,7 +661,7 @@ case "$COMMAND" in
             cd ${WORKSPACE}/tightdb_objc
             cp -R plugin ${TEMPDIR}/realm-cocoa-${VERSION}
             cp LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
-            cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/swift/
+            cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/Swift/
         )
 
         (
