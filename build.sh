@@ -552,15 +552,15 @@ case "$COMMAND" in
     # Release packaging
     ######################################
     "package-browser")
-        cd tightdb_objc
+        cd realm_objc
         sh build.sh browser
-        cd ${WORKSPACE}/tightdb_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
+        cd ${WORKSPACE}/realm_objc/tools/RealmBrowser/build/DerivedData/RealmBrowser/Build/Products/Release
         zip -r realm-browser.zip Realm\ Browser.app
         mv realm-browser.zip ${WORKSPACE}
         ;;
 
     "package-docs")
-        cd tightdb_objc
+        cd realm_objc
         sh build.sh docs
         cd docs/output/*
         tar --exclude='realm-docset.tgz' \
@@ -570,7 +570,7 @@ case "$COMMAND" in
         ;;
 
     "package-examples")
-        cd tightdb_objc
+        cd realm_objc
         ./scripts/package_examples.rb
         if [[ $PACKAGE_REALM_SWIFT == false ]]; then
           rm -rf examples/ios/swift-next
@@ -595,7 +595,7 @@ case "$COMMAND" in
         ;;
 
     "package-ios-static")
-        cd tightdb_objc
+        cd realm_objc
         sh build.sh test-ios-static
         sh build.sh ios-static
 
@@ -604,7 +604,7 @@ case "$COMMAND" in
         ;;
 
     "package-osx")
-        cd tightdb_objc
+        cd realm_objc
         sh build.sh test-osx
 
         cd build/DerivedData/Realm/Build/Products/Release
@@ -612,7 +612,7 @@ case "$COMMAND" in
         ;;
 
     "package-swift-source")
-        cd tightdb_objc
+        cd realm_objc
         sh build.sh ios-dynamic
         mkdir -p dynamic_frameworks/iphoneos dynamic_frameworks/iphonesimulator
         cp -R build/DerivedData/Realm/Build/Products/Release-iphoneos-dynamic/Realm.framework dynamic_frameworks/iphoneos/Realm.framework/
@@ -626,7 +626,7 @@ case "$COMMAND" in
     "package-release")
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package.XXXX)
 
-        cd tightdb_objc
+        cd realm_objc
         VERSION=$(sh build.sh get-version)
         cd ..
 
@@ -658,7 +658,7 @@ case "$COMMAND" in
         )
 
         (
-            cd ${WORKSPACE}/tightdb_objc
+            cd ${WORKSPACE}/realm_objc
             cp -R plugin ${TEMPDIR}/realm-cocoa-${VERSION}
             cp LICENSE ${TEMPDIR}/realm-cocoa-${VERSION}/LICENSE.txt
             cp Realm/Swift/RLMSupport.swift ${TEMPDIR}/realm-cocoa-${VERSION}/swift/
@@ -702,52 +702,52 @@ EOF
         REALM_SOURCE=$(pwd)
         mkdir $WORKSPACE
         cd $WORKSPACE
-        git clone $REALM_SOURCE tightdb_objc
+        git clone $REALM_SOURCE realm_objc
 
         echo 'Packaging iOS static'
-        sh tightdb_objc/build.sh package-ios-static
-        cp tightdb_objc/build/ios/realm-framework-ios.zip .
+        sh realm_objc/build.sh package-ios-static
+        cp realm_objc/build/ios/realm-framework-ios.zip .
 
         echo 'Packaging OS X'
-        sh tightdb_objc/build.sh package-osx
-        cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
+        sh realm_objc/build.sh package-osx
+        cp realm_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
 
         echo 'Packaging docs'
-        sh tightdb_objc/build.sh package-docs
-        cp tightdb_objc/docs/output/*/realm-docs.tgz .
+        sh realm_objc/build.sh package-docs
+        cp realm_objc/docs/output/*/realm-docs.tgz .
 
         echo 'Packaging examples'
-        cd tightdb_objc/examples
+        cd realm_objc/examples
         git clean -xfd
         cd ../..
 
-        sh tightdb_objc/build.sh package-examples
-        cp tightdb_objc/realm-examples.zip .
+        sh realm_objc/build.sh package-examples
+        cp realm_objc/realm-examples.zip .
 
         echo 'Packaging browser'
-        sh tightdb_objc/build.sh package-browser
+        sh realm_objc/build.sh package-browser
 
         echo 'Packaging Swift source'
         (
             # Reset repo state
-            cd tightdb_objc
+            cd realm_objc
             git reset --hard
             git clean -xdf
         )
-        sh tightdb_objc/build.sh package-swift-source
-        cp tightdb_objc/realm-swift-source.zip .
+        sh realm_objc/build.sh package-swift-source
+        cp realm_objc/realm-swift-source.zip .
 
         echo 'Building final release package'
         (
             # Reset repo state
-            cd tightdb_objc
+            cd realm_objc
             git reset --hard
             git clean -xdf
         )
-        sh tightdb_objc/build.sh package-release
+        sh realm_objc/build.sh package-release
 
         echo 'Testing packaged examples'
-        sh tightdb_objc/build.sh package-test-examples
+        sh realm_objc/build.sh package-test-examples
 
         ;;
 
