@@ -233,6 +233,9 @@
             _type = RLMPropertyTypeString;
         }
     }
+    if (_objcType == 'c') {
+        _type = RLMPropertyTypeInt;
+    }
 
     // update getter/setter names
     [self updateAccessors];

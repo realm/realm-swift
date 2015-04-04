@@ -348,9 +348,16 @@ static IMP RLMAccessorGetter(RLMProperty *prop, char accessorCode, NSString *obj
             });
         case 'B':
         case 'c':
-            return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
-                return RLMGetBool(obj, colIndex);
-            });
+            if (prop.type == RLMPropertyTypeBool) {
+                return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
+                    return RLMGetBool(obj, colIndex);
+                });
+            }
+            else {
+                return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
+                    return (int8_t)RLMGetLong(obj, colIndex);
+                });
+            }
         case 'S':
             return imp_implementationWithBlock(^(__unsafe_unretained RLMObjectBase *const obj) {
                 return RLMGetString(obj, colIndex);
@@ -638,7 +645,17 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
             break;
         case 'B':
         case 'c':
-            RLMSetValue(obj, col, (bool)[val boolValue]);
+            if (prop.type == RLMPropertyTypeInt) {
+                if (options & RLMCreationOptionsEnforceUnique) {
+                    RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
+                }
+                else {
+                    RLMSetValue(obj, col, [val longLongValue]);
+                }
+            }
+            else {
+                RLMSetValue(obj, col, (bool)[val boolValue]);
+            }
             break;
         case 'S':
             if (options & RLMCreationOptionsEnforceUnique) {
