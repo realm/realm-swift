@@ -241,6 +241,21 @@ static id RLMValidatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *sc
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
+- (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath {
+    [super removeObserver:observer forKeyPath:keyPath];
+    _observationInfo->removeObserver(observer, keyPath);
+}
+
+- (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(void *)context {
+    bool skipUnregistering = true;
+    if (_observationInfo) {
+        std::swap(_observationInfo->skipUnregisteringObservers, skipUnregistering);
+    }
+    [super removeObserver:observer forKeyPath:keyPath context:context];
+    std::swap(_observationInfo->skipUnregisteringObservers, skipUnregistering);
+    _observationInfo->removeObserver(observer, keyPath, context);
+}
+
 - (void *)observationInfo {
     return _observationInfo ? _observationInfo->kvoInfo : nullptr;
 }

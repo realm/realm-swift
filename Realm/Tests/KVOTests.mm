@@ -289,22 +289,39 @@ public:
 
     // `context` parameter must match if it's passed, but the overload that doesn't
     // take one will unregister any context
-    void *context = (__bridge void *)obj;
-    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:nullptr]);
-    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context]);
-    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:nullptr]);
+    void *context1 = (void *)1;
+    void *context2 = (void *)2;
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
 
-    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context]);
-    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
 
-    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col"]);
+
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
+
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
+    XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
 
     // no context version should only unregister one (unspecified) observer
-    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context]);
-    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:nullptr]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
+    XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
+    XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col"]);
 }
 
 - (void)testSimple {

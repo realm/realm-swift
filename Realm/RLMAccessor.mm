@@ -650,10 +650,8 @@ Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema,
 }
 
 Class RLMStandaloneAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    Class cls = RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
-                                       RLMAccessorStandaloneGetter, RLMAccessorStandaloneSetter);
-    RLMOverrideStandaloneMethods(cls);
-    return cls;
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMStandalone_",
+                                  RLMAccessorStandaloneGetter, RLMAccessorStandaloneSetter);
 }
 
 void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {

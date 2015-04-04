@@ -62,6 +62,7 @@ RLMObservationInfo::~RLMObservationInfo() {
 
 void RLMObservationInfo::setRow(realm::Table &table, size_t newRow) {
     REALM_ASSERT(!row);
+    skipUnregisteringObservers = true;
     row = table[newRow];
     for (auto info : objectSchema->_observedObjects) {
         if (info->row && info->row.get_index() == row.get_index()) {
@@ -94,8 +95,9 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow,
 }
 
 template<typename Container, typename Pred>
-static void erase_if(Container&& c, Pred&& p) {
+static void erase_first(Container&& c, Pred&& p) {
     auto it = find_if(c.begin(), c.end(), p);
+    assert(it != c.end());
     if (it != c.end()) {
         iter_swap(it, prev(c.end()));
         c.pop_back();
@@ -104,8 +106,8 @@ static void erase_if(Container&& c, Pred&& p) {
 
 void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
                                         __unsafe_unretained NSString *const keyPath) {
-    if (!currentlyUnregisteringObservers) {
-        erase_if(standaloneObservers, [&](auto const& info) {
+    if (!skipUnregisteringObservers) {
+        erase_first(standaloneObservers, [&](auto const& info) {
             return info.observer == observer && [info.key isEqualToString:keyPath];
         });
     }
@@ -114,8 +116,8 @@ void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
 void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
                                         __unsafe_unretained NSString *const keyPath,
                                         void *context) {
-    if (!currentlyUnregisteringObservers) {
-        erase_if(standaloneObservers, [&](auto const& info) {
+    if (!skipUnregisteringObservers) {
+        erase_first(standaloneObservers, [&](auto const& info) {
             return info.observer == observer
                 && info.context == context
                 && [info.key isEqualToString:keyPath];
@@ -124,7 +126,7 @@ void RLMObservationInfo::removeObserver(__unsafe_unretained id const observer,
 }
 
 void RLMObservationInfo::removeObservers() {
-    currentlyUnregisteringObservers = true;
+   skipUnregisteringObservers  = true;
     for (auto const& info : standaloneObservers) {
         [object removeObserver:info.observer forKeyPath:info.key context:info.context];
     }
@@ -246,43 +248,6 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
     }
 
     realm.group->set_cascade_notification_handler(nullptr);
-}
-
-void RLMOverrideStandaloneMethods(Class cls) {
-    struct methodInfo {
-        SEL sel;
-        IMP imp;
-        const char *type;
-    };
-
-    static const auto make = [](SEL sel, auto&& func) {
-        Method m = class_getInstanceMethod(NSObject.class, sel);
-        IMP superImp = method_getImplementation(m);
-        const char *type = method_getTypeEncoding(m);
-        IMP imp = imp_implementationWithBlock(func(sel, superImp));
-        return methodInfo{sel, imp, type};
-    };
-
-    static const methodInfo methods[] = {
-        make(@selector(removeObserver:forKeyPath:), [](SEL sel, IMP superImp) {
-            auto superFn = (void (*)(id, SEL, id, NSString *))superImp;
-            return ^(RLMObjectBase *self, id observer, NSString *keyPath) {
-                superFn(self, sel, observer, keyPath);
-                self->_observationInfo->removeObserver(observer, keyPath);
-            };
-        }),
-
-        make(@selector(removeObserver:forKeyPath:context:), [](SEL sel, IMP superImp) {
-            auto superFn = (void (*)(id, SEL, id, NSString *, void *))superImp;
-            return ^(RLMObjectBase *self, id observer, NSString *keyPath, void *context) {
-                superFn(self, sel, observer, keyPath, context);
-                self->_observationInfo->removeObserver(observer, keyPath, context);
-            };
-        })
-    };
-
-    for (auto const& m : methods)
-        class_addMethod(cls, m.sel, m.imp, m.type);
 }
 
 struct ObserverState {
