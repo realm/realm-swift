@@ -345,6 +345,15 @@ extern "C" {
     XCTAssertEqualObjects([objects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
+- (void)testDefaultRealmTransactionBlock {
+    [RLMRealm transactionInDefaultRealmWithBlock:^(RLMRealm *realm) {
+        [StringObject createInRealm:realm withObject:@[@"f"]];
+    }];
+    RLMResults *objects = [StringObject allObjects];
+    XCTAssertEqual(objects.count, 1U, @"Expecting 1 object");
+    XCTAssertEqualObjects([objects.firstObject stringCol], @"f", @"Expecting column to be 'f'");
+}
+
 - (void)testAutorefreshAfterBackgroundUpdate {
     RLMRealm *realm = [self realmWithTestPath];
 

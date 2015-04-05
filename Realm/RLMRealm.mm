@@ -545,6 +545,16 @@ static void CheckReadWrite(RLMRealm *realm, NSString *msg=@"Cannot write to a re
     }
 }
 
++ (void)transactionInDefaultRealmWithBlock:(void(^)(RLMRealm *))block
+{
+    RLMRealm *defaultRealm = [self defaultRealm];
+    [defaultRealm beginWriteTransaction];
+    block(defaultRealm);
+    if (defaultRealm->_inWriteTransaction) {
+        [defaultRealm commitWriteTransaction];
+    }
+}
+
 - (void)cancelWriteTransaction {
     CheckReadWrite(self);
     RLMCheckThread(self);
