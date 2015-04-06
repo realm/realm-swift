@@ -307,13 +307,29 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(Realm().objects(SwiftPrimaryStringObject).count, 4)
     }
 
-    // test NSNull for object
-    // test NSNull for list
+    func testCreateWithNSNullLinks() {
+        let values = [
+            "boolCol": true as NSNumber,
+            "intCol": 1 as NSNumber,
+            "floatCol": 1.1 as NSNumber,
+            "doubleCol": 11.1 as NSNumber,
+            "stringCol": "b" as NSString,
+            "binaryCol": "b".dataUsingEncoding(NSUTF8StringEncoding)! as NSData,
+            "dateCol": NSDate(timeIntervalSince1970: 2) as NSDate,
+            "objectCol": NSNull(),
+            "arrayCol": NSNull(),
+        ]
+
+        realmWithTestPath().beginWrite()
+        let object = realmWithTestPath().create(SwiftObject.self, value: values)
+        realmWithTestPath().commitWrite()
+
+        XCTAssertNil(object.objectCol)
+        XCTAssertEqual(object.arrayCol.count, 0)
+    }
+
     // test null object
     // test null list
-    // test literals with standalone objects
-    // test literals with existing objects
-    // test literals with existing lists
 
     // MARK: Add tests
     func testAddWithExisingNestedObjects() {
