@@ -24,7 +24,7 @@
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
     @public
-    tightdb::Row _row;
+    realm::Row _row;
 }
 
 @end

@@ -28,20 +28,20 @@
 - (void)testPropertyTypes
 {
     // Primitive types
-    XCTAssertEqual((int)RLMPropertyTypeInt,     (int)tightdb::type_Int,         @"Int");
-    XCTAssertEqual((int)RLMPropertyTypeBool,    (int)tightdb::type_Bool,        @"Bool");
-    XCTAssertEqual((int)RLMPropertyTypeFloat,   (int)tightdb::type_Float,       @"Float");
-    XCTAssertEqual((int)RLMPropertyTypeDouble,  (int)tightdb::type_Double,      @"Double");
+    XCTAssertEqual((int)RLMPropertyTypeInt,     (int)realm::type_Int,         @"Int");
+    XCTAssertEqual((int)RLMPropertyTypeBool,    (int)realm::type_Bool,        @"Bool");
+    XCTAssertEqual((int)RLMPropertyTypeFloat,   (int)realm::type_Float,       @"Float");
+    XCTAssertEqual((int)RLMPropertyTypeDouble,  (int)realm::type_Double,      @"Double");
     
     // Object types
-    XCTAssertEqual((int)RLMPropertyTypeString,  (int)tightdb::type_String,      @"String");
-    XCTAssertEqual((int)RLMPropertyTypeData,    (int)tightdb::type_Binary,      @"Binary");
-    XCTAssertEqual((int)RLMPropertyTypeAny,     (int)tightdb::type_Mixed,       @"Mixed");
-    XCTAssertEqual((int)RLMPropertyTypeDate,    (int)tightdb::type_DateTime,    @"Date");
+    XCTAssertEqual((int)RLMPropertyTypeString,  (int)realm::type_String,      @"String");
+    XCTAssertEqual((int)RLMPropertyTypeData,    (int)realm::type_Binary,      @"Binary");
+    XCTAssertEqual((int)RLMPropertyTypeAny,     (int)realm::type_Mixed,       @"Mixed");
+    XCTAssertEqual((int)RLMPropertyTypeDate,    (int)realm::type_DateTime,    @"Date");
     
     // Array/Linked object types
-    XCTAssertEqual((int)RLMPropertyTypeObject,  (int)tightdb::type_Link,        @"Link");
-    XCTAssertEqual((int)RLMPropertyTypeArray,   (int)tightdb::type_LinkList,    @"Link list");
+    XCTAssertEqual((int)RLMPropertyTypeObject,  (int)realm::type_Link,        @"Link");
+    XCTAssertEqual((int)RLMPropertyTypeArray,   (int)realm::type_LinkList,    @"Link list");
     
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeString),   @"string",  @"stringType");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeInt),      @"int",     @"intType");

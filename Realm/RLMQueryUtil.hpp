@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <vector>
 
-namespace tightdb {
+namespace realm {
     class Query;
     class Table;
     class TableView;
@@ -32,11 +32,11 @@ extern NSString * const RLMPropertiesComparisonTypeMismatchException;
 extern NSString * const RLMUnsupportedTypesFoundInPropertyComparisonException;
 
 // apply the given predicate to the passed in query, returning the updated query
-void RLMUpdateQueryWithPredicate(tightdb::Query *query, NSPredicate *predicate, RLMSchema *schema,
+void RLMUpdateQueryWithPredicate(realm::Query *query, NSPredicate *predicate, RLMSchema *schema,
                                  RLMObjectSchema *objectSchema);
 
 // sort an existing view by the specified property name and direction
-void RLMUpdateViewWithOrder(tightdb::TableView &view, RLMObjectSchema *schema, NSArray *properties);
+void RLMUpdateViewWithOrder(realm::TableView &view, RLMObjectSchema *schema, NSArray *properties);
 
 // return column index - throw for invalid column name
 NSUInteger RLMValidatedColumnIndex(RLMObjectSchema *schema, NSString *columnName);

@@ -108,7 +108,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 }
 
 // String conversion utilities
-static inline NSString * RLMStringDataToNSString(tightdb::StringData stringData) {
+static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),
                   "Need runtime overflow check for size_t to NSUInteger conversion");
     return [[NSString alloc] initWithBytes:stringData.data()
@@ -116,14 +116,14 @@ static inline NSString * RLMStringDataToNSString(tightdb::StringData stringData)
                                   encoding:NSUTF8StringEncoding];
 }
 
-static inline tightdb::StringData RLMStringDataWithNSString(NSString *string) {
+static inline realm::StringData RLMStringDataWithNSString(NSString *string) {
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");
-    return tightdb::StringData(string.UTF8String,
+    return realm::StringData(string.UTF8String,
                                [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
 // Binary convertion utilities
-static inline tightdb::BinaryData RLMBinaryDataForNSData(NSData *data) {
-    return tightdb::BinaryData(static_cast<const char *>(data.bytes), data.length);
+static inline realm::BinaryData RLMBinaryDataForNSData(NSData *data) {
+    return realm::BinaryData(static_cast<const char *>(data.bytes), data.length);
 }

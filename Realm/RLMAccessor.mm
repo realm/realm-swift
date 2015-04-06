@@ -62,7 +62,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
     if (row == obj->_row.get_index()) {
         return;
     }
-    if (row != tightdb::not_found) {
+    if (row != realm::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%lld'.", propName, val];
         @throw RLMException(reason);
     }
@@ -116,12 +116,12 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, NSString *propName,
                                      __unsafe_unretained NSString *const val) {
     RLMVerifyInWriteTransaction(obj);
-    tightdb::StringData str = RLMStringDataWithNSString(val);
+    realm::StringData str = RLMStringDataWithNSString(val);
     size_t row = obj->_row.get_table()->find_first_string(colIndex, str);
     if (row == obj->_row.get_index()) {
         return;
     }
-    if (row != tightdb::not_found) {
+    if (row != realm::not_found) {
         NSString *reason = [NSString stringWithFormat:@"Can't set primary key property '%@' to existing value '%@'.", propName, val];
         @throw RLMException(reason);
     }
@@ -136,19 +136,19 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
 // date getter/setter
 static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
-    tightdb::DateTime dt = obj->_row.get_datetime(colIndex);
+    realm::DateTime dt = obj->_row.get_datetime(colIndex);
     return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
     RLMVerifyInWriteTransaction(obj);
     std::time_t time = date.timeIntervalSince1970;
-    obj->_row.set_datetime(colIndex, tightdb::DateTime(time));
+    obj->_row.set_datetime(colIndex, realm::DateTime(time));
 }
 
 // data getter/setter
 static inline NSData *RLMGetData(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
-    tightdb::BinaryData data = obj->_row.get_binary(colIndex);
+    realm::BinaryData data = obj->_row.get_binary(colIndex);
     return [NSData dataWithBytes:data.data() length:data.size()];
 }
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSData *const data) {
@@ -219,7 +219,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline RLMArray *RLMGetArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSString *const objectClassName) {
     RLMVerifyAttached(obj);
 
-    tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
+    realm::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
     RLMArrayLinkView *ar = [RLMArrayLinkView arrayWithObjectClassName:objectClassName
                                                                  view:linkView
                                                                 realm:obj->_realm];
@@ -230,7 +230,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                RLMCreationOptions options=0) {
     RLMVerifyInWriteTransaction(obj);
 
-    tightdb::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
+    realm::LinkViewRef linkView = obj->_row.get_linklist(colIndex);
     // remove all old
     // FIXME: make sure delete rules don't purge objects
     linkView->clear();
@@ -245,7 +245,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj, NSUInteger col_ndx) {
     RLMVerifyAttached(obj);
 
-    tightdb::Mixed mixed = obj->_row.get_mixed(col_ndx);
+    realm::Mixed mixed = obj->_row.get_mixed(col_ndx);
     switch (mixed.get_type()) {
         case RLMPropertyTypeString:
             return RLMStringDataToNSString(mixed.get_string());
@@ -260,7 +260,7 @@ static inline id RLMGetAnyProperty(__unsafe_unretained RLMObjectBase *const obj,
         case RLMPropertyTypeDate:
             return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
         case RLMPropertyTypeData: {
-            tightdb::BinaryData bd = mixed.get_binary();
+            realm::BinaryData bd = mixed.get_binary();
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
             return d;
         }
@@ -288,7 +288,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         return;
     }
     if (NSDate *date = RLMDynamicCast<NSDate>(val)) {
-        obj->_row.set_mixed(col_ndx, tightdb::DateTime(time_t([date timeIntervalSince1970])));
+        obj->_row.set_mixed(col_ndx, realm::DateTime(time_t([date timeIntervalSince1970])));
         return;
     }
     if (NSData *data = RLMDynamicCast<NSData>(val)) {

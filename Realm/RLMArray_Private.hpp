@@ -21,7 +21,7 @@
 
 #import <memory>
 
-namespace tightdb {
+namespace realm {
     class LinkView;
     class Query;
     class TableView;
@@ -56,7 +56,7 @@ namespace tightdb {
 //
 @interface RLMArrayLinkView : RLMArray
 + (instancetype)arrayWithObjectClassName:(NSString *)objectClassName
-                                    view:(tightdb::LinkViewRef)view
+                                    view:(realm::LinkViewRef)view
                                    realm:(RLMRealm *)realm;
 @end
 
@@ -66,12 +66,12 @@ namespace tightdb {
 //
 @interface RLMResults ()
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<tightdb::Query>)query
+                                     query:(std::unique_ptr<realm::Query>)query
                                      realm:(RLMRealm *)realm;
 
 + (instancetype)resultsWithObjectClassName:(NSString *)objectClassName
-                                     query:(std::unique_ptr<tightdb::Query>)query
-                                      view:(tightdb::TableView)view
+                                     query:(std::unique_ptr<realm::Query>)query
+                                      view:(realm::TableView)view
                                      realm:(RLMRealm *)realm;
 - (void)deleteObjectsFromRealm;
 @end
@@ -86,7 +86,7 @@ namespace tightdb {
                                           realm:(RLMRealm *)realm;
 @end
 
-// RLMResults backed by a tightdb::Table directly rather than using a TableView
+// RLMResults backed by a realm::Table directly rather than using a TableView
 @interface RLMTableResults : RLMResults
 + (RLMResults *)tableResultsWithObjectSchema:(RLMObjectSchema *)objectSchema realm:(RLMRealm *)realm;
 @end

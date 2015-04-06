@@ -38,7 +38,7 @@
 
 @implementation RLMObjectSchema {
     // table accessor optimization
-    tightdb::TableRef _table;
+    realm::TableRef _table;
 }
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
@@ -181,7 +181,7 @@
 // generate a schema from a table - specify the custom class name for the dynamic
 // class and the name to be used in the schema - used for migrations and dynamic interface
 +(instancetype)schemaFromTableForClassName:(NSString *)className realm:(RLMRealm *)realm {
-    tightdb::TableRef table = RLMTableForObjectClass(realm, className);
+    realm::TableRef table = RLMTableForObjectClass(realm, className);
     if (!table) {
         return nil;
     }
@@ -199,7 +199,7 @@
         prop.column = col;
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             // set link type for objects and arrays
-            tightdb::TableRef linkTable = table->get_link_target(col);
+            realm::TableRef linkTable = table->get_link_target(col);
             prop.objectClassName = RLMClassForTableName(@(linkTable->get_name().data()));
         }
 
@@ -241,7 +241,7 @@
     // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];
 
-    // _table not copied as it's tightdb::Group-specific
+    // _table not copied as it's realm::Group-specific
     return schema;
 }
 
@@ -259,7 +259,7 @@
     schema->_propertiesByName = _propertiesByName;
     schema->_primaryKeyProperty = _primaryKeyProperty;
 
-    // _table not copied as it's tightdb::Group-specific
+    // _table not copied as it's realm::Group-specific
     return schema;
 }
 
@@ -291,27 +291,27 @@
     return [NSString stringWithFormat:@"%@ {\n%@}", self.className, propertiesString];
 }
 
-- (tightdb::Table *)table {
+- (realm::Table *)table {
     if (!_table) {
         _table = RLMTableForObjectClass(_realm, _className);
     }
     return _table.get();
 }
 
-- (void)setTable:(tightdb::Table *)table {
+- (void)setTable:(realm::Table *)table {
     _table.reset(table);
 }
 
 @end
 
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                          NSString *className,
                                          bool &created) {
     NSString *tableName = RLMTableNameForClass(className);
     return realm.group->get_or_add_table(tableName.UTF8String, &created);
 }
 
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm,
+realm::TableRef RLMTableForObjectClass(RLMRealm *realm,
                                          NSString *className) {
     NSString *tableName = RLMTableNameForClass(className);
     return realm.group->get_table(tableName.UTF8String);

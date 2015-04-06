@@ -106,7 +106,7 @@
             // FIXME: replace with count of distinct once we support indexing
 
             // FIXME: support other types
-            tightdb::Table *table = objectSchema.table;
+            realm::Table *table = objectSchema.table;
             NSUInteger count = table->size();
             if (primaryProperty.type == RLMPropertyTypeString) {
                 if (!table->has_search_index(primaryProperty.column)) {

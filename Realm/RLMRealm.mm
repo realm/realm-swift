@@ -36,8 +36,8 @@
 #include <tightdb/version.hpp>
 
 using namespace std;
-using namespace tightdb;
-using namespace tightdb::util;
+using namespace realm;
+using namespace realm::util;
 
 // Notification Token
 
@@ -58,8 +58,8 @@ using namespace tightdb::util;
 @end
 
 using namespace std;
-using namespace tightdb;
-using namespace tightdb::util;
+using namespace realm;
+using namespace realm::util;
 
 //
 // Global encryption key cache and validation
@@ -144,7 +144,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
 }
 
 + (BOOL)isCoreDebug {
-    return tightdb::Version::has_feature(tightdb::feature_Debug);
+    return realm::Version::has_feature(realm::feature_Debug);
 }
 
 + (void)initialize {
@@ -175,8 +175,8 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
                 _group = _readGroup.get();
             }
             else {
-                _replication = tightdb::makeWriteLogCollector(path.UTF8String, false,
-                                                              static_cast<const char *>(key.bytes));
+                _replication = realm::makeWriteLogCollector(path.UTF8String, false,
+                                                            static_cast<const char *>(key.bytes));
                 SharedGroup::DurabilityLevel durability = inMemory ? SharedGroup::durability_MemOnly :
                                                                      SharedGroup::durability_Full;
                 _sharedGroup = make_unique<SharedGroup>(*_replication, durability,
@@ -221,7 +221,7 @@ static NSString * const c_defaultRealmFileName = @"default.realm";
     return self;
 }
 
-- (tightdb::Group *)getOrCreateGroup {
+- (realm::Group *)getOrCreateGroup {
     if (!_group) {
         _group = &const_cast<Group&>(_sharedGroup->begin_read());
     }
