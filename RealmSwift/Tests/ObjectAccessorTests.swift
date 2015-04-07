@@ -90,16 +90,35 @@ class ObjectAccessorTests: TestCase {
         realm.write {
             let obj = SwiftAllIntSizesObject()
 
-            obj.int8  = v8
-            XCTAssertEqual(obj.int8, v8)
-            obj.int16 = v16
-            XCTAssertEqual(obj.int16, v16)
-            obj.int32 = v32
-            XCTAssertEqual(obj.int32, v32)
-            obj.int64 = v64
-            XCTAssertEqual(obj.int64, v64)
+            let testObject: Void -> Void = {
+                func setAndTestValue<O: Object, T: Equatable>(object: O, #value: T, #getter: (O) ->(T), #setter: (O, T) -> ()) {
+                    setter(object, value)
+                    XCTAssertEqual(getter(object), value)
+                }
+
+                obj.objectSchema.properties.map { $0.name }.map { obj[$0] = 0 }
+
+                setAndTestValue(obj, value: v8, getter: { Int8($0["int8"]! as Int) }, setter: { $0["int8"] = Int($1) as NSNumber })
+                setAndTestValue(obj, value: v16, getter: { Int16($0["int16"]! as Int) }, setter: { $0["int16"] = Int($1) as NSNumber })
+                setAndTestValue(obj, value: v32, getter: { Int32($0["int32"]! as Int) }, setter: { $0["int32"] = Int($1) as NSNumber })
+                setAndTestValue(obj, value: v64, getter: { Int64($0["int64"]! as Int) }, setter: { $0["int64"] = Int($1) as NSNumber })
+
+                setAndTestValue(obj, value: v8, getter: { Int8($0.valueForKey("int8")! as Int) }, setter: { $0.setValue(Int($1) as NSNumber, forKey: "int8") })
+                setAndTestValue(obj, value: v16, getter: { Int16($0.valueForKey("int16")! as Int) }, setter: { $0.setValue(Int($1) as NSNumber, forKey: "int16") })
+                setAndTestValue(obj, value: v32, getter: { Int32($0.valueForKey("int32")! as Int) }, setter: { $0.setValue(Int($1) as NSNumber, forKey: "int32") })
+                setAndTestValue(obj, value: v64, getter: { Int64($0.valueForKey("int64")! as Int) }, setter: { $0.setValue(Int($1) as NSNumber, forKey: "int64") })
+
+                setAndTestValue(obj, value: v8, getter: {$0.int8}, setter: {_ = $0.int8 = $1})
+                setAndTestValue(obj, value: v16, getter: {$0.int16}, setter: {_ = $0.int16 = $1})
+                setAndTestValue(obj, value: v32, getter: {$0.int32}, setter: {_ = $0.int32 = $1})
+                setAndTestValue(obj, value: v64, getter: {$0.int64}, setter: {_ = $0.int64 = $1})
+            }
+
+            testObject()
 
             realm.add(obj)
+
+            testObject()
         }
 
         let obj = realm.objects(SwiftAllIntSizesObject).first!
