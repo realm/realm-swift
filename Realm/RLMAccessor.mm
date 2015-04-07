@@ -410,7 +410,7 @@ static IMP RLMAccessorSetter(RLMProperty *prop, char accessorCode) {
         case 'f': return RLMMakeSetter<float>(colIndex, prop.isPrimary);
         case 'd': return RLMMakeSetter<double>(colIndex, prop.isPrimary);
         case 'B': return RLMMakeSetter<bool>(colIndex, prop.isPrimary);
-        case 'c': return RLMMakeSetter<BOOL, bool>(colIndex, prop.isPrimary);
+        case 'c': return prop.type == RLMPropertyTypeBool ? RLMMakeSetter<BOOL, bool>(colIndex, prop.isPrimary) : RLMMakeSetter<int8_t, long long>(colIndex, prop.isPrimary);
         case 'S': return RLMMakeSetter<NSString *>(colIndex, prop.isPrimary);
         case 'a': return RLMMakeSetter<NSDate *>(colIndex, prop.isPrimary);
         case 'e': return RLMMakeSetter<NSData *>(colIndex, prop.isPrimary);
@@ -701,7 +701,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *obj, __unsafe_unretained NSS
         case 'f': return @(RLMGetFloat(obj, col));
         case 'd': return @(RLMGetDouble(obj, col));
         case 'B': return @(RLMGetBool(obj, col));
-        case 'c': return @(RLMGetBool(obj, col));
+        case 'c': return @(prop.type == RLMPropertyTypeBool ? RLMGetBool(obj, col) : (int8_t)RLMGetLong(obj, col));
         case 'S': return RLMGetString(obj, col);
         case 'a': return RLMGetDate(obj, col);
         case 'e': return RLMGetData(obj, col);
