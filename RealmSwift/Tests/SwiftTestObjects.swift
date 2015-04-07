@@ -91,6 +91,7 @@ class SwiftAggregateObject: Object {
 }
 
 class SwiftAllIntSizesObject: Object {
+    dynamic var int8  : Int8  = 0
     dynamic var int16 : Int16 = 0
     dynamic var int32 : Int32 = 0
     dynamic var int64 : Int64 = 0

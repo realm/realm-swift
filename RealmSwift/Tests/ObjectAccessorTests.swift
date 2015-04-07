@@ -82,6 +82,7 @@ class ObjectAccessorTests: TestCase {
     func testIntSizes() {
         let realm = realmWithTestPath()
 
+        let v8  = Int8(1)  << 6
         let v16 = Int16(1) << 12
         let v32 = Int32(1) << 30
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
@@ -89,6 +90,8 @@ class ObjectAccessorTests: TestCase {
         realm.write {
             let obj = SwiftAllIntSizesObject()
 
+            obj.int8  = v8
+            XCTAssertEqual(obj.int8, v8)
             obj.int16 = v16
             XCTAssertEqual(obj.int16, v16)
             obj.int32 = v32
@@ -100,6 +103,7 @@ class ObjectAccessorTests: TestCase {
         }
 
         let obj = realm.objects(SwiftAllIntSizesObject).first!
+        XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
