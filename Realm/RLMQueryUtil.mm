@@ -25,7 +25,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 
-#include <tightdb.hpp>
+#include <realm.hpp>
 using namespace realm;
 
 NSString * const RLMPropertiesComparisonTypeMismatchException = @"RLMPropertiesComparisonTypeMismatchException";

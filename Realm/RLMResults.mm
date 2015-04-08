@@ -29,7 +29,7 @@
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
-#import <tightdb/table_view.hpp>
+#import <realm/table_view.hpp>
 
 //
 // RLMResults implementation

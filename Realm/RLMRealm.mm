@@ -32,8 +32,8 @@
 #include <sys/sysctl.h>
 #include <sys/types.h>
 
-#include <tightdb/commit_log.hpp>
-#include <tightdb/version.hpp>
+#include <realm/commit_log.hpp>
+#include <realm/version.hpp>
 
 using namespace std;
 using namespace realm;

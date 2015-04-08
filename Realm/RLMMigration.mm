@@ -28,8 +28,8 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/table_view.hpp>
+#import <realm/link_view.hpp>
+#import <realm/table_view.hpp>
 
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call

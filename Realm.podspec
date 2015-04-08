@@ -46,10 +46,10 @@ Pod::Spec.new do |s|
   s.preserve_paths          = %w(build.sh)
 
   s.ios.deployment_target   = '7.0'
-  s.ios.vendored_library    = 'core/libtightdb-ios.a'
+  s.ios.vendored_library    = 'core/librealm-ios.a'
 
   s.osx.deployment_target   = '10.9'
-  s.osx.vendored_library    = 'core/libtightdb.a'
+  s.osx.vendored_library    = 'core/librealm.a'
 
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.h'

@@ -26,7 +26,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/link_view.hpp>
+#import <realm/link_view.hpp>
 
 @implementation RLMArray {
     // array for standalone

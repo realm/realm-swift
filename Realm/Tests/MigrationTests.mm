@@ -26,7 +26,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMObjectStore.h"
 
-#import <tightdb/table.hpp>
+#import <realm/table.hpp>
 
 @interface MigrationObject : RLMObject
 @property int intCol;

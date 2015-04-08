@@ -19,8 +19,8 @@
 #import "RLMRealm_Private.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/group.hpp>
+#import <realm/link_view.hpp>
+#import <realm/group.hpp>
 #import <pthread.h>
 
 namespace realm {

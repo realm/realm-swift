@@ -23,7 +23,7 @@
 
  See [Realm Models](http://realm.io/docs/cocoa/latest/#models)
  */
-// Make sure numbers match those in <tightdb/data_type.hpp>
+// Make sure numbers match those in <realm/data_type.hpp>
 typedef NS_ENUM(int32_t, RLMPropertyType) {
     ////////////////////////////////
     // Primitive types

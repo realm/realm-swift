@@ -19,8 +19,8 @@
 #import <Realm/RLMConstants.h>
 #import <objc/runtime.h>
 
-#import <tightdb/binary_data.hpp>
-#import <tightdb/string_data.hpp>
+#import <realm/binary_data.hpp>
+#import <realm/string_data.hpp>
 
 @class RLMObjectSchema;
 @class RLMProperty;

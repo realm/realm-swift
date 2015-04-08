@@ -26,7 +26,7 @@
 #import "RLMUtil.hpp"
 
 #import <objc/runtime.h>
-#import <tightdb/group.hpp>
+#import <realm/group.hpp>
 
 NSString * const c_objectTableNamePrefix = @"class_";
 const char * const c_metadataTableName = "metadata";

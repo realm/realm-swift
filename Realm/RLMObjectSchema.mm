@@ -28,7 +28,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/group.hpp>
+#import <realm/group.hpp>
 
 // private properties
 @interface RLMObjectSchema ()
