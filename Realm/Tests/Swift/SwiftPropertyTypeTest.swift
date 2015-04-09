@@ -37,15 +37,15 @@ class SwiftPropertyTypeTest: SwiftTestCase {
         
         let objects = SwiftIntObject.allObjectsInRealm(realm)
         XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
-        XCTAssertEqual((objects[0] as SwiftIntObject).intCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual((objects[1] as SwiftIntObject).intCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual((objects[2] as SwiftIntObject).intCol, negativeLongNumber, "-2 ^ 34 expected")
+        XCTAssertEqual((objects[0] as! SwiftIntObject).intCol, longNumber, "2 ^ 34 expected")
+        XCTAssertEqual((objects[1] as! SwiftIntObject).intCol, intNumber, "2 ^ 31 - 1 expected")
+        XCTAssertEqual((objects[2] as! SwiftIntObject).intCol, negativeLongNumber, "-2 ^ 34 expected")
         
         realm.beginWriteTransaction()
-        (objects[0] as SwiftIntObject).intCol = updatedLongNumber
+        (objects[0] as! SwiftIntObject).intCol = updatedLongNumber
         realm.commitWriteTransaction()
         
-        XCTAssertEqual((objects[0] as SwiftIntObject).intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssertEqual((objects[0] as! SwiftIntObject).intCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
     func testIntSizes() {
@@ -68,7 +68,7 @@ class SwiftPropertyTypeTest: SwiftTestCase {
             realm.addObject(obj)
         }
 
-        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0]! as SwiftAllIntSizesObject
+        let obj = SwiftAllIntSizesObject.allObjectsInRealm(realm)[0]! as! SwiftAllIntSizesObject
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
@@ -94,7 +94,7 @@ class SwiftPropertyTypeTest: SwiftTestCase {
             realm.addObject(obj)
         }
 
-        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0]! as AllIntSizesObject
+        let obj = AllIntSizesObject.allObjectsInRealm(realm)[0]! as! AllIntSizesObject
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)

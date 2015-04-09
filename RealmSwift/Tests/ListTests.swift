@@ -163,10 +163,10 @@ class ListTests: TestCase {
 
     func testValueForKey() {
         let expected = map(array) { $0.stringCol }
-        let actual = array.valueForKey("stringCol") as [String]!
+        let actual = array.valueForKey("stringCol") as! [String]!
         XCTAssertEqual(expected, actual)
 
-        XCTAssertEqual(map(array) { $0 }, array.valueForKey("self") as [SwiftStringObject])
+        XCTAssertEqual(map(array) { $0 }, array.valueForKey("self") as! [SwiftStringObject])
     }
 
     func testSetValueForKey() {

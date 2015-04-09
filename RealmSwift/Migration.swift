@@ -206,10 +206,10 @@ private func accessorMigrationBlock(migrationBlock: MigrationBlock) -> RLMMigrat
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
         for objectSchema in migration.oldSchema.objectSchema {
-            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+            (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
         }
         for objectSchema in migration.newSchema.objectSchema {
-            (objectSchema as RLMObjectSchema).accessorClass = MigrationObject.self
+            (objectSchema as! RLMObjectSchema).accessorClass = MigrationObject.self
         }
 
         // run migration

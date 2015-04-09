@@ -41,7 +41,7 @@ class SwiftDynamicTests: SwiftTestCase {
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertEqual(dynSchema.properties.count, Int(2))
         XCTAssertEqual(dynSchema.properties[0].name!, "stringCol")
-        XCTAssertEqual((dynSchema.properties[1] as RLMProperty).type, RLMPropertyType.Int)
+        XCTAssertEqual((dynSchema.properties[1] as! RLMProperty).type, RLMPropertyType.Int)
 
         // verify object type
         let array = SwiftDynamicObject.allObjectsInRealm(dyrealm)
@@ -63,8 +63,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("SwiftDynamicObject")
 
-        XCTAssertTrue((array[0] as RLMObject)["intCol"] as NSNumber == 1)
-        XCTAssertTrue((array[1] as RLMObject)["stringCol"] as String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // FIXME: Uncomment once Swift-defined models support RLMPropertyTypeAny
@@ -126,7 +126,7 @@ class SwiftDynamicTests: SwiftTestCase {
         XCTAssertNotNil(dynSchema, "Should be able to get object schema dynamically")
         XCTAssertTrue(dynSchema.properties.count == 2)
         XCTAssertTrue(dynSchema.properties[0].name! == "stringCol")
-        XCTAssertTrue((dynSchema.properties[1] as RLMProperty).type == RLMPropertyType.Int)
+        XCTAssertTrue((dynSchema.properties[1] as! RLMProperty).type == RLMPropertyType.Int)
 
         // verify object type
         let array = DynamicObject.allObjectsInRealm(dyrealm)
@@ -148,8 +148,8 @@ class SwiftDynamicTests: SwiftTestCase {
         let dyrealm = dynamicRealmWithTestPathAndSchema(nil)
         let array = dyrealm.allObjects("DynamicObject")
 
-        XCTAssertTrue((array[0] as RLMObject)["intCol"] as NSNumber == 1)
-        XCTAssertTrue((array[1] as RLMObject)["stringCol"] as String == "column2")
+        XCTAssertTrue((array[0] as! RLMObject)["intCol"] as! NSNumber == 1)
+        XCTAssertTrue((array[1] as! RLMObject)["stringCol"] as! String == "column2")
     }
 
     // these helper functions make the below test not take five minutes to compile
@@ -201,16 +201,16 @@ class SwiftDynamicTests: SwiftTestCase {
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for idx in 0..<10 {
-            let prop = schema.properties[idx] as RLMProperty
-            XCTAssertTrue(obj1[idx].isEqual((array[0] as RLMObject)[prop.name]))
-            XCTAssertTrue(obj2[idx].isEqual((array[1] as RLMObject)[prop.name]))
+            let prop = schema.properties[idx] as! RLMProperty
+            XCTAssertTrue(obj1[idx].isEqual((array[0] as! RLMObject)[prop.name]))
+            XCTAssertTrue(obj2[idx].isEqual((array[1] as! RLMObject)[prop.name]))
         }
 
         // check sub object type
-        XCTAssertTrue((schema.properties[10] as RLMProperty).objectClassName! == "StringObject")
+        XCTAssertTrue((schema.properties[10] as! RLMProperty).objectClassName! == "StringObject")
 
         // check object equality
-        XCTAssertNil((array[0] as RLMObject)["objectCol"], "object should be nil")
-        XCTAssertTrue(((array[1] as RLMObject)["objectCol"] as RLMObject)["stringCol"] as String == "string")
+        XCTAssertNil((array[0] as! RLMObject)["objectCol"], "object should be nil")
+        XCTAssertTrue(((array[1] as! RLMObject)["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
     }
 }

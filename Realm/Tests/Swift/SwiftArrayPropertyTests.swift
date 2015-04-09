@@ -38,7 +38,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         array.name = "arrayObject"
         array.array.addObject(string)
         XCTAssertEqual(array.array.count, UInt(1))
-        XCTAssertEqual((array.array.firstObject() as SwiftStringObject).stringCol, "string")
+        XCTAssertEqual((array.array.firstObject() as! SwiftStringObject).stringCol, "string")
 
         realm.beginWriteTransaction()
         realm.addObject(array)
@@ -48,7 +48,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let arrayObjects = SwiftArrayPropertyObject.allObjectsInRealm(realm)
 
         XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single SwiftStringObject in the realm")
-        var cmp = (arrayObjects.firstObject() as SwiftArrayPropertyObject).array.firstObject() as SwiftStringObject
+        var cmp = (arrayObjects.firstObject() as! SwiftArrayPropertyObject).array.firstObject() as! SwiftStringObject
         XCTAssertTrue(string.isEqualToObject(cmp), "First array object should be the string object we added")
     }
 
@@ -68,9 +68,9 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.array.count, UInt(3), "Should have three elements in array")
-        XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
-        XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
-        XCTAssertEqual((array.array[2] as SwiftStringObject).stringCol, "a", "Third element should have property value 'a'")
+        XCTAssertEqual((array.array[0] as! SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
+        XCTAssertEqual((array.array[1] as! SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
+        XCTAssertEqual((array.array[2] as! SwiftStringObject).stringCol, "a", "Third element should have property value 'a'")
 
         for obj in array.array {
             XCTAssertFalse(obj.description.isEmpty, "Object should have description")
@@ -92,8 +92,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.count, UInt(2), "Should have two elements in array")
-        XCTAssertEqual((array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
-        XCTAssertEqual((array[1] as SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
+        XCTAssertEqual((array[0] as! SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
+        XCTAssertEqual((array[1] as! SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
     }
 
     func testInsertMultiple() {
@@ -109,8 +109,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let children = SwiftStringObject.allObjectsInRealm(realm)
-        XCTAssertEqual((children[0] as SwiftStringObject).stringCol, "a", "First child should be 'a'")
-        XCTAssertEqual((children[1] as SwiftStringObject).stringCol, "b", "Second child should be 'b'")
+        XCTAssertEqual((children[0] as! SwiftStringObject).stringCol, "a", "First child should be 'a'")
+        XCTAssertEqual((children[1] as! SwiftStringObject).stringCol, "b", "Second child should be 'b'")
     }
 
     // FIXME: Support standalone RLMArray's in Swift-defined models
@@ -159,7 +159,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         let arrayObjects = ArrayPropertyObject.allObjectsInRealm(realm)
 
         XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single StringObject in the realm")
-        var cmp = (arrayObjects.firstObject() as ArrayPropertyObject).array.firstObject() as StringObject
+        var cmp = (arrayObjects.firstObject() as! ArrayPropertyObject).array.firstObject() as! StringObject
         XCTAssertTrue(string.isEqualToObject(cmp), "First array object should be the string object we added")
     }
 
@@ -179,9 +179,9 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.array.count, UInt(3), "Should have three elements in array")
-        XCTAssertEqual((array.array[0] as StringObject).stringCol!, "a", "First element should have property value 'a'")
-        XCTAssertEqual((array.array[1] as StringObject).stringCol!, "b", "Second element should have property value 'b'")
-        XCTAssertEqual((array.array[2] as StringObject).stringCol!, "a", "Third element should have property value 'a'")
+        XCTAssertEqual((array.array[0] as! StringObject).stringCol!, "a", "First element should have property value 'a'")
+        XCTAssertEqual((array.array[1] as! StringObject).stringCol!, "b", "Second element should have property value 'b'")
+        XCTAssertEqual((array.array[2] as! StringObject).stringCol!, "a", "Third element should have property value 'a'")
 
         for idx in 0..<array.array.count {
             if let obj = array.array[idx] as? StringObject {
@@ -205,8 +205,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.count, UInt(2), "Should have two elements in array")
-        XCTAssertEqual((array[0] as StringObject).stringCol!, "a", "First element should have property value 'a'")
-        XCTAssertEqual((array[1] as StringObject).stringCol!, "b", "Second element should have property value 'b'")
+        XCTAssertEqual((array[0] as! StringObject).stringCol!, "a", "First element should have property value 'a'")
+        XCTAssertEqual((array[1] as! StringObject).stringCol!, "b", "Second element should have property value 'b'")
     }
 
     func testInsertMultiple_objc() {
@@ -222,8 +222,8 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         let children = StringObject.allObjectsInRealm(realm)
-        XCTAssertEqual((children[0] as StringObject).stringCol!, "a", "First child should be 'a'")
-        XCTAssertEqual((children[1] as StringObject).stringCol!, "b", "Second child should be 'b'")
+        XCTAssertEqual((children[0] as! StringObject).stringCol!, "a", "First child should be 'a'")
+        XCTAssertEqual((children[1] as! StringObject).stringCol!, "b", "Second child should be 'b'")
     }
 
     func testStandalone_objc() {
@@ -243,7 +243,7 @@ class SwiftArrayPropertyTests: SwiftTestCase {
         realm.commitWriteTransaction()
 
         XCTAssertEqual(array.array.count, UInt(2), "Should have two elements in array")
-        XCTAssertEqual((array.array[0] as StringObject).stringCol!, "a", "First element should have property value 'a'")
-        XCTAssertEqual((array.array[1] as StringObject).stringCol!, "a", "Second element should have property value 'a'")
+        XCTAssertEqual((array.array[0] as! StringObject).stringCol!, "a", "First element should have property value 'a'")
+        XCTAssertEqual((array.array[1] as! StringObject).stringCol!, "a", "Second element should have property value 'a'")
     }
 }

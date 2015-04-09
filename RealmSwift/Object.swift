@@ -216,7 +216,7 @@ public class Object: RLMObjectBase, Equatable, Printable {
     private func listProperty(key: String) -> RLMListBase? {
         if let prop = RLMObjectBaseObjectSchema(self)?[key] {
             if prop.type == .Array {
-                return object_getIvar(self, prop.swiftListIvar) as RLMListBase?
+                return object_getIvar(self, prop.swiftListIvar) as! RLMListBase?
             }
         }
         return nil
@@ -303,7 +303,7 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func initializeListProperty(object: RLMObjectBase?, property: RLMProperty?, array: RLMArray?) {
-        let list = (object as Object)[property!.name]! as RLMListBase
+        let list = (object as! Object)[property!.name]! as! RLMListBase
         list._rlmArray = array
     }
 }
