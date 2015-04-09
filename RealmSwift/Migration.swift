@@ -162,7 +162,7 @@ public final class Migration {
     :param: className The name of the `Object` class to enumerate.
     :param: block     The block providing both the old and new versions of an object in this Realm.
     */
-    public func enumerate(objectClassName: String, block: MigrationObjectEnumerateBlock) {
+    public func enumerate(objectClassName: String, _ block: MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(objectClassName) {
             block(oldObject: unsafeBitCast($0, MigrationObject.self), newObject: unsafeBitCast($1, MigrationObject.self))
         }

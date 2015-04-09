@@ -124,15 +124,15 @@ public final class Results<T: Object>: Printable {
     public subscript(index: Int) -> T {
         get {
             throwForNegativeIndex(index)
-            return rlmResults[UInt(index)] as T
+            return rlmResults[UInt(index)] as! T
         }
     }
 
     /// Returns the first object in the results, or `nil` if empty.
-    public var first: T? { return rlmResults.firstObject() as T? }
+    public var first: T? { return rlmResults.firstObject() as! T? }
 
     /// Returns the last object in the results, or `nil` if empty.
-    public var last: T? { return rlmResults.lastObject() as T? }
+    public var last: T? { return rlmResults.lastObject() as! T? }
 
     // MARK: KVC
 
@@ -218,7 +218,7 @@ public final class Results<T: Object>: Printable {
     :returns: The minimum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func min<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.minOfProperty(property) as U?
+        return rlmResults.minOfProperty(property) as! U?
     }
 
     /**
@@ -231,7 +231,7 @@ public final class Results<T: Object>: Printable {
     :returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
     public func max<U: MinMaxType>(property: String) -> U? {
-        return rlmResults.maxOfProperty(property) as U?
+        return rlmResults.maxOfProperty(property) as! U?
     }
 
     /**
@@ -244,7 +244,7 @@ public final class Results<T: Object>: Printable {
     :returns: The sum of the given property over all objects in the Results.
     */
     public func sum<U: AddableType>(property: String) -> U {
-        return rlmResults.sumOfProperty(property) as AnyObject as U
+        return rlmResults.sumOfProperty(property) as AnyObject as! U
     }
 
     /**
@@ -257,7 +257,7 @@ public final class Results<T: Object>: Printable {
     :returns: The average of the given property over all objects in the Results.
     */
     public func average<U: AddableType>(property: String) -> U {
-        return rlmResults.averageOfProperty(property) as AnyObject as U
+        return rlmResults.averageOfProperty(property) as AnyObject as! U
     }
 }
 
@@ -268,7 +268,7 @@ extension Results: CollectionType {
     public func generate() -> GeneratorOf<T> {
         let base = NSFastGenerator(rlmResults)
         return GeneratorOf<T>() {
-            return base.next() as T?
+            return base.next() as! T?
         }
     }
 

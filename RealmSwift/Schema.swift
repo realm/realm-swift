@@ -35,7 +35,7 @@ public final class Schema: Printable {
     /// `ObjectSchema`s for all object types in this Realm. Meant
     /// to be used during migrations for dynamic introspection.
     public var objectSchema: [ObjectSchema] {
-        return (rlmSchema.objectSchema as [RLMObjectSchema]).map { ObjectSchema($0) }
+        return (rlmSchema.objectSchema as! [RLMObjectSchema]).map { ObjectSchema($0) }
     }
 
     /// Returns a human-readable description of the object schemas contained in this schema.
