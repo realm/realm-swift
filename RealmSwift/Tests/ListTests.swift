@@ -389,7 +389,7 @@ class ListTests: TestCase {
 
         // Make sure we can enumerate
         for obj in array {
-            XCTAssertTrue(countElements(obj.description) > 0, "Object should have description")
+            XCTAssertTrue(count(obj.description) > 0, "Object should have description")
         }
     }
 }
