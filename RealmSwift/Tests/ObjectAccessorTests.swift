@@ -74,7 +74,7 @@ class ObjectAccessorTests: TestCase {
     func testPersistedAccessors() {
         let object = SwiftObject()
         Realm().beginWrite()
-        Realm().create(SwiftObject.self)
+        Realm().create(SwiftObject)
         setAndTestAllProperties(object)
         Realm().commitWrite()
     }
@@ -99,7 +99,7 @@ class ObjectAccessorTests: TestCase {
             realm.add(obj)
         }
 
-        let obj = realm.objects(SwiftAllIntSizesObject.self).first!
+        let obj = realm.objects(SwiftAllIntSizesObject).first!
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
         XCTAssertEqual(obj.int64, v64)
@@ -119,7 +119,7 @@ class ObjectAccessorTests: TestCase {
         realm.create(SwiftIntObject.self, value: [negativeLongNumber])
         realm.commitWrite()
 
-        let objects = realm.objects(SwiftIntObject.self)
+        let objects = realm.objects(SwiftIntObject)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].intCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].intCol, intNumber, "2 ^ 31 - 1 expected")

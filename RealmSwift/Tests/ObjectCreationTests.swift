@@ -120,14 +120,14 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithDefaults() {
         let realm = Realm()
-        assertThrows(realm.create(SwiftObject.self), "Must be in write transaction")
+        assertThrows(realm.create(SwiftObject), "Must be in write transaction")
 
         var object: SwiftObject!
         let objects = realm.objects(SwiftObject)
         XCTAssertEqual(0, objects.count)
         realm.write {
             // test create with all defaults
-            object = realm.create(SwiftObject.self)
+            object = realm.create(SwiftObject)
             return
         }
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false, boolObjectListValues: [])
