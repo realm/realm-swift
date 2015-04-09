@@ -95,8 +95,8 @@ class ListTests: TestCase {
     }
 
     func testIndexOfPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
 
         XCTAssertNil(array.indexOf(pred1))
         XCTAssertNil(array.indexOf(pred2))
@@ -190,8 +190,8 @@ class ListTests: TestCase {
     }
 
     func testFilterPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
 
         XCTAssertEqual(Int(0), array.filter(pred1).count)
         XCTAssertEqual(Int(0), array.filter(pred2).count)
@@ -419,8 +419,8 @@ class ListStandaloneTests: ListTests {
     }
 
     override func testFilterPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "noSuchCol = '2'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")
 
         assertThrows(self.array.filter(pred1))
         assertThrows(self.array.filter(pred2))
@@ -432,8 +432,8 @@ class ListStandaloneTests: ListTests {
     }
 
     override func testIndexOfPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "noSuchCol = '2'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "noSuchCol = '2'")
 
         assertThrows(self.array.indexOf(pred1))
         assertThrows(self.array.indexOf(pred2))

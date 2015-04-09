@@ -121,9 +121,9 @@ class ResultsTests: TestCase {
     }
 
     func testIndexOfPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
-        let pred3 = NSPredicate(format: "stringCol = '3'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(Int(0), results.indexOf(pred1)!)
         XCTAssertEqual(Int(1), results.indexOf(pred2)!)
@@ -180,9 +180,9 @@ class ResultsTests: TestCase {
     }
 
     func testFilterPredicate() {
-        let pred1 = NSPredicate(format: "stringCol = '1'")!
-        let pred2 = NSPredicate(format: "stringCol = '2'")!
-        let pred3 = NSPredicate(format: "stringCol = '3'")!
+        let pred1 = NSPredicate(format: "stringCol = '1'")
+        let pred2 = NSPredicate(format: "stringCol = '2'")
+        let pred3 = NSPredicate(format: "stringCol = '3'")
 
         XCTAssertEqual(Int(1), results.filter(pred1).count)
         XCTAssertEqual(Int(1), results.filter(pred2).count)
