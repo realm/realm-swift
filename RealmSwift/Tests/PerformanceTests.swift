@@ -31,6 +31,7 @@ private func createStringObjects(factor: Int) -> Realm {
     }
     return realm
 }
+
 private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!
@@ -72,6 +73,12 @@ class SwiftPerformanceTests: TestCase {
         measureMetrics(self.dynamicType.defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
             _ = block()
         }
+    }
+
+    private func copyRealmToTestPath(realm: Realm) -> Realm {
+        NSFileManager.defaultManager().removeItemAtPath(testRealmPath(), error: nil)
+        realm.writeCopyToPath(testRealmPath())
+        return realmWithTestPath()
     }
 
     func testInsertMultiple() {
@@ -118,15 +125,8 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func getStringObjects(factor: Int) -> Realm {
-        let realm = Realm(inMemoryIdentifier: factor.description)
-        NSFileManager.defaultManager().removeItemAtPath(testRealmPath(), error: nil)
-        realm.writeCopyToPath(testRealmPath())
-        return realmWithTestPath()
-    }
-
     func testCountWhereQuery() {
-        let realm = getStringObjects(50)
+        let realm = copyRealmToTestPath(largeRealm)
         measureBlock {
             let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
             _ = results.count
@@ -134,7 +134,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testCountWhereTableView() {
-        let realm = getStringObjects(50)
+        let realm = copyRealmToTestPath(largeRealm)
         measureBlock {
             let results = realm.objects(SwiftStringObject).filter("stringCol = 'a'")
             _ = results.first
@@ -143,7 +143,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndAccessQuery() {
-        let realm = getStringObjects(5)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             for stringObject in realm.objects(SwiftStringObject).filter("stringCol = 'a'") {
                 let string = stringObject.stringCol
@@ -152,7 +152,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndAccessAll() {
-        let realm = getStringObjects(5)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             for stringObject in realm.objects(SwiftStringObject) {
                 let string = stringObject.stringCol
@@ -161,7 +161,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndAccessAllSlow() {
-        let realm = getStringObjects(5)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             let results = realm.objects(SwiftStringObject)
             for i in 0..<results.count {
@@ -171,7 +171,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndAccessArrayProperty() {
-        let realm = getStringObjects(5)
+        let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
         realm.commitWrite()
@@ -184,7 +184,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndAccessArrayPropertySlow() {
-        let realm = getStringObjects(5)
+        let realm = copyRealmToTestPath(mediumRealm)
         realm.beginWrite()
         let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self, value: ["name", map(realm.objects(SwiftStringObject)) { $0 }, []])
         realm.commitWrite()
@@ -198,7 +198,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndMutateAll() {
-        let realm =  getStringObjects(10)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             realm.write {
                 for stringObject in realm.objects(SwiftStringObject) {
@@ -209,7 +209,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndMutateQuery() {
-        let realm =  getStringObjects(1)
+        let realm = copyRealmToTestPath(mediumRealm)
         measureBlock {
             realm.write {
                 for stringObject in realm.objects(SwiftStringObject).filter("stringCol != 'b'") {
@@ -232,7 +232,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testDeleteAll() {
         inMeasureBlock {
-            let realm = self.getStringObjects(5)
+            let realm = self.copyRealmToTestPath(mediumRealm)
             self.startMeasuring()
             realm.write {
                 realm.delete(realm.objects(SwiftStringObject))
@@ -243,7 +243,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testQueryDeletion() {
         inMeasureBlock {
-            let realm = self.getStringObjects(5)
+            let realm = self.copyRealmToTestPath(mediumRealm)
             self.startMeasuring()
             realm.write {
                 realm.delete(realm.objects(SwiftStringObject).filter("stringCol = 'a' OR stringCol = 'b'"))
@@ -254,7 +254,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testManualDeletion() {
         inMeasureBlock {
-            let realm = self.getStringObjects(5)
+            let realm = self.copyRealmToTestPath(mediumRealm)
             let objects = map(realm.objects(SwiftStringObject)) { $0 }
             self.startMeasuring()
             realm.write {
