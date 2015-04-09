@@ -141,8 +141,8 @@ class ResultsTests: TestCase {
         XCTAssertEqual(str1, results[0])
         XCTAssertEqual(str2, results[1])
 
-        assertThrows(results[200])
-        assertThrows(results[-200])
+        assertThrows(self.results[200])
+        assertThrows(self.results[-200])
     }
 
     func testFirst() {
@@ -198,7 +198,7 @@ class ResultsTests: TestCase {
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(results.sorted("noSuchCol"))
+        assertThrows(self.results.sorted("noSuchCol"))
     }
 
     func testSortWithDescriptor() {

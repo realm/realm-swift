@@ -129,14 +129,14 @@ class ListTests: TestCase {
 
         array[0] = str2
         XCTAssertEqual(str2, array[0])
-        assertThrows(array[-1] = str2)
+        assertThrows(self.array[-1] = self.str2)
 
         array.append(str1)
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(array[200])
-        assertThrows(array[-200])
+        assertThrows(self.array[200])
+        assertThrows(self.array[-200])
     }
 
     func testFirst() {
@@ -216,7 +216,7 @@ class ListTests: TestCase {
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(array.sorted("noSuchCol"))
+        assertThrows(self.array.sorted("noSuchCol"))
     }
 
     func testSortWithDescriptors() {
@@ -308,8 +308,8 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(array.insert(str2, atIndex: 200))
-        assertThrows(array.insert(str2, atIndex: -200))
+        assertThrows(self.array.insert(self.str2, atIndex: 200))
+        assertThrows(self.array.insert(self.str2, atIndex: -200))
     }
 
     func testRemoveAtIndex() {
@@ -319,8 +319,8 @@ class ListTests: TestCase {
         XCTAssertEqual(str1, array[0])
         XCTAssertEqual(str1, array[1])
 
-        assertThrows(array.removeAtIndex(200))
-        assertThrows(array.removeAtIndex(-200))
+        assertThrows(self.array.removeAtIndex(200))
+        assertThrows(self.array.removeAtIndex(-200))
     }
 
     func testRemoveLast() {
@@ -360,8 +360,8 @@ class ListTests: TestCase {
         XCTAssertEqual(str2, array[0])
         XCTAssertEqual(str2, array[1])
 
-        assertThrows(array.replace(200, object: str2))
-        assertThrows(array.replace(-200, object: str2))
+        assertThrows(self.array.replace(200, object: self.str2))
+        assertThrows(self.array.replace(-200, object: self.str2))
     }
 
     func testChangesArePersisted() {
@@ -404,39 +404,39 @@ class ListStandaloneTests: ListTests {
     // MARK: Things not implemented in standalone
 
     override func testSortWithProperty() {
-        assertThrows(array.sorted("stringCol", ascending: true))
-        assertThrows(array.sorted("noSuchCol"))
+        assertThrows(self.array.sorted("stringCol", ascending: true))
+        assertThrows(self.array.sorted("noSuchCol"))
     }
 
     override func testSortWithDescriptors() {
-        assertThrows(array.sorted([SortDescriptor(property: "intCol", ascending: true)]))
-        assertThrows(array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
+        assertThrows(self.array.sorted([SortDescriptor(property: "intCol", ascending: true)]))
+        assertThrows(self.array.sorted([SortDescriptor(property: "noSuchCol", ascending: true)]))
     }
 
     override func testFilterFormat() {
-        assertThrows(array.filter("stringCol = '1'"))
-        assertThrows(array.filter("noSuchCol = '1'"))
+        assertThrows(self.array.filter("stringCol = '1'"))
+        assertThrows(self.array.filter("noSuchCol = '1'"))
     }
 
     override func testFilterPredicate() {
         let pred1 = NSPredicate(format: "stringCol = '1'")!
         let pred2 = NSPredicate(format: "noSuchCol = '2'")!
 
-        assertThrows(array.filter(pred1))
-        assertThrows(array.filter(pred2))
+        assertThrows(self.array.filter(pred1))
+        assertThrows(self.array.filter(pred2))
     }
 
     override func testIndexOfFormat() {
-        assertThrows(array.indexOf("stringCol = %@", "1"))
-        assertThrows(array.indexOf("noSuchCol = %@", "1"))
+        assertThrows(self.array.indexOf("stringCol = %@", "1"))
+        assertThrows(self.array.indexOf("noSuchCol = %@", "1"))
     }
 
     override func testIndexOfPredicate() {
         let pred1 = NSPredicate(format: "stringCol = '1'")!
         let pred2 = NSPredicate(format: "noSuchCol = '2'")!
 
-        assertThrows(array.indexOf(pred1))
-        assertThrows(array.indexOf(pred2))
+        assertThrows(self.array.indexOf(pred1))
+        assertThrows(self.array.indexOf(pred2))
     }
 }
 
