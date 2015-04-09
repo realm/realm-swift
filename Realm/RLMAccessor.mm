@@ -472,7 +472,7 @@ static IMP RLMAccessorStandaloneSetter(RLMProperty *prop, char accessorCode) {
 
 // getter type strings
 // NOTE: this typecode is really the the first charachter of the objc/runtime.h type
-//       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
+//       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
 static const char *getterTypeStringForObjcCode(char code) {
     switch (code) {
         case 's': return GETTER_TYPES("s");
@@ -490,7 +490,7 @@ static const char *getterTypeStringForObjcCode(char code) {
 
 // setter type strings
 // NOTE: this typecode is really the the first charachter of the objc/runtime.h type
-//       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
+//       the @ type maps to multiple core types (string, date, array, mixed, any which are id in objc)
 static const char *setterTypeStringForObjcCode(char code) {
     switch (code) {
         case 's': return SETTER_TYPES("s");

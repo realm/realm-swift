@@ -421,7 +421,7 @@
 		3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUpdateChecker.mm; sourceTree = "<group>"; };
 		3F44109E19953F5900223146 /* RLMTestObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
-		3F6B89AE19EF40BA004E8EA8 /* libtightdb-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-ios.a"; path = "../core/libtightdb-ios.a"; sourceTree = "<group>"; };
+		3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "librealm-ios.a"; path = "../core/librealm-ios.a"; sourceTree = "<group>"; };
 		3F8DCA5719930F550008BD7F /* iOS Device Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS Device Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
@@ -718,7 +718,7 @@
 			isa = PBXGroup;
 			children = (
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
-				3F6B89AE19EF40BA004E8EA8 /* libtightdb-ios.a */,
+				3F6B89AE19EF40BA004E8EA8 /* librealm-ios.a */,
 				E81A1F621955FC9300FDED82 /* Realm-Info.plist */,
 				02E334C21A5F3C45009F8810 /* module.modulemap */,
 			);
@@ -1561,8 +1561,8 @@
 				MACH_O_TYPE = mh_dylib;
 				METAL_ENABLE_DEBUG_INFO = YES;
 				MODULEMAP_FILE = Realm/module.modulemap;
-				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
-				OTHER_LIBTOOLFLAGS = "-ltightdb-ios-dbg";
+				OTHER_LDFLAGS = "-lrealm-ios-dbg";
+				OTHER_LIBTOOLFLAGS = "-lrealm-ios-dbg";
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1595,8 +1595,8 @@
 				MACH_O_TYPE = mh_dylib;
 				METAL_ENABLE_DEBUG_INFO = NO;
 				MODULEMAP_FILE = Realm/module.modulemap;
-				OTHER_LDFLAGS = "-ltightdb-ios";
-				OTHER_LIBTOOLFLAGS = "-ltightdb-ios";
+				OTHER_LDFLAGS = "-lrealm-ios";
+				OTHER_LIBTOOLFLAGS = "-lrealm-ios";
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1705,8 +1705,8 @@
 				MACH_O_TYPE = staticlib;
 				METAL_ENABLE_DEBUG_INFO = YES;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
-				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
-				OTHER_LIBTOOLFLAGS = "-ltightdb-ios-dbg";
+				OTHER_LDFLAGS = "-lrealm-ios-dbg";
+				OTHER_LIBTOOLFLAGS = "-lrealm-ios-dbg";
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1736,8 +1736,8 @@
 				MACH_O_TYPE = staticlib;
 				METAL_ENABLE_DEBUG_INFO = NO;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
-				OTHER_LDFLAGS = "-ltightdb-ios";
-				OTHER_LIBTOOLFLAGS = "-ltightdb-ios";
+				OTHER_LDFLAGS = "-lrealm-ios";
+				OTHER_LIBTOOLFLAGS = "-lrealm-ios";
 				PRODUCT_NAME = Realm;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1908,7 +1908,6 @@
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Realm/Realm-Info.plist";
@@ -1917,7 +1916,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
-				OTHER_LDFLAGS = "-ltightdb-dbg";
+				OTHER_LDFLAGS = "-lrealm-dbg";
 				PRODUCT_NAME = Realm;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1937,7 +1936,6 @@
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Realm/Realm-Info.plist";
@@ -1946,7 +1944,7 @@
 				LIBRARY_SEARCH_PATHS = core;
 				MACH_O_TYPE = mh_dylib;
 				MODULEMAP_FILE = "$(SRCROOT)/Realm/module.modulemap";
-				OTHER_LDFLAGS = "-ltightdb";
+				OTHER_LDFLAGS = "-lrealm";
 				PRODUCT_NAME = Realm;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -1966,7 +1964,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
@@ -1993,7 +1990,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Applications/Xcode6-Beta2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
 					core/include,
 				);
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
