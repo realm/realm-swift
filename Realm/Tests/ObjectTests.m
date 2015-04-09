@@ -418,13 +418,13 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
     AllTypesObject *c = [[AllTypesObject alloc] init];
     
-    c.BoolCol   = NO;
-    c.IntCol  = 54;
-    c.FloatCol = 0.7f;
-    c.DoubleCol = 0.8;
-    c.StringCol = @"foo";
-    c.BinaryCol = bin1;
-    c.DateCol = timeZero;
+    c.boolCol   = NO;
+    c.intCol  = 54;
+    c.floatCol = 0.7f;
+    c.doubleCol = 0.8;
+    c.stringCol = @"foo";
+    c.binaryCol = bin1;
+    c.dateCol = timeZero;
     c.cBoolCol = false;
     c.longCol = 99;
     c.mixedCol = @"string";
