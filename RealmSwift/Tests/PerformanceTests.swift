@@ -209,7 +209,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testEnumerateAndMutateQuery() {
-        let realm = copyRealmToTestPath(mediumRealm)
+        let realm = copyRealmToTestPath(smallRealm)
         measureBlock {
             realm.write {
                 for stringObject in realm.objects(SwiftStringObject).filter("stringCol != 'b'") {
