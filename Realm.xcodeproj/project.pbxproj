@@ -1844,6 +1844,7 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
@@ -1891,6 +1892,7 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_FILE = "$(PRODUCT_NAME)_vers.m";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
