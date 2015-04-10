@@ -20,7 +20,14 @@
 
 #import <Realm/Realm.h>
 #import <Realm/RLMRealmUtil.h>
-#import <XCTest/XCTestCase.h>
+
+@implementation RLMAutoreleasePoolTestCase
+- (void)invokeTest {
+    @autoreleasepool {
+        [super invokeTest];
+    }
+}
+@end
 
 void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;

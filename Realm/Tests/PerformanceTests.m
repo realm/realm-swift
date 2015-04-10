@@ -40,6 +40,22 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [super tearDown];
 }
 
+- (void)measureBlock:(void (^)(void))block {
+    [super measureBlock:^{
+        @autoreleasepool {
+            block();
+        }
+    }];
+}
+
+- (void)measureMetrics:(NSArray *)metrics automaticallyStartMeasuring:(BOOL)automaticallyStartMeasuring forBlock:(void (^)(void))block {
+    [super measureMetrics:metrics automaticallyStartMeasuring:automaticallyStartMeasuring forBlock:^{
+        @autoreleasepool {
+            block();
+        }
+    }];
+}
+
 + (RLMRealm *)createStringObjects:(int)factor {
     RLMRealm *realm = [RLMRealm inMemoryRealmWithIdentifier:@(factor).stringValue];
     [realm beginWriteTransaction];
@@ -69,7 +85,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testInsertSingleLiteral {
     [self measureBlock:^{
         RLMRealm *realm = self.realmWithTestPath;
-        for (int i = 0; i < 500; ++i) {
+        for (int i = 0; i < 50; ++i) {
             [realm beginWriteTransaction];
             [StringObject createInRealm:realm withObject:@[@"a"]];
             [realm commitWriteTransaction];
@@ -178,7 +194,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndMutateAll {
-    RLMRealm *realm = [self getStringObjects:10];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];

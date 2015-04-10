@@ -23,16 +23,19 @@ import Foundation
 class RealmTests: TestCase {
     override func setUp() {
         super.setUp()
-        realmWithTestPath().write {
-            self.realmWithTestPath().create(SwiftStringObject.self, value: ["1"])
-            self.realmWithTestPath().create(SwiftStringObject.self, value: ["2"])
-            self.realmWithTestPath().create(SwiftStringObject.self, value: ["3"])
-        }
 
-        Realm().write {
-            Realm().create(SwiftIntObject.self, value: [100])
-            Realm().create(SwiftIntObject.self, value: [200])
-            Realm().create(SwiftIntObject.self, value: [300])
+        autoreleasepool {
+            self.realmWithTestPath().write {
+                self.realmWithTestPath().create(SwiftStringObject.self, value: ["1"])
+                self.realmWithTestPath().create(SwiftStringObject.self, value: ["2"])
+                self.realmWithTestPath().create(SwiftStringObject.self, value: ["3"])
+            }
+
+            Realm().write {
+                Realm().create(SwiftIntObject.self, value: [100])
+                Realm().create(SwiftIntObject.self, value: [200])
+                Realm().create(SwiftIntObject.self, value: [300])
+            }
         }
     }
 

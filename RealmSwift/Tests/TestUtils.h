@@ -17,8 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <XCTest/XCTestCase.h>
 
-@class XCTestCase;
+// An XCTestCase that invokes each test in an autorelease pool
+// Works around a swift 1.1 limitation where `super` can't be used in a block
+@interface RLMAutoreleasePoolTestCase : XCTestCase
+@end
 
 FOUNDATION_EXTERN void RLMAssertThrows(XCTestCase *self, dispatch_block_t block, NSString *message, NSString *fileName, NSUInteger lineNumber);
 

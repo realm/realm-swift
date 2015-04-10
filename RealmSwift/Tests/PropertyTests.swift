@@ -26,10 +26,12 @@ class PropertyTests: TestCase {
 
     override func setUp() {
         super.setUp()
-        let schema = Realm().schema
-        primitiveProperty = schema["SwiftObject"]!["intCol"]!
-        linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
-        primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+        autoreleasepool {
+            let schema = Realm().schema
+            self.primitiveProperty = schema["SwiftObject"]!["intCol"]!
+            self.linkProperty = schema["SwiftOptionalObject"]!["optObjectCol"]!
+            self.primaryProperty = schema["SwiftPrimaryStringObject"]!["stringCol"]!
+        }
     }
 
     func testName() {

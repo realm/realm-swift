@@ -16,13 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
-import RealmSwift
+import Foundation
 import Realm
 import Realm.Private
-import Foundation
+import RealmSwift
+import XCTest
 
-class TestCase: XCTestCase {
+class TestCase: RLMAutoreleasePoolTestCase {
     var exceptionThrown = false
 
     func realmWithTestPath() -> Realm {
@@ -34,14 +34,7 @@ class TestCase: XCTestCase {
         NSFileManager.defaultManager().createDirectoryAtPath(realmPathForFile(""), withIntermediateDirectories: true, attributes: nil, error: nil)
 
         exceptionThrown = false
-
-        autoreleasepool {
-            self.setUp()
-        }
-        autoreleasepool {
-            self.invocation.invoke()
-            self.tearDown()
-        }
+        super.invokeTest()
 
         if exceptionThrown {
             RLMDeallocateRealm(Realm.defaultPath)
