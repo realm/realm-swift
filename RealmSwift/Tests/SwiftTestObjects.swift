@@ -146,7 +146,7 @@ class SwiftPrimaryStringObject: Object {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 
-    override class func primaryKey() -> String {
+    override class func primaryKey() -> String? {
         return "stringCol"
     }
 }
