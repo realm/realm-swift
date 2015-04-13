@@ -703,5 +703,48 @@
     RLMClearAccessorCache();
 }
 
+- (void)testAddingAndRemovingIndex {
+    RLMSchema *noIndex = [[RLMSchema alloc] init];
+    noIndex.objectSchema = @[[RLMObjectSchema schemaForObjectClass:StringObject.class]];
+
+    RLMSchema *index = [[RLMSchema alloc] init];
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    [objectSchema.properties[0] setIndexed:YES];
+    index.objectSchema = @[objectSchema];
+
+    // create realm file
+    @autoreleasepool { [self realmWithTestPathAndSchema:noIndex]; }
+
+    // should require a migration to open with indexed schema
+    XCTAssertThrows([self realmWithTestPathAndSchema:index]);
+
+    __block bool migrationApplied = false;
+    [RLMRealm setSchemaVersion:1
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                migrationApplied = true;
+            }];
+
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPathAndSchema:index]);
+        XCTAssertTrue(migrationApplied);
+    }
+
+    // should now require another migration to open with unindexed schema
+    XCTAssertThrows([self realmWithTestPathAndSchema:noIndex]);
+
+    migrationApplied = false;
+    [RLMRealm setSchemaVersion:2
+                forRealmAtPath:RLMTestRealmPath()
+            withMigrationBlock:^(__unused RLMMigration *migration, __unused NSUInteger oldSchemaVersion) {
+                migrationApplied = true;
+            }];
+
+    @autoreleasepool {
+        XCTAssertNoThrow([self realmWithTestPathAndSchema:noIndex]);
+        XCTAssertTrue(migrationApplied);
+    }
+}
+
 @end
 

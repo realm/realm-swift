@@ -64,6 +64,15 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
                 [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has been made a primary key.", tableProp.name]];
             }
         }
+        // don't double-complain about indexedness changing due to pk changing
+        else if (tableProp.indexed != schemaProp.indexed) {
+            if (tableProp.indexed) {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' is no longer indexed.", tableProp.name]];
+            }
+            else {
+                [exceptionMessages addObject:[NSString stringWithFormat:@"Property '%@' has had an index added.", tableProp.name]];
+            }
+        }
 
         // create new property with aligned column
         schemaProp.column = tableProp.column;
@@ -214,9 +223,21 @@ static bool RLMRealmCreateTables(RLMRealm *realm, RLMSchema *targetSchema, bool 
 
         // add missing columns
         for (RLMProperty *prop in objectSchema.properties) {
+            RLMProperty *tableProp = tableSchema[prop.name];
+
             // add any new properties (new name or different type)
-            if (RLMPropertyHasChanged(prop, tableSchema[prop.name])) {
+            if (RLMPropertyHasChanged(prop, tableProp)) {
                 RLMCreateColumn(realm, *objectSchema.table, prop);
+                changed = true;
+            }
+            // ensure search indexes for existing columns are up to date
+            else if (tableProp && prop.indexed != tableProp.indexed) {
+                if (prop.indexed) {
+                    objectSchema.table->add_search_index(tableProp.column);
+                }
+                else {
+                    objectSchema.table->remove_search_index(tableProp.column);
+                }
                 changed = true;
             }
         }
