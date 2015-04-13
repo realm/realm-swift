@@ -19,16 +19,16 @@
 #import "RLMRealm_Private.h"
 #import "RLMUtil.hpp"
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/group.hpp>
+#import <realm/link_view.hpp>
+#import <realm/group.hpp>
 #import <pthread.h>
 
-namespace tightdb {
+namespace realm {
     class Group;
 }
 
 @interface RLMRealm ()
-@property (nonatomic, readonly, getter=getOrCreateGroup) tightdb::Group *group;
+@property (nonatomic, readonly, getter=getOrCreateGroup) realm::Group *group;
 - (void)handleExternalCommit;
 @end
 

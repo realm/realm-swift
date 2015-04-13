@@ -89,17 +89,17 @@ static void RLMVerifyAndAlignColumns(RLMObjectSchema *tableSchema, RLMObjectSche
 
 // create a column for a property in a table
 // NOTE: must be called from within write transaction
-static void RLMCreateColumn(RLMRealm *realm, tightdb::Table &table, RLMProperty *prop) {
+static void RLMCreateColumn(RLMRealm *realm, realm::Table &table, RLMProperty *prop) {
     switch (prop.type) {
             // for objects and arrays, we have to specify target table
         case RLMPropertyTypeObject:
         case RLMPropertyTypeArray: {
-            tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
-            prop.column = table.add_column_link(tightdb::DataType(prop.type), prop.name.UTF8String, *linkTable);
+            realm::TableRef linkTable = RLMTableForObjectClass(realm, prop.objectClassName);
+            prop.column = table.add_column_link(realm::DataType(prop.type), prop.name.UTF8String, *linkTable);
             break;
         }
         default: {
-            prop.column = table.add_column(tightdb::DataType(prop.type), prop.name.UTF8String);
+            prop.column = table.add_column(realm::DataType(prop.type), prop.name.UTF8String);
             if (prop.indexed) {
                 // FIXME - support other types
                 if (prop.type != RLMPropertyTypeString) {
@@ -344,8 +344,8 @@ void RLMInitializeSwiftListAccessor(RLMObjectBase *object) {
 template<typename F>
 static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F primaryValueGetter, RLMCreationOptions options, bool &created) {
     // try to get existing row if updating
-    size_t rowIndex = tightdb::not_found;
-    tightdb::Table &table = *schema.table;
+    size_t rowIndex = realm::not_found;
+    realm::Table &table = *schema.table;
     RLMProperty *primaryProperty = schema.primaryKeyProperty;
     if ((options & RLMCreationOptionsUpdateOrCreate) && primaryProperty) {
         // get primary value
@@ -362,7 +362,7 @@ static inline NSUInteger RLMCreateOrGetRowForObject(RLMObjectSchema *schema, F p
 
     // if no existing, create row
     created = NO;
-    if (rowIndex == tightdb::not_found) {
+    if (rowIndex == realm::not_found) {
         rowIndex = table.add_empty_row();
         created = YES;
     }
@@ -540,7 +540,7 @@ RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicat
     }
 
     if (predicate) {
-        tightdb::Query query = objectSchema.table->where();
+        realm::Query query = objectSchema.table->where();
         RLMUpdateQueryWithPredicate(&query, predicate, realm.schema, objectSchema);
 
         // create and populate array
@@ -569,7 +569,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         return nil;
     }
 
-    size_t row = tightdb::not_found;
+    size_t row = realm::not_found;
     if (primaryProperty.type == RLMPropertyTypeString) {
         if (NSString *str = RLMDynamicCast<NSString>(key)) {
             row = objectSchema.table->find_first_string(primaryProperty.column, RLMStringDataWithNSString(str));
@@ -587,7 +587,7 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
         }
     }
 
-    if (row == tightdb::not_found) {
+    if (row == realm::not_found) {
         return nil;
     }
 

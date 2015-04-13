@@ -18,7 +18,7 @@
 
 #import "RLMObjectSchema_Private.h"
 
-namespace tightdb {
+namespace realm {
     class Table;
     template<typename T> class BasicTableRef;
     typedef BasicTableRef<Table> TableRef;
@@ -27,7 +27,7 @@ namespace tightdb {
 // RLMObjectSchema private
 @interface RLMObjectSchema ()
 
-@property (nonatomic) tightdb::Table *table;
+@property (nonatomic) realm::Table *table;
 
 // shallow copy reusing properties and property map
 - (instancetype)shallowCopy;
@@ -35,5 +35,5 @@ namespace tightdb {
 @end
 
 // get the table used to store object of objectClass
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className, bool &created);
-tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className);
+realm::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className, bool &created);
+realm::TableRef RLMTableForObjectClass(RLMRealm *realm, NSString *className);

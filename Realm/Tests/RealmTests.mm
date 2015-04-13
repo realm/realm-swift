@@ -48,9 +48,9 @@ extern "C" {
 
 - (void)testCoreDebug {
 #if DEBUG
-    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use libtightdb{-ios}-dbg");
+    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
 #else
-    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use libtightdb{-ios}");
+    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
 #endif
 }
 

@@ -18,13 +18,13 @@
 
 #import "RLMObject_Private.h"
 
-#import <tightdb/link_view.hpp> // required by row.hpp
-#import <tightdb/row.hpp>
+#import <realm/link_view.hpp> // required by row.hpp
+#import <realm/row.hpp>
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
     @public
-    tightdb::Row _row;
+    realm::Row _row;
 }
 
 @end

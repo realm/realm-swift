@@ -28,8 +28,8 @@
 #import "RLMResults_Private.h"
 #import "RLMSchema_Private.h"
 
-#import <tightdb/link_view.hpp>
-#import <tightdb/table_view.hpp>
+#import <realm/link_view.hpp>
+#import <realm/table_view.hpp>
 
 // The source realm for a migration has to use a SharedGroup to be able to share
 // the file with the destination realm, but we don't want to let the user call
@@ -106,7 +106,7 @@
             // FIXME: replace with count of distinct once we support indexing
 
             // FIXME: support other types
-            tightdb::Table *table = objectSchema.table;
+            realm::Table *table = objectSchema.table;
             NSUInteger count = table->size();
             if (primaryProperty.type == RLMPropertyTypeString) {
                 if (!table->has_search_index(primaryProperty.column)) {
