@@ -362,7 +362,7 @@ static id RLMAutorelease(id value) {
         if (readonly || (dynamic && !customSchema)) {
             // for readonly realms and dynamic realms without a custom schema just set the schema
             if (RLMRealmSchemaVersion(realm) == RLMNotVersioned) {
-                @throw RLMException(@"Cannot open an uninitialized realm in read-only mode");
+                RLMSetErrorOrThrow([NSError errorWithDomain:RLMErrorDomain code:RLMErrorFail userInfo:@{NSLocalizedDescriptionKey:@"Cannot open an uninitialized realm in read-only mode"}], outError);
             }
             RLMSchema *targetSchema = readonly ? [RLMSchema.sharedSchema copy] : [RLMSchema dynamicSchemaFromRealm:realm];
             RLMRealmSetSchema(realm, targetSchema, true);
