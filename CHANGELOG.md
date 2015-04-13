@@ -4,11 +4,19 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * `RLMCollection` supports collection KVC operations.
+* Sorting `RLMResults` is 2-5x faster (typically closer to 2x).
+* Refreshing `RLMRealm` after a write transaction which inserts or modifies
+  strings or `NSData` is committed on another thread is significantly faster.
 
 ### Bugfixes
 
 * `+[RLMSchema dynamicSchemaForRealm:]` now respects search indexes.
 * `+[RLMProperty isEqualToProperty:]` now checks for equal `indexed` properties.
+* Setting indexed string properties to strings with embedded NUL bytes now
+  throws an exception rather than crashing deep within the core library.
+* Fix incorrect results when querying an indexed property on an RLMArray.
+* Fix corruption of string indexes when an object is deleted when there are
+  duplicate values for the indexed property.
 
 0.91.1 Release notes (2015-03-12)
 =============================================================
