@@ -49,6 +49,6 @@ Pod::Spec.new do |s|
   s.subspec 'Headers' do |s|
     s.source_files          = 'include/**/*.{h,hpp}'
     s.public_header_files   = public_header_files
-    s.private_header_files  = 'include/Realm/*{ListBase,ObjectStore,Private,Dynamic}.h'
+    s.private_header_files  = 'include/Realm/*{RealmUtil,ListBase,ObjectStore,Private,Dynamic}.h'
   end
 end
